@@ -3,6 +3,7 @@
 # ---
 FROM node:16.3-buster as setup
 USER root
+# NOTE: maybe add "chokidar" if I can get it to work in script
 RUN npm install --global zx
 
 # ---
@@ -30,7 +31,6 @@ COPY ./yarn.lock .
 # user "node" in container as UID/GID of 1000
 COPY --chown=1000:1000 ./entrypoint.mjs .
 RUN chmod +x entrypoint.mjs
-RUN echo $NODE_ENV
 RUN yarn --pure-lockfile
 
 ENTRYPOINT [ "./entrypoint.mjs" ]
