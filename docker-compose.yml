@@ -1,0 +1,17 @@
+version: "3"
+services:
+
+  project:
+    build:
+      context: ./project
+      args:
+        NODE_ENV: "production"
+
+  database:
+    image: mongo:4.4-bionic
+    container_name: ${PROJECT_NAME}-database
+    environment:
+      MONGO_INITDB_ROOT_USERNAME: $MONGO_ROOT_USERNAME
+      MONGO_INITDB_ROOT_PASSWORD: $MONGO_ROOT_PASSWORD
+    volumes:
+      - ./data/mongo:/data/db
