@@ -1,6 +1,18 @@
 version: "3"
 services:
 
+  server:
+    image: caddy:2.4.3-alpine
+    container_name: server
+    environment:
+      HOST: $HOST
+    volumes:
+      - ./data/caddy/config:/config
+      - ./data/caddy/data:/data
+    ports:
+      - "80:80"
+      - "443:443"
+
   api:
     build:
       context: ./project

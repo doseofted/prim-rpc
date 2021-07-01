@@ -1,6 +1,11 @@
 version: "3"
 services:
 
+  server:
+    restart: "no"
+    volumes:
+      - ./caddy/dev.Caddyfile:/etc/caddy/Caddyfile
+
   api:
     build:
       args:

@@ -1,10 +1,16 @@
 version: "3"
 services:
 
+  server:
+    restart: "always"
+    volumes:
+      - ./caddy/prod.Caddyfile:/etc/caddy/Caddyfile
+
   api:
     build:
       args:
         NODE_ENV: "production"
+    restart: "always"
     environment:
       NODE_ENV: "production"
 

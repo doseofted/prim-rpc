@@ -1,0 +1,4 @@
+{$HOST},
+www.{$HOST} {
+  reverse_proxy api:3000
+}
