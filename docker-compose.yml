@@ -4,8 +4,6 @@ services:
   project:
     build:
       context: ./project
-    volumes:
-      - project_node_modules_cache:/home/node/node_modules
 
   database:
     image: mongo:4.4-bionic
@@ -15,6 +13,3 @@ services:
       MONGO_INITDB_ROOT_PASSWORD: $MONGO_ROOT_PASSWORD
     volumes:
       - ./data/mongo:/data/db
-
-volumes:
-  project_node_modules_cache:

@@ -3,14 +3,7 @@
 # ---
 FROM node:16.3-buster as setup
 USER root
-# RUN DEBIAN_FRONTEND=noninteractive apt-get update -qq && \
-#   DEBIAN_FRONTEND=noninteractive apt-get install -y -qq inotify-tools
-
 RUN npm install --global zx
-
-# REFERENCE: https://michaelb.org/the-right-way-to-do-global-npm-install-without-sudo/
-# RUN npm config set prefix ~/.local
-# ENV PATH=~/.local/bin/:$PATH
 
 # ---
 # Configure project build
@@ -39,12 +32,9 @@ COPY --chown=1000:1000 ./yarn.lock .
 RUN yarn --pure-lockfile
 # user "node" in container has UID/GID of 1000
 COPY --chown=1000:1000 --from=build /home/node/dist ./dist
-COPY --chown=1000:1000 ./entrypoint.mjs .
+COPY --chown=1000:1000 . .
+# NOTE: `src` folder is removed from final container but remains part of final Docker image
+RUN rm -fr src
 RUN chmod +x entrypoint.mjs
-
-# to use global dependency, I need to link it so module can be found from entrypoint script
-# USER root
-# WORKDIR /home/node
-# RUN npm link chokidar
 
 ENTRYPOINT [ "./entrypoint.mjs" ]
