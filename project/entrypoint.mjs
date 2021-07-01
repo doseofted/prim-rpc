@@ -18,18 +18,28 @@ try {
   echo`Could not gather project name from package.json`
 }
 
-// if (process.env.NODE_ENV === "development") {
-//   const watcher = chokidar.watch('./node_modules')
-//   watcher.on('change', (path, stats) => {
-//     echo`File changed: ${path}`
-//     $`(yarn check --integrity && yarn check --verify-tree) || yarn --pure-lockfile`
-//   });
-// }
+// NOTE: below is useful only if install is ran on host and not in container
+/* if (process.env.NODE_ENV === "development") {
+  echo`Currently in development mode. Running background tasks ...`
+  const watcher = chokidar.watch(['./package.json', 'yarn.lock'], { persistent: true })
+  let installing = false
+  watcher.on('change', async (path, _stats) => {
+    echo`File changed: ${path}`
+    if (!installing) {
+      installing = true
+      echo`Checking dependencies ...`
+      // REFERENCE: https://gist.github.com/armand1m/b8061bcc9e8e9a5c1303854290c7d61e
+      await $`(yarn check --integrity && yarn check --verify-tree) || yarn --pure-lockfile`
+      installing = false
+    }
+  })
+} */
 
-// echo`Checking dependencies ...`
-// REFERENCE: https://gist.github.com/armand1m/b8061bcc9e8e9a5c1303854290c7d61e
-// await $`(yarn check --integrity && yarn check --verify-tree) || yarn --pure-lockfile`
+if (process.env.NODE_ENV !== "production") {
+  echo`Running in ${process.env.NODE_ENV} mode. Building in background ...`
+  $`yarn build`
+}
 
-const args = process.argv.slice(3)
+const args = process.argv.slice(3).join(" ")
 echo`Starting app ...`
-$`yarn ${args.length > 0 ? args.join(" ") : "start"}`
+$`yarn ${args || "start"}`

@@ -3,6 +3,8 @@ import * as webpack from 'webpack'
 import nodeExternals from 'webpack-node-externals'
 
 const mode = process.env.NODE_ENV === "production" ? "production" : "development"
+console.log("Using", mode, "mode for build.")
+
 const config: webpack.Configuration = {
   mode,
   entry: './src/index.js',

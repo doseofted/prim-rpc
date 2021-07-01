@@ -4,16 +4,7 @@ services:
   project:
     build:
       context: ./project
-      args:
-        NODE_ENV: "production"
-    environment:
-      NODE_ENV: "development"
     volumes:
-      # development
-      - ./project/src:/home/node/src
-      - ./project/package.json:/home/node/package.json
-      - ./project/yarn.lock:/home/node/yarn.lock
-      # modules cache for development
       - project_node_modules_cache:/home/node/node_modules
 
   database:

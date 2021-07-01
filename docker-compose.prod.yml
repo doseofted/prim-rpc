@@ -1,0 +1,12 @@
+version: "3"
+services:
+
+  project:
+    build:
+      args:
+        NODE_ENV: "production"
+    environment:
+      NODE_ENV: "production"
+
+  database:
+    restart: "always"
