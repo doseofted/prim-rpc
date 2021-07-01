@@ -1,7 +1,7 @@
 version: "3"
 services:
 
-  project:
+  api:
     build:
       args:
         NODE_ENV: "development"
@@ -13,7 +13,7 @@ services:
       - ./project/package.json:/home/node/package.json
       - ./project/yarn.lock:/home/node/yarn.lock
 
-  database:
+  db:
     restart: "no"
 
 volumes:

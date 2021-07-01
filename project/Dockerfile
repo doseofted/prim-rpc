@@ -37,4 +37,6 @@ COPY --chown=1000:1000 . .
 RUN rm -fr src
 RUN chmod +x entrypoint.mjs
 
+EXPOSE 3000
+
 ENTRYPOINT [ "./entrypoint.mjs" ]

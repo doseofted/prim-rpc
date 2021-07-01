@@ -1,13 +1,14 @@
 version: "3"
 services:
 
-  project:
+  api:
     build:
       context: ./project
+    container_name: api
 
-  database:
+  db:
     image: mongo:4.4-bionic
-    container_name: ${PROJECT_NAME}-database
+    container_name: db
     environment:
       MONGO_INITDB_ROOT_USERNAME: $MONGO_ROOT_USERNAME
       MONGO_INITDB_ROOT_PASSWORD: $MONGO_ROOT_PASSWORD

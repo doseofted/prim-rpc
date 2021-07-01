@@ -1,12 +1,12 @@
 version: "3"
 services:
 
-  project:
+  api:
     build:
       args:
         NODE_ENV: "production"
     environment:
       NODE_ENV: "production"
 
-  database:
+  db:
     restart: "always"
