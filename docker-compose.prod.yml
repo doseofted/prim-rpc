@@ -1,7 +1,7 @@
 version: "3"
 services:
 
-  server:
+  proxy:
     restart: "always"
     volumes:
       - ./project/proxy/prod.Caddyfile:/etc/caddy/Caddyfile
@@ -11,6 +11,15 @@ services:
       args:
         NODE_ENV: "production"
     restart: "always"
+    environment:
+      NODE_ENV: "production"
+
+  ui:
+    build:
+      args:
+        NODE_ENV: "production"
+    restart: "always"
+    command: "serve --host=0.0.0.0 --port=3000"
     environment:
       NODE_ENV: "production"
 

@@ -1,11 +1,15 @@
-{
-  log {
-    output stdout
-    format json
-  }
+import base.Caddyfile
+
+www.{$HOST} {
+  redir https://{$HOST}{uri}
 }
 
-{$HOST},
-www.{$HOST} {
+{$HOST} {
+  reverse_proxy ui:3000
+}
+
+{$HOST}/api,
+{$HOST}/api/* {
+  uri strip_prefix /api
   reverse_proxy api:3000
 }

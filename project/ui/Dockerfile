@@ -29,6 +29,6 @@ COPY --chown=1000:1000 . .
 # NOTE: `src` folder is removed from final container but remains part of final Docker image
 RUN rm -fr src
 
-EXPOSE 5000
+EXPOSE 3000
 
 ENTRYPOINT [ "yarn" ]

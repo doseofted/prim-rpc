@@ -1,7 +1,7 @@
 version: "3"
 services:
 
-  server:
+  proxy:
     restart: "no"
     volumes:
       - ./project/proxy/dev.Caddyfile:/etc/caddy/Caddyfile
@@ -17,6 +17,21 @@ services:
       - ./project/api/src:/home/node/src
       - ./project/api/package.json:/home/node/package.json
       - ./project/api/yarn.lock:/home/node/yarn.lock
+
+  ui:
+    build:
+      args:
+        NODE_ENV: "development"
+    restart: "no"
+    command: "dev --host=0.0.0.0 --port=3000"
+    environment:
+      NODE_ENV: "development"
+    volumes:
+      - ./project/ui/public:/home/node/public
+      - ./project/ui/src:/home/node/src
+      - ./project/ui/index.html:/home/node/index.html
+      - ./project/ui/package.json:/home/node/package.json
+      - ./project/ui/yarn.lock:/home/node/yarn.lock
 
   db:
     restart: "no"

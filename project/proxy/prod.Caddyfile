@@ -1,4 +1,15 @@
-{$HOST},
+import base.Caddyfile
+
 www.{$HOST} {
+  redir https://{$HOST}{uri}
+}
+
+{$HOST} {
+  reverse_proxy ui:3000
+}
+
+{$HOST}/api,
+{$HOST}/api/* {
+  uri strip_prefix /api
   reverse_proxy api:3000
 }

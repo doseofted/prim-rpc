@@ -1,12 +1,13 @@
 version: "3"
 services:
 
-  server:
+  proxy:
     image: caddy:2.4.3-alpine
-    container_name: server
+    container_name: proxy
     environment:
       HOST: $HOST
     volumes:
+      - ./project/proxy/base.Caddyfile:/etc/caddy/base.Caddyfile
       - ./data/server/config:/config
       - ./data/server/data:/data
     ports:
@@ -17,6 +18,11 @@ services:
     build:
       context: ./project/api
     container_name: api
+
+  ui:
+    build:
+      context: ./project/ui
+    container_name: ui
 
   db:
     image: mongo:4.4-bionic
