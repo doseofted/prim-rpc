@@ -11,6 +11,8 @@ services:
       args:
         NODE_ENV: "development"
     restart: "no"
+    ports:
+      - "3001:3001"
     environment:
       NODE_ENV: "development"
     volumes:
@@ -23,6 +25,8 @@ services:
       args:
         NODE_ENV: "development"
     restart: "no"
+    ports:
+      - "3000:3000"
     command: "dev --host=0.0.0.0 --port=3000"
     environment:
       NODE_ENV: "development"
@@ -30,8 +34,11 @@ services:
       - ./project/ui/public:/home/node/public
       - ./project/ui/src:/home/node/src
       - ./project/ui/index.html:/home/node/index.html
+      - ./project/ui/vite.config.ts:/home/node/vite.config.ts
       - ./project/ui/package.json:/home/node/package.json
       - ./project/ui/yarn.lock:/home/node/yarn.lock
 
   db:
     restart: "no"
+    ports: 
+      - "27017:27017"

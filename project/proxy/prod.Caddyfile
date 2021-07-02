@@ -11,5 +11,5 @@ www.{$HOST} {
 {$HOST}/api,
 {$HOST}/api/* {
   uri strip_prefix /api
-  reverse_proxy api:3000
+  reverse_proxy api:3001
 }
