@@ -7,15 +7,15 @@ services:
     environment:
       HOST: $HOST
     volumes:
-      - ./data/caddy/config:/config
-      - ./data/caddy/data:/data
+      - ./data/server/config:/config
+      - ./data/server/data:/data
     ports:
       - "80:80"
       - "443:443"
 
   api:
     build:
-      context: ./project
+      context: ./api
     container_name: api
 
   db:
@@ -25,4 +25,4 @@ services:
       MONGO_INITDB_ROOT_USERNAME: $MONGO_ROOT_USERNAME
       MONGO_INITDB_ROOT_PASSWORD: $MONGO_ROOT_PASSWORD
     volumes:
-      - ./data/mongo:/data/db
+      - ./data/db:/data/db
