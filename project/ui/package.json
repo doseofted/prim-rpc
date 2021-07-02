@@ -11,7 +11,7 @@
     "build": "vue-tsc --noEmit && vite build",
     "serve": "vite preview",
     "cap": "cap",
-    "sync": "cap sync",
+    "sync": "cap sync && cap sync @capacitor-community/electron",
     "ios": "cap run ios",
     "android": "cap run android",
     "desktop": "cap open @capacitor-community/electron"
