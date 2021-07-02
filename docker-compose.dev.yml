@@ -4,7 +4,7 @@ services:
   server:
     restart: "no"
     volumes:
-      - ./server/dev.Caddyfile:/etc/caddy/Caddyfile
+      - ./project/proxy/dev.Caddyfile:/etc/caddy/Caddyfile
 
   api:
     build:
@@ -14,9 +14,9 @@ services:
     environment:
       NODE_ENV: "development"
     volumes:
-      - ./api/src:/home/node/src
-      - ./api/package.json:/home/node/package.json
-      - ./api/yarn.lock:/home/node/yarn.lock
+      - ./project/api/src:/home/node/src
+      - ./project/api/package.json:/home/node/package.json
+      - ./project/api/yarn.lock:/home/node/yarn.lock
 
   db:
     restart: "no"

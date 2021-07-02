@@ -15,7 +15,7 @@ services:
 
   api:
     build:
-      context: ./api
+      context: ./project/api
     container_name: api
 
   db:
