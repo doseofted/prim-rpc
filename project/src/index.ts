@@ -1,6 +1,6 @@
-import * as fastify from "fastify"
+import fastify from "fastify"
 
-const app = fastify({ logger: true, http2: false })
+const app = fastify({ logger: true })
 
 app.get('/', (request, reply) => {
   reply.send({ hello: 'world' })

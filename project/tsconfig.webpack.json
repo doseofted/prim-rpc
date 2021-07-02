@@ -6,6 +6,6 @@
     "esModuleInterop": true
   },
   "exclude": [
-    "src"
+    "./src"
   ]
 }
