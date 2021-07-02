@@ -868,6 +868,11 @@
     "@babel/helper-validator-identifier" "^7.14.5"
     to-fast-properties "^2.0.0"
 
+"@capacitor/android@^3.0.2":
+  version "3.0.2"
+  resolved "https://registry.yarnpkg.com/@capacitor/android/-/android-3.0.2.tgz#818c98006456e00b34d11c231a8a53ec971b2ee2"
+  integrity sha512-sn2FGCMscXr8q413gSz8p1TAw69D3i4Hb2Bcd0S0SSDbvXwHCtDgwKQfD777+wmLifSkt8fwWVFIOKdbiGVRHw==
+
 "@capacitor/cli@^3.0.2":
   version "3.0.2"
   resolved "https://registry.yarnpkg.com/@capacitor/cli/-/cli-3.0.2.tgz#46b9aa5fab4f6c61a2220f99b83c85bd906c063c"
@@ -896,6 +901,11 @@
   integrity sha512-uvKvX++uj17pK2LYekPJlxsEprUTmqPk/SdDwczj5I/pmloAV8TkQ/zqwI+yOC9h6hEwRBZ689TGTS1GfPnYuA==
   dependencies:
     tslib "^2.1.0"
+
+"@capacitor/ios@^3.0.2":
+  version "3.0.2"
+  resolved "https://registry.yarnpkg.com/@capacitor/ios/-/ios-3.0.2.tgz#49b3690ce38911ce4254a74860f6ca9dd0ed0303"
+  integrity sha512-BEEwQ7TSGdmTusDPB2+WOOkOFCxYc9C36uzDNNLfwhSdgaDjoKJmVxj0oPb7wpfC1xMPGnTxYPmSjKj5AyKQ/Q==
 
 "@hapi/address@^2.1.2":
   version "2.1.4"
