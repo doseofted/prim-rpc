@@ -1,0 +1,38 @@
+{
+  "folders": [
+		{
+			"name": "Prim",
+			"path": "."
+		},
+		{
+			"name": "Frontend",
+			"path": "./project/ui"
+		},
+		{
+			"name": "API Server",
+			"path": "./project/api"
+		},
+		{
+			"name": "Reverse Proxy",
+			"path": "./project/proxy"
+		}
+	],
+	"settings": {
+		"editor.rulers": [80, 120],
+		"editor.tabSize": 2,
+		"editor.detectIndentation": true,
+		"editor.insertSpaces": false,
+		"editor.wordWrapColumn": 120,
+		"editor.codeActionsOnSave": {
+			"source.fixAll": true
+		},
+		"editor.formatOnPaste": true,
+		"npm.packageManager": "yarn"
+	},
+	"extensions": {
+		"recommendations": [
+			"johnsoncodehk.volar",
+			"ms-azuretools.vscode-docker"
+		]
+	}
+}
