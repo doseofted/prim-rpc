@@ -32,3 +32,13 @@ services:
       MONGO_INITDB_ROOT_PASSWORD: $MONGO_ROOT_PASSWORD
     volumes:
       - ./data/db:/data/db
+
+  dbsql:
+    container_name: dbsql
+    image: postgres:13.3-alpine
+    environment:
+      POSTGRES_DB: $DB_NAME
+      POSTGRES_USER: $DB_USER
+      POSTGRES_PASSWORD: $DB_PASS
+    volumes:
+      - ./data/dbsql:/var/lib/postgresql/data

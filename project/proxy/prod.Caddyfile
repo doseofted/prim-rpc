@@ -1,5 +1,9 @@
 import base.Caddyfile
 
+{
+  import log_options
+}
+
 www.{$HOST} {
   redir https://{$HOST}{uri}
 }

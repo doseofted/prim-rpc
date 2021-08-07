@@ -42,3 +42,8 @@ services:
     restart: "no"
     ports: 
       - "27017:27017"
+
+  dbsql:
+    restart: "no"
+    ports: 
+      - "5432:5432"
