@@ -1,7 +1,7 @@
 # ---
 # Install some utils for container
 # ---
-FROM node:16.3-buster as setup
+FROM node:16.6-buster as setup
 USER root
 RUN npm install --global zx
 

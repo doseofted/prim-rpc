@@ -25,6 +25,8 @@
     "webpack-node-externals": "^3.0.0"
   },
   "dependencies": {
+    "@mikro-orm/core": "^4.5.7",
+    "@mikro-orm/postgresql": "^4.5.7",
     "fastify": "^3.18.1"
   }
 }

@@ -1,8 +1,25 @@
 import fastify from "fastify"
+import { MikroORM } from "@mikro-orm/core";
+
+async function initORM () {
+  const { DATABASE_USER: username, DATABASE_PASS: password } = process.env
+  try {
+    const orm = await MikroORM.init({
+      entities: [],
+      dbName: 'prim',
+      type: 'postgresql',
+      clientUrl: `postgresql://${username}:${password}@dbsql:5432`,
+    });
+    console.log(orm);
+    return orm;
+  } catch (error) {
+    console.log(error.message);
+  }
+}
 
 const app = fastify({ logger: true })
 
-app.get('/', (request, reply) => {
+app.get('/', (request, reply) => {initORM()
   reply.send({ hello: 'world' })
 })
 

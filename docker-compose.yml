@@ -18,6 +18,9 @@ services:
     build:
       context: ./project/api
     container_name: api
+    environment:
+      DATABASE_USERNAME: $MONGO_ROOT_USERNAME
+      DATABASE_PASSWORD: $MONGO_ROOT_PASSWORD
 
   ui:
     build:
