@@ -1,4 +1,4 @@
-import { objectType, extendType } from 'nexus'
+import { objectType, extendType, nonNull, arg, inputObjectType } from 'nexus'
 
 const nameOfType = 'User'
 
@@ -28,6 +28,17 @@ export const User = objectType({
 	},
 })
 
+export const UserInput = inputObjectType({
+	name: 'UserInput',
+	description: 'A user input',
+	definition(t) {
+		t.nullable.int('id')
+		t.nullable.string('name')
+		t.nullable.string('email')
+		t.nullable.boolean('verified')
+	},
+})
+
 export const UsersQuery = extendType({
 	type: 'Query',
 	definition(t) {
@@ -51,3 +62,22 @@ export const UserQuery = extendType({
 		})
 	}
 })
+
+export const UserMutation = extendType({
+	type: 'Mutation',
+	definition(t) {
+		t.nonNull.field('createUser', {
+			type: nameOfType,
+			args: {
+				data: nonNull(UserInput)
+			},
+			resolve(_root, args, ctx) {
+				source[0] = { ...source[0], ...args.data }
+				console.log(args, source);
+				return source[0]
+			},
+		})
+	},
+})
+
+export const UserTypes = [User, UsersQuery, UserQuery, UserMutation]

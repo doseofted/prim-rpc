@@ -1,9 +1,9 @@
 import { makeSchema } from 'nexus'
-import { User, UserQuery, UsersQuery } from './create'
+import { UserTypes } from './create'
 import path from 'path'
 
 const schema = makeSchema({
-	types: [User, UserQuery, UsersQuery],
+	types: [...UserTypes],
 	outputs: {
 		// NOTE: consider making false when generating types dynamically
 		typegen: path.join(__dirname, 'nexus-typegen.ts'),
