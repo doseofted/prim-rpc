@@ -6,15 +6,18 @@ import base.Caddyfile
 }
 
 www.{$HOST} {
+  tls internal
   redir https://{$HOST}{uri}
 }
 
 {$HOST} {
+  tls internal
   reverse_proxy ui:3000
 }
 
 {$HOST}/api,
 {$HOST}/api/* {
+  tls internal
   uri strip_prefix /api
   reverse_proxy api:3001
 }

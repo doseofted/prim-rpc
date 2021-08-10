@@ -1,6 +1,18 @@
 version: "3"
 services:
 
+  dns: # only needed in development
+    container_name: ${PROJECT_NAME}_dns
+    image: coredns/coredns:1.8.4
+    ports:
+      - "53:53/tcp"
+      - "53:53/udp"
+    volumes:
+      - ./dev.Corefile:/root/Corefile
+    command: "-conf /root/Corefile"
+    environment: # use loopback as default, change to local address to access from other devices
+      DNS_BIND: "${DNS_BIND:-127.0.0.1}"
+
   proxy:
     restart: "no"
     volumes:
@@ -39,11 +51,6 @@ services:
       - ./project/ui/yarn.lock:/home/node/yarn.lock
 
   db:
-    restart: "no"
-    ports: 
-      - "27017:27017"
-
-  dbsql:
     restart: "no"
     ports: 
       - "5432:5432"

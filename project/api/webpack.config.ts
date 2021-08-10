@@ -26,6 +26,10 @@ const config: webpack.Configuration = {
   resolve: {
     extensions: ['.tsx', '.ts', '.js'],
   },
+  node: {
+    __dirname: false,
+    __filename: false
+  },
   externalsPresets: { node: true },
   externals: [nodeExternals() as any]
 }

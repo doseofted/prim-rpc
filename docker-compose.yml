@@ -3,7 +3,7 @@ services:
 
   proxy:
     image: caddy:2.4.3-alpine
-    container_name: proxy
+    container_name: ${PROJECT_NAME}_proxy
     environment:
       HOST: $HOST
     volumes:
@@ -17,31 +17,22 @@ services:
   api:
     build:
       context: ./project/api
-    container_name: api
+    container_name: ${PROJECT_NAME}_api
     environment:
-      DATABASE_USERNAME: $MONGO_ROOT_USERNAME
-      DATABASE_PASSWORD: $MONGO_ROOT_PASSWORD
+      DATABASE_USERNAME: $DB_USER
+      DATABASE_PASSWORD: $DB_PASS
 
   ui:
     build:
       context: ./project/ui
-    container_name: ui
+    container_name: ${PROJECT_NAME}_ui
 
   db:
-    image: mongo:4.4-bionic
-    container_name: db
-    environment:
-      MONGO_INITDB_ROOT_USERNAME: $MONGO_ROOT_USERNAME
-      MONGO_INITDB_ROOT_PASSWORD: $MONGO_ROOT_PASSWORD
-    volumes:
-      - ./data/db:/data/db
-
-  dbsql:
-    container_name: dbsql
+    container_name: ${PROJECT_NAME}_db
     image: postgres:13.3-alpine
     environment:
       POSTGRES_DB: $DB_NAME
       POSTGRES_USER: $DB_USER
       POSTGRES_PASSWORD: $DB_PASS
     volumes:
-      - ./data/dbsql:/var/lib/postgresql/data
+      - ./data/db:/var/lib/postgresql/data

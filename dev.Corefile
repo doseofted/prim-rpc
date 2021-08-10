@@ -1,0 +1,12 @@
+. {
+  log
+  forward . 8.8.8.8 8.8.4.4
+  cache
+}
+
+test {
+  log
+  template IN A {
+    answer "{{ .Name }} 0 IN A {$DNS_BIND}"
+  }
+}
