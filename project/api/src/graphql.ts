@@ -1,5 +1,5 @@
 import { makeSchema } from 'nexus'
-import { UserTypes } from './create'
+import { UserTypes } from './create/example'
 import path from 'path'
 
 const schema = makeSchema({
