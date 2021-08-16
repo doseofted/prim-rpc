@@ -47,5 +47,11 @@ Change folder to `./project/ui` to run the app in a desktop or mobile app. Use t
 Command | Description
 --- | ---
 `yarn build` | Build application
+`yarn dev` | Build application and watch for changes
 `yarn sync` | Sync built application for all supported platforms
 `yarn desktop|ios|android` | Run built project on platform
+
+## Notes
+
+- iOS and Android have support for live reload in development but feature is not supported for Electron yet ([follow issue here](https://github.com/capacitor-community/electron/issues/120))
+- Yarn is aliased so that is can be used regardless of current working directory but some commands like those for Electron platform will require the working directory to be `./project/ui` when running command through Yarn.
