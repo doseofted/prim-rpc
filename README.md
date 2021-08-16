@@ -28,14 +28,24 @@ To get off on the right foot, here are some ideas to guide initial code:
 
 ## Get Started
 
-To start the project easily, use aliases: `source source.sh`. Reference the following commands for development.
+To start the project easily, use aliases: `source source.sh`. Reference the following commands for development. Commands starting with `dc` represent `docker-compose`.
+
+## Server-related Commands
 
 Command | Description
 --- | ---
-`dc` | Run `docker-compose` with configuration needed for environment. Environment set in `.env`
+`dc` | Run `docker-compose` with configuration needed for environment. Environment set in `.env`.
 `dc-up` | Start project in background
 `dc-down` | Stop running project, also remove anonymous volumes and containers no longer in use.
 `dc-logs` | Tail latest logs from containers, Ctrl-C to stop tailing
 `dex <container_name> <command>` | Run command in running container, for example `dex api yarn` will run execute `yarn` in `api` container.
 
-See `source.sh` for expansions. Generally, commands starting with `dc` represent `docker-compose`.
+## App-related Commands
+
+Change folder to `./project/ui` to run the app in a desktop or mobile app. Use the following commands:
+
+Command | Description
+--- | ---
+`yarn build` | Build application
+`yarn sync` | Sync built application for all supported platforms
+`yarn desktop|ios|android` | Run built project on platform

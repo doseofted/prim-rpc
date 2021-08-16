@@ -22,7 +22,7 @@
     "@capacitor/core": "^3.0.2",
     "@capacitor/ios": "^3.0.2",
     "vue": "^3.0.5",
-    "vue-router": "4"
+    "vue-router": "^4.0.11"
   },
   "devDependencies": {
     "@capacitor/cli": "^3.0.2",
