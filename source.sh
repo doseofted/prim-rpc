@@ -28,11 +28,14 @@ dc () {
   eval "docker-compose ${ENV_TO_USE[@]} $@"
 }
 
+drun () {
+  local given_args="${@:2}"
+  local run_this="${given_args:-bash}"
+  eval "dc run --entrypoint='' $1 $run_this"
+}
+
 # Basic aliases
 alias dc-logs="dc logs -f --tail=50"
 alias dc-up="dc up --build -d"
 alias dc-down="dc down -v --remove-orphans -t 10"
 alias dex="dc exec"
-
-# App-specific situations
-alias yarn="yarn --cwd ${PROJECT_DIR}/project/ui"

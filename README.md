@@ -39,6 +39,7 @@ Command | Description
 `dc-down` | Stop running project, also remove anonymous volumes and containers no longer in use.
 `dc-logs` | Tail latest logs from containers, Ctrl-C to stop tailing
 `dex <container_name> <command>` | Run command in running container, for example `dex api yarn` will run execute `yarn` in `api` container.
+`drun <container_name> <command>` | Run command in one-off container based on specified container's image. Without a given command, an interactive bash session will be started.
 
 ## App-related Commands
 
@@ -55,3 +56,4 @@ Command | Description
 
 - iOS and Android have support for live reload in development but feature is not supported for Electron yet ([follow issue here](https://github.com/capacitor-community/electron/issues/120))
 - Yarn is aliased so that is can be used regardless of current working directory but some commands like those for Electron platform will require the working directory to be `./project/ui` when running command through Yarn.
+- When developing with Docker, Yarn commands should be ran within container during development to prevent missing modules. Volumes mounted through Compose will allow changes made to `package.json` to be seen from host.
