@@ -1,7 +1,7 @@
 /** add initial styles here ... */
 
 body {
-	background-color: #ffffff;
-	margin: 0;
-	min-height: 100vh;
+  min-height: 100vh;
+  margin: 0;
+  background-color: #fff;
 }

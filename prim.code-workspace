@@ -27,7 +27,12 @@
 			"source.fixAll": true
 		},
 		"editor.formatOnPaste": true,
-		"npm.packageManager": "yarn"
+		"npm.packageManager": "yarn",
+		"css.lint.unknownAtRules": "ignore",
+		"scss.lint.unknownAtRules": "ignore",
+		"css.validate": false,
+		"less.validate": false,
+		"scss.validate": false,
 	},
 	"extensions": {
 		"recommendations": [

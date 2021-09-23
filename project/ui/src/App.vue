@@ -1,7 +1,4 @@
 <template>
-	<div>
-		<p>Hello.</p>
-	</div>
 	<router-view />
 </template>
 

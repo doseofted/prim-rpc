@@ -9,6 +9,9 @@ export default defineConfig({
 	plugins: [
 		vue(),
 		VitePWA({
+			injectRegister: "inline",
+			registerType: "autoUpdate",
+			strategies: "generateSW",
 			manifest: {
 				name: "Prim",
 				short_name: "Prim",

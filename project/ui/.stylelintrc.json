@@ -1,0 +1,25 @@
+{
+	"plugins": [
+		"stylelint-order"
+	],
+	"extends": [
+		"stylelint-config-standard",
+		"stylelint-config-idiomatic-order"
+	],
+	"rules": {
+		"at-rule-no-unknown": [
+			true,
+			{
+				"ignoreAtRules": [
+					"tailwind",
+					"apply",
+					"variants",
+					"responsive",
+					"screen",
+					"layer",
+					"use"
+				]
+			}
+		]
+	}
+}
