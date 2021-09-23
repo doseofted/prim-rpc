@@ -1,0 +1,32 @@
+{
+	"parser": "vue-eslint-parser",
+	"parserOptions": {
+		"parser": "@typescript-eslint/parser"
+	},
+	"extends": [
+		"eslint:recommended",
+		"plugin:@typescript-eslint/recommended",
+		"plugin:vue/vue3-recommended"
+	],
+	"rules": {
+		"quotes": [
+			"warn",
+			"double"
+		],
+		"indent": [
+			"warn",
+			"tab"
+		],
+		"vue/html-indent": [
+			"warn",
+			"tab"
+		],
+		"semi": [
+			"warn",
+			"never"
+		],
+		"@typescript-eslint/no-explicit-any": [
+			"off"
+		]
+	}
+}
