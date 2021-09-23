@@ -1,6 +1,7 @@
 
 // this is an example of the type of structure that should be used with Prim
-const exampleThing = {
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
+export const exampleThing = {
 	"identifiers": {
 		// identifiers and other details concerning the created type
 		"name": "user",
@@ -50,7 +51,6 @@ const exampleThing = {
 	}
 }
 
-function createNewType(json: any) {
+/* function createNewType(json: any) {
 	const { behaviors, identifiers, properties  } = exampleThing
-	
-}
+} */

@@ -9,8 +9,8 @@ const app = fastify({ logger: true })
 app.register(mercurius, { schema })
 
 // set up some default routes
-app.get('/', (request, reply) => {
-	reply.send({ hello: 'world' })
+app.get("/", (request, reply) => {
+	reply.send({ hello: "world" })
 })
 
 export { app }
