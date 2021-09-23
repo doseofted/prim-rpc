@@ -1,14 +1,14 @@
 # ---
 # Install some utils for container
 # ---
-FROM node:16.6-buster as setup
+FROM node:16.7-bullseye as setup
 USER root
 RUN npm install --global zx
 
 # ---
 # Configure project build
 # ---
-FROM node:16.3-buster as build
+FROM node:16.7-bullseye as build
 USER node
 WORKDIR /home/node
 COPY --chown=1000:1000 ./package.json .

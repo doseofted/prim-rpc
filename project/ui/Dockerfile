@@ -1,7 +1,7 @@
 # ---
 # Configure project build
 # ---
-FROM node:16.6-buster as build
+FROM node:16.7-bullseye as build
 USER node
 WORKDIR /home/node
 COPY --chown=1000:1000 ./package.json .
@@ -14,7 +14,7 @@ RUN (export NODE_ENV="production"; yarn build)
 # ---
 # Prepare project to be run
 # ---
-FROM node:16.3-buster as run
+FROM node:16.7-bullseye as run
 # NOTE: NODE_ENV can be overridden while actively developing
 ARG NODE_ENV="production"
 USER node

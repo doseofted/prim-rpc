@@ -20,4 +20,4 @@ if (mode !== "production") {
 
 const args = process.argv.slice(3).join(" ")
 echo`Starting app in ${mode} mode ...`
-$`yarn ${args || (mode === "production" ? "start" : "restart")}`
+await $`yarn ${args || (mode === "production" ? "start" : "restart")}`
