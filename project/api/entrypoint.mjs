@@ -1,4 +1,5 @@
 #!/usr/bin/env zx
+$.verbose = false
 
 /** Add color to console logs then echo. */
 function echo(strings, ...vals) {
@@ -12,6 +13,7 @@ try {
   prefix = JSON.parse(await $`cat package.json`)?.name ?? prefix
 } catch (error) { echo`Could not gather project name from package.json` }
 
+$.verbose = true
 const mode = process.env.NODE_ENV || "production"
 if (mode !== "production") {
   echo`Running in ${mode} mode. Building in background ...`

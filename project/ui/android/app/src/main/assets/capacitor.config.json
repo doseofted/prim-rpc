@@ -2,8 +2,5 @@
 	"appId": "com.doseofted.prim",
 	"appName": "Prim",
 	"webDir": "dist",
-	"bundledWebRuntime": false,
-	"server": {
-		"url": "http://localhost:3000"
-	}
+	"bundledWebRuntime": false
 }

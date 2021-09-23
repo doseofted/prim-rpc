@@ -23,7 +23,6 @@
     "@capacitor/ios": "^3.2.3",
     "vue": "^3.2.16",
     "vue-router": "^4.0.11",
-    "vuex": "^4.0.2",
     "workbox-build": "^6.2.2",
     "workbox-window": "^6.2.2"
   },
