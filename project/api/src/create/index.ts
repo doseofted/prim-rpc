@@ -1,6 +1,8 @@
 
 // this is an example of the type of structure that should be used with Prim
-// eslint-disable-next-line @typescript-eslint/no-unused-vars
+
+import { EntitySchema } from "@mikro-orm/core"
+
 export const exampleThing = {
 	"identifiers": {
 		// identifiers and other details concerning the created type
@@ -50,6 +52,10 @@ export const exampleThing = {
 		}
 	}
 }
+
+new EntitySchema({
+	name: "Test"
+})
 
 /* function createNewType(json: any) {
 	const { behaviors, identifiers, properties  } = exampleThing

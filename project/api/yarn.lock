@@ -2951,10 +2951,10 @@ map-visit@^1.0.0:
   dependencies:
     object-visit "^1.0.0"
 
-mercurius@^8.3.0:
-  version "8.3.0"
-  resolved "https://registry.yarnpkg.com/mercurius/-/mercurius-8.3.0.tgz#7cedbf89203922eb1cdde42c8bc4c671a7ee5116"
-  integrity sha512-iw6ZxCsgkvCe5sPJadsy1zfzuv906W1rVwFDvADzpj3rT7sKtQcuoydVWMpSXeH9pXKMMZTfX84z0/66FaysdQ==
+mercurius@^8.4.0:
+  version "8.4.0"
+  resolved "https://registry.yarnpkg.com/mercurius/-/mercurius-8.4.0.tgz#fbdfbaa0e235910c8cf46245f7a7717d9b056403"
+  integrity sha512-Ueget1EbE1nCfWL0G7XHkdx8TP33LcRH+NXtgGVS1ArgJnEMwJ9UGs6yVtsfdyNKREIQuiIE9bXnWDV7VQTwHg==
   dependencies:
     "@types/isomorphic-form-data" "^2.0.0"
     end-of-stream "^1.4.4"
@@ -2973,7 +2973,7 @@ mercurius@^8.3.0:
     single-user-cache "^0.5.0"
     tiny-lru "^7.0.6"
     undici "^4.1.0"
-    ws "^7.5.2"
+    ws "^8.2.2"
 
 merge-stream@^2.0.0:
   version "2.0.0"
@@ -4644,12 +4644,7 @@ write-file-atomic@^3.0.0:
     signal-exit "^3.0.2"
     typedarray-to-buffer "^3.1.5"
 
-ws@^7.5.2:
-  version "7.5.3"
-  resolved "https://registry.yarnpkg.com/ws/-/ws-7.5.3.tgz#160835b63c7d97bfab418fc1b8a9fced2ac01a74"
-  integrity sha512-kQ/dHIzuLrS6Je9+uv81ueZomEwH0qVYstcAQ4/Z93K8zeko9gtAbttJWzoC5ukqXY1PpoouV3+VSOqEAFt5wg==
-
-ws@^8.0.0:
+ws@^8.0.0, ws@^8.2.2:
   version "8.2.2"
   resolved "https://registry.yarnpkg.com/ws/-/ws-8.2.2.tgz#ca684330c6dd6076a737250ed81ac1606cb0a63e"
   integrity sha512-Q6B6H2oc8QY3llc3cB8kVmQ6pnJWVQbP7Q5algTcIxx7YEpc0oU4NBVHlztA7Ekzfhw2r0rPducMUiCGWKQRzw==
