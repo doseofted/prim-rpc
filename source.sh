@@ -4,6 +4,26 @@
 PROJECT_DIR=$(cd -P -- "$(dirname -- "$0")" && pwd -P)
 cd $PROJECT_DIR
 
+testdns () {
+  if [[ $(uname -s) == 'Linux' ]]; then
+    echo "Disabling resolved ..."
+    sudo sed -i 's/nameserver 127.0.0.53/nameserver 127.0.0.1/g' /etc/resolv.conf
+    sudo systemctl stop systemd-resolved.service
+  fi
+  docker run -it --rm \
+    --name coredns \
+    -v "${PROJECT_DIR}/dev.Corefile:/root/Corefile" \
+    -p 53:53/tcp -p 53:53/udp \
+    -e "DNS_BIND=${1:-127.0.0.1}" \
+    coredns/coredns:1.8.4 \
+    -conf /root/Corefile
+  if [[ $(uname -s) == 'Linux' ]]; then
+    echo "Re-enabling resolved ..."
+    sudo systemctl start systemd-resolved.service
+    sudo sed -i 's/nameserver 127.0.0.1/nameserver 127.0.0.53/g' /etc/resolv.conf
+  fi
+}
+
 # REFERENCE: https://gist.github.com/mihow/9c7f559807069a03e302605691f85572#gistcomment-3225272
 setenv () {
   local file=$([ -z "$1" ] && echo ".env" || echo ".env.$1")
