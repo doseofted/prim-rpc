@@ -48,16 +48,16 @@ dc () {
   eval "docker-compose ${ENV_TO_USE[@]} $@"
 }
 
-drun () {
-  local given_args="${@:2}"
-  local run_this="${given_args:-bash}"
-  eval "dc run --entrypoint='' $1 $run_this"
-}
-
 dex () {
   local given_args="${@:2}"
   local run_this="${given_args:-bash}"
   eval "dc exec $1 $run_this"
+}
+
+drun () {
+  local given_args="${@:2}"
+  local run_this="${given_args:-bash}"
+  eval "dc run --entrypoint='' $1 $run_this"
 }
 
 # Basic aliases
