@@ -19,6 +19,7 @@ services:
       - ./project/api/src:/home/node/src
       - ./project/api/package.json:/home/node/package.json
       - ./project/api/yarn.lock:/home/node/yarn.lock
+      - ./project/api/.yarn:/home/node/.yarn
 
   ui:
     build:
@@ -31,12 +32,13 @@ services:
     environment:
       NODE_ENV: "development"
     volumes:
-      - ./project/ui/public:/home/node/public
-      - ./project/ui/src:/home/node/src
-      - ./project/ui/index.html:/home/node/index.html
-      - ./project/ui/vite.config.ts:/home/node/vite.config.ts
-      - ./project/ui/package.json:/home/node/package.json
-      - ./project/ui/yarn.lock:/home/node/yarn.lock
+      - ./project/ui/public:/home/node/project/public
+      - ./project/ui/src:/home/node/project/src
+      - ./project/ui/index.html:/home/node/project/index.html
+      - ./project/ui/vite.config.ts:/home/node/project/vite.config.ts
+      - ./project/ui/package.json:/home/node/project/package.json
+      - ./project/ui/yarn.lock:/home/node/project/yarn.lock
+      - ./project/api/.yarn:/home/node/project/.yarn
 
   db:
     restart: "no"

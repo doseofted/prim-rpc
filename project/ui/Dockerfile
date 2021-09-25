@@ -3,11 +3,14 @@
 # ---
 FROM node:16.7-bullseye as build
 USER node
-WORKDIR /home/node
-COPY --chown=1000:1000 ./package.json .
-COPY --chown=1000:1000 ./yarn.lock .
+RUN mkdir -p /home/node/project
+WORKDIR /home/node/project
+COPY --chown=1000:1000 package.json .
+COPY --chown=1000:1000 yarn.lock .
+COPY --chown=1000:1000 .yarnrc.yml .
+COPY --chown=1000:1000 .yarn/. ./.yarn
 # force NODE_ENV to development to install dev dependencies for build
-RUN (export NODE_ENV="development"; yarn --pure-lockfile)
+RUN (export NODE_ENV="development"; yarn)
 COPY --chown=1000:1000 . .
 RUN (export NODE_ENV="production"; yarn build)
 
@@ -18,13 +21,16 @@ FROM node:16.7-bullseye as run
 # NOTE: NODE_ENV can be overridden while actively developing
 ARG NODE_ENV="production"
 USER node
-WORKDIR /home/node
-COPY --chown=1000:1000 ./package.json .
-COPY --chown=1000:1000 ./yarn.lock .
+RUN mkdir -p /home/node/project
+WORKDIR /home/node/project
+COPY --chown=1000:1000 package.json .
+COPY --chown=1000:1000 yarn.lock .
+COPY --chown=1000:1000 .yarnrc.yml .
+COPY --chown=1000:1000 .yarn/. ./.yarn
 # unlike build stage, I only need production dependencies here
-RUN yarn --pure-lockfile
+RUN yarn
 # user "node" in container has UID/GID of 1000
-COPY --chown=1000:1000 --from=build /home/node/dist ./dist
+COPY --chown=1000:1000 --from=build /home/node/project/dist ./dist
 COPY --chown=1000:1000 . .
 # NOTE: `src` folder is removed from final container but remains part of final Docker image
 RUN rm -fr src
