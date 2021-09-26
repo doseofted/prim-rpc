@@ -1,62 +1,83 @@
+import { objectType, extendType, nonNull, inputObjectType } from "nexus"
 
-// this is an example of the type of structure that should be used with Prim
+const nameOfType = "User"
 
-import { EntitySchema } from "@mikro-orm/core"
-
-export const exampleThing = {
-	"identifiers": {
-		// identifiers and other details concerning the created type
-		"name": "user",
-		"description": "An app user"
+const source = [
+	{
+		id: 123,
+		name: "Ted",
+		email: "ted@doseofted.com",
+		verified: false
 	},
-	"behaviors": {
-		"before": {
-			"find": {
-				"userLoggedIn": ["username", "password"]
-			},
-			"create": {
-				// generic functions should be encroused, passing relevant property names as needed
-				"verifyEmail": ["username"]
-			}
-		}
-	},
-	"properties": {
-		"username": {
-			// built from scalar type
-			"type": "string",
-			"required": true,
-			"identifiers": {
-				"name": "username",
-				"description": "An email is used as the username"
-			},
-			"validation": {
-				// validations are for scalar types
-				"minlength": [1],
-				"maxlength": [100],
-				"lowercase": [true],
-				"match": ["[\\w-]*"],
-				"email": [true]
-			}
-		},
-		"host": {
-			// built from other created types
-			"type": "user",
-			"required": true,
-			"identifiers": {
-				"name": "host",
-				"description": "A reference to the user who who invited this user."
-			},
-			"validation": {
-				"exists": true
-			}
-		}
+	{
+		id: 456,
+		name: "Theodor",
+		email: "hi@doseofted.com",
+		verified: false
 	}
-}
+]
 
-new EntitySchema({
-	name: "Test"
+export const User = objectType({
+	name: nameOfType,
+	description: "A user",
+	definition(t) {
+		t.int("id")
+		t.string("name")
+		t.string("email")
+		t.boolean("verified")
+	},
 })
 
-/* function createNewType(json: any) {
-	const { behaviors, identifiers, properties  } = exampleThing
-} */
+export const UserInput = inputObjectType({
+	name: "UserInput",
+	description: "A user input",
+	definition(t) {
+		t.nullable.int("id")
+		t.nullable.string("name")
+		t.nullable.string("email")
+		t.nullable.boolean("verified")
+	},
+})
+
+export const UsersQuery = extendType({
+	type: "Query",
+	definition(t) {
+		t.nonNull.list.field("users", {
+			type: nameOfType,
+			resolve() {
+				return source
+			}
+		})
+	}
+})
+
+export const UserQuery = extendType({
+	type: "Query",
+	definition(t) {
+		t.nonNull.field("user", {
+			type: nameOfType,
+			resolve() {
+				return source[0]
+			}
+		})
+	}
+})
+
+export const UserMutation = extendType({
+	type: "Mutation",
+	definition(t) {
+		t.nonNull.field("createUser", {
+			type: nameOfType,
+			args: {
+				data: nonNull(UserInput)
+			},
+			resolve(_root, args, ctx) {
+				source[0] = { ...source[0], ...args.data }
+				console.log(args, source)
+				return source[0]
+			},
+		})
+	},
+})
+
+export const UserTypes = [User, UsersQuery, UserQuery, UserMutation]

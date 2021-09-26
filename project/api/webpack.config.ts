@@ -35,7 +35,10 @@ const config: webpack.Configuration = {
 	externals: [nodeExternals() as any],
 	plugins: [
 		new ESLintPlugin()
-	]
+	],
+	experiments: {
+		topLevelAwait: true
+	}
 }
 
 export default config
