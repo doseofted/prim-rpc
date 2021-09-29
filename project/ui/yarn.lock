@@ -5488,6 +5488,13 @@ fsevents@~2.3.2:
   languageName: node
   linkType: hard
 
+"paper@npm:^0.12.15":
+  version: 0.12.15
+  resolution: "paper@npm:0.12.15"
+  checksum: 12c7fc8b806853a1eb7b8cd9d3364d3d2e8db4d1623aeca0d486015da07d551681cda298166eaabc236d63256ca2f792cda7ba82fddd34a47e2989f70f988291
+  languageName: node
+  linkType: hard
+
 "parent-module@npm:^1.0.0":
   version: 1.0.1
   resolution: "parent-module@npm:1.0.1"
@@ -5795,6 +5802,7 @@ fsevents@~2.3.2:
     autoprefixer: ^10.3.5
     eslint: ^7.32.0
     eslint-plugin-vue: ^7.18.0
+    paper: ^0.12.15
     postcss: ^8.3.7
     sass: ^1.42.1
     stylelint: ^13.13.1

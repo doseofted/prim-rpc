@@ -21,6 +21,7 @@
     "@capacitor/android": "^3.2.3",
     "@capacitor/core": "^3.2.3",
     "@capacitor/ios": "^3.2.3",
+    "paper": "^0.12.15",
     "sass": "^1.42.1",
     "vue": "^3.2.16",
     "vue-router": "^4.0.11",
