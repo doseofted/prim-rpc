@@ -10,7 +10,7 @@
     "build": "TS_NODE_PROJECT=\"tsconfig.webpack.json\" webpack",
     "dev": "TS_NODE_PROJECT=\"tsconfig.webpack.json\" webpack --watch",
     "start": "node dist/index.js",
-    "restart": "nodemon --signal SIGTERM --watch dist dist/index.js"
+    "restart": "nodemon --watch dist dist/index.js"
   },
   "devDependencies": {
     "@types/node": "^16.9.6",

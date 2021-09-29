@@ -10,5 +10,6 @@ app.listen(3001, "0.0.0.0", (err, address) => {
 })
 
 // NOTE: run any graceful shutdown processes if needed (for nodemon)
-const goodbye = () => process.kill(process.pid, "SIGUSR2")
-process.once("SIGUSR2", goodbye)
+const goodbye = () => { process.exit(0) }
+process.once("SIGTERM", goodbye)
+// process.on("SIGUSR2", () => console.log("reloading"))
