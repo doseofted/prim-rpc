@@ -43,28 +43,40 @@ export default defineComponent({
 				const gradientCenter = center
 				createOffsetRadialBgGradient(form, gradient, gradientDistance, gradientCenter)
 			}
-			const form1 = new CanvasForm(space).composite("source-over")
-			const form3 = new CanvasForm(space).composite("hard-light")
-			const form5 = new CanvasForm(space).composite("color-dodge")
-			const form6 = new CanvasForm(space).composite("screen")
-			const form7 = new CanvasForm(space).composite("saturation")
+			const form = new CanvasForm(space)
 			space.add(() => {
+				// NOTE: colors and composite mode given in Designer file
 				const { width: w, height: h } = space
-				const center = space.pointer
-				const mostShort = w < h ? w : h
-				const one = Color.fromHex("#007FD3")
-				const two = one.clone(); two.alpha = 0
-				createGradient(form1, [one.rgba, two.rgba], center.$subtract(0, -100), mostShort / 2)
-				createGradient(form1, [one.rgba, two.rgba], center.$subtract(-400, -300), mostShort / 2)
-				createGradient(form3, ["#22FF6C", two.rgba], center.$subtract(0, -600), mostShort / 1)
-				createGradient(form3, ["#FF4314", two.rgba], center.$subtract(-300, -200), mostShort / 1)
-				createGradient(form5, ["#FF7614", two.rgba], center.$subtract(-200, -500), mostShort / 2)
-				createGradient(form5, ["#FF7614", two.rgba], center.$subtract(100, -200), mostShort / 2)
-				createGradient(form6, ["#FFFFFF", two.rgba], center.$subtract(-200, -600), mostShort / 1)
-				createGradient(form6, ["#FFFFFF", two.rgba], center.$subtract(0, -200), mostShort / 3)
+				/** top-left */
+				const s = space.size.$add(space.pointer.$multiply(-1))
+				/** contained */
+				const c = w < h ? w : h
+				const blueBegin = Color.fromHex("#007FD3")
+				const blueEnd = Color.fromHex("#00385D"); blueEnd.alpha = 0
+				// REFERENCE: https://developer.mozilla.org/en-US/docs/Web/API/CanvasRenderingContext2D/globalCompositeOperation
+				form.composite("source-over")
+				createGradient(form, [blueBegin.rgba, blueEnd.rgba], s.$multiply(0, 0.2), c * 0.5)
+				createGradient(form, [blueBegin.rgba, blueEnd.rgba], s.$multiply(0.4, 0.3), c * 0.5)
+				form.composite("hard-light")
+				const greenBegin = Color.fromHex("#22FF6C")
+				const greenEnd = greenBegin.clone(); greenEnd.alpha = 0
+				createGradient(form, [greenBegin.rgba, greenEnd.rgba], s.$multiply(0, 0.9), c * 0.65)
+				const redBegin = Color.fromHex("#FF4314")
+				const redEnd = redBegin.clone(); redEnd.alpha = 0
+				createGradient(form, [redBegin.rgba, redEnd.rgba], s.$multiply(0.2, 0.15), c * 0.55)
+				form.composite("color-dodge") // NOTE: color-dodge does not work in same way Designer does
+				const orangeBegin = Color.fromHex("#FF7614")
+				const orangeEnd = orangeBegin.clone(); orangeEnd.alpha = 0
+				createGradient(form, [orangeBegin.rgba, orangeEnd.rgba], s.$multiply(0.25, 0.85), c * 0.65)
+				createGradient(form, [orangeBegin.rgba, orangeEnd.rgba], s.$multiply(-0.2, 0.4), c * 0.65)
+				form.composite("screen")
+				const whiteBegin = Color.fromHex("#FFFFFF")
+				const lightBlueEnd = Color.fromHex("#007FD3"); lightBlueEnd.alpha = 0
+				createGradient(form, [whiteBegin.rgba, lightBlueEnd.rgba], s.$multiply(0.15, 1.1), c * 0.7)
+				createGradient(form, [whiteBegin.rgba, lightBlueEnd.rgba], s.$multiply(0, 0.4), c * 0.7)
+				form.composite("saturation")
 				const saturate = Color.fromHex("#FF0505"); saturate.alpha = 0.42
-				form7.fillOnly(saturate.rgba).rect(Rectangle.fromTopLeft(new Pt(0, 0), w, h))
-				// form1.strokeOnly("#fff").circle(Circle.fromCenter(center, mostShort / 2))
+				form.fillOnly(saturate.rgba).rect(Rectangle.fromTopLeft(new Pt(0, 0), w, h))
 			})
 			space.play()
 		})
