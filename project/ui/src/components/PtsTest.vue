@@ -45,7 +45,6 @@ export default defineComponent({
 			}
 			const form1 = new CanvasForm(space).composite("source-over")
 			const form3 = new CanvasForm(space).composite("hard-light")
-			const form4 = new CanvasForm(space).composite("hard-light")
 			const form5 = new CanvasForm(space).composite("color-dodge")
 			const form6 = new CanvasForm(space).composite("screen")
 			const form7 = new CanvasForm(space).composite("saturation")
@@ -58,7 +57,7 @@ export default defineComponent({
 				createGradient(form1, [one.rgba, two.rgba], center.$subtract(0, -100), mostShort / 2)
 				createGradient(form1, [one.rgba, two.rgba], center.$subtract(-400, -300), mostShort / 2)
 				createGradient(form3, ["#22FF6C", two.rgba], center.$subtract(0, -600), mostShort / 1)
-				createGradient(form4, ["#FF4314", two.rgba], center.$subtract(-300, -200), mostShort / 1)
+				createGradient(form3, ["#FF4314", two.rgba], center.$subtract(-300, -200), mostShort / 1)
 				createGradient(form5, ["#FF7614", two.rgba], center.$subtract(-200, -500), mostShort / 2)
 				createGradient(form5, ["#FF7614", two.rgba], center.$subtract(100, -200), mostShort / 2)
 				createGradient(form6, ["#FFFFFF", two.rgba], center.$subtract(-200, -600), mostShort / 1)
