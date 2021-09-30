@@ -5842,6 +5842,7 @@ fsevents@~2.3.2:
     eslint-plugin-vue: ^7.18.0
     paper: ^0.12.15
     postcss: ^8.3.7
+    pts: ^0.10.6
     sass: ^1.42.1
     stylelint: ^13.13.1
     stylelint-config-idiomatic-order: ^8.1.0
@@ -5908,6 +5909,13 @@ fsevents@~2.3.2:
     kleur: ^3.0.3
     sisteransi: ^1.0.5
   checksum: 05bf4865870665067b14fc54ced6c96e353f58f57658351e16bb8c12c017402582696fb42d97306b7c98efc0e2cc1ebf27ab573448d5a5da2ac18991cc9e4cad
+  languageName: node
+  linkType: hard
+
+"pts@npm:^0.10.6":
+  version: 0.10.6
+  resolution: "pts@npm:0.10.6"
+  checksum: 1f76ef8f73a611f75f32cef9da4f5b2a579379ee6a1defd6e1b885cd8c0a746c4caa10e4d937a411c4fae4d8a71c73c76b1941668b6a918da4f9c3b9fe42e76b
   languageName: node
   linkType: hard
 
