@@ -25,6 +25,7 @@ services:
   ui:
     build:
       context: ./project/ui
+    stop_signal: SIGKILL # no state attached, just kill it
     container_name: ${PROJECT_NAME}_ui
 
   db:
