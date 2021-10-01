@@ -18,7 +18,7 @@ export default defineComponent({
 		onMounted(() => {
 			if (!canvas.value) { return }
 			const space = new CanvasSpace(canvas.value)
-				.setup({ bgcolor: "#00385D", resize: true })
+				.setup({ bgcolor: "#00385D", resize: true, retina: true })
 				.bindMouse()
 				.bindTouch()
 			// const bg = space.getForm()
@@ -48,7 +48,7 @@ export default defineComponent({
 				// NOTE: colors and composite mode given in Designer file
 				const { width: w, height: h } = space
 				/** top-left */
-				const s = space.size.$add(space.pointer.$multiply(-1))
+				const s = space.size.$add(space.pointer.$multiply(-1.5))
 				/** contained */
 				const c = w < h ? w : h
 				const blueBegin = Color.fromHex("#007FD3")
@@ -61,11 +61,11 @@ export default defineComponent({
 				const greenBegin = Color.fromHex("#22FF6C")
 				const greenEnd = greenBegin.clone(); greenEnd.alpha = 0
 				createGradient(form, [greenBegin.rgba, greenEnd.rgba], s.$multiply(0, 0.9), c * 0.65)
-				const redBegin = Color.fromHex("#FF4314")
+				const redBegin = Color.fromHex("#FF4314"); redBegin.alpha = 0.9
 				const redEnd = redBegin.clone(); redEnd.alpha = 0
 				createGradient(form, [redBegin.rgba, redEnd.rgba], s.$multiply(0.2, 0.15), c * 0.55)
-				form.composite("color-dodge") // NOTE: color-dodge does not work in same way Designer does
-				const orangeBegin = Color.fromHex("#FF7614")
+				form.composite("lighten") // NOTE: color-dodge does not work in same way Designer does
+				const orangeBegin = Color.fromHex("#FF7614"); orangeBegin.alpha = 0.7
 				const orangeEnd = orangeBegin.clone(); orangeEnd.alpha = 0
 				createGradient(form, [orangeBegin.rgba, orangeEnd.rgba], s.$multiply(0.25, 0.85), c * 0.65)
 				createGradient(form, [orangeBegin.rgba, orangeEnd.rgba], s.$multiply(-0.2, 0.4), c * 0.65)
