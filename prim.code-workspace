@@ -33,6 +33,20 @@
 		"css.validate": false,
 		"less.validate": false,
 		"scss.validate": false,
+		"peacock.color": "#57b0ca",
+		"peacock.affectAccentBorders": false,
+		"peacock.affectStatusAndTitleBorders": true,
+		"peacock.affectTitleBar": false,
+		"peacock.affectActivityBar": false,
+		"peacock.showColorInStatusBar": false,
+		"workbench.colorCustomizations": {
+			"statusBar.background": "#57b0ca",
+			"statusBar.border": "#57b0ca",
+			"statusBar.foreground": "#15202b",
+			"statusBarItem.hoverBackground": "#3999b5",
+			"statusBarItem.remoteBackground": "#57b0ca",
+			"statusBarItem.remoteForeground": "#15202b"
+		}
 	},
 	"extensions": {
 		"recommendations": [
