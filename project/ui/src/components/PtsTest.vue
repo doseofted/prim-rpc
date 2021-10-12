@@ -1,9 +1,8 @@
 <template>
-	<div class="w-full h-full">
-		<canvas
-			ref="canvas"
-			class="w-full h-full"
-		/>
+	<div class="w-full h-full overflow-hidden">
+		<div class="size-offset -m-4 absolute filter blur-md">
+			<canvas ref="canvas" class="w-full h-full" />
+		</div>
 	</div>
 </template>
 
@@ -14,7 +13,7 @@ import { CanvasSpace, Circle, Color, CanvasForm, Pt, GroupLike, Rectangle } from
 export default defineComponent({
 	setup() {
 		// ...
-		const canvas = ref<HTMLCanvasElement|null>(null)
+		const canvas = ref<HTMLCanvasElement | null>(null)
 		onMounted(() => {
 			if (!canvas.value) { return }
 			const space = new CanvasSpace(canvas.value)
@@ -25,10 +24,11 @@ export default defineComponent({
 			const createOffsetRadialBgGradient = (
 				form: CanvasForm,
 				gradient: (area1: GroupLike, area2?: GroupLike | undefined) => CanvasGradient,
+				center: Pt,
 				distance: Pt,
-				center: Pt
 			) => {
-				const offsetTranslate = center.map(c => c < 0 ? c * 2 : 0) as Pt
+				center = space.pointer.$add(center)
+				const offsetTranslate = center.map(c => c < 0 ? c * 3 : 0) as Pt
 				const offsetReset = offsetTranslate.map(c => c * -1) as Pt
 				space.ctx.translate(offsetTranslate[0], offsetTranslate[1])
 				form.fill(gradient(
@@ -37,11 +37,11 @@ export default defineComponent({
 				)).stroke("transparent").rect(space.innerBound)
 				space.ctx.translate(offsetReset[0], offsetReset[1])
 			}
-			const createGradient = (form: CanvasForm, stops: string[]|[number, string][], center: Pt, length: number) => {
+			const createGradient = (form: CanvasForm, stops: string[] | [number, string][], center: Pt, length: number) => {
 				const gradient = form.gradient(stops)
-				const gradientDistance = new Pt(0, length)
+				const gradientDistance = new Pt(0, length * 1.5)
 				const gradientCenter = center
-				createOffsetRadialBgGradient(form, gradient, gradientDistance, gradientCenter)
+				createOffsetRadialBgGradient(form, gradient, gradientCenter, gradientDistance)
 			}
 			const form = new CanvasForm(space)
 			space.add(() => {
@@ -84,3 +84,11 @@ export default defineComponent({
 	}
 })
 </script>
+
+<style lang="scss">
+.size-offset {
+	--extra: #{theme('width.4')};
+	width: calc(100% + (var(--extra) * 2));
+	height: calc(100% + (var(--extra) * 2));
+}
+</style>
