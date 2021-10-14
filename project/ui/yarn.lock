@@ -2247,6 +2247,82 @@ __metadata:
   languageName: node
   linkType: hard
 
+"@vueuse/core@npm:^6.5.3":
+  version: 6.5.3
+  resolution: "@vueuse/core@npm:6.5.3"
+  dependencies:
+    "@vueuse/shared": 6.5.3
+    vue-demi: "*"
+  peerDependencies:
+    "@vue/composition-api": ^1.1.0
+    vue: ^2.6.0 || ^3.2.0
+  peerDependenciesMeta:
+    "@vue/composition-api":
+      optional: true
+    vue:
+      optional: true
+  checksum: 70745c29fa863ed0fc1611e96b58a67057ad456bfd97d6e3174a90ca97f02af1fd62cb58183a354d831a1baf4b7f018d6e8cf0fb1ce4430c284f0457ca122275
+  languageName: node
+  linkType: hard
+
+"@vueuse/gesture@npm:^1.0.0":
+  version: 1.0.0
+  resolution: "@vueuse/gesture@npm:1.0.0"
+  dependencies:
+    vue-demi: ^0.7.4
+  peerDependencies:
+    "@vue/composition-api": ^1.0.0-beta.1
+    vue: ^2.0.0 || >=3.0.0-rc.0
+  peerDependenciesMeta:
+    "@vue/composition-api":
+      optional: true
+  checksum: 6f83b27357d989c5e9d7810d82d3d01b294065b27f9a9701b6cd30e95a7a262504043922550ed45075d3c9af087ee8d84672bcba5290f65c93fc9803f133c319
+  languageName: node
+  linkType: hard
+
+"@vueuse/head@npm:^0.6.0":
+  version: 0.6.0
+  resolution: "@vueuse/head@npm:0.6.0"
+  peerDependencies:
+    vue: ">=3"
+  checksum: 0bdf0df9ee322cf9967e144b1ec4244540faa6f29a31d96d420921f3cecf714d9a17ce603a47d3238a672174e0b92fd788dd51bbc4697d1a1975f6246948dc2a
+  languageName: node
+  linkType: hard
+
+"@vueuse/motion@npm:^2.0.0-beta.4":
+  version: 2.0.0-beta.4
+  resolution: "@vueuse/motion@npm:2.0.0-beta.4"
+  dependencies:
+    "@vueuse/core": ^6.5.3
+    popmotion: ^10.0.1
+    vue-demi: "*"
+  peerDependencies:
+    "@vue/composition-api": ^1.2.2
+    vue: ^2.0.0 || >=3.0.0-rc.0
+  peerDependenciesMeta:
+    "@vue/composition-api":
+      optional: true
+  checksum: 2c9aa95422a2c6ad317cc7ccdd01ba928ca367f7a37ba9fafa322237e388b3f9cc4a0dad2550c774092548baf5b7382fed00ff3fd3a5bb7c520a0179eaad7f52
+  languageName: node
+  linkType: hard
+
+"@vueuse/shared@npm:6.5.3":
+  version: 6.5.3
+  resolution: "@vueuse/shared@npm:6.5.3"
+  dependencies:
+    vue-demi: "*"
+  peerDependencies:
+    "@vue/composition-api": ^1.1.0
+    vue: ^2.6.0 || ^3.2.0
+  peerDependenciesMeta:
+    "@vue/composition-api":
+      optional: true
+    vue:
+      optional: true
+  checksum: 31dc2f7372577306236a50d4a83359f667e7f9c8116eb5bb84aa064905d451264927675e75d37b07592a07fffe7e56ee0ba581d66f3b6c030a9423f90e8d7a62
+  languageName: node
+  linkType: hard
+
 "abbrev@npm:1":
   version: 1.1.1
   resolution: "abbrev@npm:1.1.1"
@@ -3814,6 +3890,15 @@ __metadata:
   languageName: node
   linkType: hard
 
+"framesync@npm:6.0.0":
+  version: 6.0.0
+  resolution: "framesync@npm:6.0.0"
+  dependencies:
+    tslib: ^2.1.0
+  checksum: 10443b26e9e09378f7c32d6938590b40c441e73d1bb29a80b45ddfed4d3b988238c09ccf08991fb95772dade7751770d81b89f3b9ea5bdd0b528ec6eb32cc9fb
+  languageName: node
+  linkType: hard
+
 "fs-extra@npm:^10.0.0":
   version: 10.0.0
   resolution: "fs-extra@npm:10.0.0"
@@ -4125,6 +4210,13 @@ fsevents@~2.3.2:
   version: 1.1.0
   resolution: "hex-color-regex@npm:1.1.0"
   checksum: 44fa1b7a26d745012f3bfeeab8015f60514f72d2fcf10dce33068352456b8d71a2e6bc5a17f933ab470da2c5ab1e3e04b05caf3fefe3c1cabd7e02e516fc8784
+  languageName: node
+  linkType: hard
+
+"hey-listen@npm:^1.0.8":
+  version: 1.0.8
+  resolution: "hey-listen@npm:1.0.8"
+  checksum: 6bad60b367688f5348e25e7ca3276a74b59ac5a09b0455e6ff8ab7d4a9e38cd2116c708a7dcd8a954d27253ce1d8717ec891d175723ea739885b828cf44e4072
   languageName: node
   linkType: hard
 
@@ -5628,6 +5720,18 @@ fsevents@~2.3.2:
   languageName: node
   linkType: hard
 
+"popmotion@npm:^10.0.1":
+  version: 10.0.1
+  resolution: "popmotion@npm:10.0.1"
+  dependencies:
+    framesync: 6.0.0
+    hey-listen: ^1.0.8
+    style-value-types: 5.0.0
+    tslib: ^2.1.0
+  checksum: 13a5a449496d4ae69f5fed01b4829983879a7eac6f9b0eee6ca2fa42ff78eaf281bfa1720ee7b6944218a7f2bd56c7e137354ce3852042b529e1acb8bcd3efaa
+  languageName: node
+  linkType: hard
+
 "postcss-html@npm:^0.36.0":
   version: 0.36.0
   resolution: "postcss-html@npm:0.36.0"
@@ -5837,6 +5941,10 @@ fsevents@~2.3.2:
     "@typescript-eslint/eslint-plugin": ^4.31.2
     "@typescript-eslint/parser": ^4.31.2
     "@vitejs/plugin-vue": ^1.9.0
+    "@vueuse/core": ^6.5.3
+    "@vueuse/gesture": ^1.0.0
+    "@vueuse/head": ^0.6.0
+    "@vueuse/motion": ^2.0.0-beta.4
     autoprefixer: ^10.3.5
     eslint: ^7.32.0
     eslint-plugin-vue: ^7.18.0
@@ -6869,6 +6977,16 @@ fsevents@~2.3.2:
   languageName: node
   linkType: hard
 
+"style-value-types@npm:5.0.0":
+  version: 5.0.0
+  resolution: "style-value-types@npm:5.0.0"
+  dependencies:
+    hey-listen: ^1.0.8
+    tslib: ^2.1.0
+  checksum: 16d198302cd102edf9dba94e7752a2364c93b1eaa5cc7c32b42b28eef4af4ccb5149a3f16bc2a256adc02616a2404f4612bd15f3081c1e8ca06132cae78be6c0
+  languageName: node
+  linkType: hard
+
 "stylelint-config-idiomatic-order@npm:^8.1.0":
   version: 8.1.0
   resolution: "stylelint-config-idiomatic-order@npm:8.1.0"
@@ -7745,6 +7863,38 @@ typescript@^4.4.3:
     vscode-pug-languageservice: ^0.27.24
     vscode-typescript-languageservice: ^0.27.25
   checksum: f906de40a87426bfa2e588fc1d32303092cd5c654f95aebbafdfb689bfd428c2a9549bcebf6427ffaf11b9c1cef2bf6753392f90f9dfd46f91531af8fd4c873b
+  languageName: node
+  linkType: hard
+
+"vue-demi@npm:*":
+  version: 0.11.4
+  resolution: "vue-demi@npm:0.11.4"
+  peerDependencies:
+    "@vue/composition-api": ^1.0.0-rc.1
+    vue: ^3.0.0-0 || ^2.6.0
+  peerDependenciesMeta:
+    "@vue/composition-api":
+      optional: true
+  bin:
+    vue-demi-fix: bin/vue-demi-fix.js
+    vue-demi-switch: bin/vue-demi-switch.js
+  checksum: 794464387a6a031daa5cb8f751f1bd55f19a7dbe026385c8b0347a1b5c67bcc949c9f11c2b1bfc9e32a627b8e2caeb7fbff4b66c84d22ea625fbb77e57c6e075
+  languageName: node
+  linkType: hard
+
+"vue-demi@npm:^0.7.4":
+  version: 0.7.5
+  resolution: "vue-demi@npm:0.7.5"
+  peerDependencies:
+    "@vue/composition-api": ^1.0.0-beta.1
+    vue: ^2.6.0 || >=3.0.0-rc.1
+  peerDependenciesMeta:
+    "@vue/composition-api":
+      optional: true
+  bin:
+    vue-demi-fix: bin/vue-demi-fix.js
+    vue-demi-switch: bin/vue-demi-switch.js
+  checksum: 6f7eed9db42e89d1f2a62ef10b3d77ec5d8db4c4fa7d04d87e5c74467052f1a79612ee203707e6c01d8fcfb0c986a9b84335395e18189cb2b2acabeb48e92fac
   languageName: node
   linkType: hard
 

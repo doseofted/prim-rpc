@@ -2,7 +2,8 @@
 	<div class="flex justify-center items-center h-screen">
 		<!-- <hello-world>Ted</hello-world> -->
 		<!-- <paper-test /> -->
-		<pts-test />
+		<!-- <pts-test /> -->
+		<elem-test />
 	</div>
 </template>
 
