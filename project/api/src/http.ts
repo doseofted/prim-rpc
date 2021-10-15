@@ -23,7 +23,7 @@ const app = await setupServer()
 
 // set up some default routes
 app.get("/", (request, reply) => {
-	reply.send({ hello: "world" })
+	reply.send({ hello: "you" })
 })
 
 export { app }
