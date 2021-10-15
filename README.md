@@ -2,6 +2,17 @@
 
 Not a headless CMS but better. A place to structure and handle data. The administration interface is your app.
 
+## Get Going
+
+```bash
+# Set alias and functions, useful for project
+source source.sh
+# Start apps, show all logs, and shut it all down on Ctrl-C
+dc-up && dc-logs || dc-down
+# Start DNS server that can resolve ".test" TLD
+testdns
+```
+
 ## Idea
 
 To get off on the right foot, here are some ideas to guide initial code:

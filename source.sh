@@ -19,6 +19,7 @@ if [[ $? -ne 0 ]]; then
 fi
 
 testdns () {
+  docker pull coredns/coredns:1.8.4
   if [[ $(uname -s) == 'Linux' ]]; then
     echo "Disabling resolved ..."
     sudo sed -i 's/nameserver 127.0.0.53/nameserver 127.0.0.1/g' /etc/resolv.conf
