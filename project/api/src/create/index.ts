@@ -1,22 +1,55 @@
 import { arg, inputObjectType, mutationField, objectType, queryField } from "nexus"
 import { InputDefinitionBlock, ObjectDefinitionBlock } from "nexus/dist/blocks"
+import { CommonFieldConfig } from "nexus/dist/core"
 
-function identifierDefinition<T extends string>(t: InputDefinitionBlock<T> | ObjectDefinitionBlock<T>) {
-	t.string("app", { description: "Identifier as used by an app, not reader-friendly" })
-	t.string("friendly", { description: "Name as used in conversation, reader-friendly" })
+interface CustomScalarType {
+	fieldName: string,
+	type: "string"|"boolean"|"float"|"int"|"id",
+	config: CommonFieldConfig
 }
 
-const Identifier = objectType({
-	name: "Identifier",
-	description: "Identifiers used in different contexts, such as internally or in a sentence.",
-	definition: identifierDefinition
-})
+function createScalarFieldTypes<T extends string>(
+	given: CustomScalarType[],
+	t: InputDefinitionBlock<T> | ObjectDefinitionBlock<T>
+) {
+	for (const {type, config, fieldName} of given) {
+		t[type](fieldName, config)
+	}
+}
 
-const IdentifierInput = inputObjectType({
-	name: "IdentifierInput",
-	description: "Identifiers used in different contexts, such as internally or in a sentence.",
-	definition: identifierDefinition
-})
+function createIdentifierTypes () {
+	const name = "Idenfitier"
+	const description = "Identifiers used in different contexts, such as internally or in a sentence."
+	const types = [
+		{
+			fieldName: "app",
+			type: "string",
+			config: { description: "Identifier as used by an app, not reader-friendly" }
+		},
+		{
+			fieldName: "friendly",
+			type: "string",
+			config: { description: "Name as used in conversation, reader-friendly" }
+		}
+	] as CustomScalarType[]
+	const Identifier = objectType({
+		name,
+		description,
+		definition(t) {
+			createScalarFieldTypes(types, t)
+		}
+	})
+	const IdentifierInput = inputObjectType({
+		name: `${name}Input`,
+		description,
+		definition(t) {
+			createScalarFieldTypes(types, t)
+		}
+	})
+	return { Identifier, IdentifierInput }
+}
+
+const { Identifier, IdentifierInput } = createIdentifierTypes()
 
 const ThingInput = inputObjectType({
 	name: "ThingInput",
@@ -39,6 +72,7 @@ const testData = {
 		friendly: ""
 	}
 }
+
 
 const Mutation = mutationField("createThing", {
 	type: Thing,
