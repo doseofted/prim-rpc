@@ -56,6 +56,10 @@ dex () {
   eval "dc exec $1 $run_this"
 }
 
+dc-magic () {
+  dc-up && dc-logs || dc-down
+}
+
 drun () {
   local given_args="${@:2}"
   local run_this="${given_args:-bash}"

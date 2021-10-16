@@ -1,83 +1,31 @@
-import { objectType, extendType, nonNull, inputObjectType } from "nexus"
+import { objectType, queryField } from "nexus"
 
-const nameOfType = "User"
-
-const source = [
-	{
-		id: 123,
-		name: "Ted",
-		email: "ted@doseofted.com",
-		verified: false
-	},
-	{
-		id: 456,
-		name: "Theodor",
-		email: "hi@doseofted.com",
-		verified: false
+const Identifier = objectType({
+	name: "Identifier",
+	description: "Identifiers used in different contexts, such as internally or in a sentence.",
+	definition(t) {
+		t.string("app", { description: "Identifier as used by an app, not reader-friendly" })
+		t.string("friendly", {description: "Name as used in conversation, reader-friendly" })
 	}
+})
+
+const Thing = objectType({
+	name: "Thing",
+	description: "A thing",
+	definition(t) {
+		t.field("identifier", { type: Identifier, description: "Identifier for a thing" })
+	}
+})
+
+const Query = queryField("create", {
+	description: "Create a thing",
+	type: Thing
+})
+
+const types = [
+	Query,
+	Thing,
+	Identifier
 ]
 
-export const User = objectType({
-	name: nameOfType,
-	description: "A user",
-	definition(t) {
-		t.int("id")
-		t.string("name")
-		t.string("email")
-		t.boolean("verified")
-	},
-})
-
-export const UserInput = inputObjectType({
-	name: "UserInput",
-	description: "A user input",
-	definition(t) {
-		t.nullable.int("id")
-		t.nullable.string("name")
-		t.nullable.string("email")
-		t.nullable.boolean("verified")
-	},
-})
-
-export const UsersQuery = extendType({
-	type: "Query",
-	definition(t) {
-		t.nonNull.list.field("users", {
-			type: nameOfType,
-			resolve() {
-				return source
-			}
-		})
-	}
-})
-
-export const UserQuery = extendType({
-	type: "Query",
-	definition(t) {
-		t.nonNull.field("user", {
-			type: nameOfType,
-			resolve() {
-				return source[0]
-			}
-		})
-	}
-})
-
-export const UserMutation = extendType({
-	type: "Mutation",
-	definition(t) {
-		t.nonNull.field("createUser", {
-			type: nameOfType,
-			args: {
-				data: nonNull(UserInput)
-			},
-			resolve(_root, args, ctx) {
-				source[0] = { ...source[0], ...args.data }
-				console.log(args, source)
-				return source[0]
-			},
-		})
-	},
-})
-
-export const UserTypes = [User, UsersQuery, UserQuery, UserMutation]
+export { types as createTypes }
