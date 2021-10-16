@@ -1,7 +1,16 @@
-import { objectType, queryField } from "nexus"
+import { arg, inputObjectType, mutationField, objectType, queryField } from "nexus"
 
 const Identifier = objectType({
 	name: "Identifier",
+	description: "Identifiers used in different contexts, such as internally or in a sentence.",
+	definition(t) {
+		t.string("app", { description: "Identifier as used by an app, not reader-friendly" })
+		t.string("friendly", { description: "Name as used in conversation, reader-friendly" })
+	}
+})
+
+const IdentifierInput = inputObjectType({
+	name: "IdentifierInput",
 	description: "Identifiers used in different contexts, such as internally or in a sentence.",
 	definition(t) {
 		t.string("app", { description: "Identifier as used by an app, not reader-friendly" })
@@ -9,23 +18,56 @@ const Identifier = objectType({
 	}
 })
 
+const ThingInput = inputObjectType({
+	name: "ThingInput",
+	description: "A thing",
+	definition(t) {
+		t.field("identifier", { type: IdentifierInput, description: "Identifier for a thing" })
+	}
+})
+
 const Thing = objectType({
 	name: "Thing",
-	description: "A thing",
 	definition(t) {
 		t.field("identifier", { type: Identifier, description: "Identifier for a thing" })
 	}
 })
 
-const Query = queryField("create", {
+const testData = {
+	identifier: {
+		app: "",
+		friendly: ""
+	}
+}
+
+const Mutation = mutationField("createThing", {
+	type: Thing,
 	description: "Create a thing",
-	type: Thing
+	args: {
+		thing: arg({ type: ThingInput })
+	},
+	resolve(root, args, ctx) {
+		console.log(args)
+		testData.identifier.app = args.thing.identifier.app
+		testData.identifier.friendly = args.thing.identifier.friendly
+		return testData
+	}
+})
+
+const Query = queryField("thing", {
+	type: Thing,
+	resolve() {
+		return testData
+	}
 })
 
 const types = [
-	Query,
+	Identifier,
+	IdentifierInput,
 	Thing,
-	Identifier
+	ThingInput,
+	Mutation,
+	Query
 ]
 
 export { types as createTypes }
