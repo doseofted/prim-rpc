@@ -1,21 +1,21 @@
 import { arg, inputObjectType, mutationField, objectType, queryField } from "nexus"
+import { InputDefinitionBlock, ObjectDefinitionBlock } from "nexus/dist/blocks"
+
+function identifierDefinition<T extends string>(t: InputDefinitionBlock<T> | ObjectDefinitionBlock<T>) {
+	t.string("app", { description: "Identifier as used by an app, not reader-friendly" })
+	t.string("friendly", { description: "Name as used in conversation, reader-friendly" })
+}
 
 const Identifier = objectType({
 	name: "Identifier",
 	description: "Identifiers used in different contexts, such as internally or in a sentence.",
-	definition(t) {
-		t.string("app", { description: "Identifier as used by an app, not reader-friendly" })
-		t.string("friendly", { description: "Name as used in conversation, reader-friendly" })
-	}
+	definition: identifierDefinition
 })
 
 const IdentifierInput = inputObjectType({
 	name: "IdentifierInput",
 	description: "Identifiers used in different contexts, such as internally or in a sentence.",
-	definition(t) {
-		t.string("app", { description: "Identifier as used by an app, not reader-friendly" })
-		t.string("friendly", {description: "Name as used in conversation, reader-friendly" })
-	}
+	definition: identifierDefinition
 })
 
 const ThingInput = inputObjectType({
