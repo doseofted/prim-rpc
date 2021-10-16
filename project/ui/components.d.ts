@@ -4,7 +4,10 @@
 
 declare module 'vue' {
   export interface GlobalComponents {
+    ElemTest: typeof import('./src/components/ElemTest.vue')['default']
     HelloWorld: typeof import('./src/components/HelloWorld.vue')['default']
+    PaperTest: typeof import('./src/components/PaperTest.vue')['default']
+    PtsTest: typeof import('./src/components/PtsTest.vue')['default']
   }
 }
 

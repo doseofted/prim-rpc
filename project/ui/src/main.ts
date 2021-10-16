@@ -5,9 +5,16 @@ import router from "./router"
 import "./style/index.scss"
 import { registerSW } from "virtual:pwa-register"
 import { Capacitor } from "@capacitor/core"
+import { MotionPlugin } from "@vueuse/motion"
+import { GesturePlugin } from "@vueuse/gesture"
+import { createHead } from "@vueuse/head"
 
-const app = createApp(App)
-app.use(router)
+const head = createHead()
+
+const app = createApp(App).use(router)
+	.use(head)
+	.use(MotionPlugin)
+	.use(GesturePlugin)
 app.mount("#app")
 
 const platform = Capacitor.getPlatform()

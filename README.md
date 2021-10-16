@@ -2,6 +2,17 @@
 
 Not a headless CMS but better. A place to structure and handle data. The administration interface is your app.
 
+## Get Going
+
+```bash
+# Set alias and functions, useful for project
+source source.sh
+# Start apps, show all logs, and shut it all down on Ctrl-C
+dc-magic # runs `dc-up && dc-logs || dc-down`
+# Start DNS server that can resolve ".test" TLD
+testdns
+```
+
 ## Idea
 
 To get off on the right foot, here are some ideas to guide initial code:
@@ -25,10 +36,7 @@ To get off on the right foot, here are some ideas to guide initial code:
 - Prim itself may have an initial builder for creating Things with their various validations, behaviors, and relationships. This will work like a node graph where app can be designed visually and structure JSON to declaratively describe Things. The created JSON should be so simple that someone could write it by hand (although you shouldn't have to).
   - Once created, there may be an interface for viewing things as a list or table of readable properties. However, an Interface should be created to view individual Things in detail (otherwise I'm back to viewing a seemingly-random list of fields that vaguely describe a Thing).
   - "Representations" may be added to Simple and Complex Things to describe them and its basic readable properties. For instance, a user might be represented by template "{profilePicture(img)} {name} ({email})". A Simple Thing would be represented by a function, for instance to translate a created "date" type to something in users' language.
-
-## Get Started
-
-To start the project easily, use aliases: `source source.sh`. Reference the following commands for development. Commands starting with `dc` represent `docker-compose`.
+- Prim doesn't reinvent the wheel, it makes the wheel useful by building a car. Cars have been built before but but I didn't like them so I'm making my own. Don't reinvent validation, data-handling, and querying libaries. The only thing being invented is the Prim app, as described above.
 
 ## Server-related Commands
 

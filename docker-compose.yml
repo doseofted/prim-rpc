@@ -2,7 +2,7 @@ version: "3"
 services:
 
   proxy:
-    image: caddy:2.4.3-alpine
+    image: caddy:2.4.5-alpine
     container_name: ${PROJECT_NAME}_proxy
     environment:
       HOST: $HOST
@@ -25,11 +25,12 @@ services:
   ui:
     build:
       context: ./project/ui
+    stop_signal: SIGKILL # no state attached, just kill it
     container_name: ${PROJECT_NAME}_ui
 
   db:
     container_name: ${PROJECT_NAME}_db
-    image: postgres:13.3-alpine
+    image: postgres:14.0-alpine
     environment:
       POSTGRES_DB: $DB_NAME
       POSTGRES_USER: $DB_USER

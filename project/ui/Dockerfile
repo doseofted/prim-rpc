@@ -1,4 +1,11 @@
 # ---
+# Install some utils for container
+# ---
+FROM node:16.7-bullseye as setup
+USER root
+RUN npm install --global zx
+
+# ---
 # Configure project build
 # ---
 FROM node:16.7-bullseye as build
@@ -17,7 +24,7 @@ RUN (export NODE_ENV="production"; yarn build)
 # ---
 # Prepare project to be run
 # ---
-FROM node:16.7-bullseye as run
+FROM setup as run
 # NOTE: NODE_ENV can be overridden while actively developing
 ARG NODE_ENV="production"
 USER node
@@ -34,6 +41,7 @@ COPY --chown=1000:1000 --from=build /home/node/project/dist ./dist
 COPY --chown=1000:1000 . .
 # NOTE: `src` folder is removed from final container but remains part of final Docker image
 RUN rm -fr src
+# RUN chmod +x entrypoint.mjs
 
 EXPOSE 3000
 

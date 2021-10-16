@@ -17,7 +17,7 @@ try {
 $.verbose = true
 
 const mode = process.env.NODE_ENV || "production"
-let dev
+let dev = new Promise(r => r()) // simple promise to resolve, if not in dev mode
 if (mode !== "production") {
 	echo`Running in ${mode} mode. Building in background ...`
 	dev = nothrow($`yarn dev`) // wrap in `nothrow` since it's just a dev process
@@ -31,7 +31,7 @@ try {
 		app.kill("SIGINT") // send interrupt, as if used interactively
 		if (dev) { dev.kill("SIGINT") } // same with dev, if in dev mode
 	})
-	await app
+	await Promise.all([app, dev])
 } catch (p) {
 	echo`app exited, code ${p.exitCode}`
 	if (p.stderr) { echo`error: ${p.stderr}` }
