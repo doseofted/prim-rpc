@@ -8,8 +8,8 @@ Not a headless CMS but better. A place to structure and handle data. The adminis
 # Set alias and functions, useful for project
 source source.sh
 # Start apps, show all logs, and shut it all down on Ctrl-C
-dc-magic # runs `dc-up && dc-logs || dc-down`
-# Start DNS server that can resolve ".test" TLD
+dc-magic
+# Optional: start DNS server that can resolve ".test" TLD, if needed
 testdns
 ```
 

@@ -46,7 +46,8 @@
 			"statusBarItem.hoverBackground": "#3999b5",
 			"statusBarItem.remoteBackground": "#57b0ca",
 			"statusBarItem.remoteForeground": "#15202b"
-		}
+		},
+		"workbench.editor.pinnedTabSizing": "compact"
 	},
 	"extensions": {
 		"recommendations": [
