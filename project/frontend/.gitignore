@@ -8,3 +8,10 @@
 # Documentation here: https://yarnpkg.com/features/zero-installs
 !/.yarn/cache
 #/.pnp.*
+
+# Given by vue-ts template used to generate project with Vite
+node_modules
+.DS_Store
+dist
+dist-ssr
+*.local

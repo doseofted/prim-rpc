@@ -58,7 +58,8 @@
 			"statusBarItem.remoteForeground": "#15202b",
 			"sash.hoverBorder": "#7ec2d6"
 		},
-		"workbench.editor.pinnedTabSizing": "compact"
+		"workbench.editor.pinnedTabSizing": "compact",
+		"editor.linkedEditing": true
 	},
 	"extensions": {
 		"recommendations": [
