@@ -1,28 +1,46 @@
 version: "3"
+
+x-logging:
+  &logging
+  driver: "fluentd"
+  options:
+    fluentd-address: "localhost:24224"
+    fluentd-async: "true"
+
 services:
 
-  proxy:
+  caddy:
+    logging:
+      <<: *logging
     restart: "always"
     volumes:
-      - ./project/proxy/prod.Caddyfile:/etc/caddy/Caddyfile
+      - ./project/server/prod.Caddyfile:/etc/caddy/Caddyfile:ro
+      - ./data/server:/srv:ro
 
-  api:
+  postgres:
+    logging:
+      <<: *logging
+    restart: "always"
+
+  backend:
+    logging:
+      <<: *logging
+    restart: "always"
     build:
       args:
         NODE_ENV: "production"
-    restart: "always"
     environment:
       NODE_ENV: "production"
 
-  ui:
+  frontend:
+    logging:
+      <<: *logging
+    restart: "always"
     build:
       args:
         NODE_ENV: "production"
-    restart: "always"
+    environment:
+      NODE_ENV: "production"
     command: "serve --config vite.prod.config.ts --host=0.0.0.0 --port=3000"
-    environment:
-      NODE_ENV: "production"
-
-  db:
-    restart: "always"
-
+    volumes:
+      - ./data/server:/home/node/project/dist

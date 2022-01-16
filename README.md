@@ -36,7 +36,18 @@ To get off on the right foot, here are some ideas to guide initial code:
 - Prim itself may have an initial builder for creating Things with their various validations, behaviors, and relationships. This will work like a node graph where app can be designed visually and structure JSON to declaratively describe Things. The created JSON should be so simple that someone could write it by hand (although you shouldn't have to).
   - Once created, there may be an interface for viewing things as a list or table of readable properties. However, an Interface should be created to view individual Things in detail (otherwise I'm back to viewing a seemingly-random list of fields that vaguely describe a Thing).
   - "Representations" may be added to Simple and Complex Things to describe them and its basic readable properties. For instance, a user might be represented by template "{profilePicture(img)} {name} ({email})". A Simple Thing would be represented by a function, for instance to translate a created "date" type to something in users' language.
+- There's no such thing as an original Idea. Ideas come from Things around us. In Prim, an "Idea" is computed from Things and doesn't exist except from those things. It's similar to computed properties in Vue. They may be stored and updated in a database for easier searching and querying but they are directly attached to properties of Things
 - Prim doesn't reinvent the wheel, it makes the wheel useful by building a car. Cars have been built before but but I didn't like them so I'm making my own. Don't reinvent validation, data-handling, and querying libaries. The only thing being invented is the Prim app, as described above.
+
+## Get Started
+
+To start the project easily, use aliases: `source source.sh`. Reference the following commands for development. Commands starting with `dc` represent `docker-compose`. To access the project locally with a trusted certificate run alias `devcert` (uses mkcert, only intended fro development). Start the project with `dc-magic`.
+
+If database has never been initialized before (there are zero migrations), run `dex api migrate --name init` to generate Prisma client (along with type definitions for TypeScript), create an inital migration file, and prepare the database. If database has been initalized but not on the current development device, run `dex api prisma migrate dev` to run migrations in development mode. Note that this all happens in Docker, not locally.
+
+In order to use generated TypeScript definitions during local development, run `yarn generate` on machine (happens locally). The environment variable `DATABASE_URL` will need to be populated even though it doesn't appear a connection is made to the database with this command. The `DATABASE_URL` variable can be found in the Docker Compose config of this project. When using `source source.sh`, all required variables will already be set. I'll need to make this simpler in the future.
+
+**Note:** local development of the API server is not possible unless all steps in Docker container are completed including setup if dependencies. This is because the server depends on the database and some values that are only set or otherwise available in the container. For simplicity's sake and since the server will be ran with Docker anaway, just use Docker during development (because things just work).
 
 ## Server-related Commands
 
@@ -49,9 +60,22 @@ Command | Description
 `dex <container_name> <command>` | Run command in running container, for example `dex api yarn` will run execute `yarn` in `api` container.
 `drun <container_name> <command>` | Run command in one-off container based on specified container's image. Without a given command, an interactive bash session will be started.
 
+**Note:** The API container can interact with the database through Prisma. In development, migrations can be created by editing `schema.prisma` with changes and then running `dex api migrate --name [NAME]`. Once pushed to production, the entrypoint file will automatically call `yarn migrate deploy`.
+
 ## App-related Commands
 
-Change folder to `./project/ui` to run the app in a desktop or mobile app. Use the following commands:
+Change folder to `./project/ui` to run the app in a desktop or mobile app. In order to build the project run 
+
+```bash
+# set host to be used in app
+export VITE_HOST=prim.dose.host
+# build the app with host and then sync that to Android and iOS
+yarn build && yarn sync
+# Run on platform needed (also available, `yarn android`)
+yarn ios
+```
+
+Use the following commands specific to app development:
 
 Command | Description
 --- | ---
@@ -65,3 +89,4 @@ Command | Description
 - iOS and Android have support for live reload in development but feature is not supported for Electron yet ([follow issue here](https://github.com/capacitor-community/electron/issues/120))
 - Yarn is aliased so that is can be used regardless of current working directory but some commands like those for Electron platform will require the working directory to be `./project/ui` when running command through Yarn.
 - When developing with Docker, Yarn commands should be ran within container during development to prevent missing modules. Volumes mounted through Compose will allow changes made to `package.json` to be seen from host.
+- On M1 Macs, Node 16 on Debian Buster is not currently working when emulating x86_64 architecture. However Node 16 seems to work on Bullseye release of Debian which is not yet available on Docker Hub for the Node image. Until it is, Node 14 is working and has few major changes from version 16 that will affect me. [Follow issue here](https://github.com/docker/for-mac/issues/5831).

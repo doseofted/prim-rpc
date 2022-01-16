@@ -1,18 +1,27 @@
 version: "3"
 services:
 
-  proxy:
+  caddy:
     restart: "no"
+    ports: 
+      - "2019:2019"
     volumes:
-      - ./project/proxy/dev.Caddyfile:/etc/caddy/Caddyfile
+      - ./project/server/dev.Caddyfile:/etc/caddy/Caddyfile:ro
+      - ./data/server/dev-cert.pem:/etc/caddy/local/dev-cert.pem:ro
+      - ./data/server/dev-key.pem:/etc/caddy/local/dev-key.pem:ro
 
-  api:
-    build:
-      args:
-        NODE_ENV: "development"
+  postgres:
+    restart: "no"
+    ports: 
+      - "5432:5432"
+
+  backend:
     restart: "no"
     ports:
       - "3001:3001"
+    build:
+      args:
+        NODE_ENV: "development"
     environment:
       NODE_ENV: "development"
     volumes:
@@ -21,26 +30,23 @@ services:
       - ./project/api/yarn.lock:/home/node/project/yarn.lock
       - ./project/api/.yarn:/home/node/project/.yarn
 
-  ui:
-    build:
-      args:
-        NODE_ENV: "development"
+  frontend:
     restart: "no"
     ports:
       - "3000:3000"
-    command: "dev --host=0.0.0.0 --port=3000"
+    build:
+      args:
+        NODE_ENV: "development"
     environment:
       NODE_ENV: "development"
     volumes:
-      - ./project/ui/public:/home/node/project/public
       - ./project/ui/src:/home/node/project/src
+      - ./project/ui/public:/home/node/project/public
       - ./project/ui/index.html:/home/node/project/index.html
       - ./project/ui/vite.config.ts:/home/node/project/vite.config.ts
+      - ./project/ui/postcss.config.js:/home/node/project/postcss.config.js
+      - ./project/ui/tailwind.config.js:/home/node/project/tailwind.config.js
       - ./project/ui/package.json:/home/node/project/package.json
       - ./project/ui/yarn.lock:/home/node/project/yarn.lock
       - ./project/ui/.yarn:/home/node/project/.yarn
-
-  db:
-    restart: "no"
-    ports: 
-      - "5432:5432"
+    command: "dev --host=0.0.0.0 --port=3000"

@@ -1,0 +1,26 @@
+import base.Caddyfile
+
+(dev_certificates) {
+  tls /etc/caddy/local/dev-cert.pem /etc/caddy/local/dev-key.pem
+}
+
+{
+  import log_options
+  local_certs
+}
+
+www.{$HOST} {
+  import dev_certificates
+  redir https://{$HOST}{uri}
+}
+
+{$HOST} {
+  import dev_certificates
+  # NOTE: use dev server in development
+  reverse_proxy frontend:3000
+}
+
+api.{$HOST} {
+  import dev_certificates
+  reverse_proxy backend:3001
+}
