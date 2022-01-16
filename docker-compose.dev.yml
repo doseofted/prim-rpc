@@ -1,4 +1,5 @@
 version: "3"
+
 services:
 
   caddy:
@@ -25,10 +26,12 @@ services:
     environment:
       NODE_ENV: "development"
     volumes:
-      - ./project/api/src:/home/node/project/src
-      - ./project/api/package.json:/home/node/project/package.json
-      - ./project/api/yarn.lock:/home/node/project/yarn.lock
-      - ./project/api/.yarn:/home/node/project/.yarn
+      # Volumes for Yarn (so installs ran in containers are written to host)
+      - ./project/backend/.yarn:/home/node/project/.yarn
+      - ./project/backend/package.json:/home/node/project/package.json
+      - ./project/backend/yarn.lock:/home/node/project/yarn.lock
+      # App files
+      - ./project/backend/src:/home/node/project/src
 
   frontend:
     restart: "no"
@@ -40,13 +43,15 @@ services:
     environment:
       NODE_ENV: "development"
     volumes:
-      - ./project/ui/src:/home/node/project/src
-      - ./project/ui/public:/home/node/project/public
-      - ./project/ui/index.html:/home/node/project/index.html
-      - ./project/ui/vite.config.ts:/home/node/project/vite.config.ts
-      - ./project/ui/postcss.config.js:/home/node/project/postcss.config.js
-      - ./project/ui/tailwind.config.js:/home/node/project/tailwind.config.js
-      - ./project/ui/package.json:/home/node/project/package.json
-      - ./project/ui/yarn.lock:/home/node/project/yarn.lock
-      - ./project/ui/.yarn:/home/node/project/.yarn
+      # Volumes for Yarn (so installs ran in containers are written to host)
+      - ./project/frontend/.yarn:/home/node/project/.yarn
+      - ./project/frontend/package.json:/home/node/project/package.json
+      - ./project/frontend/yarn.lock:/home/node/project/yarn.lock
+      # App files
+      - ./project/frontend/src:/home/node/project/src
+      - ./project/frontend/public:/home/node/project/public
+      - ./project/frontend/index.html:/home/node/project/index.html
+      - ./project/frontend/vite.config.ts:/home/node/project/vite.config.ts
+      - ./project/frontend/postcss.config.js:/home/node/project/postcss.config.js
+      - ./project/frontend/tailwind.config.js:/home/node/project/tailwind.config.js
     command: "dev --host=0.0.0.0 --port=3000"

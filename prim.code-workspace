@@ -5,16 +5,16 @@
 			"path": "."
 		},
 		{
-			"name": "Interface",
-			"path": "./project/ui"
+			"name": "Frontend",
+			"path": "./project/frontend"
+		},
+		{
+			"name": "Backend",
+			"path": "./project/backend"
 		},
 		{
 			"name": "Server",
-			"path": "./project/api"
-		},
-		{
-			"name": "Proxy",
-			"path": "./project/proxy"
+			"path": "./project/server"
 		}
 	],
 	"settings": {
@@ -41,8 +41,8 @@
 			"vue"
 		],
 		"eslint.workingDirectories": [
-			"./project/ui",
-			"./project/api"
+			"./project/frontend",
+			"./project/backend"
 		],
 		"peacock.color": "#57b0ca",
 		"peacock.affectStatusAndTitleBorders": true,
