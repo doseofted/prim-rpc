@@ -63,11 +63,12 @@
 	},
 	"extensions": {
 		"recommendations": [
+			"arcanis.vscode-zipfs",
 			"johnsoncodehk.volar",
 			"ms-azuretools.vscode-docker",
 			"stylelint.vscode-stylelint",
 			"dbaeumer.vscode-eslint",
-			"bradlc.vscode-tailwindcss"
+			"bradlc.vscode-tailwindcss",
 		],
 		"unwantedRecommendations": [
 			"octref.vetur"
