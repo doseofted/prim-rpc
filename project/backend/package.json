@@ -1,4 +1,15 @@
 {
   "name": "backend",
-  "packageManager": "pnpm@6.26.1"
+  "packageManager": "pnpm@6.26.1",
+  "source": "src/index.ts",
+  "engines": {
+    "node": ">= 16.13.2"
+  },
+  "scripts": {
+    "start": "parcel",
+    "build": "parcel build"
+  },
+  "devDependencies": {
+    "parcel": "^2.2.0"
+  }
 }
