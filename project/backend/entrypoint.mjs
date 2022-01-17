@@ -20,7 +20,7 @@ let dev = new Promise(r => r()) // simple promise to resolve, if not in dev mode
 
 if (mode !== "production") {
 	echo`Running in ${mode} mode. Building in background ...`
-	dev = nothrow($`pnpm watch`) // wrap in `nothrow` since it's just a dev process
+	dev = nothrow($`pnpm dev`) // wrap in `nothrow` since it's just a dev process
 }
 
 const args = process.argv.slice(3).join(" ")

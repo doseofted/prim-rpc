@@ -26,10 +26,9 @@ services:
     environment:
       NODE_ENV: "development"
     volumes:
-      # Volumes for Yarn (so installs ran in containers are written to host)
-      - ./project/backend/.yarn:/home/node/project/.yarn
+      # Volumes for pnpm (so installs ran in containers are written to host)
       - ./project/backend/package.json:/home/node/project/package.json
-      - ./project/backend/yarn.lock:/home/node/project/yarn.lock
+      - ./project/backend/pnpm-lock.yaml:/home/node/project/pnpm-lock.yaml
       # App files
       - ./project/backend/src:/home/node/project/src
 
@@ -43,15 +42,12 @@ services:
     environment:
       NODE_ENV: "development"
     volumes:
-      # Volumes for Yarn (so installs ran in containers are written to host)
-      - ./project/frontend/.yarn:/home/node/project/.yarn
+      # Volumes for pnpm (so installs ran in containers are written to host)
       - ./project/frontend/package.json:/home/node/project/package.json
-      - ./project/frontend/yarn.lock:/home/node/project/yarn.lock
+      - ./project/backend/pnpm-lock.yaml:/home/node/project/pnpm-lock.yaml
       # App files
       - ./project/frontend/src:/home/node/project/src
       - ./project/frontend/public:/home/node/project/public
       - ./project/frontend/index.html:/home/node/project/index.html
       - ./project/frontend/vite.config.ts:/home/node/project/vite.config.ts
-      - ./project/frontend/postcss.config.js:/home/node/project/postcss.config.js
-      - ./project/frontend/tailwind.config.js:/home/node/project/tailwind.config.js
-    command: "dev --host=0.0.0.0 --port=3000"
+    command: "dev"

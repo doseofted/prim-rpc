@@ -4,6 +4,8 @@
 FROM node:16.13-bullseye as setup
 USER root
 RUN npm install --global zx
+RUN corepack enable
+RUN corepack prepare pnpm@6.26.1 --activate
 USER node
 RUN mkdir -p /home/node/project
 WORKDIR /home/node/project
@@ -15,12 +17,13 @@ FROM node:16.13-bullseye as build
 USER node
 RUN mkdir -p /home/node/project
 WORKDIR /home/node/project
-COPY --chown=1000:1000 package.json .
-COPY --chown=1000:1000 pnpm-lock.yaml .
+# REFERENCE: for pnpm install in container https://pnpm.io/cli/fetch
+COPY --chown=1000:1000 package.json pnpm-lock.yaml ./
+RUN pnpm fetch
 # force NODE_ENV to development to install dev dependencies for build
-RUN (export NODE_ENV="development"; pnpm install)
+RUN (export NODE_ENV="development"; pnpm install --frozen-lockfile --offline)
 COPY --chown=1000:1000 . .
-# needed to run app
+RUN pnpm check
 RUN (export NODE_ENV="production"; pnpm build)
 
 # ---

@@ -7,7 +7,7 @@
   },
   "scripts": {
     "check": "tsc --noEmit",
-    "watch": "parcel watch",
+    "dev": "parcel watch",
     "build": "parcel build",
     "start": "nodemon dist/index.js",
     "watchstart": "nodemon dist/index.js"

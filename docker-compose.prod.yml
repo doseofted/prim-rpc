@@ -41,6 +41,6 @@ services:
         NODE_ENV: "production"
     environment:
       NODE_ENV: "production"
-    command: "serve --config vite.prod.config.ts --host=0.0.0.0 --port=3000"
+    command: "preview"
     volumes:
       - ./data/server:/home/node/project/dist
