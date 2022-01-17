@@ -1,5 +1,14 @@
-const a: number = 5
+import Fastify from 'fastify'
 
-console.log(a)
+const fastify = Fastify({ logger: true })
 
-export { a }
+fastify.get('/', function (request, reply) {
+	reply.send({ hello: 'world' })
+})
+
+fastify.listen(3001, function (err, address) {
+	if (err) {
+		fastify.log.error(err)
+		process.exit(1)
+	}
+})

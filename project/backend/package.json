@@ -6,12 +6,18 @@
     "node": ">= 16.13.2"
   },
   "scripts": {
-    "start": "parcel",
     "check": "tsc --noEmit",
-    "build": "parcel build"
+    "watch": "parcel watch",
+    "build": "parcel build",
+    "start": "nodemon dist/index.js",
+    "watchstart": "nodemon dist/index.js"
   },
   "devDependencies": {
+    "nodemon": "^2.0.15",
     "parcel": "^2.2.0",
     "typescript": "^4.5.4"
+  },
+  "dependencies": {
+    "fastify": "^3.25.3"
   }
 }
