@@ -7,9 +7,11 @@
   },
   "scripts": {
     "start": "parcel",
+    "check": "tsc --noEmit",
     "build": "parcel build"
   },
   "devDependencies": {
-    "parcel": "^2.2.0"
+    "parcel": "^2.2.0",
+    "typescript": "^4.5.4"
   }
 }
