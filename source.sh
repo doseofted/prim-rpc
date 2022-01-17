@@ -12,7 +12,7 @@ setenv () {
   local file=$([ -z "$1" ] && echo ".env" || echo ".env.$1")
   if [[ -f $file ]]; then
     set -a; source $file; set +a
-    echo "Functions and aliases are set for $ENV_COMPOSE environment."
+    echo "Functions and aliases are set for $COMPOSE_ENV environment."
   else
     echo "No $file file found. Are you in the project root?" 1>&2
     return 1
@@ -30,7 +30,7 @@ fi
 dc () {
   local dcdev=("-f" "${PROJECT_DIR}/docker-compose.yml" "-f" "${PROJECT_DIR}/docker-compose.dev.yml")
   local dcprod=("-f" "${PROJECT_DIR}/docker-compose.yml" "-f" "${PROJECT_DIR}/misc/logging.yml" "-f" "${PROJECT_DIR}/docker-compose.prod.yml")
-  if [[ "$ENV_COMPOSE" == "development" ]]; then
+  if [[ "$COMPOSE_ENV" == "development" ]]; then
     ENV_TO_USE=("${dcdev[@]}")
   else
     ENV_TO_USE=("${dcprod[@]}")
@@ -74,10 +74,11 @@ drun () {
 # Generate a new certificate trusted by the host system (`mkcert` must be installed)
 # Install guide: https://github.com/FiloSottile/mkcert#installation
 devcert () {
+  mkdir -p "${PROJECT_DIR}/data/server/"
   mkcert \
     -key-file "${PROJECT_DIR}/data/server/dev-key.pem" \
     -cert-file "${PROJECT_DIR}/data/server/dev-cert.pem" \
-    $COMPOSE_HOST
+    $COMPOSE_HOST "*.$COMPOSE_HOST" localhost 127.0.0.1 ::1
 }
 
 # Containerized DNS server, to be used with `dev.Corefile` configuration.

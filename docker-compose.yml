@@ -6,12 +6,10 @@ x-environment:
   COMPOSE_HOST: $COMPOSE_HOST
 
 x-database:
-  # NOTE: DATABASE_HOST must match postgres service name below
   &database
-  DATABASE_HOST: "postgres"
-  DATABASE_DB: "prim"
-  DATABASE_USER: "proper"
-  DATABASE_PASSWORD: $POSTGRES_PASSWORD
+  POSTGRES_DB: "prim"
+  POSTGRES_USER: "proper"
+  POSTGRES_PASSWORD: $POSTGRES_PASSWORD
 
 services:
 
@@ -44,6 +42,8 @@ services:
       context: ./project/backend
     environment:
       <<: [ *base_environment, *database ]
+      # NOTE: DATABASE_HOST must match postgres service name above
+      DATABASE_HOST: "postgres"
       SES_SMTP_USER: $SES_SMTP_USER
       SES_SMTP_PASS: $SES_SMTP_PASS
       SES_SMTP_HOST: $SES_SMTP_HOST

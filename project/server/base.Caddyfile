@@ -4,3 +4,7 @@
     format json
   }
 }
+
+(dev_certificates) {
+  tls /etc/caddy/local/dev-cert.pem /etc/caddy/local/dev-key.pem
+}

@@ -13,10 +13,8 @@ WORKDIR /home/node/project
 # ---
 # Configure project build
 # ---
-FROM node:16.13-bullseye as build
+FROM setup as build
 USER node
-RUN mkdir -p /home/node/project
-WORKDIR /home/node/project
 # REFERENCE: for pnpm install in container https://pnpm.io/cli/fetch
 COPY --chown=1000:1000 package.json pnpm-lock.yaml ./
 RUN pnpm fetch
@@ -33,10 +31,10 @@ FROM setup as run
 # NOTE: NODE_ENV can be overridden while actively developing
 USER node
 ARG NODE_ENV="production"
-COPY --chown=1000:1000 package.json .
-COPY --chown=1000:1000 pnpm-lock.yaml .
+COPY --chown=1000:1000 package.json pnpm-lock.yaml ./
 # unlike build stage, I only need production dependencies here
-RUN yarn
+RUN pnpm fetch
+RUN pnpm install --frozen-lockfile --offline
 # user "node" in container has UID/GID of 1000
 COPY --chown=1000:1000 --from=build /home/node/project/dist ./dist
 

@@ -8,16 +8,16 @@ import base.Caddyfile
   # acme_ca https://acme-staging-v02.api.letsencrypt.org/directory
 }
 
-www.{$HOST} {
-  redir https://{$HOST}{uri}
+www.{$COMPOSE_HOST} {
+  redir https://{$COMPOSE_HOST}{uri}
 }
 
-{$HOST} {
-  reverse_proxy api:3001
+{$COMPOSE_HOST} {
+  reverse_proxy frontend:3000
   root * /srv
   file_server
 }
 
-api.{$HOST} {
+api.{$COMPOSE_HOST} {
   reverse_proxy backend:3001
 }
