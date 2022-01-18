@@ -39,21 +39,21 @@ dc () {
 }
 
 # Show logs in running containers for set environment (see `dc` function above)
-alias dc-logs="dc logs -f --tail=50"
+alias dc-logs="dc logs -f --tail=15"
 # Start all services for configuration
 alias dc-up="dc up --build -d"
 # Stop all services for configuration (assuming already started)
 alias dc-down="dc down -v --remove-orphans -t 10"
 
-# Start Docker Compose and immediately view logs. Ctrl-C doesn't kill the thing. Run `dc-down` when done.
-dc-magic-bg () {
+# Start Docker Compose services and immediately view logs. Ctrl-C doesn't kill the thing.
+dc-magic () {
   dc-up && dc-logs
-  echo "Services are still running. Run dc-down to stop services."
+  echo "\nServices are still running.\n  - \`dc-down\`: stop services\n  - \`dc-logs\`: view logs again"
 }
 
 # For development. Start Docker Compose in foreground and stop all services when done with it.
-# It's essentially the same as running `docker-compose up -d` except
-dc-magic () {
+# It's essentially the same as running `docker-compose up -d` except provided a bunch of given parameters
+dc-magic-fg () {
   dc-up && dc-logs || dc-down
 }
 

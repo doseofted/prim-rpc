@@ -68,3 +68,6 @@ services:
     environment:
       VITE_HOST: $COMPOSE_HOST
       VITE_COMPOSE_ENV: $COMPOSE_ENV
+
+  #libraries:
+    # TODO: once working, add service with shared volumes so libraries can be used by other containers

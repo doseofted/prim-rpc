@@ -5,6 +5,10 @@
 			"path": "."
 		},
 		{
+			"name": "Libraries",
+			"path": "./project/libraries"
+		},
+		{
 			"name": "Frontend",
 			"path": "./project/frontend"
 		},
@@ -42,7 +46,8 @@
 		],
 		"eslint.workingDirectories": [
 			"./project/frontend",
-			"./project/backend"
+			"./project/backend",
+			"./project/libraries"
 		],
 		"peacock.color": "#57b0ca",
 		"peacock.affectStatusAndTitleBorders": true,

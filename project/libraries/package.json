@@ -1,0 +1,19 @@
+{
+	"name": "andproper",
+	"private": true,
+	"scripts": {
+		"dev": "parcel watch packages/*",
+		"build": "parcel build packages/*"
+	},
+	"packageManager": "pnpm@6.26.1",
+	"devDependencies": {
+		"@parcel/packager-ts": "^2.2.1",
+		"@parcel/transformer-typescript-types": "^2.2.1",
+		"parcel": "^2.2.1",
+		"postcss": "^8.4.5",
+		"typescript": ">=3.0.0"
+	},
+	"peerDependencies": {
+		"postcss": "^8.4.5"
+	}
+}
