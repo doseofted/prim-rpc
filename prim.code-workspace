@@ -5,16 +5,20 @@
 			"path": "."
 		},
 		{
+			"name": "Libraries",
+			"path": "./project/libraries"
+		},
+		{
 			"name": "Frontend",
-			"path": "./project/ui"
+			"path": "./project/frontend"
 		},
 		{
-			"name": "API Server",
-			"path": "./project/api"
+			"name": "Backend",
+			"path": "./project/backend"
 		},
 		{
-			"name": "Reverse Proxy",
-			"path": "./project/proxy"
+			"name": "Server",
+			"path": "./project/server"
 		}
 	],
 	"settings": {
@@ -27,14 +31,25 @@
 			"source.fixAll": true
 		},
 		"editor.formatOnPaste": true,
-		"npm.packageManager": "yarn",
 		"css.lint.unknownAtRules": "ignore",
 		"scss.lint.unknownAtRules": "ignore",
 		"css.validate": false,
 		"less.validate": false,
 		"scss.validate": false,
+		"npm.packageManager": "auto",
+		"eslint.validate": [
+			"javascript",
+			"javascriptreact",
+			"typescript",
+			"typescriptreact",
+			"vue"
+		],
+		"eslint.workingDirectories": [
+			"./project/frontend",
+			"./project/backend",
+			"./project/libraries"
+		],
 		"peacock.color": "#57b0ca",
-		"peacock.affectAccentBorders": false,
 		"peacock.affectStatusAndTitleBorders": true,
 		"peacock.affectTitleBar": false,
 		"peacock.affectActivityBar": false,
@@ -45,14 +60,19 @@
 			"statusBar.foreground": "#15202b",
 			"statusBarItem.hoverBackground": "#3999b5",
 			"statusBarItem.remoteBackground": "#57b0ca",
-			"statusBarItem.remoteForeground": "#15202b"
+			"statusBarItem.remoteForeground": "#15202b",
+			"sash.hoverBorder": "#7ec2d6"
 		},
-		"workbench.editor.pinnedTabSizing": "compact"
+		"workbench.editor.pinnedTabSizing": "compact",
+		"editor.linkedEditing": true
 	},
 	"extensions": {
 		"recommendations": [
 			"johnsoncodehk.volar",
-			"ms-azuretools.vscode-docker"
+			"ms-azuretools.vscode-docker",
+			"stylelint.vscode-stylelint",
+			"dbaeumer.vscode-eslint",
+			"bradlc.vscode-tailwindcss",
 		],
 		"unwantedRecommendations": [
 			"octref.vetur"

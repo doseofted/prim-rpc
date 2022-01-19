@@ -1,0 +1,22 @@
+import base.Caddyfile
+
+{
+  import log_options
+  local_certs
+}
+
+www.{$COMPOSE_HOST} {
+  import dev_certificates
+  redir https://{$COMPOSE_HOST}{uri}
+}
+
+{$COMPOSE_HOST} {
+  import dev_certificates
+  # NOTE: use dev server in development
+  reverse_proxy frontend:3000
+}
+
+api.{$COMPOSE_HOST} {
+  import dev_certificates
+  reverse_proxy backend:3001
+}

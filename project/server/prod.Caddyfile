@@ -1,0 +1,23 @@
+import base.Caddyfile
+
+{
+  import log_options
+  email {$ADMIN_EMAIL}
+  # use below for staging environment
+  # REFERENCE: https://caddyserver.com/docs/caddyfile/options#acme-ca
+  # acme_ca https://acme-staging-v02.api.letsencrypt.org/directory
+}
+
+www.{$COMPOSE_HOST} {
+  redir https://{$COMPOSE_HOST}{uri}
+}
+
+{$COMPOSE_HOST} {
+  reverse_proxy frontend:3000
+  root * /srv
+  file_server
+}
+
+api.{$COMPOSE_HOST} {
+  reverse_proxy backend:3001
+}

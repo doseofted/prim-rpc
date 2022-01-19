@@ -1,6 +1,0 @@
-(log_options) {
-  log {
-    output stdout
-    format json
-  }
-}

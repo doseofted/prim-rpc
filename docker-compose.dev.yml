@@ -1,46 +1,61 @@
 version: "3"
+
 services:
 
-  proxy:
+  caddy:
     restart: "no"
+    ports: 
+      - "2019:2019"
     volumes:
-      - ./project/proxy/dev.Caddyfile:/etc/caddy/Caddyfile
+      - ./project/server/dev.Caddyfile:/etc/caddy/Caddyfile:ro
+      - ./data/server/dev-cert.pem:/etc/caddy/local/dev-cert.pem:ro
+      - ./data/server/dev-key.pem:/etc/caddy/local/dev-key.pem:ro
 
-  api:
-    build:
-      args:
-        NODE_ENV: "development"
-    restart: "no"
-    ports:
-      - "3001:3001"
-    environment:
-      NODE_ENV: "development"
-    volumes:
-      - ./project/api/src:/home/node/project/src
-      - ./project/api/package.json:/home/node/project/package.json
-      - ./project/api/yarn.lock:/home/node/project/yarn.lock
-      - ./project/api/.yarn:/home/node/project/.yarn
-
-  ui:
-    build:
-      args:
-        NODE_ENV: "development"
-    restart: "no"
-    ports:
-      - "3000:3000"
-    command: "dev --host=0.0.0.0 --port=3000"
-    environment:
-      NODE_ENV: "development"
-    volumes:
-      - ./project/ui/public:/home/node/project/public
-      - ./project/ui/src:/home/node/project/src
-      - ./project/ui/index.html:/home/node/project/index.html
-      - ./project/ui/vite.config.ts:/home/node/project/vite.config.ts
-      - ./project/ui/package.json:/home/node/project/package.json
-      - ./project/ui/yarn.lock:/home/node/project/yarn.lock
-      - ./project/ui/.yarn:/home/node/project/.yarn
-
-  db:
+  postgres:
     restart: "no"
     ports: 
       - "5432:5432"
+
+  backend:
+    restart: "no"
+    ports:
+      - "3001:3001"
+    build:
+      args:
+        NODE_ENV: "development"
+    environment:
+      NODE_ENV: "development"
+    volumes:
+      # Volumes for pnpm (so installs ran in containers are written to host)
+      - ./project/backend/package.json:/home/node/project/package.json
+      - ./project/backend/pnpm-lock.yaml:/home/node/project/pnpm-lock.yaml
+      # App files
+      - ./project/backend/src:/home/node/project/src
+
+  frontend:
+    restart: "no"
+    ports:
+      - "3000:3000"
+    build:
+      args:
+        NODE_ENV: "development"
+    environment:
+      NODE_ENV: "development"
+    volumes:
+      # Volumes for pnpm (so installs ran in containers are written to host)
+      - ./project/frontend/package.json:/home/node/project/package.json
+      - ./project/backend/pnpm-lock.yaml:/home/node/project/pnpm-lock.yaml
+      # App files
+      - ./project/frontend/src:/home/node/project/src
+      - ./project/frontend/public:/home/node/project/public
+      - ./project/frontend/index.html:/home/node/project/index.html
+      - ./project/frontend/vite.config.ts:/home/node/project/vite.config.ts
+    command: "dev"
+
+  # libraries:
+  #   restart: "no"
+  #   build:
+  #     args:
+  #       NODE_ENV: "development"
+  #   environment:
+  #     NODE_ENV: "development"
