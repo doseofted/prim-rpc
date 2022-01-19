@@ -39,6 +39,7 @@ RUN pnpm fetch
 RUN pnpm install --frozen-lockfile --offline
 # user "node" in container has UID/GID of 1000
 COPY --chown=1000:1000 --from=build /home/node/project/dist ./dist
+# NOTE: copying everything is useful for development processes but should probably be removed from production container
 COPY --chown=1000:1000 . .
 # RUN chmod +x entrypoint.mjs
 

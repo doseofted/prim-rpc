@@ -51,3 +51,11 @@ services:
       - ./project/frontend/index.html:/home/node/project/index.html
       - ./project/frontend/vite.config.ts:/home/node/project/vite.config.ts
     command: "dev"
+
+  # libraries:
+  #   restart: "no"
+  #   build:
+  #     args:
+  #       NODE_ENV: "development"
+  #   environment:
+  #     NODE_ENV: "development"

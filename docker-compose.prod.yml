@@ -44,3 +44,13 @@ services:
     command: "preview"
     volumes:
       - ./data/server:/home/node/project/dist
+
+  # libraries:
+  #   logging:
+  #     <<: *logging
+  #   restart: "always"
+  #   build:
+  #     args:
+  #       NODE_ENV: "production"
+  #   environment:
+  #     NODE_ENV: "production"

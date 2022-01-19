@@ -40,6 +40,8 @@ COPY --chown=1000:1000 --from=build /home/node/project/dist ./dist
 
 COPY --chown=1000:1000 ./entrypoint.mjs .
 RUN chmod +x entrypoint.mjs
+# NOTE: copying everything is useful for development processes but should probably be removed from production container
+COPY --chown=1000:1000 . .
 
 EXPOSE 3001
 

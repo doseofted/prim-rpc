@@ -57,17 +57,28 @@ services:
   frontend:
     build:
       context: ./project/frontend
-      # NOTE: in production, build arguments are always used
+      # in production, build arguments are always used
       args:
         VITE_HOST: $COMPOSE_HOST
         VITE_COMPOSE_ENV: $COMPOSE_ENV
     # no state attached, just kill it
     stop_signal: SIGKILL
-    # NOTE: in development, the dev server will utilize these
+    # in development, the dev server will utilize these
     # and must be prefixed with "VITE_" as security measure
     environment:
       VITE_HOST: $COMPOSE_HOST
       VITE_COMPOSE_ENV: $COMPOSE_ENV
+    volumes:
+      # Folder organization must match host system so that project can also be built outside of Docker
+      - ./data/libraries:/home/node/libraries:ro
 
-  #libraries:
-    # TODO: once working, add service with shared volumes so libraries can be used by other containers
+  # libraries:
+  #   build:
+  #     context: ./project/libraries
+  #     args:
+  #       <<: *base_environment
+  #   environment:
+  #     <<: *base_environment
+  #   volumes:
+  #     # root `dist` folder will contain final built copies of all libraries (not watched in dev mode)
+  #     - ./data/libraries:/home/node/project/dist

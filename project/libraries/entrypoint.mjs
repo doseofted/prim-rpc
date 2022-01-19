@@ -24,10 +24,10 @@ if (mode !== "production") {
 }
 
 const args = process.argv.slice(3).join(" ")
-echo`Starting app in ${mode} mode ...`
+echo`Keeping libraries container open (to use mounted volumes), in ${mode} mode ...`
 try {
 	// TODO: use script that keeps container open so volumes can be mounted to others to use build libraries
-	const app = $`pnpm ${args || (mode === "production" ? "start" : "watchstart")}`
+	const app = $`tail -f /dev/null`
 	process.on("SIGTERM", () => { // sigterm received from docker-compose
 		app.kill("SIGINT") // send interrupt, as if used interactively
 		if (dev) { dev.kill("SIGINT") } // same with dev, if in dev mode
