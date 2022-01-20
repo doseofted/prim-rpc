@@ -5,9 +5,9 @@
 # ---
 FROM node:16.13-bullseye as setup
 USER root
-RUN npm install --global zx
 RUN corepack enable
 RUN corepack prepare pnpm@6.26.1 --activate
+RUN pnpm install zx --global
 USER node
 RUN mkdir -p /home/node/project
 WORKDIR /home/node/project
@@ -18,25 +18,22 @@ WORKDIR /home/node/project
 FROM setup as production_modules
 USER node
 # REFERENCE: for pnpm install in container https://pnpm.io/cli/fetch
-COPY --chown=1000:1000 .pnpm-workspace.yaml package.json pnpm-lock.yaml ./
+COPY --chown=1000:1000 pnpm-*.yaml package.json ./
 # install prod dependencies since dev dependencies are only needed for build
 RUN pnpm fetch --prod
 
 # ---
 # Configure project build
 # ---
-FROM setup as build
+FROM production_modules as build
 USER node
-# REFERENCE: for pnpm install in container https://pnpm.io/cli/fetch
-COPY --chown=1000:1000 .pnpm-workspace.yaml package.json pnpm-lock.yaml ./
-# install dev dependencies since they'll be needed for build
+# in addition to prod dependencies, install dev dependencies since they'll be needed for build
 RUN pnpm fetch --dev
 COPY --chown=1000:1000 libraries/* .
-# force NODE_ENV to development to install dev dependencies for build
-RUN (export NODE_ENV="development"; pnpm install -r --frozen-lockfile --offline)
-COPY --chown=1000:1000 . .
+# FIXME: add `--frozen-lockfile` back to install. For some reason it fails in container.
+RUN pnpm install --offline --frozen-lockfile --dev -r
 # build all packages copied into the container from the monorepo
-RUN (export NODE_ENV="production"; pnpm build)
+RUN pnpm libraries:build
 
 # ---
 # Prepare project to be run
@@ -50,7 +47,7 @@ ARG COMPOSE_HOST
 # Copy all build libraries and their package.json
 COPY --from=build /home/node/project/libraries/*/dist /home/node/project/libraries/*/package.json /home/node/project/libraries/*/pnpm-lock.yaml ./
 # unlike build stage, I only need production dependencies here
-RUN pnpm install -r --frozen-lockfile --offline
+RUN pnpm install --frozen-lockfile --offline --prod
 
 RUN mkdir -p /home/node/misc
 COPY --chown=1000:1000 misc/zx-utils.mjs /home/node/misc
