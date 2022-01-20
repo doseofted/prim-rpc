@@ -36,49 +36,50 @@ services:
     volumes:
       - ./data/postgres:/var/lib/postgresql/data
 
-  # Where API is hosted
-  backend:
-    build:
-      context: ./project/backend
-    environment:
-      <<: [ *base_environment, *database ]
-      # NOTE: DATABASE_HOST must match postgres service name above
-      DATABASE_HOST: "postgres"
-      SES_SMTP_USER: $SES_SMTP_USER
-      SES_SMTP_PASS: $SES_SMTP_PASS
-      SES_SMTP_HOST: $SES_SMTP_HOST
-      SES_FROM_ADDR: $SES_FROM_ADDR
-      SES_SMTP_PORT: "465"
-      TELEGRAM_BOT_TOKEN: $TELEGRAM_BOT_TOKEN
-      TELEGRAM_CHAT_ID_LIST: $TELEGRAM_CHAT_ID_LIST
-    volumes:
-      - ./data/backend/uploads:/home/node/project/uploads
-
-  frontend:
-    build:
-      context: ./project/frontend
-      # in production, build arguments are always used
-      args:
-        VITE_HOST: $COMPOSE_HOST
-        VITE_COMPOSE_ENV: $COMPOSE_ENV
-    # no state attached, just kill it
-    stop_signal: SIGKILL
-    # in development, the dev server will utilize these
-    # and must be prefixed with "VITE_" as security measure
-    environment:
-      VITE_HOST: $COMPOSE_HOST
-      VITE_COMPOSE_ENV: $COMPOSE_ENV
-    volumes:
-      # Folder organization must match host system so that project can also be built outside of Docker
-      - ./data/libraries:/home/node/libraries:ro
-
-  # libraries:
+  # # Where API is hosted
+  # backend:
   #   build:
-  #     context: ./project/libraries
-  #     args:
-  #       <<: *base_environment
+  #     context: ./project/backend
   #   environment:
-  #     <<: *base_environment
+  #     <<: [ *base_environment, *database ]
+  #     # NOTE: DATABASE_HOST must match postgres service name above
+  #     DATABASE_HOST: "postgres"
+  #     SES_SMTP_USER: $SES_SMTP_USER
+  #     SES_SMTP_PASS: $SES_SMTP_PASS
+  #     SES_SMTP_HOST: $SES_SMTP_HOST
+  #     SES_FROM_ADDR: $SES_FROM_ADDR
+  #     SES_SMTP_PORT: "465"
+  #     TELEGRAM_BOT_TOKEN: $TELEGRAM_BOT_TOKEN
+  #     TELEGRAM_CHAT_ID_LIST: $TELEGRAM_CHAT_ID_LIST
   #   volumes:
-  #     # root `dist` folder will contain final built copies of all libraries (not watched in dev mode)
-  #     - ./data/libraries:/home/node/project/dist
+  #     - ./data/backend/uploads:/home/node/project/uploads
+
+  # frontend:
+  #   build:
+  #     context: ./project/frontend
+  #     # in production, build arguments are always used
+  #     args:
+  #       VITE_HOST: $COMPOSE_HOST
+  #       VITE_COMPOSE_ENV: $COMPOSE_ENV
+  #   # no state attached, just kill it
+  #   stop_signal: SIGKILL
+  #   # in development, the dev server will utilize these
+  #   # and must be prefixed with "VITE_" as security measure
+  #   environment:
+  #     VITE_HOST: $COMPOSE_HOST
+  #     VITE_COMPOSE_ENV: $COMPOSE_ENV
+  #   volumes:
+  #     # Folder organization must match host system so that project can also be built outside of Docker
+  #     - ./data/libraries:/home/node/libraries:ro
+
+  libraries:
+    build:
+      context: .
+      dockerfile: ./libraries/monorepo.Dockerfile
+      args:
+        <<: *base_environment
+    environment:
+      <<: *base_environment
+    # volumes:
+    #   # root `dist` folder will contain final built copies of all libraries (not watched in dev mode)
+    #   - ./data/libraries:/home/node/project

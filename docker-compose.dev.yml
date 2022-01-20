@@ -16,46 +16,46 @@ services:
     ports: 
       - "5432:5432"
 
-  backend:
-    restart: "no"
-    ports:
-      - "3001:3001"
-    build:
-      args:
-        NODE_ENV: "development"
-    environment:
-      NODE_ENV: "development"
-    volumes:
-      # Volumes for pnpm (so installs ran in containers are written to host)
-      - ./project/backend/package.json:/home/node/project/package.json
-      - ./project/backend/pnpm-lock.yaml:/home/node/project/pnpm-lock.yaml
-      # App files
-      - ./project/backend/src:/home/node/project/src
-
-  frontend:
-    restart: "no"
-    ports:
-      - "3000:3000"
-    build:
-      args:
-        NODE_ENV: "development"
-    environment:
-      NODE_ENV: "development"
-    volumes:
-      # Volumes for pnpm (so installs ran in containers are written to host)
-      - ./project/frontend/package.json:/home/node/project/package.json
-      - ./project/backend/pnpm-lock.yaml:/home/node/project/pnpm-lock.yaml
-      # App files
-      - ./project/frontend/src:/home/node/project/src
-      - ./project/frontend/public:/home/node/project/public
-      - ./project/frontend/index.html:/home/node/project/index.html
-      - ./project/frontend/vite.config.ts:/home/node/project/vite.config.ts
-    command: "dev"
-
-  # libraries:
+  # backend:
   #   restart: "no"
+  #   ports:
+  #     - "3001:3001"
   #   build:
   #     args:
   #       NODE_ENV: "development"
   #   environment:
   #     NODE_ENV: "development"
+  #   volumes:
+  #     # Volumes for pnpm (so installs ran in containers are written to host)
+  #     - ./project/backend/package.json:/home/node/project/package.json
+  #     - ./project/backend/pnpm-lock.yaml:/home/node/project/pnpm-lock.yaml
+  #     # App files
+  #     - ./project/backend/src:/home/node/project/src
+
+  # frontend:
+  #   restart: "no"
+  #   ports:
+  #     - "3000:3000"
+  #   build:
+  #     args:
+  #       NODE_ENV: "development"
+  #   environment:
+  #     NODE_ENV: "development"
+  #   volumes:
+  #     # Volumes for pnpm (so installs ran in containers are written to host)
+  #     - ./project/frontend/package.json:/home/node/project/package.json
+  #     - ./project/backend/pnpm-lock.yaml:/home/node/project/pnpm-lock.yaml
+  #     # App files
+  #     - ./project/frontend/src:/home/node/project/src
+  #     - ./project/frontend/public:/home/node/project/public
+  #     - ./project/frontend/index.html:/home/node/project/index.html
+  #     - ./project/frontend/vite.config.ts:/home/node/project/vite.config.ts
+  #   command: "dev"
+
+  libraries:
+    restart: "no"
+    build:
+      args:
+        NODE_ENV: "development"
+    environment:
+      NODE_ENV: "development"

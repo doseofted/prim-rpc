@@ -22,30 +22,7 @@ services:
       <<: *logging
     restart: "always"
 
-  backend:
-    logging:
-      <<: *logging
-    restart: "always"
-    build:
-      args:
-        NODE_ENV: "production"
-    environment:
-      NODE_ENV: "production"
-
-  frontend:
-    logging:
-      <<: *logging
-    restart: "always"
-    build:
-      args:
-        NODE_ENV: "production"
-    environment:
-      NODE_ENV: "production"
-    command: "preview"
-    volumes:
-      - ./data/server:/home/node/project/dist
-
-  # libraries:
+  # backend:
   #   logging:
   #     <<: *logging
   #   restart: "always"
@@ -54,3 +31,26 @@ services:
   #       NODE_ENV: "production"
   #   environment:
   #     NODE_ENV: "production"
+
+  # frontend:
+  #   logging:
+  #     <<: *logging
+  #   restart: "always"
+  #   build:
+  #     args:
+  #       NODE_ENV: "production"
+  #   environment:
+  #     NODE_ENV: "production"
+  #   command: "preview"
+  #   volumes:
+  #     - ./data/server:/home/node/project/dist
+
+  libraries:
+    logging:
+      <<: *logging
+    restart: "always"
+    build:
+      args:
+        NODE_ENV: "production"
+    environment:
+      NODE_ENV: "production"
