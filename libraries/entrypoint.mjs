@@ -2,13 +2,14 @@
 import { createEcho, gatherPackageName, mode } from "../misc/zx-utils.mjs"
 $.verbose = false
 
-const prefix = gatherPackageName('libraries/package.json')
+const prefix = await gatherPackageName('package.json')
 const echo = createEcho(prefix)
 
+$.verbose = true
 let dev = new Promise(r => r()) // simple promise to resolve, if not in dev mode
 if (mode !== "production") {
 	echo`Running in ${mode} mode. Building in background ...`
-	dev = nothrow($`pnpm dev`) // wrap in `nothrow` since it's just a dev process
+	dev = nothrow($`pnpm libraries:dev`) // wrap in `nothrow` since it's just a dev process
 }
 
 echo`Keeping libraries container open (to use mounted volumes), in ${mode} mode ...`

@@ -24,7 +24,7 @@ const echo = createEcho('zx-utils')
 /**
  * Gather name of package from `package.json` file.
  */
-function gatherPackageName(packageJson = "package.json") {
+async function gatherPackageName(packageJson = "package.json") {
 	let prefix
 	try {
 		prefix = JSON.parse(await $`cat ${packageJson}`)?.name ?? prefix
