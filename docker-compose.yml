@@ -36,23 +36,27 @@ services:
     volumes:
       - ./data/postgres:/var/lib/postgresql/data
 
-  # # Where API is hosted
-  # backend:
-  #   build:
-  #     context: ./project/backend
-  #   environment:
-  #     <<: [ *base_environment, *database ]
-  #     # NOTE: DATABASE_HOST must match postgres service name above
-  #     DATABASE_HOST: "postgres"
-  #     SES_SMTP_USER: $SES_SMTP_USER
-  #     SES_SMTP_PASS: $SES_SMTP_PASS
-  #     SES_SMTP_HOST: $SES_SMTP_HOST
-  #     SES_FROM_ADDR: $SES_FROM_ADDR
-  #     SES_SMTP_PORT: "465"
-  #     TELEGRAM_BOT_TOKEN: $TELEGRAM_BOT_TOKEN
-  #     TELEGRAM_CHAT_ID_LIST: $TELEGRAM_CHAT_ID_LIST
-  #   volumes:
-  #     - ./data/backend/uploads:/home/node/project/uploads
+  # Where API is hosted
+  backend:
+    depends_on:
+      - libraries
+    build:
+      context: .
+      dockerfile: ./project/backend/Dockerfile
+      # NOTE: args are not needed here since they are provided at run-time
+    environment:
+      <<: [ *base_environment, *database ]
+      # NOTE: DATABASE_HOST must match postgres service name above
+      DATABASE_HOST: "postgres"
+      SES_SMTP_USER: $SES_SMTP_USER
+      SES_SMTP_PASS: $SES_SMTP_PASS
+      SES_SMTP_HOST: $SES_SMTP_HOST
+      SES_FROM_ADDR: $SES_FROM_ADDR
+      SES_SMTP_PORT: "465"
+      TELEGRAM_BOT_TOKEN: $TELEGRAM_BOT_TOKEN
+      TELEGRAM_CHAT_ID_LIST: $TELEGRAM_CHAT_ID_LIST
+    # volumes:
+    #   - ./data/backend/uploads:/home/node/project/backend/uploads
 
   # frontend:
   #   build:
@@ -72,7 +76,9 @@ services:
   #     # Folder organization must match host system so that project can also be built outside of Docker
   #     - ./data/libraries:/home/node/libraries:ro
 
+  # Libraries specific to this project
   libraries:
+    image: libraries
     build:
       context: .
       dockerfile: ./libraries/Dockerfile

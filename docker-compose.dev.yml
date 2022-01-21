@@ -16,21 +16,17 @@ services:
     ports: 
       - "5432:5432"
 
-  # backend:
-  #   restart: "no"
-  #   ports:
-  #     - "3001:3001"
-  #   build:
-  #     args:
-  #       NODE_ENV: "development"
-  #   environment:
-  #     NODE_ENV: "development"
-  #   volumes:
-  #     # Volumes for pnpm (so installs ran in containers are written to host)
-  #     - ./project/backend/package.json:/home/node/project/package.json
-  #     - ./project/backend/pnpm-lock.yaml:/home/node/project/pnpm-lock.yaml
-  #     # App files
-  #     - ./project/backend/src:/home/node/project/src
+  backend:
+    restart: "no"
+    ports:
+      - "3001:3001"
+    build:
+      args:
+        NODE_ENV: "development"
+    environment:
+      NODE_ENV: "development"
+    volumes:
+      - ./project/backend/src:/home/node/project/backend/src
 
   # frontend:
   #   restart: "no"

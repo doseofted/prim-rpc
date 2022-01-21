@@ -33,23 +33,21 @@ RUN pnpm fetch --dev
 COPY --chown=1000:1000 libraries ./libraries
 RUN pnpm install --offline --frozen-lockfile --dev
 # build all packages copied into the container from the monorepo
-RUN pnpm libraries:build
+RUN (export NODE_ENV="production"; pnpm libraries:build)
 # Now remove all folders for source code and dev-related node_modules (only prod node_modules needed later)
-RUN find . -type d -name 'src' -o -name 'node_modules' -prune -exec rm -rf {} \;
+RUN find ./libraries -type d -name 'src' -o -name 'node_modules' -prune -exec rm -rf {} \;
 
 # ---
 # Prepare project to be run
 # ---
 FROM production_modules as built_libraries
-# NOTE: NODE_ENV can be overridden while actively developing project
+# NOTE: NODE_ENV can be overridden while actively developing and pnpm utilizes the variable
 USER node
 ARG NODE_ENV="production"
 ARG COMPOSE_ENV
 ARG COMPOSE_HOST
-# Copy all build libraries and their package.json
-# TODO: copy all built libraries into one folder to avoid multiple COPY commands
+# Copy all built libraries and their package.json
 COPY --from=build /home/node/project/libraries ./libraries
-
 # unlike build stage, I only need production dependencies here
 RUN pnpm install --frozen-lockfile --offline
 
