@@ -1,8 +1,12 @@
+# Project data
 /data/*
 !**/.gitkeep
-node_modules
-dist
+# Common to all projects
 .env
 *.log
 .DS_Store
-**/.DS_Store
+# JavaScript projects
+node_modules
+dist
+dist-ssr
+.parcel-cache

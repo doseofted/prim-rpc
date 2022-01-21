@@ -1,0 +1,7 @@
+# Files specific to the host system should not be copied into container during build step
+# NOTE: mounted volumes in Compose configuration are copied regardless of this file
+**/node_modules
+**/dist
+**/.parcel-cache
+**/Dockerfile
+**/*.Dockerfile

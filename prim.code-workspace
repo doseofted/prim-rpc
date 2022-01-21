@@ -6,7 +6,7 @@
 		},
 		{
 			"name": "Libraries",
-			"path": "./project/libraries"
+			"path": "./libraries"
 		},
 		{
 			"name": "Frontend",

@@ -1,19 +1,18 @@
 {
-	"name": "andproper",
+	"name": "prim",
 	"private": true,
 	"scripts": {
-		"dev": "parcel watch packages/*",
-		"build": "parcel build packages/*"
+		"libraries:dev": "parcel watch 'libraries/example'",
+		"libraries:build": "parcel build 'libraries/example'"
 	},
 	"packageManager": "pnpm@6.26.1",
 	"devDependencies": {
+		"@parcel/core": "^2.2.1",
 		"@parcel/packager-ts": "^2.2.1",
 		"@parcel/transformer-typescript-types": "^2.2.1",
+		"@parcel/transformer-yaml": "^2.2.1",
 		"parcel": "^2.2.1",
 		"postcss": "^8.4.5",
 		"typescript": ">=3.0.0"
-	},
-	"peerDependencies": {
-		"postcss": "^8.4.5"
 	}
 }
