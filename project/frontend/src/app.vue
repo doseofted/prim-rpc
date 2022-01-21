@@ -4,7 +4,7 @@ import HelloYou from './components/hello-you.vue'
 
 <template>
   <div class="greeting">
-    <hello-you name="you" />
+    <hello-you />
   </div>
 </template>
 

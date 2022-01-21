@@ -25,11 +25,13 @@ importers:
 
   project/backend:
     specifiers:
+      example: workspace:*
       fastify: ^3.25.3
       nodemon: ^2.0.15
       parcel: ^2.2.0
       typescript: ^4.5.4
     dependencies:
+      example: link:../../libraries/example
       fastify: 3.27.0
     devDependencies:
       nodemon: 2.0.15
@@ -39,11 +41,13 @@ importers:
   project/frontend:
     specifiers:
       '@vitejs/plugin-vue': ^2.0.1
+      example: workspace:*
       typescript: ^4.5.4
       vite: ^2.7.12
       vue: ^3.2.27
       vue-tsc: ^0.30.5
     dependencies:
+      example: link:../../libraries/example
       vue: 3.2.27
     devDependencies:
       '@vitejs/plugin-vue': 2.0.1_vite@2.7.13+vue@3.2.27

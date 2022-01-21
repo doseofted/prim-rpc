@@ -1,9 +1,15 @@
 <script setup lang="ts">
-defineProps<{ name: string }>()
+import { you } from "example"
+
+withDefaults(defineProps<{
+  name: string
+}>(), {
+  name: you
+})
 </script>
 
 <template>
-  <p>hello {{ name }}</p>
+  <p>Hello {{ name }}</p>
 </template>
 
 <style scoped>

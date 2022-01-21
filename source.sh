@@ -38,6 +38,8 @@ dc () {
   eval "docker compose ${ENV_TO_USE[@]} $@"
 }
 
+# Build libraries that are used used by backend and frontend (must be ran before starting compose config)
+alias dc-libraries="dc build libraries"
 # Show logs in running containers for set environment (see `dc` function above)
 alias dc-logs="dc logs -f --tail=15"
 # Start all services for configuration
@@ -47,14 +49,14 @@ alias dc-down="dc down -v --remove-orphans -t 10"
 
 # Start Docker Compose services and immediately view logs. Ctrl-C doesn't kill the thing.
 dc-magic () {
-  dc-up && dc-logs
+  dc-libraries && dc-up && dc-logs
   echo "\nServices are still running.\n  - \`dc-down\`: stop services\n  - \`dc-logs\`: view logs again"
 }
 
 # For development. Start Docker Compose in foreground and stop all services when done with it.
 # It's essentially the same as running `docker-compose up -d` except provided a bunch of given parameters
 dc-magic-fg () {
-  dc-up && dc-logs || dc-down
+  dc-libraries && dc-up && dc-logs || dc-down
 }
 
 # Run something in existing container
