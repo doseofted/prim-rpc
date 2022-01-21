@@ -27,12 +27,14 @@ importers:
     specifiers:
       example: workspace:*
       fastify: ^3.25.3
+      fastify-cors: ^6.0.2
       nodemon: ^2.0.15
       parcel: ^2.2.0
       typescript: ^4.5.4
     dependencies:
       example: link:../../libraries/example
       fastify: 3.27.0
+      fastify-cors: 6.0.2
     devDependencies:
       nodemon: 2.0.15
       parcel: 2.2.1_postcss@8.4.5
@@ -1071,6 +1073,18 @@ packages:
       typescript: 4.5.4
     dev: true
 
+  /@parcel/types/2.2.1:
+    resolution: {integrity: sha512-h25EMpnypXHJ05Gx2WxGpRbokgCdmro98AlDbQ39XkddBkjUSodj8+efQWiDxSB/IPS1kPf1drBtS0bI0zCeXA==}
+    dependencies:
+      '@parcel/cache': 2.2.1_@parcel+core@2.2.1
+      '@parcel/diagnostic': 2.2.1
+      '@parcel/fs': 2.2.1_@parcel+core@2.2.1
+      '@parcel/package-manager': 2.2.1_@parcel+core@2.2.1
+      '@parcel/source-map': 2.0.1
+      '@parcel/workers': 2.2.1_@parcel+core@2.2.1
+      utility-types: 3.10.0
+    dev: true
+
   /@parcel/types/2.2.1_@parcel+core@2.2.1:
     resolution: {integrity: sha512-h25EMpnypXHJ05Gx2WxGpRbokgCdmro98AlDbQ39XkddBkjUSodj8+efQWiDxSB/IPS1kPf1drBtS0bI0zCeXA==}
     dependencies:
@@ -1130,7 +1144,7 @@ packages:
       '@parcel/core': 2.2.1
       '@parcel/diagnostic': 2.2.1
       '@parcel/logger': 2.2.1
-      '@parcel/types': 2.2.1_@parcel+core@2.2.1
+      '@parcel/types': 2.2.1
       '@parcel/utils': 2.2.1
       chrome-trace-event: 1.0.3
       nullthrows: 1.1.1
@@ -2565,8 +2579,19 @@ packages:
     resolution: {integrity: sha512-On2N+BpYJ15xIC974QNVuYGMOlEVt4s0EOI3wwMqOmK1fdDY+FN/zltPV8vosq4ad4c/gJ1KHScUn/6AWIgiow==}
     dev: true
 
+  /fastify-cors/6.0.2:
+    resolution: {integrity: sha512-sE0AOyzmj5hLLRRVgenjA6G2iOGX35/1S3QGYB9rr9TXelMZB3lFrXy4CzwYVOMiujJeMiLgO4J7eRm8sQSv8Q==}
+    dependencies:
+      fastify-plugin: 3.0.0
+      vary: 1.1.2
+    dev: false
+
   /fastify-error/0.3.1:
     resolution: {integrity: sha512-oCfpcsDndgnDVgiI7bwFKAun2dO+4h84vBlkWsWnz/OUK9Reff5UFoFl241xTiLeHWX/vU9zkDVXqYUxjOwHcQ==}
+    dev: false
+
+  /fastify-plugin/3.0.0:
+    resolution: {integrity: sha512-ZdCvKEEd92DNLps5n0v231Bha8bkz1DjnPP/aEz37rz/q42Z5JVLmgnqR4DYuNn3NXAO3IDCPyRvgvxtJ4Ym4w==}
     dev: false
 
   /fastify-warning/0.2.0:
@@ -5070,6 +5095,11 @@ packages:
   /v8-compile-cache/2.3.0:
     resolution: {integrity: sha512-l8lCEmLcLYZh4nbunNZvQCJc5pv7+RCwa8q/LdUx8u7lsWvPDKmpodJAJNwkAhJC//dFY48KuIEmjtd4RViDrA==}
     dev: true
+
+  /vary/1.1.2:
+    resolution: {integrity: sha1-IpnwLG3tMNSllhsLn3RSShj2NPw=}
+    engines: {node: '>= 0.8'}
+    dev: false
 
   /vite/2.7.13:
     resolution: {integrity: sha512-Mq8et7f3aK0SgSxjDNfOAimZGW9XryfHRa/uV0jseQSilg+KhYDSoNb9h1rknOy6SuMkvNDLKCYAYYUMCE+IgQ==}

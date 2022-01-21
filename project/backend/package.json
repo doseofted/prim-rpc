@@ -18,7 +18,8 @@
     "typescript": "^4.5.4"
   },
   "dependencies": {
+    "example": "workspace:*",
     "fastify": "^3.25.3",
-    "example": "workspace:*"
+    "fastify-cors": "^6.0.2"
   }
 }
