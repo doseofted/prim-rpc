@@ -32,18 +32,15 @@ services:
     environment:
       NODE_ENV: "production"
 
-  # frontend:
-  #   logging:
-  #     <<: *logging
-  #   restart: "always"
-  #   build:
-  #     args:
-  #       NODE_ENV: "production"
-  #   environment:
-  #     NODE_ENV: "production"
-  #   command: "preview"
-  #   volumes:
-  #     - ./data/server:/home/node/project/dist
+  frontend:
+    logging:
+      <<: *logging
+    restart: "always"
+    build:
+      args:
+        NODE_ENV: "production"
+    environment:
+      NODE_ENV: "production"
 
   libraries:
     logging:

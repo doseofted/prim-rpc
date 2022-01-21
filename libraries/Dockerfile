@@ -15,7 +15,7 @@ WORKDIR /home/node/project
 # ---
 # Install all needed dependencies in monorepo, to be used by other containers (to avoid duplicate network requests)
 # ---
-FROM setup as production_modules
+FROM setup as installed
 USER node
 # REFERENCE: for pnpm install in container https://pnpm.io/cli/fetch
 COPY --chown=1000:1000 pnpm-*.yaml package.json ./
@@ -26,7 +26,7 @@ RUN pnpm fetch
 # ---
 # Configure project build
 # ---
-FROM production_modules as build
+FROM installed as built
 USER node
 # in addition to prod dependencies, install dev dependencies since they'll be needed for build
 RUN pnpm fetch --dev
@@ -40,14 +40,14 @@ RUN find ./libraries -type d -name 'src' -o -name 'node_modules' -prune -exec rm
 # ---
 # Prepare project to be run
 # ---
-FROM production_modules as built_libraries
+FROM installed as run
 # NOTE: NODE_ENV can be overridden while actively developing and pnpm utilizes the variable
 USER node
 ARG NODE_ENV="production"
 ARG COMPOSE_ENV
 ARG COMPOSE_HOST
 # Copy all built libraries and their package.json
-COPY --from=build /home/node/project/libraries ./libraries
+COPY --from=built /home/node/project/libraries ./libraries
 # unlike build stage, I only need production dependencies here
 RUN pnpm install --frozen-lockfile --offline
 

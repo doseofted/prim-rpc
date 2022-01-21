@@ -28,25 +28,19 @@ services:
     volumes:
       - ./project/backend/src:/home/node/project/project/backend/src
 
-  # frontend:
-  #   restart: "no"
-  #   ports:
-  #     - "3000:3000"
-  #   build:
-  #     args:
-  #       NODE_ENV: "development"
-  #   environment:
-  #     NODE_ENV: "development"
-  #   volumes:
-  #     # Volumes for pnpm (so installs ran in containers are written to host)
-  #     - ./project/frontend/package.json:/home/node/project/package.json
-  #     - ./project/backend/pnpm-lock.yaml:/home/node/project/pnpm-lock.yaml
-  #     # App files
-  #     - ./project/frontend/src:/home/node/project/src
-  #     - ./project/frontend/public:/home/node/project/public
-  #     - ./project/frontend/index.html:/home/node/project/index.html
-  #     - ./project/frontend/vite.config.ts:/home/node/project/vite.config.ts
-  #   command: "dev"
+  frontend:
+    restart: "no"
+    ports:
+      - "3000:3000"
+    build:
+      args:
+        NODE_ENV: "development"
+    environment:
+      NODE_ENV: "development"
+    volumes:
+      - ./project/frontend/src:/home/node/project/project/frontend/src
+      - ./project/frontend/public:/home/node/project/project/frontend/public
+      - ./project/frontend/index.html:/home/node/project/project/frontend/index.html
 
   libraries:
     restart: "no"
