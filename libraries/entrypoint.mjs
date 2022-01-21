@@ -2,7 +2,7 @@
 import { createEcho, gatherPackageName, mode } from "../misc/zx-utils.mjs"
 $.verbose = false
 
-const prefix = await gatherPackageName('package.json')
+const prefix = "libraries" // await gatherPackageName('package.json')
 const echo = createEcho(prefix)
 
 $.verbose = true
@@ -12,7 +12,7 @@ if (mode !== "production") {
 	dev = nothrow($`pnpm libraries:dev`) // wrap in `nothrow` since it's just a dev process
 }
 
-echo`Keeping libraries container open (to use mounted volumes), in ${mode} mode ...`
+echo`Keeping container open to use mounted volumes.`
 try {
 	// TODO: use script that keeps container open so volumes can be mounted to others to use build libraries
 	const app = $`tail -f /dev/null`
