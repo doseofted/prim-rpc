@@ -59,3 +59,6 @@ services:
         NODE_ENV: "development"
     environment:
       NODE_ENV: "development"
+    volumes:
+      # NOTE: all projects under libraries should have their src folder linked here for development use
+      - ./libraries/example/src:/home/node/project/libraries/example/src

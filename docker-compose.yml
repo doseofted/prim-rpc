@@ -75,11 +75,8 @@ services:
   libraries:
     build:
       context: .
-      dockerfile: ./libraries/monorepo.Dockerfile
+      dockerfile: ./libraries/Dockerfile
       args:
         <<: *base_environment
     environment:
       <<: *base_environment
-    # volumes:
-    #   # root `dist` folder will contain final built copies of all libraries (not watched in dev mode)
-    #   - ./data/libraries:/home/node/project
