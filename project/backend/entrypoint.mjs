@@ -1,5 +1,5 @@
 #!/usr/bin/env zx
-import { createEcho, gatherPackageName, mode } from "../misc/zx-utils.mjs"
+import { createEcho, gatherPackageName, mode } from "../../misc/zx-utils.mjs"
 $.verbose = false
 
 const prefix = await gatherPackageName('backend/package.json')

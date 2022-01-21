@@ -26,7 +26,7 @@ services:
     environment:
       NODE_ENV: "development"
     volumes:
-      - ./project/backend/src:/home/node/project/backend/src
+      - ./project/backend/src:/home/node/project/project/backend/src
 
   # frontend:
   #   restart: "no"
