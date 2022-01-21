@@ -27,6 +27,8 @@ services:
       NODE_ENV: "development"
     volumes:
       - ./project/backend/src:/home/node/project/project/backend/src
+      # libraries developed and watched from libraries container
+      - library_example:/home/node/project/libraries/example/dist:ro
 
   frontend:
     restart: "no"
@@ -41,6 +43,8 @@ services:
       - ./project/frontend/src:/home/node/project/project/frontend/src
       - ./project/frontend/public:/home/node/project/project/frontend/public
       - ./project/frontend/index.html:/home/node/project/project/frontend/index.html
+      # libraries developed and watched from libraries container
+      - library_example:/home/node/project/libraries/example/dist:ro
 
   libraries:
     restart: "no"
@@ -52,3 +56,8 @@ services:
     volumes:
       # NOTE: all projects under libraries should have their src folder linked here for development use
       - ./libraries/example/src:/home/node/project/libraries/example/src
+      # Built libraries while container is running can be used from other containers
+      - library_example:/home/node/project/libraries/example/dist
+
+volumes:
+  library_example:

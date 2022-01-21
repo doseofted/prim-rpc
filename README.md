@@ -11,6 +11,8 @@ source source.sh
 dc-magic
 # Optional: start DNS server that can resolve ".test" TLD, if needed
 testdns
+# Install dependencies locally, useful for type suggestions with editor
+pnpm install
 ```
 
 ## Idea
@@ -38,16 +40,6 @@ To get off on the right foot, here are some ideas to guide initial code:
   - "Representations" may be added to Simple and Complex Things to describe them and its basic readable properties. For instance, a user might be represented by template "{profilePicture(img)} {name} ({email})". A Simple Thing would be represented by a function, for instance to translate a created "date" type to something in users' language.
 - There's no such thing as an original Idea. Ideas come from Things around us. In Prim, an "Idea" is computed from Things and doesn't exist except from those things. It's similar to computed properties in Vue. They may be stored and updated in a database for easier searching and querying but they are directly attached to properties of Things
 - Prim doesn't reinvent the wheel, it makes the wheel useful by building a car. Cars have been built before but but I didn't like them so I'm making my own. Don't reinvent validation, data-handling, and querying libaries. The only thing being invented is the Prim app, as described above.
-
-## Get Started
-
-To start the project easily, use aliases: `source source.sh`. Reference the following commands for development. Commands starting with `dc` represent `docker-compose`. To access the project locally with a trusted certificate run alias `devcert` (uses mkcert, only intended fro development). Start the project with `dc-magic`.
-
-If database has never been initialized before (there are zero migrations), run `dex api migrate --name init` to generate Prisma client (along with type definitions for TypeScript), create an inital migration file, and prepare the database. If database has been initalized but not on the current development device, run `dex api prisma migrate dev` to run migrations in development mode. Note that this all happens in Docker, not locally.
-
-In order to use generated TypeScript definitions during local development, run `yarn generate` on machine (happens locally). The environment variable `DATABASE_URL` will need to be populated even though it doesn't appear a connection is made to the database with this command. The `DATABASE_URL` variable can be found in the Docker Compose config of this project. When using `source source.sh`, all required variables will already be set. I'll need to make this simpler in the future.
-
-**Note:** local development of the API server is not possible unless all steps in Docker container are completed including setup if dependencies. This is because the server depends on the database and some values that are only set or otherwise available in the container. For simplicity's sake and since the server will be ran with Docker anaway, just use Docker during development (because things just work).
 
 ## Server-related Commands
 
