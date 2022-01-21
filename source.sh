@@ -73,6 +73,11 @@ drun () {
   eval "dc run --entrypoint='' $1 $run_this"
 }
 
+# TODO: consider cleaning built folders
+# devclean () {
+#   find . -type d -name 'dist' -o -name 'node_modules' -prune
+# }
+
 # Generate a new certificate trusted by the host system (`mkcert` must be installed)
 # Install guide: https://github.com/FiloSottile/mkcert#installation
 devcert () {
