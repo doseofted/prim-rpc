@@ -46,6 +46,8 @@ alias dc-libraries="dc build libraries"
 alias dc-logs="dc logs -f --tail=15"
 # Start all services for configuration
 alias dc-up="dc up --build -d"
+# See all running service names
+alias dc-ps="dc ps --services"
 # Stop all services for configuration (assuming already started)
 alias dc-down="dc down -v --remove-orphans -t 10"
 
@@ -55,9 +57,10 @@ dc-magic-bg () {
 }
 
 dc-help () {
-  echo "  - \`dc-up\`: rebuild services if needed"
   echo "  - \`dc-down\`: stop services"
-  echo "  - \`dc-logs\`: view logs again"
+  echo "  - \`dc-ps\`: view list of running services"
+  echo "  - \`dc-up\`: rebuild services if needed"
+  echo "  - \`dc-logs\`: view logs for services again"
   echo "  - \`dex <container> <cmd>\`: run command in running container"
   echo "  - \`dun <container> <cmd>\`: run command in one-off container"
   echo "  - \`dc-help\`: show this message again"

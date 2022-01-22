@@ -31,6 +31,7 @@
 			"source.fixAll": true
 		},
 		"editor.formatOnPaste": true,
+		"explorer.autoReveal": false,
 		"css.lint.unknownAtRules": "ignore",
 		"scss.lint.unknownAtRules": "ignore",
 		"css.validate": false,
@@ -64,7 +65,7 @@
 			"statusBarItem.hoverBackground": "#3999b5",
 			"statusBarItem.remoteBackground": "#57b0ca",
 			"statusBarItem.remoteForeground": "#15202b"
-		}
+		},
 	},
 	"extensions": {
 		"recommendations": [
