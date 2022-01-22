@@ -3,7 +3,9 @@
 	"private": true,
 	"scripts": {
 		"libraries:dev": "parcel watch 'libraries/example'",
-		"libraries:build": "parcel build 'libraries/example'"
+		"libraries:build": "parcel build 'libraries/example'",
+		"frontend": "pnpm --filter='frontend'",
+		"backend": "pnpm --filter='backend'"
 	},
 	"packageManager": "pnpm@6.26.1",
 	"devDependencies": {
