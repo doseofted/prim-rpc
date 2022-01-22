@@ -5,14 +5,18 @@ Not a headless CMS but better. A place to structure and handle data. The adminis
 ## Get Going
 
 ```bash
-# Set alias and functions, useful for project
+# Set up environment for services (and remember to configure for project run)
+cp .env.example .env
+# Set aliases and functions, useful for project
 source source.sh
-# Start apps, show all logs, and shut it all down on Ctrl-C
+# Start server and show all services logs
 dc-magic
-# Optional: start DNS server that can resolve ".test" TLD, if needed
-testdns
-# Install dependencies locally, useful for type suggestions with editor
+# When done, shut it all down
+dc-down
+# Development: Install dependencies locally, useful for type suggestions with editor
 pnpm install
+# Development: start DNS server that can resolve ".test" TLD, if needed
+testdns
 ```
 
 ## Idea
@@ -41,16 +45,15 @@ To get off on the right foot, here are some ideas to guide initial code:
 - There's no such thing as an original Idea. Ideas come from Things around us. In Prim, an "Idea" is computed from Things and doesn't exist except from those things. It's similar to computed properties in Vue. They may be stored and updated in a database for easier searching and querying but they are directly attached to properties of Things
 - Prim doesn't reinvent the wheel, it makes the wheel useful by building a car. Cars have been built before but but I didn't like them so I'm making my own. Don't reinvent validation, data-handling, and querying libaries. The only thing being invented is the Prim app, as described above.
 
-## Server-related Commands
+## Typical Commands
+
+There are quite a few aliases set to accomplish tasks in the project. These make the project easy to manage. Below is a list ofthe most common and useful commands. To see what they all do, see `source.sh` and any `package.json` files in this project.
 
 Command | Description
 --- | ---
-`dc` | Run `docker-compose` with configuration needed for environment. Environment set in `.env`.
-`dc-up` | Start project in background
-`dc-down` | Stop running project, also remove anonymous volumes and containers no longer in use.
-`dc-logs` | Tail latest logs from containers, Ctrl-C to stop tailing
-`dex <container_name> <command>` | Run command in running container, for example `dex api yarn` will run execute `yarn` in `api` container.
-`drun <container_name> <command>` | Run command in one-off container based on specified container's image. Without a given command, an interactive bash session will be started.
+`dc` | Run `docker-compose` with configuration needed for environment. Environment set in `.env`. All commands prefixed with `dc-*` utilize this function to replace `docker-compose -f config.yml -f config.yml ... [CMD]` with something like `dc [CMD]`.
+`dc-magic` | Setup all project dependencies and then start all project services. When done running in the foreground, just type `CTRL-C` and suggestions will be offered to interact with or shut down services.
+`...` | Add others later
 
 **Note:** The API container can interact with the database through Prisma. In development, migrations can be created by editing `schema.prisma` with changes and then running `dex api migrate --name [NAME]`. Once pushed to production, the entrypoint file will automatically call `yarn migrate deploy`.
 

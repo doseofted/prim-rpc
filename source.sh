@@ -47,15 +47,30 @@ alias dc-up="dc up --build -d"
 # Stop all services for configuration (assuming already started)
 alias dc-down="dc down -v --remove-orphans -t 10"
 
+# Used with other `dc-magic commands`
+dc-magic-bg () {
+  devcert && dc-libraries && dc-up
+}
+
+dc-help () {
+  echo "  - \`dc-up\`: rebuild services if needed"
+  echo "  - \`dc-down\`: stop services"
+  echo "  - \`dc-logs\`: view logs again"
+  echo "  - \`dex <container> <cmd>\`: run command in running container"
+  echo "  - \`dun <container> <cmd>\`: run command in one-off container"
+  echo "  - \`dc-help\`: show this message again"
+}
+
 # Start Docker Compose services and immediately view logs. Ctrl-C doesn't kill the thing.
 dc-magic () {
-  devcert && dc-libraries && dc-up && dc-logs
-  echo "\nServices are still running.\n  - \`dc-down\`: stop services\n  - \`dc-logs\`: view logs again"
+  dc-magic-bg && dc-logs
+  echo "\nServices are still running.\n"
+  dc-help
 }
 
 # For development. Start Docker Compose in foreground and stop all services when done with it.
 dc-magic-fg () {
-  devcert && dc-libraries && dc-up && dc-logs || dc-down
+  dc-magic-bg && dc-logs || dc-down
 }
 
 # Run something in existing container
@@ -66,7 +81,7 @@ dex () {
 }
 
 # Run something in one-time instance of container based on image
-drun () {
+dun () {
   local given_args="${@:2}"
   local run_this="${given_args:-bash}"
   eval "dc run --entrypoint='' $1 $run_this"
