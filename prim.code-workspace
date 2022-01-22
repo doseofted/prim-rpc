@@ -54,17 +54,17 @@
 		"peacock.affectTitleBar": false,
 		"peacock.affectActivityBar": false,
 		"peacock.showColorInStatusBar": false,
+		"workbench.editor.pinnedTabSizing": "compact",
+		"editor.linkedEditing": true,
 		"workbench.colorCustomizations": {
+			"sash.hoverBorder": "#7ec2d6",
 			"statusBar.background": "#57b0ca",
 			"statusBar.border": "#57b0ca",
 			"statusBar.foreground": "#15202b",
 			"statusBarItem.hoverBackground": "#3999b5",
 			"statusBarItem.remoteBackground": "#57b0ca",
-			"statusBarItem.remoteForeground": "#15202b",
-			"sash.hoverBorder": "#7ec2d6"
-		},
-		"workbench.editor.pinnedTabSizing": "compact",
-		"editor.linkedEditing": true
+			"statusBarItem.remoteForeground": "#15202b"
+		}
 	},
 	"extensions": {
 		"recommendations": [
