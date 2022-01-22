@@ -30,7 +30,10 @@ onMounted(async () => {
 </template>
 
 <style>
-body { margin: 0; background-color: #dfdfdf; }
+body {
+  margin: 0;
+  background-color: #dfdfdf;
+}
 
 div {
   display: flex;
@@ -41,6 +44,7 @@ div {
 }
 
 .you { transition: color 3s; }
+
 .you:not(.matches) {
   color: #f55;
 }

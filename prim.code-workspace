@@ -38,6 +38,13 @@
 		"less.validate": false,
 		"scss.validate": false,
 		"npm.packageManager": "auto",
+		"stylelint.validate": [
+			"css",
+			"less",
+			"postcss",
+			"scss",
+			"vue"
+		],
 		"eslint.validate": [
 			"javascript",
 			"javascriptreact",
