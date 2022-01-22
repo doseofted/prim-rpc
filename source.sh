@@ -49,14 +49,13 @@ alias dc-down="dc down -v --remove-orphans -t 10"
 
 # Start Docker Compose services and immediately view logs. Ctrl-C doesn't kill the thing.
 dc-magic () {
-  dc-libraries && dc-up && dc-logs
+  devcert && dc-libraries && dc-up && dc-logs
   echo "\nServices are still running.\n  - \`dc-down\`: stop services\n  - \`dc-logs\`: view logs again"
 }
 
 # For development. Start Docker Compose in foreground and stop all services when done with it.
-# It's essentially the same as running `docker-compose up -d` except provided a bunch of given parameters
 dc-magic-fg () {
-  dc-libraries && dc-up && dc-logs || dc-down
+  devcert && dc-libraries && dc-up && dc-logs || dc-down
 }
 
 # Run something in existing container
