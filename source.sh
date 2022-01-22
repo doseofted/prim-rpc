@@ -38,6 +38,8 @@ dc () {
   eval "docker compose ${ENV_TO_USE[@]} $@"
 }
 
+# Run app-related commands through helpful shortcut
+alias prim="pnpm frontend"
 # Build libraries that are used used by backend and frontend (must be ran before starting compose config)
 alias dc-libraries="dc build libraries"
 # Show logs in running containers for set environment (see `dc` function above)

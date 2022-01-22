@@ -2,10 +2,28 @@
 
 Not a headless CMS but better. A place to structure and handle data. The administration interface is your app.
 
+## Project Setup
+
+This is a project is intended to be flexible but selects a few tools to make development easier. It is a monorepo composed of a:
+
+- **Libraries**: A set of shared libraries written in TypeScript and built with Parcel that, for the most part, can be used in both the Frontend and Backend, described next. Most project logic should be contained in libraries and utilized by the frontend and backend.
+- **Frontend**: Fastify server written in TypeScript that runs behind Caddy (used as a reverse proxy) and is built with Parcel.
+- **Backend**: A Vue app written in TypeScript that can be built for web browsers through Vite. Capacitor is used to serve native platforms.
+
+All of these services are set up and configured through Docker Compose to easily set up the project so that all parts can be developed locally. In development, source folders are watched so services are rebuilt in the running containers, including libraries that frontend and backend depend on. In production, it is intended to be ran through Docker Swarm.
+
+The goal is to synchronize steps taken to run a project in all environments (for example: dev, staging, prod), simplify development of all parts of the project by completing prerequisite steps in containers that are configured to work together with working versions of dependencies, and allow easy cross-platform development of the project by minimizing the amount of steps required to setup the project itself.
+
+In development, most project setup will be made through Docker Compose but some Node-related dependencies are needed. Specific versions of Node and PNPM are needed for building the project locally. Reference setup `libraries/Dockerfile` for versions used in project. Use [nvm](https://github.com/nvm-sh/nvm) to easily install a specific version of Node. Install [mkcert](https://github.com/FiloSottile/mkcert) to use locally trusted certificates and avoid browser warnings during development (as used in `dc-magic` function of this project, described below).
+
+In production, Docker and Docker Compose are the only tools needed to run the project.
+
 ## Get Going
 
+Instructions given will be intended for Linux but should generally work on Mac or through WSL2 on Windows.
+
 ```bash
-# Set up environment for services (and remember to configure for project run)
+# Set up environment for services (and remember to edit/configure for project run)
 cp .env.example .env
 # Set aliases and functions, useful for project
 source source.sh
@@ -19,7 +37,27 @@ pnpm install
 testdns
 ```
 
-## Idea
+## Container Commands
+
+There are quite a few aliases set to accomplish tasks in the project. These make the project easy to manage. Below is a list ofthe most common and useful commands. To see what they all do, see `source.sh` in this project.
+
+Command | Description
+--- | ---
+`dc` | Run `docker-compose` with configuration needed for environment. Environment set in `.env`. All commands prefixed with `dc-*` utilize this function to replace `docker-compose -f config.yml -f config.yml ... [CMD]` with something like `dc [CMD]`.
+`dc-magic` | Setup all project dependencies and then start all project services. When done running in the foreground, just type `CTRL-C` and suggestions will be offered to interact with or shut down services.
+
+## Native Commands
+
+While development of the server is done through Docker Compose, containerization isn't so useful when you're building an app for a platform natively. This means that some commands will only work on some systems. iOS builds can only be built on a Mac. Desktop builds can only be built on each respective platform.
+
+The following scripts are all given and scattered throughout `package.json` files. The command reference below is intended be ran from the root of this project (it is a monorepo), where `prim` is a reference to `pnpm frontend` which .
+
+Command | Description
+--- | ---
+`prim sync` | Build application and then sync build to all platforms, including Electron
+`prim <platform>` | Run built project on given platform, currently: `ios`, `android`, and `desktop`.
+
+## Prim Idea
 
 To get off on the right foot, here are some ideas to guide initial code:
 
@@ -44,45 +82,3 @@ To get off on the right foot, here are some ideas to guide initial code:
   - "Representations" may be added to Simple and Complex Things to describe them and its basic readable properties. For instance, a user might be represented by template "{profilePicture(img)} {name} ({email})". A Simple Thing would be represented by a function, for instance to translate a created "date" type to something in users' language.
 - There's no such thing as an original Idea. Ideas come from Things around us. In Prim, an "Idea" is computed from Things and doesn't exist except from those things. It's similar to computed properties in Vue. They may be stored and updated in a database for easier searching and querying but they are directly attached to properties of Things
 - Prim doesn't reinvent the wheel, it makes the wheel useful by building a car. Cars have been built before but but I didn't like them so I'm making my own. Don't reinvent validation, data-handling, and querying libaries. The only thing being invented is the Prim app, as described above.
-
-## Typical Commands
-
-There are quite a few aliases set to accomplish tasks in the project. These make the project easy to manage. Below is a list ofthe most common and useful commands. To see what they all do, see `source.sh` and any `package.json` files in this project.
-
-Command | Description
---- | ---
-`dc` | Run `docker-compose` with configuration needed for environment. Environment set in `.env`. All commands prefixed with `dc-*` utilize this function to replace `docker-compose -f config.yml -f config.yml ... [CMD]` with something like `dc [CMD]`.
-`dc-magic` | Setup all project dependencies and then start all project services. When done running in the foreground, just type `CTRL-C` and suggestions will be offered to interact with or shut down services.
-`...` | Add others later
-
-**Note:** The API container can interact with the database through Prisma. In development, migrations can be created by editing `schema.prisma` with changes and then running `dex api migrate --name [NAME]`. Once pushed to production, the entrypoint file will automatically call `yarn migrate deploy`.
-
-## App-related Commands
-
-Change folder to `./project/ui` to run the app in a desktop or mobile app. In order to build the project run 
-
-```bash
-# set host to be used in app
-export VITE_HOST=prim.dose.host
-# build the app with host and then sync that to Android and iOS
-yarn build && yarn sync
-# Run on platform needed (also available, `yarn android`)
-yarn ios
-```
-
-Use the following commands specific to app development:
-
-Command | Description
---- | ---
-`yarn build` | Build application
-`yarn dev` | Build application and watch for changes
-`yarn sync` | Sync built application for all supported platforms
-`yarn desktop|ios|android` | Run built project on platform
-
-## Notes
-
-- iOS and Android have support for live reload in development but feature is not supported for Electron yet ([follow issue here](https://github.com/capacitor-community/electron/issues/120))
-- Yarn is aliased so that is can be used regardless of current working directory but some commands like those for Electron platform will require the working directory to be `./project/ui` when running command through Yarn.
-- When developing with Docker, Yarn commands should be ran within container during development to prevent missing modules. Volumes mounted through Compose will allow changes made to `package.json` to be seen from host.
-- On M1 Macs, Node 16 on Debian Buster is not currently working when emulating x86_64 architecture. However Node 16 seems to work on Bullseye release of Debian which is not yet available on Docker Hub for the Node image. Until it is, Node 14 is working and has few major changes from version 16 that will affect me. [Follow issue here](https://github.com/docker/for-mac/issues/5831).
-- Currently the Volar extension for VS Code shows a warning about Volar's TSConfig not being found and flags the warning on my own TSConfig file on Volar version 0.30.5. Downgrading to 0.29.8 has fixed the issue for now.
