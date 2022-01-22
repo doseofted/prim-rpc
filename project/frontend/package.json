@@ -24,6 +24,7 @@
   "devDependencies": {
     "@capacitor/cli": "^3.4.0",
     "@vitejs/plugin-vue": "^2.0.1",
+    "eslint-plugin-vue": "^8.3.0",
     "typescript": "^4.5.4",
     "vite": "^2.7.12",
     "vue-tsc": "^0.30.5"

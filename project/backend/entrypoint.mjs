@@ -1,8 +1,9 @@
 #!/usr/bin/env zx
+/* eslint-disable no-undef */
 import { createEcho, gatherPackageName, mode } from "../../misc/zx-utils.mjs"
 $.verbose = false
 
-const prefix = await gatherPackageName('backend/package.json')
+const prefix = await gatherPackageName("backend/package.json")
 const echo = createEcho(prefix)
 
 $.verbose = true

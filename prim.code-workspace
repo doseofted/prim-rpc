@@ -48,7 +48,7 @@
 		"eslint.workingDirectories": [
 			"./project/frontend",
 			"./project/backend",
-			"./project/libraries"
+			"./libraries/packages"
 		],
 		"peacock.color": "#57b0ca",
 		"peacock.affectStatusAndTitleBorders": true,

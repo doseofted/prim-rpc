@@ -1,27 +1,31 @@
 <script setup lang="ts">
-import { onMounted, ref, computed } from 'vue'
+import { onMounted, ref, computed } from "vue"
 import { you as proposedYou } from "example"
-import HelloYou from './components/hello-you.vue'
+import HelloYou from "./components/hello-you.vue"
 
 async function hello () {
-  try {
-    const result = await fetch(`https://api.${import.meta.env.VITE_HOST}`)
-    const json = await result.json()
-    return json.Hello
-  } catch (error) {
-    return "stranger"
-  }
+	try {
+		const result = await fetch(`https://api.${import.meta.env.VITE_HOST}`)
+		const json = await result.json()
+		return json.Hello
+	} catch (error) {
+		return "stranger"
+	}
 }
 const you = ref<string>()
 const matches = computed(() => you.value === proposedYou)
 onMounted(async () => {
-  you.value = await hello()
+	you.value = await hello()
 })
 </script>
 
 <template>
   <div class="greeting">
-    <hello-you :name="you" :class="{ matches }" class="you" />
+    <hello-you
+      :name="you"
+      :class="{ matches }"
+      class="you"
+    />
   </div>
 </template>
 

@@ -1,8 +1,9 @@
 #!/usr/bin/env zx
+/* eslint-disable no-undef */
 import { createEcho, gatherPackageName, mode } from "../../misc/zx-utils.mjs"
 $.verbose = false
 
-const prefix = await gatherPackageName('frontend/package.json')
+const prefix = await gatherPackageName("frontend/package.json")
 const echo = createEcho(prefix)
 
 $.verbose = true
@@ -13,7 +14,7 @@ if (mode !== "production") {
 	dev = nothrow($`pnpm dev --filter="frontend"`) // wrap in `nothrow` since it's just a dev process
 }
 
-const args = process.argv.slice(3).join(" ")
+// const args = process.argv.slice(3).join(" ")
 echo`Starting app in ${mode} mode ...`
 try {
 	// NOTE: server may go here in the future, for now just resolve and depend on dev process (won't work in prod yet)

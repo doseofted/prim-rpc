@@ -1,0 +1,10 @@
+# don't lint node_modules
+node_modules
+# don't lint build output
+dist
+# ignore data folder of this project
+/data
+# don't lint build output copied to native platforms
+android
+ios
+electron

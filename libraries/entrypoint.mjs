@@ -1,4 +1,5 @@
 #!/usr/bin/env zx
+/* eslint-disable no-undef */
 import { createEcho, mode } from "../misc/zx-utils.mjs"
 $.verbose = false
 

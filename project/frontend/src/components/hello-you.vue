@@ -2,9 +2,9 @@
 import { you } from "example"
 
 withDefaults(defineProps<{
-  name: string
+	name: string
 }>(), {
-  name: you
+	name: you
 })
 </script>
 
