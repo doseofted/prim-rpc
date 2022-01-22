@@ -5,9 +5,11 @@
     "dev": "vite",
     "check": "vue-tsc --noEmit",
     "build": "vite build",
-    "preview": "vite preview"
+    "preview": "vite preview",
+    "cap": "cap"
   },
   "dependencies": {
+    "@capacitor-community/electron": "^4.0.3",
     "@capacitor/android": "^3.4.0",
     "@capacitor/core": "^3.4.0",
     "@capacitor/ios": "^3.4.0",

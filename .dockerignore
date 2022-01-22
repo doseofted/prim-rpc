@@ -7,3 +7,4 @@
 **/*.Dockerfile
 project/frontend/android
 project/frontend/ios
+project/frontend/electron
