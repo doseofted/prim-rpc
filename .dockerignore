@@ -5,3 +5,5 @@
 **/.parcel-cache
 **/Dockerfile
 **/*.Dockerfile
+project/frontend/android
+project/frontend/ios
