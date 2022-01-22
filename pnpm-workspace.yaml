@@ -2,4 +2,4 @@ packages:
   - "project/**"
   - "!project/server"
   - "!project/frontend/electron"
-  - "libraries/**"
+  - "libraries/packages/**"
