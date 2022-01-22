@@ -6,7 +6,12 @@
     "check": "vue-tsc --noEmit",
     "build": "vite build",
     "preview": "vite preview",
-    "cap": "cap"
+    "cap": "cap",
+    "native:desktop": "cap open @capacitor-community/electron",
+    "native:android": "cap run android",
+    "native:ios": "cap run ios",
+    "sync:electron": "npm install --prefix ./electron && cap sync @capacitor-community/electron",
+    "sync": "pnpm build && cap sync && pnpm sync:electron"
   },
   "dependencies": {
     "@capacitor-community/electron": "^4.0.3",

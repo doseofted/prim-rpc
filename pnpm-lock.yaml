@@ -29,7 +29,6 @@ importers:
       fastify: ^3.25.3
       fastify-cors: ^6.0.2
       nodemon: ^2.0.15
-      parcel: ^2.2.0
       typescript: ^4.5.4
     dependencies:
       example: link:../../libraries/example
@@ -37,7 +36,6 @@ importers:
       fastify-cors: 6.0.2
     devDependencies:
       nodemon: 2.0.15
-      parcel: 2.2.1_postcss@8.4.5
       typescript: 4.5.4
 
   project/frontend:
