@@ -76,10 +76,10 @@
 	},
 	"extensions": {
 		"recommendations": [
-			"johnsoncodehk.volar",
 			"ms-azuretools.vscode-docker",
-			"stylelint.vscode-stylelint",
 			"dbaeumer.vscode-eslint",
+			"stylelint.vscode-stylelint",
+			"johnsoncodehk.volar",
 			"bradlc.vscode-tailwindcss",
 		],
 		"unwantedRecommendations": [

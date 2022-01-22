@@ -1,6 +1,11 @@
 {
   "name": "frontend",
   "packageManager": "pnpm@6.26.1",
+  "author": {
+    "name": "Ted Klingenberg",
+    "email": "ted@doseofted.com",
+    "url": "https://doseofted.com/"
+  },
   "scripts": {
     "dev": "vite",
     "check": "vue-tsc --noEmit",

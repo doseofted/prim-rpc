@@ -4,17 +4,28 @@ Not a headless CMS but better. A place to structure and handle data. The adminis
 
 ## Project Setup
 
-This is a project is intended to be flexible but selects a few tools to make development easier. It is a monorepo composed of a:
+This is a project is intended to be flexible but selects a few tools to make development easier. It is a monorepo composed of:
 
-- **Libraries**: A set of shared libraries written in TypeScript and built with Parcel that, for the most part, can be used in both the Frontend and Backend, described next. Most project logic should be contained in libraries and utilized by the frontend and backend.
-- **Frontend**: Fastify server written in TypeScript that runs behind Caddy (used as a reverse proxy) and is built with Parcel.
-- **Backend**: A Vue app written in TypeScript that can be built for web browsers through Vite. Capacitor is used to serve native platforms.
+- **Libraries**: A set of shared libraries written in TypeScript and built with Parcel that, for the most part, can be used in both the Frontend and Backend. Most project logic should be contained in libraries and utilized by the frontend and backend, described next.
+- **Frontend**: Fastify server written in TypeScript built with Parcel that runs behind Caddy, a reverse proxy server.
+- **Backend**: A Vue app written in TypeScript built with Vite. Capacitor is used to serve native platforms.
 
-All of these services are set up and configured through Docker Compose to easily set up the project so that all parts can be developed locally. In development, source folders are watched so services are rebuilt in the running containers, including libraries that frontend and backend depend on. In production, it is intended to be ran through Docker Swarm.
+All of these services are set up and configured through Docker Compose to easily set up the project so that all parts can be developed locally. In development, source folders are watched so services are rebuilt in the running containers, including libraries that frontend and backend depend on. In production, the same configuration can be used to run the project with Docker Swarm.
 
 The goal is to synchronize steps taken to run a project in all environments (for example: dev, staging, prod), simplify development of all parts of the project by completing prerequisite steps in containers that are configured to work together with working versions of dependencies, and allow easy cross-platform development of the project by minimizing the amount of steps required to setup the project itself.
 
-In development, most project setup will be made through Docker Compose but some Node-related dependencies are needed. Development is intended for VS Code (a workspace is provided and ESLint is configured for use with VS Code) Specific versions of Node and PNPM are needed for building the project locally. Reference setup `libraries/Dockerfile` for versions used in project. Use [nvm](https://github.com/nvm-sh/nvm) to easily install a specific version of Node. Install [mkcert](https://github.com/FiloSottile/mkcert) to use locally trusted certificates and avoid browser warnings during development (as used in `dc-magic` function of this project, described below).
+# Development
+
+In development, most project setup will be completed through use of containers configured with Docker Compose. Some other dependencies are needed for a better development experience.
+
+Follow steps below to setup a development environment. Reference setup stage of `libraries/Dockerfile` for versions of dependencies used in this project.
+
+1. Install [nvm](https://github.com/nvm-sh/nvm) and run `nvm use` in this project to set the utilized Node version.
+2. Run `corepack enable` so package managers defined in `package.json` files are utilized.
+3. Run `pnpm install` so type definitions can be suggested in code edtior.
+4. Install [mkcert](https://github.com/FiloSottile/mkcert) for locally generated and trusted certifcates in web browsers. Run `mkcert -install` to install the certificate authority.
+5. Although not required, this project is configured to be edited with VS Code. Install VS Code and open `prim.code-workspace` in the editor.
+6. Once code-workspace is opened, a prompt will show recommended extensions for this project. Install all to utilize all settings of project.
 
 In production, Docker and Docker Compose are the only tools needed to run the project.
 
@@ -27,7 +38,7 @@ Instructions given will be intended for Linux but should generally work on Mac o
 cp .env.example .env
 # Set aliases and functions, useful for project
 source source.sh
-# Start server and show all services logs
+# Start server and show all service logs
 dc-magic
 # When done, shut it all down
 dc-down
@@ -37,7 +48,7 @@ pnpm install
 testdns
 ```
 
-## Container Commands
+### Container Commands
 
 There are quite a few aliases set to accomplish tasks in the project. These make the project easy to manage. Below is a list ofthe most common and useful commands. To see what they all do, see `source.sh` in this project.
 
@@ -46,15 +57,15 @@ Command | Description
 `dc` | Run `docker-compose` with configuration needed for environment. Environment set in `.env`. All commands prefixed with `dc-*` utilize this function to replace `docker-compose -f config.yml -f config.yml ... [CMD]` with something like `dc [CMD]`.
 `dc-magic` | Setup all project dependencies and then start all project services. When done running in the foreground, just type `CTRL-C` and suggestions will be offered to interact with or shut down services.
 
-## Native Commands
+### Native Commands
 
 While development of the server is done through Docker Compose, containerization isn't so useful when you're building an app for a platform natively. This means that some commands will only work on some systems. iOS builds can only be built on a Mac. Desktop builds can only be built on each respective platform.
 
-The following scripts are all given and scattered throughout `package.json` files. The command reference below is intended be ran from the root of this project (it is a monorepo), where `prim` is a reference to `pnpm frontend` which .
+There are a lot of scripts scattered throughout `package.json` files. The command reference below are the most important and are intended be ran from the root of this project (it is a monorepo), where `prim` is a reference to `pnpm frontend` which just filters commands to only be ran from frontend package.
 
 Command | Description
 --- | ---
-`prim sync` | Build application and then sync build to all platforms, including Electron
+`prim sync` | Build application and then sync build to all platforms, including Electron. Some environment variables will need to be provided so build picks them up, for example: `VITE_HOST="prim.localhost" prim sync` 
 `prim <platform>` | Run built project on given platform, currently: `ios`, `android`, and `desktop`.
 
 ## Prim Idea

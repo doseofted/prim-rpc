@@ -1,6 +1,11 @@
 {
 	"name": "prim",
 	"private": true,
+	"author": {
+		"name": "Ted Klingenberg",
+		"email": "ted@doseofted.com",
+		"url": "https://doseofted.com/"
+	},
 	"scripts": {
 		"libraries:dev": "parcel watch 'libraries/packages/*'",
 		"libraries:build": "parcel build 'libraries/packages/*'",
