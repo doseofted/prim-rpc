@@ -5,13 +5,24 @@
     "dev": "vite",
     "check": "vue-tsc --noEmit",
     "build": "vite build",
-    "preview": "vite preview"
+    "preview": "vite preview",
+    "cap": "cap",
+    "desktop": "cap open @capacitor-community/electron",
+    "android": "cap run android",
+    "ios": "cap run ios",
+    "sync:electron": "npm install --prefix ./electron && cap sync @capacitor-community/electron",
+    "sync": "pnpm build && cap sync && pnpm sync:electron"
   },
   "dependencies": {
-    "vue": "^3.2.27",
-    "example": "workspace:*"
+    "@capacitor-community/electron": "^4.0.3",
+    "@capacitor/android": "^3.4.0",
+    "@capacitor/core": "^3.4.0",
+    "@capacitor/ios": "^3.4.0",
+    "example": "workspace:*",
+    "vue": "^3.2.27"
   },
   "devDependencies": {
+    "@capacitor/cli": "^3.4.0",
     "@vitejs/plugin-vue": "^2.0.1",
     "typescript": "^4.5.4",
     "vite": "^2.7.12",

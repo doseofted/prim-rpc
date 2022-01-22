@@ -22,10 +22,11 @@ RUN pnpm install zx@4.3.0 --global
 
 # Caddy is used as a reverse proxy and couldbe tested in development if needed
 # REFERENCE: https://caddyserver.com/docs/install#debian-ubuntu-raspbian
-RUN apt install -y debian-keyring debian-archive-keyring apt-transport-https
+RUN apt-get install -y debian-keyring debian-archive-keyring apt-transport-https
 RUN curl -1sLf 'https://dl.cloudsmith.io/public/caddy/stable/gpg.key' | tee /etc/apt/trusted.gpg.d/caddy-stable.asc
 RUN curl -1sLf 'https://dl.cloudsmith.io/public/caddy/stable/debian.deb.txt' | tee /etc/apt/sources.list.d/caddy-stable.list
 RUN apt-get update
+RUN apt-cache madison caddy
 RUN apt-get install -y caddy=2.4.6
 
 ENTRYPOINT [ "/bin/bash" ]

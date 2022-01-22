@@ -1,0 +1,7 @@
+<?xml version='1.0' encoding='utf-8'?>
+<resources>
+    <string name="app_name">Prim</string>
+    <string name="title_activity_main">Prim</string>
+    <string name="package_name">com.doseofted.prim</string>
+    <string name="custom_url_scheme">com.doseofted.prim</string>
+</resources>
