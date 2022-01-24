@@ -2,6 +2,7 @@
 	"compilerOptions": {
 		"experimentalDecorators": true,
 		"jsxImportSource": "preact",
-		"jsx": "react-jsx"
+		"jsx": "react-jsx",
+		"resolveJsonModule": true
 	}
 }

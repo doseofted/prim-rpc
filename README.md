@@ -70,6 +70,8 @@ Command | Description
 
 ## Prim Idea
 
+### Draft 1
+
 To get off on the right foot, here are some ideas to guide initial code:
 
 - Prim should be designed to declare what makes data valid and how that data should behave. It's built on "Things" because data should point to some tangible thing, not just data and metadata.
@@ -93,3 +95,9 @@ To get off on the right foot, here are some ideas to guide initial code:
   - "Representations" may be added to Simple and Complex Things to describe them and its basic readable properties. For instance, a user might be represented by template "{profilePicture(img)} {name} ({email})". A Simple Thing would be represented by a function, for instance to translate a created "date" type to something in users' language.
 - There's no such thing as an original Idea. Ideas come from Things around us. In Prim, an "Idea" is computed from Things and doesn't exist except from those things. It's similar to computed properties in Vue. They may be stored and updated in a database for easier searching and querying but they are directly attached to properties of Things
 - Prim doesn't reinvent the wheel, it makes the wheel useful by building a car. Cars have been built before but but I didn't like them so I'm making my own. Don't reinvent validation, data-handling, and querying libaries. The only thing being invented is the Prim app, as described above.
+
+### Draft 2
+
+Keep it simple. Prim is a headless content manager. Creation of "ideas," blueprints for creating data structures, is completed through the administration interface. Creation of "things," data instances generated to follow the structure of a particular "idea," is done through an interface created by the developer through a provided headless library ("headless" as in the developer creates the interface, while functions are provided). Each "idea" can define the structure for singular or multiple things and is made up of simple properties as well as other ideas. Ideas can have generated properties that come from other defined properties or ideas and can also have constants that don't change. Properties of "things" and "things" themselves can have validations defined to make sure created data adheres to the original "ideas."
+
+All communication between server and client (whether administation interface or developer-created interface) is done over HTTP and Websocket, with functions formatted loosely as JSON-RPC and response data sent back over JSON-RPC using JSON-LD-like structures for linked data. Structures for JSON could possibly be validated with JSON-Schema standard for tasks such as defining requests and response shapes or even partially defining "things" themselves. All data is assumed to be flat, that is, without hierarchy. Hierarchy may be defined by the developer through linked structures but shouldn't be recognized in Prim for simplicty. Websocket connections are useful for finding linked data structures since the connection is kept open once a "thing" is received through an RPC call. RPC Calls can be optimized for linked data often so that it's readily available if requested or a paramteer could be defined to expand references only if absolutely needed (because this should be simple). A benefit of basing communication on JSON is that it will be fairly easy to create type definitions that could be shared with a client.

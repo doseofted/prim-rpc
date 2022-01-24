@@ -24,6 +24,7 @@
 	"settings": {
 		"editor.rulers": [80, 120],
 		"editor.tabSize": 2,
+		"editor.renderWhitespace": "selection",
 		"editor.detectIndentation": true,
 		"editor.insertSpaces": false,
 		"editor.wordWrapColumn": 120,

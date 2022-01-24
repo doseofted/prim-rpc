@@ -1,4 +1,5 @@
 #!/usr/bin/env zx
+/* eslint-disable no-undef */
 $.verbose = false // toggle off default
 
 /**
@@ -19,7 +20,7 @@ function createEcho(prefix = "project") {
 		console.log(chalk`{green.bold [ ${prefix} ]}`, str)
 	}
 }
-const echo = createEcho('zx-utils')
+const echo = createEcho("zx-utils")
 
 /**
  * Gather name of package from `package.json` file.
