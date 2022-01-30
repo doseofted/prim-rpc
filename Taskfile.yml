@@ -1,0 +1,40 @@
+version: "3"
+# NOTE: pnpm compose is used for docker-compose configuration specific to given environment. Use like so:
+# $ pnpm compose -- {{...misc/zx-compose.mjs args}} -- {{...docker-compose args}}
+
+dotenv:
+  - ".env"
+
+tasks:
+
+  logs:
+    desc: "Show recent logs for running Compose services"
+    cmds:
+      # NOTE: Option (A) this method uses pnpm to gather docker-compose configs (no zx script needed)
+      - "pnpm compose:{{.COMPOSE_ENV}} -- logs -f --tail=15"
+
+  pull:
+    desc: "Explicitly pull newer versions of services if available"
+    cmds:
+      # NOTE: Option (B) this method uses a zx script to gather docker-compose configs and is ran through pnpm
+      - "pnpm compose -- --mode={{.COMPOSE_ENV}} -- pull --ignore-pull-failures"
+
+  services:
+    desc: "View list of running services"
+    cmds:
+      - "pnpm compose -- --mode={{.COMPOSE_ENV}} -- ps --services"
+
+  build:
+    desc: "Build docker services in order of images' dependencies, with build cache"
+    cmds:
+      # First build libraries image since possibly needed in frontend and backend
+      - "pnpm compose -- --mode={{.COMPOSE_ENV}} -- build libraries"
+      # Now build everything else (libraries is already cached)
+      - "pnpm compose -- --mode={{.COMPOSE_ENV}} -- build"
+
+  up:
+    desc: "Run services in background, with flag to build if needed"
+    deps:
+      - build
+    cmds:
+      - "pnpm compose -- --mode={{.COMPOSE_ENV}} -- up -d"
