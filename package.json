@@ -7,9 +7,6 @@
 		"url": "https://doseofted.com/"
 	},
 	"scripts": {
-		"compose": "zx misc/zx-compose.mjs",
-		"compose:development": "docker compose -f docker-compose.yml -f docker-compose.dev.yml",
-		"compose:production": "docker compose -f docker-compose.yml -f misc/logging.yml -f docker-compose.prod.yml",
 		"libraries:dev": "parcel watch 'libraries/packages/*'",
 		"libraries:build": "parcel build 'libraries/packages/*'",
 		"frontend": "pnpm --filter='frontend'",

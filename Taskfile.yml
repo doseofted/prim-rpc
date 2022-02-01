@@ -12,6 +12,7 @@ vars:
 includes:
   # "dc" as in "Docker Compose"
   dc: ./misc/Taskfile.dc.yml
+  js: ./misc/Taskfile.js.yml
 
 tasks:
 

@@ -15,8 +15,8 @@
     "desktop": "cap open @capacitor-community/electron",
     "android": "cap run android",
     "ios": "cap run ios",
-    "sync:electron": "npm install --prefix ./electron && cap sync @capacitor-community/electron",
-    "sync": "pnpm build && cap sync && pnpm sync:electron"
+    "sync:electroninstall": "npm install --prefix ./electron",
+    "sync:electron": "cap sync @capacitor-community/electron"
   },
   "dependencies": {
     "@capacitor-community/electron": "^4.0.3",

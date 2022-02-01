@@ -26,36 +26,30 @@ Follow steps below to setup a development environment. Reference setup stage of 
 4. Install [mkcert](https://github.com/FiloSottile/mkcert) for locally generated and trusted certifcates in web browsers. Run `mkcert -install` to install the certificate authority.
 5. Although not required, this project is configured to be edited with VS Code. Install VS Code and open `prim.code-workspace` in the editor.
 6. Once code-workspace is opened, a prompt will show recommended extensions for this project. Install all to utilize all settings of project.
+7. Install [Task](https://github.com/go-task/task) to easily run project tasks and dependencies.
 
-In production, Docker and Docker Compose are the only tools needed to run the project.
+In production, Docker and Docker Compose are the only tools needed to run the project. [Task](https://github.com/go-task/task) (the task runner) is also helpful.
 
 ## Get Going
 
 Instructions given will be intended for Linux but should generally work on Mac or through WSL2 on Windows.
 
 ```bash
-# Set up environment for services (and remember to edit/configure for project run)
+# Set up environment for project (remember to edit the defaults before running)
 cp .env.example .env
-# Set aliases and functions, useful for project
-source source.sh
-# Start server and show all service logs
-dc-magic
+# Run dependencies given in Taskfile then start all services
+task dc:up
 # When done, shut it all down
-dc-down
+task dc:down
 # Development: Install dependencies locally, useful for type suggestions with editor
 pnpm install
-# Development: start DNS server that can resolve ".test" TLD, if needed
-testdns
+# Development: start DNS server that can resolve ".test" TLD, if testing locally on multiple devices
+task dev:dns
 ```
 
-### Container Commands
+All other Task-related commands can be found by running `task --list`.
 
-There are quite a few aliases set to accomplish tasks in the project. These make the project easy to manage. Below is a list ofthe most common and useful commands. To see what they all do, see `source.sh` in this project.
-
-Command | Description
---- | ---
-`dc` | Run `docker-compose` with configuration needed for environment. Environment set in `.env`. All commands prefixed with `dc-*` utilize this function to replace `docker-compose -f config.yml -f config.yml ... [CMD]` with something like `dc [CMD]`.
-`dc-magic` | Setup all project dependencies and then start all project services. When done running in the foreground, just type `CTRL-C` and suggestions will be offered to interact with or shut down services.
+For Node-specific tasks in projects, also see projects' respective `package.json` scripts. For instance, to run the dev server in the frontend, use `pnpm frontend dev`. To run the dev server on the backend, use `pnpm backend dev`.
 
 ### Native Commands
 
