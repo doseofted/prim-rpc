@@ -48,3 +48,17 @@ tasks:
           -e "DNS_TLD={{.DNS_TLD}}" \
           coredns/coredns:1.8.4 \
           -conf /root/Corefile
+
+  clean:
+    desc: "Remove locally built files from the project, useful for a clean run (note: data/* must be deleted separately by root)"
+    cmds:
+      # Remove Parcel cache
+      - "rm -r .parcel-cache"
+      # Remove all node_modules
+      - "find ./project -name 'node_modules' -type d -prune -exec rm -rf '{}' \\;"
+      - "find ./libraries -name 'node_modules' -type d -prune -exec rm -rf '{}' \\;"
+      # Now that node_modules are gone, delete dist folders (doing after deletion of node_modules so modules aren't included)
+      - "find ./project -name 'dist' -type d -prune -exec rm -rf '{}' \\;"
+      - "find ./libraries -name 'dist' -type d -prune -exec rm -rf '{}' \\;"
+      # NOTE: data/* must be deleted by root user
+      # - "rm -r ./data/*"

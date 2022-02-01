@@ -20,9 +20,9 @@ tasks:
     cmds:
       - "pnpm frontend {{.CLI_ARGS}}"
 
-
   # TODO: make this work locally (currently only works in containers)
   # for instance, variables need to be assigned and strict security settings disabled since not running behind Caddy
+  # I could also prevent some tasks from running if not needed: https://taskfile.dev/#/usage?id=prevent-unnecessary-work
   watch:
     desc: "Build and watch all JS-related projects, with server running"
     deps:

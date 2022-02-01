@@ -12,3 +12,5 @@ dist-ssr
 .parcel-cache
 # Other
 /bin/*
+# Folder where Checksums used by Taskfile when fingerprinting files
+/.task/*
