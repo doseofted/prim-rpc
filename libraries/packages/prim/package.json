@@ -1,0 +1,15 @@
+{
+  "name": "prim",
+  "version": "1.0.0",
+  "description": "Not a headless content manager but also kinda a headless content manager.",
+  "source": "src/index.ts",
+  "main": "dist/main.js",
+  "module": "dist/module.js",
+  "types": "dist/types.d.ts",
+  "author": {
+    "name": "Ted Klingenberg",
+    "email": "ted@doseofted.com",
+    "url": "https://doseofted.com/"
+  },
+  "license": "UNLICENSED"
+}
