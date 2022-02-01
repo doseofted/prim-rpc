@@ -49,7 +49,7 @@ tasks:
           coredns/coredns:1.8.4 \
           -conf /root/Corefile
 
-  clean:
+  dev:clean:
     desc: "Remove locally built files from the project, useful for a clean run (note: data/* must be deleted separately by root)"
     cmds:
       # Remove Parcel cache
