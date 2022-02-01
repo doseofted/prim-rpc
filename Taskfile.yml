@@ -5,24 +5,26 @@ version: "3"
 dotenv:
   - ".env"
 
+# includes:
+#   compose: ./misc/Taskfile.compose.yml
+
+vars:
+  COMPOSE_BASE: "-f docker-compose.yml"
+
 tasks:
 
-  logs:
+  services:
     desc: "Show recent logs for running Compose services"
     cmds:
       # NOTE: Option (A) this method uses pnpm to gather docker-compose configs (no zx script needed)
-      - "pnpm compose:{{.COMPOSE_ENV}} -- logs -f --tail=15"
+      - "docker compose {{coalesce .COMPOSE_DEV .COMPOSE_PROD }} ps"
 
   pull:
     desc: "Explicitly pull newer versions of services if available"
     cmds:
+      - cmd: 
       # NOTE: Option (B) this method uses a zx script to gather docker-compose configs and is ran through pnpm
       - "pnpm compose -- --mode={{.COMPOSE_ENV}} -- pull --ignore-pull-failures"
-
-  services:
-    desc: "View list of running services"
-    cmds:
-      - "pnpm compose -- --mode={{.COMPOSE_ENV}} -- ps --services"
 
   build:
     desc: "Build docker services in order of images' dependencies, with build cache"
@@ -38,3 +40,19 @@ tasks:
       - build
     cmds:
       - "pnpm compose -- --mode={{.COMPOSE_ENV}} -- up -d"
+
+  down:
+    desc: "Take down running services"
+    cmds:
+      - "pnpm compose -- --mode={{.COMPOSE_ENV}} -- down -v --remove-orphans -t 10"
+
+  logs:
+    desc: "Show recent logs for running Compose services"
+    cmds:
+      # NOTE: Option (A) this method uses pnpm to gather docker-compose configs (no zx script needed)
+      - "pnpm compose:{{.COMPOSE_ENV}} -- logs -f --tail=15"
+
+  services:
+    desc: "View list of running services"
+    cmds:
+      - "pnpm compose -- --mode={{.COMPOSE_ENV}} -- ps --services"

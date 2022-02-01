@@ -78,7 +78,7 @@ services:
 
   # libraries specific to this project
   libraries:
-    image: libraries
+    # image: libraries
     build:
       context: .
       dockerfile: ./libraries/Dockerfile
