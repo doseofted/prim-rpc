@@ -58,6 +58,9 @@
 			"./project/backend",
 			"./libraries/packages"
 		],
+		"yaml.schemas": {
+			"https://json.schemastore.org/taskfile.json": "Taskfile.*.yml"
+		},
 		"peacock.color": "#57b0ca",
 		"peacock.affectStatusAndTitleBorders": true,
 		"peacock.affectTitleBar": false,

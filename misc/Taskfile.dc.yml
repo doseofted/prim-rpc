@@ -1,0 +1,56 @@
+# yaml-language-server: https://json.schemastore.org/taskfile.json
+version: "3"
+
+tasks:
+
+  ps:
+    desc: "List all running service names"
+    cmds:
+      - "docker compose {{.COMPOSE_CONFIG_GIVEN}} ps"
+
+  pull:
+    desc: "Pull newer versions of services if available"
+    cmds:
+      - "docker compose {{.COMPOSE_CONFIG_BASE}} pull"
+
+  logs:
+    desc: "Show and follow recent logs for running services"
+    cmds:
+      - "docker compose {{.COMPOSE_CONFIG_GIVEN}} logs -f --tail=15"
+
+  build:
+    desc: "Build services in order of images' dependencies, with build cache"
+    deps:
+      - pull
+    cmds:
+      # First build libraries image since possibly needed in frontend and backend
+      - "docker compose {{.COMPOSE_CONFIG_GIVEN}} build libraries"
+      # Now build everything else (libraries is now tagged and cached)
+      - "docker compose {{.COMPOSE_CONFIG_GIVEN}} build"
+
+  up:
+    desc: "Start services in background"
+    deps:
+      - build
+    cmds:
+      # First, a trused certificate should be set up for use in container
+      - task: :dev:cert
+      # Now the services can be started in the background
+      - "docker compose {{.COMPOSE_CONFIG_GIVEN}} up -d"
+      # For convenience, logs from running services will be shown. Ctrl-C does not shut down services.
+      - task: logs
+
+  down:
+    desc: "Stop running services"
+    cmds:
+      - "docker compose {{.COMPOSE_CONFIG_GIVEN}} down -v --remove-orphans -t 10"
+
+  exe:
+    desc: "Run command in running service, like so: `task dc:exe -- backend`"
+    cmds:
+      - "docker compose {{.COMPOSE_CONFIG_GIVEN}} exec {{.CLI_ARGS}}"
+
+  run:
+    desc: "Run command in one-off service, like so: `task dc:run -- backend`"
+    cmds:
+      - "docker compose {{.COMPOSE_CONFIG_GIVEN}} run {{.CLI_ARGS}}"

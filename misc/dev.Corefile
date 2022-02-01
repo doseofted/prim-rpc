@@ -10,7 +10,7 @@
 }
 
 # ...except for requests for the local server (using given TLD)
-{$DEV_TLD} {
+{$DNS_TLD} {
   log
   template IN A {
     answer "{{ .Name }} 0 IN A {$DNS_BIND}"

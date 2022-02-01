@@ -1,58 +1,49 @@
 version: "3"
-# NOTE: pnpm compose is used for docker-compose configuration specific to given environment. Use like so:
-# $ pnpm compose -- {{...misc/zx-compose.mjs args}} -- {{...docker-compose args}}
 
 dotenv:
   - ".env"
 
-# includes:
-#   compose: ./misc/Taskfile.compose.yml
-
 vars:
-  COMPOSE_BASE: "-f docker-compose.yml"
+  COMPOSE_CONFIG_BASE: "-f docker-compose.yml"
+  # The following snippet is used to determine configuration for wanted environment:
+  # If configuration order changes, snippet below should be updated to reflect it.
+  COMPOSE_CONFIG_GIVEN: "{{coalesce .COMPOSE_PROD .COMPOSE_DEV}}"
+
+includes:
+  # "dc" as in "Docker Compose"
+  dc: ./misc/Taskfile.dc.yml
 
 tasks:
 
-  services:
-    desc: "Show recent logs for running Compose services"
-    cmds:
-      # NOTE: Option (A) this method uses pnpm to gather docker-compose configs (no zx script needed)
-      - "docker compose {{coalesce .COMPOSE_DEV .COMPOSE_PROD }} ps"
-
-  pull:
-    desc: "Explicitly pull newer versions of services if available"
-    cmds:
-      - cmd: 
-      # NOTE: Option (B) this method uses a zx script to gather docker-compose configs and is ran through pnpm
-      - "pnpm compose -- --mode={{.COMPOSE_ENV}} -- pull --ignore-pull-failures"
-
-  build:
-    desc: "Build docker services in order of images' dependencies, with build cache"
-    cmds:
-      # First build libraries image since possibly needed in frontend and backend
-      - "pnpm compose -- --mode={{.COMPOSE_ENV}} -- build libraries"
-      # Now build everything else (libraries is already cached)
-      - "pnpm compose -- --mode={{.COMPOSE_ENV}} -- build"
-
-  up:
-    desc: "Run services in background, with flag to build if needed"
+  default:
     deps:
-      - build
-    cmds:
-      - "pnpm compose -- --mode={{.COMPOSE_ENV}} -- up -d"
+      - dc:up
 
-  down:
-    desc: "Take down running services"
+  # NOTE: `mkcert` must be installed on the host, since a containerized version would install CA in its own stores
+  dev:cert:
+    desc: "Create a certifcate to be used in development, trusted by the host system (requires `mkcert`)"
     cmds:
-      - "pnpm compose -- --mode={{.COMPOSE_ENV}} -- down -v --remove-orphans -t 10"
+      - "mkdir -p data/server"
+      - |
+        mkcert \
+          -key-file "data/server/dev-key.pem" \
+          -cert-file "data/server/dev-cert.pem" \
+          {{.COMPOSE_HOST}} "*.{{.COMPOSE_HOST}}" localhost 127.0.0.1 ::1
 
-  logs:
-    desc: "Show recent logs for running Compose services"
+  dev:dns:
+    desc: "Run a DNS for development, useful for resolving '*.test' TLDs using devices on the same network"
+    # NOTE: variables below is now set from .env file
+    # vars:
+    #   DNS_BIND:
+    #     sh: "hostname -I | awk '{print $1}'"
+    #   DNS_TLD: "test"
     cmds:
-      # NOTE: Option (A) this method uses pnpm to gather docker-compose configs (no zx script needed)
-      - "pnpm compose:{{.COMPOSE_ENV}} -- logs -f --tail=15"
-
-  services:
-    desc: "View list of running services"
-    cmds:
-      - "pnpm compose -- --mode={{.COMPOSE_ENV}} -- ps --services"
+      - "docker pull coredns/coredns:1.8.4"
+      - |
+        docker run -it --rm --name coredns \
+          -v "$(pwd)/misc/dev.Corefile:/root/Corefile" \
+          -p "{{.DNS_BIND}}:53:53/tcp" -p "{{.DNS_BIND}}:53:53/udp" \
+          -e "DNS_BIND={{.DNS_BIND}}" \
+          -e "DNS_TLD={{.DNS_TLD}}" \
+          coredns/coredns:1.8.4 \
+          -conf /root/Corefile

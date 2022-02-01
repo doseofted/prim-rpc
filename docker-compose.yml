@@ -78,6 +78,7 @@ services:
 
   # libraries specific to this project
   libraries:
+    # NOTE: .image is now given in ./libraries/compose.yml
     # image: libraries
     build:
       context: .
