@@ -6,6 +6,7 @@ tasks:
   setup:
     desc: "Set up dependencies and build out type definitions for use in code editor"
     cmds:
+      - "nvm install"
       - "pnpm install"
       - "pnpm libraries:build"
 
