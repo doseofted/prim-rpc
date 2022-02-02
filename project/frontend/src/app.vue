@@ -32,7 +32,7 @@ onMounted(async () => {
 <style>
 body {
   margin: 0;
-  background-color: #dfdfdf;
+  background-color: #fff;
 }
 
 div {
@@ -46,6 +46,6 @@ div {
 .you { transition: color 3s; }
 
 .you:not(.matches) {
-  color: #f55;
+  color: #2aa;
 }
 </style>

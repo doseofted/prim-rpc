@@ -53,8 +53,10 @@ tasks:
     desc: "Remove locally built files from the project, useful for a clean run (note: data/* must be deleted separately by root)"
     cmds:
       # Remove Parcel cache
-      - "rm -rf .parcel-cache"
-      # Remove all node_modules
+      - "rm -fr .parcel-cache"
+      # and root node modules
+      - "rm -fr node_modules"
+      # Remove all node_modules in projects and libraries
       - "find ./project -name 'node_modules' -type d -prune -exec rm -rf '{}' \\;"
       - "find ./libraries -name 'node_modules' -type d -prune -exec rm -rf '{}' \\;"
       # Now that node_modules are gone, delete dist folders (doing after deletion of node_modules so modules aren't included)

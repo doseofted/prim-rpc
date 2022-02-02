@@ -19,6 +19,27 @@
  * available from the server to generate a new client from this JSON.
  */
 
+interface RpcBase {
+	jsonrpc: "2.0"
+	id: null | string | number
+}
+
+interface RpcError<T = unknown> {
+	code: number
+	message: string
+	data?: T
+}
+
+interface RpcCall<T = unknown> extends RpcBase {
+	method: string
+	params?: T
+}
+
+interface RpcAnswer<T = unknown> extends RpcBase {
+	result?: T
+	error?: RpcError
+}
+
 /**
  * This should accept a given module and then return a function which can resolve
  * a JSON-RPC call and then return data that matches a certain schema, with linked
@@ -33,7 +54,7 @@
  * Those middleware/plugin functions should probably form a separate library from
  * Prim.
  */
-export function prim(givenModule: unknown) {
+export function prim(givenModule: object) {
 	const givenNames = Object.keys(givenModule)
 	console.log(givenNames)
 	return function (rpcCall: RpcCall): RpcAnswer {
