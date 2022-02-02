@@ -7,10 +7,10 @@ const { you } = example
 
 const pluginTest: FastifyPluginAsync<{ example: object }> = async (fastify, { example }) => {
 	const prim = setupPrim(example)
-	fastify.route<{ Body: RpcCall, Querystring: unknown }>({
+	fastify.route<{ Body: RpcCall, Querystring: unknown, Params: { method: string } }>({
 		method: "POST",
-		url: "/",
-		handler: ({ body, query }, reply) => {
+		url: "/:method?",
+		handler: ({ body, query, params: reqParams }, reply) => {
 			// NOTE: by using the query, some options could be passed in the URL
 			// for use with JSON-LD (they'll just be passed to parameters in RPC call
 			// so it doesn't matter if given in body or query, but if given in both
@@ -25,11 +25,17 @@ const pluginTest: FastifyPluginAsync<{ example: object }> = async (fastify, { ex
 			// endpoints but using GET requests to further gather linked data will make using this
 			// kind of API so much easier (for instance, I can literally click a link
 			// to go to the next page of data)
+			// NOTE: to keep ID even more unique, I may attach method name in params
+			// and then use a UUID to correlate requests. In general, any GET request
+			// made after a JSON-RPC/POST request is only to grab related data to first
+			// request and queries to GET request should be kept as simple as possible
+			// such as "?page=2" or "?linked=<ref_id>"
+			const { method } = reqParams
 			let params = typeof body.params === "object" ? body.params : {}
 			if (typeof query === "object") { params = { ...params, ...query } }
 			// TODO: consider using lodash's merge or "defu" library for mergng query into params of RPC call
 			console.log(params)
-			reply.send(prim({ ...body, params }))
+			reply.send(prim({ method, params, ...body }))
 		}
 	})
 }
