@@ -3,6 +3,12 @@ version: "3"
 
 tasks:
 
+  setup:
+    desc: "Set up dependencies and build out type definitions for use in code editor"
+    cmds:
+      - "pnpm install"
+      - "pnpm libraries:build"
+
   sync:
     desc: "Build the frontend locally and sync to all available native platforms"
     cmds:

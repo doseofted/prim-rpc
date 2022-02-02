@@ -23,6 +23,7 @@
   },
   "dependencies": {
     "example": "workspace:*",
+    "prim": "workspace:*",
     "fastify": "^3.25.3",
     "fastify-cors": "^6.0.2"
   }

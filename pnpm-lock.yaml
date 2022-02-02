@@ -29,17 +29,22 @@ importers:
   libraries/packages/example:
     specifiers: {}
 
+  libraries/packages/prim:
+    specifiers: {}
+
   project/backend:
     specifiers:
       example: workspace:*
       fastify: ^3.25.3
       fastify-cors: ^6.0.2
       nodemon: ^2.0.15
+      prim: workspace:*
       typescript: ^4.5.4
     dependencies:
       example: link:../../libraries/packages/example
       fastify: 3.27.0
       fastify-cors: 6.0.2
+      prim: link:../../libraries/packages/prim
     devDependencies:
       nodemon: 2.0.15
       typescript: 4.5.4
@@ -55,6 +60,7 @@ importers:
       eslint-plugin-vue: ^8.3.0
       example: workspace:*
       postcss-html: ^1.3.0
+      prim: workspace:*
       stylelint: ^14.2.0
       stylelint-config-recommended-vue: ^1.1.0
       stylelint-config-standard-scss: ^3.0.0
@@ -68,6 +74,7 @@ importers:
       '@capacitor/core': 3.4.0
       '@capacitor/ios': 3.4.0_@capacitor+core@3.4.0
       example: link:../../libraries/packages/example
+      prim: link:../../libraries/packages/prim
       vue: 3.2.27
     devDependencies:
       '@capacitor/cli': 3.4.0

@@ -24,6 +24,7 @@
     "@capacitor/core": "^3.4.0",
     "@capacitor/ios": "^3.4.0",
     "example": "workspace:*",
+    "prim": "workspace:*",
     "vue": "^3.2.27"
   },
   "devDependencies": {

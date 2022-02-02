@@ -52,8 +52,8 @@ cp .env.example .env
 task dc:up
 # When done, shut it all down
 task dc:down
-# Development: Install dependencies locally, useful for type suggestions with editor
-pnpm install
+# Development: Install dependencies and build type definitions for libraries, useful for type suggestions with editor
+task js:setup
 ```
 
 All other Task-related commands can be found by running `task --list`.
