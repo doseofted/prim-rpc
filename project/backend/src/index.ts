@@ -2,15 +2,16 @@ import Fastify, { FastifyPluginAsync } from "fastify"
 import Cors from "fastify-cors"
 import * as example from "example"
 import { prim as setupPrim, RpcCall } from "prim"
+import defu from "defu"
 
 const { you } = example
 
 const pluginTest: FastifyPluginAsync<{ example: object }> = async (fastify, { example }) => {
 	const prim = setupPrim(example)
 	fastify.route<{ Body: RpcCall, Querystring: unknown, Params: { method: string } }>({
-		method: "POST",
+		method: ["POST", "GET"],
 		url: "/:method?",
-		handler: ({ body, query, params: reqParams }, reply) => {
+		handler: ({ body, query, params: { method = "prim" } }, reply) => {
 			// NOTE: by using the query, some options could be passed in the URL
 			// for use with JSON-LD (they'll just be passed to parameters in RPC call
 			// so it doesn't matter if given in body or query, but if given in both
@@ -30,12 +31,20 @@ const pluginTest: FastifyPluginAsync<{ example: object }> = async (fastify, { ex
 			// made after a JSON-RPC/POST request is only to grab related data to first
 			// request and queries to GET request should be kept as simple as possible
 			// such as "?page=2" or "?linked=<ref_id>"
-			const { method } = reqParams
-			let params = typeof body.params === "object" ? body.params : {}
-			if (typeof query === "object") { params = { ...params, ...query } }
-			// TODO: consider using lodash's merge or "defu" library for mergng query into params of RPC call
-			console.log(params)
-			reply.send(prim({ method, params, ...body }))
+			const isPositional = (q: unknown) => typeof q === "object"
+				&& Object.keys(q).length === 1
+				&& ("." in q || "params" in q)
+			const givenIsPositional = isPositional(query) || Array.isArray(body.params)
+			const params = givenIsPositional ? (query["."] ?? query["params"])?.split(",") : query
+			const defaults: RpcCall = {
+				method,
+				params,
+				id: null,
+				jsonrpc: "2.0"
+			}
+			const send = defu<RpcCall, RpcCall>(body, defaults)
+			console.log(send, body, defaults)
+			reply.send(prim(send))
 		}
 	})
 }

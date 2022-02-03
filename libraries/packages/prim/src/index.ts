@@ -62,7 +62,7 @@ export function prim(givenModule: object) {
 		// TODO: match module functions with RPC call
 		try {
 			// TODO: consider supporting positional arguments too
-			const result = givenModule[method](params)
+			const result = Array.isArray(params) ? givenModule[method](...params) : givenModule[method](params)
 			return { jsonrpc, id, result }
 		} catch (e) {
 			if (e instanceof Error) {

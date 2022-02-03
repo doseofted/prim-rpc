@@ -15,16 +15,17 @@
     "dev": "parcel watch",
     "build": "parcel build",
     "start": "node dist/index.js",
-    "watchstart": "nodemon --watch ../../libraries --watch dist/index.js dist/index.js"
+    "watchstart": "nodemon --watch ../../libraries/ --watch dist/index.js dist/index.js"
   },
   "devDependencies": {
     "nodemon": "^2.0.15",
     "typescript": "^4.5.4"
   },
   "dependencies": {
+    "defu": "^5.0.1",
     "example": "workspace:*",
-    "prim": "workspace:*",
     "fastify": "^3.25.3",
-    "fastify-cors": "^6.0.2"
+    "fastify-cors": "^6.0.2",
+    "prim": "workspace:*"
   }
 }

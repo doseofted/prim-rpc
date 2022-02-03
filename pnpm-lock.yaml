@@ -36,6 +36,7 @@ importers:
 
   project/backend:
     specifiers:
+      defu: ^5.0.1
       example: workspace:*
       fastify: ^3.25.3
       fastify-cors: ^6.0.2
@@ -43,6 +44,7 @@ importers:
       prim: workspace:*
       typescript: ^4.5.4
     dependencies:
+      defu: 5.0.1
       example: link:../../libraries/packages/example
       fastify: 3.27.0
       fastify-cors: 6.0.2
@@ -2597,6 +2599,10 @@ packages:
     dependencies:
       object-keys: 1.1.1
     dev: true
+
+  /defu/5.0.1:
+    resolution: {integrity: sha512-EPS1carKg+dkEVy3qNTqIdp2qV7mUP08nIsupfwQpz++slCVRw7qbQyWvSTig+kFPwz2XXp5/kIIkH+CwrJKkQ==}
+    dev: false
 
   /delayed-stream/1.0.0:
     resolution: {integrity: sha1-3zrhmayt+31ECqrgsp4icrJOxhk=}

@@ -18,6 +18,10 @@ export function sayHello (options: { greeting?: string, name?: string }) {
 	return `${greeting ?? "Hello"} ${name ?? "you"}!`
 }
 
-export function sayHelloAlternative(greeting = "", name ="") {
+export function sayHelloAlternative(greeting = "", name = "") {
 	return `${greeting ?? "Hello"} ${name ?? "you"}!`
+}
+
+export function prim() {
+	return "You're using Prim."
 }
