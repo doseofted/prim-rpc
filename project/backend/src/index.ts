@@ -32,6 +32,8 @@ const pluginTest: FastifyPluginAsync<{ example: object }> = async (fastify, { ex
 			// request and queries to GET request should be kept as simple as possible
 			// such as "?page=2" or "?linked=<ref_id>"
 			const isPositional = (q: unknown) => typeof q === "object" && "-" in q && Object.keys(q).length === 1
+			// NOTE: when given params over query string, they should be be simple arguments like number, string or boolean
+			// and if complex: objects should be given like prop.subprop=..., arrays like possiblyArray=1,2,3
 			/* const isPositional = (...given: unknown[]) => given
 				.map(q => typeof q === "object" && Object.keys(q).length === 1 && ("-" in q))
 				.reduce((p, n) => p || n, false) */
