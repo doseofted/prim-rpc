@@ -8,7 +8,7 @@ const { you } = example
 
 const pluginTest: FastifyPluginAsync<{ example: object }> = async (fastify, { example }) => {
 	const prim = setupPrim(example)
-	fastify.route<{ Body: RpcCall, Querystring: unknown, Params: { method: string } }>({
+	fastify.route<{ Body: RpcCall, Querystring: unknown, Params: { method?: string } }>({
 		method: ["POST", "GET"],
 		url: "/:method?",
 		handler: ({ body, query, params: { method = "prim" } }, reply) => {
@@ -31,11 +31,13 @@ const pluginTest: FastifyPluginAsync<{ example: object }> = async (fastify, { ex
 			// made after a JSON-RPC/POST request is only to grab related data to first
 			// request and queries to GET request should be kept as simple as possible
 			// such as "?page=2" or "?linked=<ref_id>"
-			const isPositional = (q: unknown) => typeof q === "object"
-				&& Object.keys(q).length === 1
-				&& ("." in q || "params" in q)
-			const givenIsPositional = isPositional(query) || Array.isArray(body.params)
-			const params = givenIsPositional ? (query["."] ?? query["params"])?.split(",") : query
+			const isPositional = (q: unknown) => typeof q === "object" && "-" in q && Object.keys(q).length === 1
+			/* const isPositional = (...given: unknown[]) => given
+				.map(q => typeof q === "object" && Object.keys(q).length === 1 && ("-" in q))
+				.reduce((p, n) => p || n, false) */
+			// TODO: if body is not given, check query for body and 
+			const givenIsPositional = isPositional(query) && !body
+			const params = givenIsPositional ? query["-"] : (Object.keys(query).length > 0 ? query : undefined)
 			const defaults: RpcCall = {
 				method,
 				params,
@@ -43,7 +45,7 @@ const pluginTest: FastifyPluginAsync<{ example: object }> = async (fastify, { ex
 				jsonrpc: "2.0"
 			}
 			const send = defu<RpcCall, RpcCall>(body, defaults)
-			console.log(send, body, defaults)
+			console.log(send)
 			reply.send(prim(send))
 		}
 	})
