@@ -17,12 +17,15 @@ includes:
 tasks:
 
   default:
-    deps:
-      - dc:up
+    cmds:
+      - "task --list"
 
   # NOTE: `mkcert` must be installed on the host, since a containerized version would install CA in its own stores
   dev:cert:
     desc: "Create a certifcate to be used in development, trusted by the host system (requires `mkcert`)"
+    status:
+      - "test -f data/server/dev-cert.pem"
+      - "test -f data/server/dev-key.pem"
     cmds:
       - "mkdir -p data/server"
       - |
@@ -33,7 +36,7 @@ tasks:
 
   dev:dns:
     desc: "Run a DNS for development, useful for resolving '*.test' TLDs using devices on the same network"
-    # NOTE: variables below is now set from .env file
+    # NOTE: variables below are now set from .env file
     # vars:
     #   DNS_BIND:
     #     sh: "hostname -I | awk '{print $1}'"
