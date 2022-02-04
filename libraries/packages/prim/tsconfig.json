@@ -3,6 +3,7 @@
 		"experimentalDecorators": true,
 		"jsxImportSource": "preact",
 		"jsx": "react-jsx",
-		"resolveJsonModule": true
+		"resolveJsonModule": true,
+		"esModuleInterop": true,
 	}
 }

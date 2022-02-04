@@ -11,7 +11,8 @@ const pluginTest: FastifyPluginAsync<{ example: object }> = async (fastify, { ex
 	fastify.route<{ Body: RpcCall, Querystring: unknown, Params: { method?: string } }>({
 		method: ["POST", "GET"],
 		url: "/:method?",
-		handler: ({ body, query, params: { method = "prim" } }, reply) => {
+		handler: ({ body: postBody, query, params: { method } }, reply) => {
+			const defaultBody: RpcCall = { jsonrpc: "2.0", id: null, method: "prim", params: undefined }
 			// NOTE: by using the query, some options could be passed in the URL
 			// for use with JSON-LD (they'll just be passed to parameters in RPC call
 			// so it doesn't matter if given in body or query, but if given in both
@@ -31,22 +32,28 @@ const pluginTest: FastifyPluginAsync<{ example: object }> = async (fastify, { ex
 			// made after a JSON-RPC/POST request is only to grab related data to first
 			// request and queries to GET request should be kept as simple as possible
 			// such as "?page=2" or "?linked=<ref_id>"
-			const isPositional = (q: unknown) => typeof q === "object" && "-" in q && Object.keys(q).length === 1
+
+			// NOTE: if body is given, it should be like JSON-RPC but if given through URL,
+			// it should be used as defaults unless overriden by RPC call in request body
+			const isPositional = (q: unknown) => typeof q === "object"
+				&& query?.constructor.name === "Object"
+				&& "-" in q
+				&& Object.keys(q).length === 1
 			// NOTE: when given params over query string, they should be be simple arguments like number, string or boolean
 			// and if complex: objects should be given like prop.subprop=..., arrays like possiblyArray=1,2,3
 			/* const isPositional = (...given: unknown[]) => given
 				.map(q => typeof q === "object" && Object.keys(q).length === 1 && ("-" in q))
 				.reduce((p, n) => p || n, false) */
 			// TODO: if body is not given, check query for body and 
-			const givenIsPositional = isPositional(query) && !body
-			const params = givenIsPositional ? query["-"] : (Object.keys(query).length > 0 ? query : undefined)
-			const defaults: RpcCall = {
+			const givenIsPositional = !postBody && isPositional(query)
+			const params = givenIsPositional ? (query ?? {})["-"] : query
+			const getBody: RpcCall = {
 				method,
 				params,
 				id: null,
 				jsonrpc: "2.0"
 			}
-			const send = defu<RpcCall, RpcCall>(body, defaults)
+			const send = defu<RpcCall, RpcCall>(postBody, getBody, defaultBody)
 			console.log(send)
 			reply.send(prim(send))
 		}

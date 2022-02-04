@@ -11,5 +11,16 @@
     "email": "ted@doseofted.com",
     "url": "https://doseofted.com/"
   },
-  "license": "UNLICENSED"
+  "license": "UNLICENSED",
+  "dependencies": {
+    "defu": "^5.0.1",
+    "utility-types": "^3.10.0",
+    "vue": "^3.2.29"
+  },
+  "devDependencies": {
+    "@types/jest": "^27.4.0",
+    "example": "workspace:*",
+    "jest": "^27.4.7",
+    "ts-jest": "^27.1.3"
+  }
 }
