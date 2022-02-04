@@ -1,5 +1,5 @@
 import defu from "defu"
-import { ref, Ref, toRefs, watchEffect } from "vue"
+// import { ref, Ref, toRefs, watchEffect } from "vue"
 import * as example from "./example"
 interface RpcBase {
 	id?: string|number
@@ -22,8 +22,8 @@ interface RpcAnswer<Result = unknown, Error = unknown> extends RpcBase {
 }
 
 interface PrimOptions<Module> {
-	endpoint: string
-	client: <T = unknown>(jsonBody: RpcCall) => Promise<RpcAnswer<T>>
+	endpoint?: string
+	client?: <T = unknown>(jsonBody: RpcCall) => Promise<RpcAnswer<T>>
 }
 
 // type GenericFunction = <A, B>(...params: A[]) => B
@@ -32,21 +32,25 @@ export function prim<T extends Record<keyof T, T[V]>, V extends keyof T = keyof 
 	const opts: PrimOptions<Partial<T>> = defu<PrimOptions<Partial<T>>, PrimOptions<Partial<T>>>(options, {
 		endpoint: "/prim",
 		client: async (jsonBody) => {
-			const result = await fetch(opts.endpoint, {
-				method: "POST",
-				body: JSON.stringify(jsonBody)
-			})
-			return result.json()
+			try {
+				const result = await fetch(opts.endpoint, {
+					method: "POST",
+					body: JSON.stringify(jsonBody)
+				})
+				return result.json()
+			} catch (error) {
+				console.log(error)
+			}
 		}
 	})
 	// now return function that can be used client or server-side
-	return <A extends V>(method: A, ...params: Parameters<T[A]>): Ref<ReturnType<T[A]>> => {
+	return <A extends V>(method: A, ...params: Parameters<T[A]>): ReturnType<T[A]> => {
 		const rpc: RpcCall = { method: String(method), params }
-		const answer = ref<ReturnType<T[A]>>(givenModule?.[method](...params))
-		opts.client<ReturnType<T[A]>>(rpc).then(a => { answer.value = a })
-		return answer.value as Ref<ReturnType<T[A]>>
+		// const answer = ref<ReturnType<T[A]>>(givenModule?.[method](...params))
+		opts.client<ReturnType<T[A]>>(rpc).then(a => { console.log("from server:",a) })
+		// return answer.value as Ref<ReturnType<T[A]>>
 		// TODO: consider returning reactive value so that value can be updated once client is done
-		// return givenModule?.[method](...params)
+		return givenModule?.[method](...params as unknown[])
 	}
 }
 
@@ -59,8 +63,5 @@ const b = prim<typeof a>({
 }) // client-side
 const c = prim(example) // server-side (also, using imported module similar to `a`)
 const r = b("hello", "Ted", "Hello")
-const {greeting, you} = toRefs(c("given", {greeting: "Yo", you: "Ted"}).value)
-watchEffect(() => {
-	console.log(r.value, greeting.value, you.value)
-})
-
+const {greeting, you} = c("given", {greeting: "Yo", you: "Ted"})
+console.log(r, greeting, you)
