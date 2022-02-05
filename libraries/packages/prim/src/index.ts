@@ -54,7 +54,7 @@ interface PrimOptions {
  * @param givenModule If `options.server` is true, provide the module where functions should be resovled
  * @returns A wrapper function around the given module or type definitions used for calling functions from server
  */
-export function createPrim<T extends Record<keyof T, T[V]>, V extends keyof T = keyof T>(options?: PrimOptions, givenModule?: T) {
+export function createPrim<T extends Record<V, T[V]>, V extends keyof T = keyof T>(options?: PrimOptions, givenModule?: T) {
 	// first initialize given options and values for which to fallback
 	const opts: PrimOptions= defu<PrimOptions, PrimOptions>(options, {
 		// by default, it should be assumed that function is used client-side (assumed value for easier developer use from client-side)
@@ -104,4 +104,26 @@ export function createPrim<T extends Record<keyof T, T[V]>, V extends keyof T = 
 			throw new Error(error)
 		}
 	}
+}
+
+export function proxyTest<T extends Record<V, T[V]>, V extends keyof T = keyof T>(givenModule?: T) {
+	const empty = {} as T // when not given, on client-side, treat empty object as T
+	type PromisifiedFunction = <A extends V>(...args: Parameters<T[A]>) => Promise<ReturnType<T[A]>>
+	const proxy: Record<V, PromisifiedFunction> = new Proxy<T>(givenModule ?? empty, {
+		get (target, prop) {
+			const promisedAnswer: PromisifiedFunction = (...args) => {
+				console.log(prop, args)
+				// if on server, return it (wrap in promise to match client-side response)
+				if (prop in target) {
+					return new Promise(resolve => {
+						resolve(target[prop](...args as unknown[]))
+					})
+				}
+				// on client, return result given from server
+				return new Promise(r => r("test" as any))
+			}
+			return promisedAnswer
+		}
+	})
+	return proxy
 }

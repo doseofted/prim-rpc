@@ -1,18 +1,17 @@
 import Fastify, { FastifyPluginAsync } from "fastify"
 import Cors from "fastify-cors"
 import * as example from "example"
-import { prim as setupPrim, RpcCall } from "prim"
+import { createPrim, RpcCall } from "prim"
 import defu from "defu"
 
-const { you } = example
-
-const pluginTest: FastifyPluginAsync<{ example: object }> = async (fastify, { example }) => {
-	const prim = setupPrim(example)
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+const pluginTest: FastifyPluginAsync<{ module: any }> = async (fastify, { module: givenModule }) => {
+	const prim = createPrim({ server: true }, givenModule)
 	fastify.route<{ Body: RpcCall, Querystring: unknown, Params: { method?: string } }>({
 		method: ["POST", "GET"],
 		url: "/:method?",
 		handler: ({ body: postBody, query, params: { method } }, reply) => {
-			const defaultBody: RpcCall = { jsonrpc: "2.0", id: null, method: "prim", params: undefined }
+			const defaultBody: RpcCall = { id: null, method: "prim", params: undefined }
 			// NOTE: by using the query, some options could be passed in the URL
 			// for use with JSON-LD (they'll just be passed to parameters in RPC call
 			// so it doesn't matter if given in body or query, but if given in both
@@ -32,7 +31,6 @@ const pluginTest: FastifyPluginAsync<{ example: object }> = async (fastify, { ex
 			// made after a JSON-RPC/POST request is only to grab related data to first
 			// request and queries to GET request should be kept as simple as possible
 			// such as "?page=2" or "?linked=<ref_id>"
-
 			// NOTE: if body is given, it should be like JSON-RPC but if given through URL,
 			// it should be used as defaults unless overriden by RPC call in request body
 			const isPositional = (q: unknown) => typeof q === "object"
@@ -47,21 +45,16 @@ const pluginTest: FastifyPluginAsync<{ example: object }> = async (fastify, { ex
 			// TODO: if body is not given, check query for body and 
 			const givenIsPositional = !postBody && isPositional(query)
 			const params = givenIsPositional ? (query ?? {})["-"] : query
-			const getBody: RpcCall = {
-				method,
-				params,
-				id: null,
-				jsonrpc: "2.0"
-			}
+			const getBody: RpcCall = { method, params }
 			const send = defu<RpcCall, RpcCall>(postBody, getBody, defaultBody)
 			console.log(send)
-			reply.send(prim(send))
+			reply.send(prim(send.method, ...send.params))
 		}
 	})
 }
 
 const fastify = Fastify({ logger: true })
-fastify.register(pluginTest, { example, prefix: "/json" })
+fastify.register(pluginTest, { module: example, prefix: "/json" })
 fastify.register(Cors, { origin: `https://${process.env.COMPOSE_HOST}` })
 
 fastify.get("/", function (request, reply) {

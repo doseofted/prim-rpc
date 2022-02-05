@@ -1,4 +1,4 @@
-import { createPrim, RpcError } from "./index"
+import { createPrim, RpcError, proxyTest } from "./index"
 import type * as exampleClient from "example"
 import * as exampleServer from "example"
 
@@ -58,4 +58,17 @@ test("Prim answers calls, server-side", async () => {
 		}
 	}
 	expect(greeting).toEqual(response)
+})
+
+describe("Proxy version works", () => {
+	test("from client", async () => {
+		const created = proxyTest<{ hello(name: string): string }>()
+		expect(await created.hello("there")).toEqual("test")
+	})
+	test("from server", async () => {
+		const created = proxyTest({
+			hello(name: string) { return `Hello ${name}!`}
+		})
+		expect(await created.hello("there")).toBe("Hello there!")
+	})
 })
