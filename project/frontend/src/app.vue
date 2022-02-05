@@ -5,17 +5,16 @@ import { createPrim } from "prim"
 import * as exampleServer from "example"
 import type * as exampleClient from "example"
 
-const { sayHello, sayHelloAlternative } = createPrim<typeof exampleClient>({
+const { sayHello } = createPrim<typeof exampleClient>({
 	endpoint: `https://api.${import.meta.env.VITE_HOST}`
 })
-
+const exampleArgs = { greeting: "Hey", name: "Ted" }
 const message = ref<string>()
-const matches = computed(() => message.value === exampleServer.sayHelloAlternative("Hey", "Ted"))
+const matches = computed(() => message.value === exampleServer.sayHello(exampleArgs))
 const errored = computed(() => message.value === "errored")
 onMounted(async () => {
 	try {
-		message.value = await sayHello({greeting: "Hey", name: "Ted" })
-		console.log(await sayHelloAlternative("Hey again", "Teed"));
+		message.value = await sayHello(exampleArgs)
 	} catch (error) {
 		message.value = "errored"
 	}

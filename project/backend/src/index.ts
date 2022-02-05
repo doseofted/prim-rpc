@@ -22,7 +22,6 @@ const fastify = Fastify({ logger: true })
 fastify.register(primFasifyPlugin(), { module: example })
 fastify.register(Cors, { origin: `https://${process.env.COMPOSE_HOST}` })
 
-
 fastify.listen(3001, "0.0.0.0", function (err) {
 	if (err) {
 		fastify.log.error(err)

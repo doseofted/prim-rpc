@@ -22,6 +22,8 @@ tasks:
       - "libraries/packages/**/dist/**/*"
 
   build:frontend:
+    env:
+      VITE_HOST: "{{.COMPOSE_HOST}}"
     cmds:
       - "pnpm frontend build"
     sources:
@@ -54,7 +56,8 @@ tasks:
   sync:
     desc: "Build the frontend locally and sync to all available native platforms"
     env:
-      NODE_ENV: "production"
+      # FIXME: npm install has to be in development mode because Electron depdencies are missing in production mode
+      NODE_ENV: "development"
     sources:
       - "project/frontend/dist/**/*"
     generates:
