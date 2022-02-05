@@ -15,7 +15,7 @@
     "dev": "parcel watch",
     "build": "parcel build",
     "start": "node dist/index.js",
-    "watchstart": "nodemon --watch ../../libraries/ --watch dist/index.js dist/index.js"
+    "watchstart": "nodemon --watch ../../libraries/packages --watch dist/index.js dist/index.js"
   },
   "devDependencies": {
     "nodemon": "^2.0.15",

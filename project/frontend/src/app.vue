@@ -1,28 +1,26 @@
 <script setup lang="ts">
 import { onMounted, ref, computed } from "vue"
-import { you as proposedYou } from "example"
 import HelloYou from "./components/hello-you.vue"
+import { createPrim } from "prim"
+import * as exampleServer from "example"
+import type * as exampleClient from "example"
 
-async function hello () {
-	try {
-		const result = await fetch(`https://api.${import.meta.env.VITE_HOST}`)
-		const json = await result.json()
-		return json.Hello
-	} catch (error) {
-		return "stranger"
-	}
-}
-const you = ref<string>()
-const matches = computed(() => you.value === proposedYou)
+const { sayHello, sayHelloAlternative } = createPrim<typeof exampleClient>({
+	endpoint: `https://api.${import.meta.env.VITE_HOST}/json`
+})
+
+const message = ref<string>()
+const matches = computed(() => message.value === exampleServer.sayHelloAlternative("Hey", "Ted"))
 onMounted(async () => {
-	you.value = await hello()
+	message.value = await sayHello({greeting: "Hey", name: "Ted" })
+	console.log(await sayHelloAlternative("Hey again", "Teed"));
 })
 </script>
 
 <template>
   <div class="greeting">
     <hello-you
-      :name="you"
+      :message="message"
       :class="{ matches }"
       class="you"
     />
@@ -45,7 +43,7 @@ div {
 
 .you { transition: color 3s; }
 
-.you:not(.matches) {
+.you.matches {
   color: #2aa;
 }
 </style>

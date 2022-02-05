@@ -1,20 +1,29 @@
 <script setup lang="ts">
-import { you } from "example"
-
 withDefaults(defineProps<{
-	name: string
+	message: string
 }>(), {
-	name: you
+	message: "loading"
 })
 </script>
 
 <template>
-  <p>Hello {{ name }}</p>
+  <p>{{ message }}</p>
 </template>
 
 <style scoped>
 p {
-  font-family: sans-serif;
-  font-size: 14px;
+  font-family:
+    -apple-system,
+    BlinkMacSystemFont,
+    "Segoe UI",
+    Roboto,
+    Oxygen,
+    Ubuntu,
+    Cantarell,
+    "Open Sans",
+    "Helvetica Neue",
+    sans-serif;
+  font-weight: 600;
+  font-size: 18px;
 }
 </style>

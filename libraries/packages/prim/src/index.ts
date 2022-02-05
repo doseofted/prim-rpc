@@ -132,6 +132,7 @@ export function createPrim<T extends Record<V, T[V]>, V extends keyof T = keyof 
 		client: async (jsonBody, endpoint) => {
 			const result = await fetch(endpoint, {
 				method: "POST",
+				headers: { "Content-Type": "application/json" },
 				body: JSON.stringify(jsonBody)
 			})
 			// RPC result should be returned on success and RPC error thrown if errored
@@ -155,7 +156,7 @@ export function createPrim<T extends Record<V, T[V]>, V extends keyof T = keyof 
 						if (err.isRpcErr) { throw err }
 						throw new Error(error)
 					}
-				}				
+				}
 				// on client, return result given from server
 				const rpc = { method: prop.toString(), params: args }
 				const answer = async () => {

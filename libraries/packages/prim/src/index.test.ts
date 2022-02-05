@@ -85,6 +85,6 @@ describe("Prim can be used from server framework", () => {
 			method: "sayHello",
 			params: [{ greeting: "Hey", name: "Ted"}]
 		})
-		expect(await answer).toEqual("Hey Ted!")
+		expect((await answer).result).toEqual("Hey Ted!")
 	})
 })

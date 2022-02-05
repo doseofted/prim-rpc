@@ -31,3 +31,12 @@ export function oops(ok = false) {
 	if (!ok) { throw new Error("My bad.") }
 	return "I did it again."
 }
+
+// TODO: Prim-RPC doesn't currently work with nested methods
+// Consider references below to add the functionality later:
+// REFERENCE: https://stackoverflow.com/a/41300128
+// REFERNCE: https://www.npmjs.com/package/proxy-deep
+export const test =  {
+	sayHello,
+	sayHelloAlternative
+}

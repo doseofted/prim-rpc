@@ -11,6 +11,8 @@ function createPlugin<T extends Record<V, T[V]>, V extends keyof T = keyof T>() 
 			method: ["POST", "GET"],
 			url: `${options.prefix ?? "/"}`,
 			handler: ({ body }, reply) => {
+				console.log(typeof body);
+				
 				// TODO: add support for query strings (simple requests, for linked data, similar to JSON-LD links)
 				reply.send(prim(body))
 			}
