@@ -1,6 +1,5 @@
 import defu from "defu"
-// import { ref, Ref, toRefs, watchEffect } from "vue"
-// import * as example from "./example"
+
 interface RpcBase {
 	id?: string|number
 }
@@ -21,27 +20,24 @@ interface RpcAnswer<Result = unknown, Error = unknown> extends RpcBase {
 	error?: RpcErr<Error>
 }
 
-// extend as needed
 export class RpcError<T> extends Error implements RpcErr<T> {
-	code: number
-	data?: T
-	message: string
+	get code(): number { return this.err.code }
+	get message(): string { return this.err.message }
+	get data(): T|undefined { return this.err.data }
+	get isRpcErr(): boolean { return !!this.err && this.message !== undefined && this.code !== undefined }
 
-	constructor(err: RpcErr<T>) {
+	constructor(private err?: RpcErr<T>) {
 		super()
-		this.message = err.message
-		this.code = err.code
-		this.data = err.data
 	}
 }
 
 interface PrimOptions {
 	/** `true` when Prim-RPC is used from server. A module to be resolved should also be given as argument to `createPrim` */
 	server?: boolean
-	/** When `options.server` is `false`, provide the server URL where Prim is being used */
+	/** When `options.server` is `false`, provide the server URL where Prim is being used, to be used from `options.client` */
 	endpoint?: string
 	/** When used from the client, override the HTTP framework used for requests (default is browser's `fetch()`) */
-	client?: <Method = string, Params = unknown, Answer = unknown>(jsonBody: RpcCall<Method, Params>) => Promise<RpcAnswer<Answer>>
+	client?: <Method = string, Params = unknown, Answer = unknown>(jsonBody: RpcCall<Method, Params>, endpoint: string) => Promise<RpcAnswer<Answer>>
 }
 
 /**
@@ -59,44 +55,53 @@ interface PrimOptions {
  * @returns A wrapper function around the given module or type definitions used for calling functions from server
  */
 export function createPrim<T extends Record<keyof T, T[V]>, V extends keyof T = keyof T>(options?: PrimOptions, givenModule?: T) {
-	// first initialize options
+	// first initialize given options and values for which to fallback
 	const opts: PrimOptions= defu<PrimOptions, PrimOptions>(options, {
+		// by default, it should be assumed that function is used client-side (assumed value for easier developer use from client-side)
+		server: false,
+		// if endpoint is not given then assume endpoint is relative to current url, following suggested `/prim` for Prim-RPC calls
 		endpoint: "/prim",
-		client: async (jsonBody) => {
-			const result = await fetch(opts.endpoint, {
+		// `client()` is intended to be overridden so as not to force any one HTTP framework but default is fine for most cases
+		client: async (jsonBody, endpoint) => {
+			const result = await fetch(endpoint, {
 				method: "POST",
 				body: JSON.stringify(jsonBody)
 			})
+			// RPC result should be returned on success and RPC error thrown if errored
 			return result.json()
 		}
 	})
-	// now return function that can be used client or server-side
+	// now return a function that can be used to call code in given module, either directly when on the server
+	// or through an HTTP call on the client
 	/**
 	 * @throws {RpcError} An object extending Error resembling expected response from server
 	 */
 	return async <A extends V>(method: A, ...p: Parameters<T[A]>): Promise<ReturnType<T[A]>> => {
-		// on server, return the result of the function since the function is available
+		// on server, return the result of the function since module was expected to be given
 		if (opts.server) {
-			return givenModule?.[method](...p as unknown[])
-		}
-		// if one argument is given, remove array that argument is contained in
-		const params = (Array.isArray(p) && p[0] !== undefined && p[1] === undefined) ? p[0] : p
-		const rpc: RpcCall<A, Parameters<T[A]>> = { method, params }
-		try {
-			const answer = await opts.client<A, Parameters<T[A]>, ReturnType<T[A]>>(rpc)
-			return answer.result
-		} catch (error) {
-			if (error instanceof RpcError) {
-				throw new RpcError(error as RpcErr)
-			} else {
-				throw new Error(error)
+			// by using spread operator, arguments to module will be given as expected (positional or not)
+			try {
+				return givenModule?.[method](...p as unknown[])
+			} catch (error) {
+				// instead of throwing, return 
+				return 
 			}
 		}
-		// return answer.value as Ref<ReturnType<T[A]>>
-		// TODO: when server-side receives request, it should return result from module
-		
+		// if only one argument is given, remove outer array (this way if developer writes an RPC request by hand, `params`
+		// does not have to be an array of one)
+		const params: Parameters<T[A]> = (Array.isArray(p) && p[0] !== undefined && p[1] === undefined) ? p[0] : p
+		// now form the request body for use by the client
+		const rpc: RpcCall<A, Parameters<T[A]>> = { method, params }
+		try {
+			// gather answer and then return the result of RPC call back to the client
+			const answer = await opts.client<A, Parameters<T[A]>, ReturnType<T[A]>>(rpc, opts.endpoint)
+			return answer.result
+		} catch (error) {
+			const err = new RpcError(error)
+			// it is expected for given module to throw if there is an error so that Prim-RPC can also error on the client
+			if (err.isRpcErr) { throw err }
+			// if not an RPC error, throw a generic error with given data as message
+			throw new Error(error)
+		}
 	}
 }
-
-
-// TODO: this is a client-side version but a server-side version needs to make functions available over RPC

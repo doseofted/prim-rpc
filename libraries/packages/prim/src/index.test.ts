@@ -1,52 +1,57 @@
 import { createPrim, RpcError } from "./index"
-import type * as example from "example"
-import * as exampleReal from "example"
+import type * as exampleClient from "example"
+import * as exampleServer from "example"
 
+describe("Prim instantiates", () => {
+	test("Client-side instantiation", () => {
+		const prim = createPrim<typeof exampleClient>()
+		expect(typeof prim === "function").toBeTruthy()
+	})
+	test("Server-side instantiation", () => {
+		const prim = createPrim({ server: true }, exampleServer)
+		expect(typeof prim === "function").toBeTruthy()
+	})
+})
 
-test("positional args work", async () => {
-	const primmed = createPrim <typeof example>({
+describe("Arguments are given correctly", () => {
+	const prim = createPrim<typeof exampleClient>({
 		client: (body) => new Promise((r) => {
 			// eslint-disable-next-line @typescript-eslint/no-explicit-any
 			r({ result: body.params as any })
 		})
 	})
-	let greeting: string
-	const args = ["Yo", "Ted"]
-	try {
-		greeting = await primmed("sayHelloAlternative", ...args)
-	} catch (error) {
-		if (error instanceof RpcError) {
-			console.log(error.message)
+	test("Positional arguments work", async () => {
+		let greeting: string
+		const args = ["Yo", "Ted"]
+		try {
+			greeting = await prim("sayHelloAlternative", ...args)
+		} catch (error) {
+			if (error instanceof RpcError) {
+				console.log(error.message)
+			}
 		}
-	}
-	expect(greeting).toEqual(args)
-})
-
-test("objects args work", async () => {
-	const primmed = createPrim<typeof example>({
-		client: (body) => new Promise((r) => {
-			// eslint-disable-next-line @typescript-eslint/no-explicit-any
-			r({ result: body.params as any })
-		})
+		expect(greeting).toEqual(args)
 	})
-	let greeting: string
-	const response = { greeting: "Yo", name: "Ted" }
-	try {
-		greeting = await primmed("sayHello", { greeting: "Yo", name: "Ted" })
-	} catch (error) {
-		if (error instanceof RpcError) {
-			console.log(error.message)
+	test("Object argument works", async () => {
+		let greeting: string
+		const body = { greeting: "Yo", name: "Ted" }
+		try {
+			greeting = await prim("sayHello", body)
+		} catch (error) {
+			if (error instanceof RpcError) {
+				console.log(error.message)
+			}
 		}
-	}
-	expect(greeting).toEqual(response)
+		expect(greeting).toEqual(body)
+	})
 })
 
-test("server-mode answers function", async () => {
-	const primmed = createPrim({ server: true }, exampleReal)
+test("Prim answers calls, server-side", async () => {
+	const prim = createPrim({ server: true }, exampleServer)
 	let greeting: string
 	const response = "Yo Ted!"
 	try {
-		greeting = await primmed("sayHello", { greeting: "Yo", name: "Ted" })
+		greeting = await prim("sayHello", { greeting: "Yo", name: "Ted" })
 	} catch (error) {
 		if (error instanceof RpcError) {
 			console.log(error.message)
