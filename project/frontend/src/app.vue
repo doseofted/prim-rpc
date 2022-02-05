@@ -6,14 +6,19 @@ import * as exampleServer from "example"
 import type * as exampleClient from "example"
 
 const { sayHello, sayHelloAlternative } = createPrim<typeof exampleClient>({
-	endpoint: `https://api.${import.meta.env.VITE_HOST}/json`
+	endpoint: `https://api.${import.meta.env.VITE_HOST}`
 })
 
 const message = ref<string>()
 const matches = computed(() => message.value === exampleServer.sayHelloAlternative("Hey", "Ted"))
+const errored = computed(() => message.value === "errored")
 onMounted(async () => {
-	message.value = await sayHello({greeting: "Hey", name: "Ted" })
-	console.log(await sayHelloAlternative("Hey again", "Teed"));
+	try {
+		message.value = await sayHello({greeting: "Hey", name: "Ted" })
+		console.log(await sayHelloAlternative("Hey again", "Teed"));
+	} catch (error) {
+		message.value = "errored"
+	}
 })
 </script>
 
@@ -21,7 +26,7 @@ onMounted(async () => {
   <div class="greeting">
     <hello-you
       :message="message"
-      :class="{ matches }"
+      :class="{ matches, errored }"
       class="you"
     />
   </div>
@@ -41,9 +46,16 @@ div {
   min-height: 100vh;
 }
 
-.you { transition: color 3s; }
+.you {
+  transition: color 1s;
+  color: #fff;
+}
 
 .you.matches {
   color: #2aa;
+}
+
+.you.errored {
+  color: #a22;
 }
 </style>
