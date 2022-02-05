@@ -1,29 +1,31 @@
 <script setup lang="ts">
 import { onMounted, ref, computed } from "vue"
-import { you as proposedYou } from "example"
 import HelloYou from "./components/hello-you.vue"
+import { createPrim } from "prim"
+import * as exampleServer from "example"
+import type * as exampleClient from "example"
 
-async function hello () {
-	try {
-		const result = await fetch(`https://api.${import.meta.env.VITE_HOST}`)
-		const json = await result.json()
-		return json.Hello
-	} catch (error) {
-		return "stranger"
-	}
-}
-const you = ref<string>()
-const matches = computed(() => you.value === proposedYou)
+const { sayHello } = createPrim<typeof exampleClient>({
+	endpoint: `https://api.${import.meta.env.VITE_HOST}`
+})
+const exampleArgs = { greeting: "Hey", name: "Ted" }
+const message = ref<string>()
+const matches = computed(() => message.value === exampleServer.sayHello(exampleArgs))
+const errored = computed(() => message.value === "errored")
 onMounted(async () => {
-	you.value = await hello()
+	try {
+		message.value = await sayHello(exampleArgs)
+	} catch (error) {
+		message.value = "errored"
+	}
 })
 </script>
 
 <template>
   <div class="greeting">
     <hello-you
-      :name="you"
-      :class="{ matches }"
+      :message="message"
+      :class="{ matches, errored }"
       class="you"
     />
   </div>
@@ -32,7 +34,7 @@ onMounted(async () => {
 <style>
 body {
   margin: 0;
-  background-color: #dfdfdf;
+  background-color: #fff;
 }
 
 div {
@@ -43,9 +45,16 @@ div {
   min-height: 100vh;
 }
 
-.you { transition: color 3s; }
+.you {
+  transition: color 1s;
+  color: #fff;
+}
 
-.you:not(.matches) {
-  color: #f55;
+.you.matches {
+  color: #2aa;
+}
+
+.you.errored {
+  color: #a22;
 }
 </style>

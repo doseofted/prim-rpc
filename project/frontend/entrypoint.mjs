@@ -3,7 +3,7 @@
 import { createEcho, gatherPackageName, mode } from "../../misc/zx-utils.mjs"
 $.verbose = false
 
-const prefix = await gatherPackageName("frontend/package.json")
+const prefix = await gatherPackageName("project/frontend/package.json")
 const echo = createEcho(prefix)
 
 $.verbose = true

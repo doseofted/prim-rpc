@@ -27,12 +27,12 @@ The goal is to synchronize steps taken to run a project in all environments (for
 
 In development, most project setup will be completed through use of containers configured with Docker Compose. Some other dependencies are needed for a better development experience.
 
-Follow steps below to setup a development environment. Reference setup stage of `libraries/Dockerfile` for versions of dependencies used in this project.
+Follow steps below to setup a development environment. `nvm`, `task`, `mkcert`, `docker`, and `docker-compose` are suggested.
 
-1. Install [nvm](https://github.com/nvm-sh/nvm) and run `nvm use` in this project to set the utilized Node version.
-2. Run `corepack enable` so package managers defined in `package.json` files are utilized.
-3. Run `pnpm install` so type definitions can be suggested in code editor.
-4. Install [Task](https://github.com/go-task/task) to easily run project tasks and dependencies.
+1. Install [nvm](https://github.com/nvm-sh/nvm) and run `nvm use` in this project to set the utilized Node version (or download given version in `.nvmrc`).
+2. Run `corepack enable` so package managers defined in `package.json` files are utilized (`pnpm`). Otherwise, install version of `pnpm` given in `package.json`.
+3. Install [Task](https://github.com/go-task/task) to easily run project tasks and dependencies. Alternatively, manually run commands defined in `Taskfile.yml`
+4. Run `task js:setup` to install dependencies and build out all projects once so code editor can suggest type definitions in all projects.
 5. Install [mkcert](https://github.com/FiloSottile/mkcert) for locally generated and trusted certifcates in web browsers. Run `mkcert -install` to install the certificate authority.
 6. Although not required, this project is configured to be edited with VS Code. Install VS Code and open `prim.code-workspace` in the editor.
 7. Once code-workspace is opened, a prompt will show recommended extensions for this project. Install all to utilize all settings of project.
@@ -43,17 +43,19 @@ In production, Docker and Docker Compose are the only tools needed to run the pr
 
 ## Get Going
 
-Instructions given will be intended for Linux but should generally work on Mac or through WSL2 on Windows.
+Once steps for environment are completed, the project can be ran. Instructions given will be intended for Linux but should generally work on Mac or through WSL2 on Windows.
 
 ```bash
 # Set up environment for project (remember to edit the defaults before running)
 cp .env.example .env
+# Development: install dependencies and build all projects once
+task js:setup
 # Run dependencies given in Taskfile, start all services, then view logs (Ctrl-C will not shut it down)
 task dc:up
 # When done, shut it all down
 task dc:down
-# Development: Install dependencies locally, useful for type suggestions with editor
-pnpm install
+# Development: Install dependencies and build type definitions for libraries, useful for type suggestions with editor
+task js:setup
 ```
 
 All other Task-related commands can be found by running `task --list`.

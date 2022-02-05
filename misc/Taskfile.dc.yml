@@ -6,7 +6,7 @@ tasks:
   ps:
     desc: "List all running service names"
     cmds:
-      - "docker compose {{.COMPOSE_CONFIG_GIVEN}} ps"
+      - "docker compose {{.COMPOSE_CONFIG_GIVEN}} ps --services"
 
   pull:
     desc: "Pull newer versions of services if available"
@@ -16,7 +16,8 @@ tasks:
   logs:
     desc: "Show and follow recent logs for running services"
     cmds:
-      - "docker compose {{.COMPOSE_CONFIG_GIVEN}} logs -f --tail=15"
+      - cmd: "docker compose {{.COMPOSE_CONFIG_GIVEN}} logs -f --tail=15"
+        ignore_error: true
 
   build:
     desc: "Build services in order of images' dependencies, with build cache"
@@ -46,11 +47,13 @@ tasks:
       - "docker compose {{.COMPOSE_CONFIG_GIVEN}} down -v --remove-orphans -t 10"
 
   exe:
-    desc: "Run command in running service, like so: `task dc:exe -- backend`"
+    desc: "Run shell in running service, like so: `task dc:exe -- backend`"
+    interactive: true
     cmds:
-      - "docker compose {{.COMPOSE_CONFIG_GIVEN}} exec {{.CLI_ARGS}}"
+      - "docker compose {{.COMPOSE_CONFIG_GIVEN}} exec {{.CLI_ARGS}} bash"
 
   run:
-    desc: "Run command in one-off service, like so: `task dc:run -- backend`"
+    desc: "Run shell in one-off service, like so: `task dc:run -- backend`"
+    interactive: true
     cmds:
-      - "docker compose {{.COMPOSE_CONFIG_GIVEN}} run {{.CLI_ARGS}}"
+      - "docker compose {{.COMPOSE_CONFIG_GIVEN}} run {{.CLI_ARGS}} bash"

@@ -77,6 +77,7 @@
 			"statusBarItem.remoteBackground": "#57b0ca",
 			"statusBarItem.remoteForeground": "#15202b"
 		},
+		"typescript.tsdk": "Prim/node_modules/typescript/lib",
 	},
 	"extensions": {
 		"recommendations": [
