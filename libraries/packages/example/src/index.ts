@@ -10,7 +10,7 @@
 // SECTION: frontend/backend integration test
 // this is for example usage from frontend and backend
 export const you = "Ted"
-console.log("Hello", you)
+// console.log("Hello", you)
 // !SECTION: frontend/backend integration test
 
 export function sayHello (options: { greeting?: string, name?: string }) {

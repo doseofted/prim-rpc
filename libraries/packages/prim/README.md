@@ -68,3 +68,7 @@ integration with Vite or other tool) could check the version of the given API at
 Deno you could probably copy the definitions and make it available on the server and import from the URL.
 This assumes those definitions are free to share (nothing secret should be in them anyway) but that rules out Node
 unless the definitions are downloaded.
+
+Another possible idea, not sure if this would work: I could use a series of Proxy functions built around
+the given module definitions on the server and then once the proxy function is called, I take the name and arguments
+give from the proxy and forward those to the server.

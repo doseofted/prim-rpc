@@ -5,7 +5,8 @@
 		"jsx": "react-jsx",
 		"resolveJsonModule": true,
 		"esModuleInterop": true,
+		"module": "ESNext",
 		"moduleResolution": "Node",
-		"target": "ES2021"
+		"target": "ESNext"
 	}
 }
