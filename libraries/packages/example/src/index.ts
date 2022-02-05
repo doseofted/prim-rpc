@@ -13,7 +13,7 @@ export const you = "Ted"
 // console.log("Hello", you)
 // !SECTION: frontend/backend integration test
 
-export function sayHello (options: { greeting?: string, name?: string }) {
+export async function sayHello (options: { greeting?: string, name?: string }) {
 	const { greeting = "", name = "" } = options
 	return `${greeting ?? "Hello"} ${name ?? "you"}!`
 }

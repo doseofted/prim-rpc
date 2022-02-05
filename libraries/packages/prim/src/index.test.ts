@@ -62,13 +62,11 @@ test("Prim answers calls, server-side", async () => {
 
 describe("Proxy version works", () => {
 	test("from client", async () => {
-		const created = proxyTest<{ hello(name: string): string }>()
-		expect(await created.hello("there")).toEqual("test")
+		const created = proxyTest<typeof exampleClient>()
+		expect(await created.sayHelloAlternative("Hey", "Ted")).toEqual("test")
 	})
 	test("from server", async () => {
-		const created = proxyTest({
-			hello(name: string) { return `Hello ${name}!`}
-		})
-		expect(await created.hello("there")).toBe("Hello there!")
+		const created = proxyTest(exampleServer)
+		expect(created.sayHelloAlternative("Hey", "Ted")).toBe("Hey Ted!")
 	})
 })

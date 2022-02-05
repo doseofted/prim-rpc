@@ -107,17 +107,14 @@ export function createPrim<T extends Record<V, T[V]>, V extends keyof T = keyof 
 }
 
 export function proxyTest<T extends Record<V, T[V]>, V extends keyof T = keyof T>(givenModule?: T) {
-	const empty = {} as T // when not given, on client-side, treat empty object as T
+	const empty = {} as T // when not given on client-side, treat empty object as T
 	type PromisifiedFunction = <A extends V>(...args: Parameters<T[A]>) => Promise<ReturnType<T[A]>>
-	const proxy: Record<V, PromisifiedFunction> = new Proxy<T>(givenModule ?? empty, {
+	const proxy: T /* Record<V, PromisifiedFunction> */ = new Proxy<T>(givenModule ?? empty, {
 		get (target, prop) {
 			const promisedAnswer: PromisifiedFunction = (...args) => {
-				console.log(prop, args)
 				// if on server, return it (wrap in promise to match client-side response)
 				if (prop in target) {
-					return new Promise(resolve => {
-						resolve(target[prop](...args as unknown[]))
-					})
+					return target[prop](...args as unknown[])
 				}
 				// on client, return result given from server
 				return new Promise(r => r("test" as any))
