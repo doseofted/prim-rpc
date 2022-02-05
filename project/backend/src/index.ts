@@ -4,15 +4,13 @@ import fp from "fastify-plugin"
 import * as example from "example"
 import { createPrimServer, RpcCall } from "prim"
 
-function createPlugin<T extends Record<V, T[V]>, V extends keyof T = keyof T>() {
+function primFasifyPlugin<T extends Record<V, T[V]>, V extends keyof T = keyof T>() {
 	return fp<{ module: T, prefix: string }>(async (fastify, options) => {
 		const prim = createPrimServer({ server: true }, options.module)
 		fastify.route<{ Body: RpcCall<V, Parameters<T[V]>>, Params: { method?: keyof T } }>({
 			method: ["POST", "GET"],
 			url: `${options.prefix ?? "/"}`,
 			handler: ({ body }, reply) => {
-				console.log(typeof body);
-				
 				// TODO: add support for query strings (simple requests, for linked data, similar to JSON-LD links)
 				reply.send(prim(body))
 			}
@@ -71,7 +69,7 @@ function createPlugin<T extends Record<V, T[V]>, V extends keyof T = keyof T>() 
 } */
 
 const fastify = Fastify({ logger: true })
-fastify.register(createPlugin(), { module: example, prefix: "/json" })
+fastify.register(primFasifyPlugin(), { module: example, prefix: "/json" })
 // fastify.register(pluginTest, { module: example, prefix: "/json" })
 fastify.register(Cors, { origin: `https://${process.env.COMPOSE_HOST}` })
 

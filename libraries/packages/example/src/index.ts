@@ -13,11 +13,24 @@ export const you = "Ted"
 // console.log("Hello", you)
 // !SECTION: frontend/backend integration test
 
+/**
+ * Say hello.
+ *
+ * @param options Options used for greeting
+ * @returns A nice greeting
+ */
 export function sayHello (options: { greeting?: string, name?: string }) {
 	const { greeting = "", name = "" } = options
 	return `${greeting ?? "Hello"} ${name ?? "you"}!`
 }
 
+/**
+ * An alternative to `sayHello` that uses positional arguments.
+ *
+ * @param greeting How should `name` be greeted?
+ * @param name What's your name?
+ * @returns A nice greeting
+ */
 export function sayHelloAlternative(greeting = "", name = "") {
 	return `${greeting ?? "Hello"} ${name ?? "you"}!`
 }
@@ -25,7 +38,6 @@ export function sayHelloAlternative(greeting = "", name = "") {
 export function prim() {
 	return "You're using Prim."
 }
-
 
 export function oops(ok = false) {
 	if (!ok) { throw new Error("My bad.") }
@@ -35,7 +47,7 @@ export function oops(ok = false) {
 // TODO: Prim-RPC doesn't currently work with nested methods
 // Consider references below to add the functionality later:
 // REFERENCE: https://stackoverflow.com/a/41300128
-// REFERNCE: https://www.npmjs.com/package/proxy-deep
+// REFERENCE: https://www.npmjs.com/package/proxy-deep
 export const test =  {
 	sayHello,
 	sayHelloAlternative
