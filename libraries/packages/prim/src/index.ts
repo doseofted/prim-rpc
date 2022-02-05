@@ -4,18 +4,18 @@ interface RpcBase {
 	id?: string|number
 }
 
-interface RpcErr<Data = unknown> {
+export interface RpcErr<Data = unknown> {
 	code: number
 	message: string
 	data?: Data
 }
 
-interface RpcCall<Method = string, Params = unknown> extends RpcBase {
+export interface RpcCall<Method = string, Params = unknown> extends RpcBase {
 	method: Method
 	params?: Params
 }
 
-interface RpcAnswer<Result = unknown, Error = unknown> extends RpcBase {
+export interface RpcAnswer<Result = unknown, Error = unknown> extends RpcBase {
 	result?: Result
 	error?: RpcErr<Error>
 }
@@ -26,12 +26,17 @@ export class RpcError<T> extends Error implements RpcErr<T> {
 	get data(): T|undefined { return this.err.data }
 	get isRpcErr(): boolean { return !!this.err && this.message !== undefined && this.code !== undefined }
 
+	send(): RpcErr<T> {
+		const { code, message, data} = this
+		return { code, message, data }
+	}
+
 	constructor(private err?: RpcErr<T>) {
 		super()
 	}
 }
 
-interface PrimOptions {
+interface PrimV1Options {
 	/** `true` when Prim-RPC is used from server. A module to be resolved should also be given as argument to `createPrim` */
 	server?: boolean
 	/** When `options.server` is `false`, provide the server URL where Prim is being used, to be used from `options.client` */
@@ -54,9 +59,9 @@ interface PrimOptions {
  * @param givenModule If `options.server` is true, provide the module where functions should be resovled
  * @returns A wrapper function around the given module or type definitions used for calling functions from server
  */
-export function createPrim<T extends Record<V, T[V]>, V extends keyof T = keyof T>(options?: PrimOptions, givenModule?: T) {
+export function createPrimV1<T extends Record<V, T[V]>, V extends keyof T = keyof T>(options?: PrimV1Options, givenModule?: T) {
 	// first initialize given options and values for which to fallback
-	const opts: PrimOptions= defu<PrimOptions, PrimOptions>(options, {
+	const opts: PrimV1Options = defu<PrimV1Options, PrimV1Options>(options, {
 		// by default, it should be assumed that function is used client-side (assumed value for easier developer use from client-side)
 		server: false,
 		// if endpoint is not given then assume endpoint is relative to current url, following suggested `/prim` for Prim-RPC calls
@@ -106,21 +111,90 @@ export function createPrim<T extends Record<V, T[V]>, V extends keyof T = keyof 
 	}
 }
 
-export function proxyTest<T extends Record<V, T[V]>, V extends keyof T = keyof T>(givenModule?: T) {
+interface PrimOptions {
+	/** `true` when Prim-RPC is used from server. A module to be resolved should also be given as argument to `createPrim` */
+	server?: boolean
+	/** When `options.server` is `false`, provide the server URL where Prim is being used, to be used from `options.client` */
+	endpoint?: string
+	/** When used from the client, override the HTTP framework used for requests (default is browser's `fetch()`) */
+	client?: (jsonBody: RpcCall<string, unknown>, endpoint: string) => Promise<RpcAnswer>
+}
+
+
+export function createPrim<T extends Record<V, T[V]>, V extends keyof T = keyof T>(options?: PrimOptions, givenModule?: T) {
+	// first initialize given options and values for which to fallback
+	const configured: PrimOptions = defu<PrimOptions, PrimOptions>(options, {
+		// by default, it should be assumed that function is used client-side (assumed value for easier developer use from client-side)
+		server: false,
+		// if endpoint is not given then assume endpoint is relative to current url, following suggested `/prim` for Prim-RPC calls
+		endpoint: "/prim",
+		// `client()` is intended to be overridden so as not to force any one HTTP framework but default is fine for most cases
+		client: async (jsonBody, endpoint) => {
+			const result = await fetch(endpoint, {
+				method: "POST",
+				body: JSON.stringify(jsonBody)
+			})
+			// RPC result should be returned on success and RPC error thrown if errored
+			return result.json()
+		}
+	})
 	const empty = {} as T // when not given on client-side, treat empty object as T
 	type PromisifiedFunction = <A extends V>(...args: Parameters<T[A]>) => Promise<ReturnType<T[A]>>
+	// TODO: find way to wrap all `ReturnType`s in Promises on all T[V] functions ...not sure it's possible
+	// (that way, code editors don't prompt message "'await' has no effect on ...")
+	// NOTE: if given function is already async, then `await` is used anyway
 	const proxy: T /* Record<V, PromisifiedFunction> */ = new Proxy<T>(givenModule ?? empty, {
 		get (target, prop) {
 			const promisedAnswer: PromisifiedFunction = (...args) => {
-				// if on server, return it (wrap in promise to match client-side response)
-				if (prop in target) {
-					return target[prop](...args as unknown[])
-				}
+				// if on server, return method on module
+				if (prop in target && configured.server) {
+					try {
+						return target[prop](...args as unknown[])
+					} catch (error) {
+						const err = new RpcError(error)
+						if (err.isRpcErr) { throw err }
+						throw new Error(error)
+					}
+				}				
 				// on client, return result given from server
-				return new Promise(r => r("test" as any))
+				const rpc = { method: prop.toString(), params: args }
+				const answer = async () => {
+					try {
+						// gather answer and then return the result of RPC call back to the client
+						const answer = await configured.client(rpc, configured.endpoint)
+						if (answer.error) { throw answer.error }
+						return answer.result
+					} catch (error) {
+						// it is expected for given module to throw if there is an error so that Prim-RPC can also error on the client
+						const err = new RpcError(error)
+						if (err.isRpcErr) { throw err }
+						// if not an RPC error, throw a generic error with given data as message
+						throw new Error(error)
+					}
+				}
+				return answer()
 			}
 			return promisedAnswer
 		}
 	})
 	return proxy
+}
+
+// TODO: add support for query strings too (simple requests, for linked data, similar to JSON-LD links)
+export function createPrimServer<T extends Record<V, T[V]>, V extends keyof T = keyof T>(options?: PrimOptions, givenModule?: T) {
+	const prim = createPrim(options, givenModule)
+	return <A extends V>(rpc: RpcCall<A, Parameters<T[A]>>): Promise<RpcAnswer<ReturnType<T[A]>>>|RpcAnswer<ReturnType<T[A]>> => {
+		const { method, params } = rpc
+		// const args = Array.isArray(params) ? params : [params]
+		try {
+			return { result: prim[method](...params as unknown[]) }
+		} catch (err) {
+			// don't throw on server, simply return error to be interpreted as error on receiving client
+			if (err instanceof RpcError) {
+				const error = err.send()
+				return { error }
+			}
+			return { error: new RpcError(err).send() }
+		}
+	}
 }

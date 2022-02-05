@@ -26,6 +26,7 @@
     "example": "workspace:*",
     "fastify": "^3.25.3",
     "fastify-cors": "^6.0.2",
+    "fastify-plugin": "^3.0.1",
     "prim": "workspace:*"
   }
 }

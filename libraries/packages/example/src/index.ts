@@ -13,7 +13,7 @@ export const you = "Ted"
 // console.log("Hello", you)
 // !SECTION: frontend/backend integration test
 
-export async function sayHello (options: { greeting?: string, name?: string }) {
+export function sayHello (options: { greeting?: string, name?: string }) {
 	const { greeting = "", name = "" } = options
 	return `${greeting ?? "Hello"} ${name ?? "you"}!`
 }
@@ -24,4 +24,10 @@ export function sayHelloAlternative(greeting = "", name = "") {
 
 export function prim() {
 	return "You're using Prim."
+}
+
+
+export function oops(ok = false) {
+	if (!ok) { throw new Error("My bad.") }
+	return "I did it again."
 }

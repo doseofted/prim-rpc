@@ -1,20 +1,20 @@
-import { createPrim, RpcError, proxyTest } from "./index"
+import { createPrim, RpcError, createPrimServer, RpcAnswer, createPrimV1 } from "./index"
 import type * as exampleClient from "example"
 import * as exampleServer from "example"
 
-describe("Prim instantiates", () => {
+describe("V1: Prim instantiates", () => {
 	test("Client-side instantiation", () => {
-		const prim = createPrim<typeof exampleClient>()
+		const prim = createPrimV1<typeof exampleClient>()
 		expect(typeof prim === "function").toBeTruthy()
 	})
 	test("Server-side instantiation", () => {
-		const prim = createPrim({ server: true }, exampleServer)
+		const prim = createPrimV1({ server: true }, exampleServer)
 		expect(typeof prim === "function").toBeTruthy()
 	})
 })
 
-describe("Arguments are given correctly", () => {
-	const prim = createPrim<typeof exampleClient>({
+describe("V1: Arguments are given correctly", () => {
+	const prim = createPrimV1<typeof exampleClient>({
 		client: (body) => new Promise((r) => {
 			// eslint-disable-next-line @typescript-eslint/no-explicit-any
 			r({ result: body.params as any })
@@ -46,8 +46,8 @@ describe("Arguments are given correctly", () => {
 	})
 })
 
-test("Prim answers calls, server-side", async () => {
-	const prim = createPrim({ server: true }, exampleServer)
+test("V1: Prim answers calls, server-side", async () => {
+	const prim = createPrimV1({ server: true }, exampleServer)
 	let greeting: string
 	const response = "Yo Ted!"
 	try {
@@ -60,13 +60,31 @@ test("Prim answers calls, server-side", async () => {
 	expect(greeting).toEqual(response)
 })
 
-describe("Proxy version works", () => {
+describe("Response works on client and server", () => {
 	test("from client", async () => {
-		const created = proxyTest<typeof exampleClient>()
-		expect(await created.sayHelloAlternative("Hey", "Ted")).toEqual("test")
+		const { sayHelloAlternative } = createPrim<typeof exampleClient>({
+			client: async (jsonBody) => { // NOTE: mock client since fetch is unavailable, assume server sends right response
+				const body = JSON.parse(JSON.stringify(jsonBody))
+				const result = exampleServer.sayHelloAlternative(...body.params)
+				const send: RpcAnswer = { result }
+				return send
+			}
+		})
+		expect(await sayHelloAlternative("Hey", "Ted")).toEqual("Hey Ted!")
 	})
 	test("from server", async () => {
-		const created = proxyTest(exampleServer)
-		expect(created.sayHelloAlternative("Hey", "Ted")).toBe("Hey Ted!")
+		const created = createPrim({ server: true }, exampleServer)
+		expect(await created.sayHello({ greeting: "Hey", name: "Ted" })).toBe("Hey Ted!")
+	})
+})
+
+describe("Prim can be used from server framework", () => {
+	test("using RPC call", async () => {
+		const primServer = createPrimServer({ server: true }, exampleServer)
+		const answer = primServer({
+			method: "sayHello",
+			params: [{ greeting: "Hey", name: "Ted"}]
+		})
+		expect(await answer).toEqual("Hey Ted!")
 	})
 })

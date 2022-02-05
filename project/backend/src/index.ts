@@ -1,12 +1,27 @@
-import Fastify, { FastifyPluginAsync } from "fastify"
+import Fastify from "fastify"
 import Cors from "fastify-cors"
+import fp from "fastify-plugin"
 import * as example from "example"
-import { createPrim, RpcCall } from "prim"
-import defu from "defu"
+import { createPrimServer, RpcCall } from "prim"
 
+function createPlugin<T extends Record<V, T[V]>, V extends keyof T = keyof T>() {
+	return fp<{ module: T, prefix: string }>(async (fastify, options) => {
+		const prim = createPrimServer({ server: true }, options.module)
+		fastify.route<{ Body: RpcCall<V, Parameters<T[V]>>, Params: { method?: keyof T } }>({
+			method: ["POST", "GET"],
+			url: `${options.prefix ?? "/"}`,
+			handler: ({ body }, reply) => {
+				// TODO: add support for query strings (simple requests, for linked data, similar to JSON-LD links)
+				reply.send(prim(body))
+			}
+		})
+	})
+}
+
+// NOTE: below includes the ability to use query string as RPC body. I'd like to add this back in plugin above
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
-const pluginTest: FastifyPluginAsync<{ module: any }> = async (fastify, { module: givenModule }) => {
-	const prim = createPrim({ server: true }, givenModule)
+/* const pluginTest: FastifyPluginAsync<{ module: any }> = async (fastify, { module: givenModule }) => {
+	const prim = createPrimServer({ server: true }, givenModule)
 	fastify.route<{ Body: RpcCall, Querystring: unknown, Params: { method?: string } }>({
 		method: ["POST", "GET"],
 		url: "/:method?",
@@ -39,26 +54,27 @@ const pluginTest: FastifyPluginAsync<{ module: any }> = async (fastify, { module
 				&& Object.keys(q).length === 1
 			// NOTE: when given params over query string, they should be be simple arguments like number, string or boolean
 			// and if complex: objects should be given like prop.subprop=..., arrays like possiblyArray=1,2,3
-			/* const isPositional = (...given: unknown[]) => given
-				.map(q => typeof q === "object" && Object.keys(q).length === 1 && ("-" in q))
-				.reduce((p, n) => p || n, false) */
+			// const isPositional = (...given: unknown[]) => given
+			// 	.map(q => typeof q === "object" && Object.keys(q).length === 1 && ("-" in q))
+			// 	.reduce((p, n) => p || n, false)
 			// TODO: if body is not given, check query for body and 
 			const givenIsPositional = !postBody && isPositional(query)
 			const params = givenIsPositional ? (query ?? {})["-"] : query
 			const getBody: RpcCall = { method, params }
 			const send = defu<RpcCall, RpcCall>(postBody, getBody, defaultBody)
 			console.log(send)
-			reply.send(prim(send.method, ...send.params))
+			reply.send(prim(send))
 		}
 	})
-}
+} */
 
 const fastify = Fastify({ logger: true })
-fastify.register(pluginTest, { module: example, prefix: "/json" })
+fastify.register(createPlugin(), { module: example, prefix: "/json" })
+// fastify.register(pluginTest, { module: example, prefix: "/json" })
 fastify.register(Cors, { origin: `https://${process.env.COMPOSE_HOST}` })
 
 fastify.get("/", function (request, reply) {
-	reply.send({ Hello: you })
+	reply.send({ Hello: example.you })
 })
 
 fastify.listen(3001, "0.0.0.0", function (err) {
