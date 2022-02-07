@@ -8,7 +8,14 @@
  * `createPrimServer` and can be used with any HTTP request library on the
  * client by providing the library as an option to `createPrim`.
  */
+import ProxyDeep from "proxy-deep"
+import { get as getProperty } from "lodash"
 import defu from "defu"
+
+// IDEA: replace use of proxy with deep-proxy which seems to handle
+// the nesting problem pretty well. Then use lodash "get" function to
+// to get the value from the object on the server and use deep-proxy's
+// path list to create RPC call for server to interpret into function
 
 interface RpcBase {
 	id?: string|number
@@ -103,51 +110,57 @@ export function createPrim<T extends Record<V, T[V]>, V extends keyof T = keyof 
 	// TODO: find way to wrap all `ReturnType`s in Promises on all T[V] functions ...not sure it's possible
 	// (that way, code editors don't prompt message "'await' has no effect on ...")
 	// NOTE: if given function is already async, then `await` is used anyway
-	const proxy: T /* Record<V, PromisifiedFunction> */ = new Proxy<T>(givenModule ?? empty, {
+	const proxy: T /* Record<V, PromisifiedFunction> */ = new ProxyDeep<T>(givenModule ?? empty, {
 		apply(target, that, args) {
-			console.log(target, that, args)
-			return that
+			console.log("method called on prim instance:", target, this.path, args)
+			const found = getProperty(target, this.path, {})
+			console.log("look what i found", found);
+			// target(...args)
+			// return that
 		},
 		get (target, prop) {
 			// if given object/module, recursively create a new instance of Prim to find function in that module
-			if (prop in target && typeof target[prop] === "object") {
-				// if nested functions, create a Prim instance for that module
-				console.log("given prop", prop);
-				return createPrim(configured, target[prop])
-			}
-			console.log("executing on proxy, prop:", prop)
-			const promisedAnswer: PromisifiedFunction = (...args) => {
-				console.log("attempted to call function:", prop, args)
-				// if on server, return method on module
-				if (prop in target && configured.server && typeof target[prop] === "function") {
-					try {
-						return target[prop](...args as unknown[])
-					} catch (error) {
-						const err = new RpcError(error)
-						if (err.isRpcErr) { throw err }
-						throw new Error(error)
-					}
-				}
-				// on client, return result given from server
-				const rpc = { method: prop.toString(), params: args }
-				const answer = async () => {
-					try {
-						// gather answer and then return the result of RPC call back to the client
-						const answer = await configured.client(rpc, configured.endpoint)
-						if (answer.error) { throw answer.error }
-						return answer.result
-					} catch (error) {
-						// it is expected for given module to throw if there is an error so that Prim-RPC can also error on the client
-						const err = new RpcError(error)
-						if (err.isRpcErr) { throw err }
-						// if not an RPC error, throw a generic error with given data as message
-						throw new Error(error)
-					}
-				}
-				return answer()
-			}
+			// if (prop in target && typeof target[prop] === "object") {
+			// 	// if nested functions, create a Prim instance for that module
+			// 	console.log("given prop", prop);
+			// 	return createPrim(configured, target[prop])
+			// }
+			// console.log("executing on proxy, prop:", prop)
+			// const promisedAnswer: PromisifiedFunction = (...args) => {
+			// 	console.log("attempted to call function:", prop, args)
+			// 	// if on server, return method on module
+			// 	if (prop in target && configured.server && typeof target[prop] === "function") {
+			// 		try {
+			// 			return target[prop](...args as unknown[])
+			// 		} catch (error) {
+			// 			const err = new RpcError(error)
+			// 			if (err.isRpcErr) { throw err }
+			// 			throw new Error(error)
+			// 		}
+			// 	}
+			// 	// on client, return result given from server
+			// 	const rpc = { method: prop.toString(), params: args }
+			// 	const answer = async () => {
+			// 		try {
+			// 			// gather answer and then return the result of RPC call back to the client
+			// 			const answer = await configured.client(rpc, configured.endpoint)
+			// 			if (answer.error) { throw answer.error }
+			// 			return answer.result
+			// 		} catch (error) {
+			// 			// it is expected for given module to throw if there is an error so that Prim-RPC can also error on the client
+			// 			const err = new RpcError(error)
+			// 			if (err.isRpcErr) { throw err }
+			// 			// if not an RPC error, throw a generic error with given data as message
+			// 			throw new Error(error)
+			// 		}
+			// 	}
+			// 	return answer()
+			// }
+			console.log(prop);
+			
+			return this.nest(() => (target[prop]))
 			// return promisedAnswer
-			const proxiedPromisedAnswer = new Proxy(promisedAnswer, {
+			/* const proxiedPromisedAnswer = new Proxy(promisedAnswer, {
 				apply(target, that, args) {
 					console.log("calling method:", target, that, args)
 					return target(...args as Parameters<T[V]>)
@@ -156,11 +169,11 @@ export function createPrim<T extends Record<V, T[V]>, V extends keyof T = keyof 
 					console.log("tried calling prop:", nestedProp, ", of prop:", prop)
 					// NOTE: this works at odd intervals of nested levels when promised answer is returned here
 					// and at even intervals, returning a new instance of Prim works
-					/* const t = createPrim({
-						...configured,
-						internal: { nested: configured.internal.nested + 1 }
-					})
-					return t[nestedProp]() */
+					// const t = createPrim({
+					// 	...configured,
+					// 	internal: { nested: configured.internal.nested + 1 }
+					// })
+					// return t[nestedProp]()
 					// console.log("result of creating new prim instance:", t[nestedProp]());
 					// return promisedAnswer
 					return createPrim({
@@ -169,7 +182,7 @@ export function createPrim<T extends Record<V, T[V]>, V extends keyof T = keyof 
 					})
 				}
 			})
-			return proxiedPromisedAnswer
+			return proxiedPromisedAnswer */
 		}
 	})
 	console.log("new prim instance created", configured.internal.nested);
