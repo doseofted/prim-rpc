@@ -48,7 +48,17 @@ export function oops(ok = false) {
 // Consider references below to add the functionality later:
 // REFERENCE: https://stackoverflow.com/a/41300128
 // REFERENCE: https://www.npmjs.com/package/proxy-deep
+/**
+ * This is an example of an entire that module that might be expor
+ */
 export const test =  {
 	sayHello,
 	sayHelloAlternative
 }
+
+// FIXME: this works at 2 levels but but above does not work at 1 level ...
+export const deepTest = { test }
+
+export const deepDeepTest = { deepTest }
+
+export const whatEven = { deepDeepTest }

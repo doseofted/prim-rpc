@@ -72,8 +72,8 @@ describe("Response works on client and server", () => {
 		expect(await sayHelloAlternative("Hey", "Ted")).toEqual("Hey Ted!")
 	})
 	test("from server", async () => {
-		const created = createPrim({ server: true }, exampleServer)
-		expect(await created.sayHello({ greeting: "Hey", name: "Ted" })).toBe("Hey Ted!")
+		const prim = createPrim({ server: true }, exampleServer)
+		expect(await prim.sayHello({ greeting: "Hey", name: "Ted" })).toBe("Hey Ted!")
 	})
 })
 
@@ -85,5 +85,51 @@ describe("Prim can be used from server framework", () => {
 			params: [{ greeting: "Hey", name: "Ted"}]
 		})
 		expect((await answer).result).toEqual("Hey Ted!")
+	})
+})
+
+describe("Prim can be nested at one level", () => {
+	test("Nested server-side, one level", async () => {
+		const prim = createPrim({ server: true }, exampleServer)
+		const result = await prim.test.sayHello({ greeting: "Hey", name: "Ted" })
+		expect(result).toEqual("Hey Ted!")
+	})
+	test("Nested client-side, one level", async () => {
+		const prim = createPrim<typeof exampleClient>({
+			client: async (jsonBody) => { // NOTE: mock client since fetch is unavailable, assume server sends right response
+				const body = JSON.parse(JSON.stringify(jsonBody))
+				const result = exampleServer.test.sayHelloAlternative(...body.params)
+				const send: RpcAnswer = { result }
+				return send
+			}
+		})
+		// const result = await prim.whatEven.deepDeepTest.deepTest.test.sayHelloAlternative("hey", "ted")
+		// const result = await prim.deepDeepTest.deepTest.test.sayHelloAlternative("hey", "ted")
+		// const result = await prim.deepTest.test.sayHelloAlternative("hey", "ted")
+		const result = await prim.test.sayHelloAlternative("hey", "ted")
+		// const result = await prim.sayHelloAlternative("hey", "ted")
+		console.log("given:", result)
+		expect(result).toEqual("hey ted!")
+	})
+})
+
+describe("Prim can be nested deeply", () => {
+	test("Deeply nested server-side", async () => {
+		const prim = createPrim({ server: true }, exampleServer)
+		const result = await prim.deepTest.test.sayHello({ greeting: "Hey", name: "Ted" })
+		expect(result).toEqual("Hey Ted!")
+	})
+	test("Deeply nested client-side", async () => {
+		const prim = createPrim<typeof exampleClient>({
+			client: async (jsonBody) => { // NOTE: mock client since fetch is unavailable, assume server sends right response
+				const body = JSON.parse(JSON.stringify(jsonBody))
+				const result = exampleServer.deepTest.test.sayHelloAlternative(...body.params)
+				const send: RpcAnswer = { result }
+				return send
+			}
+		})
+		const result = await prim.deepTest.test.sayHelloAlternative("Hey", "Ted") // ("Hey", "Ted")
+		console.log("given:", result)
+		expect(result).toEqual("Hey Ted!")
 	})
 })

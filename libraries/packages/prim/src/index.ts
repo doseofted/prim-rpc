@@ -52,7 +52,10 @@ interface PrimOptions {
 	/** When `options.server` is `false`, provide the server URL where Prim is being used, to be used from `options.client` */
 	endpoint?: string
 	/** When used from the client, override the HTTP framework used for requests (default is browser's `fetch()`) */
-	client?: (jsonBody: RpcCall<string, unknown>, endpoint: string) => Promise<RpcAnswer>
+	client?: (jsonBody: RpcCall<string, unknown>, endpoint: string) => Promise<RpcAnswer>,
+	internal?: {
+		nested: number
+	}
 }
 
 function createPrimOptions(options?: PrimOptions) {
@@ -71,6 +74,10 @@ function createPrimOptions(options?: PrimOptions) {
 			})
 			// RPC result should be returned on success and RPC error thrown if errored
 			return result.json()
+		},
+		// these options should not be passed by a developer but are used internally
+		internal: {
+			nested: 0
 		}
 	})
 	return configured
@@ -97,10 +104,22 @@ export function createPrim<T extends Record<V, T[V]>, V extends keyof T = keyof 
 	// (that way, code editors don't prompt message "'await' has no effect on ...")
 	// NOTE: if given function is already async, then `await` is used anyway
 	const proxy: T /* Record<V, PromisifiedFunction> */ = new Proxy<T>(givenModule ?? empty, {
+		apply(target, that, args) {
+			console.log(target, that, args)
+			return that
+		},
 		get (target, prop) {
+			// if given object/module, recursively create a new instance of Prim to find function in that module
+			if (prop in target && typeof target[prop] === "object") {
+				// if nested functions, create a Prim instance for that module
+				console.log("given prop", prop);
+				return createPrim(configured, target[prop])
+			}
+			console.log("executing on proxy, prop:", prop)
 			const promisedAnswer: PromisifiedFunction = (...args) => {
+				console.log("attempted to call function:", prop, args)
 				// if on server, return method on module
-				if (prop in target && configured.server) {
+				if (prop in target && configured.server && typeof target[prop] === "function") {
 					try {
 						return target[prop](...args as unknown[])
 					} catch (error) {
@@ -127,9 +146,33 @@ export function createPrim<T extends Record<V, T[V]>, V extends keyof T = keyof 
 				}
 				return answer()
 			}
-			return promisedAnswer
+			// return promisedAnswer
+			const proxiedPromisedAnswer = new Proxy(promisedAnswer, {
+				apply(target, that, args) {
+					console.log("calling method:", target, that, args)
+					return target(...args as Parameters<T[V]>)
+				},
+				get(nestedTarget, nestedProp) {
+					console.log("tried calling prop:", nestedProp, ", of prop:", prop)
+					// NOTE: this works at odd intervals of nested levels when promised answer is returned here
+					// and at even intervals, returning a new instance of Prim works
+					/* const t = createPrim({
+						...configured,
+						internal: { nested: configured.internal.nested + 1 }
+					})
+					return t[nestedProp]() */
+					// console.log("result of creating new prim instance:", t[nestedProp]());
+					// return promisedAnswer
+					return createPrim({
+						...configured,
+						internal: { nested: configured.internal.nested + 1 }
+					})
+				}
+			})
+			return proxiedPromisedAnswer
 		}
 	})
+	console.log("new prim instance created", configured.internal.nested);
 	return proxy
 }
 
@@ -172,11 +215,11 @@ export function createPrimServer<T extends Record<V, T[V]>, V extends keyof T = 
  * This could look something like this (with a state library like Vue's):
  *
  * ```typescript
- * const prim = createPrimUniveral<typeof moduleServer>({ ...options }, {
- *   sayHello(name: string) { return `Loading, please wait ${name} ...` }
+ * const { sayHello } = createPrimUniveral<typeof moduleServer>({ ...options }, {
+ *   sayHello(name: string) { return `Loading, please wait ${name} ...` },
+ *   sayGoodbye(...) { ... }
  * })
- * // this would likely 
- * const { result, loading } = await prim.sayHello("Ted")
+ * const { result, loading } = await sayHello("Ted")
  * watchEffect(() => console.log(result.value, loading ? "loading" : "loaded"))
  * ```
  * 
