@@ -16,8 +16,8 @@ All communication between server and client (whether administation interface or 
 This is a project is intended to be flexible but selects a few tools to make development easier. It is a monorepo composed of:
 
 - **Libraries**: A set of shared libraries written in TypeScript and built with Parcel that, for the most part, can be used in both the Frontend and Backend. Most project logic should be contained in libraries and utilized by the frontend and backend, described next.
-- **Frontend**: Fastify server written in TypeScript built with Parcel that runs behind Caddy, a reverse proxy server.
-- **Backend**: A Vue app written in TypeScript built with Vite. Capacitor is used to serve native platforms.
+- **Backend**: Fastify server written in TypeScript built with Parcel that runs behind Caddy, a reverse proxy server.
+- **Frontend**: A Vue app written in TypeScript built with Vite. Capacitor is used to serve native platforms.
 
 All of these services are set up and configured through Docker Compose to easily set up the project so that all parts can be developed locally. In development, source folders are watched so services are rebuilt in the running containers, including libraries that frontend and backend depend on. In production, the same configuration can be used to run the project with Docker Swarm.
 
@@ -48,13 +48,11 @@ Once steps for environment are completed, the project can be ran. Instructions g
 ```bash
 # Set up environment for project (remember to edit the defaults before running)
 cp .env.example .env
-# Development: install dependencies and build all projects once
-task js:setup
 # Run dependencies given in Taskfile, start all services, then view logs (Ctrl-C will not shut it down)
 task dc:up
 # When done, shut it all down
 task dc:down
-# Development: Install dependencies and build type definitions for libraries, useful for type suggestions with editor
+# Development: install dependencies and build all projects once, useful for type suggestions with editor
 task js:setup
 ```
 

@@ -119,17 +119,17 @@ describe("Prim can be nested deeply", () => {
 		const result = await prim.deepTest.test.sayHello({ greeting: "Hey", name: "Ted" })
 		expect(result).toEqual("Hey Ted!")
 	})
-	// test("Deeply nested client-side", async () => {
-	// 	const prim = createPrim<typeof exampleClient>({
-	// 		client: async (jsonBody) => { // NOTE: mock client since fetch is unavailable, assume server sends right response
-	// 			const body = JSON.parse(JSON.stringify(jsonBody))
-	// 			const result = exampleServer.deepTest.test.sayHelloAlternative(...body.params)
-	// 			const send: RpcAnswer = { result }
-	// 			return send
-	// 		}
-	// 	})
-	// 	const result = await prim.deepTest.test.sayHelloAlternative("Hey", "Ted") // ("Hey", "Ted")
-	// 	console.log("given:", result)
-	// 	expect(result).toEqual("Hey Ted!")
-	// })
+	test("Deeply nested client-side", async () => {
+		const prim = createPrim<typeof exampleClient>({
+			client: async (jsonBody) => { // NOTE: mock client since fetch is unavailable, assume server sends right response
+				const body = JSON.parse(JSON.stringify(jsonBody))
+				const result = exampleServer.deepTest.test.sayHelloAlternative(...body.params)
+				const send: RpcAnswer = { result }
+				return send
+			}
+		})
+		const result = await prim.deepTest.test.sayHelloAlternative("Hey", "Ted") // ("Hey", "Ted")
+		console.log("given:", result)
+		expect(result).toEqual({ test: 5 })
+	})
 })
