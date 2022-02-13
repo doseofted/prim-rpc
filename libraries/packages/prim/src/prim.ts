@@ -51,6 +51,11 @@ function createPrimOptions(options?: PrimOptions) {
 			// RPC result should be returned on success and RPC error thrown if errored
 			return result.json()
 		},
+		/* socket: {
+			create<WebSocket>(endpoint) {
+				return new WebSocket(endpoint)
+			}
+		}, */
 		// these options should not be passed by a developer but are used internally
 		internal: {
 			nested: 0

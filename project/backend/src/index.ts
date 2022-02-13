@@ -7,12 +7,13 @@ import { createPrimServer, RpcCall } from "prim"
 function primFasifyPlugin<T extends Record<V, T[V]>, V extends keyof T = keyof T>() {
 	return fp<{ module: T, prefix?: string }>(async (fastify, options) => {
 		const prim = createPrimServer({ server: true }, options.module)
-		fastify.route<{ Body: RpcCall<V, Parameters<T[V]>>, Params: { method?: keyof T } }>({
+		fastify.route<{ Body: RpcCall, Params: { method?: string } }>({
 			method: ["POST", "GET"],
 			url: `${options.prefix ?? "/"}`,
-			handler: ({ body }, reply) => {
+			handler: async ({ body }, reply) => {
 				// TODO: add support for query strings (simple requests, for linked data, similar to JSON-LD links)
-				reply.send(prim(body))
+				const response = await prim(body)
+				reply.send(response)
 			}
 		})
 	})
