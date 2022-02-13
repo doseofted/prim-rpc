@@ -13,11 +13,6 @@ import { get as getProperty } from "lodash"
 import defu from "defu"
 import { RpcAnswer, RpcCall, RpcErr, PrimOptions } from "./prim.interface"
 
-// IDEA: replace use of proxy with deep-proxy which seems to handle
-// the nesting problem pretty well. Then use lodash "get" function to
-// to get the value from the object on the server and use deep-proxy's
-// path list to create RPC call for server to interpret into function
-
 export class RpcError<T> extends Error implements RpcErr<T> {
 	get code(): number { return this.err.code }
 	get message(): string { return this.err.message }
@@ -121,6 +116,10 @@ export function createPrimClient<T extends Record<V, T[V]>, V extends keyof T = 
 	})
 	return proxy
 }
+
+// TODO: make this work with methods called in path over GET request
+// the function should be restructured to accept: path, body, querystring
+// and handle conditions like querystring in path, or body not being converted to string yet
 
 /**
  * Unlike `createPrimClient()`, this function is designed purely for the server. Rather than integrating directly with a
