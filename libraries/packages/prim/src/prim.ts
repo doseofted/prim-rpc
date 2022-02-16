@@ -12,6 +12,7 @@ import ProxyDeep from "proxy-deep"
 import { get as getProperty } from "lodash"
 import defu from "defu"
 import { RpcAnswer, RpcCall, RpcErr, PrimOptions } from "./prim.interface"
+import { nanoid } from "nanoid"
 
 export class RpcError<T> extends Error implements RpcErr<T> {
 	get code(): number { return this.err.code }
@@ -71,14 +72,10 @@ function createPrimOptions(options?: PrimOptions) {
 export function createPrimClient<T extends Record<V, T[V]>, V extends keyof T = keyof T>(options?: PrimOptions, givenModule?: T) {
 	const configured = createPrimOptions(options)
 	const empty = {} as T // when not given on client-side, treat empty object as T
-	// NOTE: if given function is not async, a code editor might prompt message "'await' has no effect on ..."
-	// however it is required on the client since we must await a network response
 	const proxy = new ProxyDeep<T>(givenModule ?? empty, {
 		apply(_emptyTarget, that, args) {
-			// console.log(`method: ${this.path.join(".")}`)
-			// console.log(`${this.path.slice(0, -1).join(".")}.${this.path[this.path.length - 1]}(${args.map(a => JSON.stringify(a)).join(", ")})`)
-			const realTarget = getProperty(givenModule, this.path)
 			// call available function on server
+			const realTarget = getProperty(givenModule, this.path)
 			if (configured.server && typeof realTarget === "function") {
 				try {
 					return Reflect.apply(realTarget, that, args)
@@ -88,7 +85,7 @@ export function createPrimClient<T extends Record<V, T[V]>, V extends keyof T = 
 					throw new Error(error)
 				}
 			}
-			// if on client, send off request
+			// if on client, send off request to server
 			if (!configured.server) {
 				const rpc: RpcCall = { method: this.path.join("/"), params: args }
 				const answer = async () => {
@@ -107,10 +104,8 @@ export function createPrimClient<T extends Record<V, T[V]>, V extends keyof T = 
 				}
 				return answer()
 			}
-			// return this.nest(() => undefined)
 		},
 		get(_target, _prop, _receiver) {
-			// console.log(`prop: ${this.path.join(".")}`)
 			return this.nest(() => undefined)
 		}
 	})
@@ -121,6 +116,22 @@ export function createPrimClient<T extends Record<V, T[V]>, V extends keyof T = 
 // the function should be restructured to accept: path, body, querystring
 // and handle conditions like querystring in path, or body not being converted to string yet
 
+/**
+ * Common properties given by server frameworks so generic `createPrimServer`
+ * can translate generic request into RPC.
+ */
+interface CommonFrameworkOptions {
+	/** Typically the path without a querystring */
+	path?: string
+	/** The prefix where Prim lives. To be removed from the path. */
+	prefix?: string
+	/** The parsed querystring, usally a JSON object */
+	// eslint-disable-next-line @typescript-eslint/no-explicit-any
+	query?: Record<string|number, any>
+	/** The JSON body, which should already be formatted as RPC */
+	// eslint-disable-next-line @typescript-eslint/no-explicit-any
+	body?: Record<string|number, any>
+}
 /**
  * Unlike `createPrimClient()`, this function is designed purely for the server. Rather than integrating directly with a
  * server framework, it is meant to be given a JSON body expected for the RPC call and return the result as an RPC
@@ -133,7 +144,7 @@ export function createPrimClient<T extends Record<V, T[V]>, V extends keyof T = 
  */
 export function createPrimServer<T extends Record<V, T[V]>, V extends keyof T = keyof T>(options?: PrimOptions, givenModule?: T) {
 	const prim = createPrimClient(options, givenModule)
-	return async (rpc: RpcCall): Promise<RpcAnswer> => {
+	const primRpc = async (rpc: RpcCall): Promise<RpcAnswer> => {
 		const { method, params, id } = rpc
 		// const args = Array.isArray(params) ? params : [params]
 		try {
@@ -149,6 +160,25 @@ export function createPrimServer<T extends Record<V, T[V]>, V extends keyof T = 
 			}
 			return { error: new RpcError(err).formatSend(), id }
 		}
+	}
+	// NOTE: accepts JSON body or variant given in path like so:
+	// /prefix/sayHello?-id=123&-=Hello&-=Ted
+	return async (given: CommonFrameworkOptions) => {
+		const { path, prefix, query } = given
+		const bodyFromPath = (() => {
+			const method = path?.replace(prefix, "")
+			const id = query?.["-id"]
+			if (query) { delete query["-id"] }
+			const params = query
+			return { method, params, id }
+		})()
+		const { body } = given
+		const rpc = defu<Partial<RpcCall>, RpcCall>(
+			body,
+			bodyFromPath,
+			{ id: nanoid(), method: "default" }
+		)
+		return primRpc(rpc)
 	}
 }
 

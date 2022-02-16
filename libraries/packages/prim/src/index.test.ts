@@ -47,21 +47,25 @@ describe("Prim-Server can call methods", () => {
 	test("Locally", async () => {
 		const prim = createPrimServer({ server: true }, exampleServer)
 		const result = await prim({
-			id: 1,
-			method: "testLevel2/testLevel1/sayHello",
-			params: [{ greeting: "Hey", name: "Ted" }]
+			body: {
+				id: 1,
+				method: "testLevel2/testLevel1/sayHello",
+				params: [{ greeting: "Hey", name: "Ted" }]
+			}
 		})
 		expect(result).toEqual({ result: "Hey Ted!", id: 1 })
 	})
 	test("From another Prim-Server", async () => {
 		const primServer = createPrimServer({ server: true }, exampleServer)
 		const primRemoteServer = createPrimServer({
-			client: async (body) => primServer(body)
+			client: async (body) => primServer({ body })
 		}, exampleServer)
 		const result = await primRemoteServer({
-			id: 1,
-			method: "testLevel2/testLevel1/sayHello",
-			params: [{ greeting: "Hey", name: "Ted" }]
+			body: {
+				id: 1,
+				method: "testLevel2/testLevel1/sayHello",
+				params: [{ greeting: "Hey", name: "Ted" }]
+			}
 		})
 		expect(result).toEqual({ result: "Hey Ted!", id: 1 })
 	})
