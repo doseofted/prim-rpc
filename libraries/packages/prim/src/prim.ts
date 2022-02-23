@@ -173,9 +173,9 @@ export function createPrimServer<T extends Record<V, T[V]>, V extends keyof T = 
 			return { method, params, id }
 		})()
 		const { body } = given
-		const rpc = defu<Partial<RpcCall>, RpcCall>(
-			body,
-			bodyFromPath,
+		// TODO: stop defu from concatenating params
+		const rpc = defu.fn<Partial<RpcCall>, RpcCall>(
+			body ?? bodyFromPath,
 			{ id: nanoid(), method: "default" }
 		)
 		return primRpc(rpc)
