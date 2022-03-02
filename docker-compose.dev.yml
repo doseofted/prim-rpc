@@ -20,11 +20,13 @@ services:
     restart: "no"
     ports:
       - "3001:3001"
+    image: "doseofted/${COMPOSE_PROJECT_NAME}-backend:${PROJECT_VERSION}"
     build:
+      context: .
+      dockerfile: ./project/backend/Dockerfile
+      # in production, build arguments aren't needed because env is provided at run-time
       args:
-        NODE_ENV: "development"
-    environment:
-      NODE_ENV: "development"
+        NODE_ENV: $NODE_ENV
     volumes:
       - ./project/backend/src:/home/node/project/project/backend/src
       # libraries developed and watched from libraries container
@@ -35,11 +37,14 @@ services:
     restart: "no"
     ports:
       - "3000:3000"
+    image: "doseofted/${COMPOSE_PROJECT_NAME}-frontend:${PROJECT_VERSION}"
     build:
+      context: .
+      dockerfile: ./project/frontend/Dockerfile
+      # in production, build arguments are always used
       args:
-        NODE_ENV: "development"
-    environment:
-      NODE_ENV: "development"
+        VITE_HOST: $HOST
+        NODE_ENV: $NODE_ENV
     volumes:
       - ./project/frontend/src:/home/node/project/project/frontend/src
       - ./project/frontend/public:/home/node/project/project/frontend/public
@@ -50,11 +55,13 @@ services:
 
   libraries:
     restart: "no"
+    image: "doseofted/${COMPOSE_PROJECT_NAME}-libraries:${PROJECT_VERSION}"
     build:
+      context: .
+      dockerfile: ./libraries/Dockerfile
       args:
-        NODE_ENV: "development"
-    environment:
-      NODE_ENV: "development"
+        HOST: $HOST
+        NODE_ENV: $NODE_ENV
     volumes:
       # NOTE: all projects under libraries should have their src folder linked here for development use
       - ./libraries/packages/example/src:/home/node/project/libraries/packages/example/src
