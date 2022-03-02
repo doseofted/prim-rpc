@@ -9,9 +9,12 @@ tasks:
       - "docker compose ps --services"
 
   pull:
-    desc: "Pull newer versions of services if available"
+    desc: "Pull newer versions of services if available, excluding local images"
+    env:
+      COMPOSE_FILE: "{{.COMPOSE_FILE_DEV}}"
+      COMPOSE_PROFILES: "essential,project"
     cmds:
-      - "docker compose pull"
+      - "docker compose pull --ignore-pull-failures"
 
   logs:
     desc: "Show and follow recent logs for running services"
@@ -22,7 +25,7 @@ tasks:
   build:
     desc: "Build services in order of images' dependencies, with build cache"
     env:
-      COMPOSE_FILE: $COMPOSE_FILE_PROD
+      COMPOSE_FILE: "{{.COMPOSE_FILE_DEV}}"
     deps:
       - pull
     cmds:
@@ -31,7 +34,7 @@ tasks:
       # Now build everything else (libraries is now tagged and cached)
       - "docker compose build"
 
-  up:
+  up:dev:
     desc: "Start services in background"
     deps:
       - build

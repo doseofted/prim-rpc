@@ -18,6 +18,8 @@ services:
     ports:
       - "80:80"
       - "443:443"
+    profiles:
+      - "essential"
 
   # database available for use in project
   postgres:
@@ -30,6 +32,8 @@ services:
       POSTGRES_PASSWORD: $POSTGRES_PASSWORD
     volumes:
       - ./data/postgres:/var/lib/postgresql/data
+    profiles:
+      - "essential"
 # !SECTION ---------------------------------------------------------------------
 
 
@@ -51,6 +55,8 @@ services:
       TELEGRAM_BOT_TOKEN: $TELEGRAM_BOT_TOKEN
       TELEGRAM_CHAT_ID_LIST: $TELEGRAM_CHAT_ID_LIST
       NODE_ENV: $NODE_ENV
+    profiles:
+      - "project"
     # volumes:
     #   - ./data/backend/uploads:/home/node/project/backend/uploads
 
@@ -64,12 +70,16 @@ services:
     environment:
       VITE_HOST: $HOST
       NODE_ENV: $NODE_ENV
+    profiles:
+      - "project"
 
   # libraries specific to this project
   libraries:
     environment:
       HOST: $HOST
       NODE_ENV: $NODE_ENV
+    profiles:
+      - "project"
 # !SECTION ---------------------------------------------------------------------
 
 
