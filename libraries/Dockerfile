@@ -44,8 +44,7 @@ FROM installed as run
 # NOTE: NODE_ENV can be overridden while actively developing and pnpm utilizes the variable
 USER node
 ARG NODE_ENV="production"
-ARG COMPOSE_ENV
-ARG COMPOSE_HOST
+ARG HOST
 # Copy all built libraries and their package.json
 COPY --from=built /home/node/project/libraries ./libraries
 # unlike build stage, I only need production dependencies here

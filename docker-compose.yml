@@ -1,16 +1,5 @@
 version: "3"
 
-x-environment:
-  &base_environment
-  COMPOSE_ENV: $COMPOSE_ENV
-  COMPOSE_HOST: $COMPOSE_HOST
-
-x-database:
-  &database
-  POSTGRES_DB: "prim"
-  POSTGRES_USER: "proper"
-  POSTGRES_PASSWORD: $POSTGRES_PASSWORD
-
 services:
 
   # used as reverse proxy for services below
@@ -18,7 +7,7 @@ services:
   caddy:
     image: caddy:2.4.6-alpine
     environment:
-      <<: *base_environment
+      HOST: $HOST
       ADMIN_EMAIL: "ted@doseofted.com"
     volumes:
       - ./project/server/base.Caddyfile:/etc/caddy/base.Caddyfile:ro
@@ -32,7 +21,11 @@ services:
   postgres:
     image: postgres:14.0-alpine
     environment:
-      <<: [ *base_environment, *database ]
+      &database
+      HOST: $HOST
+      POSTGRES_DB: "prim"
+      POSTGRES_USER: "proper"
+      POSTGRES_PASSWORD: $POSTGRES_PASSWORD
     volumes:
       - ./data/postgres:/var/lib/postgresql/data
 
@@ -45,7 +38,7 @@ services:
       dockerfile: ./project/backend/Dockerfile
       # NOTE: args are not needed here since they are provided at run-time
     environment:
-      <<: [ *base_environment, *database ]
+      <<: *database
       # NOTE: DATABASE_HOST must match postgres service name above
       DATABASE_HOST: "postgres"
       SES_SMTP_USER: $SES_SMTP_USER
@@ -66,15 +59,13 @@ services:
       dockerfile: ./project/frontend/Dockerfile
       # in production, build arguments are always used
       args:
-        VITE_HOST: $COMPOSE_HOST
-        VITE_COMPOSE_ENV: $COMPOSE_ENV
+        VITE_HOST: $HOST
     # no state attached, just kill it
     stop_signal: SIGKILL
     # in development, the dev server will utilize these
     # and must be prefixed with "VITE_" as security measure
     environment:
-      VITE_HOST: $COMPOSE_HOST
-      VITE_COMPOSE_ENV: $COMPOSE_ENV
+      VITE_HOST: $HOST
 
   # libraries specific to this project
   libraries:
@@ -84,6 +75,6 @@ services:
       context: .
       dockerfile: ./libraries/Dockerfile
       args:
-        <<: *base_environment
+        HOST: $HOST
     environment:
-      <<: *base_environment
+      HOST: $HOST

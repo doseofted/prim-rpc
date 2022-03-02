@@ -1,30 +1,25 @@
 version: "3"
 
-x-logging:
-  &logging
-  driver: "fluentd"
-  options:
-    fluentd-address: "localhost:24224"
-    fluentd-async: "true"
-
 services:
 
   caddy:
     logging:
-      <<: *logging
+      &logging
+      driver: "fluentd"
+      options:
+        fluentd-address: "localhost:24224"
+        fluentd-async: "true"
     restart: "always"
     volumes:
       - ./project/server/prod.Caddyfile:/etc/caddy/Caddyfile:ro
       - ./data/server:/srv:ro
 
   postgres:
-    logging:
-      <<: *logging
+    logging: *logging
     restart: "always"
 
   backend:
-    logging:
-      <<: *logging
+    logging: *logging
     restart: "always"
     build:
       args:
@@ -33,8 +28,7 @@ services:
       NODE_ENV: "production"
 
   frontend:
-    logging:
-      <<: *logging
+    logging: *logging
     restart: "always"
     build:
       args:
@@ -43,8 +37,7 @@ services:
       NODE_ENV: "production"
 
   libraries:
-    logging:
-      <<: *logging
+    logging: *logging
     restart: "always"
     build:
       args:

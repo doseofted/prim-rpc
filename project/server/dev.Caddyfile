@@ -5,18 +5,18 @@ import base.Caddyfile
   local_certs
 }
 
-www.{$COMPOSE_HOST} {
+www.{$HOST} {
   import dev_certificates
-  redir https://{$COMPOSE_HOST}{uri}
+  redir https://{$HOST}{uri}
 }
 
-{$COMPOSE_HOST} {
+{$HOST} {
   import dev_certificates
   # NOTE: use dev server in development
   reverse_proxy frontend:3000
 }
 
-api.{$COMPOSE_HOST} {
+api.{$HOST} {
   import dev_certificates
   reverse_proxy backend:3001
 }

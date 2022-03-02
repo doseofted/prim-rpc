@@ -19,7 +19,7 @@ services:
       - "24224:24224"
       - "24224:24224/udp"
     environment:
-      HOST: $COMPOSE_HOST
+      HOST: $HOST
       METRICS_COLLECTION_HOST: $METRICS_COLLECTION_HOST
 
   # Metrics to be pulled by Prometheus

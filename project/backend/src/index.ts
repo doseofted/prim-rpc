@@ -21,7 +21,7 @@ function primFasifyPlugin<T extends Record<V, T[V]>, V extends keyof T = keyof T
 
 const fastify = Fastify({ logger: true })
 fastify.register(primFasifyPlugin(), { module: example })
-fastify.register(Cors, { origin: `https://${process.env.COMPOSE_HOST}` })
+fastify.register(Cors, { origin: `https://${process.env.HOST}` })
 
 fastify.listen(3001, "0.0.0.0", function (err) {
 	if (err) {

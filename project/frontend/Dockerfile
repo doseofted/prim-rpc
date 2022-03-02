@@ -17,7 +17,6 @@ COPY --chown=1000:1000 project/frontend/package.json ./project/frontend/package.
 FROM installed as built
 USER node
 ARG VITE_HOST
-ARG VITE_COMPOSE_ENV
 RUN pnpm fetch --dev
 COPY --chown=1000:1000 project/frontend ./project/frontend
 # yes, install happened in utilized libraries image *but* install needs to run again
