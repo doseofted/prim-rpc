@@ -12,8 +12,8 @@ tasks:
     desc: "Pull newer versions of services if available, excluding local images"
     env:
       COMPOSE_FILE: "{{.COMPOSE_FILE_DEV}}"
-      COMPOSE_PROFILES: "essential,project"
     cmds:
+      # NOTE ignore pull failures since local containers may not be pushed to registry yet
       - "docker compose pull --ignore-pull-failures"
 
   logs:
@@ -35,12 +35,20 @@ tasks:
       - "docker compose build"
 
   up:dev:
-    desc: "Start services in background"
+    desc: "Build then start services in background"
     deps:
       - build
     cmds:
       # First, a trused certificate should be set up for use in container
       - task: :dev:cert
+      # Now the services can be started in the background
+      - "docker compose up -d"
+      # For convenience, logs from running services will be shown. Ctrl-C does not shut down services.
+      - task: logs
+
+  up:
+    desc: "Start services in background"
+    cmds:
       # Now the services can be started in the background
       - "docker compose up -d"
       # For convenience, logs from running services will be shown. Ctrl-C does not shut down services.

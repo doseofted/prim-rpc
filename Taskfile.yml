@@ -1,12 +1,16 @@
 version: "3"
 
-dotenv:
-  - ".env"
-
 includes:
   # "dc" as in "Docker Compose"
   dc: ./misc/Taskfile.dc.yml
   js: ./misc/Taskfile.js.yml
+
+dotenv:
+  - ".env"
+
+# vars:
+#   COMPOSE_FILE_NAME:
+#     sh: echo {{list "COMPOSE_FILE" .ENV_COMPOSE | join "_"}}
 
 tasks:
 

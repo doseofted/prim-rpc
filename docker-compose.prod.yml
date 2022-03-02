@@ -18,14 +18,14 @@ services:
     logging: *logging
     restart: "always"
 
+  libraries:
+    logging: *logging
+    restart: "always"
+
   backend:
     logging: *logging
     restart: "always"
 
   frontend:
-    logging: *logging
-    restart: "always"
-
-  libraries:
     logging: *logging
     restart: "always"

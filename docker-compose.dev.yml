@@ -16,6 +16,23 @@ services:
     ports: 
       - "5432:5432"
 
+  libraries:
+    restart: "no"
+    image: "doseofted/${COMPOSE_PROJECT_NAME}-libraries:${PROJECT_VERSION}"
+    build:
+      context: .
+      dockerfile: ./libraries/Dockerfile
+      args:
+        HOST: $HOST
+        NODE_ENV: $NODE_ENV
+    volumes:
+      # NOTE: all projects under libraries should have their src folder linked here for development use
+      - ./libraries/packages/example/src:/home/node/project/libraries/packages/example/src
+      - ./libraries/packages/prim/src:/home/node/project/libraries/packages/prim/src
+      # Built libraries while container is running can be used from other containers
+      - ./libraries/packages/example/dist:/home/node/project/libraries/packages/example/dist
+      - ./libraries/packages/prim/dist:/home/node/project/libraries/packages/prim/dist
+
   backend:
     restart: "no"
     ports:
@@ -30,8 +47,8 @@ services:
     volumes:
       - ./project/backend/src:/home/node/project/project/backend/src
       # libraries developed and watched from libraries container
-      - built_example:/home/node/project/libraries/packages/example/dist:ro
-      - built_prim:/home/node/project/libraries/packages/prim/dist:ro
+      - ./libraries/packages/example/dist:/home/node/project/libraries/packages/example/dist:ro
+      - ./libraries/packages/prim/dist:/home/node/project/libraries/packages/prim/dist:ro
 
   frontend:
     restart: "no"
@@ -50,25 +67,9 @@ services:
       - ./project/frontend/public:/home/node/project/project/frontend/public
       - ./project/frontend/index.html:/home/node/project/project/frontend/index.html
       # libraries developed and watched from libraries container
-      - built_example:/home/node/project/libraries/packages/example/dist:ro
-      - built_prim:/home/node/project/libraries/packages/prim/dist:ro
+      - ./libraries/packages/example/dist:/home/node/project/libraries/packages/example/dist:ro
+      - ./libraries/packages/prim/dist:/home/node/project/libraries/packages/prim/dist:ro
 
-  libraries:
-    restart: "no"
-    image: "doseofted/${COMPOSE_PROJECT_NAME}-libraries:${PROJECT_VERSION}"
-    build:
-      context: .
-      dockerfile: ./libraries/Dockerfile
-      args:
-        HOST: $HOST
-        NODE_ENV: $NODE_ENV
-    volumes:
-      # NOTE: all projects under libraries should have their src folder linked here for development use
-      - ./libraries/packages/example/src:/home/node/project/libraries/packages/example/src
-      # Built libraries while container is running can be used from other containers
-      - built_example:/home/node/project/libraries/packages/example/dist
-      - built_prim:/home/node/project/libraries/packages/prim/dist
-
-volumes:
-  built_example:
-  built_prim:
+# volumes:
+#   built_example:
+#   built_prim:

@@ -20,7 +20,7 @@ export const you = "Ted"
  * @returns A nice greeting
  */
 export async function sayHello (options: { greeting?: string, name?: string }) {
-	const { greeting = "", name = "" } = options
+	const { greeting, name } = options
 	return `${greeting ?? "Hello"} ${name ?? "you"}!`
 }
 
@@ -32,7 +32,7 @@ export async function sayHello (options: { greeting?: string, name?: string }) {
  * @returns A nice greeting
  */
 export async function sayHelloAlternative(greeting = "", name = "") {
-	return `${greeting ?? "Hello"} ${name ?? "you"}!`
+	return `${greeting || "Hello"} ${name || "you"}!`
 }
 
 /**

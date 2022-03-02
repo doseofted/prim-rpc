@@ -39,6 +39,14 @@ services:
 
 # SECTION Prim
 # ------------------------------------------------------------------------------
+  # libraries specific to this project
+  libraries:
+    environment:
+      HOST: $HOST
+      NODE_ENV: $NODE_ENV
+    profiles:
+      - "project"
+
   # where API is hosted
   backend:
     depends_on:
@@ -69,14 +77,6 @@ services:
     # and must be prefixed with "VITE_" as security measure
     environment:
       VITE_HOST: $HOST
-      NODE_ENV: $NODE_ENV
-    profiles:
-      - "project"
-
-  # libraries specific to this project
-  libraries:
-    environment:
-      HOST: $HOST
       NODE_ENV: $NODE_ENV
     profiles:
       - "project"
