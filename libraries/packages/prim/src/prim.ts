@@ -14,6 +14,7 @@ import { get as getProperty } from "lodash"
 import defu from "defu"
 import { RpcError } from "./error"
 import { RpcCall, PrimOptions } from "./common.interface"
+import { nanoid } from "nanoid"
 
 /**
  * Prim-RPC can be used to write plain functions on the server and then call them easily from the client.
@@ -40,7 +41,7 @@ export function createPrimClient<T extends Record<V, T[V]>, V extends keyof T = 
 			}
 			// if on client, send off request to server
 			if (!configured.server) {
-				const rpc: RpcCall = { method: this.path.join("/"), params: args }
+				const rpc: RpcCall = { method: this.path.join("/"), params: args, id: nanoid() }
 				return configured.client(rpc, configured.endpoint)
 					.then(answer => {
 						if (answer.error) {
