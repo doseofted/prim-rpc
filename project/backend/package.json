@@ -27,6 +27,7 @@
     "fastify": "^3.27.2",
     "fastify-cors": "^6.0.3",
     "fastify-plugin": "^3.0.1",
-    "prim": "workspace:*"
+    "prim": "workspace:*",
+    "prim-plugins": "workspace:*"
   }
 }

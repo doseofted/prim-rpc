@@ -1,0 +1,9 @@
+{
+	"compilerOptions": {
+		"experimentalDecorators": true,
+		"jsxImportSource": "preact",
+		"jsx": "react-jsx",
+		"resolveJsonModule": true,
+		"types": ["node"]
+	}
+}

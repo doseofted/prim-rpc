@@ -29,9 +29,11 @@ services:
       # NOTE: all projects under libraries should have their src folder linked here for development use
       - ./libraries/packages/example/src:/home/node/project/libraries/packages/example/src
       - ./libraries/packages/prim/src:/home/node/project/libraries/packages/prim/src
+      - ./libraries/packages/prim-plugins/src:/home/node/project/libraries/packages/prim-plugins/src
       # Built libraries while container is running can be used from other containers
       - ./libraries/packages/example/dist:/home/node/project/libraries/packages/example/dist
       - ./libraries/packages/prim/dist:/home/node/project/libraries/packages/prim/dist
+      - ./libraries/packages/prim-plugins/dist:/home/node/project/libraries/packages/prim-plugins/dist
 
   backend:
     restart: "no"
@@ -50,6 +52,7 @@ services:
       # libraries developed and watched from libraries container
       - ./libraries/packages/example/dist:/home/node/project/libraries/packages/example/dist:ro
       - ./libraries/packages/prim/dist:/home/node/project/libraries/packages/prim/dist:ro
+      - ./libraries/packages/prim-plugins/dist:/home/node/project/libraries/packages/prim-plugins/dist:ro
 
   frontend:
     restart: "no"
@@ -71,6 +74,7 @@ services:
       # libraries developed and watched from libraries container
       - ./libraries/packages/example/dist:/home/node/project/libraries/packages/example/dist:ro
       - ./libraries/packages/prim/dist:/home/node/project/libraries/packages/prim/dist:ro
+      - ./libraries/packages/prim-plugins/dist:/home/node/project/libraries/packages/prim-plugins/dist:ro
 
 # volumes:
 #   built_example:

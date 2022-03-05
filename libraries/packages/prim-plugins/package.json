@@ -1,0 +1,21 @@
+{
+  "name": "prim-plugins",
+  "version": "1.0.0",
+  "description": "Plugins for using Prim with server frameworks",
+  "source": "src/index.ts",
+  "main": "dist/main.js",
+  "module": "dist/module.js",
+  "types": "dist/types.d.ts",
+  "author": {
+    "name": "Ted Klingenberg",
+    "email": "ted@doseofted.com",
+    "url": "https://doseofted.com/"
+  },
+  "license": "UNLICENSED",
+  "dependencies": {
+    "prim": "workspace:*"
+  },
+  "devDependencies": {
+    "fastify": "^3.27.2"
+  }
+}
