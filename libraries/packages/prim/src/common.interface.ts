@@ -1,11 +1,6 @@
+import { RpcErr } from "./error"
 interface RpcBase {
 	id?: string | number
-}
-
-export interface RpcErr<Data = unknown> {
-	code: number
-	message: string
-	data?: Data
 }
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -40,7 +35,23 @@ export interface PrimOptions {
 		send: (jsonBody: RpcCall, endpoint: string) => void
 		message: (response: unknown) => Promise<RpcAnswer>
 	},
-	internal?: {
-		nested: number
-	}
+	// NOTE not utilized yet but could be useful for passing internal options to Prim
+	internal?: Record<string, unknown>
+}
+
+/**
+ * Common properties given by server frameworks so generic `createPrimServer`
+ * can translate generic request into RPC.
+ */
+export interface CommonFrameworkOptions {
+	/** Typically the path without a querystring */
+	path?: string
+	/** The prefix where Prim lives. To be removed from the path. */
+	prefix?: string
+	/** The parsed querystring, usally a JSON object */
+	// eslint-disable-next-line @typescript-eslint/no-explicit-any
+	query?: Record<string | number, any>
+	/** The JSON body, which should already be formatted as RPC */
+	// eslint-disable-next-line @typescript-eslint/no-explicit-any
+	body?: Record<string | number, any>
 }
