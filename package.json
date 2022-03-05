@@ -10,7 +10,7 @@
 		"zx": "zx",
 		"libraries:dev": "parcel watch 'libraries/packages/*'",
 		"libraries:build": "parcel build 'libraries/packages/*'",
-		"libraries:test": "jest",
+		"libraries:test": "jest --watch",
 		"frontend": "pnpm --filter='frontend'",
 		"backend": "pnpm --filter='backend'"
 	},

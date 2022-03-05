@@ -11,7 +11,6 @@ USER node
 # NOTE: I should probably rename "/home/node/project" so I don't have to type "project" twice
 RUN mkdir -p /home/node/project/project/frontend 
 COPY --chown=1000:1000 project/frontend/package.json ./project/frontend/package.json
-
 # ---
 # Configure project build
 # ---

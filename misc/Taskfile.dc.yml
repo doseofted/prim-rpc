@@ -62,26 +62,26 @@ tasks:
       - "docker compose build"
   
   push:
-    desc: "Push the production-built services to the registry."
+    desc: "Build and push, for production, the services to the registry."
     deps:
       - build-production
     cmds:
       - docker compose push
 
-  up-build:
-    desc: "Build and start services in background"
+  dev:
+    desc: "Build and then start services in background"
     deps:
       - build
     cmds:
-      # First, a trused certificate should be set up for use in container
+      # First, a trusted certificate should be set up for use in container
       - task: :dev:cert
       # Now the services can be started in the background
       - "docker compose up -d"
       # For convenience, logs from running services will be shown. Ctrl-C does not shut down services.
       - task: logs
 
-  up-only:
-    desc: "Start services in background (pull prior to running, as needed)"
+  up:
+    desc: "Start services in background (optionally, run `task dc:pull` prior to running)"
     cmds:
       # Now the services can be started in the background
       - "docker compose up -d"

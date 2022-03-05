@@ -51,7 +51,7 @@ tasks:
           -conf /root/Corefile
 
   dev:clean:
-    desc: "Remove locally built files from the project, useful for a clean run (note: data/* must be deleted separately by root)"
+    desc: "Remove locally built files from the project, useful for a clean run (data/* must be deleted separately by root)"
     cmds:
       # Remove Parcel cache
       - "rm -fr .parcel-cache"

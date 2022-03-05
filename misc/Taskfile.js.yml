@@ -14,7 +14,7 @@ tasks:
       - "node_modules/**/*"
 
   test:
-    desc: "build libraries and then test with Jest."
+    desc: "Build libraries and then test with Jest."
     cmds:
       - "pnpm libraries:test"
 
