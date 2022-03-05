@@ -43,6 +43,7 @@ services:
       dockerfile: ./project/backend/Dockerfile
       # in production, build arguments aren't needed because env is provided at run-time
       args:
+        PROJECT_VERSION: $PROJECT_VERSION
         NODE_ENV: $NODE_ENV
     volumes:
       - ./project/backend/src:/home/node/project/project/backend/src
@@ -60,6 +61,7 @@ services:
       dockerfile: ./project/frontend/Dockerfile
       # in production, build arguments are always used
       args:
+        PROJECT_VERSION: $PROJECT_VERSION
         VITE_HOST: $HOST
         NODE_ENV: $NODE_ENV
     volumes:

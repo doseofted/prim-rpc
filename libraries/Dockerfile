@@ -6,7 +6,7 @@
 FROM node:16.13-bullseye as setup
 USER root
 RUN corepack enable
-RUN corepack prepare pnpm@6.26.1 --activate
+RUN corepack prepare pnpm@6.32.2 --activate
 RUN pnpm install zx@4.3.0 --global
 USER node
 RUN mkdir -p /home/node/project

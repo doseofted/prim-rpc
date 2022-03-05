@@ -19,13 +19,13 @@
   },
   "devDependencies": {
     "nodemon": "^2.0.15",
-    "typescript": "^4.5.4"
+    "typescript": "^4.6.2"
   },
   "dependencies": {
     "defu": "^5.0.1",
     "example": "workspace:*",
-    "fastify": "^3.25.3",
-    "fastify-cors": "^6.0.2",
+    "fastify": "^3.27.2",
+    "fastify-cors": "^6.0.3",
     "fastify-plugin": "^3.0.1",
     "prim": "workspace:*"
   }
