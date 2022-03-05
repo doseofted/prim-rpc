@@ -1,7 +1,7 @@
 import Fastify from "fastify"
 import Cors from "fastify-cors"
-import * as example from "example"
 import { primFasifyPlugin } from "prim-plugins"
+import * as example from "example"
 
 const fastify = Fastify({ logger: true })
 fastify.register(primFasifyPlugin, { module: example })

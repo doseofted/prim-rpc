@@ -16,6 +16,7 @@
     "prim": "workspace:*"
   },
   "devDependencies": {
+    "@types/express": "^4.17.13",
     "fastify": "^3.27.2"
   }
 }
