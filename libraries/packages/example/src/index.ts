@@ -45,12 +45,14 @@ export const testLevel1 = {
 
 export const testLevel2 = { testLevel1 }
 
-export function withCallback(cb: (message: string) => void) {
-	cb("You're using Prim.")
-	cb("Still using Prim!")
-}
-
 export function oops(ok = false) {
 	if (!ok) { throw new Error("My bad.") }
 	return "I did it again."
+}
+
+export function withCallback(cb: (message: string) => void) {
+	cb("You're using Prim.")
+	setTimeout(() => {
+		cb("Still using Prim!")
+	}, 5000);
 }

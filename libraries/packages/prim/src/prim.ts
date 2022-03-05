@@ -80,29 +80,23 @@ export function createPrimClient<T extends Record<V, T[V]>, V extends keyof T = 
 				try {
 					return Reflect.apply(realTarget, that, args)
 				} catch (error) {
-					const err = new RpcError(error)
-					if (err.isRpcErr) { throw err }
-					throw new Error(error)
+					throw new RpcError(error)
 				}
 			}
 			// if on client, send off request to server
 			if (!configured.server) {
 				const rpc: RpcCall = { method: this.path.join("/"), params: args }
-				const answer = async () => {
-					try {
-						// gather answer and then return the result of RPC call back to the client
-						const answer = await configured.client(rpc, configured.endpoint)
-						if (answer.error) { throw answer.error }
+				return configured.client(rpc, configured.endpoint)
+					.then(answer => {
+						if (answer.error) {
+							throw answer.error
+						}
 						return answer.result
-					} catch (error) {
+					})
+					.catch((error) => {
 						// it is expected for given module to throw if there is an error so that Prim-RPC can also error on the client
-						const err = new RpcError(error)
-						if (err.isRpcErr) { throw err }
-						// if not an RPC error, throw a generic error with given data as message
-						throw new Error(error)
-					}
-				}
-				return answer()
+						throw new RpcError(error)
+					})
 			}
 		},
 		get(_target, _prop, _receiver) {

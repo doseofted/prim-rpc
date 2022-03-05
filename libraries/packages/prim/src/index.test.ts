@@ -1,4 +1,4 @@
-import { createPrimClient, createPrimServer } from "./index"
+import { createPrimClient, createPrimServer, RpcError } from "./index"
 import type * as exampleClient from "example"
 import * as exampleServer from "example"
 
@@ -40,6 +40,24 @@ describe("Prim-Client can call deeply nested methods", () => {
 		})
 		const result = await prim.testLevel2.testLevel1.sayHello({ greeting: "Hey", name: "Ted" })
 		expect(result).toEqual("Hey Ted!")
+	})
+})
+
+describe("Prim-Client can throw errors", () => {
+	test("Locally", async () => {
+		const { oops } = createPrimClient({ server: true }, exampleServer)
+		expect(() => { oops() }).toThrow("My bad.")
+	})
+	test("Remotely", () => {
+		const { oops } = createPrimClient<typeof exampleClient>({
+			client: async () => ({
+				error: { code: 1, message: "My bad." }
+			})
+		})
+		// LINK https://jestjs.io/docs/expect#rejects
+		expect(async () => {
+			await oops()
+		}).rejects.toThrow("My bad.")
 	})
 })
 
