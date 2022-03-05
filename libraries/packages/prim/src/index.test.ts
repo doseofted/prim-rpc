@@ -1,4 +1,4 @@
-import { createPrimClient, createPrimServer, RpcError } from "./index"
+import { createPrimClient, createPrimServer } from "./index"
 import type * as exampleClient from "example"
 import * as exampleServer from "example"
 
