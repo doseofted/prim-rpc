@@ -1,6 +1,6 @@
 {
   "name": "frontend",
-  "packageManager": "pnpm@6.26.1",
+  "packageManager": "pnpm@6.32.2",
   "author": {
     "name": "Ted Klingenberg",
     "email": "ted@doseofted.com",
@@ -19,24 +19,24 @@
     "sync:electron": "cap sync @capacitor-community/electron"
   },
   "dependencies": {
-    "@capacitor-community/electron": "^4.0.3",
-    "@capacitor/android": "^3.4.0",
-    "@capacitor/core": "^3.4.0",
-    "@capacitor/ios": "^3.4.0",
+    "@capacitor-community/electron": "^4.1.0",
+    "@capacitor/android": "^3.4.3",
+    "@capacitor/core": "^3.4.3",
+    "@capacitor/ios": "^3.4.3",
     "example": "workspace:*",
     "prim": "workspace:*",
-    "vue": "^3.2.27"
+    "vue": "^3.2.31"
   },
   "devDependencies": {
-    "@capacitor/cli": "^3.4.0",
-    "@vitejs/plugin-vue": "^2.0.1",
-    "eslint-plugin-vue": "^8.3.0",
+    "@capacitor/cli": "^3.4.3",
+    "@vitejs/plugin-vue": "^2.2.4",
+    "eslint-plugin-vue": "^8.5.0",
     "postcss-html": "^1.3.0",
-    "stylelint": "^14.2.0",
-    "stylelint-config-recommended-vue": "^1.1.0",
+    "stylelint": "^14.5.3",
+    "stylelint-config-recommended-vue": "^1.3.0",
     "stylelint-config-standard-scss": "^3.0.0",
-    "typescript": "^4.5.4",
-    "vite": "^2.7.12",
-    "vue-tsc": "^0.30.5"
+    "typescript": "^4.6.2",
+    "vite": "^2.8.6",
+    "vue-tsc": "^0.32.1"
   }
 }

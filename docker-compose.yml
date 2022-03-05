@@ -1,24 +1,15 @@
 version: "3"
 
-x-environment:
-  &base_environment
-  COMPOSE_ENV: $COMPOSE_ENV
-  COMPOSE_HOST: $COMPOSE_HOST
-
-x-database:
-  &database
-  POSTGRES_DB: "prim"
-  POSTGRES_USER: "proper"
-  POSTGRES_PASSWORD: $POSTGRES_PASSWORD
-
 services:
 
+# SECTION Required services
+# ------------------------------------------------------------------------------
   # used as reverse proxy for services below
   # also, used to serve built frontend
   caddy:
     image: caddy:2.4.6-alpine
     environment:
-      <<: *base_environment
+      HOST: $HOST
       ADMIN_EMAIL: "ted@doseofted.com"
     volumes:
       - ./project/server/base.Caddyfile:/etc/caddy/base.Caddyfile:ro
@@ -27,25 +18,41 @@ services:
     ports:
       - "80:80"
       - "443:443"
+    profiles:
+      - "essential"
 
   # database available for use in project
   postgres:
     image: postgres:14.0-alpine
     environment:
-      <<: [ *base_environment, *database ]
+      &database
+      HOST: $HOST
+      POSTGRES_DB: "prim"
+      POSTGRES_USER: "proper"
+      POSTGRES_PASSWORD: $POSTGRES_PASSWORD
     volumes:
       - ./data/postgres:/var/lib/postgresql/data
+    profiles:
+      - "essential"
+# !SECTION ---------------------------------------------------------------------
+
+
+# SECTION Prim
+# ------------------------------------------------------------------------------
+  # libraries specific to this project
+  libraries:
+    environment:
+      HOST: $HOST
+      NODE_ENV: $NODE_ENV
+    profiles:
+      - "project"
 
   # where API is hosted
   backend:
     depends_on:
       - libraries
-    build:
-      context: .
-      dockerfile: ./project/backend/Dockerfile
-      # NOTE: args are not needed here since they are provided at run-time
     environment:
-      <<: [ *base_environment, *database ]
+      <<: *database
       # NOTE: DATABASE_HOST must match postgres service name above
       DATABASE_HOST: "postgres"
       SES_SMTP_USER: $SES_SMTP_USER
@@ -55,35 +62,63 @@ services:
       SES_SMTP_PORT: "465"
       TELEGRAM_BOT_TOKEN: $TELEGRAM_BOT_TOKEN
       TELEGRAM_CHAT_ID_LIST: $TELEGRAM_CHAT_ID_LIST
+      NODE_ENV: $NODE_ENV
+    profiles:
+      - "project"
     # volumes:
     #   - ./data/backend/uploads:/home/node/project/backend/uploads
 
   frontend:
     depends_on:
       - libraries
-    build:
-      context: .
-      dockerfile: ./project/frontend/Dockerfile
-      # in production, build arguments are always used
-      args:
-        VITE_HOST: $COMPOSE_HOST
-        VITE_COMPOSE_ENV: $COMPOSE_ENV
     # no state attached, just kill it
     stop_signal: SIGKILL
     # in development, the dev server will utilize these
     # and must be prefixed with "VITE_" as security measure
     environment:
-      VITE_HOST: $COMPOSE_HOST
-      VITE_COMPOSE_ENV: $COMPOSE_ENV
+      VITE_HOST: $HOST
+      NODE_ENV: $NODE_ENV
+    profiles:
+      - "project"
+# !SECTION ---------------------------------------------------------------------
 
-  # libraries specific to this project
-  libraries:
-    # NOTE: .image is now given in ./libraries/compose.yml
-    # image: libraries
-    build:
-      context: .
-      dockerfile: ./libraries/Dockerfile
-      args:
-        <<: *base_environment
+
+# SECTION Monitoring
+# ------------------------------------------------------------------------------
+  # Metrics from Docker (fluentd) will be forwarded to fluentbit
+  fluentbit:
+    image: fluent/fluent-bit:1.8
+    restart: "always"
+    command: "/fluent-bit/bin/fluent-bit -c /configs/config.conf"
+    volumes:
+      - /etc/localtime:/etc/localtime:ro
+      - /etc/timezone:/etc/timezone:ro
+      # NOTE: path base is given by primary Compose file (project directory)
+      - ./misc/fluentbit.conf:/configs/config.conf
+    ports:
+      - "24224:24224"
+      - "24224:24224/udp"
     environment:
-      <<: *base_environment
+      HOST: $HOST
+      METRICS_COLLECTION_HOST: $METRICS_COLLECTION_HOST
+    profiles:
+      - "monitoring"
+
+  # Metrics to be pulled by Prometheus
+  nodeexporter:
+    image: prom/node-exporter:v1.3.1
+    restart: "always"
+    volumes:
+      - /proc:/host/proc:ro
+      - /sys:/host/sys:ro
+      - /:/rootfs:ro
+    ports:
+      - "9100:9100"
+    command:
+      - "--path.procfs=/host/proc"
+      - "--path.sysfs=/host/sys"
+      - "--path.rootfs=/rootfs"
+      - "--collector.filesystem.mount-points-exclude=^/(sys|proc|dev|host|etc)($$|/)"
+    profiles:
+      - "monitoring"
+# !SECTION ---------------------------------------------------------------------

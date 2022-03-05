@@ -3,11 +3,14 @@
 # ---
 # Install common utils for container
 # ---
-FROM node:16.13-bullseye as setup
+FROM node:16.14-bullseye-slim as setup
+ARG DEBIAN_FRONTEND "noninteractive"
+RUN apt-get update -qq --no-install-recommends \
+	&& apt-get install -qq build-essential python3
 USER root
 RUN corepack enable
-RUN corepack prepare pnpm@6.26.1 --activate
-RUN pnpm install zx@4.3.0 --global
+RUN corepack prepare pnpm@6.32.2 --activate
+RUN pnpm install zx@5.2.0 --global
 USER node
 RUN mkdir -p /home/node/project
 WORKDIR /home/node/project
@@ -20,7 +23,7 @@ USER node
 # REFERENCE: for pnpm install in container https://pnpm.io/cli/fetch
 COPY --chown=1000:1000 pnpm-*.yaml package.json ./
 # install prod dependencies since dev dependencies are only needed for build, unless NODE_ENV is changed (during dev)
-ARG NODE_ENV="production"
+ARG NODE_ENV "production"
 RUN pnpm fetch
 
 # ---
@@ -43,9 +46,8 @@ RUN find ./libraries -type d -name 'src' -o -name 'node_modules' -prune -exec rm
 FROM installed as run
 # NOTE: NODE_ENV can be overridden while actively developing and pnpm utilizes the variable
 USER node
-ARG NODE_ENV="production"
-ARG COMPOSE_ENV
-ARG COMPOSE_HOST
+ARG NODE_ENV "production"
+ARG HOST
 # Copy all built libraries and their package.json
 COPY --from=built /home/node/project/libraries ./libraries
 # unlike build stage, I only need production dependencies here

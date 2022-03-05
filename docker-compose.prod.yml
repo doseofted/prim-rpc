@@ -1,53 +1,34 @@
 version: "3"
 
-x-logging:
-  &logging
-  driver: "fluentd"
-  options:
-    fluentd-address: "localhost:24224"
-    fluentd-async: "true"
-
 services:
 
   caddy:
     logging:
-      <<: *logging
+      &logging
+      driver: "fluentd"
+      options:
+        fluentd-address: "localhost:24224"
+        fluentd-async: "true"
     restart: "always"
     volumes:
       - ./project/server/prod.Caddyfile:/etc/caddy/Caddyfile:ro
       - ./data/server:/srv:ro
 
   postgres:
-    logging:
-      <<: *logging
+    logging: *logging
+    restart: "always"
+
+  libraries:
+    logging: *logging
+    image: "doseofted/${COMPOSE_PROJECT_NAME}-libraries:v0.0.1"
     restart: "always"
 
   backend:
-    logging:
-      <<: *logging
+    logging: *logging
+    image: "doseofted/${COMPOSE_PROJECT_NAME}-backend:v0.0.1"
     restart: "always"
-    build:
-      args:
-        NODE_ENV: "production"
-    environment:
-      NODE_ENV: "production"
 
   frontend:
-    logging:
-      <<: *logging
+    logging: *logging
+    image: "doseofted/${COMPOSE_PROJECT_NAME}-frontend:v0.0.1"
     restart: "always"
-    build:
-      args:
-        NODE_ENV: "production"
-    environment:
-      NODE_ENV: "production"
-
-  libraries:
-    logging:
-      <<: *logging
-    restart: "always"
-    build:
-      args:
-        NODE_ENV: "production"
-    environment:
-      NODE_ENV: "production"

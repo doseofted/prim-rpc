@@ -1,18 +1,16 @@
 version: "3"
 
-dotenv:
-  - ".env"
-
-vars:
-  COMPOSE_CONFIG_BASE: "-f docker-compose.yml"
-  # The following snippet is used to determine configuration for wanted environment:
-  # If configuration order changes, snippet below should be updated to reflect it.
-  COMPOSE_CONFIG_GIVEN: "{{coalesce .COMPOSE_PROD .COMPOSE_DEV}}"
-
 includes:
   # "dc" as in "Docker Compose"
   dc: ./misc/Taskfile.dc.yml
   js: ./misc/Taskfile.js.yml
+
+dotenv:
+  - ".env"
+
+# vars:
+#   COMPOSE_FILE_NAME:
+#     sh: echo {{list "COMPOSE_FILE" .ENV_COMPOSE | join "_"}}
 
 tasks:
 
@@ -32,7 +30,7 @@ tasks:
         mkcert \
           -key-file "data/server/dev-key.pem" \
           -cert-file "data/server/dev-cert.pem" \
-          {{.COMPOSE_HOST}} "*.{{.COMPOSE_HOST}}" localhost 127.0.0.1 ::1
+          {{.HOST}} "*.{{.HOST}}" localhost 127.0.0.1 ::1
 
   dev:dns:
     desc: "Run a DNS for development, useful for resolving '*.test' TLDs using devices on the same network"
@@ -53,7 +51,7 @@ tasks:
           -conf /root/Corefile
 
   dev:clean:
-    desc: "Remove locally built files from the project, useful for a clean run (note: data/* must be deleted separately by root)"
+    desc: "Remove locally built files from the project, useful for a clean run (data/* must be deleted separately by root)"
     cmds:
       # Remove Parcel cache
       - "rm -fr .parcel-cache"

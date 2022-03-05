@@ -5,7 +5,8 @@
 # ---
 # Install needed dependencies in this project (fetched in libraries image, needs to run for this project yet)
 # ---
-FROM libraries:latest as installed
+ARG PROJECT_VERSION latest
+FROM doseofted/prim-libraries:${PROJECT_VERSION} as installed
 USER node
 # NOTE: I should probably rename "/home/node/project" so I don't have to type "project" twice
 RUN mkdir -p /home/node/project/project/backend 

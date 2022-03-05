@@ -1,21 +1,23 @@
 <script setup lang="ts">
 import { onMounted, ref, computed } from "vue"
 import HelloYou from "./components/hello-you.vue"
-import { createPrim } from "prim"
+import { createPrimClient } from "prim"
 import * as exampleServer from "example"
 import type * as exampleClient from "example"
 
-const primLocal = createPrim({ server: true }, exampleServer)
-const { sayHello } = createPrim<typeof exampleClient>({
+const primLocal = createPrimClient({ server: true }, exampleServer)
+const expectedMessage = ref("")
+const exampleArgs = { greeting: "Hey", name: "Ted" }
+const { sayHello } = createPrimClient<typeof exampleClient>({
 	endpoint: `https://api.${import.meta.env.VITE_HOST}`
 })
-const exampleArgs = { greeting: "Hey", name: "Ted" }
 const message = ref<string>()
-const matches = computed(() => message.value === primLocal.sayHello(exampleArgs))
+const matches = computed(() => message.value === expectedMessage.value)
 const errored = computed(() => message.value === "errored")
 onMounted(async () => {
 	try {
 		message.value = await sayHello(exampleArgs)
+		expectedMessage.value = await primLocal.sayHello(exampleArgs)
 	} catch (error) {
 		message.value = "errored"
 	}
@@ -38,7 +40,7 @@ body {
   background-color: #fff;
 }
 
-div {
+.greeting {
   display: flex;
   justify-content: center;
   align-items: center;

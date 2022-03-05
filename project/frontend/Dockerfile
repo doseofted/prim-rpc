@@ -5,19 +5,18 @@
 # ---
 # Install needed dependencies in this project (fetched in libraries image, needs to run for this project yet)
 # ---
-FROM libraries:latest as installed
+ARG PROJECT_VERSION latest
+FROM doseofted/prim-libraries:${PROJECT_VERSION} as installed
 USER node
 # NOTE: I should probably rename "/home/node/project" so I don't have to type "project" twice
 RUN mkdir -p /home/node/project/project/frontend 
 COPY --chown=1000:1000 project/frontend/package.json ./project/frontend/package.json
-
 # ---
 # Configure project build
 # ---
 FROM installed as built
 USER node
 ARG VITE_HOST
-ARG VITE_COMPOSE_ENV
 RUN pnpm fetch --dev
 COPY --chown=1000:1000 project/frontend ./project/frontend
 # yes, install happened in utilized libraries image *but* install needs to run again

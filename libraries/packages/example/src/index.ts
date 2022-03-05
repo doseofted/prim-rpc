@@ -19,8 +19,8 @@ export const you = "Ted"
  * @param options Options used for greeting
  * @returns A nice greeting
  */
-export function sayHello (options: { greeting?: string, name?: string }) {
-	const { greeting = "", name = "" } = options
+export async function sayHello (options: { greeting?: string, name?: string }) {
+	const { greeting, name } = options
 	return `${greeting ?? "Hello"} ${name ?? "you"}!`
 }
 
@@ -31,34 +31,28 @@ export function sayHello (options: { greeting?: string, name?: string }) {
  * @param name What's your name?
  * @returns A nice greeting
  */
-export function sayHelloAlternative(greeting = "", name = "") {
-	return `${greeting ?? "Hello"} ${name ?? "you"}!`
+export async function sayHelloAlternative(greeting = "", name = "") {
+	return `${greeting || "Hello"} ${name || "you"}!`
 }
 
-export function prim() {
-	return "You're using Prim."
+/**
+ * This is an example of an entire that module that might be exported
+ */
+export const testLevel1 = {
+	sayHello,
+	sayHelloAlternative
 }
+
+export const testLevel2 = { testLevel1 }
 
 export function oops(ok = false) {
 	if (!ok) { throw new Error("My bad.") }
 	return "I did it again."
 }
 
-// TODO: Prim-RPC doesn't currently work with nested methods
-// Consider references below to add the functionality later:
-// REFERENCE: https://stackoverflow.com/a/41300128
-// REFERENCE: https://www.npmjs.com/package/proxy-deep
-/**
- * This is an example of an entire that module that might be expor
- */
-export const test =  {
-	sayHello,
-	sayHelloAlternative
+export function withCallback(cb: (message: string) => void) {
+	cb("You're using Prim.")
+	setTimeout(() => {
+		cb("Still using Prim!")
+	}, 5000);
 }
-
-// FIXME: this works at 2 levels but but above does not work at 1 level ...
-export const deepTest = { test }
-
-export const deepDeepTest = { deepTest }
-
-export const whatEven = { deepDeepTest }
