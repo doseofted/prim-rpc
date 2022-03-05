@@ -28,7 +28,11 @@ export function createPrimServer<T extends Record<V, T[V]>, V extends keyof T = 
 			const methodExpanded = method.split("/")
 			const target = getProperty(prim, methodExpanded)
 			console.log(methodExpanded)
-			return { result: await target(...params as unknown[]), id }
+			if (Array.isArray(params)) {
+				return { result: await target(...params), id }
+			} else {
+				return { result: await target(params), id }
+			}
 		} catch (err) {
 			// don't throw on server, simply return error to be interpreted as error on receiving client
 			if (err instanceof RpcError) {

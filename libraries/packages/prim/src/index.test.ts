@@ -44,9 +44,10 @@ describe("Prim-Client can call deeply nested methods", () => {
 })
 
 describe("Prim-Client can throw errors", () => {
+	// LINK https://jestjs.io/docs/expect#rejects
 	test("Locally", async () => {
 		const { oops } = createPrimClient({ server: true }, exampleServer)
-		expect(() => { oops() }).toThrow("My bad.")
+		expect(async () => { await oops() }).rejects.toThrow("My bad.")
 	})
 	test("Remotely", () => {
 		const { oops } = createPrimClient<typeof exampleClient>({
@@ -54,7 +55,6 @@ describe("Prim-Client can throw errors", () => {
 				error: { code: 1, message: "My bad." }
 			})
 		})
-		// LINK https://jestjs.io/docs/expect#rejects
 		expect(async () => {
 			await oops()
 		}).rejects.toThrow("My bad.")
@@ -68,7 +68,7 @@ describe("Prim-Server can call methods", () => {
 			body: {
 				id: 1,
 				method: "testLevel2/testLevel1/sayHello",
-				params: [{ greeting: "Hey", name: "Ted" }]
+				params: { greeting: "Hey", name: "Ted" }
 			}
 		})
 		expect(result).toEqual({ result: "Hey Ted!", id: 1 })
@@ -82,7 +82,7 @@ describe("Prim-Server can call methods", () => {
 			body: {
 				id: 1,
 				method: "testLevel2/testLevel1/sayHello",
-				params: [{ greeting: "Hey", name: "Ted" }]
+				params: { greeting: "Hey", name: "Ted" }
 			}
 		})
 		expect(result).toEqual({ result: "Hey Ted!", id: 1 })

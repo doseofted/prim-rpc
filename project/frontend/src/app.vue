@@ -9,7 +9,7 @@ const primLocal = createPrimClient({ server: true }, exampleServer)
 const expectedMessage = ref("")
 const exampleArgs = { greeting: "Hey", name: "Ted" }
 const { sayHello } = createPrimClient<typeof exampleClient>({
-	endpoint: `https://api.${import.meta.env.VITE_HOST}`
+	endpoint: `https://api.${import.meta.env.VITE_HOST}/prim`
 })
 const message = ref<string>()
 const matches = computed(() => message.value === expectedMessage.value)

@@ -6,11 +6,11 @@ import { createPrimServer, RpcCall } from "prim"
 
 function primFasifyPlugin<T extends Record<V, T[V]>, V extends keyof T = keyof T>() {
 	return fp<{ module: T, prefix?: string }>(async (fastify, options) => {
-		const { prefix } = options
+		const { prefix = "/prim" } = options
 		const prim = createPrimServer({ server: true }, options.module)
 		fastify.route<{ Body: RpcCall, Params: { method?: string } }>({
 			method: ["POST", "GET"],
-			url: `${prefix ?? "/"}`,
+			url: `${prefix}`,
 			handler: async ({ body, url: path, query }, reply) => {
 				const response = await prim({ path, prefix, body, query })
 				reply.send(response)
