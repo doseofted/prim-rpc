@@ -13,6 +13,11 @@ tasks:
     generates:
       - "node_modules/**/*"
 
+  test:
+    desc: "build libraries and then test with Jest."
+    cmds:
+      - "pnpm libraries:test"
+
   build:libraries:
     cmds:
       - "pnpm libraries:build"

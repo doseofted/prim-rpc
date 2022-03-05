@@ -8,9 +8,11 @@ const echo = createEcho(prefix)
 
 $.verbose = true
 let dev = new Promise(r => r()) // simple promise to resolve, if not in dev mode
+// let test = new Promise(r => r()) // simple promise to resolve, if not in dev mode
 if (mode !== "production") {
 	echo`Running in ${mode} mode. Building in background ...`
 	dev = nothrow($`pnpm libraries:dev`) // wrap in `nothrow` since it's just a dev process
+	// test = nothrow($`pnpm libraries:test`) // wrap in `nothrow` since it's just a dev process
 }
 
 echo`Keeping container open to use mounted volumes.`
@@ -20,6 +22,7 @@ try {
 	process.on("SIGTERM", () => { // sigterm received from docker-compose
 		app.kill("SIGINT") // send interrupt, as if used interactively
 		if (dev) { dev.kill("SIGINT") } // same with dev, if in dev mode
+		// if (test) { test.kill("SIGINT") } // same with dev, if in dev mode
 	})
 	await Promise.all([app, dev])
 } catch (p) {
