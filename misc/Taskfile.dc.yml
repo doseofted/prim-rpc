@@ -22,9 +22,8 @@ tasks:
       # NOTE ignore pull failures since local containers may not be pushed to registry yet
       - "docker compose pull --ignore-pull-failures"
 
+  # Build services in order of images' dependencies, with build cache
   build:
-    &build-base
-    desc: "Build services in order of images' dependencies, with build cache"
     env:
       COMPOSE_FILE: "{{.COMPOSE_FILE_DEV}}"
     deps:
@@ -35,17 +34,42 @@ tasks:
       # Now build everything else (libraries is now tagged and cached)
       - "docker compose build"
 
+  # Build services in development but without a build cache. Useful when a major change is made to project.
   build-clean:
-    <<: *build-base
-    desc: "Build services but without a build cache. Useful when a major change is made to project."
+    env:
+      COMPOSE_FILE: "{{.COMPOSE_FILE_DEV}}"
+    deps:
+      - pull
     cmds:
       # First build libraries image since possibly needed in frontend and backend
       - "docker compose build libraries --no-cache"
       # Now build everything else (libraries is now tagged and cached)
       - "docker compose build --no-cache"
 
-  dev:
-    desc: "Build then start services in background"
+  # Build services in production with overridden build arguments and using the server's target platform.
+  build-prod:
+    env:
+      DOCKER_DEFAULT_PLATFORM: "linux/amd64"
+      COMPOSE_FILE: "{{.COMPOSE_FILE_DEV}}"
+      NODE_ENV: "production"
+      HOST: "prim.plus"
+    deps:
+      - pull
+    cmds:
+      # First build libraries image since possibly needed in frontend and backend
+      - "docker compose build libraries"
+      # Now build everything else (libraries is now tagged and cached)
+      - "docker compose build"
+  
+  push:
+    desc: "Push the production-built services to the registry."
+    deps:
+      - build-production
+    cmds:
+      - docker compose push
+
+  up-build:
+    desc: "Build and start services in background"
     deps:
       - build
     cmds:
@@ -56,8 +80,8 @@ tasks:
       # For convenience, logs from running services will be shown. Ctrl-C does not shut down services.
       - task: logs
 
-  up:
-    desc: "Start services in background"
+  up-only:
+    desc: "Start services in background (pull prior to running, as needed)"
     cmds:
       # Now the services can be started in the background
       - "docker compose up -d"

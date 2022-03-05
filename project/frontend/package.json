@@ -1,6 +1,6 @@
 {
   "name": "frontend",
-  "packageManager": "pnpm@6.26.1",
+  "packageManager": "pnpm@6.32.2",
   "author": {
     "name": "Ted Klingenberg",
     "email": "ted@doseofted.com",
