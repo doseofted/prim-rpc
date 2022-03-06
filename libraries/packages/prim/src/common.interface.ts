@@ -30,11 +30,16 @@ export interface PrimOptions {
 	 */
 	client?: (jsonBody: RpcCall, endpoint: string) => Promise<RpcAnswer>
 	/** If a custom websocket framework is used,  */
-	socket?: {
-		create: <T>(endpoint: string) => T,
-		send: (jsonBody: RpcCall, endpoint: string) => void
-		message: (response: unknown) => Promise<RpcAnswer>
-	},
+	socket?: (endpoint: string, respond:(message: string) => void) => ({ send: (message: string) => void })
+	// socket?: {
+	// 	/** Initialize a WebSocket instance, called once a callback is detected */
+	// 	create: (endpoint: string) => unknown,
+	// 	/** Used when client sends a request to the server */
+	// 	send: (jsonBody: RpcCall, client: unknown) => void
+	// 	/** Used when the client receives a response */
+	// 	message: (response: unknown) => Promise<RpcAnswer>
+	// 	// TODO: above events are specific to client. I need to write events specific to the server
+	// },
 	// NOTE not utilized yet but could be useful for passing internal options to Prim
 	internal?: Record<string, unknown>
 }

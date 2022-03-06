@@ -15,6 +15,7 @@ import defu from "defu"
 import { RpcError } from "./error"
 import { RpcCall, PrimOptions } from "./common.interface"
 import { nanoid } from "nanoid"
+import { createNanoEvents } from "nanoevents"
 
 /**
  * Prim-RPC can be used to write plain functions on the server and then call them easily from the client.
@@ -42,6 +43,7 @@ export function createPrimClient<T extends Record<V, T[V]>, V extends keyof T = 
 			// if on client, send off request to server
 			if (!configured.server) {
 				const rpc: RpcCall = { method: this.path.join("/"), params: args, id: nanoid() }
+				// TODO: read arguments and if callback is found, use a websocket
 				return configured.client(rpc, configured.endpoint)
 					.then(answer => {
 						if (answer.error) {
@@ -59,6 +61,8 @@ export function createPrimClient<T extends Record<V, T[V]>, V extends keyof T = 
 			return this.nest(() => undefined)
 		}
 	})
+	// const emitter = createNanoEvents()
+	// emitter.emit("test")
 	return proxy
 }
 
@@ -85,11 +89,14 @@ function createPrimOptions(options?: PrimOptions) {
 			// RPC result should be returned on success and RPC error thrown if errored
 			return result.json()
 		},
-		/* socket: {
-			create<WebSocket>(endpoint) {
-				return new WebSocket(endpoint)
-			}
-		}, */
+		socket(endpoint, response) {
+			const ws = new WebSocket(endpoint)
+			ws.onmessage = (({ data: message }) => {
+				response(message)
+			})
+			const send = (msg: string) => ws.send(msg)
+			return { send }
+		},
 		// these options should not be passed by a developer but are used internally
 		internal: {}
 	})
