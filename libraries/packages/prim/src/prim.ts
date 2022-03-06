@@ -13,7 +13,7 @@ import ProxyDeep from "proxy-deep"
 import { get as getProperty } from "lodash"
 import defu from "defu"
 import { RpcError } from "./error"
-import { RpcCall, PrimOptions, RpcAnswer } from "./common.interface"
+import { RpcCall, PrimOptions, RpcAnswer, PrimWebsocketEvents } from "./common.interface"
 import { nanoid } from "nanoid"
 import { createNanoEvents } from "nanoevents"
 
@@ -50,14 +50,13 @@ export function createPrimClient<T extends Record<V, T[V]>, V extends keyof T = 
 						const generatedId = "_cb_" + nanoid()
 						const unbind = event.on("response", (msg) => {
 							console.log("nano event response", msg, generatedId)
-							if (msg.id == generatedId) {
-								if (Array.isArray(msg.result)) {
-									a(...msg.result)
-								} else {
-									a(msg.result)
-								}
-								unbind()
+							if (msg.id !== generatedId) { return }
+							if (Array.isArray(msg.result)) {
+								a(...msg.result)
+							} else {
+								a(msg.result)
 							}
+							unbind()
 						})
 						return generatedId
 					}
@@ -87,10 +86,7 @@ export function createPrimClient<T extends Record<V, T[V]>, V extends keyof T = 
 			return this.nest(() => undefined)
 		}
 	})
-	const event = createNanoEvents<{
-		"response": (message: RpcAnswer) => void
-		"end": () => void
-	}>()
+	const event = configured.internal.event ?? createNanoEvents<PrimWebsocketEvents>()
 	function createWebsocket(initialMessage: RpcCall) {
 		const response = (given: RpcAnswer) => {
 			console.log("response attempt")

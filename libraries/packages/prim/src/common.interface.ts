@@ -1,3 +1,4 @@
+import { Emitter } from "nanoevents"
 import { RpcErr } from "./error"
 interface RpcBase {
 	id?: string | number
@@ -13,6 +14,11 @@ export interface RpcCall<Method = string, Params = any> extends RpcBase {
 export interface RpcAnswer<Result = any, Error = any> extends RpcBase {
 	result?: Result
 	error?: RpcErr<Error>
+}
+
+export interface PrimWebsocketEvents {
+	response: (message: RpcAnswer) => void
+	end: () => void
 }
 
 export interface PrimOptions {
@@ -43,7 +49,10 @@ export interface PrimOptions {
 	// 	// TODO: above events are specific to client. I need to write events specific to the server
 	// },
 	// NOTE not utilized yet but could be useful for passing internal options to Prim
-	internal?: Record<string, unknown>
+	internal?: {
+		/** Event emitter to be shared with Prim Server, if websocket events are used */
+		event?: Emitter<PrimWebsocketEvents>
+	}
 }
 
 /**

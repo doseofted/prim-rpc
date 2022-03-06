@@ -67,12 +67,14 @@ importers:
   libraries/packages/prim-plugins:
     specifiers:
       '@types/express': ^4.17.13
+      '@types/ws': ^8.5.2
       fastify: ^3.27.2
       prim: workspace:*
     dependencies:
       prim: link:../prim
     devDependencies:
       '@types/express': 4.17.13
+      '@types/ws': 8.5.2
       fastify: 3.27.2
 
   project/backend:

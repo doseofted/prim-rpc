@@ -5,6 +5,7 @@ import { get as getProperty } from "lodash"
 import defu from "defu"
 import { nanoid } from "nanoid"
 import { getQuery, parseURL } from "ufo"
+import { createNanoEvents } from "nanoevents"
 
 // TODO: make this work with methods called in path over GET request
 // the function should be restructured to accept: path, body, querystring
@@ -21,7 +22,10 @@ import { getQuery, parseURL } from "ufo"
  * @returns A function that expects JSON resembling an RPC call
  */
 export function createPrimServer<T extends Record<V, T[V]>, V extends keyof T = keyof T>(options?: PrimOptions, givenModule?: T) {
-	const prim = createPrimClient(options, givenModule)
+	const givenOptions = options ?? {}
+	const event = createNanoEvents()
+	givenOptions.internal = { event }
+	const prim = createPrimClient(givenOptions, givenModule)
 	const primRpc = async (rpc: RpcCall): Promise<RpcAnswer> => {
 		const { method, params, id } = rpc
 		// const args = Array.isArray(params) ? params : [params]

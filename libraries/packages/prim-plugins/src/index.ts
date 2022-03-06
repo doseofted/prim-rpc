@@ -1,6 +1,7 @@
 import { RpcCall, createPrimServer, PrimOptions } from "prim"
 import type { FastifyPluginAsync } from "fastify"
 import type * as Express from "express"
+import type { WebSocketServer } from "ws"
 
 interface PrimFastifyOptions {
 	// Prims-specific options
@@ -61,3 +62,18 @@ export const primExpressMiddleware = (givenModule: unknown, prefix = "/prim", op
 
 // TODO write a "ws" (node module) websocket handler to be used with Prim's "socket" option
 // so that websocket callbacks don't have to be wired up manually
+export const primWebsocketServerSetup = (wsServer: WebSocketServer) => {
+	const message = () => ({})
+	wsServer.on("connection", (ws) => {
+		ws.on("message", (data) => {
+			const rpc = JSON.parse(String(data))
+			ws.send(rpc)
+		})
+		// ws.send()
+	})
+	// const options: PrimOptions = {
+	// 	socket(endpoint, response, end) {
+	// 		// ...
+	// 	}
+	// }
+}

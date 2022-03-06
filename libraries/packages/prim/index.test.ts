@@ -74,7 +74,7 @@ describe("Prim-Client can use callbacks", () => {
 			}
 		})
 	})
-	/* test("Remotely", (done) => {
+	test("Remotely", (done) => {
 		const results = []
 		const { withCallback } = createPrimClient<typeof exampleClient>({
 			socket(_endpoint, response, _end) {
@@ -96,7 +96,7 @@ describe("Prim-Client can use callbacks", () => {
 				done()
 			}
 		})
-	}) */
+	})
 })
 
 describe("Prim-Server can call methods with RPC", () => {
