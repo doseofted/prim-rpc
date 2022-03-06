@@ -66,8 +66,6 @@ export function createPrimServer<T extends Record<V, T[V]>, V extends keyof T = 
 			body ?? bodyFromPath,
 			{ id: nanoid(), method: "default" }
 		)
-		console.log(rpc);
-		
 		return primRpc(rpc)
 	}
 }

@@ -56,3 +56,12 @@ export function withCallback(cb: (message: string) => void) {
 		cb("Still using Prim!")
 	}, 100);
 }
+
+export function typeMessage(message: string, typeLetter: (typed: string) => void, speed = 300) {
+	let timeout = 0
+	message.split("").forEach(letter => {
+		setTimeout(() => {
+			typeLetter(letter)
+		}, ++timeout * speed);
+	})
+}

@@ -8,7 +8,7 @@ import type * as exampleClient from "example"
 const primLocal = createPrimClient({ server: true }, exampleServer)
 const expectedMessage = ref("")
 const exampleArgs = { greeting: "Hey", name: "Ted" }
-const { sayHello } = createPrimClient<typeof exampleClient>({
+const { sayHello, typeMessage } = createPrimClient<typeof exampleClient>({
 	endpoint: `https://api.${import.meta.env.VITE_HOST}/prim`
 })
 const message = ref<string>()
@@ -21,6 +21,9 @@ onMounted(async () => {
 	} catch (error) {
 		message.value = "errored"
 	}
+	typeMessage(message.value, (letter) => {
+		console.log(letter)
+	})
 })
 </script>
 

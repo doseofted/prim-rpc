@@ -76,7 +76,10 @@ describe("Prim-Client can use callbacks", () => {
 	})
 	/* test("Remotely", (done) => {
 		const results = []
-		const send = (msg: string) => results.push(msg)
+		const send = (msg: string) => {
+			console.log("custom send attempted");
+			results.push(msg)
+		}
 		const { withCallback } = createPrimClient<typeof exampleClient>({
 			socket(_endpoint, _response, _end) {
 				return { send }

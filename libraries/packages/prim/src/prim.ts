@@ -42,8 +42,22 @@ export function createPrimClient<T extends Record<V, T[V]>, V extends keyof T = 
 			}
 			// if on client, send off request to server
 			if (!configured.server) {
+				let callbacksGiven = false
+				// eslint-disable-next-line @typescript-eslint/no-explicit-any
+				args = (args as any[]).map((a) => {
+					if (typeof a === "function") {
+						callbacksGiven = true
+						return "_cb_" + nanoid()
+					}
+					return a
+				})
 				const rpc: RpcCall = { method: this.path.join("/"), params: args, id: nanoid() }
 				// TODO: read arguments and if callback is found, use a websocket
+				if (callbacksGiven) {
+					console.log("given args", args)
+					// sendMessage(rpc)
+					throw new RpcError({ message: "Feature not implemented", code: 0 })
+				}
 				return configured.client(rpc, configured.endpoint)
 					.then(answer => {
 						if (answer.error) {
@@ -62,17 +76,19 @@ export function createPrimClient<T extends Record<V, T[V]>, V extends keyof T = 
 		}
 	})
 	const event = createNanoEvents()
-	function createWebsocket(initialMessage: string) {
-		const message = (given: string) => { event.emit("message", given) }
+	function createWebsocket(initialMessage: unknown) {
+		const message = (given: unknown) => { event.emit("message", given) }
 		const end = () => { sendMessage = setupWebsocket }
 		const { send } = configured.socket(configured.endpoint, message, end)
 		sendMessage = send
-		sendMessage(initialMessage)
+		send(initialMessage)
+		console.log("websocket creation attempted");
+		
 	}
 	/** Internal function referenced when a WebSocket connection has not been created yet */
-	const setupWebsocket = (msg: string) => createWebsocket(msg)
+	const setupWebsocket = (msg: unknown) => createWebsocket(msg)
 	/** Sets up WebSocket if needed, then sends a message */
-	let sendMessage: (message: string) => void = setupWebsocket
+	let sendMessage: (message: unknown) => void = setupWebsocket
 	return proxy
 }
 
@@ -101,11 +117,19 @@ function createPrimOptions(options?: PrimOptions) {
 		},
 		socket(endpoint, response, end) {
 			const ws = new WebSocket(endpoint)
+			console.log("default client used")
 			ws.onmessage = (({ data: message }) => {
+				console.log("message received")
 				response(message)
 			})
-			ws.onclose = () => { end() }
-			const send = (msg: string) => ws.send(msg)
+			ws.onclose = () => {
+				console.log("connection closed")
+				end()
+			}
+			const send = (msg: unknown) => {
+				console.log("attempting send")
+				ws.send(JSON.stringify(msg))
+			}
 			return { send }
 		},
 		// these options should not be passed by a developer but are used internally
