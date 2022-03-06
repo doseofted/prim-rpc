@@ -11,6 +11,11 @@
       "includeNodeModules": [
         "nanoevents"
       ]
+    },
+    "module": {
+      "includeNodeModules": [
+        "nanoevents"
+      ]
     }
   },
   "author": {

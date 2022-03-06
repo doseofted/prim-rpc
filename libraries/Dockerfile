@@ -34,7 +34,7 @@ USER node
 # in addition to prod dependencies, install dev dependencies since they'll be needed for build
 RUN pnpm fetch --dev
 COPY --chown=1000:1000 libraries ./libraries
-RUN pnpm install --offline --frozen-lockfile --dev
+RUN pnpm install --offline --frozen-lockfile
 # build all packages copied into the container from the monorepo
 RUN (export NODE_ENV="production"; pnpm libraries:build)
 # Now remove all folders for source code and dev-related node_modules (only prod node_modules needed later)
