@@ -1,4 +1,4 @@
-import { createPrimClient, createPrimServer } from "./index"
+import { createPrimClient, createPrimServer } from "."
 import type * as exampleClient from "example"
 import * as exampleServer from "example"
 
@@ -61,7 +61,38 @@ describe("Prim-Client can throw errors", () => {
 	})
 })
 
-describe("Prim-Server can call methods", () => {
+describe("Prim-Client can use callbacks", () => {
+	// LINK https://jestjs.io/docs/expect#rejects
+	test("Locally", (done) => {
+		const { withCallback } = createPrimClient({ server: true }, exampleServer)
+		const results = []
+		withCallback((message) => {
+			results.push(message)
+			if (results.length === 2) {
+				expect(results).toEqual(["You're using Prim.", "Still using Prim!"])
+				done()
+			}
+		})
+	})
+	/* test("Remotely", (done) => {
+		const results = []
+		const send = (msg: string) => results.push(msg)
+		const { withCallback } = createPrimClient<typeof exampleClient>({
+			socket(_endpoint, _response, _end) {
+				return { send }
+			}
+		})
+		withCallback((message) => {
+			results.push(message)
+			if (results.length === 2) {
+				expect(results).toEqual(["You're using Prim.", "Still using Prim!"])
+				done()
+			}
+		})
+	}) */
+})
+
+describe("Prim-Server can call methods with RPC", () => {
 	test("Locally", async () => {
 		const prim = createPrimServer({ server: true }, exampleServer)
 		const result = await prim({
@@ -86,5 +117,27 @@ describe("Prim-Server can call methods", () => {
 			}
 		})
 		expect(result).toEqual({ result: "Hey Ted!", id: 1 })
+	})
+})
+
+describe("Prim-Server can call methods with RPC via URL", () => {
+	test("Locally", async () => {
+		const prim = createPrimServer({ server: true }, exampleServer)
+		const result = await prim({
+			url: "/prim/testLevel2/testLevel1/sayHello?-id=1&greeting=Hey&name=Ted",
+			prefix: "/prim"
+		})
+		expect(result).toEqual({ result: "Hey Ted!", id: "1" })
+	})
+	test("From another Prim-Server", async () => {
+		const primServer = createPrimServer({ server: true }, exampleServer)
+		const primRemoteServer = createPrimServer({
+			client: async (body) => primServer({ body })
+		}, exampleServer)
+		const result = await primRemoteServer({
+			url: "/prim/testLevel2/testLevel1/sayHelloAlternative?-id=1&-=Hey&-=Ted",
+			prefix: "/prim"
+		})
+		expect(result).toEqual({ result: "Hey Ted!", id: "1" })
 	})
 })

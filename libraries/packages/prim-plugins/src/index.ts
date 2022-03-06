@@ -26,9 +26,9 @@ export const primFasifyPlugin: FastifyPluginAsync<PrimFastifyOptions> = async (f
 	const prim = createPrimServer(primOptions, givenModule)
 	fastify.route<{ Body: RpcCall, Params: { method?: string } }>({
 		method: ["POST", "GET"],
-		url: `${prefix}`,
-		handler: async ({ body, url: path, query }, reply) => {
-			const response = await prim({ prefix, path, body, query })
+		url: `${prefix}*`,
+		handler: async ({ url, body }, reply) => {
+			const response = await prim({ prefix, url, body })
 			reply.send(response)
 		}
 	})
@@ -42,18 +42,19 @@ export const primFasifyPlugin: FastifyPluginAsync<PrimFastifyOptions> = async (f
  * import { primExpressMiddleware } from "prim-plugins"
  * import * as example from "example"
  * // ...
- * expressApp.use("/prim", primExpressMiddleware(example, "/prim"))
+ * expressApp.use(primExpressMiddleware(example, "/prim"))
  * ```
  */
 export const primExpressMiddleware = (givenModule: unknown, prefix = "/prim", options: PrimOptions = { server: true }) => {
 	options.server = true // this is always true since it is being used from a server framework
 	const prim = createPrimServer(options, givenModule)
 	return async (req: Express.Request, res: Express.Response, next: Express.NextFunction) => {
-		if (!(req.method === "GET" || (req.method === "POST"))) {
-			next() // not intended for Prim
-		}
-		const { path, query, body } = req
-		const response = await prim({ prefix, path, body, query })
+		const { method, url, body } = req
+		const acceptedMethod = method === "GET" || method === "POST"
+		const primPrefix = url.includes(prefix)
+		const isPrimRequest = acceptedMethod && primPrefix
+		if (!isPrimRequest) { next(); return }
+		const response = await prim({ prefix, url, body })
 		res.json(response)
 	}
 }

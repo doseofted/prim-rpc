@@ -4,6 +4,7 @@ import { CommonFrameworkOptions, PrimOptions, RpcAnswer, RpcCall } from "./commo
 import { get as getProperty } from "lodash"
 import defu from "defu"
 import { nanoid } from "nanoid"
+import { getQuery, parseURL } from "ufo"
 
 // TODO: make this work with methods called in path over GET request
 // the function should be restructured to accept: path, body, querystring
@@ -27,7 +28,7 @@ export function createPrimServer<T extends Record<V, T[V]>, V extends keyof T = 
 		try {
 			const methodExpanded = method.split("/")
 			const target = getProperty(prim, methodExpanded)
-			console.log(methodExpanded)
+			// console.log(methodExpanded)
 			if (Array.isArray(params)) {
 				return { result: await target(...params), id }
 			} else {
@@ -45,12 +46,18 @@ export function createPrimServer<T extends Record<V, T[V]>, V extends keyof T = 
 	// NOTE: accepts JSON body or variant given in path like so:
 	// /prefix/sayHello?-id=123&-=Hello&-=Ted
 	return async (given: CommonFrameworkOptions) => {
-		const { path, prefix, query } = given
+		const { url: urlGiven, prefix = "/prim" } = given
+		const url = parseURL(urlGiven)
+		const query = getQuery(url.search)
 		const bodyFromPath = (() => {
-			const method = path?.replace(prefix, "")
-			const id = query?.["-id"]
-			if (query) { delete query["-id"] }
-			const params = query
+			const method = url.pathname.replace(prefix + "/", "")
+			// eslint-disable-next-line @typescript-eslint/no-explicit-any
+			let params: any = query
+			const id = query["-id"]
+			delete query["-id"]
+			if (Object.keys(query).length === 1 && "-" in query) {
+				params = query["-"] // all arguments are positional
+			}
 			return { method, params, id }
 		})()
 		const { body } = given
@@ -59,6 +66,8 @@ export function createPrimServer<T extends Record<V, T[V]>, V extends keyof T = 
 			body ?? bodyFromPath,
 			{ id: nanoid(), method: "default" }
 		)
+		console.log(rpc);
+		
 		return primRpc(rpc)
 	}
 }

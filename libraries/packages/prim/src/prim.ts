@@ -62,8 +62,17 @@ export function createPrimClient<T extends Record<V, T[V]>, V extends keyof T = 
 		}
 	})
 	const event = createNanoEvents()
-	event.on("t", () => console.log("test"))
-	event.emit("t")
+	function createWebsocket(initialMessage: string) {
+		const message = (given: string) => { event.emit("message", given) }
+		const end = () => { sendMessage = setupWebsocket }
+		const { send } = configured.socket(configured.endpoint, message, end)
+		sendMessage = send
+		sendMessage(initialMessage)
+	}
+	/** Internal function referenced when a WebSocket connection has not been created yet */
+	const setupWebsocket = (msg: string) => createWebsocket(msg)
+	/** Sets up WebSocket if needed, then sends a message */
+	let sendMessage: (message: string) => void = setupWebsocket
 	return proxy
 }
 
@@ -90,11 +99,12 @@ function createPrimOptions(options?: PrimOptions) {
 			// RPC result should be returned on success and RPC error thrown if errored
 			return result.json()
 		},
-		socket(endpoint, response) {
+		socket(endpoint, response, end) {
 			const ws = new WebSocket(endpoint)
 			ws.onmessage = (({ data: message }) => {
 				response(message)
 			})
+			ws.onclose = () => { end() }
 			const send = (msg: string) => ws.send(msg)
 			return { send }
 		},

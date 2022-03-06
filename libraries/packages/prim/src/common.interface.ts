@@ -30,7 +30,7 @@ export interface PrimOptions {
 	 */
 	client?: (jsonBody: RpcCall, endpoint: string) => Promise<RpcAnswer>
 	/** If a custom websocket framework is used,  */
-	socket?: (endpoint: string, respond:(message: string) => void) => ({ send: (message: string) => void })
+	socket?: (endpoint: string, respond: (message: string) => void, end: () => void) => ({ send: (message: string) => void })
 	// socket?: {
 	// 	/** Initialize a WebSocket instance, called once a callback is detected */
 	// 	create: (endpoint: string) => unknown,
@@ -49,14 +49,11 @@ export interface PrimOptions {
  * can translate generic request into RPC.
  */
 export interface CommonFrameworkOptions {
-	/** Typically the path without a querystring */
-	path?: string
-	/** The prefix where Prim lives. To be removed from the path. */
+	/** The prefix where Prim lives, to be removed from the path. By default: `/prim` */
 	prefix?: string
-	/** The parsed querystring, usally a JSON object */
-	// eslint-disable-next-line @typescript-eslint/no-explicit-any
-	query?: Record<string | number, any>
+	/** The URL before parsing querystring */
+	url?: string
 	/** The JSON body, which should already be formatted as RPC */
 	// eslint-disable-next-line @typescript-eslint/no-explicit-any
-	body?: Record<string | number, any>
+	body?: any
 }

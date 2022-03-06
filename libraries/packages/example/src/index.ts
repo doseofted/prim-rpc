@@ -54,5 +54,5 @@ export function withCallback(cb: (message: string) => void) {
 	cb("You're using Prim.")
 	setTimeout(() => {
 		cb("Still using Prim!")
-	}, 5000);
+	}, 100);
 }
