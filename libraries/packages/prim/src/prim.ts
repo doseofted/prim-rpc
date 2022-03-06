@@ -61,8 +61,9 @@ export function createPrimClient<T extends Record<V, T[V]>, V extends keyof T = 
 			return this.nest(() => undefined)
 		}
 	})
-	// const emitter = createNanoEvents()
-	// emitter.emit("test")
+	const emitter = createNanoEvents()
+	emitter.on("t", () => console.log("test"))
+	emitter.emit("t")
 	return proxy
 }
 

@@ -6,6 +6,13 @@
   "main": "dist/main.js",
   "module": "dist/module.js",
   "types": "dist/types.d.ts",
+  "targets": {
+    "main": {
+      "includeNodeModules": [
+        "nanoevents"
+      ]
+    }
+  },
   "author": {
     "name": "Ted Klingenberg",
     "email": "ted@doseofted.com",
