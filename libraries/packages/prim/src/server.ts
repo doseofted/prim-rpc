@@ -29,6 +29,7 @@ export function createPrimServer<T extends Record<V, T[V]>, V extends keyof T = 
 			const methodExpanded = method.split("/")
 			const target = getProperty(prim, methodExpanded)
 			// console.log(methodExpanded)
+			// TODO: go through params and look for callbacks, using configured "options.socket" to send back response
 			if (Array.isArray(params)) {
 				return { result: await target(...params), id }
 			} else {

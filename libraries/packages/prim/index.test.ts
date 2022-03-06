@@ -1,4 +1,4 @@
-import { createPrimClient, createPrimServer } from "."
+import { createPrimClient, createPrimServer, RpcCall } from "."
 import type * as exampleClient from "example"
 import * as exampleServer from "example"
 
@@ -76,12 +76,16 @@ describe("Prim-Client can use callbacks", () => {
 	})
 	/* test("Remotely", (done) => {
 		const results = []
-		const send = (msg: string) => {
-			console.log("custom send attempted");
-			results.push(msg)
-		}
 		const { withCallback } = createPrimClient<typeof exampleClient>({
-			socket(_endpoint, _response, _end) {
+			socket(_endpoint, response, _end) {
+				console.log("custom websocket handler attempted");
+				const send = (msg: RpcCall) => {
+					const id = msg.id
+					// TODO: sort params and create a callback for each one and once each callback is called,
+					// send response back using "response" callback. Example psuedo-code:
+					// if (givenParam.startsWith("_cb_")) { givenParam = (...args) => { response(...args) } }
+					response({ id, result: "some response" })
+				}
 				return { send }
 			}
 		})

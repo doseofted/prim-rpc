@@ -13,7 +13,7 @@ import ProxyDeep from "proxy-deep"
 import { get as getProperty } from "lodash"
 import defu from "defu"
 import { RpcError } from "./error"
-import { RpcCall, PrimOptions } from "./common.interface"
+import { RpcCall, PrimOptions, RpcAnswer } from "./common.interface"
 import { nanoid } from "nanoid"
 import { createNanoEvents } from "nanoevents"
 
@@ -47,7 +47,19 @@ export function createPrimClient<T extends Record<V, T[V]>, V extends keyof T = 
 				args = (args as any[]).map((a) => {
 					if (typeof a === "function") {
 						callbacksGiven = true
-						return "_cb_" + nanoid()
+						const generatedId = "_cb_" + nanoid()
+						const unbind = event.on("response", (msg) => {
+							console.log("nano event response", msg, generatedId)
+							if (msg.id == generatedId) {
+								if (Array.isArray(msg.result)) {
+									a(...msg.result)
+								} else {
+									a(msg.result)
+								}
+								unbind()
+							}
+						})
+						return generatedId
 					}
 					return a
 				})
@@ -55,8 +67,8 @@ export function createPrimClient<T extends Record<V, T[V]>, V extends keyof T = 
 				// TODO: read arguments and if callback is found, use a websocket
 				if (callbacksGiven) {
 					console.log("given args", args)
-					// sendMessage(rpc)
-					throw new RpcError({ message: "Feature not implemented", code: 0 })
+					sendMessage(rpc)
+					// throw new RpcError({ message: "Feature not implemented", code: 0 })
 				}
 				return configured.client(rpc, configured.endpoint)
 					.then(answer => {
@@ -75,20 +87,28 @@ export function createPrimClient<T extends Record<V, T[V]>, V extends keyof T = 
 			return this.nest(() => undefined)
 		}
 	})
-	const event = createNanoEvents()
-	function createWebsocket(initialMessage: unknown) {
-		const message = (given: unknown) => { event.emit("message", given) }
-		const end = () => { sendMessage = setupWebsocket }
-		const { send } = configured.socket(configured.endpoint, message, end)
+	const event = createNanoEvents<{
+		"response": (message: RpcAnswer) => void
+		"end": () => void
+	}>()
+	function createWebsocket(initialMessage: RpcCall) {
+		const response = (given: RpcAnswer) => {
+			console.log("response attempt")
+			event.emit("response", given)
+		}
+		const end = () => {
+			sendMessage = setupWebsocket
+			event.emit("end")
+		}
+		const { send } = configured.socket(configured.endpoint, response, end)
 		sendMessage = send
 		send(initialMessage)
-		console.log("websocket creation attempted");
-		
+		console.log("websocket creation attempted")
 	}
 	/** Internal function referenced when a WebSocket connection has not been created yet */
-	const setupWebsocket = (msg: unknown) => createWebsocket(msg)
+	const setupWebsocket = (msg: RpcCall) => createWebsocket(msg)
 	/** Sets up WebSocket if needed, then sends a message */
-	let sendMessage: (message: unknown) => void = setupWebsocket
+	let sendMessage: (message: RpcCall) => void = setupWebsocket
 	return proxy
 }
 

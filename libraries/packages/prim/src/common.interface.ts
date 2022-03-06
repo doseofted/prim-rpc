@@ -30,7 +30,9 @@ export interface PrimOptions {
 	 */
 	client?: (jsonBody: RpcCall, endpoint: string) => Promise<RpcAnswer>
 	/** If a custom websocket framework is used,  */
-	socket?: (endpoint: string, respond: (message: string) => void, end: () => void) => ({ send: (message: unknown) => void })
+	socket?: (endpoint: string, response: (answer: RpcAnswer) => void, end: () => void) => ({
+		send: (message: RpcCall) => void
+	})
 	// socket?: {
 	// 	/** Initialize a WebSocket instance, called once a callback is detected */
 	// 	create: (endpoint: string) => unknown,

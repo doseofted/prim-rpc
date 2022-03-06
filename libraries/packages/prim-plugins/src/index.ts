@@ -58,3 +58,6 @@ export const primExpressMiddleware = (givenModule: unknown, prefix = "/prim", op
 		res.json(response)
 	}
 }
+
+// TODO write a "ws" (node module) websocket handler to be used with Prim's "socket" option
+// so that websocket callbacks don't have to be wired up manually

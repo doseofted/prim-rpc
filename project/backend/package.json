@@ -18,6 +18,7 @@
     "watchstart": "nodemon --watch ../../libraries/packages --watch dist/index.js dist/index.js"
   },
   "devDependencies": {
+    "@types/ws": "^8.5.2",
     "nodemon": "^2.0.15",
     "typescript": "^4.6.2"
   },
@@ -27,6 +28,7 @@
     "fastify": "^3.27.2",
     "fastify-cors": "^6.0.3",
     "prim": "workspace:*",
-    "prim-plugins": "workspace:*"
+    "prim-plugins": "workspace:*",
+    "ws": "^8.5.0"
   }
 }
