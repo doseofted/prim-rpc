@@ -35,6 +35,11 @@ export const primFasifyPlugin: FastifyPluginAsync<PrimFastifyOptions> = async (f
 	})
 }
 
+// IDEA: separate Prim Server instance from middleware in this module. Prim Server currently returns
+// the instance alone but I could turn this export into an object containing the RPC function (the instance)
+// and the event emitter. The shared event emitter could then be passed to a Prim plugin for different 
+// websocket clients (since websockets are optional and only used if functions have a callback)
+
 // TODO: actually test this
 /**
  * Prim's Express/Connect middleware. Use like so:
