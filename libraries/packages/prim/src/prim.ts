@@ -148,7 +148,7 @@ function createPrimOptions(options?: PrimOptions) {
 			// RPC result should be returned on success and RPC error thrown if errored
 			return result.json()
 		},
-		socket(endpoint, connected, response, ended) {
+		socket: (endpoint, connected, response, ended) => {
 			const ws = new WebSocket(endpoint)
 			console.log("default client used")
 			ws.onmessage = (({ data: message }) => {
