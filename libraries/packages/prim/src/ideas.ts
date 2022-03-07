@@ -101,6 +101,12 @@ let batchRequests: unknown
  * Since this is more of a MVP/POC right now, I should either not support file uploads at the moment and encourage
  * the use of a separate HTTP route dedicated to that function or if absolutely needed, work with base64 encoded
  * strings as file uploads if I decide to support it.
+ * 
+ * If I use blobs using base64 string, I could combine this with a JSON serialization library like "superjson"
+ * (more details in idea below) and use this to support data types like Blobs (maybe). That's a really rough idea
+ * and I might need to think more about how that integration would work (it would be only if someone uses a
+ * specific HTTP/WS client which is fine if I write a Prim Plugin to support it but it would make it harder if someone
+ * was to decide to write their own Prim Plugin).
  */
 let imageUploadsAndFormSupport: unknown
 
