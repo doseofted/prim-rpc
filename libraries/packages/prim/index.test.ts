@@ -77,7 +77,7 @@ describe("Prim-Client can use callbacks", () => {
 	test("Remotely", (done) => {
 		const results = []
 		const { withCallback } = createPrimClient<typeof exampleClient>({
-			socket(_endpoint, response, _end) {
+			socket(_endpoint, _connected, response, _end) {
 				console.log("custom websocket handler attempted");
 				const send = (msg: RpcCall) => {
 					const id = msg.id

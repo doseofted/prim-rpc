@@ -104,9 +104,13 @@ export function createPrimClient<T extends Record<V, T[V]>, V extends keyof T = 
 			sendMessage = setupWebsocket
 			event.emit("end")
 		}
-		const { send } = configured.socket(configured.wsEndpoint, response, end)
+		const connect = () => {
+			// event.emit("connect")
+			// NOTE connect event should only happen once so initial message will be sent then
+			send(initialMessage)
+		}
+		const { send } = configured.socket(configured.wsEndpoint, connect, response, end)
 		sendMessage = send
-		send(initialMessage)
 		console.log("websocket creation attempted")
 	}
 	/** Internal function referenced when a WebSocket connection has not been created yet */
@@ -140,7 +144,7 @@ function createPrimOptions(options?: PrimOptions) {
 			// RPC result should be returned on success and RPC error thrown if errored
 			return result.json()
 		},
-		socket(endpoint, response, end) {
+		socket(endpoint, connected, response, ended) {
 			const ws = new WebSocket(endpoint)
 			console.log("default client used")
 			ws.onmessage = (({ data: message }) => {
@@ -149,7 +153,11 @@ function createPrimOptions(options?: PrimOptions) {
 			})
 			ws.onclose = () => {
 				console.log("connection closed")
-				end()
+				ended()
+			}
+			ws.onopen = () => {
+				console.log("connected")
+				connected()
 			}
 			const send = (msg: unknown) => {
 				console.log("attempting send")

@@ -19,6 +19,7 @@ export interface RpcAnswer<Result = any, Error = any> extends RpcBase {
 export interface PrimWebsocketEvents {
 	response: (message: RpcAnswer) => void
 	end: () => void
+	connect: () => void
 }
 
 export interface PrimOptions {
@@ -36,7 +37,7 @@ export interface PrimOptions {
 	 */
 	client?: (jsonBody: RpcCall, endpoint: string) => Promise<RpcAnswer>
 	/** If a custom websocket framework is used,  */
-	socket?: (endpoint: string, response: (answer: RpcAnswer) => void, end: () => void) => ({
+	socket?: (endpoint: string, connected: () => void, response: (answer: RpcAnswer) => void, end: () => void) => ({
 		send: (message: RpcCall) => void
 	})
 	// socket?: {
