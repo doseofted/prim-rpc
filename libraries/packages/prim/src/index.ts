@@ -8,7 +8,8 @@ export {
 
 import type { RpcErr } from "./error"
 import type { PrimOptions, RpcAnswer, RpcCall } from "./common.interface"
+import type { PrimServer } from "./server"
 
 export type {
-	PrimOptions, RpcAnswer, RpcCall, RpcErr
+	PrimOptions, RpcAnswer, RpcCall, RpcErr, PrimServer
 }

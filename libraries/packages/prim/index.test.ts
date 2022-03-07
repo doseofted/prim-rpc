@@ -101,8 +101,8 @@ describe("Prim-Client can use callbacks", () => {
 
 describe("Prim-Server can call methods with RPC", () => {
 	test("Locally", async () => {
-		const prim = createPrimServer({ server: true }, exampleServer)
-		const result = await prim({
+		const prim = createPrimServer(exampleServer, { server: true })
+		const result = await prim.rpc({
 			body: {
 				id: 1,
 				method: "testLevel2/testLevel1/sayHello",
@@ -112,11 +112,11 @@ describe("Prim-Server can call methods with RPC", () => {
 		expect(result).toEqual({ result: "Hey Ted!", id: 1 })
 	})
 	test("From another Prim-Server", async () => {
-		const primServer = createPrimServer({ server: true }, exampleServer)
-		const primRemoteServer = createPrimServer({
-			client: async (body) => primServer({ body })
-		}, exampleServer)
-		const result = await primRemoteServer({
+		const primServer = createPrimServer(exampleServer, { server: true })
+		const primRemoteServer = createPrimServer(exampleServer, {
+			client: async (body) => primServer.rpc({ body })
+		})
+		const result = await primRemoteServer.rpc({
 			body: {
 				id: 1,
 				method: "testLevel2/testLevel1/sayHello",
@@ -129,19 +129,19 @@ describe("Prim-Server can call methods with RPC", () => {
 
 describe("Prim-Server can call methods with RPC via URL", () => {
 	test("Locally", async () => {
-		const prim = createPrimServer({ server: true }, exampleServer)
-		const result = await prim({
+		const prim = createPrimServer(exampleServer, { server: true })
+		const result = await prim.rpc({
 			url: "/prim/testLevel2/testLevel1/sayHello?-id=1&greeting=Hey&name=Ted",
 			prefix: "/prim"
 		})
 		expect(result).toEqual({ result: "Hey Ted!", id: "1" })
 	})
 	test("From another Prim-Server", async () => {
-		const primServer = createPrimServer({ server: true }, exampleServer)
-		const primRemoteServer = createPrimServer({
-			client: async (body) => primServer({ body })
-		}, exampleServer)
-		const result = await primRemoteServer({
+		const primServer = createPrimServer(exampleServer, { server: true })
+		const primRemoteServer = createPrimServer(exampleServer, {
+			client: async (body) => primServer.rpc({ body })
+		})
+		const result = await primRemoteServer.rpc({
 			url: "/prim/testLevel2/testLevel1/sayHelloAlternative?-id=1&-=Hey&-=Ted",
 			prefix: "/prim"
 		})

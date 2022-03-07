@@ -1,15 +1,20 @@
 import { RpcError } from "./error"
 import { createPrimClient } from "./prim"
-import { CommonFrameworkOptions, PrimOptions, RpcAnswer, RpcCall } from "./common.interface"
+import { CommonFrameworkOptions, PrimOptions, PrimWebsocketEvents, RpcAnswer, RpcCall } from "./common.interface"
 import { get as getProperty } from "lodash"
 import defu from "defu"
 import { nanoid } from "nanoid"
 import { getQuery, parseURL } from "ufo"
-import { createNanoEvents } from "nanoevents"
+import { createNanoEvents, Emitter } from "nanoevents"
 
 // TODO: make this work with methods called in path over GET request
 // the function should be restructured to accept: path, body, querystring
 // and handle conditions like querystring in path, or body not being converted to string yet
+
+export interface PrimServer {
+	rpc: (given: CommonFrameworkOptions) => Promise<RpcAnswer>
+	ws: Emitter<PrimWebsocketEvents>
+}
 
 /**
  * Unlike `createPrimClient()`, this function is designed purely for the server. Rather than integrating directly with a
@@ -21,12 +26,13 @@ import { createNanoEvents } from "nanoevents"
  * @param givenModule If `options.server` is true, provide the module where functions should be resolved
  * @returns A function that expects JSON resembling an RPC call
  */
-export function createPrimServer<T extends Record<V, T[V]>, V extends keyof T = keyof T>(options?: PrimOptions, givenModule?: T) {
+export function createPrimServer<T extends Record<V, T[V]>, V extends keyof T = keyof T>(givenModule?: T, options?: PrimOptions): PrimServer {
 	const givenOptions = options ?? {}
-	const event = createNanoEvents()
-	givenOptions.internal = { event }
+	const ws = createNanoEvents<PrimWebsocketEvents>()
+	givenOptions.server = true
+	givenOptions.internal = { event: ws }
 	const prim = createPrimClient(givenOptions, givenModule)
-	const primRpc = async (rpc: RpcCall): Promise<RpcAnswer> => {
+	const makeRpcCall = async (rpc: RpcCall): Promise<RpcAnswer> => {
 		const { method, params, id } = rpc
 		// const args = Array.isArray(params) ? params : [params]
 		try {
@@ -50,7 +56,7 @@ export function createPrimServer<T extends Record<V, T[V]>, V extends keyof T = 
 	}
 	// NOTE: accepts JSON body or variant given in path like so:
 	// /prefix/sayHello?-id=123&-=Hello&-=Ted
-	return async (given: CommonFrameworkOptions) => {
+	const rpc = async (given: CommonFrameworkOptions) => {
 		const { url: urlGiven, prefix = "/prim" } = given
 		const url = parseURL(urlGiven)
 		const query = getQuery(url.search)
@@ -71,6 +77,7 @@ export function createPrimServer<T extends Record<V, T[V]>, V extends keyof T = 
 			body ?? bodyFromPath,
 			{ id: nanoid(), method: "default" }
 		)
-		return primRpc(rpc)
+		return makeRpcCall(rpc)
 	}
+	return { rpc, ws }
 }

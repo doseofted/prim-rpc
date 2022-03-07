@@ -35,6 +35,9 @@ export function createPrimClient<T extends Record<V, T[V]>, V extends keyof T = 
 			const realTarget = getProperty(givenModule, this.path)
 			if (configured.server && typeof realTarget === "function") {
 				try {
+					// TODO: at this point, all callbacks have been replaced with identifiers so I should go through each reference
+					// and make a callback that emits a "response" type which will in turn be sent back over the websocket
+					// with the identifier
 					return Reflect.apply(realTarget, that, args)
 				} catch (error) {
 					throw new RpcError(error)
@@ -45,22 +48,20 @@ export function createPrimClient<T extends Record<V, T[V]>, V extends keyof T = 
 				let callbacksGiven = false
 				// eslint-disable-next-line @typescript-eslint/no-explicit-any
 				args = (args as any[]).map((a) => {
-					if (typeof a === "function") {
-						callbacksGiven = true
-						const generatedId = "_cb_" + nanoid()
-						const unbind = event.on("response", (msg) => {
-							console.log("nano event response", msg, generatedId)
-							if (msg.id !== generatedId) { return }
-							if (Array.isArray(msg.result)) {
-								a(...msg.result)
-							} else {
-								a(msg.result)
-							}
-							unbind()
-						})
-						return generatedId
-					}
-					return a
+					if (typeof a !== "function") { return a }
+					callbacksGiven = true
+					const generatedId = "_cb_" + nanoid()
+					const unbind = event.on("response", (msg) => {
+						console.log("nano event response", msg, generatedId)
+						if (msg.id !== generatedId) { return }
+						if (Array.isArray(msg.result)) {
+							a(...msg.result)
+						} else {
+							a(msg.result)
+						}
+						unbind()
+					})
+					return generatedId
 				})
 				const rpc: RpcCall = { method: this.path.join("/"), params: args, id: nanoid() }
 				// TODO: read arguments and if callback is found, use a websocket

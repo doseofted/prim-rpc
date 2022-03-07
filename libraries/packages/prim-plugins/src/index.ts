@@ -1,35 +1,27 @@
-import { RpcCall, createPrimServer, PrimOptions } from "prim"
+import type { RpcCall, PrimServer } from "prim"
 import type { FastifyPluginAsync } from "fastify"
 import type * as Express from "express"
 import type { WebSocketServer } from "ws"
-
-interface PrimFastifyOptions {
-	// Prims-specific options
-	options?: PrimOptions
-	module: unknown
-	// Fastify-specific options
-	prefix?: string
-}
 
 /**
  * Prim's Fastify plugin. Use like so:
  * 
  * ```typescript
  * import { primFasifyPlugin } from "prim-plugins"
+ * import { createPrimServer } from "prim"
  * import * as example from "example"
  * // ...
- * fastify.register(primFasifyPlugin, { module: example })
+ * const prim = createPrimServer(example)
+ * fastify.register(primFasifyPlugin, { prim })
  * ```
  */
-export const primFasifyPlugin: FastifyPluginAsync<PrimFastifyOptions> = async (fastify, options) => {
-	const { prefix = "/prim", options: primOptions = {}, module: givenModule } = options
-	primOptions.server = true // this is always true since it is being used from a server framework
-	const prim = createPrimServer(primOptions, givenModule)
+export const primFasifyPlugin: FastifyPluginAsync<{ prim: PrimServer, prefix?: string }> = async (fastify, options) => {
+	const { prefix = "/prim", prim } = options
 	fastify.route<{ Body: RpcCall, Params: { method?: string } }>({
 		method: ["POST", "GET"],
 		url: `${prefix}*`,
 		handler: async ({ url, body }, reply) => {
-			const response = await prim({ prefix, url, body })
+			const response = await prim.rpc({ prefix, url, body })
 			reply.send(response)
 		}
 	})
@@ -51,34 +43,31 @@ export const primFasifyPlugin: FastifyPluginAsync<PrimFastifyOptions> = async (f
  * expressApp.use(primExpressMiddleware(example, "/prim"))
  * ```
  */
-export const primExpressMiddleware = (givenModule: unknown, prefix = "/prim", options: PrimOptions = { server: true }) => {
-	options.server = true // this is always true since it is being used from a server framework
-	const prim = createPrimServer(options, givenModule)
+export const primExpressMiddleware = (prim: PrimServer, prefix = "/prim") => {
 	return async (req: Express.Request, res: Express.Response, next: Express.NextFunction) => {
 		const { method, url, body } = req
 		const acceptedMethod = method === "GET" || method === "POST"
 		const primPrefix = url.includes(prefix)
 		const isPrimRequest = acceptedMethod && primPrefix
 		if (!isPrimRequest) { next(); return }
-		const response = await prim({ prefix, url, body })
+		const response = await prim.rpc({ prefix, url, body })
 		res.json(response)
 	}
 }
 
 // TODO write a "ws" (node module) websocket handler to be used with Prim's "socket" option
 // so that websocket callbacks don't have to be wired up manually
-export const primWebsocketServerSetup = (wsServer: WebSocketServer) => {
-	const message = () => ({})
-	wsServer.on("connection", (ws) => {
-		ws.on("message", (data) => {
+export const primWebSocketServerSetup = (prim: PrimServer, socket: WebSocketServer) => {
+	socket.on("connection", (ws) => {
+		ws.on("message", async (data) => {
 			const rpc = JSON.parse(String(data))
-			ws.send(rpc)
+			prim.rpc(rpc)
+			prim.ws.on("response", (cbAnswer) => {
+				ws.send(cbAnswer)
+			})
 		})
-		// ws.send()
+		ws.on("close", () => {
+			prim.ws.emit("end")
+		})
 	})
-	// const options: PrimOptions = {
-	// 	socket(endpoint, response, end) {
-	// 		// ...
-	// 	}
-	// }
 }
