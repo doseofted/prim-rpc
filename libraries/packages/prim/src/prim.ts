@@ -13,7 +13,7 @@ import ProxyDeep from "proxy-deep"
 import { get as getProperty } from "lodash"
 import defu from "defu"
 import { RpcError } from "./error"
-import { RpcCall, PrimOptions, RpcAnswer, PrimWebsocketEvents } from "./common.interface"
+import { RpcCall, PrimOptions, RpcAnswer, PrimWebsocketEvents } from "./interfaces"
 import { nanoid } from "nanoid"
 import { createNanoEvents } from "nanoevents"
 

@@ -7,7 +7,7 @@ export {
 }
 
 import type { RpcErr } from "./error"
-import type { PrimOptions, RpcAnswer, RpcCall } from "./common.interface"
+import type { PrimOptions, RpcAnswer, RpcCall } from "./interfaces"
 import type { PrimServer } from "./server"
 
 export type {

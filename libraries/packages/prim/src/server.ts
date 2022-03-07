@@ -1,6 +1,6 @@
 import { RpcError } from "./error"
 import { createPrimClient } from "./prim"
-import { CommonFrameworkOptions, PrimOptions, PrimWebsocketEvents, RpcAnswer, RpcCall } from "./common.interface"
+import { CommonFrameworkOptions, PrimOptions, PrimWebsocketEvents, RpcAnswer, RpcCall } from "./interfaces"
 import { get as getProperty } from "lodash"
 import defu from "defu"
 import { nanoid } from "nanoid"
