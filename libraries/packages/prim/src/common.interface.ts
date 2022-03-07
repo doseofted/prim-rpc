@@ -1,3 +1,4 @@
+import { Emitter } from "nanoevents"
 import { RpcErr } from "./error"
 interface RpcBase {
 	id?: string | number
@@ -15,6 +16,12 @@ export interface RpcAnswer<Result = any, Error = any> extends RpcBase {
 	error?: RpcErr<Error>
 }
 
+export interface PrimWebsocketEvents {
+	response: (message: RpcAnswer) => void
+	end: () => void
+	// connect: () => void
+}
+
 export interface PrimOptions {
 	/** `true` when Prim-RPC is used from server. A module to be resolved should also be given as argument to `createPrim` */
 	server?: boolean
@@ -30,13 +37,23 @@ export interface PrimOptions {
 	 */
 	client?: (jsonBody: RpcCall, endpoint: string) => Promise<RpcAnswer>
 	/** If a custom websocket framework is used,  */
-	socket?: {
-		create: <T>(endpoint: string) => T,
-		send: (jsonBody: RpcCall, endpoint: string) => void
-		message: (response: unknown) => Promise<RpcAnswer>
-	},
+	socket?: (endpoint: string, connected: () => void, response: (answer: RpcAnswer) => void, end: () => void) => ({
+		send: (message: RpcCall) => void
+	})
+	// socket?: {
+	// 	/** Initialize a WebSocket instance, called once a callback is detected */
+	// 	create: (endpoint: string) => unknown,
+	// 	/** Used when client sends a request to the server */
+	// 	send: (jsonBody: RpcCall, client: unknown) => void
+	// 	/** Used when the client receives a response */
+	// 	message: (response: unknown) => Promise<RpcAnswer>
+	// 	// TODO: above events are specific to client. I need to write events specific to the server
+	// },
 	// NOTE not utilized yet but could be useful for passing internal options to Prim
-	internal?: Record<string, unknown>
+	internal?: {
+		/** Event emitter to be shared with Prim Server, if websocket events are used */
+		event?: Emitter<PrimWebsocketEvents>
+	}
 }
 
 /**
@@ -44,14 +61,11 @@ export interface PrimOptions {
  * can translate generic request into RPC.
  */
 export interface CommonFrameworkOptions {
-	/** Typically the path without a querystring */
-	path?: string
-	/** The prefix where Prim lives. To be removed from the path. */
+	/** The prefix where Prim lives, to be removed from the path. By default: `/prim` */
 	prefix?: string
-	/** The parsed querystring, usally a JSON object */
-	// eslint-disable-next-line @typescript-eslint/no-explicit-any
-	query?: Record<string | number, any>
+	/** The URL before parsing querystring */
+	url?: string
 	/** The JSON body, which should already be formatted as RPC */
 	// eslint-disable-next-line @typescript-eslint/no-explicit-any
-	body?: Record<string | number, any>
+	body?: any
 }

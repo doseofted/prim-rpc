@@ -1,38 +1,36 @@
-import { RpcCall, createPrimServer, PrimOptions } from "prim"
+import type { RpcCall, PrimServer } from "prim"
 import type { FastifyPluginAsync } from "fastify"
 import type * as Express from "express"
-
-interface PrimFastifyOptions {
-	// Prims-specific options
-	options?: PrimOptions
-	module: unknown
-	// Fastify-specific options
-	prefix?: string
-}
+import type { WebSocketServer } from "ws"
 
 /**
  * Prim's Fastify plugin. Use like so:
  * 
  * ```typescript
  * import { primFasifyPlugin } from "prim-plugins"
+ * import { createPrimServer } from "prim"
  * import * as example from "example"
  * // ...
- * fastify.register(primFasifyPlugin, { module: example })
+ * const prim = createPrimServer(example)
+ * fastify.register(primFasifyPlugin, { prim })
  * ```
  */
-export const primFasifyPlugin: FastifyPluginAsync<PrimFastifyOptions> = async (fastify, options) => {
-	const { prefix = "/prim", options: primOptions = {}, module: givenModule } = options
-	primOptions.server = true // this is always true since it is being used from a server framework
-	const prim = createPrimServer(primOptions, givenModule)
+export const primFasifyPlugin: FastifyPluginAsync<{ prim: PrimServer, prefix?: string }> = async (fastify, options) => {
+	const { prefix = "/prim", prim } = options
 	fastify.route<{ Body: RpcCall, Params: { method?: string } }>({
 		method: ["POST", "GET"],
-		url: `${prefix}`,
-		handler: async ({ body, url: path, query }, reply) => {
-			const response = await prim({ prefix, path, body, query })
+		url: `${prefix}*`,
+		handler: async ({ url, body }, reply) => {
+			const response = await prim.rpc({ prefix, url, body })
 			reply.send(response)
 		}
 	})
 }
+
+// IDEA: separate Prim Server instance from middleware in this module. Prim Server currently returns
+// the instance alone but I could turn this export into an object containing the RPC function (the instance)
+// and the event emitter. The shared event emitter could then be passed to a Prim plugin for different 
+// websocket clients (since websockets are optional and only used if functions have a callback)
 
 // TODO: actually test this
 /**
@@ -42,18 +40,35 @@ export const primFasifyPlugin: FastifyPluginAsync<PrimFastifyOptions> = async (f
  * import { primExpressMiddleware } from "prim-plugins"
  * import * as example from "example"
  * // ...
- * expressApp.use("/prim", primExpressMiddleware(example, "/prim"))
+ * expressApp.use(primExpressMiddleware(example, "/prim"))
  * ```
  */
-export const primExpressMiddleware = (givenModule: unknown, prefix = "/prim", options: PrimOptions = { server: true }) => {
-	options.server = true // this is always true since it is being used from a server framework
-	const prim = createPrimServer(options, givenModule)
+export const primExpressMiddleware = (prim: PrimServer, prefix = "/prim") => {
 	return async (req: Express.Request, res: Express.Response, next: Express.NextFunction) => {
-		if (!(req.method === "GET" || (req.method === "POST"))) {
-			next() // not intended for Prim
-		}
-		const { path, query, body } = req
-		const response = await prim({ prefix, path, body, query })
+		const { method, url, body } = req
+		const acceptedMethod = method === "GET" || method === "POST"
+		const primPrefix = url.includes(prefix)
+		const isPrimRequest = acceptedMethod && primPrefix
+		if (!isPrimRequest) { next(); return }
+		const response = await prim.rpc({ prefix, url, body })
 		res.json(response)
 	}
+}
+
+// TODO write a "ws" (node module) websocket handler to be used with Prim's "socket" option
+// so that websocket callbacks don't have to be wired up manually
+export const primWebSocketServerSetup = (prim: PrimServer, socket: WebSocketServer) => {
+	socket.on("connection", (ws) => {
+		// prim.ws.emit("connect")
+		ws.on("message", async (data) => {
+			const rpc = JSON.parse(String(data))
+			prim.rpc(rpc)
+			prim.ws.on("response", (cbAnswer) => {
+				ws.send(JSON.stringify(cbAnswer))
+			})
+		})
+		ws.on("close", () => {
+			prim.ws.emit("end")
+		})
+	})
 }

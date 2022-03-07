@@ -8,12 +8,14 @@ import type * as exampleClient from "example"
 const primLocal = createPrimClient({ server: true }, exampleServer)
 const expectedMessage = ref("")
 const exampleArgs = { greeting: "Hey", name: "Ted" }
-const { sayHello } = createPrimClient<typeof exampleClient>({
-	endpoint: `https://api.${import.meta.env.VITE_HOST}/prim`
+const { sayHello, typeMessage } = createPrimClient<typeof exampleClient>({
+	endpoint: `https://api.${import.meta.env.VITE_HOST}/prim`,
+	wsEndpoint: `wss://api.${import.meta.env.VITE_HOST}/prim`
 })
 const message = ref<string>()
 const matches = computed(() => message.value === expectedMessage.value)
 const errored = computed(() => message.value === "errored")
+const typedMessage = ref<string[]>([])
 onMounted(async () => {
 	try {
 		message.value = await sayHello(exampleArgs)
@@ -21,13 +23,17 @@ onMounted(async () => {
 	} catch (error) {
 		message.value = "errored"
 	}
+	typeMessage(message.value, (letter) => {
+		console.log(letter)
+		typedMessage.value.push(letter)
+	}, 100)
 })
 </script>
 
 <template>
   <div class="greeting">
     <hello-you
-      :message="message"
+      :message="typedMessage.join('')"
       :class="{ matches, errored }"
       class="you"
     />

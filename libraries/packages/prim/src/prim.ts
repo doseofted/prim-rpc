@@ -13,8 +13,9 @@ import ProxyDeep from "proxy-deep"
 import { get as getProperty } from "lodash"
 import defu from "defu"
 import { RpcError } from "./error"
-import { RpcCall, PrimOptions } from "./common.interface"
+import { RpcCall, PrimOptions, RpcAnswer, PrimWebsocketEvents } from "./common.interface"
 import { nanoid } from "nanoid"
+import { createNanoEvents } from "nanoevents"
 
 /**
  * Prim-RPC can be used to write plain functions on the server and then call them easily from the client.
@@ -34,6 +35,16 @@ export function createPrimClient<T extends Record<V, T[V]>, V extends keyof T = 
 			const realTarget = getProperty(givenModule, this.path)
 			if (configured.server && typeof realTarget === "function") {
 				try {
+					// TODO: at this point, all callbacks have been replaced with identifiers so I should go through each reference
+					// and make a callback that emits a "response" type which will in turn be sent back over the websocket
+					// with the identifier
+					// eslint-disable-next-line @typescript-eslint/no-explicit-any
+					args = (args as any[]).map(arg => {
+						if (!(typeof arg === "string" && arg.startsWith("_cb_"))) { return arg }
+						return (...cbArgs) => {
+							event.emit("response", { result: cbArgs, id: arg })
+						}
+					})
 					return Reflect.apply(realTarget, that, args)
 				} catch (error) {
 					throw new RpcError(error)
@@ -41,7 +52,35 @@ export function createPrimClient<T extends Record<V, T[V]>, V extends keyof T = 
 			}
 			// if on client, send off request to server
 			if (!configured.server) {
+				let callbacksGiven = false
+				// eslint-disable-next-line @typescript-eslint/no-explicit-any
+				args = (args as any[]).map((a) => {
+					if (typeof a !== "function") { return a }
+					callbacksGiven = true
+					const generatedId = "_cb_" + nanoid()
+					/* const unbind =  */event.on("response", (msg) => {
+						console.log("nano event response", msg, generatedId)
+						if (msg.id !== generatedId) { return }
+						if (Array.isArray(msg.result)) {
+							a(...msg.result)
+						} else {
+							a(msg.result)
+						}
+						// TODO: it's hard to unbind until I know callback won't fire anymore
+						// I may need to just move old events to a deprioritized list so the
+						// list of events doesn't become unwieldy and potentially slow down
+						// new callbacks/events
+						// unbind()
+					})
+					return generatedId
+				})
 				const rpc: RpcCall = { method: this.path.join("/"), params: args, id: nanoid() }
+				// TODO: read arguments and if callback is found, use a websocket
+				if (callbacksGiven) {
+					console.log("given args", args)
+					sendMessage(rpc)
+					// return
+				}
 				return configured.client(rpc, configured.endpoint)
 					.then(answer => {
 						if (answer.error) {
@@ -59,6 +98,29 @@ export function createPrimClient<T extends Record<V, T[V]>, V extends keyof T = 
 			return this.nest(() => undefined)
 		}
 	})
+	const event = configured.internal.event ?? createNanoEvents<PrimWebsocketEvents>()
+	function createWebsocket(initialMessage: RpcCall) {
+		const response = (given: RpcAnswer) => {
+			console.log("response attempt")
+			event.emit("response", given)
+		}
+		const end = () => {
+			sendMessage = setupWebsocket
+			event.emit("end")
+		}
+		const connect = () => {
+			// event.emit("connect")
+			// NOTE connect event should only happen once so initial message will be sent then
+			send(initialMessage)
+		}
+		const { send } = configured.socket(configured.wsEndpoint, connect, response, end)
+		sendMessage = send
+		console.log("websocket creation attempted")
+	}
+	/** Internal function referenced when a WebSocket connection has not been created yet */
+	const setupWebsocket = (msg: RpcCall) => createWebsocket(msg)
+	/** Sets up WebSocket if needed, then sends a message */
+	let sendMessage: (message: RpcCall) => void = setupWebsocket
 	return proxy
 }
 
@@ -74,7 +136,8 @@ function createPrimOptions(options?: PrimOptions) {
 		// by default, it should be assumed that function is used client-side (assumed value for easier developer use from client-side)
 		server: false,
 		// if endpoint is not given then assume endpoint is relative to current url, following suggested `/prim` for Prim-RPC calls
-		endpoint: "/prim",
+		endpoint: "/prim", // NOTE this should be overriden on the client
+		wsEndpoint: "/prim", // NOTE this should be overridden on the client too, since protocol is required anyway
 		// `client()` is intended to be overridden so as not to force any one HTTP framework but default is fine for most cases
 		client: async (jsonBody, endpoint) => {
 			const result = await fetch(endpoint, {
@@ -85,11 +148,27 @@ function createPrimOptions(options?: PrimOptions) {
 			// RPC result should be returned on success and RPC error thrown if errored
 			return result.json()
 		},
-		/* socket: {
-			create<WebSocket>(endpoint) {
-				return new WebSocket(endpoint)
+		socket(endpoint, connected, response, ended) {
+			const ws = new WebSocket(endpoint)
+			console.log("default client used")
+			ws.onmessage = (({ data: message }) => {
+				console.log("message received")
+				response(JSON.parse(message))
+			})
+			ws.onclose = () => {
+				console.log("connection closed")
+				ended()
 			}
-		}, */
+			ws.onopen = () => {
+				console.log("connected")
+				connected()
+			}
+			const send = (msg: unknown) => {
+				console.log("attempting send")
+				ws.send(JSON.stringify(msg))
+			}
+			return { send }
+		},
 		// these options should not be passed by a developer but are used internally
 		internal: {}
 	})
