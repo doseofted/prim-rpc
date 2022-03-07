@@ -58,7 +58,7 @@ export function createPrimClient<T extends Record<V, T[V]>, V extends keyof T = 
 					if (typeof a !== "function") { return a }
 					callbacksGiven = true
 					const generatedId = "_cb_" + nanoid()
-					const unbind = event.on("response", (msg) => {
+					/* const unbind =  */event.on("response", (msg) => {
 						console.log("nano event response", msg, generatedId)
 						if (msg.id !== generatedId) { return }
 						if (Array.isArray(msg.result)) {
@@ -66,7 +66,11 @@ export function createPrimClient<T extends Record<V, T[V]>, V extends keyof T = 
 						} else {
 							a(msg.result)
 						}
-						unbind()
+						// TODO: it's hard to unbind until I know callback won't fire anymore
+						// I may need to just move old events to a deprioritized list so the
+						// list of events doesn't become unwieldy and potentially slow down
+						// new callbacks/events
+						// unbind()
 					})
 					return generatedId
 				})
@@ -75,7 +79,7 @@ export function createPrimClient<T extends Record<V, T[V]>, V extends keyof T = 
 				if (callbacksGiven) {
 					console.log("given args", args)
 					sendMessage(rpc)
-					// throw new RpcError({ message: "Feature not implemented", code: 0 })
+					// return
 				}
 				return configured.client(rpc, configured.endpoint)
 					.then(answer => {
@@ -149,7 +153,7 @@ function createPrimOptions(options?: PrimOptions) {
 			console.log("default client used")
 			ws.onmessage = (({ data: message }) => {
 				console.log("message received")
-				response(message)
+				response(JSON.parse(message))
 			})
 			ws.onclose = () => {
 				console.log("connection closed")

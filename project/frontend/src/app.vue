@@ -15,6 +15,7 @@ const { sayHello, typeMessage } = createPrimClient<typeof exampleClient>({
 const message = ref<string>()
 const matches = computed(() => message.value === expectedMessage.value)
 const errored = computed(() => message.value === "errored")
+const typedMessage = ref<string[]>([])
 onMounted(async () => {
 	try {
 		message.value = await sayHello(exampleArgs)
@@ -24,14 +25,15 @@ onMounted(async () => {
 	}
 	typeMessage(message.value, (letter) => {
 		console.log(letter)
-	})
+		typedMessage.value.push(letter)
+	}, 100)
 })
 </script>
 
 <template>
   <div class="greeting">
     <hello-you
-      :message="message"
+      :message="typedMessage.join('')"
       :class="{ matches, errored }"
       class="you"
     />

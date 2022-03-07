@@ -59,7 +59,7 @@ export const primExpressMiddleware = (prim: PrimServer, prefix = "/prim") => {
 // so that websocket callbacks don't have to be wired up manually
 export const primWebSocketServerSetup = (prim: PrimServer, socket: WebSocketServer) => {
 	socket.on("connection", (ws) => {
-		prim.ws.emit("connect")
+		// prim.ws.emit("connect")
 		ws.on("message", async (data) => {
 			const rpc = JSON.parse(String(data))
 			prim.rpc(rpc)

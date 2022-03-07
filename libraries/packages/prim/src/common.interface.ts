@@ -19,7 +19,7 @@ export interface RpcAnswer<Result = any, Error = any> extends RpcBase {
 export interface PrimWebsocketEvents {
 	response: (message: RpcAnswer) => void
 	end: () => void
-	connect: () => void
+	// connect: () => void
 }
 
 export interface PrimOptions {

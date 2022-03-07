@@ -1,6 +1,7 @@
 import { createPrimClient, createPrimServer, RpcCall } from "."
 import type * as exampleClient from "example"
 import * as exampleServer from "example"
+// import { createNanoEvents } from "nanoevents"
 
 describe("Prim instantiates", () => {
 	test("Client-side instantiation", () => {
@@ -76,23 +77,39 @@ describe("Prim-Client can use callbacks", () => {
 	})
 	test("Remotely", (done) => {
 		const results = []
+		// const event = createNanoEvents()
+		// event.emit("response", { result: "some response" })
+		// eslint-disable-next-line @typescript-eslint/no-explicit-any
+		let responseRef: any = undefined
 		const { withCallback } = createPrimClient<typeof exampleClient>({
-			socket(_endpoint, _connected, response, _end) {
+			socket(_endpoint, connected, response, _end) {
+				responseRef = response
 				console.log("custom websocket handler attempted");
-				const send = (msg: RpcCall) => {
-					const id = msg.id
-					// TODO: sort params and create a callback for each one and once each callback is called,
-					// send response back using "response" callback. Example psuedo-code:
-					// if (givenParam.startsWith("_cb_")) { givenParam = (...args) => { response(...args) } }
-					response({ id, result: "some response" })
+				const send = (_msg: RpcCall) => {
+					// const id = msg.id
+					// response({ result: "some response" })
+					// response({ result: "some response" })
 				}
+				setTimeout(() => {
+					connected()
+				}, 300)
 				return { send }
-			}
+			},
+			client: async (json, _endpoint) => {
+				console.log(json.params)
+				setTimeout(() => {
+					responseRef({ result: "some response", id: json.params[0] })
+					responseRef({ result: "some response", id: json.params[0] })
+				}, 500);
+				return { id: json.id }
+			},
+			// internal: { event }
 		})
 		withCallback((message) => {
+			console.log("given message", message)
 			results.push(message)
 			if (results.length === 2) {
-				expect(results).toEqual(["You're using Prim.", "Still using Prim!"])
+				expect(results).toEqual(["some response", "some response"])
 				done()
 			}
 		})
