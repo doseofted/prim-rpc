@@ -6,17 +6,12 @@ import { createPrimServer } from "prim"
 import { primFasifyPlugin, primWebSocketServerSetup } from "prim-plugins"
 
 const fastify = Fastify({ logger: true })
-fastify.register(Cors, { origin: `https://${process.env.HOST}` })
-const wsServer = new WebSocketServer({ server: fastify.server })
-/* wsServer.on("connection", (ws) => {
-	ws.on("message", (data) => {
-		const rpc = JSON.parse(String(data))
-		ws.send(rpc)
-	})
-}) */
+const websocket = new WebSocketServer({ server: fastify.server })
 const prim = createPrimServer(example)
+
 fastify.register(primFasifyPlugin, { prim })
-primWebSocketServerSetup(prim, wsServer)
+primWebSocketServerSetup(prim, websocket)
+fastify.register(Cors, { origin: `https://${process.env.HOST}` })
 
 fastify.listen(3001, "0.0.0.0", function (err) {
 	if (err) {

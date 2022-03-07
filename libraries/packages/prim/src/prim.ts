@@ -35,9 +35,8 @@ export function createPrimClient<T extends Record<V, T[V]>, V extends keyof T = 
 			const realTarget = getProperty(givenModule, this.path)
 			if (configured.server && typeof realTarget === "function") {
 				try {
-					// TODO: at this point, all callbacks have been replaced with identifiers so I should go through each reference
-					// and make a callback that emits a "response" type which will in turn be sent back over the websocket
-					// with the identifier
+					// At this point, all callbacks have been replaced with identifiers so I should go through each reference
+					// and make a callback that emits a "response" type which will be sent back over the websocket with identifier
 					// eslint-disable-next-line @typescript-eslint/no-explicit-any
 					args = (args as any[]).map(arg => {
 						if (!(typeof arg === "string" && arg.startsWith("_cb_"))) { return arg }
@@ -45,7 +44,12 @@ export function createPrimClient<T extends Record<V, T[V]>, V extends keyof T = 
 							event.emit("response", { result: cbArgs, id: arg })
 						}
 					})
-					return Reflect.apply(realTarget, that, args)
+					const result = Reflect.apply(realTarget, that, args)
+					// TODO instead of returning result directly back to Prim Server, wrap this in an RPC respons with the given
+					// ID and return that (similar to how callbacks answers are handled above). This would allow me to move
+					// more RPC functionality into this library and keep Prim Server as a way of translating requests into RPC.
+					// NOTE see `makeRpcCall` in Prim Server and consider moving that functionality into the client
+					return result
 				} catch (error) {
 					throw new RpcError(error)
 				}
@@ -81,6 +85,9 @@ export function createPrimClient<T extends Record<V, T[V]>, V extends keyof T = 
 					sendMessage(rpc)
 					// return
 				}
+				// TODO: write wrapper around client to support batch requests and instead make below return a promise that
+				// becomes resolved when either answered in a batch respone over HTTP or answered over websocket.
+				// See `batchRequests` idea in this project.
 				return configured.client(rpc, configured.endpoint)
 					.then(answer => {
 						if (answer.error) {
