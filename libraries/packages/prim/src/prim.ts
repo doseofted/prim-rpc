@@ -38,6 +38,13 @@ export function createPrimClient<T extends Record<V, T[V]>, V extends keyof T = 
 					// TODO: at this point, all callbacks have been replaced with identifiers so I should go through each reference
 					// and make a callback that emits a "response" type which will in turn be sent back over the websocket
 					// with the identifier
+					// eslint-disable-next-line @typescript-eslint/no-explicit-any
+					args = (args as any[]).map(arg => {
+						if (!(typeof arg === "string" && arg.startsWith("_cb_"))) { return arg }
+						return (...cbArgs) => {
+							event.emit("response", { result: cbArgs, id: arg })
+						}
+					})
 					return Reflect.apply(realTarget, that, args)
 				} catch (error) {
 					throw new RpcError(error)
@@ -97,7 +104,7 @@ export function createPrimClient<T extends Record<V, T[V]>, V extends keyof T = 
 			sendMessage = setupWebsocket
 			event.emit("end")
 		}
-		const { send } = configured.socket(configured.endpoint, response, end)
+		const { send } = configured.socket(configured.wsEndpoint, response, end)
 		sendMessage = send
 		send(initialMessage)
 		console.log("websocket creation attempted")
@@ -121,7 +128,8 @@ function createPrimOptions(options?: PrimOptions) {
 		// by default, it should be assumed that function is used client-side (assumed value for easier developer use from client-side)
 		server: false,
 		// if endpoint is not given then assume endpoint is relative to current url, following suggested `/prim` for Prim-RPC calls
-		endpoint: "/prim",
+		endpoint: "/prim", // NOTE this should be overriden on the client
+		wsEndpoint: "/prim", // NOTE this should be overridden on the client too, since protocol is required anyway
 		// `client()` is intended to be overridden so as not to force any one HTTP framework but default is fine for most cases
 		client: async (jsonBody, endpoint) => {
 			const result = await fetch(endpoint, {

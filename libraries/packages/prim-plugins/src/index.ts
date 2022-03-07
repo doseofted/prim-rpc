@@ -63,7 +63,7 @@ export const primWebSocketServerSetup = (prim: PrimServer, socket: WebSocketServ
 			const rpc = JSON.parse(String(data))
 			prim.rpc(rpc)
 			prim.ws.on("response", (cbAnswer) => {
-				ws.send(cbAnswer)
+				ws.send(JSON.stringify(cbAnswer))
 			})
 		})
 		ws.on("close", () => {
