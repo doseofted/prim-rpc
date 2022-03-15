@@ -7,7 +7,7 @@
  * This is basically a way for me to avoid REST and just write plain functions.
  * It can be used with any server framework as long as a plugin is written for
  * `createPrimServer` and can be used with any HTTP request library on the
- * client by providing the library as an option to `createPrim`.
+ * client by providing the library as an option to `createPrimClient`.
  */
 import ProxyDeep from "proxy-deep"
 import { get as getProperty } from "lodash"
@@ -45,7 +45,7 @@ export function createPrimClient<T extends Record<V, T[V]>, V extends keyof T = 
 						}
 					})
 					const result = Reflect.apply(realTarget, that, args)
-					// TODO instead of returning result directly back to Prim Server, wrap this in an RPC respons with the given
+					// TODO instead of returning result directly back to Prim Server, wrap this in an RPC response with the given
 					// ID and return that (similar to how callbacks answers are handled above). This would allow me to move
 					// more RPC functionality into this library and keep Prim Server as a way of translating requests into RPC.
 					// NOTE see `makeRpcCall` in Prim Server and consider moving that functionality into the client

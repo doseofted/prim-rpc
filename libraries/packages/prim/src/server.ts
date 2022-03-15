@@ -13,7 +13,7 @@ import { createPrimOptions } from "./options"
 // and handle conditions like querystring in path, or body not being converted to string yet
 
 export interface PrimServer {
-	rpc: (given: CommonFrameworkOptions) => Promise<RpcAnswer>
+	rpc: (given: CommonFrameworkOptions) => Promise<RpcAnswer|RpcAnswer[]>
 	ws: Emitter<PrimWebsocketEvents>
 	// TODO: consider alternate way of passing options to websocket plugin on server,
 	// since they can't be modified here (because they've already been used)
@@ -64,11 +64,11 @@ export function createPrimServer<T extends Record<V, T[V]>, V extends keyof T = 
 		const { url: urlGiven, prefix = "/prim" } = given
 		const url = parseURL(urlGiven)
 		const query = getQuery(url.search)
-		const bodyFromPath = (() => {
+		const bodyFromPath = ((): Partial<RpcCall> => {
 			const method = url.pathname.replace(prefix + "/", "")
 			// eslint-disable-next-line @typescript-eslint/no-explicit-any
 			let params: any = query
-			const id = query["-id"]
+			const id = String(query["-id"])
 			delete query["-id"]
 			if (Object.keys(query).length === 1 && "-" in query) {
 				params = query["-"] // all arguments are positional
@@ -87,12 +87,18 @@ export function createPrimServer<T extends Record<V, T[V]>, V extends keyof T = 
 			// if custom handler is not given but body is still string, parse it using default JSON handler
 			body = givenOptions.jsonHandler.parse(body)
 		}
-		// TODO: stop defu from concatenating params
-		const rpc = defu.fn<Partial<RpcCall>, RpcCall>(
-			body ?? bodyFromPath,
-			{ id: nanoid(), method: "default" }
-		)
-		return makeRpcCall(rpc)
+		const callWithDefaults = (body: Partial<RpcCall>) => {
+			// TODO: stop defu from concatenating params
+			const rpc = defu.fn<Partial<RpcCall>, RpcCall>(body, { id: nanoid(), method: "default" })
+			return makeRpcCall(rpc)
+		}
+		// if RPC calls are batched, answer all calls, otherwise answer the single RPC call
+		if (Array.isArray(body)) {
+			const results = body.map(b => callWithDefaults(b ?? bodyFromPath))
+			return Promise.all(results)
+		} else {
+			return callWithDefaults(body ?? bodyFromPath)
+		}
 	}
 	return { rpc, ws, opts: givenOptions }
 }
