@@ -35,6 +35,19 @@ importers:
   libraries/packages/example:
     specifiers: {}
 
+  libraries/packages/plugins:
+    specifiers:
+      '@types/express': ^4.17.13
+      '@types/ws': ^8.5.2
+      fastify: ^3.27.2
+      prim: workspace:*
+    dependencies:
+      prim: link:../prim
+    devDependencies:
+      '@types/express': 4.17.13
+      '@types/ws': 8.5.2
+      fastify: 3.27.2
+
   libraries/packages/prim:
     specifiers:
       '@types/jest': ^27.4.1
@@ -64,19 +77,6 @@ importers:
       ts-jest: 27.1.3_60149d457e34ffba7d4e845dde6a1263
       typescript: 4.6.2
 
-  libraries/packages/prim-plugins:
-    specifiers:
-      '@types/express': ^4.17.13
-      '@types/ws': ^8.5.2
-      fastify: ^3.27.2
-      prim: workspace:*
-    dependencies:
-      prim: link:../prim
-    devDependencies:
-      '@types/express': 4.17.13
-      '@types/ws': 8.5.2
-      fastify: 3.27.2
-
   project/backend:
     specifiers:
       '@types/ws': ^8.5.2
@@ -95,7 +95,7 @@ importers:
       fastify: 3.27.2
       fastify-cors: 6.0.3
       prim: link:../../libraries/packages/prim
-      prim-plugins: link:../../libraries/packages/prim-plugins
+      prim-plugins: link:../../libraries/packages/plugins
       ws: 8.5.0
     devDependencies:
       '@types/ws': 8.5.2

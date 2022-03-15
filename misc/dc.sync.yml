@@ -1,0 +1,17 @@
+version: "3"
+
+services:
+  
+  libraries:
+    volumes:
+      &built-shared
+      # Built libraries can be used from other containers while container is running
+      - ./libraries/packages/example/dist:/home/node/project/libraries/packages/example/dist
+      - ./libraries/packages/prim/dist:/home/node/project/libraries/packages/prim/dist
+      - ./libraries/packages/plugins/dist:/home/node/project/libraries/packages/plugins/dist
+
+  backend:
+    volumes: *built-shared
+
+  frontend:
+    volumes: *built-shared
