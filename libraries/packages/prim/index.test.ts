@@ -75,6 +75,7 @@ describe("Prim-Client can use callbacks", () => {
 			}
 		})
 	})
+	// TODO: ensure that this is testing events for websockets correctly (as a real websocket would work)
 	test("Remotely", (done) => {
 		const results = []
 		// const event = createNanoEvents()
@@ -82,7 +83,7 @@ describe("Prim-Client can use callbacks", () => {
 		// eslint-disable-next-line @typescript-eslint/no-explicit-any
 		let responseRef: any = undefined
 		const { withCallback } = createPrimClient<typeof exampleClient>({
-			socket(_endpoint, connected, response, _end) {
+			socket(_endpoint, { connected, response }) {
 				responseRef = response
 				const send = (_msg: RpcCall) => {
 					// const id = msg.id
@@ -94,7 +95,7 @@ describe("Prim-Client can use callbacks", () => {
 				}, 300)
 				return { send }
 			},
-			client: async (json, _endpoint) => {
+			client: async (_endpoint, json) => {
 				setTimeout(() => {
 					responseRef({ result: "some response", id: json.params[0] })
 					responseRef({ result: "some response", id: json.params[0] })
@@ -162,3 +163,5 @@ describe("Prim-Server can call methods with RPC via URL", () => {
 		expect(result).toEqual({ result: "Hey Ted!", id: "1" })
 	})
 })
+
+// TODO: write test for batch calls over HTTP
