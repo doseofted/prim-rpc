@@ -22,6 +22,12 @@ export interface PrimWebsocketEvents {
 	// connect: () => void
 }
 
+export interface PrimWebSocketEvents {
+	connected: () => void
+	response: (answer: RpcAnswer) => void
+	ended: () => void
+}
+
 export interface PrimOptions {
 	/** `true` when Prim-RPC is used from server. A module to be resolved should also be given as argument to `createPrim` */
 	server?: boolean
@@ -35,21 +41,11 @@ export interface PrimOptions {
 	 * @param {RpcCall} jsonBody RPC to be stringified before being sent to server
 	 * @param {string} endpoint The configured `option.endpoint` on created instance
 	 */
-	client?: (jsonBody: RpcCall, endpoint: string) => Promise<RpcAnswer>
+	client?: (endpoint: string, jsonBody: RpcCall) => Promise<RpcAnswer>
 	/** If a custom websocket framework is used,  */
-	socket?: (endpoint: string, connected: () => void, response: (answer: RpcAnswer) => void, end: () => void) => ({
+	socket?: (endpoint: string, events: PrimWebSocketEvents) => ({
 		send: (message: RpcCall) => void
 	})
-	// socket?: {
-	// 	/** Initialize a WebSocket instance, called once a callback is detected */
-	// 	create: (endpoint: string) => unknown,
-	// 	/** Used when client sends a request to the server */
-	// 	send: (jsonBody: RpcCall, client: unknown) => void
-	// 	/** Used when the client receives a response */
-	// 	message: (response: unknown) => Promise<RpcAnswer>
-	// 	// TODO: above events are specific to client. I need to write events specific to the server
-	// },
-	// NOTE not utilized yet but could be useful for passing internal options to Prim
 	internal?: {
 		/** Event emitter to be shared with Prim Server, if websocket events are used */
 		event?: Emitter<PrimWebsocketEvents>
