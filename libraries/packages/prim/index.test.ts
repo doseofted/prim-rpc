@@ -96,6 +96,10 @@ describe("Prim-Client can use callbacks", () => {
 				return { send }
 			},
 			client: async (_endpoint, json) => {
+				if (Array.isArray(json)) {
+					// NOTE: list of RPC calls isn't used here
+					return
+				}
 				setTimeout(() => {
 					responseRef({ result: "some response", id: json.params[0] })
 					responseRef({ result: "some response", id: json.params[0] })

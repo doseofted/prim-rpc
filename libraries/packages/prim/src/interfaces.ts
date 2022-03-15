@@ -24,13 +24,13 @@ export interface PrimWebsocketEvents {
 
 export interface PrimWebSocketEvents {
 	connected: () => void
-	response: (answer: RpcAnswer) => void
+	response: (answer: RpcAnswer|RpcAnswer[]) => void
 	ended: () => void
 }
 
-export type PrimClientFunction = (endpoint: string, jsonBody: RpcCall, jsonHandler?: JSON) => Promise<RpcAnswer>
+export type PrimClientFunction = (endpoint: string, jsonBody: RpcCall|RpcCall[], jsonHandler?: JSON) => Promise<RpcAnswer|RpcAnswer[]>
 export type PrimSocketFunction = (endpoint: string, events: PrimWebSocketEvents, jsonHandler?: JSON) => ({
-	send: (message: RpcCall) => void
+	send: (message: RpcCall|RpcCall[]) => void
 })
 
 export interface PrimOptions {

@@ -88,6 +88,10 @@ export function createPrimClient<T extends Record<V, T[V]>, V extends keyof T = 
 				// See `batchRequests` idea in this project.
 				return configured.client(configured.endpoint, rpc, configured.jsonHandler)
 					.then(answer => {
+						if (Array.isArray(answer)) {
+							// TODO add support for multiple responses, see TODO above
+							throw new RpcError({ message: "Not implemented.", code: -1 })
+						}
 						if (answer.error) {
 							throw answer.error
 						}
