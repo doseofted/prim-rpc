@@ -70,13 +70,14 @@ export const primExpressMiddleware = (prim: PrimServer, prefix = "/prim") => {
  * ```
  */
 export const primWebSocketServerSetup = (prim: PrimServer, socket: WebSocketServer) => {
+	const jsonHandler = prim.opts.jsonHandler ?? JSON
 	socket.on("connection", (ws) => {
 		// prim.ws.emit("connect")
 		ws.on("message", async (data) => {
-			const rpc = JSON.parse(String(data))
+			const rpc = jsonHandler.parse(String(data))
 			prim.rpc(rpc)
 			prim.ws.on("response", (cbAnswer) => {
-				ws.send(JSON.stringify(cbAnswer))
+				ws.send(jsonHandler.stringify(cbAnswer))
 			})
 		})
 		ws.on("close", () => {

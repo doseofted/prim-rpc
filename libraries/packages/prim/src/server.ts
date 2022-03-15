@@ -15,6 +15,9 @@ import { createPrimOptions } from "./options"
 export interface PrimServer {
 	rpc: (given: CommonFrameworkOptions) => Promise<RpcAnswer>
 	ws: Emitter<PrimWebsocketEvents>
+	// TODO: consider alternate way of passing options to websocket plugin on server,
+	// since they can't be modified here (because they've already been used)
+	opts: PrimOptions
 }
 
 /**
@@ -72,7 +75,18 @@ export function createPrimServer<T extends Record<V, T[V]>, V extends keyof T = 
 			}
 			return { method, params, id }
 		})()
-		const { body } = given
+		let { body } = given
+		// if given a JSON handler, use that parser rather than using result of parser used by server
+		// (it's encouraged to pass body as string from server when using separate JSON handler)
+		if (givenOptions.jsonHandler !== JSON) {
+			if (typeof body !== "string") {
+				body = givenOptions.jsonHandler.stringify(body)
+			}
+			body = givenOptions.jsonHandler.parse(body)
+		} else if (typeof body === "string") {
+			// if custom handler is not given but body is still string, parse it using default JSON handler
+			body = givenOptions.jsonHandler.parse(body)
+		}
 		// TODO: stop defu from concatenating params
 		const rpc = defu.fn<Partial<RpcCall>, RpcCall>(
 			body ?? bodyFromPath,
@@ -80,5 +94,5 @@ export function createPrimServer<T extends Record<V, T[V]>, V extends keyof T = 
 		)
 		return makeRpcCall(rpc)
 	}
-	return { rpc, ws }
+	return { rpc, ws, opts: givenOptions }
 }
