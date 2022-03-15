@@ -29,6 +29,15 @@ import { createPrimOptions } from "./options"
 export function createPrimClient<T extends Record<V, T[V]>, V extends keyof T = keyof T>(options?: PrimOptions, givenModule?: T) {
 	const configured = createPrimOptions(options)
 	const empty = {} as T // when not given on client-side, treat empty object as T
+	const queuedCalls: { time: Date, rpc: RpcCall, result: Promise<RpcAnswer> }[] = []
+	const httpEvent = createNanoEvents<{
+		individualResponse: (result: RpcAnswer) => void
+		addToQueue: (given: { time: Date, rpc: RpcCall, result: Promise<RpcAnswer> }) => void
+	}>()
+	httpEvent.on("addToQueue", (given) => {
+		queuedCalls.push(given)
+		// TODO: create a timer for given calls, and once done, make batch request then emit "individualResponse" for each answer
+	})
 	const proxy = new ProxyDeep<T>(givenModule ?? empty, {
 		apply(_emptyTarget, that, args) {
 			// call available function on server
@@ -83,6 +92,19 @@ export function createPrimClient<T extends Record<V, T[V]>, V extends keyof T = 
 					sendMessage(rpc)
 					// return
 				}
+
+				// SECTION: WIP, batched calls
+				// const result = new Promise<RpcAnswer>((resolve) => {
+				// 	httpEvent.on("individualResponse" , (result) => { resolve(result) })
+				// })
+				// if (configured.clientBatchTime > 0) {
+				// 	const time = new Date()
+				// 	// queuedCalls.push({ time, rpc, result })
+				// 	httpEvent.emit("addToQueue", { time, rpc, result })
+				// }
+				// return result
+				// !SECTION
+
 				// TODO: write wrapper around client to support batch requests and instead make below return a promise that
 				// becomes resolved when either answered in a batch respone over HTTP or answered over websocket.
 				// See `batchRequests` idea in this project.
