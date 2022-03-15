@@ -86,7 +86,7 @@ export function createPrimClient<T extends Record<V, T[V]>, V extends keyof T = 
 				// TODO: write wrapper around client to support batch requests and instead make below return a promise that
 				// becomes resolved when either answered in a batch respone over HTTP or answered over websocket.
 				// See `batchRequests` idea in this project.
-				return configured.client(configured.endpoint, rpc)
+				return configured.client(configured.endpoint, rpc, configured.jsonHandler)
 					.then(answer => {
 						if (answer.error) {
 							throw answer.error
@@ -117,7 +117,7 @@ export function createPrimClient<T extends Record<V, T[V]>, V extends keyof T = 
 			// NOTE connect event should only happen once so initial message will be sent then
 			send(initialMessage)
 		}
-		const { send } = configured.socket(configured.wsEndpoint, { connected, response, ended })
+		const { send } = configured.socket(configured.wsEndpoint, { connected, response, ended }, configured.jsonHandler)
 		sendMessage = send
 	}
 	/** Internal function referenced when a WebSocket connection has not been created yet */

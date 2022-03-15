@@ -36,14 +36,20 @@ export interface PrimOptions {
 	/** When `options.server` is `false` and websocket endpont is different from HTTP endpoint, provide the websocket URL where Prim is being used, to be used from `options.socket` */
 	wsEndpoint?: string
 	/**
+	 * Usually default of `JSON` is sufficient but parsing/conversion of more complex types may benefit from other JSON handling libraries.
+	 *
+	 * Given object is required to have both a `.stringify()` and `.parse()` method.
+	 */
+	jsonHandler?: JSON
+	/**
 	 * When used from the client, override the HTTP framework used for requests (default is browser's `fetch()`)
 	 * 
 	 * @param {RpcCall} jsonBody RPC to be stringified before being sent to server
 	 * @param {string} endpoint The configured `option.endpoint` on created instance
 	 */
-	client?: (endpoint: string, jsonBody: RpcCall) => Promise<RpcAnswer>
+	client?: (endpoint: string, jsonBody: RpcCall, jsonHandler?: JSON) => Promise<RpcAnswer>
 	/** If a custom websocket framework is used,  */
-	socket?: (endpoint: string, events: PrimWebSocketEvents) => ({
+	socket?: (endpoint: string, events: PrimWebSocketEvents, jsonHandler?: JSON) => ({
 		send: (message: RpcCall) => void
 	})
 	internal?: {

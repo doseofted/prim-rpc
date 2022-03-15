@@ -15,25 +15,28 @@ export function createPrimOptions(options?: PrimOptions) {
 		// if endpoint is not given then assume endpoint is relative to current url, following suggested `/prim` for Prim-RPC calls
 		endpoint: "/prim", // NOTE this should be overridden on the client
 		wsEndpoint: "/prim", // NOTE this should be overridden on the client too, since protocol is required anyway
+		// allow options of using a different JSON parsing/conversion library (for instance, "superjson")
+		jsonHandler: JSON,
 		// `client()` is intended to be overridden so as not to force any one HTTP framework but default is fine for most cases
-		client: async (endpoint, jsonBody) => {
+		client: async (endpoint, jsonBody, jsonHandler) => {
 			const result = await fetch(endpoint, {
 				method: "POST",
 				headers: { "Content-Type": "application/json" },
-				body: JSON.stringify(jsonBody)
+				body: jsonHandler.stringify(jsonBody)
 			})
 			// RPC result should be returned on success and RPC error thrown if errored
-			return JSON.parse(await result.text())
+			return jsonHandler.parse(await result.text())
 		},
-		socket: (endpoint, { connected, response, ended }) => {
+		// same with socket, usually the default WebSocket client is fine but the choice to change should be there
+		socket: (endpoint, { connected, response, ended }, jsonHandler) => {
 			const ws = new WebSocket(endpoint)
 			ws.onopen = connected
 			ws.onmessage = (({ data: message }) => {
-				response(JSON.parse(message))
+				response(jsonHandler.parse(message))
 			})
 			ws.onclose = ended
 			const send = (msg: unknown) => {
-				ws.send(JSON.stringify(msg))
+				ws.send(jsonHandler.stringify(msg))
 			}
 			return { send }
 		},
