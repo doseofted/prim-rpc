@@ -63,7 +63,6 @@ export function createPrimClient<T extends Record<V, T[V]>, V extends keyof T = 
 					callbacksGiven = true
 					const generatedId = "_cb_" + nanoid()
 					/* const unbind =  */event.on("response", (msg) => {
-						console.log("nano event response", msg, generatedId)
 						if (msg.id !== generatedId) { return }
 						if (Array.isArray(msg.result)) {
 							a(...msg.result)
@@ -81,7 +80,6 @@ export function createPrimClient<T extends Record<V, T[V]>, V extends keyof T = 
 				const rpc: RpcCall = { method: this.path.join("/"), params: args, id: nanoid() }
 				// TODO: read arguments and if callback is found, use a websocket
 				if (callbacksGiven) {
-					console.log("given args", args)
 					sendMessage(rpc)
 					// return
 				}
@@ -108,7 +106,6 @@ export function createPrimClient<T extends Record<V, T[V]>, V extends keyof T = 
 	const event = configured.internal.event ?? createNanoEvents<PrimWebsocketEvents>()
 	function createWebsocket(initialMessage: RpcCall) {
 		const response = (given: RpcAnswer) => {
-			console.log("response attempt")
 			event.emit("response", given)
 		}
 		const end = () => {
@@ -122,7 +119,6 @@ export function createPrimClient<T extends Record<V, T[V]>, V extends keyof T = 
 		}
 		const { send } = configured.socket(configured.wsEndpoint, connect, response, end)
 		sendMessage = send
-		console.log("websocket creation attempted")
 	}
 	/** Internal function referenced when a WebSocket connection has not been created yet */
 	const setupWebsocket = (msg: RpcCall) => createWebsocket(msg)
@@ -153,25 +149,16 @@ function createPrimOptions(options?: PrimOptions) {
 				body: JSON.stringify(jsonBody)
 			})
 			// RPC result should be returned on success and RPC error thrown if errored
-			return result.json()
+			return JSON.parse(await result.text())
 		},
 		socket: (endpoint, connected, response, ended) => {
 			const ws = new WebSocket(endpoint)
-			console.log("default client used")
+			ws.onopen = connected
 			ws.onmessage = (({ data: message }) => {
-				console.log("message received")
 				response(JSON.parse(message))
 			})
-			ws.onclose = () => {
-				console.log("connection closed")
-				ended()
-			}
-			ws.onopen = () => {
-				console.log("connected")
-				connected()
-			}
+			ws.onclose = ended
 			const send = (msg: unknown) => {
-				console.log("attempting send")
 				ws.send(JSON.stringify(msg))
 			}
 			return { send }

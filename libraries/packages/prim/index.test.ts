@@ -84,7 +84,6 @@ describe("Prim-Client can use callbacks", () => {
 		const { withCallback } = createPrimClient<typeof exampleClient>({
 			socket(_endpoint, connected, response, _end) {
 				responseRef = response
-				console.log("custom websocket handler attempted");
 				const send = (_msg: RpcCall) => {
 					// const id = msg.id
 					// response({ result: "some response" })
@@ -96,7 +95,6 @@ describe("Prim-Client can use callbacks", () => {
 				return { send }
 			},
 			client: async (json, _endpoint) => {
-				console.log(json.params)
 				setTimeout(() => {
 					responseRef({ result: "some response", id: json.params[0] })
 					responseRef({ result: "some response", id: json.params[0] })
@@ -106,7 +104,6 @@ describe("Prim-Client can use callbacks", () => {
 			// internal: { event }
 		})
 		withCallback((message) => {
-			console.log("given message", message)
 			results.push(message)
 			if (results.length === 2) {
 				expect(results).toEqual(["some response", "some response"])
