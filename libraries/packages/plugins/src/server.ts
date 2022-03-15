@@ -2,6 +2,7 @@ import type { RpcCall, PrimServer } from "prim"
 import type { FastifyPluginAsync } from "fastify"
 import type * as Express from "express"
 import type { WebSocketServer } from "ws"
+import type { Server as SocketIoServer } from "socket.io"
 
 /**
  * Prim's Fastify plugin. Use like so:
@@ -86,4 +87,32 @@ export const primWebSocketServerSetup = (prim: PrimServer, socket: WebSocketServ
 	})
 }
 
-// TODO consider supporting socket.io server
+// TODO actually test this
+/**
+ * Prim's support for the "socket.io" client. Use like so:
+ * 
+ * ```typescript
+ * import { primWebSocketServerSetup } from "prim-plugins"
+ * import { createPrimServer } from "prim"
+ * // ...
+ * const prim = createPrimServer(example)
+ * const wsServer = new SocketIoServer(server)
+ * primSocketIoServerSetup(prim, wsServer)
+ * ```
+ */
+export const primSocketIoServerSetup = (prim: PrimServer, socket: SocketIoServer) => {
+	const jsonHandler = prim.opts.jsonHandler ?? JSON
+	socket.on("connection", (ws) => {
+		// prim.ws.emit("connect")
+		ws.on("prim", async (data) => {
+			const rpc = jsonHandler.parse(String(data))
+			prim.rpc(rpc)
+			prim.ws.on("response", (cbAnswer) => {
+				ws.emit("prim", jsonHandler.stringify(cbAnswer))
+			})
+		})
+		ws.on("close", () => {
+			prim.ws.emit("end")
+		})
+	})
+}

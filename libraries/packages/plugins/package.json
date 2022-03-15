@@ -18,6 +18,9 @@
   "devDependencies": {
     "@types/express": "^4.17.13",
     "@types/ws": "^8.5.2",
-    "fastify": "^3.27.2"
+    "axios": "^0.26.1",
+    "fastify": "^3.27.2",
+    "socket.io": "^4.4.1",
+    "socket.io-client": "^4.4.1"
   }
 }

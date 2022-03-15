@@ -28,6 +28,11 @@ export interface PrimWebSocketEvents {
 	ended: () => void
 }
 
+export type PrimClientFunction = (endpoint: string, jsonBody: RpcCall, jsonHandler?: JSON) => Promise<RpcAnswer>
+export type PrimSocketFunction = (endpoint: string, events: PrimWebSocketEvents, jsonHandler?: JSON) => ({
+	send: (message: RpcCall) => void
+})
+
 export interface PrimOptions {
 	/** `true` when Prim-RPC is used from server. A module to be resolved should also be given as argument to `createPrim` */
 	server?: boolean
@@ -43,15 +48,19 @@ export interface PrimOptions {
 	jsonHandler?: JSON
 	/**
 	 * When used from the client, override the HTTP framework used for requests (default is browser's `fetch()`)
-	 * 
-	 * @param {RpcCall} jsonBody RPC to be stringified before being sent to server
-	 * @param {string} endpoint The configured `option.endpoint` on created instance
+	 * @param endpoint The configured `option.endpoint` on created instance
+	 * @param jsonBody RPC to be stringified before being sent to server
+	 * @param jsonHandler Provide a custom handler for JSON, with `.stringify()` and `.parse()` methods
 	 */
-	client?: (endpoint: string, jsonBody: RpcCall, jsonHandler?: JSON) => Promise<RpcAnswer>
-	/** If a custom websocket framework is used,  */
-	socket?: (endpoint: string, events: PrimWebSocketEvents, jsonHandler?: JSON) => ({
-		send: (message: RpcCall) => void
-	})
+	client?: PrimClientFunction
+	/**
+	 * Use a given WebSocket framework and utilize generic websocket events given over function.
+	 *
+	 * @param endpoint The configured `option.endpoint` on created instance
+	 * @param events: An object containing several callbacks that should be called when event happens on websocket
+	 * @param jsonHandler Provide a custom handler for JSON, with `.stringify()` and `.parse()` methods
+	 */
+	socket?: PrimSocketFunction
 	internal?: {
 		/** Event emitter to be shared with Prim Server, if websocket events are used */
 		event?: Emitter<PrimWebsocketEvents>
