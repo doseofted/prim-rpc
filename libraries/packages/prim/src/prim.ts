@@ -10,7 +10,7 @@
  * client by providing the library as an option to `createPrimClient`.
  */
 import ProxyDeep from "proxy-deep"
-import { get as getProperty } from "lodash"
+import { get as getProperty, remove as removeFromArray } from "lodash"
 import { nanoid } from "nanoid"
 import { createNanoEvents } from "nanoevents"
 import { RpcCall, PrimOptions, RpcAnswer, PrimWebsocketEvents } from "./interfaces"
@@ -41,22 +41,26 @@ export function createPrimClient<T extends Record<V, T[V]>, V extends keyof T = 
 	// 	if (timer) { return }
 	// 	timer = setTimeout(async () => {
 	// 		const rpcList = queuedCalls.filter(c => !c.resolved)
+	// 		rpcList.forEach(r => { r.resolved = "pending" })
 	// 		timer = undefined
 	// 		configured.client(configured.endpoint, rpcList.map(r => r.rpc), configured.jsonHandler)
 	// 			.then(answer => {
 	// 				if (Array.isArray(answer)) {
 	// 					answer.forEach(a => {
 	// 						httpEvent.emit("response", a)
-	// 						// TODO:
 	// 					})
 	// 				} else {
 	// 					httpEvent.emit("response", answer)
 	// 				}
 	// 			})
 	// 			.catch((error) => {
-	// 				// it is expected for given module to throw if there is an error so that Prim-RPC can also error on the client
-	// 				// throw new RpcError(error)
-	// 				httpEvent.emit("response", error)
+	// 				if (Array.isArray(error)) {
+	// 					error.forEach(e => { httpEvent.emit("response", e) })
+	// 				} else {
+	// 					rpcList.forEach(r => { httpEvent.emit("response", { id: r.rpc.id, error }) })
+	// 				}
+	// 			}).finally(() => {
+	// 				removeFromArray(queuedCalls, given => given.resolved === "pending")
 	// 			})
 	// 	}, configured.clientBatchTime)
 	// }

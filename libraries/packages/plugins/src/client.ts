@@ -18,7 +18,8 @@ import type { Socket as SocketIoSocket } from "socket.io-client"
 export const createPrimAxiosClient = (client: AxiosInstance) => {
 	const primClient: PrimClientFunction = async (endpoint, jsonBody, jsonHandler = JSON) => {
 		let { data: result } = await client.post(endpoint, jsonHandler.stringify(jsonBody), {
-			headers: { "Content-Type": "application/json" }
+			headers: { "Content-Type": "application/json" },
+			validateStatus: () => true // don't throw error on HTTP error since Prim handles error property
 		})
 		if (typeof result !== "string") {
 			result = jsonHandler.stringify(result)
