@@ -11,11 +11,11 @@
  */
 import ProxyDeep from "proxy-deep"
 import { get as getProperty } from "lodash"
-import { RpcError } from "./error"
-import { RpcCall, PrimOptions, RpcAnswer, PrimWebsocketEvents } from "./interfaces"
 import { nanoid } from "nanoid"
 import { createNanoEvents } from "nanoevents"
+import { RpcCall, PrimOptions, RpcAnswer, PrimWebsocketEvents } from "./interfaces"
 import { createPrimOptions } from "./options"
+import { RpcError } from "./error"
 
 /**
  * Prim-RPC can be used to write plain functions on the server and then call them easily from the client.
@@ -29,15 +29,44 @@ import { createPrimOptions } from "./options"
 export function createPrimClient<T extends Record<V, T[V]>, V extends keyof T = keyof T>(options?: PrimOptions, givenModule?: T) {
 	const configured = createPrimOptions(options)
 	const empty = {} as T // when not given on client-side, treat empty object as T
-	const queuedCalls: { time: Date, rpc: RpcCall, result: Promise<RpcAnswer> }[] = []
-	const httpEvent = createNanoEvents<{
-		individualResponse: (result: RpcAnswer) => void
-		addToQueue: (given: { time: Date, rpc: RpcCall, result: Promise<RpcAnswer> }) => void
-	}>()
-	httpEvent.on("addToQueue", (given) => {
-		queuedCalls.push(given)
-		// TODO: create a timer for given calls, and once done, make batch request then emit "individualResponse" for each answer
-	})
+
+	// SECTION: WIP, batched calls
+	// const queuedCalls: { time: Date, rpc: RpcCall, result: Promise<RpcAnswer>, resolved?: "yes"|"pending" }[] = []
+	// const httpEvent = createNanoEvents<{
+	// 	response: (result: RpcAnswer) => void
+	// 	queue: (given: { time: Date, rpc: RpcCall, result: Promise<RpcAnswer>, resolved?: "yes"|"pending" }) => void
+	// }>()
+	// let timer: ReturnType<typeof setTimeout>
+	// const batchedRequests = () => {
+	// 	if (timer) { return }
+	// 	timer = setTimeout(async () => {
+	// 		const rpcList = queuedCalls.filter(c => !c.resolved)
+	// 		timer = undefined
+	// 		configured.client(configured.endpoint, rpcList.map(r => r.rpc), configured.jsonHandler)
+	// 			.then(answer => {
+	// 				if (Array.isArray(answer)) {
+	// 					answer.forEach(a => {
+	// 						httpEvent.emit("response", a)
+	// 						// TODO:
+	// 					})
+	// 				} else {
+	// 					httpEvent.emit("response", answer)
+	// 				}
+	// 			})
+	// 			.catch((error) => {
+	// 				// it is expected for given module to throw if there is an error so that Prim-RPC can also error on the client
+	// 				// throw new RpcError(error)
+	// 				httpEvent.emit("response", error)
+	// 			})
+	// 	}, configured.clientBatchTime)
+	// }
+	// httpEvent.on("queue", (given) => {
+	// 	queuedCalls.push(given)
+	// 	batchedRequests()
+	// 	// TODO: create a timer for given calls, and once done, make batch request then emit "individualResponse" for each answer
+	// })
+	// !SECTION
+
 	const proxy = new ProxyDeep<T>(givenModule ?? empty, {
 		apply(_emptyTarget, that, args) {
 			// call available function on server
@@ -50,7 +79,7 @@ export function createPrimClient<T extends Record<V, T[V]>, V extends keyof T = 
 					args = (args as any[]).map(arg => {
 						if (!(typeof arg === "string" && arg.startsWith("_cb_"))) { return arg }
 						return (...cbArgs) => {
-							event.emit("response", { result: cbArgs, id: arg })
+							wsEvent.emit("response", { result: cbArgs, id: arg })
 						}
 					})
 					const result = Reflect.apply(realTarget, that, args)
@@ -71,7 +100,7 @@ export function createPrimClient<T extends Record<V, T[V]>, V extends keyof T = 
 					if (typeof a !== "function") { return a }
 					callbacksGiven = true
 					const generatedId = "_cb_" + nanoid()
-					/* const unbind =  */event.on("response", (msg) => {
+					/* const unbind =  */wsEvent.on("response", (msg) => {
 						if (msg.id !== generatedId) { return }
 						if (Array.isArray(msg.result)) {
 							a(...msg.result)
@@ -94,14 +123,14 @@ export function createPrimClient<T extends Record<V, T[V]>, V extends keyof T = 
 				}
 
 				// SECTION: WIP, batched calls
-				// const result = new Promise<RpcAnswer>((resolve) => {
-				// 	httpEvent.on("individualResponse" , (result) => { resolve(result) })
+				// const result = new Promise<RpcAnswer>((resolve, reject) => {
+				// 	httpEvent.on("response", (answer) => {
+				// 		if (rpc.id !== answer.id) { return }
+				// 		if (answer.error) { reject(answer.error) } else { resolve(answer) }
+				// 	})
 				// })
-				// if (configured.clientBatchTime > 0) {
-				// 	const time = new Date()
-				// 	// queuedCalls.push({ time, rpc, result })
-				// 	httpEvent.emit("addToQueue", { time, rpc, result })
-				// }
+				// const time = new Date()
+				// httpEvent.emit("queue", { time, rpc, result })
 				// return result
 				// !SECTION
 
@@ -129,14 +158,14 @@ export function createPrimClient<T extends Record<V, T[V]>, V extends keyof T = 
 			return this.nest(() => undefined)
 		}
 	})
-	const event = configured.internal.event ?? createNanoEvents<PrimWebsocketEvents>()
+	const wsEvent = configured.internal.event ?? createNanoEvents<PrimWebsocketEvents>()
 	function createWebsocket(initialMessage: RpcCall) {
 		const response = (given: RpcAnswer) => {
-			event.emit("response", given)
+			wsEvent.emit("response", given)
 		}
 		const ended = () => {
 			sendMessage = setupWebsocket
-			event.emit("end")
+			wsEvent.emit("end")
 		}
 		const connected = () => {
 			// event.emit("connect")
