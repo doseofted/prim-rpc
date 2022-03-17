@@ -15,6 +15,8 @@ export function createPrimOptions(options?: PrimOptions) {
 		// if endpoint is not given then assume endpoint is relative to current url, following suggested `/prim` for Prim-RPC calls
 		endpoint: "/prim", // NOTE this should be overridden on the client
 		wsEndpoint: "/prim", // NOTE this should be overridden on the client too, since protocol is required anyway
+		// batch time of 0 turns off batching while anything > 0 batches requests
+		clientBatchTime: 0,
 		// allow options of using a different JSON parsing/conversion library (for instance, "superjson")
 		jsonHandler: JSON,
 		// `client()` is intended to be overridden so as not to force any one HTTP framework but default is fine for most cases

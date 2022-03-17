@@ -7,15 +7,15 @@
  * This is basically a way for me to avoid REST and just write plain functions.
  * It can be used with any server framework as long as a plugin is written for
  * `createPrimServer` and can be used with any HTTP request library on the
- * client by providing the library as an option to `createPrim`.
+ * client by providing the library as an option to `createPrimClient`.
  */
 import ProxyDeep from "proxy-deep"
-import { get as getProperty } from "lodash"
-import { RpcError } from "./error"
-import { RpcCall, PrimOptions, RpcAnswer, PrimWebsocketEvents } from "./interfaces"
+import { get as getProperty, remove as removeFromArray } from "lodash"
 import { nanoid } from "nanoid"
 import { createNanoEvents } from "nanoevents"
+import { RpcCall, PrimOptions, RpcAnswer, PrimWebsocketEvents } from "./interfaces"
 import { createPrimOptions } from "./options"
+import { RpcError } from "./error"
 
 /**
  * Prim-RPC can be used to write plain functions on the server and then call them easily from the client.
@@ -29,6 +29,58 @@ import { createPrimOptions } from "./options"
 export function createPrimClient<T extends Record<V, T[V]>, V extends keyof T = keyof T>(options?: PrimOptions, givenModule?: T) {
 	const configured = createPrimOptions(options)
 	const empty = {} as T // when not given on client-side, treat empty object as T
+
+	// SECTION: WIP, batched calls
+	const queuedCalls: { time: Date, rpc: RpcCall, result: Promise<RpcAnswer>, resolved?: "yes"|"pending" }[] = []
+	const httpEvent = createNanoEvents<{
+		response: (result: RpcAnswer) => void
+		queue: (given: { time: Date, rpc: RpcCall, result: Promise<RpcAnswer>, resolved?: "yes"|"pending" }) => void
+	}>()
+	let timer: ReturnType<typeof setTimeout>
+	const batchedRequests = () => {
+		if (timer) { return }
+		timer = setTimeout(async () => {
+			const rpcList = queuedCalls.filter(c => !c.resolved)
+			rpcList.forEach(r => { r.resolved = "pending" })
+			clearTimeout(timer); timer = undefined
+			const rpcCalls = rpcList.map(r => r.rpc)
+			configured.client(configured.endpoint, rpcCalls.length === 1 ? rpcCalls[0] : rpcCalls, configured.jsonHandler)
+				.then(answer => {
+					console.log(answer);
+					
+					// return either the single result or the list of results to caller
+					if (Array.isArray(answer)) {
+						answer.forEach(a => {
+							httpEvent.emit("response", a)
+						})
+					} else {
+						httpEvent.emit("response", answer)
+					}
+				})
+				.catch((error) => {
+					if (Array.isArray(error)) {
+						// multiple errors given, return each error result to caller
+						error.forEach(e => { httpEvent.emit("response", e) })
+					} else {
+						// one error was given even though there may be multiple results, return that error to caller
+						rpcList.forEach(r => {
+							const id = r.rpc.id
+							httpEvent.emit("response", { id, error })
+						})
+					}
+				}).finally(() => {
+					// mark all RPC in this list as resolved so they can be removed, without removing other pending requests
+					rpcList.forEach(r => { r.resolved = "yes" })
+					removeFromArray(queuedCalls, given => given.resolved === "yes")
+				})
+		}, configured.clientBatchTime)
+	}
+	httpEvent.on("queue", (given) => {
+		queuedCalls.push(given)
+		batchedRequests()
+	})
+	// !SECTION
+	// SECTION proxy to resolve function calls
 	const proxy = new ProxyDeep<T>(givenModule ?? empty, {
 		apply(_emptyTarget, that, args) {
 			// call available function on server
@@ -41,11 +93,11 @@ export function createPrimClient<T extends Record<V, T[V]>, V extends keyof T = 
 					args = (args as any[]).map(arg => {
 						if (!(typeof arg === "string" && arg.startsWith("_cb_"))) { return arg }
 						return (...cbArgs) => {
-							event.emit("response", { result: cbArgs, id: arg })
+							wsEvent.emit("response", { result: cbArgs, id: arg })
 						}
 					})
 					const result = Reflect.apply(realTarget, that, args)
-					// TODO instead of returning result directly back to Prim Server, wrap this in an RPC respons with the given
+					// TODO instead of returning result directly back to Prim Server, wrap this in an RPC response with the given
 					// ID and return that (similar to how callbacks answers are handled above). This would allow me to move
 					// more RPC functionality into this library and keep Prim Server as a way of translating requests into RPC.
 					// NOTE see `makeRpcCall` in Prim Server and consider moving that functionality into the client
@@ -62,17 +114,16 @@ export function createPrimClient<T extends Record<V, T[V]>, V extends keyof T = 
 					if (typeof a !== "function") { return a }
 					callbacksGiven = true
 					const generatedId = "_cb_" + nanoid()
-					/* const unbind =  */event.on("response", (msg) => {
+					/* const unbind =  */wsEvent.on("response", (msg) => {
 						if (msg.id !== generatedId) { return }
 						if (Array.isArray(msg.result)) {
 							a(...msg.result)
 						} else {
 							a(msg.result)
 						}
-						// TODO: it's hard to unbind until I know callback won't fire anymore
-						// I may need to just move old events to a deprioritized list so the
-						// list of events doesn't become unwieldy and potentially slow down
-						// new callbacks/events
+						// TODO: it's hard to unbind until I know callback won't fire anymore. I may need to just move old events
+						// to a deprioritized list so the list of events doesn't become unwieldy and potentially slow down new
+						// callbacks/events
 						// unbind()
 					})
 					return generatedId
@@ -83,34 +134,62 @@ export function createPrimClient<T extends Record<V, T[V]>, V extends keyof T = 
 					sendMessage(rpc)
 					// return
 				}
-				// TODO: write wrapper around client to support batch requests and instead make below return a promise that
-				// becomes resolved when either answered in a batch respone over HTTP or answered over websocket.
-				// See `batchRequests` idea in this project.
-				return configured.client(configured.endpoint, rpc, configured.jsonHandler)
-					.then(answer => {
+
+				// SECTION: WIP, batched calls
+				const result = new Promise<RpcAnswer>((resolve, reject) => {
+					console.log("adding event handler");
+					
+					httpEvent.on("response", (answer) => {
+						console.log(rpc.id, answer.id, answer);
+						
+						if (rpc.id !== answer.id) { return }
 						if (answer.error) {
-							throw answer.error
+							reject(new RpcError(answer.error))
+						} else {
+							resolve(answer.result)
 						}
-						return answer.result
 					})
-					.catch((error) => {
-						// it is expected for given module to throw if there is an error so that Prim-RPC can also error on the client
-						throw new RpcError(error)
-					})
+				})
+				// TODO consider removing time (it's not used yet)
+				const time = new Date()
+				httpEvent.emit("queue", { time, rpc, result })
+				return result
+				// !SECTION
+
+				// TODO: write wrapper around client to support batch requests and instead make below return a promise that
+				// becomes resolved when either answered in a batch response over HTTP or answered over websocket.
+				// See `batchRequests` idea in this project.
+				// return configured.client(configured.endpoint, rpc, configured.jsonHandler)
+				// 	.then(answer => {
+				// 		if (Array.isArray(answer)) {
+				// 			// TODO add support for multiple responses, see TODO above
+				// 			throw new RpcError({ message: "Not implemented.", code: -1 })
+				// 		}
+				// 		if (answer.error) {
+				// 			throw answer.error
+				// 		}
+				// 		return answer.result
+				// 	})
+				// 	.catch((error) => {
+				// 		// it is expected for given module to throw if there is an error so that Prim-RPC can also error on the client
+				// 		throw new RpcError(error)
+				// 	})
 			}
 		},
 		get(_target, _prop, _receiver) {
 			return this.nest(() => undefined)
 		}
 	})
-	const event = configured.internal.event ?? createNanoEvents<PrimWebsocketEvents>()
+	// !SECTION
+	// SECTION: WebSocket event handling
+	const wsEvent = configured.internal.event ?? createNanoEvents<PrimWebsocketEvents>()
 	function createWebsocket(initialMessage: RpcCall) {
 		const response = (given: RpcAnswer) => {
-			event.emit("response", given)
+			wsEvent.emit("response", given)
 		}
 		const ended = () => {
 			sendMessage = setupWebsocket
-			event.emit("end")
+			wsEvent.emit("end")
 		}
 		const connected = () => {
 			// event.emit("connect")
@@ -124,5 +203,6 @@ export function createPrimClient<T extends Record<V, T[V]>, V extends keyof T = 
 	const setupWebsocket = (msg: RpcCall) => createWebsocket(msg)
 	/** Sets up WebSocket if needed, then sends a message */
 	let sendMessage: (message: RpcCall) => void = setupWebsocket
+	// !SECTION
 	return proxy
 }

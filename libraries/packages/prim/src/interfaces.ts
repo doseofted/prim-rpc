@@ -24,13 +24,13 @@ export interface PrimWebsocketEvents {
 
 export interface PrimWebSocketEvents {
 	connected: () => void
-	response: (answer: RpcAnswer) => void
+	response: (answer: RpcAnswer|RpcAnswer[]) => void
 	ended: () => void
 }
 
-export type PrimClientFunction = (endpoint: string, jsonBody: RpcCall, jsonHandler?: JSON) => Promise<RpcAnswer>
+export type PrimClientFunction = (endpoint: string, jsonBody: RpcCall|RpcCall[], jsonHandler?: JSON) => Promise<RpcAnswer|RpcAnswer[]>
 export type PrimSocketFunction = (endpoint: string, events: PrimWebSocketEvents, jsonHandler?: JSON) => ({
-	send: (message: RpcCall) => void
+	send: (message: RpcCall|RpcCall[]) => void
 })
 
 export interface PrimOptions {
@@ -40,6 +40,13 @@ export interface PrimOptions {
 	endpoint?: string
 	/** When `options.server` is `false` and websocket endpont is different from HTTP endpoint, provide the websocket URL where Prim is being used, to be used from `options.socket` */
 	wsEndpoint?: string
+	/**
+	 * If zero, don't batch RPC calls. If non-zero then wait a short time, in milliseconds, before sending HTTP requests.
+	 * This comes in handy when sending multiple RPC calls at once that do not depend on one another.
+	 * 
+	 * As a recommendation, keep this time very low (under `15`ms). Default is `0` (don't batch).
+	 */
+	clientBatchTime?: number
 	/**
 	 * Usually default of `JSON` is sufficient but parsing/conversion of more complex types may benefit from other JSON handling libraries.
 	 *
