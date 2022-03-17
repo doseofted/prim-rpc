@@ -10,7 +10,8 @@ const expectedMessage = ref("")
 const exampleArgs = { greeting: "Hey", name: "Ted" }
 const { sayHello, typeMessage } = createPrimClient<typeof exampleClient>({
 	endpoint: `https://api.${import.meta.env.VITE_HOST}/prim`,
-	wsEndpoint: `wss://api.${import.meta.env.VITE_HOST}/prim`
+	wsEndpoint: `wss://api.${import.meta.env.VITE_HOST}/prim`,
+	clientBatchTime: 10
 })
 const message = ref<string>()
 const matches = computed(() => message.value === expectedMessage.value)

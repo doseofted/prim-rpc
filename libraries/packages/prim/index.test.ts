@@ -3,6 +3,8 @@ import type * as exampleClient from "example"
 import * as exampleServer from "example"
 // import { createNanoEvents } from "nanoevents"
 
+// TODO: update tests so that each remote call makes a request to Prim Server (instead of generating a fake response from Prim client)
+
 describe("Prim instantiates", () => {
 	test("Client-side instantiation", () => {
 		const prim = createPrimClient<typeof exampleClient>()
@@ -22,7 +24,10 @@ describe("Prim-Client can call methods directly", () => {
 	})
 	test("Remotely", async () => {
 		const { sayHello } = createPrimClient<typeof exampleClient>({
-			client: async () => ({ result: await exampleServer.sayHello({ greeting: "Hey", name: "Ted" }) })
+			client: async (_endpoint, a) => ({
+				id: Array.isArray(a) ? undefined : a.id,
+				result: (await exampleServer.sayHello({ greeting: "Hey", name: "Ted" }))
+			})
 		})
 		const result = await sayHello({ greeting: "Hey", name: "Ted" })
 		expect(result).toEqual("Hey Ted!")
@@ -37,7 +42,10 @@ describe("Prim-Client can call deeply nested methods", () => {
 	})
 	test("Remotely", async () => {
 		const prim = createPrimClient<typeof exampleClient>({
-			client: async () => ({ result: await exampleServer.sayHello({ greeting: "Hey", name: "Ted" }) })
+			client: async (_e, a) => ({
+				id: Array.isArray(a) ? undefined : a.id,
+				result: await exampleServer.sayHello({ greeting: "Hey", name: "Ted" })
+			})
 		})
 		const result = await prim.testLevel2.testLevel1.sayHello({ greeting: "Hey", name: "Ted" })
 		expect(result).toEqual("Hey Ted!")

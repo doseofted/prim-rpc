@@ -31,46 +31,56 @@ export function createPrimClient<T extends Record<V, T[V]>, V extends keyof T = 
 	const empty = {} as T // when not given on client-side, treat empty object as T
 
 	// SECTION: WIP, batched calls
-	// const queuedCalls: { time: Date, rpc: RpcCall, result: Promise<RpcAnswer>, resolved?: "yes"|"pending" }[] = []
-	// const httpEvent = createNanoEvents<{
-	// 	response: (result: RpcAnswer) => void
-	// 	queue: (given: { time: Date, rpc: RpcCall, result: Promise<RpcAnswer>, resolved?: "yes"|"pending" }) => void
-	// }>()
-	// let timer: ReturnType<typeof setTimeout>
-	// const batchedRequests = () => {
-	// 	if (timer) { return }
-	// 	timer = setTimeout(async () => {
-	// 		const rpcList = queuedCalls.filter(c => !c.resolved)
-	// 		rpcList.forEach(r => { r.resolved = "pending" })
-	// 		timer = undefined
-	// 		configured.client(configured.endpoint, rpcList.map(r => r.rpc), configured.jsonHandler)
-	// 			.then(answer => {
-	// 				if (Array.isArray(answer)) {
-	// 					answer.forEach(a => {
-	// 						httpEvent.emit("response", a)
-	// 					})
-	// 				} else {
-	// 					httpEvent.emit("response", answer)
-	// 				}
-	// 			})
-	// 			.catch((error) => {
-	// 				if (Array.isArray(error)) {
-	// 					error.forEach(e => { httpEvent.emit("response", e) })
-	// 				} else {
-	// 					rpcList.forEach(r => { httpEvent.emit("response", { id: r.rpc.id, error }) })
-	// 				}
-	// 			}).finally(() => {
-	// 				removeFromArray(queuedCalls, given => given.resolved === "pending")
-	// 			})
-	// 	}, configured.clientBatchTime)
-	// }
-	// httpEvent.on("queue", (given) => {
-	// 	queuedCalls.push(given)
-	// 	batchedRequests()
-	// 	// TODO: create a timer for given calls, and once done, make batch request then emit "individualResponse" for each answer
-	// })
+	const queuedCalls: { time: Date, rpc: RpcCall, result: Promise<RpcAnswer>, resolved?: "yes"|"pending" }[] = []
+	const httpEvent = createNanoEvents<{
+		response: (result: RpcAnswer) => void
+		queue: (given: { time: Date, rpc: RpcCall, result: Promise<RpcAnswer>, resolved?: "yes"|"pending" }) => void
+	}>()
+	let timer: ReturnType<typeof setTimeout>
+	const batchedRequests = () => {
+		if (timer) { return }
+		timer = setTimeout(async () => {
+			const rpcList = queuedCalls.filter(c => !c.resolved)
+			rpcList.forEach(r => { r.resolved = "pending" })
+			clearTimeout(timer); timer = undefined
+			const rpcCalls = rpcList.map(r => r.rpc)
+			configured.client(configured.endpoint, rpcCalls.length === 1 ? rpcCalls[0] : rpcCalls, configured.jsonHandler)
+				.then(answer => {
+					console.log(answer);
+					
+					// return either the single result or the list of results to caller
+					if (Array.isArray(answer)) {
+						answer.forEach(a => {
+							httpEvent.emit("response", a)
+						})
+					} else {
+						httpEvent.emit("response", answer)
+					}
+				})
+				.catch((error) => {
+					if (Array.isArray(error)) {
+						// multiple errors given, return each error result to caller
+						error.forEach(e => { httpEvent.emit("response", e) })
+					} else {
+						// one error was given even though there may be multiple results, return that error to caller
+						rpcList.forEach(r => {
+							const id = r.rpc.id
+							httpEvent.emit("response", { id, error })
+						})
+					}
+				}).finally(() => {
+					// mark all RPC in this list as resolved so they can be removed, without removing other pending requests
+					rpcList.forEach(r => { r.resolved = "yes" })
+					removeFromArray(queuedCalls, given => given.resolved === "yes")
+				})
+		}, configured.clientBatchTime)
+	}
+	httpEvent.on("queue", (given) => {
+		queuedCalls.push(given)
+		batchedRequests()
+	})
 	// !SECTION
-
+	// SECTION proxy to resolve function calls
 	const proxy = new ProxyDeep<T>(givenModule ?? empty, {
 		apply(_emptyTarget, that, args) {
 			// call available function on server
@@ -111,10 +121,9 @@ export function createPrimClient<T extends Record<V, T[V]>, V extends keyof T = 
 						} else {
 							a(msg.result)
 						}
-						// TODO: it's hard to unbind until I know callback won't fire anymore
-						// I may need to just move old events to a deprioritized list so the
-						// list of events doesn't become unwieldy and potentially slow down
-						// new callbacks/events
+						// TODO: it's hard to unbind until I know callback won't fire anymore. I may need to just move old events
+						// to a deprioritized list so the list of events doesn't become unwieldy and potentially slow down new
+						// callbacks/events
 						// unbind()
 					})
 					return generatedId
@@ -127,41 +136,52 @@ export function createPrimClient<T extends Record<V, T[V]>, V extends keyof T = 
 				}
 
 				// SECTION: WIP, batched calls
-				// const result = new Promise<RpcAnswer>((resolve, reject) => {
-				// 	httpEvent.on("response", (answer) => {
-				// 		if (rpc.id !== answer.id) { return }
-				// 		if (answer.error) { reject(answer.error) } else { resolve(answer) }
-				// 	})
-				// })
-				// const time = new Date()
-				// httpEvent.emit("queue", { time, rpc, result })
-				// return result
+				const result = new Promise<RpcAnswer>((resolve, reject) => {
+					console.log("adding event handler");
+					
+					httpEvent.on("response", (answer) => {
+						console.log(rpc.id, answer.id, answer);
+						
+						if (rpc.id !== answer.id) { return }
+						if (answer.error) {
+							reject(new RpcError(answer.error))
+						} else {
+							resolve(answer.result)
+						}
+					})
+				})
+				// TODO consider removing time (it's not used yet)
+				const time = new Date()
+				httpEvent.emit("queue", { time, rpc, result })
+				return result
 				// !SECTION
 
 				// TODO: write wrapper around client to support batch requests and instead make below return a promise that
-				// becomes resolved when either answered in a batch respone over HTTP or answered over websocket.
+				// becomes resolved when either answered in a batch response over HTTP or answered over websocket.
 				// See `batchRequests` idea in this project.
-				return configured.client(configured.endpoint, rpc, configured.jsonHandler)
-					.then(answer => {
-						if (Array.isArray(answer)) {
-							// TODO add support for multiple responses, see TODO above
-							throw new RpcError({ message: "Not implemented.", code: -1 })
-						}
-						if (answer.error) {
-							throw answer.error
-						}
-						return answer.result
-					})
-					.catch((error) => {
-						// it is expected for given module to throw if there is an error so that Prim-RPC can also error on the client
-						throw new RpcError(error)
-					})
+				// return configured.client(configured.endpoint, rpc, configured.jsonHandler)
+				// 	.then(answer => {
+				// 		if (Array.isArray(answer)) {
+				// 			// TODO add support for multiple responses, see TODO above
+				// 			throw new RpcError({ message: "Not implemented.", code: -1 })
+				// 		}
+				// 		if (answer.error) {
+				// 			throw answer.error
+				// 		}
+				// 		return answer.result
+				// 	})
+				// 	.catch((error) => {
+				// 		// it is expected for given module to throw if there is an error so that Prim-RPC can also error on the client
+				// 		throw new RpcError(error)
+				// 	})
 			}
 		},
 		get(_target, _prop, _receiver) {
 			return this.nest(() => undefined)
 		}
 	})
+	// !SECTION
+	// SECTION: WebSocket event handling
 	const wsEvent = configured.internal.event ?? createNanoEvents<PrimWebsocketEvents>()
 	function createWebsocket(initialMessage: RpcCall) {
 		const response = (given: RpcAnswer) => {
@@ -183,5 +203,6 @@ export function createPrimClient<T extends Record<V, T[V]>, V extends keyof T = 
 	const setupWebsocket = (msg: RpcCall) => createWebsocket(msg)
 	/** Sets up WebSocket if needed, then sends a message */
 	let sendMessage: (message: RpcCall) => void = setupWebsocket
+	// !SECTION
 	return proxy
 }

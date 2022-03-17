@@ -124,3 +124,11 @@ let imageUploadsAndFormSupport: unknown
  * a separate JSON parsing library (such as "superjson" or even something as simple as  "json-bigint") to the client.
  */
 let nextIdea: unknown
+
+/**
+ * When a request comes into Prim Server, send the answer over a list of configured webhooks.
+ * This can be done by using the clinet option configured with Prim except I'll just be using it from
+ * the server to contact each configured endpoint. I could potentially allow for a filter on what answers
+ * to forward to webhook endpoints (for instance, regex or glob that matches function names)
+ */
+let webhooks: unknown
