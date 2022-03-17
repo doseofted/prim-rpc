@@ -30,6 +30,8 @@
 let reactiveInterfaceIdea: unknown
 
 /**
+ * NOTE: implemented with HTTP, still might be nice to also allow option of sending requests over websocket (individually, not batched)
+ *
  * When using graphql, I get to batch what would usually be many separate requests into one single request. With REST,
  * each request has to made individually unless batched together by the server by exposing an endpoint dedicated to
  * that function.

@@ -35,7 +35,7 @@ export function createPrimServer<T extends Record<V, T[V]>, V extends keyof T = 
 	const givenOptions = createPrimOptions(options)
 	givenOptions.server = true
 	givenOptions.internal = { event: ws }
-	const prim = createPrimClient(givenOptions, givenModule)
+	const prim = createPrimClient<typeof givenModule>(givenOptions, givenModule)
 	const makeRpcCall = async (rpc: RpcCall): Promise<RpcAnswer> => {
 		const { method, params, id } = rpc
 		// const args = Array.isArray(params) ? params : [params]

@@ -6,28 +6,38 @@ import * as exampleServer from "example"
 // TODO: update tests so that each remote call makes a request to Prim Server (instead of generating a fake response from Prim client)
 
 describe("Prim instantiates", () => {
-	test("Client-side instantiation", () => {
+	// use case: not sure yet, possibly to return optimistic local result while waiting on remote result
+	test("client instantiation, local source", () => {
+		const prim = createPrimClient({ server: true }, exampleServer)
+		expect(typeof prim.sayHelloAlternative === "function").toBeTruthy()
+	})
+	// use case: to contact remote server from client app (most common)
+	test("client instantiation, remote source", () => {
 		const prim = createPrimClient<typeof exampleClient>()
 		expect(typeof prim.sayHello === "function").toBeTruthy()
 	})
-	test("Server-side instantiation", () => {
-		const prim = createPrimClient({ server: true }, exampleServer)
-		expect(typeof prim.sayHelloAlternative === "function").toBeTruthy()
+	// use case: to respond to client app (most common)
+	test("server instantiation, local source", () => {
+		const prim = createPrimServer(exampleServer)
+		expect(typeof prim.rpc === "function").toBeTruthy()
+	})
+	// use case: to chain multiple Prim servers together
+	test("server instantiation, remote source", () => {
+		const prim = createPrimServer<typeof exampleClient>()
+		expect(typeof prim.rpc === "function").toBeTruthy()
 	})
 })
 
 describe("Prim-Client can call methods directly", () => {
-	test("Locally", async () => {
+	test("with local source", async () => {
 		const { sayHello } = createPrimClient({ server: true }, exampleServer)
 		const result = await sayHello({ greeting: "Hey", name: "Ted" })
 		expect(result).toEqual("Hey Ted!")
 	})
-	test("Remotely", async () => {
+	test("with remote source", async () => {
+		const prim = createPrimServer(exampleServer)
 		const { sayHello } = createPrimClient<typeof exampleClient>({
-			client: async (_endpoint, a) => ({
-				id: Array.isArray(a) ? undefined : a.id,
-				result: (await exampleServer.sayHello({ greeting: "Hey", name: "Ted" }))
-			})
+			client: async (_endpoint, body) => prim.rpc( { body })
 		})
 		const result = await sayHello({ greeting: "Hey", name: "Ted" })
 		expect(result).toEqual("Hey Ted!")
@@ -35,34 +45,33 @@ describe("Prim-Client can call methods directly", () => {
 })
 
 describe("Prim-Client can call deeply nested methods", () => {
-	test("Locally", async () => {
+	test("with local source", async () => {
 		const prim = createPrimClient({ server: true }, exampleServer)
 		const result = await prim.testLevel2.testLevel1.sayHello({ greeting: "Hey", name: "Ted" })
 		expect(result).toEqual("Hey Ted!")
 	})
-	test("Remotely", async () => {
-		const prim = createPrimClient<typeof exampleClient>({
-			client: async (_e, a) => ({
-				id: Array.isArray(a) ? undefined : a.id,
-				result: await exampleServer.sayHello({ greeting: "Hey", name: "Ted" })
-			})
+	test("with remote source", async () => {
+		const prim = createPrimServer(exampleServer)
+		const { testLevel2 } = createPrimClient<typeof exampleClient>({
+			client: async (_endpoint, body) => prim.rpc({ body })
 		})
-		const result = await prim.testLevel2.testLevel1.sayHello({ greeting: "Hey", name: "Ted" })
+		const result = await testLevel2.testLevel1.sayHello({ greeting: "Hey", name: "Ted" })
 		expect(result).toEqual("Hey Ted!")
 	})
 })
 
 describe("Prim-Client can throw errors", () => {
 	// LINK https://jestjs.io/docs/expect#rejects
-	test("Locally", async () => {
+	test("with local source", async () => {
 		const { oops } = createPrimClient({ server: true }, exampleServer)
-		expect(async () => { await oops() }).rejects.toThrow("My bad.")
+		expect(async () => {
+			await oops()
+		}).rejects.toThrow("My bad.")
 	})
-	test("Remotely", () => {
+	test("with remote source", () => {
+		const prim = createPrimServer(exampleServer)
 		const { oops } = createPrimClient<typeof exampleClient>({
-			client: async () => ({
-				error: { code: 1, message: "My bad." }
-			})
+			client: async (_endpoint, body) => prim.rpc({ body })
 		})
 		expect(async () => {
 			await oops()
@@ -72,7 +81,7 @@ describe("Prim-Client can throw errors", () => {
 
 describe("Prim-Client can use callbacks", () => {
 	// LINK https://jestjs.io/docs/expect#rejects
-	test("Locally", (done) => {
+	test("with local source", (done) => {
 		const { withCallback } = createPrimClient({ server: true }, exampleServer)
 		const results = []
 		withCallback((message) => {
@@ -83,43 +92,26 @@ describe("Prim-Client can use callbacks", () => {
 			}
 		})
 	})
-	// TODO: ensure that this is testing events for websockets correctly (as a real websocket would work)
-	test("Remotely", (done) => {
+	test("with remote source", (done) => {
 		const results = []
-		// const event = createNanoEvents()
-		// event.emit("response", { result: "some response" })
-		// eslint-disable-next-line @typescript-eslint/no-explicit-any
-		let responseRef: any = undefined
+		const prim = createPrimServer(exampleServer)
 		const { withCallback } = createPrimClient<typeof exampleClient>({
-			socket(_endpoint, { connected, response }) {
-				responseRef = response
-				const send = (_msg: RpcCall) => {
-					// const id = msg.id
-					// response({ result: "some response" })
-					// response({ result: "some response" })
-				}
+			socket(_endpoint, { connected, response, ended }) {
+				prim.ws.on("response", (answer) => { response(answer) })
+				prim.ws.on("end", () => { ended() })
 				setTimeout(() => {
 					connected()
-				}, 300)
+				}, 0)
+				// FIXME: find out why sending RPC call here causes error (webosocket still works?)
+				const send = () => ({}) // (body: RpcCall) => { prim.rpc({ body }) }
 				return { send }
 			},
-			client: async (_endpoint, json) => {
-				if (Array.isArray(json)) {
-					// NOTE: list of RPC calls isn't used here
-					return
-				}
-				setTimeout(() => {
-					responseRef({ result: "some response", id: json.params[0] })
-					responseRef({ result: "some response", id: json.params[0] })
-				}, 500);
-				return { id: json.id }
-			},
-			// internal: { event }
+			client: async (_endpoint, body) => prim.rpc({ body })
 		})
 		withCallback((message) => {
 			results.push(message)
 			if (results.length === 2) {
-				expect(results).toEqual(["some response", "some response"])
+				expect(results).toEqual(["You're using Prim.", "Still using Prim!"])
 				done()
 			}
 		})
@@ -127,8 +119,8 @@ describe("Prim-Client can use callbacks", () => {
 })
 
 describe("Prim-Server can call methods with RPC", () => {
-	test("Locally", async () => {
-		const prim = createPrimServer(exampleServer, { server: true })
+	test("with local source", async () => {
+		const prim = createPrimServer(exampleServer)
 		const result = await prim.rpc({
 			body: {
 				id: 1,
@@ -138,8 +130,8 @@ describe("Prim-Server can call methods with RPC", () => {
 		})
 		expect(result).toEqual({ result: "Hey Ted!", id: 1 })
 	})
-	test("From another Prim-Server", async () => {
-		const primServer = createPrimServer(exampleServer, { server: true })
+	test("from another Prim Server", async () => {
+		const primServer = createPrimServer(exampleServer)
 		const primRemoteServer = createPrimServer(exampleServer, {
 			client: async (body) => primServer.rpc({ body })
 		})
@@ -156,7 +148,7 @@ describe("Prim-Server can call methods with RPC", () => {
 
 describe("Prim-Server can call methods with RPC via URL", () => {
 	test("Locally", async () => {
-		const prim = createPrimServer(exampleServer, { server: true })
+		const prim = createPrimServer(exampleServer)
 		const result = await prim.rpc({
 			url: "/prim/testLevel2/testLevel1/sayHello?-id=1&greeting=Hey&name=Ted",
 			prefix: "/prim"
@@ -164,7 +156,7 @@ describe("Prim-Server can call methods with RPC via URL", () => {
 		expect(result).toEqual({ result: "Hey Ted!", id: "1" })
 	})
 	test("From another Prim-Server", async () => {
-		const primServer = createPrimServer(exampleServer, { server: true })
+		const primServer = createPrimServer(exampleServer)
 		const primRemoteServer = createPrimServer(exampleServer, {
 			client: async (body) => primServer.rpc({ body })
 		})

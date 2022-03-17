@@ -44,7 +44,7 @@ export interface PrimOptions {
 	 * If zero, don't batch RPC calls. If non-zero then wait a short time, in milliseconds, before sending HTTP requests.
 	 * This comes in handy when sending multiple RPC calls at once that do not depend on one another.
 	 * 
-	 * As a recommendation, keep this time very low (under `100`ms). Default is `0` (don't batch).
+	 * As a recommendation, keep this time very low (under `15`ms). Default is `0` (don't batch).
 	 */
 	clientBatchTime?: number
 	/**
