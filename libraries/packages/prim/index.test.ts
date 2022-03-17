@@ -1,9 +1,7 @@
-import { createPrimClient, createPrimServer, RpcCall } from "."
+import { createPrimClient, createPrimServer } from "."
 import type * as exampleClient from "example"
 import * as exampleServer from "example"
-// import { createNanoEvents } from "nanoevents"
-
-// TODO: update tests so that each remote call makes a request to Prim Server (instead of generating a fake response from Prim client)
+import { RpcAnswer } from "./src"
 
 describe("Prim instantiates", () => {
 	// use case: not sure yet, possibly to return optimistic local result while waiting on remote result
@@ -21,14 +19,14 @@ describe("Prim instantiates", () => {
 		const prim = createPrimServer(exampleServer)
 		expect(typeof prim.rpc === "function").toBeTruthy()
 	})
-	// use case: to chain multiple Prim servers together
+	// use case: to chain multiple Prim servers together (TODO feature itself not implemented yet)
 	test("server instantiation, remote source", () => {
 		const prim = createPrimServer<typeof exampleClient>()
 		expect(typeof prim.rpc === "function").toBeTruthy()
 	})
 })
 
-describe("Prim-Client can call methods directly", () => {
+describe("Prim Client can call methods directly", () => {
 	test("with local source", async () => {
 		const { sayHello } = createPrimClient({ server: true }, exampleServer)
 		const result = await sayHello({ greeting: "Hey", name: "Ted" })
@@ -44,7 +42,7 @@ describe("Prim-Client can call methods directly", () => {
 	})
 })
 
-describe("Prim-Client can call deeply nested methods", () => {
+describe("Prim Client can call deeply nested methods", () => {
 	test("with local source", async () => {
 		const prim = createPrimClient({ server: true }, exampleServer)
 		const result = await prim.testLevel2.testLevel1.sayHello({ greeting: "Hey", name: "Ted" })
@@ -60,7 +58,7 @@ describe("Prim-Client can call deeply nested methods", () => {
 	})
 })
 
-describe("Prim-Client can throw errors", () => {
+describe("Prim Client can throw errors", () => {
 	// LINK https://jestjs.io/docs/expect#rejects
 	test("with local source", async () => {
 		const { oops } = createPrimClient({ server: true }, exampleServer)
@@ -79,7 +77,7 @@ describe("Prim-Client can throw errors", () => {
 	})
 })
 
-describe("Prim-Client can use callbacks", () => {
+describe("Prim Client can use callbacks", () => {
 	// LINK https://jestjs.io/docs/expect#rejects
 	test("with local source", (done) => {
 		const { withCallback } = createPrimClient({ server: true }, exampleServer)
@@ -118,7 +116,7 @@ describe("Prim-Client can use callbacks", () => {
 	})
 })
 
-describe("Prim-Server can call methods with RPC", () => {
+describe("Prim Server can call methods with RPC", () => {
 	test("with local source", async () => {
 		const prim = createPrimServer(exampleServer)
 		const result = await prim.rpc({
@@ -146,7 +144,7 @@ describe("Prim-Server can call methods with RPC", () => {
 	})
 })
 
-describe("Prim-Server can call methods with RPC via URL", () => {
+describe("Prim Server can call methods with RPC via URL", () => {
 	test("Locally", async () => {
 		const prim = createPrimServer(exampleServer)
 		const result = await prim.rpc({
@@ -169,3 +167,43 @@ describe("Prim-Server can call methods with RPC via URL", () => {
 })
 
 // TODO: write test for batch calls over HTTP
+describe("Prim can batch requests", () => {
+	test("server can handle batch requests", async () => {
+		const prim = createPrimServer(exampleServer)
+		const answers = await prim.rpc({
+			body: [
+				{
+					id: 1,
+					method: "testLevel2/testLevel1/sayHello",
+					params: { greeting: "Hey", name: "Ted" }
+				},
+				{
+					id: 2,
+					method: "testLevel2/testLevel1/sayHello",
+					params: { greeting: "Hi", name: "Ted" }
+				}
+			]
+		})
+		const sorted = (answers as RpcAnswer[]).sort((a, b) => a.id < b.id ? -1 : 1)
+		expect(sorted).toEqual([
+			{ result: "Hey Ted!", id: 1 },
+			{ result: "Hi Ted!", id: 2 }
+		])
+	})
+	test("client understands responses from batch request", async () => {
+		const prim = createPrimServer(exampleServer)
+		const { sayHello, sayHelloAlternative } = createPrimClient<typeof exampleClient>({
+			client: async (_endpoint, body) => prim.rpc({ body }),
+			clientBatchTime: 300 // NOTE test result will take slightly longer than 300ms (only for test, usually <15ms)
+		})
+		const expected = [
+			exampleServer.sayHello({ greeting: "Hey", name: "Ted" }),
+			exampleServer.sayHelloAlternative("Hey", "Ted")
+		]
+		const results = [
+			sayHello({ greeting: "Hey", name: "Ted" }),
+			sayHelloAlternative("Hey", "Ted")
+		]
+		expect(await Promise.all(results)).toEqual(await Promise.all(expected))
+	})
+})
