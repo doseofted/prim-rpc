@@ -117,7 +117,7 @@ describe("Prim Client can use callbacks", () => {
 })
 
 describe("Prim Server can call methods with RPC", () => {
-	test("with local source", async () => {
+	test("with local modules", async () => {
 		const prim = createPrimServer(exampleServer)
 		const result = await prim.rpc({
 			body: {
@@ -129,11 +129,12 @@ describe("Prim Server can call methods with RPC", () => {
 		expect(result).toEqual({ result: "Hey Ted!", id: 1 })
 	})
 	test("from another Prim Server", async () => {
-		const primServer = createPrimServer(exampleServer)
-		const primRemoteServer = createPrimServer(exampleServer, {
-			client: async (body) => primServer.rpc({ body })
+		const primRemoteServer = createPrimServer(exampleServer)
+		const primServer = createPrimServer<typeof exampleClient>(undefined, {
+			server: false, // set to false so Prim will communicate with another server
+			client: async (_endpoint, body) => primRemoteServer.rpc({ body })
 		})
-		const result = await primRemoteServer.rpc({
+		const result = await primServer.rpc({
 			body: {
 				id: 1,
 				method: "testLevel2/testLevel1/sayHello",

@@ -33,7 +33,8 @@ export interface PrimServer {
 export function createPrimServer<T extends Record<V, T[V]>, V extends keyof T = keyof T>(givenModule?: T, options?: PrimOptions): PrimServer {
 	const ws = createNanoEvents<PrimWebsocketEvents>()
 	const givenOptions = createPrimOptions(options)
-	givenOptions.server = true
+	// if server is false, Prim Server should forward request to another Prim Server otherwise resolve locally
+	if (options?.server === undefined) { givenOptions.server = true } // assume `server` is true if option was not given
 	givenOptions.internal = { event: ws }
 	const prim = createPrimClient<typeof givenModule>(givenOptions, givenModule)
 	const makeRpcCall = async (rpc: RpcCall): Promise<RpcAnswer> => {

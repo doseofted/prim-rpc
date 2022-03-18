@@ -134,3 +134,23 @@ let nextIdea: unknown
  * to forward to webhook endpoints (for instance, regex or glob that matches function names)
  */
 let webhooks: unknown
+
+/**
+ * Use Prim for easy IPC. The way this would work is to set up a Prim Client on the renderer process that communicates
+ * using an Electron-specific HTTP and WebSocket client that sends RPC to a dedicated method provided over the
+ * contextBridge in the Electron preload script. The method (probably called `prim(rpc)`) will send/emit an event
+ * called "prim" with an argument of the RPC. The main process will then accept this and forward to Prim Server which is
+ * also configured on the main process.
+ *
+ * The Prim Server can then either be used to call a function locally in the main process or be used as a proxy
+ * for another Prim Server (like a remote server) and send off that RPC. This way Prim can be used for:
+ *
+ * - requesting data from the server, without CORS errors in renderer, or resorting to turning off Electron's security
+ *   features.
+ * - requesting functions defined in main process from renderer without all of the duplicate code
+ *
+ * Note that the main process will need a handle for the event sent from the preload script. This should be a function
+ * that returns the result gathered from the Prim Server (regardless of whether function is local to main process
+ * or a call to a remote server).
+ */
+let electronSupport: unknown
