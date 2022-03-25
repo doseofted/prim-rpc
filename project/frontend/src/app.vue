@@ -8,9 +8,9 @@ import type * as exampleClient from "example"
 const primLocal = createPrimClient({ server: true }, exampleServer)
 const expectedMessage = ref("")
 const exampleArgs = { greeting: "Hey", name: "Ted" }
+const host = import.meta.env.VITE_HOST
 const { sayHello, typeMessage } = createPrimClient<typeof exampleClient>({
-	endpoint: `https://api.${import.meta.env.VITE_HOST}/prim`,
-	wsEndpoint: `wss://api.${import.meta.env.VITE_HOST}/prim`,
+	endpoint: `https://api.${host}/prim`,
 	clientBatchTime: 10
 })
 const message = ref<string>()

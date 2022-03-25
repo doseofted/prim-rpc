@@ -46,8 +46,6 @@ export function createPrimClient<T extends Record<V, T[V]>, V extends keyof T = 
 			const rpcCalls = rpcList.map(r => r.rpc)
 			configured.client(configured.endpoint, rpcCalls.length === 1 ? rpcCalls[0] : rpcCalls, configured.jsonHandler)
 				.then(answer => {
-					console.log(answer);
-					
 					// return either the single result or the list of results to caller
 					if (Array.isArray(answer)) {
 						answer.forEach(a => {
@@ -196,7 +194,8 @@ export function createPrimClient<T extends Record<V, T[V]>, V extends keyof T = 
 			// NOTE connect event should only happen once so initial message will be sent then
 			send(initialMessage)
 		}
-		const { send } = configured.socket(configured.wsEndpoint, { connected, response, ended }, configured.jsonHandler)
+		const wsEndpoint = configured.wsEndpoint || configured.endpoint.replace(/^http(s?)/g, "ws$1")
+		const { send } = configured.socket(wsEndpoint, { connected, response, ended }, configured.jsonHandler)
 		sendMessage = send
 	}
 	/** Internal function referenced when a WebSocket connection has not been created yet */
