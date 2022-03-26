@@ -1,6 +1,6 @@
 import { RpcError } from "./error"
 import { createPrimClient } from "./prim"
-import { CommonFrameworkOptions, PrimOptions, PrimWebsocketEvents, RpcAnswer, RpcCall } from "./interfaces"
+import { CommonFrameworkOptions, PrimOptions, PrimWebSocketEvents, RpcAnswer, RpcCall } from "./interfaces"
 import { get as getProperty } from "lodash"
 import defu from "defu"
 import { nanoid } from "nanoid"
@@ -14,7 +14,7 @@ import { createPrimOptions } from "./options"
 
 export interface PrimServer {
 	rpc: (given: CommonFrameworkOptions) => Promise<RpcAnswer|RpcAnswer[]>
-	ws: Emitter<PrimWebsocketEvents>
+	ws: Emitter<PrimWebSocketEvents>
 	// TODO: consider alternate way of passing options to websocket plugin on server,
 	// since they can't be modified here (because they've already been used)
 	opts: PrimOptions
@@ -31,7 +31,7 @@ export interface PrimServer {
  * @returns A function that expects JSON resembling an RPC call
  */
 export function createPrimServer<T extends Record<V, T[V]>, V extends keyof T = keyof T>(givenModule?: T, options?: PrimOptions): PrimServer {
-	const ws = createNanoEvents<PrimWebsocketEvents>()
+	const ws = createNanoEvents<PrimWebSocketEvents>()
 	const givenOptions = createPrimOptions(options)
 	// if server is false, Prim Server should forward request to another Prim Server otherwise resolve locally
 	if (options?.server === undefined) { givenOptions.server = true } // assume `server` is true if option was not given

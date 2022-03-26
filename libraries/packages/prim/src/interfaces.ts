@@ -16,15 +16,11 @@ export interface RpcAnswer<Result = any, Error = any> extends RpcBase {
 	error?: RpcErr<Error>
 }
 
-export interface PrimWebsocketEvents {
-	response: (message: RpcAnswer) => void
-	end: () => void
-	// connect: () => void
-}
-
 export interface PrimWebSocketEvents {
 	connected: () => void
-	response: (answer: RpcAnswer|RpcAnswer[]) => void
+	// NOTE: I don't need to return multiple answers unless batching is allowed over websocket (not needed)
+	// response: (answer: RpcAnswer|RpcAnswer[]) => void
+	response: (answer: RpcAnswer) => void
 	ended: () => void
 }
 
@@ -70,7 +66,7 @@ export interface PrimOptions {
 	socket?: PrimSocketFunction
 	internal?: {
 		/** Event emitter to be shared with Prim Server, if websocket events are used */
-		event?: Emitter<PrimWebsocketEvents>
+		event?: Emitter<PrimWebSocketEvents>
 	}
 }
 

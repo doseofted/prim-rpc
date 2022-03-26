@@ -96,7 +96,7 @@ describe("Prim Client can use callbacks", () => {
 		const { withCallback } = createPrimClient<typeof exampleClient>({
 			socket(_endpoint, { connected, response, ended }) {
 				prim.ws.on("response", (answer) => { response(answer) })
-				prim.ws.on("end", () => { ended() })
+				prim.ws.on("ended", () => { ended() })
 				setTimeout(() => {
 					connected()
 				}, 0)

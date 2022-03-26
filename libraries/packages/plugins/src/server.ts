@@ -82,7 +82,7 @@ export const primWebSocketServerSetup = (prim: PrimServer, socket: WebSocketServ
 			})
 		})
 		ws.on("close", () => {
-			prim.ws.emit("end")
+			prim.ws.emit("ended")
 		})
 	})
 }
@@ -112,7 +112,7 @@ export const primSocketIoServerSetup = (prim: PrimServer, socket: SocketIoServer
 			})
 		})
 		ws.on("close", () => {
-			prim.ws.emit("end")
+			prim.ws.emit("ended")
 		})
 	})
 }

@@ -13,7 +13,7 @@ import ProxyDeep from "proxy-deep"
 import { get as getProperty, remove as removeFromArray } from "lodash"
 import { nanoid } from "nanoid"
 import { createNanoEvents } from "nanoevents"
-import { RpcCall, PrimOptions, RpcAnswer, PrimWebsocketEvents } from "./interfaces"
+import { RpcCall, PrimOptions, RpcAnswer, PrimWebSocketEvents } from "./interfaces"
 import { createPrimOptions } from "./options"
 import { RpcError } from "./error"
 
@@ -29,8 +29,7 @@ import { RpcError } from "./error"
 export function createPrimClient<T extends Record<V, T[V]>, V extends keyof T = keyof T>(options?: PrimOptions, givenModule?: T) {
 	const configured = createPrimOptions(options)
 	const empty = {} as T // when not given on client-side, treat empty object as T
-
-	// SECTION: WIP, batched calls
+	// SECTION: batched HTTP calls
 	const queuedCalls: { time: Date, rpc: RpcCall, result: Promise<RpcAnswer>, resolved?: "yes"|"pending" }[] = []
 	const httpEvent = createNanoEvents<{
 		response: (result: RpcAnswer) => void
@@ -112,7 +111,8 @@ export function createPrimClient<T extends Record<V, T[V]>, V extends keyof T = 
 					if (typeof a !== "function") { return a }
 					callbacksGiven = true
 					const generatedId = "_cb_" + nanoid()
-					/* const unbind =  */wsEvent.on("response", (msg) => {
+					// eslint-disable-next-line @typescript-eslint/no-unused-vars
+					const unbind = wsEvent.on("response", (msg) => {
 						if (msg.id !== generatedId) { return }
 						if (Array.isArray(msg.result)) {
 							a(...msg.result)
@@ -120,7 +120,7 @@ export function createPrimClient<T extends Record<V, T[V]>, V extends keyof T = 
 							a(msg.result)
 						}
 						// TODO: it's hard to unbind until I know callback won't fire anymore. I may need to just move old events
-						// to a deprioritized list so the list of events doesn't become unwieldy and potentially slow down new
+						// to a de-prioritized list so the list of events doesn't become unwieldy and potentially slow down new
 						// callbacks/events
 						// unbind()
 					})
@@ -153,25 +153,6 @@ export function createPrimClient<T extends Record<V, T[V]>, V extends keyof T = 
 				httpEvent.emit("queue", { time, rpc, result })
 				return result
 				// !SECTION
-
-				// TODO: write wrapper around client to support batch requests and instead make below return a promise that
-				// becomes resolved when either answered in a batch response over HTTP or answered over websocket.
-				// See `batchRequests` idea in this project.
-				// return configured.client(configured.endpoint, rpc, configured.jsonHandler)
-				// 	.then(answer => {
-				// 		if (Array.isArray(answer)) {
-				// 			// TODO add support for multiple responses, see TODO above
-				// 			throw new RpcError({ message: "Not implemented.", code: -1 })
-				// 		}
-				// 		if (answer.error) {
-				// 			throw answer.error
-				// 		}
-				// 		return answer.result
-				// 	})
-				// 	.catch((error) => {
-				// 		// it is expected for given module to throw if there is an error so that Prim-RPC can also error on the client
-				// 		throw new RpcError(error)
-				// 	})
 			}
 		},
 		get(_target, _prop, _receiver) {
@@ -180,14 +161,14 @@ export function createPrimClient<T extends Record<V, T[V]>, V extends keyof T = 
 	})
 	// !SECTION
 	// SECTION: WebSocket event handling
-	const wsEvent = configured.internal.event ?? createNanoEvents<PrimWebsocketEvents>()
+	const wsEvent = configured.internal.event ?? createNanoEvents<PrimWebSocketEvents>()
 	function createWebsocket(initialMessage: RpcCall) {
 		const response = (given: RpcAnswer) => {
 			wsEvent.emit("response", given)
 		}
 		const ended = () => {
 			sendMessage = setupWebsocket
-			wsEvent.emit("end")
+			wsEvent.emit("ended")
 		}
 		const connected = () => {
 			// event.emit("connect")
