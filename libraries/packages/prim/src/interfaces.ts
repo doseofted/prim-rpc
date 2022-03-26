@@ -16,6 +16,17 @@ export interface RpcAnswer<Result = any, Error = any> extends RpcBase {
 	error?: RpcErr<Error>
 }
 
+export interface PrimHttpQueueItem {
+	rpc: RpcCall
+	result: Promise<RpcAnswer>,
+	resolved?: "yes"|"pending"
+}
+
+export interface PrimHttpEvents {
+	response: (result: RpcAnswer) => void
+	queue: (given: PrimHttpQueueItem) => void
+}
+
 export interface PrimWebSocketEvents {
 	connected: () => void
 	// NOTE: I don't need to return multiple answers unless batching is allowed over websocket (not needed)

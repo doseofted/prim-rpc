@@ -13,7 +13,7 @@ import ProxyDeep from "proxy-deep"
 import { get as getProperty, remove as removeFromArray } from "lodash"
 import { nanoid } from "nanoid"
 import { createNanoEvents } from "nanoevents"
-import { RpcCall, PrimOptions, RpcAnswer, PrimWebSocketEvents } from "./interfaces"
+import { RpcCall, PrimOptions, RpcAnswer, PrimWebSocketEvents, PrimHttpEvents } from "./interfaces"
 import { createPrimOptions } from "./options"
 import { RpcError } from "./error"
 
@@ -30,11 +30,8 @@ export function createPrimClient<T extends Record<V, T[V]>, V extends keyof T = 
 	const configured = createPrimOptions(options)
 	const empty = {} as T // when not given on client-side, treat empty object as T
 	// SECTION: batched HTTP calls
-	const queuedCalls: { time: Date, rpc: RpcCall, result: Promise<RpcAnswer>, resolved?: "yes"|"pending" }[] = []
-	const httpEvent = createNanoEvents<{
-		response: (result: RpcAnswer) => void
-		queue: (given: { time: Date, rpc: RpcCall, result: Promise<RpcAnswer>, resolved?: "yes"|"pending" }) => void
-	}>()
+	const queuedCalls: { rpc: RpcCall, result: Promise<RpcAnswer>, resolved?: "yes"|"pending" }[] = []
+	const httpEvent = createNanoEvents<PrimHttpEvents>()
 	let timer: ReturnType<typeof setTimeout>
 	const batchedRequests = () => {
 		if (timer) { return }
@@ -135,11 +132,7 @@ export function createPrimClient<T extends Record<V, T[V]>, V extends keyof T = 
 
 				// SECTION: WIP, batched calls
 				const result = new Promise<RpcAnswer>((resolve, reject) => {
-					console.log("adding event handler");
-					
 					httpEvent.on("response", (answer) => {
-						console.log(rpc.id, answer.id, answer);
-						
 						if (rpc.id !== answer.id) { return }
 						if (answer.error) {
 							reject(new RpcError(answer.error))
@@ -148,9 +141,7 @@ export function createPrimClient<T extends Record<V, T[V]>, V extends keyof T = 
 						}
 					})
 				})
-				// TODO consider removing time (it's not used yet)
-				const time = new Date()
-				httpEvent.emit("queue", { time, rpc, result })
+				httpEvent.emit("queue", { rpc, result })
 				return result
 				// !SECTION
 			}
@@ -171,7 +162,7 @@ export function createPrimClient<T extends Record<V, T[V]>, V extends keyof T = 
 			wsEvent.emit("ended")
 		}
 		const connected = () => {
-			// event.emit("connect")
+			// wsEvent.emit("connected")
 			// NOTE connect event should only happen once so initial message will be sent then
 			send(initialMessage)
 		}
