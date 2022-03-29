@@ -7,14 +7,10 @@
  * a testing framework is setup.
  */
 
-// SECTION: frontend/backend integration test
-// this is for example usage from frontend and backend
 export const you = "Ted"
-// console.log("Hello", you)
-// !SECTION: frontend/backend integration test
 
 /**
- * Say hello.
+ * Say hello. A test with an object parameter.
  *
  * @param options Options used for greeting
  * @returns A nice greeting
@@ -31,25 +27,28 @@ export async function sayHello (options: { greeting?: string, name?: string }) {
  * @param name What's your name?
  * @returns A nice greeting
  */
-export async function sayHelloAlternative(greeting = "", name = "") {
-	return `${greeting || "Hello"} ${name || "you"}!`
+export async function sayHelloAlternative(greeting: string, name: string) {
+	return `${greeting ?? "Hello"} ${name ?? "you"}!`
 }
 
 /**
- * This is an example of an entire that module that might be exported
+ * This is an example of an entire that module that might be exported.
  */
 export const testLevel1 = {
 	sayHello,
 	sayHelloAlternative
 }
 
+/** A module inside of module. A module turducken. */
 export const testLevel2 = { testLevel1 }
 
+/** It throws on purpose. */
 export function oops(ok = false) {
 	if (!ok) { throw new Error("My bad.") }
 	return "I did it again."
 }
 
+/** This function makes use of a callback. Sometimes I don't need to be clever. */
 export function withCallback(cb: (message: string) => void) {
 	cb("You're using Prim.")
 	setTimeout(() => {
@@ -57,6 +56,7 @@ export function withCallback(cb: (message: string) => void) {
 	}, 100);
 }
 
+/** Type a message. Now with configurable type speed. */
 export function typeMessage(message: string, typeLetter: (typed: string) => void, speed = 300) {
 	let timeout = 0
 	message.split("").forEach(letter => {

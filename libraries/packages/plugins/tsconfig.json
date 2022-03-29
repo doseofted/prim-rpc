@@ -4,6 +4,7 @@
 		"jsxImportSource": "preact",
 		"jsx": "react-jsx",
 		"resolveJsonModule": true,
-		"types": ["node"]
+		"esModuleInterop": true,
+		"types": ["node", "jest"]
 	}
 }

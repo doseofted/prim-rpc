@@ -20,7 +20,7 @@ export const primFasifyPlugin: FastifyPluginAsync<{ prim: PrimServer, prefix?: s
 	const { prefix = "/prim", prim } = options
 	fastify.route<{ Body: RpcCall, Params: { method?: string } }>({
 		method: ["POST", "GET"],
-		url: `${prefix}*`,
+		url: "*", // NOTE: fastify handles prefix already
 		handler: async ({ url, body }, reply) => {
 			const response = await prim.rpc({ prefix, url, body })
 			reply.send(response)
