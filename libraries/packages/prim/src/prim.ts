@@ -29,51 +29,6 @@ import { RpcError } from "./error"
 export function createPrimClient<T extends Record<V, T[V]>, V extends keyof T = keyof T>(options?: PrimOptions, givenModule?: T) {
 	const configured = createPrimOptions(options)
 	const empty = {} as T // when not given on client-side, treat empty object as T
-	// SECTION: batched HTTP calls
-	const queuedCalls: { rpc: RpcCall, result: Promise<RpcAnswer>, resolved?: "yes"|"pending" }[] = []
-	const httpEvent = createNanoEvents<PrimHttpEvents>()
-	let timer: ReturnType<typeof setTimeout>
-	const batchedRequests = () => {
-		if (timer) { return }
-		timer = setTimeout(async () => {
-			const rpcList = queuedCalls.filter(c => !c.resolved)
-			rpcList.forEach(r => { r.resolved = "pending" })
-			clearTimeout(timer); timer = undefined
-			const rpcCalls = rpcList.map(r => r.rpc)
-			configured.client(configured.endpoint, rpcCalls.length === 1 ? rpcCalls[0] : rpcCalls, configured.jsonHandler)
-				.then(answer => {
-					// return either the single result or the list of results to caller
-					if (Array.isArray(answer)) {
-						answer.forEach(a => {
-							httpEvent.emit("response", a)
-						})
-					} else {
-						httpEvent.emit("response", answer)
-					}
-				})
-				.catch((error) => {
-					if (Array.isArray(error)) {
-						// multiple errors given, return each error result to caller
-						error.forEach(e => { httpEvent.emit("response", e) })
-					} else {
-						// one error was given even though there may be multiple results, return that error to caller
-						rpcList.forEach(r => {
-							const id = r.rpc.id
-							httpEvent.emit("response", { id, error })
-						})
-					}
-				}).finally(() => {
-					// mark all RPC in this list as resolved so they can be removed, without removing other pending requests
-					rpcList.forEach(r => { r.resolved = "yes" })
-					removeFromArray(queuedCalls, given => given.resolved === "yes")
-				})
-		}, configured.clientBatchTime)
-	}
-	httpEvent.on("queue", (given) => {
-		queuedCalls.push(given)
-		batchedRequests()
-	})
-	// !SECTION
 	// SECTION proxy to resolve function calls
 	const proxy = new ProxyDeep<T>(givenModule ?? empty, {
 		apply(_emptyTarget, that, args) {
@@ -129,8 +84,6 @@ export function createPrimClient<T extends Record<V, T[V]>, V extends keyof T = 
 					sendMessage(rpc)
 					// return
 				}
-
-				// SECTION: WIP, batched calls
 				const result = new Promise<RpcAnswer>((resolve, reject) => {
 					httpEvent.on("response", (answer) => {
 						if (rpc.id !== answer.id) { return }
@@ -143,7 +96,6 @@ export function createPrimClient<T extends Record<V, T[V]>, V extends keyof T = 
 				})
 				httpEvent.emit("queue", { rpc, result })
 				return result
-				// !SECTION
 			}
 		},
 		get(_target, _prop, _receiver) {
@@ -174,6 +126,51 @@ export function createPrimClient<T extends Record<V, T[V]>, V extends keyof T = 
 	const setupWebsocket = (msg: RpcCall) => createWebsocket(msg)
 	/** Sets up WebSocket if needed, then sends a message */
 	let sendMessage: (message: RpcCall) => void = setupWebsocket
+	// !SECTION
+	// SECTION: batched HTTP calls
+	const queuedCalls: { rpc: RpcCall, result: Promise<RpcAnswer>, resolved?: "yes" | "pending" }[] = []
+	const httpEvent = createNanoEvents<PrimHttpEvents>()
+	let timer: ReturnType<typeof setTimeout>
+	const batchedRequests = () => {
+		if (timer) { return }
+		timer = setTimeout(async () => {
+			const rpcList = queuedCalls.filter(c => !c.resolved)
+			rpcList.forEach(r => { r.resolved = "pending" })
+			clearTimeout(timer); timer = undefined
+			const rpcCalls = rpcList.map(r => r.rpc)
+			configured.client(configured.endpoint, rpcCalls.length === 1 ? rpcCalls[0] : rpcCalls, configured.jsonHandler)
+				.then(answer => {
+					// return either the single result or the list of results to caller
+					if (Array.isArray(answer)) {
+						answer.forEach(a => {
+							httpEvent.emit("response", a)
+						})
+					} else {
+						httpEvent.emit("response", answer)
+					}
+				})
+				.catch((error) => {
+					if (Array.isArray(error)) {
+						// multiple errors given, return each error result to caller
+						error.forEach(e => { httpEvent.emit("response", e) })
+					} else {
+						// one error was given even though there may be multiple results, return that error to caller
+						rpcList.forEach(r => {
+							const id = r.rpc.id
+							httpEvent.emit("response", { id, error })
+						})
+					}
+				}).finally(() => {
+					// mark all RPC in this list as resolved so they can be removed, without removing other pending requests
+					rpcList.forEach(r => { r.resolved = "yes" })
+					removeFromArray(queuedCalls, given => given.resolved === "yes")
+				})
+		}, configured.clientBatchTime)
+	}
+	httpEvent.on("queue", (given) => {
+		queuedCalls.push(given)
+		batchedRequests()
+	})
 	// !SECTION
 	return proxy
 }
