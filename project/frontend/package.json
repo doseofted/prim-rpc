@@ -20,23 +20,23 @@
   },
   "dependencies": {
     "@capacitor-community/electron": "^4.1.0",
-    "@capacitor/android": "^3.4.3",
-    "@capacitor/core": "^3.4.3",
-    "@capacitor/ios": "^3.4.3",
+    "@capacitor/android": "^3.5.0",
+    "@capacitor/core": "^3.5.0",
+    "@capacitor/ios": "^3.5.0",
     "example": "workspace:*",
     "prim": "workspace:*",
-    "vue": "^3.2.31"
+    "vue": "^3.2.33"
   },
   "devDependencies": {
-    "@capacitor/cli": "^3.4.3",
-    "@vitejs/plugin-vue": "^2.2.4",
-    "eslint-plugin-vue": "^8.5.0",
-    "postcss-html": "^1.3.0",
-    "stylelint": "^14.5.3",
-    "stylelint-config-recommended-vue": "^1.3.0",
+    "@capacitor/cli": "^3.5.0",
+    "@vitejs/plugin-vue": "^2.3.1",
+    "eslint-plugin-vue": "^8.7.1",
+    "postcss-html": "^1.4.1",
+    "stylelint": "^14.7.1",
+    "stylelint-config-recommended-vue": "^1.4.0",
     "stylelint-config-standard-scss": "^3.0.0",
-    "typescript": "^4.6.2",
-    "vite": "^2.8.6",
-    "vue-tsc": "^0.32.1"
+    "typescript": "^4.6.3",
+    "vite": "^2.9.5",
+    "vue-tsc": "^0.34.10"
   }
 }

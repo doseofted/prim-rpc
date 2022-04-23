@@ -13,11 +13,13 @@ www.{$HOST} {
 }
 
 {$HOST} {
+  encode zstd gzip
   reverse_proxy frontend:3000
   root * /srv
   file_server
 }
 
 api.{$HOST} {
+  encode zstd gzip
   reverse_proxy backend:3001
 }

@@ -53,6 +53,8 @@ tasks:
   dev:clean:
     desc: "Remove locally built files from the project, useful for a clean run (data/* must be deleted separately by root)"
     cmds:
+      # Remove Task cache
+      - "rm -fr .task"
       # Remove Parcel cache
       - "rm -fr .parcel-cache"
       # and root node modules

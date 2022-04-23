@@ -5,11 +5,8 @@ import vue from "@vitejs/plugin-vue"
 export default defineConfig({
 	plugins: [vue()],
 	server: {
-		host: "0.0.0.0",
-		hmr: {
-			// NOTE: use port 443 for use in Docker. Remove prop and use default for local development
-			// REFERENCE: https://github.com/vitejs/vite/issues/4259#issuecomment-924219548
-			port: 443
-		}
+		host: "0.0.0.0", // needed for Docker
+		cors: false, // no need to complicate things in development
+		hmr: { clientPort: 443, port: 24678 }, // actual port Vite uses is `24678` but browser will connect to secured reverse proxy
 	}
 })

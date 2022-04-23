@@ -50,6 +50,7 @@ services:
     restart: "no"
     ports:
       - "3000:3000"
+      - "24678:24678"
     image: "doseofted/${COMPOSE_PROJECT_NAME}-frontend:${PROJECT_VERSION}"
     build:
       context: .

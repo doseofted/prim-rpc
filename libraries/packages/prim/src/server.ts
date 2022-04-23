@@ -2,7 +2,7 @@ import { RpcError } from "./error"
 import { createPrimClient } from "./prim"
 import { CommonFrameworkOptions, PrimOptions, PrimWebSocketEvents, RpcAnswer, RpcCall } from "./interfaces"
 import { get as getProperty } from "lodash"
-import defu from "defu"
+import { defu } from "defu"
 import { nanoid } from "nanoid"
 import { getQuery, parseURL } from "ufo"
 import { createNanoEvents, Emitter } from "nanoevents"
@@ -90,7 +90,7 @@ export function createPrimServer<T extends Record<V, T[V]>, V extends keyof T = 
 		}
 		const callWithDefaults = (body: Partial<RpcCall>) => {
 			// TODO: stop defu from concatenating params
-			const rpc = defu.fn<Partial<RpcCall>, RpcCall>(body, { id: nanoid(), method: "default" })
+			const rpc = defu<Partial<RpcCall>, RpcCall>(body, { id: nanoid(), method: "default" })
 			return makeRpcCall(rpc)
 		}
 		// if RPC calls are batched, answer all calls, otherwise answer the single RPC call
