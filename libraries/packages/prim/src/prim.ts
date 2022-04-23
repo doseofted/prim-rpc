@@ -31,15 +31,15 @@ export function createPrimClient<T extends Record<V, T[V]>, V extends keyof T = 
 	const empty = {} as T // when not given on client-side, treat empty object as T
 	// SECTION proxy to resolve function calls
 	const proxy = new ProxyDeep<T>(givenModule ?? empty, {
-		apply(_emptyTarget, that, args) {
+		// eslint-disable-next-line @typescript-eslint/no-explicit-any
+		apply(_emptyTarget, that, args: any[]) {
 			// call available function on server
 			const realTarget = getProperty(givenModule, this.path)
 			if (configured.server && typeof realTarget === "function") {
 				try {
 					// At this point, all callbacks have been replaced with identifiers so I should go through each reference
 					// and make a callback that emits a "response" type which will be sent back over the websocket with identifier
-					// eslint-disable-next-line @typescript-eslint/no-explicit-any
-					args = (args as any[]).map(arg => {
+					args = args.map(arg => {
 						if (!(typeof arg === "string" && arg.startsWith("_cb_"))) { return arg }
 						return (...cbArgs) => {
 							wsEvent.emit("response", { result: cbArgs, id: arg })

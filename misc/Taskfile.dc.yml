@@ -73,6 +73,7 @@ tasks:
     deps:
       - build
     cmds:
+      - task: :js:install
       # First, a trusted certificate should be set up for use in container
       - task: :dev:cert
       # Now the services can be started in the background
