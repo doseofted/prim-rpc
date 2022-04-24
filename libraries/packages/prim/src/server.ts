@@ -5,7 +5,7 @@ import { get as getProperty } from "lodash"
 import { defu } from "defu"
 import { nanoid } from "nanoid"
 import { getQuery, parseURL } from "ufo"
-import { createNanoEvents, Emitter } from "nanoevents"
+import mitt, { Emitter } from "mitt"
 import { createPrimOptions } from "./options"
 
 // TODO: make this work with methods called in path over GET request
@@ -31,7 +31,7 @@ export interface PrimServer {
  * @returns A function that expects JSON resembling an RPC call
  */
 export function createPrimServer<T extends Record<V, T[V]>, V extends keyof T = keyof T>(givenModule?: T, options?: PrimOptions): PrimServer {
-	const ws = createNanoEvents<PrimWebSocketEvents>()
+	const ws = mitt<PrimWebSocketEvents>()
 	const givenOptions = createPrimOptions(options)
 	// if server is false, Prim Server should forward request to another Prim Server otherwise resolve locally
 	if (options?.server === undefined) { givenOptions.server = true } // assume `server` is true if option was not given

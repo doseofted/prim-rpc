@@ -13,6 +13,8 @@
   },
   "license": "UNLICENSED",
   "scripts": {
+    "watch": "parcel watch",
+    "build": "parcel build",
     "doc": "typedoc src/index.ts --json dist/main.typedoc.json",
     "jsdoc": "jsdoc dist/main.js -X > dist/main.jsdoc.json"
   },

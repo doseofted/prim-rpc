@@ -5,6 +5,8 @@ import * as example from "example"
 import { createPrimServer } from "prim"
 import { primFasifyPlugin, primWebSocketServerSetup } from "prim-plugins"
 
+// const { createPrimServer } = await import("prim")
+
 const fastify = Fastify({ logger: true })
 const websocket = new WebSocketServer({ server: fastify.server })
 const prim = createPrimServer(example)

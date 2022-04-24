@@ -15,6 +15,10 @@
   "dependencies": {
     "prim": "workspace:*"
   },
+  "scripts": {
+    "watch": "parcel watch",
+    "build": "parcel build"
+  },
   "devDependencies": {
     "@types/express": "^4.17.13",
     "@types/jest": "^27.4.1",

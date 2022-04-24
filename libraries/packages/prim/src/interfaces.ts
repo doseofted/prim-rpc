@@ -1,4 +1,4 @@
-import { Emitter } from "nanoevents"
+import { Emitter } from "mitt"
 import { RpcErr } from "./error"
 interface RpcBase {
 	id?: string | number
@@ -22,12 +22,19 @@ export interface PrimHttpQueueItem {
 	resolved?: "yes"|"pending"
 }
 
-export interface PrimHttpEvents {
-	response: (result: RpcAnswer) => void
-	queue: (given: PrimHttpQueueItem) => void
+export type PrimHttpEvents = {
+	response: RpcAnswer
+	queue: PrimHttpQueueItem
 }
 
-export interface PrimWebSocketEvents {
+export type PrimWebSocketEvents = {
+	connected: undefined
+	response: RpcAnswer
+	ended: undefined
+}
+
+// NOTE: this must match type given above
+export interface PrimWebSocketFunctionEvents {
 	connected: () => void
 	// NOTE: I don't need to return multiple answers unless batching is allowed over websocket (not needed)
 	// response: (answer: RpcAnswer|RpcAnswer[]) => void
@@ -36,7 +43,7 @@ export interface PrimWebSocketEvents {
 }
 
 export type PrimClientFunction = (endpoint: string, jsonBody: RpcCall|RpcCall[], jsonHandler?: JSON) => Promise<RpcAnswer|RpcAnswer[]>
-export type PrimSocketFunction = (endpoint: string, events: PrimWebSocketEvents, jsonHandler?: JSON) => ({
+export type PrimSocketFunction = (endpoint: string, events: PrimWebSocketFunctionEvents, jsonHandler?: JSON) => ({
 	send: (message: RpcCall|RpcCall[]) => void
 })
 
