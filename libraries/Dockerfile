@@ -3,10 +3,10 @@
 # ---
 # Install common utils for container
 # ---
-FROM node:16.14-bullseye-slim as setup
-ARG DEBIAN_FRONTEND "noninteractive"
-RUN apt-get update -qq --no-install-recommends \
-	&& apt-get install -qq build-essential python3
+FROM node:16.14-bullseye as setup
+# ARG DEBIAN_FRONTEND "noninteractive"
+# RUN apt-get update -qq --no-install-recommends \
+# 	&& apt-get install -qq build-essential python3
 USER root
 RUN corepack enable
 RUN corepack prepare pnpm@6.32.2 --activate
