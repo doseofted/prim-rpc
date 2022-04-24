@@ -11,5 +11,13 @@
     "email": "ted@doseofted.com",
     "url": "https://doseofted.com/"
   },
-  "license": "UNLICENSED"
+  "license": "UNLICENSED",
+  "scripts": {
+    "doc": "typedoc src/index.ts --json dist/main.typedoc.json",
+    "jsdoc": "jsdoc dist/main.js -X > dist/main.jsdoc.json"
+  },
+  "devDependencies": {
+    "jsdoc": "^3.6.10",
+    "typedoc": "^0.22.15"
+  }
 }
