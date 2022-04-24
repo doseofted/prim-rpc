@@ -152,6 +152,7 @@ importers:
       '@capacitor/core': ^3.5.0
       '@capacitor/ios': ^3.5.0
       '@vitejs/plugin-vue': ^2.3.1
+      docs: workspace:*
       eslint-plugin-vue: ^8.7.1
       example: workspace:*
       postcss-html: ^1.4.1
@@ -168,6 +169,7 @@ importers:
       '@capacitor/android': 3.5.0_@capacitor+core@3.5.0
       '@capacitor/core': 3.5.0
       '@capacitor/ios': 3.5.0_@capacitor+core@3.5.0
+      docs: link:../../libraries/packages/docs
       example: link:../../libraries/packages/example
       prim: link:../../libraries/packages/prim
       vue: 3.2.33

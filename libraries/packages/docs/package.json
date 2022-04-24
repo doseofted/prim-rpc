@@ -1,5 +1,5 @@
 {
-  "name": "example",
+  "name": "docs",
   "version": "1.0.0",
   "description": "Internal reference for creating other packages in the future",
   "source": "src/index.ts",
