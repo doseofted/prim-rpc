@@ -5,10 +5,9 @@ importers:
   .:
     specifiers:
       '@parcel/core': ^2.5.0
-      '@parcel/packager-ts': ^2.5.0
-      '@parcel/transformer-typescript-types': ^2.5.0
+      '@parcel/packager-ts': 2.5.0
+      '@parcel/transformer-typescript-types': 2.5.0
       '@parcel/transformer-vue': 2.5.0
-      '@parcel/transformer-yaml': ^2.5.0
       '@typescript-eslint/eslint-plugin': ^5.20.0
       '@typescript-eslint/parser': ^5.20.0
       eslint: ^8.14.0
@@ -23,7 +22,6 @@ importers:
       '@parcel/packager-ts': 2.5.0_@parcel+core@2.5.0
       '@parcel/transformer-typescript-types': 2.5.0_b7188ae01d33e4f95bf569552a88b89a
       '@parcel/transformer-vue': 2.5.0_@parcel+core@2.5.0
-      '@parcel/transformer-yaml': 2.5.0_@parcel+core@2.5.0
       '@typescript-eslint/eslint-plugin': 5.20.0_81f0d1a74f014d44d273bd1612c85fd9
       '@typescript-eslint/parser': 5.20.0_eslint@8.14.0+typescript@4.6.3
       eslint: 8.14.0
@@ -33,17 +31,6 @@ importers:
       ts-jest: 27.1.4_jest@27.5.1+typescript@4.6.3
       typescript: 4.6.3
       zx: 6.1.0
-
-  libraries/packages/docs:
-    specifiers:
-      example: workspace:*
-      typescript: ^4.6.3
-      vue: ^3.2.33
-    dependencies:
-      example: link:../example
-      vue: 3.2.33
-    devDependencies:
-      typescript: 4.6.3
 
   libraries/packages/example:
     specifiers:
@@ -98,6 +85,7 @@ importers:
       example: workspace:*
       jest: ^27.5.1
       lodash: ^4.17.21
+      mitt: ^3.0.0
       nanoevents: ^6.0.2
       nanoid: ^3.3.3
       proxy-deep: ^3.1.1
@@ -107,6 +95,7 @@ importers:
     dependencies:
       defu: 6.0.0
       lodash: 4.17.21
+      mitt: 3.0.0
       nanoevents: 6.0.2
       nanoid: 3.3.3
       proxy-deep: 3.1.1
@@ -152,7 +141,6 @@ importers:
       '@capacitor/core': ^3.5.0
       '@capacitor/ios': ^3.5.0
       '@vitejs/plugin-vue': ^2.3.1
-      docs: workspace:*
       eslint-plugin-vue: ^8.7.1
       example: workspace:*
       postcss-html: ^1.4.1
@@ -169,7 +157,6 @@ importers:
       '@capacitor/android': 3.5.0_@capacitor+core@3.5.0
       '@capacitor/core': 3.5.0
       '@capacitor/ios': 3.5.0_@capacitor+core@3.5.0
-      docs: link:../../libraries/packages/docs
       example: link:../../libraries/packages/example
       prim: link:../../libraries/packages/prim
       vue: 3.2.33
@@ -1705,16 +1692,6 @@ packages:
       - '@parcel/core'
     dev: true
 
-  /@parcel/transformer-yaml/2.5.0_@parcel+core@2.5.0:
-    resolution: {integrity: sha512-AfbdXiQIpwUCfjvU0HmlO4xoe5uQttjtmYIgopZC3KdRYghjQmTx5sBMacu0605NiL3elwrUwYWquVTzPlwpzg==}
-    engines: {node: '>= 12.0.0', parcel: ^2.5.0}
-    dependencies:
-      '@parcel/plugin': 2.5.0_@parcel+core@2.5.0
-      js-yaml: 3.14.1
-    transitivePeerDependencies:
-      - '@parcel/core'
-    dev: true
-
   /@parcel/ts-utils/2.5.0_typescript@4.6.3:
     resolution: {integrity: sha512-YITx84Olg27PDxvJlXzzPVgqTtW3tEqQFh+wE2g7+Mwk4Q8vd/jL+mjDBF/5LEnGCk2WvjkcuBK/QOv7Y+YDsg==}
     engines: {node: '>= 12.0.0'}
@@ -1856,7 +1833,7 @@ packages:
     resolution: {integrity: sha512-ALYone6pm6QmwZoAgeyNksccT9Q4AWZQ6PvfwR37GT6r6FWUPguq6sUmNGSMV2Wr761oQoBxwGGa6DR5o1DC9g==}
     dependencies:
       '@types/connect': 3.4.35
-      '@types/node': 17.0.21
+      '@types/node': 17.0.25
     dev: true
 
   /@types/component-emitter/1.2.11:
@@ -1866,7 +1843,7 @@ packages:
   /@types/connect/3.4.35:
     resolution: {integrity: sha512-cdeYyv4KWoEgpBISTxWvqYsVy444DOqehiF3fM3ne10AmJ62RSyNkUnxMJXHQWRQQX2eR94m5y1IZyDwBjV9FQ==}
     dependencies:
-      '@types/node': 17.0.21
+      '@types/node': 17.0.25
     dev: true
 
   /@types/cookie/0.4.1:
@@ -1884,7 +1861,7 @@ packages:
   /@types/express-serve-static-core/4.17.28:
     resolution: {integrity: sha512-P1BJAEAW3E2DJUlkgq4tOL3RyMunoWXqbSCygWo5ZIWTjUgN1YnaXWW4VWl/oc8vs/XoYibEGBKP0uZyF4AHig==}
     dependencies:
-      '@types/node': 17.0.21
+      '@types/node': 17.0.25
       '@types/qs': 6.9.7
       '@types/range-parser': 1.2.4
     dev: true
@@ -1996,7 +1973,7 @@ packages:
     resolution: {integrity: sha512-nCkHGI4w7ZgAdNkrEu0bv+4xNV/XDqW+DydknebMOQwkpDGx8G+HTlj7R7ABI8i8nKxVw0wtKPi1D+lPOkh4YQ==}
     dependencies:
       '@types/mime': 1.3.2
-      '@types/node': 17.0.21
+      '@types/node': 17.0.25
     dev: true
 
   /@types/stack-utils/2.0.1:
@@ -2007,7 +1984,7 @@ packages:
     resolution: {integrity: sha512-mu/N4uvfDN2zVQQ5AYJI/g4qxn2bHB6521t1UuH09ShNWjebTqN0ZFuYK9uYjcgmI0dTQEs+Owi1EO6U0OkOZQ==}
     dependencies:
       '@types/cookiejar': 2.1.2
-      '@types/node': 17.0.21
+      '@types/node': 17.0.25
     dev: true
 
   /@types/supertest/2.0.12:
@@ -3335,7 +3312,7 @@ packages:
     resolution: {integrity: sha512-V05mmDo4gjimYW+FGujoGmmmxRaDsrVr7AXA3ZIfa04MWM1jOfZfUwou0oNqhNwy/votUDvGDt4JA4QF4e0b4g==}
     dependencies:
       '@socket.io/component-emitter': 3.0.0
-      debug: 4.3.3
+      debug: 4.3.4
       engine.io-parser: 5.0.3
       has-cors: 1.1.0
       parseqs: 0.0.6
@@ -3362,12 +3339,12 @@ packages:
     dependencies:
       '@types/cookie': 0.4.1
       '@types/cors': 2.8.12
-      '@types/node': 17.0.21
+      '@types/node': 17.0.25
       accepts: 1.3.8
       base64id: 2.0.0
       cookie: 0.4.2
       cors: 2.8.5
-      debug: 4.3.3
+      debug: 4.3.4
       engine.io-parser: 5.0.3
       ws: 8.2.3
     transitivePeerDependencies:
@@ -5686,6 +5663,10 @@ packages:
       minipass: 3.1.6
       yallist: 4.0.0
 
+  /mitt/3.0.0:
+    resolution: {integrity: sha512-7dX2/10ITVyqh4aOSVI9gdape+t9l2/8QxHrFmUXu4EEUpdlxl6RudZUPZoc+zuY2hk1j7XxVroIVIan/pD/SQ==}
+    dev: false
+
   /mkdirp/1.0.4:
     resolution: {integrity: sha512-vVqVZQyf3WLx2Shd0qJ9xuvqgAyKPLAiqITEtqW0oIUjzo3PePDd6fW9iFz30ef7Ysp/oiWqbhszeGWW2T6Gzw==}
     engines: {node: '>=10'}
@@ -6739,7 +6720,7 @@ packages:
     dependencies:
       '@socket.io/component-emitter': 3.0.0
       backo2: 1.0.2
-      debug: 4.3.3
+      debug: 4.3.4
       engine.io-client: 6.1.1
       parseuri: 0.0.6
       socket.io-parser: 4.1.2
@@ -6755,7 +6736,7 @@ packages:
     dependencies:
       '@types/component-emitter': 1.2.11
       component-emitter: 1.3.0
-      debug: 4.3.3
+      debug: 4.3.4
     transitivePeerDependencies:
       - supports-color
     dev: true
@@ -6765,7 +6746,7 @@ packages:
     engines: {node: '>=10.0.0'}
     dependencies:
       '@socket.io/component-emitter': 3.0.0
-      debug: 4.3.3
+      debug: 4.3.4
     transitivePeerDependencies:
       - supports-color
     dev: true
@@ -6776,7 +6757,7 @@ packages:
     dependencies:
       accepts: 1.3.8
       base64id: 2.0.0
-      debug: 4.3.3
+      debug: 4.3.4
       engine.io: 6.1.3
       socket.io-adapter: 2.3.3
       socket.io-parser: 4.0.4
@@ -7089,7 +7070,7 @@ packages:
     dependencies:
       component-emitter: 1.3.0
       cookiejar: 2.1.3
-      debug: 4.3.3
+      debug: 4.3.4
       fast-safe-stringify: 2.1.1
       form-data: 4.0.0
       formidable: 2.0.1
@@ -7097,7 +7078,7 @@ packages:
       mime: 2.6.0
       qs: 6.10.3
       readable-stream: 3.6.0
-      semver: 7.3.5
+      semver: 7.3.7
     transitivePeerDependencies:
       - supports-color
     dev: true

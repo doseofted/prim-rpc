@@ -28,10 +28,12 @@ tasks:
 
   build:frontend:
     env:
+      # NOTE: set Vite-specific environment based on environment ("VITE_" prefix is a security feature of Vite)
       VITE_HOST: "{{.HOST}}"
     cmds:
       - "pnpm frontend build"
     sources:
+      - "libraries/packages/**/src/**/*"
       - "project/frontend/src/**/*"
       - "project/frontend/public/**/*"
     generates:
@@ -41,6 +43,7 @@ tasks:
     cmds:
       - "pnpm backend build"
     sources:
+      - "libraries/packages/**/src/**/*"
       - "project/backend/src/**/*"
     generates:
       - "project/backend/dist/**/*"
@@ -87,17 +90,17 @@ tasks:
     cmds:
       - "pnpm frontend {{.CLI_ARGS}}"
 
-  watch:libraries:
+  dev:libraries:
     interactive: true
     cmds:
       - "pnpm libraries:dev"
 
-  watch:backend:
+  dev:backend:
     interactive: true
     cmds:
       - "pnpm backend dev"
 
-  watch:frontend:
+  dev:frontend:
     interactive: true
     cmds:
       - "pnpm frontend dev"
