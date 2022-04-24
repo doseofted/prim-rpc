@@ -7,6 +7,7 @@ importers:
       '@parcel/core': ^2.5.0
       '@parcel/packager-ts': ^2.5.0
       '@parcel/transformer-typescript-types': ^2.5.0
+      '@parcel/transformer-vue': 2.5.0
       '@parcel/transformer-yaml': ^2.5.0
       '@typescript-eslint/eslint-plugin': ^5.20.0
       '@typescript-eslint/parser': ^5.20.0
@@ -21,6 +22,7 @@ importers:
       '@parcel/core': 2.5.0
       '@parcel/packager-ts': 2.5.0_@parcel+core@2.5.0
       '@parcel/transformer-typescript-types': 2.5.0_b7188ae01d33e4f95bf569552a88b89a
+      '@parcel/transformer-vue': 2.5.0_@parcel+core@2.5.0
       '@parcel/transformer-yaml': 2.5.0_@parcel+core@2.5.0
       '@typescript-eslint/eslint-plugin': 5.20.0_81f0d1a74f014d44d273bd1612c85fd9
       '@typescript-eslint/parser': 5.20.0_eslint@8.14.0+typescript@4.6.3
@@ -31,6 +33,17 @@ importers:
       ts-jest: 27.1.4_jest@27.5.1+typescript@4.6.3
       typescript: 4.6.3
       zx: 6.1.0
+
+  libraries/packages/docs:
+    specifiers:
+      example: workspace:*
+      typescript: ^4.6.3
+      vue: ^3.2.33
+    dependencies:
+      example: link:../example
+      vue: 3.2.33
+    devDependencies:
+      typescript: 4.6.3
 
   libraries/packages/example:
     specifiers:
@@ -1674,6 +1687,22 @@ packages:
       - '@parcel/core'
     dev: true
 
+  /@parcel/transformer-vue/2.5.0_@parcel+core@2.5.0:
+    resolution: {integrity: sha512-cj+66r7Rv/gjv9AoeeuI7CiS7RHJZ7aDzzg+oyLHF5M+t6r2mHQdM7pWCIna5P98Apu0PPFitruz8QVnr820BA==}
+    engines: {node: '>= 12.0.0', parcel: ^2.5.0}
+    dependencies:
+      '@parcel/diagnostic': 2.5.0
+      '@parcel/plugin': 2.5.0_@parcel+core@2.5.0
+      '@parcel/source-map': 2.0.2
+      '@parcel/utils': 2.5.0
+      '@vue/compiler-sfc': 3.2.33
+      consolidate: 0.16.0
+      nullthrows: 1.1.1
+      semver: 5.7.1
+    transitivePeerDependencies:
+      - '@parcel/core'
+    dev: true
+
   /@parcel/transformer-yaml/2.5.0_@parcel+core@2.5.0:
     resolution: {integrity: sha512-AfbdXiQIpwUCfjvU0HmlO4xoe5uQttjtmYIgopZC3KdRYghjQmTx5sBMacu0605NiL3elwrUwYWquVTzPlwpzg==}
     engines: {node: '>= 12.0.0', parcel: ^2.5.0}
@@ -2915,6 +2944,13 @@ packages:
       unique-string: 2.0.0
       write-file-atomic: 3.0.3
       xdg-basedir: 4.0.0
+    dev: true
+
+  /consolidate/0.16.0:
+    resolution: {integrity: sha512-Nhl1wzCslqXYTJVDyJCu3ODohy9OfBMB5uD2BiBTzd7w+QY0lBzafkR8y8755yMYHAaMD4NuzbAw03/xzfw+eQ==}
+    engines: {node: '>= 0.10.0'}
+    dependencies:
+      bluebird: 3.7.2
     dev: true
 
   /content-disposition/0.5.4:
@@ -4271,7 +4307,6 @@ packages:
 
   /graceful-fs/4.2.10:
     resolution: {integrity: sha512-9ByhssR2fPVsNZj478qUUbKfmL0+t5BDVyjShtyZZLiK7ZDAArFFfopyOTj0M05wE2tJPisA4iTnnXl2YoPvOA==}
-    dev: true
 
   /graceful-fs/4.2.9:
     resolution: {integrity: sha512-NtNxqUcXgpW2iMrfqSfR73Glt39K+BLwWsPs94yR63v45T0Wbej7eRmL5cWfwEgqXnmjQp3zaJTshdRW/qC2ZQ==}
@@ -5059,7 +5094,7 @@ packages:
     engines: {node: ^10.13.0 || ^12.13.0 || ^14.15.0 || >=15.0.0}
     dependencies:
       '@types/node': 17.0.21
-      graceful-fs: 4.2.9
+      graceful-fs: 4.2.10
     dev: true
 
   /jest-snapshot/27.5.1:
@@ -5295,7 +5330,7 @@ packages:
     dependencies:
       universalify: 2.0.0
     optionalDependencies:
-      graceful-fs: 4.2.9
+      graceful-fs: 4.2.10
 
   /keyv/3.1.0:
     resolution: {integrity: sha512-9ykJ/46SN/9KPM/sichzQ7OvXyGDYKGTaDlKMGCAlg2UK8KRy4jb0d8sFc+0Tt0YYnThq8X2RZgCg74RPxgcVA==}
