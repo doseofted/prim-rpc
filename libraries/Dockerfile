@@ -12,6 +12,7 @@ RUN corepack enable
 RUN corepack prepare pnpm@7.0.0-rc.8 --activate
 ENV PNPM_HOME /home/node/pnpm
 RUN echo $PATH
+# FIXME: pnpm v7 wants global path defined but seems to break install, need to find out what's needed here
 RUN pnpm install zx@5.2.0 --global
 USER node
 RUN mkdir -p /home/node/project
