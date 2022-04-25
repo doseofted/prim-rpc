@@ -25,9 +25,9 @@ COPY --chown=1000:1000 project/backend ./project/backend
 RUN pnpm install --offline --frozen-lockfile
 # typechecks need to ran first since build step does not consider types
 # FIXME: typecheck fails in container but not on host system, add back later
-RUN pnpm check --filter="backend"
+RUN pnpm --filter="backend" check
 # build the server only, not libraries since already built
-RUN (export NODE_ENV="production"; pnpm build --filter="backend")
+RUN (export NODE_ENV="production"; pnpm --filter="backend" build)
 # Now remove all folders for source code and dev-related node_modules (only prod node_modules needed later)
 RUN find ./project/backend -type d -name 'src' -o -name 'node_modules' -prune -exec rm -rf {} \;
 

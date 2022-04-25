@@ -1,5 +1,5 @@
 {
-  "name": "example",
+  "name": "docs",
   "version": "1.0.0",
   "description": "Internal reference for creating other packages in the future",
   "source": "src/index.ts",
@@ -14,13 +14,13 @@
   "license": "UNLICENSED",
   "scripts": {
     "watch": "parcel watch",
-    "build": "parcel build",
-    "doc": "typedoc src/index.ts --json dist/main.typedoc.json",
-    "jsdoc": "jsdoc dist/main.js -X > dist/main.jsdoc.json"
+    "build": "parcel build"
   },
   "devDependencies": {
-    "jsdoc": "^3.6.10",
-    "typedoc": "^0.22.15",
-    "typescript": "^4.6.3"
+    "typescript": "^4.6.3",
+    "vue-tsc": "^0.34.10"
+  },
+  "dependencies": {
+    "vue": "^3.2.33"
   }
 }

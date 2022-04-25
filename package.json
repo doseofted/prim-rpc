@@ -8,13 +8,13 @@
 	},
 	"scripts": {
 		"zx": "zx",
-		"libraries:dev": "parcel watch 'libraries/packages/*'",
-		"libraries:build": "parcel build 'libraries/packages/*'",
+		"packages:dev": "parcel watch 'libraries/packages/*'",
+		"packages:build": "parcel build 'libraries/packages/*'",
 		"libraries:test": "jest --watch",
 		"frontend": "pnpm --filter='frontend'",
 		"backend": "pnpm --filter='backend'"
 	},
-	"packageManager": "pnpm@6.26.1",
+	"packageManager": "pnpm@7.0.0-rc.8",
 	"devDependencies": {
 		"@parcel/core": "^2.5.0",
 		"@parcel/packager-ts": "2.5.0",

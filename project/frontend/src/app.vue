@@ -4,6 +4,10 @@ import HelloYou from "./components/hello-you.vue"
 import { createPrimClient } from "prim"
 import * as exampleServer from "example"
 import type * as exampleClient from "example"
+import { components } from "docs"
+
+console.log(components)
+const DocTest2 = components.DocTest
 
 const primLocal = createPrimClient({ server: true }, exampleServer)
 const expectedMessage = ref("")
@@ -33,6 +37,7 @@ onMounted(async () => {
 
 <template>
   <div class="greeting">
+    <DocTest2 />
     <hello-you
       :message="typedMessage.join('')"
       :class="{ matches, errored }"

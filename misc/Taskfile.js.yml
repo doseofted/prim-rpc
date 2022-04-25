@@ -20,7 +20,7 @@ tasks:
 
   build:libraries:
     cmds:
-      - "pnpm libraries:build"
+      - "pnpm packages:build"
     sources:
       - "libraries/packages/**/src/**/*"
     generates:
@@ -90,10 +90,10 @@ tasks:
     cmds:
       - "pnpm frontend {{.CLI_ARGS}}"
 
-  dev:libraries:
+  dev:packages:
     interactive: true
     cmds:
-      - "pnpm libraries:dev"
+      - "pnpm packages:dev"
 
   dev:backend:
     interactive: true

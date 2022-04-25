@@ -9,7 +9,9 @@ FROM node:16.14-bullseye as setup
 # 	&& apt-get install -qq build-essential python3
 USER root
 RUN corepack enable
-RUN corepack prepare pnpm@6.32.2 --activate
+RUN corepack prepare pnpm@7.0.0-rc.8 --activate
+ENV PNPM_HOME /home/node/pnpm
+RUN echo $PATH
 RUN pnpm install zx@5.2.0 --global
 USER node
 RUN mkdir -p /home/node/project
@@ -36,7 +38,9 @@ RUN pnpm fetch --dev
 COPY --chown=1000:1000 libraries ./libraries
 RUN pnpm install --offline --frozen-lockfile
 # build all packages copied into the container from the monorepo
-RUN (export NODE_ENV="production"; pnpm libraries:build)
+RUN (export NODE_ENV="production"; pnpm packages:build)
+RUN (export NODE_ENV="production"; pnpm --filter "./libraries/interface/**" build)
+# TODO: run build script in interface folder but built library instead of using html entry point
 # Now remove all folders for source code and dev-related node_modules (only prod node_modules needed later)
 RUN find ./libraries -type d -name 'src' -o -name 'node_modules' -prune -exec rm -rf {} \;
 

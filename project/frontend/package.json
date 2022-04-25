@@ -1,6 +1,6 @@
 {
   "name": "frontend",
-  "packageManager": "pnpm@6.32.2",
+  "packageManager": "pnpm@7.0.0-rc.8",
   "author": {
     "name": "Ted Klingenberg",
     "email": "ted@doseofted.com",
@@ -23,6 +23,7 @@
     "@capacitor/android": "^3.5.0",
     "@capacitor/core": "^3.5.0",
     "@capacitor/ios": "^3.5.0",
+    "docs": "workspace:*",
     "example": "workspace:*",
     "prim": "workspace:*",
     "vue": "^3.2.33"
@@ -30,7 +31,9 @@
   "devDependencies": {
     "@capacitor/cli": "^3.5.0",
     "@vitejs/plugin-vue": "^2.3.1",
+    "eslint": "^8.14.0",
     "eslint-plugin-vue": "^8.7.1",
+    "postcss": "^8.4.12",
     "postcss-html": "^1.4.1",
     "stylelint": "^14.7.1",
     "stylelint-config-recommended-vue": "^1.4.0",

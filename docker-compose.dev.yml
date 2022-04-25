@@ -27,6 +27,7 @@ services:
         NODE_ENV: $NODE_ENV
     volumes:
       # NOTE: all projects under libraries should have their src folder linked here for development use
+      - ./libraries/packages/docs/src:/home/node/project/libraries/packages/docs/src
       - ./libraries/packages/example/src:/home/node/project/libraries/packages/example/src
       - ./libraries/packages/prim/src:/home/node/project/libraries/packages/prim/src
       - ./libraries/packages/plugins/src:/home/node/project/libraries/packages/plugins/src
