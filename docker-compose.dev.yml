@@ -39,7 +39,7 @@ services:
     image: "doseofted/${COMPOSE_PROJECT_NAME}-backend:${PROJECT_VERSION}"
     build:
       context: .
-      dockerfile: ./project/backend/Dockerfile
+      dockerfile: ./project/backend/${NODE_ENV}.Dockerfile
       # in production, build arguments aren't needed because env is provided at run-time
       args:
         PROJECT_VERSION: $PROJECT_VERSION
@@ -55,7 +55,7 @@ services:
     image: "doseofted/${COMPOSE_PROJECT_NAME}-frontend:${PROJECT_VERSION}"
     build:
       context: .
-      dockerfile: ./project/frontend/Dockerfile
+      dockerfile: ./project/frontend/${NODE_ENV}.Dockerfile
       # in production, build arguments are always used
       args:
         PROJECT_VERSION: $PROJECT_VERSION

@@ -48,7 +48,7 @@ COPY --chown=1000:1000 pnpm-*.yaml package.json ./
 # RUN pnpm fetch
 # Copy all built libraries and their package.json
 COPY --from=built /home/node/prim/libraries ./libraries
-# RUN pnpm install --frozen-lockfile --offline
+RUN pnpm install --frozen-lockfile --offline
 # Copy utilities used by run script
 RUN mkdir -p /home/node/prim/misc
 COPY --chown=1000:1000 misc/zx-utils.mjs ./misc
