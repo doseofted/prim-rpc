@@ -4,3 +4,4 @@ packages:
   - "!project/frontend/electron"
   - "libraries/packages/**"
   - "libraries/interface/**"
+  - "misc"

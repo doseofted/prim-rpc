@@ -1,7 +1,7 @@
 # NOTE: the context for this Dockerfile is the project root, not the location of the Dockerfile
 
 # ---
-# Install common utils for container
+# Install pnpm and zx on top of Node image, needed to run
 # ---
 FROM node:16.14-bullseye as setup
 USER root
@@ -13,42 +13,46 @@ RUN mkdir -p /home/node/prim
 WORKDIR /home/node/prim
 
 # ---
-# Install all needed dependencies in monorepo, to be used by other containers (to avoid duplicate network requests)
+# Install all needed dependencies across project, to be used for build
 # ---
 FROM setup as installed
 USER node
 # REFERENCE: for pnpm install in container https://pnpm.io/cli/fetch
 COPY --chown=1000:1000 pnpm-*.yaml package.json ./
-# install dev and prod dependencies to prepare for build
+# fetch dev and prod dependencies to prepare for build, to be installed later
 RUN (export NODE_ENV="development"; pnpm fetch)
 
 # ---
-# Configure project build
+# Build the project
 # ---
 FROM installed as built
 USER node
 COPY --chown=1000:1000 libraries ./libraries
+# Install using fetched dependencies
 RUN pnpm install --offline --frozen-lockfile
-# build all packages copied into the container from the monorepo
-ARG NODE_ENV "production"
-RUN pnpm packages:build
-# TODO: run build script in interface folder but built library instead of using html entry point
-RUN pnpm --filter './interface' build
+# build all library packages with Parcel
+RUN (export NODE_ENV="production"; pnpm packages:build)
+# build all frontend projects with Vite
+RUN (export NODE_ENV="production"; pnpm --filter './interface' build)
 
 # ---
 # Prepare project to be run
 # ---
 FROM installed as run
-# NOTE: NODE_ENV can be overridden while actively developing and pnpm utilizes the variable
 USER node
+# By using NODE_ENV arg, I can limit whether dev dependencies are installed
 ARG NODE_ENV "production"
 ARG HOST
+# Run clean install using given NODE_ENV
+COPY --chown=1000:1000 pnpm-*.yaml package.json ./
+# RUN pnpm fetch
 # Copy all built libraries and their package.json
 COPY --from=built /home/node/prim/libraries ./libraries
-# RUN pnpm install --frozen-lockfile --offline --prod
+# RUN pnpm install --frozen-lockfile --offline
+# Copy utilities used by run script
 RUN mkdir -p /home/node/prim/misc
 COPY --chown=1000:1000 misc/zx-utils.mjs ./misc
-COPY --chown=1000:1000 libraries/entrypoint.mjs ./libraries
-
+# Copy the run script itself
+COPY --chown=1000:1000 libraries/entrypoint.mjs ./libraries/
 # CMD [ "/bin/bash" ]
 ENTRYPOINT [ "./libraries/entrypoint.mjs" ]

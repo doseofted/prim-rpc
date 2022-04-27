@@ -10,6 +10,9 @@ tasks:
 
   logs:
     desc: "Show and follow recent logs for running services"
+    env:
+      # show logs from all containers
+      COMPOSE_PROFILES: "dev,monitoring"
     cmds:
       - cmd: "docker compose logs -f --tail=15"
         ignore_error: true

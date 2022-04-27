@@ -8,7 +8,6 @@
 ARG PROJECT_VERSION latest
 FROM doseofted/prim-libraries:${PROJECT_VERSION} as installed
 USER node
-# NOTE: I should probably rename "/home/node/project" so I don't have to type "project" twice
 RUN mkdir -p /home/node/prim/project/frontend 
 COPY --chown=1000:1000 project/frontend/package.json ./project/frontend/package.json
 
@@ -30,7 +29,6 @@ RUN (export NODE_ENV="production"; pnpm --filter="frontend" build)
 # Prepare project to be run
 # ---
 FROM installed as run
-# NOTE: NODE_ENV can be overridden while actively developing and pnpm utilizes the variable
 USER node
 ARG NODE_ENV "production"
 COPY --from=built /home/node/prim/project/frontend ./project/frontend

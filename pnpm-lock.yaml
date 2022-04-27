@@ -136,6 +136,12 @@ importers:
       ts-jest: 27.1.4_9985e1834e803358b7be1e6ce5ca0eea
       typescript: 4.6.3
 
+  misc:
+    specifiers:
+      zx: 6.1.0
+    devDependencies:
+      zx: 6.1.0
+
   project/backend:
     specifiers:
       '@types/ws': ^8.5.3
