@@ -9,9 +9,7 @@ FROM node:16.14-bullseye as setup
 # 	&& apt-get install -qq build-essential python3
 USER root
 RUN corepack enable
-RUN corepack prepare pnpm@7.0.0-rc.8 --activate
-ENV PNPM_HOME /home/node/pnpm
-RUN echo $PATH
+RUN corepack prepare pnpm@6.32.10 --activate
 # FIXME: pnpm v7 wants global path defined but seems to break install, need to find out what's needed here
 RUN pnpm install zx@5.2.0 --global
 USER node

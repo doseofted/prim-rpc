@@ -7,7 +7,7 @@ services:
   # used as reverse proxy for services below
   # also, used to serve built frontend
   caddy:
-    image: caddy:2.4.6-alpine
+    image: caddy:2.5.0-alpine
     environment:
       HOST: $HOST
       ADMIN_EMAIL: "ted@doseofted.com"
@@ -21,7 +21,7 @@ services:
 
   # database available for use in project
   postgres:
-    image: postgres:14.0-alpine
+    image: postgres:14.2-alpine
     environment:
       &database
       HOST: $HOST
@@ -77,7 +77,7 @@ services:
 # ------------------------------------------------------------------------------
   # Metrics from Docker (fluentd) will be forwarded to fluentbit
   fluentbit:
-    image: fluent/fluent-bit:1.8
+    image: fluent/fluent-bit:1.9.3
     command: "/fluent-bit/bin/fluent-bit -c /configs/config.conf"
     volumes:
       - /etc/localtime:/etc/localtime:ro
