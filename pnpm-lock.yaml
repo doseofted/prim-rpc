@@ -47,17 +47,6 @@ importers:
       vite: 2.9.5
       vue-tsc: 0.34.10_typescript@4.6.3
 
-  libraries/packages/docs:
-    specifiers:
-      typescript: ^4.6.3
-      vue: ^3.2.33
-      vue-tsc: ^0.34.10
-    dependencies:
-      vue: 3.2.33
-    devDependencies:
-      typescript: 4.6.3
-      vue-tsc: 0.34.10_typescript@4.6.3
-
   libraries/packages/example:
     specifiers:
       jsdoc: ^3.6.10
@@ -70,16 +59,16 @@ importers:
 
   libraries/packages/plugins:
     specifiers:
+      '@doseofted/prim': workspace:*
+      '@doseofted/prim-example': workspace:*
       '@types/express': ^4.17.13
       '@types/jest': ^27.4.1
       '@types/supertest': ^2.0.12
       '@types/ws': ^8.5.3
       axios: ^0.26.1
-      example: workspace:*
       express: ^4.17.3
       fastify: ^3.28.0
       jest: ^27.5.1
-      prim: workspace:*
       socket.io: ^4.4.1
       socket.io-client: ^4.4.1
       supertest: ^6.2.2
@@ -88,14 +77,14 @@ importers:
       typescript: ^4.6.3
       ws: ^8.5.0
     dependencies:
-      prim: link:../prim
+      '@doseofted/prim': link:../prim
     devDependencies:
+      '@doseofted/prim-example': link:../example
       '@types/express': 4.17.13
       '@types/jest': 27.4.1
       '@types/supertest': 2.0.12
       '@types/ws': 8.5.3
       axios: 0.26.1
-      example: link:../example
       express: 4.17.3
       fastify: 3.28.0
       jest: 27.5.1
@@ -109,10 +98,10 @@ importers:
 
   libraries/packages/prim:
     specifiers:
+      '@doseofted/prim-example': workspace:*
       '@types/jest': ^27.4.1
       '@types/lodash': ^4.14.182
       defu: ^6.0.0
-      example: workspace:*
       jest: ^27.5.1
       lodash: ^4.17.21
       mitt: ^3.0.0
@@ -129,9 +118,9 @@ importers:
       proxy-deep: 3.1.1
       ufo: 0.8.3
     devDependencies:
+      '@doseofted/prim-example': link:../example
       '@types/jest': 27.4.1
       '@types/lodash': 4.14.182
-      example: link:../example
       jest: 27.5.1
       ts-jest: 27.1.4_9985e1834e803358b7be1e6ce5ca0eea
       typescript: 4.6.3
@@ -144,23 +133,23 @@ importers:
 
   project/backend:
     specifiers:
+      '@doseofted/prim': workspace:*
+      '@doseofted/prim-example': workspace:*
+      '@doseofted/prim-plugins': workspace:*
       '@types/ws': ^8.5.3
       defu: ^6.0.0
-      example: workspace:*
       fastify: ^3.28.0
       fastify-cors: ^6.0.3
       nodemon: ^2.0.15
-      prim: workspace:*
-      prim-plugins: workspace:*
       typescript: ^4.6.3
       ws: ^8.5.0
     dependencies:
+      '@doseofted/prim': link:../../libraries/packages/prim
+      '@doseofted/prim-example': link:../../libraries/packages/example
+      '@doseofted/prim-plugins': link:../../libraries/packages/plugins
       defu: 6.0.0
-      example: link:../../libraries/packages/example
       fastify: 3.28.0
       fastify-cors: 6.0.3
-      prim: link:../../libraries/packages/prim
-      prim-plugins: link:../../libraries/packages/plugins
       ws: 8.5.0
     devDependencies:
       '@types/ws': 8.5.3
@@ -174,14 +163,14 @@ importers:
       '@capacitor/cli': ^3.5.0
       '@capacitor/core': ^3.5.0
       '@capacitor/ios': ^3.5.0
+      '@doseofted/prim': workspace:*
+      '@doseofted/prim-docs': workspace:*
+      '@doseofted/prim-example': workspace:*
       '@vitejs/plugin-vue': ^2.3.1
-      docs: workspace:*
       eslint: ^8.14.0
       eslint-plugin-vue: ^8.7.1
-      example: workspace:*
       postcss: ^8.4.12
       postcss-html: ^1.4.1
-      prim: workspace:*
       stylelint: ^14.7.1
       stylelint-config-recommended-vue: ^1.4.0
       stylelint-config-standard-scss: ^3.0.0
@@ -194,9 +183,9 @@ importers:
       '@capacitor/android': 3.5.0_@capacitor+core@3.5.0
       '@capacitor/core': 3.5.0
       '@capacitor/ios': 3.5.0_@capacitor+core@3.5.0
-      docs: link:../../libraries/packages/docs
-      example: link:../../libraries/packages/example
-      prim: link:../../libraries/packages/prim
+      '@doseofted/prim': link:../../libraries/packages/prim
+      '@doseofted/prim-docs': link:../../libraries/interface/docs
+      '@doseofted/prim-example': link:../../libraries/packages/example
       vue: 3.2.33
     devDependencies:
       '@capacitor/cli': 3.5.0

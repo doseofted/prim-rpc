@@ -1,5 +1,5 @@
 {
-  "name": "prim",
+  "name": "@doseofted/prim",
   "version": "1.0.0",
   "description": "Not a headless content manager but also kinda a headless content manager.",
   "source": "src/index.ts",
@@ -27,7 +27,7 @@
   "devDependencies": {
     "@types/jest": "^27.4.1",
     "@types/lodash": "^4.14.182",
-    "example": "workspace:*",
+    "@doseofted/prim-example": "workspace:*",
     "jest": "^27.5.1",
     "ts-jest": "^27.1.4",
     "typescript": "^4.6.3"

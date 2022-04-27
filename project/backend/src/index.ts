@@ -1,9 +1,9 @@
 import Fastify from "fastify"
 import Cors from "fastify-cors"
 import { WebSocketServer } from "ws"
-import * as example from "example"
-import { createPrimServer } from "prim"
-import { primFasifyPlugin, primWebSocketServerSetup } from "prim-plugins"
+import * as example from "@doseofted/prim-example"
+import { createPrimServer } from "@doseofted/prim"
+import { primFasifyPlugin, primWebSocketServerSetup } from "@doseofted/prim-plugins"
 
 // const { createPrimServer } = await import("prim")
 

@@ -1,6 +1,7 @@
 {
-  "name": "frontend",
+  "name": "@doseofted/prim-frontend",
   "packageManager": "pnpm@6.32.11",
+  "private": true,
   "author": {
     "name": "Ted Klingenberg",
     "email": "ted@doseofted.com",
@@ -23,9 +24,9 @@
     "@capacitor/android": "^3.5.0",
     "@capacitor/core": "^3.5.0",
     "@capacitor/ios": "^3.5.0",
-    "docs": "workspace:*",
-    "example": "workspace:*",
-    "prim": "workspace:*",
+    "@doseofted/prim-docs": "workspace:*",
+    "@doseofted/prim-example": "workspace:*",
+    "@doseofted/prim": "workspace:*",
     "vue": "^3.2.33"
   },
   "devDependencies": {

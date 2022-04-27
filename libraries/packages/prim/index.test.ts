@@ -1,6 +1,6 @@
 import { createPrimClient, createPrimServer } from "."
-import type * as exampleClient from "example"
-import * as exampleServer from "example"
+import type * as exampleClient from "@doseofted/prim-example"
+import * as exampleServer from "@doseofted/prim-example"
 import { RpcAnswer } from "./src"
 
 describe("Prim instantiates", () => {

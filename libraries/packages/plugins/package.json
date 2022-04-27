@@ -1,5 +1,5 @@
 {
-  "name": "prim-plugins",
+  "name": "@doseofted/prim-plugins",
   "version": "1.0.0",
   "description": "Plugins for using Prim with server frameworks",
   "source": "src/index.ts",
@@ -13,7 +13,7 @@
   },
   "license": "UNLICENSED",
   "dependencies": {
-    "prim": "workspace:*"
+    "@doseofted/prim": "workspace:*"
   },
   "scripts": {
     "watch": "parcel watch",
@@ -25,7 +25,7 @@
     "@types/supertest": "^2.0.12",
     "@types/ws": "^8.5.3",
     "axios": "^0.26.1",
-    "example": "workspace:*",
+    "@doseofted/prim-example": "workspace:*",
     "express": "^4.17.3",
     "fastify": "^3.28.0",
     "jest": "^27.5.1",

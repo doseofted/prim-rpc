@@ -1,5 +1,5 @@
 {
-	"name": "prim",
+	"name": "@doseofted/prim-monorepo",
 	"private": true,
 	"author": {
 		"name": "Ted Klingenberg",
@@ -11,8 +11,8 @@
 		"packages:dev": "parcel watch 'libraries/packages/*'",
 		"packages:build": "parcel build 'libraries/packages/*'",
 		"libraries:test": "jest --watch",
-		"frontend": "pnpm --filter='frontend'",
-		"backend": "pnpm --filter='backend'"
+		"frontend": "pnpm --filter='@doseofted/prim-frontend'",
+		"backend": "pnpm --filter='@doseofted/prim-backend'"
 	},
 	"packageManager": "pnpm@6.32.11",
 	"devDependencies": {

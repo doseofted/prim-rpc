@@ -1,5 +1,5 @@
 {
-  "name": "docs",
+  "name": "@doseofted/prim-docs",
   "private": true,
   "version": "0.0.0",
   "scripts": {

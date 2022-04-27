@@ -21,9 +21,9 @@ COPY --chown=1000:1000 project/backend ./project/backend
 # install fetched dependencies from base image
 RUN pnpm install --offline --frozen-lockfile
 # typechecks need to ran first since build step does not consider types
-RUN pnpm --filter="backend" check
+RUN pnpm --filter="@doseofted/prim-backend" check
 # build the server only, not libraries since already built
-RUN (export NODE_ENV="production"; pnpm --filter="backend" build)
+RUN (export NODE_ENV="production"; pnpm --filter="@doseofted/prim-backend" build)
 
 # ---
 # Prepare clean minimal image for running project in production

@@ -1,5 +1,6 @@
 {
-  "name": "backend",
+  "name": "@doseofted/prim-backend",
+  "private": true,
   "packageManager": "pnpm@6.32.11",
   "author": {
     "name": "Ted Klingenberg",
@@ -24,11 +25,11 @@
   },
   "dependencies": {
     "defu": "^6.0.0",
-    "example": "workspace:*",
+    "@doseofted/prim-example": "workspace:*",
     "fastify": "^3.28.0",
     "fastify-cors": "^6.0.3",
-    "prim": "workspace:*",
-    "prim-plugins": "workspace:*",
+    "@doseofted/prim": "workspace:*",
+    "@doseofted/prim-plugins": "workspace:*",
     "ws": "^8.5.0"
   }
 }
