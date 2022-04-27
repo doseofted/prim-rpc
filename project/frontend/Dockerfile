@@ -9,8 +9,9 @@ ARG PROJECT_VERSION latest
 FROM doseofted/prim-libraries:${PROJECT_VERSION} as installed
 USER node
 # NOTE: I should probably rename "/home/node/project" so I don't have to type "project" twice
-RUN mkdir -p /home/node/project/project/frontend 
+RUN mkdir -p /home/node/prim/project/frontend 
 COPY --chown=1000:1000 project/frontend/package.json ./project/frontend/package.json
+
 # ---
 # Configure project build
 # ---
@@ -18,9 +19,7 @@ FROM installed as built
 USER node
 ARG VITE_HOST
 COPY --chown=1000:1000 project/frontend ./project/frontend
-# yes, install happened in utilized libraries image *but* install needs to run again
-# so that binaries can be copied and symlinks for this project created
-# FIXME: --dev flag in install breaks image, find out why
+# install fetched dependencies from base image
 RUN pnpm --filter="frontend" install --offline --frozen-lockfile
 # typechecks need to ran first since build step does not consider types
 RUN pnpm --filter="frontend" check
@@ -33,15 +32,13 @@ RUN (export NODE_ENV="production"; pnpm --filter="frontend" build)
 FROM installed as run
 # NOTE: NODE_ENV can be overridden while actively developing and pnpm utilizes the variable
 USER node
-ARG NODE_ENV="production"
-COPY --from=built /home/node/project/project/frontend ./project/frontend
+ARG NODE_ENV "production"
+COPY --from=built /home/node/prim/project/frontend ./project/frontend
 # unlike build stage, I only need production dependencies here
 RUN pnpm install --frozen-lockfile --offline
 # NOTE: entrypoint's utilities have already been copied over in libraries image
 COPY --chown=1000:1000 project/frontend/entrypoint.mjs ./project/frontend
-RUN chmod +x ./project/frontend/entrypoint.mjs
 
 EXPOSE 3000
 
-# CMD [ "/bin/bash" ]
 ENTRYPOINT [ "./project/frontend/entrypoint.mjs" ]

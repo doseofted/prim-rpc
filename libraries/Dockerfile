@@ -6,12 +6,11 @@
 FROM node:16.14-bullseye as setup
 USER root
 RUN corepack enable
-RUN corepack prepare pnpm@6.32.10 --activate
-# TODO: pnpm v7 wants global path defined but that seems to break install, need to find out what's needed to upgrade
-RUN pnpm install zx@6.1.0 --global
+RUN corepack prepare pnpm@6.32.11 --activate
+RUN pnpm add zx@6.1.0 --global
 USER node
-RUN mkdir -p /home/node/project
-WORKDIR /home/node/project
+RUN mkdir -p /home/node/prim
+WORKDIR /home/node/prim
 
 # ---
 # Install all needed dependencies in monorepo, to be used by other containers (to avoid duplicate network requests)
@@ -21,7 +20,6 @@ USER node
 # REFERENCE: for pnpm install in container https://pnpm.io/cli/fetch
 COPY --chown=1000:1000 pnpm-*.yaml package.json ./
 # install dev and prod dependencies to prepare for build
-# TODO: once pnpm 7 releases, filter this by the libraries folder since other dependencies are not needed yet
 RUN (export NODE_ENV="development"; pnpm fetch)
 
 # ---
@@ -35,7 +33,7 @@ RUN pnpm install --offline --frozen-lockfile
 ARG NODE_ENV "production"
 RUN pnpm packages:build
 # TODO: run build script in interface folder but built library instead of using html entry point
-RUN pnpm --filter 'docs' build
+RUN pnpm --filter './interface' build
 
 # ---
 # Prepare project to be run
@@ -46,12 +44,11 @@ USER node
 ARG NODE_ENV "production"
 ARG HOST
 # Copy all built libraries and their package.json
-COPY --from=built /home/node/project/libraries ./libraries
+COPY --from=built /home/node/prim/libraries ./libraries
 # RUN pnpm install --frozen-lockfile --offline --prod
-RUN mkdir -p /home/node/project/misc
+RUN mkdir -p /home/node/prim/misc
 COPY --chown=1000:1000 misc/zx-utils.mjs ./misc
 COPY --chown=1000:1000 libraries/entrypoint.mjs ./libraries
-RUN chmod +x ./libraries/entrypoint.mjs
 
 # CMD [ "/bin/bash" ]
 ENTRYPOINT [ "./libraries/entrypoint.mjs" ]

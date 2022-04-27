@@ -40,6 +40,8 @@ services:
     environment:
       HOST: $HOST
       NODE_ENV: $NODE_ENV
+    profiles:
+      - "dev"
 
   # where API is hosted
   backend:

@@ -19,7 +19,8 @@ services:
 
   libraries:
     logging: *logging
-    image: "doseofted/${COMPOSE_PROJECT_NAME}-libraries:v0.0.1"
+    image: scratch
+    # image: "doseofted/${COMPOSE_PROJECT_NAME}-libraries:v0.0.1"
 
   backend:
     logging: *logging
