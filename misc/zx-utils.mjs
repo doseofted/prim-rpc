@@ -17,6 +17,7 @@ function createEcho(prefix = "project") {
 	return function echo(strings, ...vals) {
 		let str = strings[0]
 		for (let i = 0; i < vals.length; i++) { str += chalk`{green ${vals[i]}}` + strings[i + 1] }
+		// FIXME: replace console.log with baseEcho once I find out how to import global module without error
 		console.log(chalk`{green.bold [ ${prefix} ]}`, str)
 	}
 }
