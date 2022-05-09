@@ -1,5 +1,5 @@
 import Fastify from "fastify"
-import Cors from "fastify-cors"
+import Cors from "@fastify/cors"
 import { WebSocketServer } from "ws"
 import * as example from "@doseofted/prim-example"
 import { createPrimServer } from "@doseofted/prim"

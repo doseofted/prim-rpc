@@ -20,16 +20,16 @@
   },
   "devDependencies": {
     "@types/ws": "^8.5.3",
-    "nodemon": "^2.0.15",
-    "typescript": "^4.6.3"
+    "nodemon": "^2.0.16",
+    "typescript": "^4.6.4"
   },
   "dependencies": {
-    "defu": "^6.0.0",
-    "@doseofted/prim-example": "workspace:*",
-    "fastify": "^3.28.0",
-    "fastify-cors": "^6.0.3",
     "@doseofted/prim": "workspace:*",
+    "@doseofted/prim-example": "workspace:*",
     "@doseofted/prim-plugins": "workspace:*",
-    "ws": "^8.5.0"
+    "@fastify/cors": "^7.0.0",
+    "defu": "^6.0.0",
+    "fastify": "^3.29.0",
+    "ws": "^8.6.0"
   }
 }

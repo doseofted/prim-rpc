@@ -85,7 +85,7 @@
 			"ms-azuretools.vscode-docker",
 			"dbaeumer.vscode-eslint",
 			"stylelint.vscode-stylelint",
-			"johnsoncodehk.volar",
+			"vue.volar",
 			"bradlc.vscode-tailwindcss",
 		],
 		"unwantedRecommendations": [

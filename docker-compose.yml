@@ -7,7 +7,7 @@ services:
   # used as reverse proxy for services below
   # also, used to serve built frontend
   caddy:
-    image: caddy:2.5.0-alpine
+    image: caddy:2.5.1-alpine
     environment:
       HOST: $HOST
       ADMIN_EMAIL: "ted@doseofted.com"
