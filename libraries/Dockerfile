@@ -6,8 +6,9 @@
 FROM node:16.14-bullseye as setup
 USER root
 RUN corepack enable
-RUN corepack prepare pnpm@6.32.11 --activate
-RUN pnpm add zx@6.1.0 --global
+RUN corepack prepare pnpm@7.0.1 --activate
+# using npm for global install since PNPMv7 is now too difficult to use globally
+RUN npm install zx@6.1.0 --global
 USER node
 RUN mkdir -p /home/node/prim
 WORKDIR /home/node/prim
@@ -33,7 +34,7 @@ RUN pnpm install --offline --frozen-lockfile
 # build all library packages with Parcel
 RUN (export NODE_ENV="production"; pnpm packages:build)
 # build all frontend projects with Vite
-RUN (export NODE_ENV="production"; pnpm --filter './interface' build)
+RUN (export NODE_ENV="production"; pnpm --filter './interface/**' build)
 
 # ---
 # Prepare project to be run
@@ -41,7 +42,7 @@ RUN (export NODE_ENV="production"; pnpm --filter './interface' build)
 FROM installed as run
 USER node
 # By using NODE_ENV arg, I can limit whether dev dependencies are installed
-ARG NODE_ENV "production"
+ARG NODE_ENV="production"
 ARG HOST
 # Run clean install using given NODE_ENV
 COPY --chown=1000:1000 pnpm-*.yaml package.json ./

@@ -1,7 +1,7 @@
 #!/usr/bin/env zx
 /* eslint-disable no-undef */
 $.verbose = false // toggle off default
-// import { echo as baseEcho } from "zx/experimental"
+import { echo as baseEcho } from "zx/experimental"
 /**
  * Log output with given prefix and highlight variables. Use like so:
  * 
@@ -17,8 +17,7 @@ function createEcho(prefix = "project") {
 	return function echo(strings, ...vals) {
 		let str = strings[0]
 		for (let i = 0; i < vals.length; i++) { str += chalk`{green ${vals[i]}}` + strings[i + 1] }
-		// FIXME: replace console.log with baseEcho once I find out how to import global module without error
-		console.log(chalk`{green.bold [ ${prefix} ]}`, str)
+		baseEcho(chalk`{green.bold [${prefix}]}`, str)
 	}
 }
 const echo = createEcho("zx-utils")

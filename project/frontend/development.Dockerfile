@@ -5,7 +5,7 @@
 # ---
 # Install needed dependencies in this project (fetched in libraries image, needs to run for this project yet)
 # ---
-ARG PROJECT_VERSION latest
+ARG PROJECT_VERSION="latest"
 FROM doseofted/prim-libraries:${PROJECT_VERSION} as installed
 USER node
 RUN mkdir -p /home/node/prim/project/frontend 
@@ -30,7 +30,7 @@ RUN (export NODE_ENV="production"; pnpm --filter="@doseofted/prim-frontend" buil
 # ---
 FROM installed as run
 USER node
-ARG NODE_ENV "production"
+ARG NODE_ENV="production"
 COPY --from=built /home/node/prim/project/frontend ./project/frontend
 # unlike build stage, I only need production dependencies here
 RUN pnpm install --frozen-lockfile --offline

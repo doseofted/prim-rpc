@@ -1,6 +1,6 @@
 {
   "name": "@doseofted/prim-frontend",
-  "packageManager": "pnpm@6.32.11",
+  "packageManager": "pnpm@7.0.1",
   "private": true,
   "author": {
     "name": "Ted Klingenberg",

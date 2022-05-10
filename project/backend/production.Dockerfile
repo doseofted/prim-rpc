@@ -31,7 +31,7 @@ RUN (export NODE_ENV="production"; pnpm --filter="@doseofted/prim-backend" build
 FROM node:16.14-bullseye-slim as prepare
 USER root
 RUN corepack enable
-RUN corepack prepare pnpm@6.32.11 --activate
+RUN corepack prepare pnpm@7.0.1 --activate
 RUN pnpm add zx@6.1.0 --global
 USER node
 RUN mkdir -p /home/node/prim

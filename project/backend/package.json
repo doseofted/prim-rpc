@@ -1,7 +1,7 @@
 {
   "name": "@doseofted/prim-backend",
   "private": true,
-  "packageManager": "pnpm@6.32.11",
+  "packageManager": "pnpm@7.0.1",
   "author": {
     "name": "Ted Klingenberg",
     "email": "ted@doseofted.com",
