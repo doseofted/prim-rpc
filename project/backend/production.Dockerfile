@@ -32,7 +32,7 @@ FROM node:18.1-bullseye-slim as prepare
 USER root
 RUN corepack enable
 RUN corepack prepare pnpm@7.0.1 --activate
-RUN pnpm add zx@6.1.0 --global
+RUN npm install zx@6.1.0 --global
 USER node
 RUN mkdir -p /home/node/prim
 WORKDIR /home/node/prim

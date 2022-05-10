@@ -34,7 +34,7 @@ RUN pnpm install --offline --frozen-lockfile
 # build all library packages with Parcel
 RUN (export NODE_ENV="production"; pnpm packages:build)
 # build all frontend projects with Vite
-RUN (export NODE_ENV="production"; pnpm --filter './interface/**' build)
+RUN (export NODE_ENV="production"; pnpm --filter './libraries/interface/**' build)
 
 # ---
 # Prepare project to be run

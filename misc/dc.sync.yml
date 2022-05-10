@@ -10,6 +10,7 @@ services:
       - ./libraries/packages/example/dist:/home/node/prim/libraries/packages/example/dist
       - ./libraries/packages/prim/dist:/home/node/prim/libraries/packages/prim/dist
       - ./libraries/packages/plugins/dist:/home/node/prim/libraries/packages/plugins/dist
+      - ./libraries/interface/docs/dist:/home/node/prim/libraries/interface/docs/dist
 
   backend:
     volumes: *built-shared

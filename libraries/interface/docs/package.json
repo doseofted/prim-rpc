@@ -1,5 +1,17 @@
 {
   "name": "@doseofted/prim-docs",
+  "files": [
+    "dist"
+  ],
+  "main": "./dist/docs.umd.js",
+  "module": "./dist/docs.es.js",
+  "exports": {
+    ".": {
+      "import": "./dist/docs.es.js",
+      "require": "./dist/docs.umd.js"
+    }
+  },
+  "types": "./dist/lib.d.ts",
   "private": true,
   "version": "0.0.0",
   "scripts": {
@@ -15,6 +27,7 @@
     "@vitejs/plugin-vue": "^2.3.2",
     "typescript": "^4.6.4",
     "vite": "^2.9.8",
+    "vite-plugin-dts": "^1.1.1",
     "vue-tsc": "^0.34.12"
   }
 }

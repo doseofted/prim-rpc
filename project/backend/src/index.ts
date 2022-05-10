@@ -6,8 +6,19 @@ import { createPrimServer } from "@doseofted/prim"
 import { primFasifyPlugin, primWebSocketServerSetup } from "@doseofted/prim-plugins"
 
 // const { createPrimServer } = await import("prim")
+console.log();
 
-const fastify = Fastify({ logger: true })
+const fastify = Fastify({
+	logger: {
+		prettyPrint: process.env.NODE_ENV === "development"
+			? {
+				colorize: true,
+				translateTime: "UTC:h:MM:ssTT",
+				ignore: "req.remoteAddress,req.remotePort"
+			}
+			: false
+	}
+})
 const websocket = new WebSocketServer({ server: fastify.server })
 const prim = createPrimServer(example)
 

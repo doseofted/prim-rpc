@@ -4,7 +4,7 @@ import HelloYou from "./components/hello-you.vue"
 import { createPrimClient } from "@doseofted/prim"
 import * as exampleServer from "@doseofted/prim-example"
 import type * as exampleClient from "@doseofted/prim-example"
-// import { components } from "@doseofted/prim-docs"
+import { HelloWorld } from "@doseofted/prim-docs"
 
 // console.log(components)
 // const DocTest2 = components.DocTest
@@ -37,7 +37,7 @@ onMounted(async () => {
 
 <template>
   <div class="greeting">
-    <!-- <DocTest2 /> -->
+    <hello-world msg="Ted" />
     <hello-you
       :message="typedMessage.join('')"
       :class="{ matches, errored }"

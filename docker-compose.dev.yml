@@ -30,6 +30,7 @@ services:
       - ./libraries/packages/example/src:/home/node/prim/libraries/packages/example/src
       - ./libraries/packages/prim/src:/home/node/prim/libraries/packages/prim/src
       - ./libraries/packages/plugins/src:/home/node/prim/libraries/packages/plugins/src
+      - ./libraries/interface/docs/src:/home/node/prim/libraries/interface/docs/src
 
   backend:
     restart: "no"
