@@ -28,7 +28,7 @@ RUN (export NODE_ENV="production"; pnpm --filter="@doseofted/prim-backend" build
 # ---
 # Prepare clean minimal image for running project in production
 # ---
-FROM node:16.14-bullseye-slim as prepare
+FROM node:18.1-bullseye-slim as prepare
 USER root
 RUN corepack enable
 RUN corepack prepare pnpm@7.0.1 --activate

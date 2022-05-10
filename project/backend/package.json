@@ -9,7 +9,7 @@
   },
   "source": "src/index.ts",
   "engines": {
-    "node": ">= 16.13.2"
+    "node": ">= 18.1.0"
   },
   "scripts": {
     "check": "tsc --noEmit",

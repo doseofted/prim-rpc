@@ -3,7 +3,7 @@
 # ---
 # Install pnpm and zx on top of Node image, needed to run
 # ---
-FROM node:16.14-bullseye as setup
+FROM node:18.1-bullseye as setup
 USER root
 RUN corepack enable
 RUN corepack prepare pnpm@7.0.1 --activate

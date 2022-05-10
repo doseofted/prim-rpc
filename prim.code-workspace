@@ -69,6 +69,7 @@
 		"peacock.showColorInStatusBar": false,
 		"workbench.editor.pinnedTabSizing": "compact",
 		"editor.linkedEditing": true,
+		"typescript.tsdk": "Prim/node_modules/typescript/lib",
 		"workbench.colorCustomizations": {
 			"sash.hoverBorder": "#7ec2d6",
 			"statusBar.background": "#57b0ca",
@@ -78,7 +79,6 @@
 			"statusBarItem.remoteBackground": "#57b0ca",
 			"statusBarItem.remoteForeground": "#15202b"
 		},
-		"typescript.tsdk": "Prim/node_modules/typescript/lib",
 	},
 	"extensions": {
 		"recommendations": [
