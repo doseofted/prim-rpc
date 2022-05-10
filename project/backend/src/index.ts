@@ -11,7 +11,7 @@ const fastify = Fastify({ logger: true })
 const websocket = new WebSocketServer({ server: fastify.server })
 const prim = createPrimServer(example)
 
-fastify.register(primFasifyPlugin, { prim })
+fastify.register(primFasifyPlugin, { prim, prefix: "/prim" })
 primWebSocketServerSetup(prim, websocket)
 fastify.register(Cors, { origin: `https://${process.env.HOST}` })
 
