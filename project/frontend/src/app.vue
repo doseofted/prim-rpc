@@ -1,11 +1,9 @@
 <script setup lang="ts">
 import { onMounted, ref, computed } from "vue"
-import HelloYou from "./components/hello-you.vue"
 import { createPrimClient } from "@doseofted/prim"
 import * as exampleServer from "@doseofted/prim-example"
 import type * as exampleClient from "@doseofted/prim-example"
-import { HelloWorld } from "@doseofted/prim-docs"
-
+import { HelloYou } from "@doseofted/prim-docs"
 // console.log(components)
 // const DocTest2 = components.DocTest
 
@@ -37,8 +35,7 @@ onMounted(async () => {
 
 <template>
   <div class="greeting">
-    <hello-world msg="Ted" />
-    <hello-you
+    <HelloYou
       :message="typedMessage.join('')"
       :class="{ matches, errored }"
       class="you"

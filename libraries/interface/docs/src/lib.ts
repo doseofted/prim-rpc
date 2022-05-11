@@ -1,3 +1,3 @@
-import HelloWorld from "./components/HelloWorld.vue"
+import HelloYou from "./components/HelloYou.vue"
 
-export { HelloWorld }
+export { HelloYou }
