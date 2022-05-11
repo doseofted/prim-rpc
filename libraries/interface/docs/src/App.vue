@@ -1,7 +1,7 @@
 <script setup lang="ts">
-import HelloYou from "./components/HelloYou.vue"
+import PrimHello from "./components/PrimHello.ce.vue"
 </script>
 
 <template>
-  <HelloYou msg="Hello Ted" />
+  <PrimHello msg="Hello Ted" />
 </template>

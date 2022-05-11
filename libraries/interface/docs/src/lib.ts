@@ -1,3 +1,8 @@
-import HelloYou from "./components/HelloYou.vue"
+import PrimHello from "./components/PrimHello.ce.vue"
+import { defineCustomElement } from "vue"
 
-export { HelloYou }
+function setupComponents () {
+	customElements.define("prim-hello", defineCustomElement(PrimHello))
+}
+
+export { PrimHello, setupComponents }

@@ -1,3 +1,20 @@
+<script setup lang="ts">
+withDefaults(defineProps<{
+	message: string
+}>(), {
+	message: "loading"
+})
+</script>
+
+<template>
+  <p
+    class="test"
+  >
+    {{ message }}
+  </p>
+</template>
+
+<style>
 .test {
 	font-family:
 		-apple-system,
@@ -13,3 +30,4 @@
 	font-weight: 600;
 	font-size: 18px;
 }
+</style>
