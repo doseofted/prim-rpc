@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import "./HelloYou.css"
+import c from "./HelloYou.module.css"
 withDefaults(defineProps<{
 	message: string
 }>(), {
@@ -8,5 +8,7 @@ withDefaults(defineProps<{
 </script>
 
 <template>
-  <p>{{ message }}</p>
+  <p :class="c.test">
+    {{ message }}
+  </p>
 </template>

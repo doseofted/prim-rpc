@@ -9,7 +9,8 @@
     ".": {
       "import": "./dist/docs.es.js",
       "require": "./dist/docs.umd.js"
-    }
+    },
+    "./style.css": "./dist/style.css"
   },
   "types": "./dist/lib.d.ts",
   "private": true,

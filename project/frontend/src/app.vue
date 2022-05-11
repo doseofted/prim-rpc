@@ -4,6 +4,7 @@ import { createPrimClient } from "@doseofted/prim"
 import * as exampleServer from "@doseofted/prim-example"
 import type * as exampleClient from "@doseofted/prim-example"
 import { HelloYou } from "@doseofted/prim-docs"
+// import "@doseofted/prim-docs/style.css"
 // console.log(components)
 // const DocTest2 = components.DocTest
 
