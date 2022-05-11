@@ -3,9 +3,9 @@ import { onMounted, ref, computed } from "vue"
 import { createPrimClient } from "@doseofted/prim"
 import * as exampleServer from "@doseofted/prim-example"
 import type * as exampleClient from "@doseofted/prim-example"
-import { setupComponents } from "@doseofted/prim-docs"
+import "@doseofted/prim-docs"
 // import "@doseofted/prim-docs/style.css"
-setupComponents()
+
 const primLocal = createPrimClient({ server: true }, exampleServer)
 const expectedMessage = ref("")
 const exampleArgs = { greeting: "Hey", name: "Ted" }
