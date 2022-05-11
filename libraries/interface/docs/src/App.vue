@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import PrimHello from "./components/PrimHello.ce.vue"
+import PrimHello from "./components/PrimHello.vue"
 </script>
 
 <template>

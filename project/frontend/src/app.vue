@@ -3,8 +3,8 @@ import { onMounted, ref, computed } from "vue"
 import { createPrimClient } from "@doseofted/prim"
 import * as exampleServer from "@doseofted/prim-example"
 import type * as exampleClient from "@doseofted/prim-example"
-import "@doseofted/prim-docs"
-// import "@doseofted/prim-docs/style.css"
+import { PrimHello } from "@doseofted/prim-docs"
+import "@doseofted/prim-docs/style.css"
 
 const primLocal = createPrimClient({ server: true }, exampleServer)
 const expectedMessage = ref("")
@@ -34,7 +34,7 @@ onMounted(async () => {
 
 <template>
   <div class="greeting">
-    <prim-hello
+    <PrimHello
       :message="typedMessage.join('')"
       :class="{ matches, errored }"
       class="you"
