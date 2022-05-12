@@ -34,6 +34,7 @@ importers:
 
   libraries/interface/docs:
     specifiers:
+      '@doseofted/prim-example': workspace:*
       '@vitejs/plugin-vue': ^2.3.2
       typescript: ^4.6.4
       vite: ^2.9.8
@@ -43,6 +44,7 @@ importers:
     dependencies:
       vue: 3.2.33
     devDependencies:
+      '@doseofted/prim-example': link:../../packages/example
       '@vitejs/plugin-vue': 2.3.2_vite@2.9.8+vue@3.2.33
       typescript: 4.6.4
       vite: 2.9.8

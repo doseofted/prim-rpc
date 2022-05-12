@@ -16,6 +16,7 @@
     "watch": "parcel watch",
     "build": "parcel build",
     "typedoc": "typedoc src/index.ts --json dist/main.typedoc.json",
+    "jsdoc-test": "jsdoc src/test.js -X > dist/main.jsdoc.json",
     "jsdoc": "jsdoc dist/main.js -X > dist/main.jsdoc.json"
   },
   "devDependencies": {
