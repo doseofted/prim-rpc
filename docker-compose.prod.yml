@@ -16,19 +16,16 @@ services:
 
   postgres:
     logging: *logging
-    restart: "always"
 
   libraries:
     logging: *logging
-    image: "doseofted/${COMPOSE_PROJECT_NAME}-libraries:v0.0.1"
-    restart: "always"
+    image: scratch
+    # image: "doseofted/${COMPOSE_PROJECT_NAME}-libraries:v0.0.1"
 
   backend:
     logging: *logging
     image: "doseofted/${COMPOSE_PROJECT_NAME}-backend:v0.0.1"
-    restart: "always"
 
   frontend:
     logging: *logging
     image: "doseofted/${COMPOSE_PROJECT_NAME}-frontend:v0.0.1"
-    restart: "always"

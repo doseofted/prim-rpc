@@ -6,9 +6,11 @@ services:
     volumes:
       &built-shared
       # Built libraries can be used from other containers while container is running
-      - ./libraries/packages/example/dist:/home/node/project/libraries/packages/example/dist
-      - ./libraries/packages/prim/dist:/home/node/project/libraries/packages/prim/dist
-      - ./libraries/packages/plugins/dist:/home/node/project/libraries/packages/plugins/dist
+      # NOTE: also update volumes linking to "src" defined in docker-compose.dev.yml
+      - ./libraries/packages/example/dist:/home/node/prim/libraries/packages/example/dist
+      - ./libraries/packages/prim/dist:/home/node/prim/libraries/packages/prim/dist
+      - ./libraries/packages/plugins/dist:/home/node/prim/libraries/packages/plugins/dist
+      - ./libraries/interface/docs/dist:/home/node/prim/libraries/interface/docs/dist
 
   backend:
     volumes: *built-shared

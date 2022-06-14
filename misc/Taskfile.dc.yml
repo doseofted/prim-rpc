@@ -10,6 +10,9 @@ tasks:
 
   logs:
     desc: "Show and follow recent logs for running services"
+    env:
+      # show logs from all containers
+      COMPOSE_PROFILES: "dev,monitoring"
     cmds:
       - cmd: "docker compose logs -f --tail=15"
         ignore_error: true
@@ -17,15 +20,18 @@ tasks:
   pull:
     desc: "Pull newer versions of services if available, excluding local images"
     env:
-      COMPOSE_FILE: "{{.COMPOSE_FILE_DEV}}"
+      COMPOSE_FILE: "{{.COMPOSE_FILE_PROD}}"
+      COMPOSE_PROFILES: "monitoring"
     cmds:
       # NOTE ignore pull failures since local containers may not be pushed to registry yet
       - "docker compose pull --ignore-pull-failures"
 
   # Build services in order of images' dependencies, with build cache
   build:
+    &build
     env:
       COMPOSE_FILE: "{{.COMPOSE_FILE_DEV}}"
+      COMPOSE_PROFILES: "dev"
     deps:
       - pull
     cmds:
@@ -36,32 +42,24 @@ tasks:
 
   # Build services in development but without a build cache. Useful when a major change is made to project.
   build-clean:
-    env:
-      COMPOSE_FILE: "{{.COMPOSE_FILE_DEV}}"
-    deps:
-      - pull
+    <<: *build
     cmds:
-      # First build libraries image since possibly needed in frontend and backend
       - "docker compose build libraries --no-cache"
-      # Now build everything else (libraries is now tagged and cached)
       - "docker compose build --no-cache"
 
   # Build services in production with overridden build arguments and using the server's target platform.
-  build-prod:
+  build-production:
+    <<: *build
     env:
       DOCKER_DEFAULT_PLATFORM: "linux/amd64"
       COMPOSE_FILE: "{{.COMPOSE_FILE_DEV}}"
       NODE_ENV: "production"
       HOST: "prim.plus"
-    deps:
-      - pull
-    cmds:
-      # First build libraries image since possibly needed in frontend and backend
-      - "docker compose build libraries"
-      # Now build everything else (libraries is now tagged and cached)
-      - "docker compose build"
   
   push:
+    env:
+      # do not include base "libraries" image here
+      COMPOSE_PROFILES: ""
     desc: "Build and push, for production, the services to the registry."
     deps:
       - build-production
@@ -69,12 +67,14 @@ tasks:
       - docker compose push
 
   dev:
-    desc: "Build and then start services in background"
+    desc: "Setup development environment then build and start services in background"
     deps:
+      # Images need to be built
       - build
     cmds:
-      - task: :js:install
-      # First, a trusted certificate should be set up for use in container
+      # Install dependencies and build projects once so editor can work with type definitions
+      - task: :js:setup
+      # A trusted certificate should be set up for use in container
       - task: :dev:cert
       # Now the services can be started in the background
       - "docker compose up -d"
@@ -82,7 +82,7 @@ tasks:
       - task: logs
 
   up:
-    desc: "Start services in background (optionally, run `task dc:pull` prior to running)"
+    desc: "Start services in background with given environment (run `task dc:pull` prior when needed)"
     cmds:
       # Now the services can be started in the background
       - "docker compose up -d"

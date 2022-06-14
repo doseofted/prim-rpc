@@ -12,7 +12,7 @@
 import ProxyDeep from "proxy-deep"
 import { get as getProperty, remove as removeFromArray } from "lodash"
 import { nanoid } from "nanoid"
-import { createNanoEvents } from "nanoevents"
+import mitt from "mitt"
 import { RpcCall, PrimOptions, RpcAnswer, PrimWebSocketEvents, PrimHttpEvents } from "./interfaces"
 import { createPrimOptions } from "./options"
 import { RpcError } from "./error"
@@ -104,7 +104,7 @@ export function createPrimClient<T extends Record<V, T[V]>, V extends keyof T = 
 	})
 	// !SECTION
 	// SECTION: WebSocket event handling
-	const wsEvent = configured.internal.event ?? createNanoEvents<PrimWebSocketEvents>()
+	const wsEvent = configured.internal.event ?? mitt<PrimWebSocketEvents>()
 	function createWebsocket(initialMessage: RpcCall) {
 		const response = (given: RpcAnswer) => {
 			wsEvent.emit("response", given)
@@ -129,7 +129,7 @@ export function createPrimClient<T extends Record<V, T[V]>, V extends keyof T = 
 	// !SECTION
 	// SECTION: batched HTTP calls
 	const queuedCalls: { rpc: RpcCall, result: Promise<RpcAnswer>, resolved?: "yes" | "pending" }[] = []
-	const httpEvent = createNanoEvents<PrimHttpEvents>()
+	const httpEvent = mitt<PrimHttpEvents>()
 	let timer: ReturnType<typeof setTimeout>
 	const batchedRequests = () => {
 		if (timer) { return }

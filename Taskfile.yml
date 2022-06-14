@@ -3,14 +3,11 @@ version: "3"
 includes:
   # "dc" as in "Docker Compose"
   dc: ./misc/Taskfile.dc.yml
+  # "js" as in "JavaScript"
   js: ./misc/Taskfile.js.yml
 
 dotenv:
   - ".env"
-
-# vars:
-#   COMPOSE_FILE_NAME:
-#     sh: echo {{list "COMPOSE_FILE" .ENV_COMPOSE | join "_"}}
 
 tasks:
 
@@ -33,7 +30,7 @@ tasks:
           {{.HOST}} "*.{{.HOST}}" localhost 127.0.0.1 ::1
 
   dev:dns:
-    desc: "Run a DNS for development, useful for resolving '*.test' TLDs using devices on the same network"
+    desc: "Run a DNS server for development, useful for resolving '*.test' TLDs using devices on the same network"
     # NOTE: variables below are now set from .env file
     # vars:
     #   DNS_BIND:
@@ -67,4 +64,4 @@ tasks:
       - "find ./libraries -name 'dist' -type d -prune -exec rm -rf '{}' \\;"
       - "echo \"You'll need to remove data/* as root. The .env file in this project was kept.\""
       # NOTE: data/* must be deleted by root user
-      # - "rm -r ./data/*"
+      # - "rm -fr ./data/*"

@@ -3,3 +3,5 @@ packages:
   - "!project/server"
   - "!project/frontend/electron"
   - "libraries/packages/**"
+  - "libraries/interface/**"
+  - "misc"

@@ -7,7 +7,7 @@ services:
   # used as reverse proxy for services below
   # also, used to serve built frontend
   caddy:
-    image: caddy:2.4.6-alpine
+    image: caddy:2.5.1-alpine
     environment:
       HOST: $HOST
       ADMIN_EMAIL: "ted@doseofted.com"
@@ -18,12 +18,10 @@ services:
     ports:
       - "80:80"
       - "443:443"
-    profiles:
-      - "essential"
 
   # database available for use in project
   postgres:
-    image: postgres:14.0-alpine
+    image: postgres:14.2-alpine
     environment:
       &database
       HOST: $HOST
@@ -32,8 +30,6 @@ services:
       POSTGRES_PASSWORD: $POSTGRES_PASSWORD
     volumes:
       - ./data/postgres:/var/lib/postgresql/data
-    profiles:
-      - "essential"
 # !SECTION ---------------------------------------------------------------------
 
 
@@ -45,7 +41,7 @@ services:
       HOST: $HOST
       NODE_ENV: $NODE_ENV
     profiles:
-      - "project"
+      - "dev"
 
   # where API is hosted
   backend:
@@ -63,8 +59,6 @@ services:
       TELEGRAM_BOT_TOKEN: $TELEGRAM_BOT_TOKEN
       TELEGRAM_CHAT_ID_LIST: $TELEGRAM_CHAT_ID_LIST
       NODE_ENV: $NODE_ENV
-    profiles:
-      - "project"
     # volumes:
     #   - ./data/backend/uploads:/home/node/project/backend/uploads
 
@@ -78,8 +72,6 @@ services:
     environment:
       VITE_HOST: $HOST
       NODE_ENV: $NODE_ENV
-    profiles:
-      - "project"
 # !SECTION ---------------------------------------------------------------------
 
 
@@ -87,8 +79,7 @@ services:
 # ------------------------------------------------------------------------------
   # Metrics from Docker (fluentd) will be forwarded to fluentbit
   fluentbit:
-    image: fluent/fluent-bit:1.8
-    restart: "always"
+    image: fluent/fluent-bit:1.9.3
     command: "/fluent-bit/bin/fluent-bit -c /configs/config.conf"
     volumes:
       - /etc/localtime:/etc/localtime:ro
@@ -107,7 +98,6 @@ services:
   # Metrics to be pulled by Prometheus
   nodeexporter:
     image: prom/node-exporter:v1.3.1
-    restart: "always"
     volumes:
       - /proc:/host/proc:ro
       - /sys:/host/sys:ro
@@ -119,6 +109,17 @@ services:
       - "--path.sysfs=/host/sys"
       - "--path.rootfs=/rootfs"
       - "--collector.filesystem.mount-points-exclude=^/(sys|proc|dev|host|etc)($$|/)"
+    profiles:
+      - "monitoring"
+
+  # If monitoring profile is enabled, use this image to test changes to logging
+  playground:
+    image: scratch
+    logging:
+      driver: "fluentd"
+      options:
+        fluentd-address: "localhost:24224"
+        fluentd-async: "true"
     profiles:
       - "monitoring"
 # !SECTION ---------------------------------------------------------------------

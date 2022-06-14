@@ -3,7 +3,15 @@ import vue from "@vitejs/plugin-vue"
 
 // https://vitejs.dev/config/
 export default defineConfig({
-	plugins: [vue()],
+	plugins: [
+		vue({
+			template: {
+				compilerOptions: {
+					isCustomElement: (tag) => tag.includes("-")
+				}
+			}
+		})
+	],
 	server: {
 		host: "0.0.0.0", // needed for Docker
 		cors: false, // no need to complicate things in development

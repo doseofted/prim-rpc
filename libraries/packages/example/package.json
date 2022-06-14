@@ -1,5 +1,5 @@
 {
-  "name": "example",
+  "name": "@doseofted/prim-example",
   "version": "1.0.0",
   "description": "Internal reference for creating other packages in the future",
   "source": "src/index.ts",
@@ -13,11 +13,15 @@
   },
   "license": "UNLICENSED",
   "scripts": {
-    "doc": "typedoc src/index.ts --json dist/main.typedoc.json",
+    "watch": "parcel watch",
+    "build": "parcel build",
+    "typedoc": "typedoc src/index.ts --json dist/main.typedoc.json",
+    "jsdoc-test": "jsdoc src/test.js -X > dist/main.jsdoc.json",
     "jsdoc": "jsdoc dist/main.js -X > dist/main.jsdoc.json"
   },
   "devDependencies": {
     "jsdoc": "^3.6.10",
-    "typedoc": "^0.22.15"
+    "typedoc": "^0.22.15",
+    "typescript": "^4.6.4"
   }
 }
