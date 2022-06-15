@@ -13,7 +13,7 @@
 		"src/**/*",
 	],
 	"exclude": [
-		// but don't validate Jest tests
+		// but not Jest tests
 		"src/**/*.test.ts"
 	]
 }

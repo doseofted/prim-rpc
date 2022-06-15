@@ -9,14 +9,19 @@
 		"esModuleInterop": true,
 		// A config suggestion from Parcel:
 		// LINK https://parceljs.org/languages/typescript/#isolatedmodules
-		"isolatedModules": true
+		"isolatedModules": true,
+		// try to avoid checking declaration files
+		"skipLibCheck": true
 	},
+	// include not just all source code, but also Vue files (only .ts/.tsx extensions checked without extension specified)
 	"include": [
-		// include all source code
-		"src/**/*",
+		"src/**/*.ts",
+		"src/**/*.d.ts",
+		"src/**/*.tsx",
+		"src/**/*.vue"
 	],
 	"exclude": [
 		// but not Jest tests
 		"src/**/*.test.ts"
-	]
+	],
 }

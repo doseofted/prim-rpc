@@ -1,0 +1,24 @@
+{
+  "name": "@doseofted/prim-interface",
+  "version": "0.0.1",
+  "description": "Documentation components for Prim",
+  "license": "UNLICENSED",
+  "author": {
+    "name": "Ted Klingenberg",
+    "email": "ted@doseofted.com",
+    "url": "https://doseofted.com/"
+  },
+  "scripts": {
+    "watch": "parcel watch",
+    "build": "parcel build",
+    "check": "tsc --noEmit",
+    "test": "jest"
+  },
+  "source": "src/index.ts",
+  "types": "dist/index.d.ts",
+  "main": "dist/main.js",
+  "module": "dist/module.js",
+  "dependencies": {
+    "vue": "^3.2.37"
+  }
+}
