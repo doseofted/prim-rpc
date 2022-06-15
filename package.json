@@ -16,8 +16,8 @@
     "test": "jest",
     "watch-libs": "parcel watch 'libs/*'",
     "build-libs": "parcel build 'libs/*'",
-    "watch-ui": "pnpm --filter='./ui/**' watch",
-    "build-ui": "pnpm --filter='./ui/**' build"
+    "watch-ui": "turbo run watch --filter=./ui/**",
+    "build-ui": "turbo run build --filter=./ui/**"
   },
   "devDependencies": {
     "@nrwl/cli": "^14.3.5",
@@ -33,6 +33,7 @@
     "nx": "^14.3.5",
     "parcel": "^2.6.0",
     "ts-jest": "^28.0.5",
+    "turbo": "^1.2.16",
     "typescript": "^4.7.3",
     "zx": "^7.0.0"
   }

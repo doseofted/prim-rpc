@@ -17,6 +17,8 @@ Thumbs.db
 node_modules
 # Parcel cache is specific to built artifact, don't commit
 .parcel-cache
+# TurboRepo cache doesn't need to be committed
+.turbo
 # Don't commit Checksums used by Taskfile when fingerprinting files
 .task/*
 # Don't need to commit JavaScript-specific, built, distributable files
