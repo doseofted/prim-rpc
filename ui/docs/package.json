@@ -1,0 +1,34 @@
+{
+  "name": "@doseofted/prim-docs",
+  "private": true,
+  "version": "0.0.0",
+  "scripts": {
+    "check": "vue-tsc --noEmit",
+    "build": " vite build",
+    "watch": "vite build --watch",
+    "dev": "vite",
+    "preview": "vite preview"
+  },
+  "dependencies": {
+    "vue": "^3.2.25"
+  },
+  "devDependencies": {
+    "@types/node": "^17.0.44",
+    "@vitejs/plugin-vue": "^2.3.3",
+    "typescript": "^4.5.4",
+    "vite": "^2.9.9",
+    "vite-plugin-dts": "^1.2.0",
+    "vue-tsc": "^0.34.7"
+  },
+  "files": [
+    "dist"
+  ],
+  "main": "./dist/lib.umd.js",
+  "module": "./dist/lib.es.js",
+  "exports": {
+    ".": {
+      "import": "./dist/lib.es.js",
+      "require": "./dist/lib.umd.js"
+    }
+  }
+}

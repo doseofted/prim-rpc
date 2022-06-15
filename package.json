@@ -13,8 +13,10 @@
   "scripts": {
     "zx": "zx",
     "test": "jest",
-    "watch-all": "parcel watch 'libs/*'",
-    "build-all": "parcel build 'libs/*'"
+    "watch-libs": "parcel watch 'libs/*'",
+    "build-libs": "parcel build 'libs/*'",
+    "watch-ui": "pnpm --filter='./ui/**' watch",
+    "build-ui": "pnpm --filter='./ui/**' build"
   },
   "devDependencies": {
     "@parcel/config-default": "^2.6.0",
