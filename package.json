@@ -21,7 +21,6 @@
     "@parcel/core": "^2.6.0",
     "@parcel/packager-ts": "^2.6.0",
     "@parcel/transformer-typescript-types": "^2.6.0",
-    "@parcel/transformer-vue": "^2.6.0",
     "@parcel/validator-typescript": "^2.6.0",
     "@types/jest": "^28.1.1",
     "eslint": "^8.17.0",
