@@ -1,0 +1,19 @@
+{
+	"compilerOptions": {
+		// NOTE: standard introduced ".finally()" used in Prim (target may need to be set lower)
+		"target": "ES2018",
+		// CommonJS resolution (Parcel will still create require/module bundles)
+		// LINK https://www.typescriptlang.org/tsconfig#moduleResolution
+		"moduleResolution": "Node",
+		// // suggested by TS-Jest CLI when not set to `true` in tsconfig.json
+		"esModuleInterop": true,
+	},
+	"include": [
+		// include all source code
+		"src/**/*",
+	],
+	"exclude": [
+		// but don't validate Jest tests
+		"src/**/*.test.ts"
+	]
+}

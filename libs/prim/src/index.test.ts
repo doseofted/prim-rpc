@@ -1,7 +1,10 @@
 import { createPrimClient, createPrimServer } from "."
 import type * as exampleClient from "@doseofted/prim-example"
 import * as exampleServer from "@doseofted/prim-example"
-import { RpcAnswer } from "./src"
+import type { RpcAnswer } from "./interfaces"
+
+// TODO: move tests to their own files where it makes sense
+// for instance, functions in options.ts would be defined in options.test.ts
 
 describe("Prim instantiates", () => {
 	// use case: not sure yet, possibly to return optimistic local result while waiting on remote result
