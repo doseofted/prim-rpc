@@ -2,7 +2,7 @@
  * This is an example of a module that could be used with Prim (the server, not data manager aspect of the project).
  * Prim is intended to be a content manager but to make development easier, I plan to build a server structure
  * that will be easier to work with when working with dynamic data (as opposed to data given at build time).
- * 
+ *
  * This is an example and should be used for tests with Prim. This may move to an `example.test.ts` file once
  * a testing framework is setup.
  */

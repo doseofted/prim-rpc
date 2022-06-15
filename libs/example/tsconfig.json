@@ -1,0 +1,14 @@
+{
+	"compilerOptions": {
+		// ES6 is supported in all browsers
+		"target": "ES6",
+		// new resolution in recent versions of TypeScript
+		// LINK https://www.typescriptlang.org/tsconfig#moduleResolution
+		"moduleResolution": "NodeNext",
+		// // suggested by TS-Jest CLI when not set to `true` in tsconfig.json
+		"esModuleInterop": true,
+		// A config suggestion from Parcel:
+		// LINK https://parceljs.org/languages/typescript/#isolatedmodules
+		"isolatedModules": true
+	}
+}
