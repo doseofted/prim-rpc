@@ -20,8 +20,6 @@
     "build-ui": "turbo run build --filter=./ui/**"
   },
   "devDependencies": {
-    "@nrwl/cli": "^14.3.5",
-    "@nrwl/workspace": "^14.3.5",
     "@parcel/config-default": "^2.6.0",
     "@parcel/core": "^2.6.0",
     "@parcel/packager-ts": "^2.6.0",
@@ -30,7 +28,6 @@
     "@types/jest": "^28.1.1",
     "eslint": "^8.17.0",
     "jest": "^28.1.1",
-    "nx": "^14.3.5",
     "parcel": "^2.6.0",
     "ts-jest": "^28.0.5",
     "turbo": "^1.2.16",

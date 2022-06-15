@@ -20,13 +20,6 @@
     "vite-plugin-dts": "^1.2.0",
     "vue-tsc": "^0.34.7"
   },
-  "nx": {
-    "targets": {
-      "preview": {
-        "dependsOn": ["build"]
-      }
-    }
-  },
   "files": [
     "dist"
   ],
