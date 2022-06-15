@@ -1,11 +1,17 @@
 {
   "name": "@doseofted/prim-docs",
-  "private": true,
-  "version": "0.0.0",
+  "version": "0.0.1",
+  "description": "UI components for Prim documentation",
+  "license": "UNLICENSED",
+  "author": {
+    "name": "Ted Klingenberg",
+    "email": "ted@doseofted.com",
+    "url": "https://doseofted.com/"
+  },
   "scripts": {
-    "check": "vue-tsc --noEmit",
     "build": "vite build",
     "watch": "vite build --watch",
+    "check": "vue-tsc --noEmit",
     "dev": "vite",
     "preview": "vite preview"
   },

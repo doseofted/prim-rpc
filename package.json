@@ -11,7 +11,7 @@
   "license": "UNLICENSED",
   "private": true,
   "scripts": {
-    "nx": "nx",
+    "turbo": "turbo run",
     "zx": "zx",
     "test": "jest",
     "watch-libs": "parcel watch 'libs/*'",
