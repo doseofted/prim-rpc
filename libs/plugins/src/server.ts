@@ -1,4 +1,4 @@
-import type { RpcCall, PrimServer } from "@doseofted/prim"
+import type { RpcCall, PrimServer } from "@doseofted/prim-rpc"
 import type { FastifyPluginAsync } from "fastify"
 import type * as Express from "express"
 import type { WebSocketServer } from "ws"

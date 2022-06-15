@@ -1,11 +1,14 @@
 import wsRequest from "superwstest"
 import example from "@doseofted/prim-example"
-import { createPrimServer } from "@doseofted/prim"
+import { createPrimServer } from "@doseofted/prim-rpc"
 import { primExpressMiddleware, primFasifyPlugin, primWebSocketServerSetup } from "."
 import express from "express"
 import Fastify from "fastify"
 import { WebSocketServer } from "ws"
 import type { Server } from "http"
+
+// TODO: move tests to their own files where it makes sense
+// for instance, functions in client.ts would be defined in client.test.ts
 
 describe("Fastify plugin is functional", () => {
 	const prim = createPrimServer(example)

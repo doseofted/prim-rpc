@@ -1,41 +1,38 @@
 {
   "name": "@doseofted/prim-plugins",
-  "version": "1.0.0",
-  "description": "Plugins for using Prim with server frameworks",
-  "source": "src/index.ts",
-  "main": "dist/main.js",
-  "module": "dist/module.js",
-  "types": "dist/types.d.ts",
+  "version": "0.0.1",
+  "description": "Plugins for using Prim with server/client frameworks",
+  "license": "UNLICENSED",
   "author": {
     "name": "Ted Klingenberg",
     "email": "ted@doseofted.com",
     "url": "https://doseofted.com/"
   },
-  "license": "UNLICENSED",
   "dependencies": {
-    "@doseofted/prim": "workspace:*"
+    "@doseofted/prim-rpc": "workspace:*"
   },
   "scripts": {
     "watch": "parcel watch",
-    "build": "parcel build"
+    "build": "parcel build",
+    "check": "tsc --noEmit",
+    "test": "jest"
   },
   "devDependencies": {
     "@doseofted/prim-example": "workspace:*",
     "@types/express": "^4.17.13",
-    "@types/jest": "^27.5.0",
-    "@types/node": "^17.0.31",
     "@types/supertest": "^2.0.12",
     "@types/ws": "^8.5.3",
     "axios": "^0.27.2",
     "express": "^4.18.1",
     "fastify": "^3.29.0",
-    "jest": "^28.1.0",
     "socket.io": "^4.5.0",
     "socket.io-client": "^4.5.0",
     "supertest": "^6.2.3",
     "superwstest": "^2.0.2",
-    "ts-jest": "^28.0.2",
-    "typescript": "^4.6.4",
     "ws": "^8.6.0"
-  }
+  },
+  "source": "src/index.ts",
+  "types": "dist/index.d.ts",
+  "main": "dist/main.js",
+  "module": "dist/module.js"
 }

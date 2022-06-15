@@ -84,7 +84,7 @@ describe("Prim Client can use callbacks", () => {
 	// LINK https://jestjs.io/docs/expect#rejects
 	test("with local source", (done) => {
 		const { withCallback } = createPrimClient({ server: true }, exampleServer)
-		const results = []
+		const results: string[] = []
 		withCallback((message) => {
 			results.push(message)
 			if (results.length === 2) {
@@ -94,7 +94,7 @@ describe("Prim Client can use callbacks", () => {
 		})
 	})
 	test("with remote source", (done) => {
-		const results = []
+		const results: string[] = []
 		const prim = createPrimServer(exampleServer)
 		const { withCallback } = createPrimClient<typeof exampleClient>({
 			socket(_endpoint, { connected, response, ended }) {
@@ -188,7 +188,7 @@ describe("Prim can batch requests", () => {
 				}
 			]
 		})
-		const sorted = (answers as RpcAnswer[]).sort((a, b) => a.id < b.id ? -1 : 1)
+		const sorted = (answers as RpcAnswer[]).sort((a, b) => (a.id && b.id && a.id < b.id) ? -1 : 1)
 		expect(sorted).toEqual([
 			{ result: "Hey Ted!", id: 1 },
 			{ result: "Hi Ted!", id: 2 }

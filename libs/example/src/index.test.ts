@@ -19,7 +19,7 @@ it("oops should throw", () => {
 })
 
 it("should use callbacks", (done) => {
-  let messages = []
+  let messages: string[] = []
   function cb (message: string) {
     messages.push(message)
     if (messages.length < 2) { return }
@@ -31,7 +31,7 @@ it("should use callbacks", (done) => {
 
 it("should type hello", (done) => {
   const message = "Hello"
-  let letters = []
+  let letters: string[] = []
   function cb (letter: string) {
     letters.push(letter)
     if (letters.length < message.length) { return }
