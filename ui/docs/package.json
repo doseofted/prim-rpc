@@ -13,7 +13,9 @@
     "watch": "vite build --watch",
     "check": "vue-tsc --noEmit",
     "dev": "vite",
-    "preview": "vite preview"
+    "preview": "vite preview",
+    "lint": "eslint --ext .js,.vue,.ts .",
+    "test": "vitest"
   },
   "dependencies": {
     "vue": "^3.2.25"
@@ -21,6 +23,8 @@
   "devDependencies": {
     "@types/node": "^17.0.44",
     "@vitejs/plugin-vue": "^2.3.3",
+    "@vue/test-utils": "^2.0.0",
+    "jsdom": "^19.0.0",
     "typescript": "^4.5.4",
     "vite": "^2.9.9",
     "vite-plugin-dts": "^1.2.0",
