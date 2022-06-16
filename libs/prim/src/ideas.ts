@@ -154,3 +154,5 @@ let webhooks: unknown
  * or a call to a remote server).
  */
 let electronSupport: unknown
+
+export {}

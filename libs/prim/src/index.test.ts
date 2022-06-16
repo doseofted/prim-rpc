@@ -38,7 +38,7 @@ describe("Prim Client can call methods directly", () => {
 	test("with remote source", async () => {
 		const prim = createPrimServer(exampleServer)
 		const { sayHello } = createPrimClient<typeof exampleClient>({
-			client: async (_endpoint, body) => prim.rpc( { body })
+			client: async (_endpoint, body) => prim.rpc( { body }),
 		})
 		const result = await sayHello({ greeting: "Hey", name: "Ted" })
 		expect(result).toEqual("Hey Ted!")
@@ -54,7 +54,7 @@ describe("Prim Client can call deeply nested methods", () => {
 	test("with remote source", async () => {
 		const prim = createPrimServer(exampleServer)
 		const { testLevel2 } = createPrimClient<typeof exampleClient>({
-			client: async (_endpoint, body) => prim.rpc({ body })
+			client: async (_endpoint, body) => prim.rpc({ body }),
 		})
 		const result = await testLevel2.testLevel1.sayHello({ greeting: "Hey", name: "Ted" })
 		expect(result).toEqual("Hey Ted!")
@@ -72,7 +72,7 @@ describe("Prim Client can throw errors", () => {
 	test("with remote source", () => {
 		const prim = createPrimServer(exampleServer)
 		const { oops } = createPrimClient<typeof exampleClient>({
-			client: async (_endpoint, body) => prim.rpc({ body })
+			client: async (_endpoint, body) => prim.rpc({ body }),
 		})
 		expect(async () => {
 			await oops()
@@ -107,7 +107,7 @@ describe("Prim Client can use callbacks", () => {
 				const send = () => ({}) // (body: RpcCall) => { prim.rpc({ body }) }
 				return { send }
 			},
-			client: async (_endpoint, body) => prim.rpc({ body })
+			client: async (_endpoint, body) => prim.rpc({ body }),
 		})
 		withCallback((message) => {
 			results.push(message)
@@ -126,8 +126,8 @@ describe("Prim Server can call methods with RPC", () => {
 			body: {
 				id: 1,
 				method: "testLevel2/testLevel1/sayHello",
-				params: { greeting: "Hey", name: "Ted" }
-			}
+				params: { greeting: "Hey", name: "Ted" },
+			},
 		})
 		expect(result).toEqual({ result: "Hey Ted!", id: 1 })
 	})
@@ -135,14 +135,14 @@ describe("Prim Server can call methods with RPC", () => {
 		const primRemoteServer = createPrimServer(exampleServer)
 		const primServer = createPrimServer<typeof exampleClient>(undefined, {
 			server: false, // set to false so Prim will communicate with another server
-			client: async (_endpoint, body) => primRemoteServer.rpc({ body })
+			client: async (_endpoint, body) => primRemoteServer.rpc({ body }),
 		})
 		const result = await primServer.rpc({
 			body: {
 				id: 1,
 				method: "testLevel2/testLevel1/sayHello",
-				params: { greeting: "Hey", name: "Ted" }
-			}
+				params: { greeting: "Hey", name: "Ted" },
+			},
 		})
 		expect(result).toEqual({ result: "Hey Ted!", id: 1 })
 	})
@@ -153,18 +153,18 @@ describe("Prim Server can call methods with RPC via URL", () => {
 		const prim = createPrimServer(exampleServer)
 		const result = await prim.rpc({
 			url: "/prim/testLevel2/testLevel1/sayHello?-id=1&greeting=Hey&name=Ted",
-			prefix: "/prim"
+			prefix: "/prim",
 		})
 		expect(result).toEqual({ result: "Hey Ted!", id: "1" })
 	})
 	test("From another Prim-Server", async () => {
 		const primServer = createPrimServer(exampleServer)
 		const primRemoteServer = createPrimServer(exampleServer, {
-			client: async (body) => primServer.rpc({ body })
+			client: async (body) => primServer.rpc({ body }),
 		})
 		const result = await primRemoteServer.rpc({
 			url: "/prim/testLevel2/testLevel1/sayHelloAlternative?-id=1&-=Hey&-=Ted",
-			prefix: "/prim"
+			prefix: "/prim",
 		})
 		expect(result).toEqual({ result: "Hey Ted!", id: "1" })
 	})
@@ -179,34 +179,34 @@ describe("Prim can batch requests", () => {
 				{
 					id: 1,
 					method: "testLevel2/testLevel1/sayHello",
-					params: { greeting: "Hey", name: "Ted" }
+					params: { greeting: "Hey", name: "Ted" },
 				},
 				{
 					id: 2,
 					method: "testLevel2/testLevel1/sayHello",
-					params: { greeting: "Hi", name: "Ted" }
-				}
-			]
+					params: { greeting: "Hi", name: "Ted" },
+				},
+			],
 		})
 		const sorted = (answers as RpcAnswer[]).sort((a, b) => (a.id && b.id && a.id < b.id) ? -1 : 1)
 		expect(sorted).toEqual([
 			{ result: "Hey Ted!", id: 1 },
-			{ result: "Hi Ted!", id: 2 }
+			{ result: "Hi Ted!", id: 2 },
 		])
 	})
 	test("client understands responses from batch request", async () => {
 		const prim = createPrimServer(exampleServer)
 		const { sayHello, sayHelloAlternative } = createPrimClient<typeof exampleClient>({
 			client: async (_endpoint, body) => prim.rpc({ body }),
-			clientBatchTime: 300 // NOTE test result will take slightly longer than 300ms (only for test, usually <15ms)
+			clientBatchTime: 300, // NOTE test result will take slightly longer than 300ms (only for test, usually <15ms)
 		})
 		const expected = [
 			exampleServer.sayHello({ greeting: "Hey", name: "Ted" }),
-			exampleServer.sayHelloAlternative("Hey", "Ted")
+			exampleServer.sayHelloAlternative("Hey", "Ted"),
 		]
 		const results = [
 			sayHello({ greeting: "Hey", name: "Ted" }),
-			sayHelloAlternative("Hey", "Ted")
+			sayHelloAlternative("Hey", "Ted"),
 		]
 		expect(await Promise.all(results)).toEqual(await Promise.all(expected))
 	})

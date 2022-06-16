@@ -59,7 +59,7 @@ export function createPrimClient<T extends Record<V, T[V]>, V extends keyof T = 
 			if (!configured.server) {
 				let callbacksGiven = false
 				// eslint-disable-next-line @typescript-eslint/no-explicit-any
-				args = (args as any[]).map((a) => {
+				args = args.map((a) => {
 					if (typeof a !== "function") { return a }
 					callbacksGiven = true
 					const generatedId = "_cb_" + nanoid()
@@ -100,7 +100,7 @@ export function createPrimClient<T extends Record<V, T[V]>, V extends keyof T = 
 		},
 		get(_target, _prop, _receiver) {
 			return this.nest(() => undefined)
-		}
+		},
 	})
 	// !SECTION
 	// SECTION: WebSocket event handling

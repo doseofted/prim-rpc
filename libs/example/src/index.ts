@@ -36,7 +36,7 @@ export async function sayHelloAlternative(greeting: string, name: string) {
  */
 export const testLevel1 = {
 	sayHello,
-	sayHelloAlternative
+	sayHelloAlternative,
 }
 
 /** A module inside of module. A module turducken. */
@@ -53,7 +53,7 @@ export function withCallback(cb: (message: string) => void) {
 	cb("You're using Prim.")
 	setTimeout(() => {
 		cb("Still using Prim!")
-	}, 100);
+	}, 100)
 }
 
 /** Type a message. Now with configurable type speed. */
@@ -62,6 +62,6 @@ export function typeMessage(message: string, typeLetter: (typed: string) => void
 	message.split("").forEach(letter => {
 		setTimeout(() => {
 			typeLetter(letter)
-		}, ++timeout * speed);
+		}, ++timeout * speed)
 	})
 }

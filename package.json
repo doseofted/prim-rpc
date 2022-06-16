@@ -26,6 +26,8 @@
     "@parcel/transformer-typescript-types": "^2.6.0",
     "@parcel/validator-typescript": "^2.6.0",
     "@types/jest": "^28.1.1",
+    "@typescript-eslint/eslint-plugin": "^5.28.0",
+    "@typescript-eslint/parser": "^5.28.0",
     "eslint": "^8.17.0",
     "jest": "^28.1.1",
     "parcel": "^2.6.0",
