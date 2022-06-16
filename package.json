@@ -29,6 +29,7 @@
     "@typescript-eslint/eslint-plugin": "^5.28.0",
     "@typescript-eslint/parser": "^5.28.0",
     "eslint": "^8.17.0",
+    "eslint-plugin-vue": "^9.1.1",
     "jest": "^28.1.1",
     "parcel": "^2.6.0",
     "ts-jest": "^28.0.5",

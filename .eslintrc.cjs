@@ -32,7 +32,9 @@ const sharedRules = (() => {
 module.exports = {
 	root: true,
 	parser: "@typescript-eslint/parser",
-	plugins: ["@typescript-eslint"],
+	plugins: [
+		"@typescript-eslint",
+	],
 	extends: [
 		"eslint:recommended",
 	],
@@ -59,7 +61,7 @@ module.exports = {
 			],
 			rules: {
 				...sharedRules.typescript,
-				// Prim allows this functionality so don't report as error
+				// Prim allows this functionality so don't report it as error
 				// LINK https://typescript-eslint.io/rules/await-thenable/
 				"@typescript-eslint/await-thenable": "error",
 			},
