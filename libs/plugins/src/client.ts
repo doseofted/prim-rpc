@@ -1,6 +1,6 @@
-import type { PrimClientFunction, PrimSocketFunction, RpcCall } from "@doseofted/prim-rpc"
+import type { PrimClientFunction /* PrimSocketFunction, RpcCall */ } from "@doseofted/prim-rpc"
 import type { AxiosInstance } from "axios"
-import type { Socket as SocketIoSocket } from "socket.io-client"
+// import type { Socket as SocketIoSocket } from "socket.io-client"
 
 // TODO use axios client for those who like to use Axios
 // TODO write this

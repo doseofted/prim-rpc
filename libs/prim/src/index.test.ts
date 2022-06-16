@@ -65,9 +65,9 @@ describe("Prim Client can throw errors", () => {
 	// LINK https://jestjs.io/docs/expect#rejects
 	test("with local source", async () => {
 		const { oops } = createPrimClient({ server: true }, exampleServer)
-		expect(async () => {
-			await oops()
-		}).rejects.toThrow("My bad.")
+		expect(() => {
+			oops()
+		}).toThrow("My bad.")
 	})
 	test("with remote source", () => {
 		const prim = createPrimServer(exampleServer)

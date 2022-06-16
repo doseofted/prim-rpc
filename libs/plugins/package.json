@@ -15,7 +15,8 @@
     "watch": "parcel watch",
     "build": "parcel build",
     "check": "tsc --noEmit",
-    "test": "jest"
+    "test": "jest",
+    "lint": "eslint ."
   },
   "devDependencies": {
     "@doseofted/prim-example": "workspace:*",

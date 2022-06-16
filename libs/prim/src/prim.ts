@@ -1,3 +1,9 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
+/* eslint-disable @typescript-eslint/no-unsafe-call */
+/* eslint-disable @typescript-eslint/no-unsafe-assignment */
+/* eslint-disable @typescript-eslint/no-misused-promises */
+/* eslint-disable @typescript-eslint/no-unsafe-return */
+/* eslint-disable @typescript-eslint/no-unsafe-argument */
 /**
  * Prim-RPC is intended to allow me to write plain functions on the server and
  * then make those same function calls on the client as if they were written
@@ -31,7 +37,6 @@ export function createPrimClient<T extends Record<V, T[V]>, V extends keyof T = 
 	const empty = {} as T // when not given on client-side, treat empty object as T
 	// SECTION proxy to resolve function calls
 	const proxy = new ProxyDeep<T>(givenModule ?? empty, {
-		// eslint-disable-next-line @typescript-eslint/no-explicit-any
 		apply(_emptyTarget, that, args: any[]) {
 			// call available function on server
 			const realTarget = getProperty(givenModule, this.path)
@@ -58,7 +63,6 @@ export function createPrimClient<T extends Record<V, T[V]>, V extends keyof T = 
 			// if on client, send off request to server
 			if (!configured.server) {
 				let callbacksGiven = false
-				// eslint-disable-next-line @typescript-eslint/no-explicit-any
 				args = args.map((a) => {
 					if (typeof a !== "function") { return a }
 					callbacksGiven = true
@@ -133,7 +137,7 @@ export function createPrimClient<T extends Record<V, T[V]>, V extends keyof T = 
 	let timer: ReturnType<typeof setTimeout>
 	const batchedRequests = () => {
 		if (timer) { return }
-		timer = setTimeout(async () => {
+		timer = setTimeout(() => {
 			const rpcList = queuedCalls.filter(c => !c.resolved)
 			rpcList.forEach(r => { r.resolved = "pending" })
 			clearTimeout(timer); timer = undefined

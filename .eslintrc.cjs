@@ -1,3 +1,4 @@
+// SECTION utilities
 /** Disable ESLint rule and enable TypeScript-ESLint version instead as long as `js` argument is `false`. */
 const withBaseRule = (name, opts, js = false) => (js ? { [name]: opts } : {
 	[name]: "off",
@@ -5,7 +6,9 @@ const withBaseRule = (name, opts, js = false) => (js ? { [name]: opts } : {
 })
 /** Given rule, return tuple with ESLint rule first, then TypeScript-ESLint version */
 const rule = (name, opts) => [withBaseRule(name, opts, true), withBaseRule(name, opts)]
-const rules = (() => {
+// !SECTION utilities
+
+const sharedRules = (() => {
 	let typescript = {}; let javascript = {}
 	void [
 		// LINK https://typescript-eslint.io/rules/brace-style/
@@ -16,10 +19,10 @@ const rules = (() => {
 		rule("quotes", ["error", "double"]),
 		// LINK https://typescript-eslint.io/rules/comma-dangle
 		rule("comma-dangle", ["error", "always-multiline"]),
-		// LINK https://typescript-eslint.io/rules/require-await
-		rule("require-await", ["off"]),
 		// LINK https://typescript-eslint.io/rules/semi
 		rule("semi", ["error", "never"]),
+		// LINK https://typescript-eslint.io/rules/no-unused-vars
+		rule("no-unused-vars", ["error", { argsIgnorePattern: "^_" }]),
 	].forEach(([js, ts]) => {
 		javascript = { ...javascript, ...js }; typescript = { ...typescript, ...ts }
 	})
@@ -34,7 +37,7 @@ module.exports = {
 		"eslint:recommended",
 	],
 	rules: {
-		...rules.javascript,
+		...sharedRules.javascript,
 	},
 	env: {
 		"node": true,
@@ -55,7 +58,10 @@ module.exports = {
 				"plugin:@typescript-eslint/recommended-requiring-type-checking",
 			],
 			rules: {
-				...rules.typescript,
+				...sharedRules.typescript,
+				// Prim allows this functionality so don't report as error
+				// LINK https://typescript-eslint.io/rules/await-thenable/
+				"@typescript-eslint/await-thenable": "error",
 			},
 		},
 	],

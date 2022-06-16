@@ -27,9 +27,10 @@ export function createPrimOptions(options?: PrimOptions) {
 			const result = await fetch(endpoint, {
 				method: "POST",
 				headers: { "Content-Type": "application/json" },
-				body: jsonHandler.stringify(jsonBody)
+				body: jsonHandler.stringify(jsonBody),
 			})
 			// RPC result should be returned on success and RPC error thrown if errored
+			// eslint-disable-next-line @typescript-eslint/no-unsafe-return
 			return jsonHandler.parse(await result.text())
 		},
 		// same with socket, usually the default WebSocket client is fine but the choice to change should be there
@@ -37,6 +38,7 @@ export function createPrimOptions(options?: PrimOptions) {
 			const ws = new WebSocket(endpoint)
 			ws.onopen = connected
 			ws.onmessage = (({ data: message }) => {
+				// eslint-disable-next-line @typescript-eslint/no-unsafe-argument
 				response(jsonHandler.parse(message))
 			})
 			ws.onclose = ended
@@ -46,7 +48,7 @@ export function createPrimOptions(options?: PrimOptions) {
 			return { send }
 		},
 		// these options should not be passed by a developer but are used internally
-		internal: {}
+		internal: {},
 	})
 	return configured
 }

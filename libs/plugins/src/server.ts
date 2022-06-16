@@ -1,3 +1,8 @@
+/* eslint-disable @typescript-eslint/require-await */
+/* eslint-disable @typescript-eslint/no-unsafe-argument */
+/* eslint-disable @typescript-eslint/no-floating-promises */
+/* eslint-disable @typescript-eslint/no-unsafe-assignment */
+/* eslint-disable @typescript-eslint/no-misused-promises */
 import type { RpcCall, PrimServer } from "@doseofted/prim-rpc"
 import type { FastifyPluginAsync } from "fastify"
 import type * as Express from "express"
@@ -24,7 +29,7 @@ export const primFasifyPlugin: FastifyPluginAsync<{ prim: PrimServer, prefix?: s
 		handler: async ({ url, body }, reply) => {
 			const response = await prim.rpc({ prefix, url, body })
 			reply.send(response)
-		}
+		},
 	})
 }
 
@@ -74,7 +79,7 @@ export const primWebSocketServerSetup = (prim: PrimServer, socket: WebSocketServ
 	const jsonHandler = prim.opts.jsonHandler ?? JSON
 	socket.on("connection", (ws) => {
 		// prim.ws.emit("connect")
-		ws.on("message", async (data) => {
+		ws.on("message", (data) => {
 			const rpc = jsonHandler.parse(String(data))
 			prim.rpc(rpc)
 			prim.ws.on("response", (cbAnswer) => {
@@ -104,7 +109,7 @@ export const primSocketIoServerSetup = (prim: PrimServer, socket: SocketIoServer
 	const jsonHandler = prim.opts.jsonHandler ?? JSON
 	socket.on("connection", (ws) => {
 		// prim.ws.emit("connect")
-		ws.on("prim", async (data) => {
+		ws.on("prim", (data) => {
 			const rpc = jsonHandler.parse(String(data))
 			prim.rpc(rpc)
 			prim.ws.on("response", (cbAnswer) => {
