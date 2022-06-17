@@ -1,7 +1,31 @@
 {
   "folders": [
 		{
-			"name": "Prim",
+			"name": "📙 Prim RPC",
+			"path": "./libs/prim"
+		},
+		{
+			"name": "📙 Prim Plugins",
+			"path": "./libs/plugins"
+		},
+		{
+			"name": "📙 Example Library",
+			"path": "./libs/example"
+		},
+		{
+			"name": "⚙️ Prim Docs UI",
+			"path": "./ui/docs"
+		},
+		{
+			"name": "🌐 Example Frontend",
+			"path": "./apps/frontend"
+		},
+		{
+			"name": "🌐 Example Backend",
+			"path": "./apps/backend"
+		},
+		{
+			"name": "🌲 Project Root",
 			"path": "."
 		}
 	],
@@ -26,7 +50,7 @@
 			"scss",
 			"vue"
 		],
-		"typescript.tsdk": "Prim/node_modules/typescript/lib",
+		"typescript.tsdk": "🌲 Project Root/node_modules/typescript/lib",
 		"eslint.validate": [
 			"javascript",
 			"javascriptreact",
