@@ -3,10 +3,9 @@
 		// Target can be higher for server since I can control the version of Node used
 		// LINK https://node.green/
 		"target": "ES2021",
-		// new resolution in recent versions of TypeScript
+		// CommonJS resolution
 		// LINK https://www.typescriptlang.org/tsconfig#moduleResolution
 		"moduleResolution": "Node",
-		"module": "System",
 		// suggested by TS-Jest CLI when not set to `true` in tsconfig.json
 		"esModuleInterop": true,
 		// A config suggestion from Parcel:

@@ -16,7 +16,7 @@
  * client by providing the library as an option to `createPrimClient`.
  */
 import ProxyDeep from "proxy-deep"
-import { get as getProperty, remove as removeFromArray } from "lodash"
+import { get as getProperty, remove as removeFromArray } from "lodash-es"
 import { nanoid } from "nanoid"
 import mitt from "mitt"
 import { RpcCall, PrimOptions, RpcAnswer, PrimWebSocketEvents, PrimHttpEvents } from "./interfaces"

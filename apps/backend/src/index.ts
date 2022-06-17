@@ -14,12 +14,13 @@ const fastify = Fastify()
 const websocket = new WebSocketServer({ server: fastify.server })
 
 const prim = createPrimServer(example)
-await fastify.register(primFasifyPlugin, { prim, prefix: "/prim" })
+void fastify.register(primFasifyPlugin, { prim, prefix: "/prim" })
 primWebSocketServerSetup(prim, websocket)
-await fastify.register(Cors, { origin: `https://${process.env.HOST}` })
+void fastify.register(Cors, { origin: `https://${process.env.HOST}` })
 
 try {
-	await fastify.listen({ port: 3001, host: "0.0.0.0" })
+	void fastify.listen({ port: 3001, host: "0.0.0.0" })
+	fastify.log.info("Server is listening.")
 } catch (err) {
 	if (err) {
 		fastify.log.error(err)

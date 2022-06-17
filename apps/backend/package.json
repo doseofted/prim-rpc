@@ -28,6 +28,7 @@
     "node": ">= 16.15.1"
   },
   "source": "src/index.ts",
+  "module": "dist/module.js",
   "devDependencies": {
     "@types/ws": "^8.5.3"
   }

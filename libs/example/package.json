@@ -17,6 +17,10 @@
   },
   "source": "src/index.ts",
   "types": "dist/index.d.ts",
-  "main": "dist/main.js",
-  "module": "dist/module.js"
+  "main": "dist/main.cjs",
+  "module": "dist/module.mjs",
+  "exports": {
+    "import": "./dist/module.mjs",
+    "require": "./dist/main.cjs"
+  }
 }

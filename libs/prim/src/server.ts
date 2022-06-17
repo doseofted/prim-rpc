@@ -4,7 +4,7 @@
 import { RpcError } from "./error"
 import { createPrimClient } from "./prim"
 import { CommonFrameworkOptions, PrimOptions, PrimWebSocketEvents, RpcAnswer, RpcCall } from "./interfaces"
-import { get as getProperty } from "lodash"
+import { get as getProperty } from "lodash-es"
 import { defu } from "defu"
 import { nanoid } from "nanoid"
 import { getQuery, parseURL } from "ufo"
