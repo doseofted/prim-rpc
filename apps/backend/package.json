@@ -21,7 +21,9 @@
     "build": "parcel build",
     "check": "tsc --noEmit",
     "test": "jest",
-    "lint": "eslint ."
+    "lint": "eslint .",
+    "start": "node dist/module.js",
+    "dev": "nodemon dist/module.js"
   },
   "type": "module",
   "engines": {
@@ -30,6 +32,7 @@
   "source": "src/index.ts",
   "module": "dist/module.js",
   "devDependencies": {
-    "@types/ws": "^8.5.3"
+    "@types/ws": "^8.5.3",
+    "nodemon": "^2.0.16"
   }
 }

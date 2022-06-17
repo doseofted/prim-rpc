@@ -11,11 +11,18 @@
       "dependsOn": ["^build"],
       "outputs": ["dist/**"]
     },
+    "dev": {
+      "dependsOn": ["^build"],
+      "outputs": ["dist/**"]
+    },
     "@doseofted/prim-docs#preview": {
       "dependsOn": ["build"],
       "outputs": ["dist/**"]
     },
     "lint": {
+      "dependsOn": []
+    },
+    "lint-style": {
       "dependsOn": []
     }
   }

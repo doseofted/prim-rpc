@@ -8,8 +8,6 @@ import * as example from "@doseofted/prim-example"
 import { createPrimServer } from "@doseofted/prim-rpc"
 import { primFastifyPlugin, primWebSocketServerSetup } from "@doseofted/prim-plugins"
 
-// const { createPrimServer } = await import("prim")
-
 const fastify = Fastify()
 const websocket = new WebSocketServer({ server: fastify.server })
 

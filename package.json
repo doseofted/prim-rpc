@@ -13,11 +13,15 @@
   "scripts": {
     "turbo": "turbo run",
     "zx": "zx",
-    "test": "jest",
     "watch-libs": "parcel watch 'libs/*'",
     "build-libs": "parcel build 'libs/*'",
     "watch-ui": "turbo run watch --filter=./ui/**",
-    "build-ui": "turbo run build --filter=./ui/**"
+    "build-ui": "turbo run build --filter=./ui/**",
+    "watch-apps": "turbo run dev --filter=./apps/**",
+    "build-apps": "turbo run build --filter=./apps/**",
+    "test": "jest",
+    "lint": "turbo run lint",
+    "lint-style": "turbo run lint-style"
   },
   "devDependencies": {
     "@parcel/config-default": "^2.6.0",
