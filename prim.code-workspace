@@ -57,7 +57,9 @@
 		},
 		"cSpell.words": [
 			"doseofted",
-			"Klingenberg"
+			"fastify",
+			"Klingenberg",
+			"websockets"
 		],
 	},
 	"extensions": {

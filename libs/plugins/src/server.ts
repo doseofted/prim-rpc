@@ -13,15 +13,15 @@ import type { Server as SocketIoServer } from "socket.io"
  * Prim's Fastify plugin. Use like so:
  * 
  * ```typescript
- * import { primFasifyPlugin } from "prim-plugins"
+ * import { primFastifyPlugin } from "prim-plugins"
  * import { createPrimServer } from "prim"
  * import * as example from "example"
  * // ...
  * const prim = createPrimServer(example)
- * fastify.register(primFasifyPlugin, { prim })
+ * fastify.register(primFastifyPlugin, { prim })
  * ```
  */
-export const primFasifyPlugin: FastifyPluginAsync<{ prim: PrimServer, prefix?: string }> = async (fastify, options) => {
+export const primFastifyPlugin: FastifyPluginAsync<{ prim: PrimServer, prefix?: string }> = async (fastify, options) => {
 	const { prefix = "/prim", prim } = options
 	fastify.route<{ Body: RpcCall, Params: { method?: string } }>({
 		method: ["POST", "GET"],

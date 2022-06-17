@@ -1,5 +1,5 @@
-import { primFasifyPlugin, primExpressMiddleware, primWebSocketServerSetup } from "./server"
+import { primFastifyPlugin, primExpressMiddleware, primWebSocketServerSetup } from "./server"
 
 export {
-	primFasifyPlugin, primExpressMiddleware, primWebSocketServerSetup,
+	primFastifyPlugin, primExpressMiddleware, primWebSocketServerSetup,
 }

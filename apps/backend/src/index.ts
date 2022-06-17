@@ -6,7 +6,7 @@ import Cors from "@fastify/cors"
 import { WebSocketServer } from "ws"
 import * as example from "@doseofted/prim-example"
 import { createPrimServer } from "@doseofted/prim-rpc"
-import { primFasifyPlugin, primWebSocketServerSetup } from "@doseofted/prim-plugins"
+import { primFastifyPlugin, primWebSocketServerSetup } from "@doseofted/prim-plugins"
 
 // const { createPrimServer } = await import("prim")
 
@@ -14,7 +14,7 @@ const fastify = Fastify()
 const websocket = new WebSocketServer({ server: fastify.server })
 
 const prim = createPrimServer(example)
-void fastify.register(primFasifyPlugin, { prim, prefix: "/prim" })
+void fastify.register(primFastifyPlugin, { prim, prefix: "/prim" })
 primWebSocketServerSetup(prim, websocket)
 void fastify.register(Cors, { origin: `https://${process.env.HOST}` })
 
