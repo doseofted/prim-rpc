@@ -1,7 +1,7 @@
 import wsRequest from "superwstest"
 import example from "@doseofted/prim-example"
 import { createPrimServer } from "@doseofted/prim-rpc"
-import { primExpressMiddleware, primFasifyPlugin, primWebSocketServerSetup } from "."
+import { primExpressMiddleware, primFastifyPlugin, primWebSocketServerSetup } from "."
 import express from "express"
 import Fastify from "fastify"
 import { WebSocketServer } from "ws"
@@ -13,7 +13,7 @@ import type { Server } from "http"
 describe("Fastify plugin is functional", () => {
 	const prim = createPrimServer(example)
 	const app = Fastify()
-	app.register(primFasifyPlugin, { prim, prefix: "/prim" })
+	void app.register(primFastifyPlugin, { prim, prefix: "/prim" })
 	const server = app.server
 	const websocket = new WebSocketServer({ server })
 	primWebSocketServerSetup(prim, websocket)
@@ -33,7 +33,7 @@ describe("Fastify plugin is functional", () => {
 			.send({
 				id: 1,
 				method: "sayHello",
-				params: { greeting: "Hey", name: "Ted" }
+				params: { greeting: "Hey", name: "Ted" },
 			})
 			.set("Accept", "application/json")
 		// expect(response.headers["Content-Type"]).toBe(prefix)
@@ -74,7 +74,7 @@ describe("Express plugin is functional", () => {
 	const app = express()
 	app.use(express.json())
 	app.use(primExpressMiddleware(prim, "/prim"))
-	let server: Server;
+	let server: Server
 	beforeEach((done) => {
 		server = app.listen(0, "localhost", done)
 	})
@@ -87,7 +87,7 @@ describe("Express plugin is functional", () => {
 			.send({
 				id: 1,
 				method: "sayHello",
-				params: { greeting: "Hey", name: "Ted" }
+				params: { greeting: "Hey", name: "Ted" },
 			})
 			.set("Accept", "application/json")
 		// expect(response.headers["Content-Type"]).toBe(prefix)

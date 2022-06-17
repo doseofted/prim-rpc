@@ -11,7 +11,7 @@
  * 
  *
  * ```typescript
- * const { sayHello } = createPrimUniveral<typeof moduleServer>({ ...options }, {
+ * const { sayHello } = createPrimUniversal<typeof moduleServer>({ ...options }, {
  *   sayHello(name: string) { return `Loading, please wait ${name} ...` },
  *   sayGoodbye(...) { ... }
  * })
@@ -62,7 +62,7 @@ let batchRequests: unknown
  * Allow uploads of images by supporting multipart form data. Each field could be considered a property of an object
  * parameter to a function. So, for instance if a form exists on a page with an action `/prim/createProfile`,
  * (or `/prim/create-profile` if I support camel-case -> url conversion of function names), and that is a request to
- * the Prim Server, then a field named "profilePciture" would be passed as `{ profilePicture: Buffer }` on the server.
+ * the Prim Server, then a field named "profilePicture" would be passed as `{ profilePicture: Buffer }` on the server.
  * 
  * If I support image uploads over multipart data then I could also pass other fields over the form too, for instance
  * a text field on a form named "firstName" would then be passed as `{ firstName: string }` on the server, or with the
@@ -79,10 +79,10 @@ let batchRequests: unknown
  * for the HTTP server, like so:
  * 
  * ```typescript
- * fastify.register(primFasifyPlugin, { prim, multipart: "fastify-multipart" })
+ * fastify.register(primFastifyPlugin, { prim, multipart: "fastify-multipart" })
  * ```
  * 
- * This way, I know where on the request I can expect to find the file. This may be too complciated initially.
+ * This way, I know where on the request I can expect to find the file. This may be too complicated initially.
  * I may need to recommend handling file uploads separately from Prim through whatever HTTP framework is used
  * so I can focus on other, less complicated Prim ideas.
  * 
@@ -129,7 +129,7 @@ let nextIdea: unknown
 
 /**
  * When a request comes into Prim Server, send the answer over a list of configured webhooks.
- * This can be done by using the clinet option configured with Prim except I'll just be using it from
+ * This can be done by using the client option configured with Prim except I'll just be using it from
  * the server to contact each configured endpoint. I could potentially allow for a filter on what answers
  * to forward to webhook endpoints (for instance, regex or glob that matches function names)
  */

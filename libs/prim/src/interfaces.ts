@@ -52,7 +52,7 @@ export interface PrimOptions {
 	server?: boolean
 	/** When `options.server` is `false`, provide the server URL where Prim is being used, to be used from `options.client` */
 	endpoint?: string
-	/** When `options.server` is `false` and websocket endpont is different from HTTP endpoint, provide the websocket URL where Prim is being used, to be used from `options.socket` */
+	/** When `options.server` is `false` and websocket endpoint is different from HTTP endpoint, provide the websocket URL where Prim is being used, to be used from `options.socket` */
 	wsEndpoint?: string
 	/**
 	 * If zero, don't batch RPC calls. If non-zero then wait a short time, in milliseconds, before sending HTTP requests.

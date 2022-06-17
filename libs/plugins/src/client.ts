@@ -1,3 +1,6 @@
+/* eslint-disable @typescript-eslint/no-unsafe-return */
+/* eslint-disable @typescript-eslint/no-unsafe-argument */
+/* eslint-disable @typescript-eslint/no-unsafe-assignment */
 import type { PrimClientFunction /* PrimSocketFunction, RpcCall */ } from "@doseofted/prim-rpc"
 import type { AxiosInstance } from "axios"
 // import type { Socket as SocketIoSocket } from "socket.io-client"

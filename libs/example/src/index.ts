@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/require-await */
 /**
  * This is an example of a module that could be used with Prim (the server, not data manager aspect of the project).
  * Prim is intended to be a content manager but to make development easier, I plan to build a server structure
