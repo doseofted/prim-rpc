@@ -1,9 +1,3 @@
-/* eslint-disable @typescript-eslint/no-explicit-any */
-/* eslint-disable @typescript-eslint/no-unsafe-call */
-/* eslint-disable @typescript-eslint/no-unsafe-assignment */
-/* eslint-disable @typescript-eslint/no-misused-promises */
-/* eslint-disable @typescript-eslint/no-unsafe-return */
-/* eslint-disable @typescript-eslint/no-unsafe-argument */
 /**
  * Prim-RPC is intended to allow me to write plain functions on the server and
  * then make those same function calls on the client as if they were written
@@ -20,7 +14,7 @@ import { nanoid } from "nanoid"
 import mitt from "mitt"
 import { RpcCall, PrimOptions, RpcAnswer, PrimWebSocketEvents, PrimHttpEvents } from "./interfaces"
 import { createPrimOptions } from "./options"
-import { RpcError } from "./error"
+import { RpcErr, RpcError } from "./error"
 // Prim is intended to be used as ES Module but "lodash-es" is included in CJS bundle to avoid require() of ES module
 import { get as getProperty, remove as removeFromArray } from "lodash-es"
 
@@ -38,9 +32,9 @@ export function createPrimClient<T extends Record<V, T[V]>, V extends keyof T = 
 	const empty = {} as T // when not given on client-side, treat empty object as T
 	// SECTION proxy to resolve function calls
 	const proxy = new ProxyDeep<T>(givenModule ?? empty, {
-		apply(_emptyTarget, that, args: any[]) {
+		apply(_emptyTarget, that, args: unknown[]) {
 			// call available function on server
-			const realTarget = getProperty(givenModule, this.path)
+			const realTarget = getProperty<T, keyof T>(givenModule, this.path as [keyof T])
 			if (configured.server && typeof realTarget === "function") {
 				try {
 					// At this point, all callbacks have been replaced with identifiers so I should go through each reference
@@ -51,13 +45,14 @@ export function createPrimClient<T extends Record<V, T[V]>, V extends keyof T = 
 							wsEvent.emit("response", { result: cbArgs, id: arg })
 						}
 					})
-					const result = Reflect.apply(realTarget, that, args)
+					const result = Reflect.apply(realTarget, that, args) as unknown
 					// TODO instead of returning result directly back to Prim Server, wrap this in an RPC response with the given
 					// ID and return that (similar to how callbacks answers are handled above). This would allow me to move
 					// more RPC functionality into this library and keep Prim Server as a way of translating requests into RPC.
 					// NOTE see `makeRpcCall` in Prim Server and consider moving that functionality into the client
 					return result
-				} catch (error) {
+				} catch (e: unknown) {
+					const error = e as RpcErr
 					throw new RpcError(error)
 				}
 			}
@@ -72,7 +67,7 @@ export function createPrimClient<T extends Record<V, T[V]>, V extends keyof T = 
 					const unbind = wsEvent.on("response", (msg) => {
 						if (msg.id !== generatedId) { return }
 						if (Array.isArray(msg.result)) {
-							a(...msg.result)
+							a(...msg.result as unknown[])
 						} else {
 							a(msg.result)
 						}
@@ -95,7 +90,7 @@ export function createPrimClient<T extends Record<V, T[V]>, V extends keyof T = 
 						if (answer.error) {
 							reject(new RpcError(answer.error))
 						} else {
-							resolve(answer.result)
+							resolve(answer.result as unknown)
 						}
 					})
 				})
@@ -154,7 +149,8 @@ export function createPrimClient<T extends Record<V, T[V]>, V extends keyof T = 
 						httpEvent.emit("response", answer)
 					}
 				})
-				.catch((error) => {
+				// TODO: determine if `RpcAnswer[]` is the right type here (it may need to be an error)
+				.catch((error: RpcErr|RpcAnswer[]) => {
 					if (Array.isArray(error)) {
 						// multiple errors given, return each error result to caller
 						error.forEach(e => { httpEvent.emit("response", e) })

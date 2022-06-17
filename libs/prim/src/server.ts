@@ -1,4 +1,3 @@
-/* eslint-disable @typescript-eslint/no-unsafe-call */
 /* eslint-disable @typescript-eslint/no-unsafe-argument */
 /* eslint-disable @typescript-eslint/no-unsafe-assignment */
 import { RpcError } from "./error"
@@ -45,15 +44,16 @@ export function createPrimServer<T extends Record<V, T[V]>, V extends keyof T = 
 		// const args = Array.isArray(params) ? params : [params]
 		try {
 			const methodExpanded = method.split("/")
-			const target = getProperty(prim, methodExpanded)
+			const target = getProperty<T, keyof T>(prim, methodExpanded as [keyof T])
 			// console.log(methodExpanded)
 			// TODO: go through params and look for callbacks, using configured "options.socket" to send back response
 			if (Array.isArray(params)) {
-				return { result: await target(...params), id }
+				return { result: await target(...params as unknown[]), id }
 			} else {
 				return { result: await target(params), id }
 			}
-		} catch (err) {
+		} catch (e: unknown) {
+			const err = e as RpcError<unknown>
 			// don't throw on server, simply return error to be interpreted as error on receiving client
 			if (err instanceof RpcError) {
 				const error = err.formatSend()
