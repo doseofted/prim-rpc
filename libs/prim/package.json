@@ -30,6 +30,13 @@
     "lodash": "^4.17.21"
   },
   "source": "src/index.ts",
+  "targets": {
+    "main": {
+      "includeNodeModules": [
+        "lodash-es"
+      ]
+    }
+  },
   "types": "dist/index.d.ts",
   "main": "dist/main.cjs",
   "module": "dist/module.mjs",

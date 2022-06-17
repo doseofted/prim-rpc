@@ -16,12 +16,13 @@
  * client by providing the library as an option to `createPrimClient`.
  */
 import ProxyDeep from "proxy-deep"
-import { get as getProperty, remove as removeFromArray } from "lodash-es"
 import { nanoid } from "nanoid"
 import mitt from "mitt"
 import { RpcCall, PrimOptions, RpcAnswer, PrimWebSocketEvents, PrimHttpEvents } from "./interfaces"
 import { createPrimOptions } from "./options"
 import { RpcError } from "./error"
+// Prim is intended to be used as ES Module but "lodash-es" is included in CJS bundle to avoid require() of ES module
+import { get as getProperty, remove as removeFromArray } from "lodash-es"
 
 /**
  * Prim-RPC can be used to write plain functions on the server and then call them easily from the client.

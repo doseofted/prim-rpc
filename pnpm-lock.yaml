@@ -33,7 +33,7 @@ importers:
       '@parcel/packager-ts': 2.6.0_@parcel+core@2.6.0
       '@parcel/transformer-typescript-types': 2.6.0_w52ttl3l3dx4b2rrzqiyo3tgia
       '@parcel/validator-typescript': 2.6.0_w52ttl3l3dx4b2rrzqiyo3tgia
-      '@types/jest': 28.1.1
+      '@types/jest': 28.1.2
       '@typescript-eslint/eslint-plugin': 5.28.0_7yumg2qjgbp7maccqlfhx2vudu
       '@typescript-eslint/parser': 5.28.0_ud6rd4xtew5bv4yhvkvu24pzm4
       eslint: 8.17.0
@@ -106,13 +106,11 @@ importers:
       '@doseofted/prim-example': workspace:*
       '@doseofted/prim-rpc': workspace:*
       '@types/express': ^4.17.13
-      '@types/lodash': ^4.14.182
       '@types/supertest': ^2.0.12
       '@types/ws': ^8.5.3
       axios: ^0.27.2
       express: ^4.18.1
       fastify: ^4.0.3
-      lodash: ^4.17.21
       socket.io: ^4.5.0
       socket.io-client: ^4.5.0
       supertest: ^6.2.3
@@ -123,13 +121,11 @@ importers:
     devDependencies:
       '@doseofted/prim-example': link:../example
       '@types/express': 4.17.13
-      '@types/lodash': 4.14.182
       '@types/supertest': 2.0.12
       '@types/ws': 8.5.3
       axios: 0.27.2
       express: 4.18.1
       fastify: 4.0.3
-      lodash: 4.17.21
       socket.io: 4.5.1
       socket.io-client: 4.5.1
       supertest: 6.2.3
@@ -856,22 +852,22 @@ packages:
       '@lezer/common': 0.15.12
     dev: true
 
-  /@microsoft/api-extractor-model/7.18.1:
-    resolution: {integrity: sha512-aF9b9KU4+LCcXRbpwa+c/jOMZDsbomkehbjVNRMfCcRueeZ5KyBiERxWwc/Vk1mBFmDqkvYjK7RUxWYT2BsLAw==}
+  /@microsoft/api-extractor-model/7.18.2:
+    resolution: {integrity: sha512-m7MCvJrudnWyE4iuRhdmgJTdTkYLw+yN/XUp3y9sxicu5/mNdg8y4pflaM82ZbLakhfGreMlB/XgjvyGbLHwkA==}
     dependencies:
       '@microsoft/tsdoc': 0.14.1
       '@microsoft/tsdoc-config': 0.16.1
-      '@rushstack/node-core-library': 3.45.6
+      '@rushstack/node-core-library': 3.45.7
     dev: true
 
-  /@microsoft/api-extractor/7.25.1:
-    resolution: {integrity: sha512-/RE3G1oGD5d1QNhXdapVsFfgYIadLrhl9jjYIheADC54Jetwdb/Oc3rZpZiyoeYLBPl0JVWUplc94QdfvhvmaA==}
+  /@microsoft/api-extractor/7.25.2:
+    resolution: {integrity: sha512-ITuiZqMszZE38dGqavkFFIAW/GQGfkk8ahgBqVj3j1qD4wioPTRlSidhQDCezExAhrMt/bTkuZ3woLeR0uiSsg==}
     hasBin: true
     dependencies:
-      '@microsoft/api-extractor-model': 7.18.1
+      '@microsoft/api-extractor-model': 7.18.2
       '@microsoft/tsdoc': 0.14.1
       '@microsoft/tsdoc-config': 0.16.1
-      '@rushstack/node-core-library': 3.45.6
+      '@rushstack/node-core-library': 3.45.7
       '@rushstack/rig-package': 0.3.12
       '@rushstack/ts-command-line': 4.11.1
       colors: 1.2.5
@@ -1778,8 +1774,8 @@ packages:
       nullthrows: 1.1.1
     dev: true
 
-  /@rushstack/node-core-library/3.45.6:
-    resolution: {integrity: sha512-RKGjkakEPcc5em1Dej6ql8OQobofp1IPKUDU2angme5XH7BFJzL5CAuU4zxIXaS8IT5HUV3WXd/GIkPAnrKNyw==}
+  /@rushstack/node-core-library/3.45.7:
+    resolution: {integrity: sha512-DHfOvgPrm9X4uILlUfGgiqcobe5QGNDmqqYLM8dJ5M5fqQ9H5GwyUwBnFeRsxBo0b75RE83l41Oze+gdHKvKaA==}
     dependencies:
       '@types/node': 12.20.24
       colors: 1.2.5
@@ -1970,11 +1966,11 @@ packages:
       '@types/istanbul-lib-report': 3.0.0
     dev: true
 
-  /@types/jest/28.1.1:
-    resolution: {integrity: sha512-C2p7yqleUKtCkVjlOur9BWVA4HgUQmEj/HWCt5WzZ5mLXrWnyIfl0wGuArc+kBXsy0ZZfLp+7dywB4HtSVYGVA==}
+  /@types/jest/28.1.2:
+    resolution: {integrity: sha512-5dNM7mMuIrCtNJsFfvUO/5xCrG8swuT2c7ND+sl3XwlwxJf3k7e7o+PRvcFN/iIm8XhCqHqxLOj9yutDDOJoRg==}
     dependencies:
-      jest-matcher-utils: 27.5.1
-      pretty-format: 27.5.1
+      jest-matcher-utils: 28.1.1
+      pretty-format: 28.1.1
     dev: true
 
   /@types/json-schema/7.0.11:
@@ -2664,7 +2660,7 @@ packages:
     hasBin: true
     dependencies:
       caniuse-lite: 1.0.30001355
-      electron-to-chromium: 1.4.159
+      electron-to-chromium: 1.4.160
       escalade: 3.1.1
       node-releases: 2.0.5
       picocolors: 1.0.0
@@ -3119,11 +3115,6 @@ packages:
       wrappy: 1.0.2
     dev: true
 
-  /diff-sequences/27.5.1:
-    resolution: {integrity: sha512-k1gCAXAsNgLwEL+Y8Wvl+M6oEFj5bgazfZULpS5CneoPPXRaCCW7dm+q21Ky2VEE5X+VeRDBVg1Pcvvsr4TtNQ==}
-    engines: {node: ^10.13.0 || ^12.13.0 || ^14.15.0 || >=15.0.0}
-    dev: true
-
   /diff-sequences/28.1.1:
     resolution: {integrity: sha512-FU0iFaH/E23a+a718l8Qa/19bF9p06kgE0KipMOMadwa3SjnaElKzPaUC0vnibs6/B/9ni97s61mcejk8W1fQw==}
     engines: {node: ^12.13.0 || ^14.15.0 || ^16.10.0 || >=17.0.0}
@@ -3202,8 +3193,8 @@ packages:
     resolution: {integrity: sha1-WQxhFWsK4vTwJVcyoViyZrxWsh0=}
     dev: true
 
-  /electron-to-chromium/1.4.159:
-    resolution: {integrity: sha512-D0NfhJzv5GgN3L7bzy5VUD90yKXnNFdCy+fH6jox+5UyJJSFmDC2d1mUxc9yi3bpTaOA1MJ6BkuVjn+GZTaZwg==}
+  /electron-to-chromium/1.4.160:
+    resolution: {integrity: sha512-O1Z12YfyeX2LXYO7MdHIPazGXzLzQnr1ADW55U2ARQsJBPgfpJz3u+g3Mo2l1wSyfOCdiGqaX9qtV4XKZ0HNRA==}
     dev: true
 
   /emittery/0.10.2:
@@ -4601,16 +4592,6 @@ packages:
       - supports-color
     dev: true
 
-  /jest-diff/27.5.1:
-    resolution: {integrity: sha512-m0NvkX55LDt9T4mctTEgnZk3fmEg3NRYutvMPWM/0iPnkFj2wIeF45O1718cMSOFO1vINkqmxqD8vE37uTEbqw==}
-    engines: {node: ^10.13.0 || ^12.13.0 || ^14.15.0 || >=15.0.0}
-    dependencies:
-      chalk: 4.1.2
-      diff-sequences: 27.5.1
-      jest-get-type: 27.5.1
-      pretty-format: 27.5.1
-    dev: true
-
   /jest-diff/28.1.1:
     resolution: {integrity: sha512-/MUUxeR2fHbqHoMMiffe/Afm+U8U4olFRJ0hiVG2lZatPJcnGxx292ustVu7bULhjV65IYMxRdploAKLbcrsyg==}
     engines: {node: ^12.13.0 || ^14.15.0 || ^16.10.0 || >=17.0.0}
@@ -4651,11 +4632,6 @@ packages:
       jest-util: 28.1.1
     dev: true
 
-  /jest-get-type/27.5.1:
-    resolution: {integrity: sha512-2KY95ksYSaK7DMBWQn6dQz3kqAf3BB64y2udeG+hv4KfSOb9qwcYQstTJc1KCbsix+wLZWZYN8t7nwX3GOBLRw==}
-    engines: {node: ^10.13.0 || ^12.13.0 || ^14.15.0 || >=15.0.0}
-    dev: true
-
   /jest-get-type/28.0.2:
     resolution: {integrity: sha512-ioj2w9/DxSYHfOm5lJKCdcAmPJzQXmbM/Url3rhlghrPvT3tt+7a/+oXc9azkKmLvoiXjtV83bEWqi+vs5nlPA==}
     engines: {node: ^12.13.0 || ^14.15.0 || ^16.10.0 || >=17.0.0}
@@ -4686,16 +4662,6 @@ packages:
     dependencies:
       jest-get-type: 28.0.2
       pretty-format: 28.1.1
-    dev: true
-
-  /jest-matcher-utils/27.5.1:
-    resolution: {integrity: sha512-z2uTx/T6LBaCoNWNFWwChLBKYxTMcGBRjAt+2SbP929/Fflb9aa5LGma654Rz8z9HLxsrUaYzxE9T/EFIL/PAw==}
-    engines: {node: ^10.13.0 || ^12.13.0 || ^14.15.0 || >=15.0.0}
-    dependencies:
-      chalk: 4.1.2
-      jest-diff: 27.5.1
-      jest-get-type: 27.5.1
-      pretty-format: 27.5.1
     dev: true
 
   /jest-matcher-utils/28.1.1:
@@ -5823,15 +5789,6 @@ packages:
     engines: {node: '>= 0.8.0'}
     dev: true
 
-  /pretty-format/27.5.1:
-    resolution: {integrity: sha512-Qb1gy5OrP5+zDf2Bvnzdl3jsTf1qXVMazbvCoKhtKqVs4/YK4ozX4gKQJJVyNe+cajNPn0KoC0MC3FUmaHWEmQ==}
-    engines: {node: ^10.13.0 || ^12.13.0 || ^14.15.0 || >=15.0.0}
-    dependencies:
-      ansi-regex: 5.0.1
-      ansi-styles: 5.2.0
-      react-is: 17.0.2
-    dev: true
-
   /pretty-format/28.1.1:
     resolution: {integrity: sha512-wwJbVTGFHeucr5Jw2bQ9P+VYHyLdAqedFLEkdQUVaBF/eiidDwH5OpilINq4mEfhbCjLnirt6HTTDhv1HaTIQw==}
     engines: {node: ^12.13.0 || ^14.15.0 || ^16.10.0 || >=17.0.0}
@@ -5930,10 +5887,6 @@ packages:
 
   /react-error-overlay/6.0.9:
     resolution: {integrity: sha512-nQTTcUu+ATDbrSD1BZHr5kgSD4oF8OFjxun8uAaL8RwPBacGBNPf/yAuVVdx17N8XNzRDMrZ9XcKZHCjPW+9ew==}
-    dev: true
-
-  /react-is/17.0.2:
-    resolution: {integrity: sha512-w2GsyukL62IJnlaff/nRegPQR94C/XXamvMWmSHRJ4y7Ts/4ocGRmTHvOs8PSE6pB3dWOrD/nueuU5sduBsQ4w==}
     dev: true
 
   /react-is/18.2.0:
@@ -7116,8 +7069,8 @@ packages:
     peerDependencies:
       vite: '>=2.4.4'
     dependencies:
-      '@microsoft/api-extractor': 7.25.1
-      '@rushstack/node-core-library': 3.45.6
+      '@microsoft/api-extractor': 7.25.2
+      '@rushstack/node-core-library': 3.45.7
       chalk: 4.1.2
       debug: 4.3.4
       fast-glob: 3.2.11
