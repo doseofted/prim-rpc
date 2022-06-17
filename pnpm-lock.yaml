@@ -106,11 +106,13 @@ importers:
       '@doseofted/prim-example': workspace:*
       '@doseofted/prim-rpc': workspace:*
       '@types/express': ^4.17.13
+      '@types/lodash': ^4.14.182
       '@types/supertest': ^2.0.12
       '@types/ws': ^8.5.3
       axios: ^0.27.2
       express: ^4.18.1
       fastify: ^4.0.3
+      lodash: ^4.17.21
       socket.io: ^4.5.0
       socket.io-client: ^4.5.0
       supertest: ^6.2.3
@@ -121,11 +123,13 @@ importers:
     devDependencies:
       '@doseofted/prim-example': link:../example
       '@types/express': 4.17.13
+      '@types/lodash': 4.14.182
       '@types/supertest': 2.0.12
       '@types/ws': 8.5.3
       axios: 0.27.2
       express: 4.18.1
       fastify: 4.0.3
+      lodash: 4.17.21
       socket.io: 4.5.1
       socket.io-client: 4.5.1
       supertest: 6.2.3
@@ -135,8 +139,10 @@ importers:
   libs/prim:
     specifiers:
       '@doseofted/prim-example': workspace:*
+      '@types/lodash': ^4.14.182
       '@types/lodash-es': ^4.17.6
       defu: ^6.0.0
+      lodash: ^4.17.21
       lodash-es: ^4.17.21
       mitt: ^3.0.0
       nanoid: ^3.3.4
@@ -151,7 +157,9 @@ importers:
       ufo: 0.8.4
     devDependencies:
       '@doseofted/prim-example': link:../example
+      '@types/lodash': 4.14.182
       '@types/lodash-es': 4.17.6
+      lodash: 4.17.21
 
   ui/docs:
     specifiers:

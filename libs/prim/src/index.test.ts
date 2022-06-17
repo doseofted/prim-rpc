@@ -63,7 +63,7 @@ describe("Prim Client can call deeply nested methods", () => {
 
 describe("Prim Client can throw errors", () => {
 	// LINK https://jestjs.io/docs/expect#rejects
-	test("with local source", async () => {
+	test("with local source", () => {
 		const { oops } = createPrimClient({ server: true }, exampleServer)
 		expect(() => {
 			oops()
@@ -74,7 +74,8 @@ describe("Prim Client can throw errors", () => {
 		const { oops } = createPrimClient<typeof exampleClient>({
 			client: async (_endpoint, body) => prim.rpc({ body }),
 		})
-		expect(async () => {
+		void expect(async () => {
+			// eslint-disable-next-line @typescript-eslint/await-thenable
 			await oops()
 		}).rejects.toThrow("My bad.")
 	})

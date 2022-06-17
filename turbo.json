@@ -14,6 +14,9 @@
     "@doseofted/prim-docs#preview": {
       "dependsOn": ["build"],
       "outputs": ["dist/**"]
+    },
+    "lint": {
+      "dependsOn": []
     }
   }
 }

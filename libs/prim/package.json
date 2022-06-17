@@ -25,7 +25,9 @@
   },
   "devDependencies": {
     "@doseofted/prim-example": "workspace:*",
-    "@types/lodash-es": "^4.17.6"
+    "@types/lodash": "^4.14.182",
+    "@types/lodash-es": "^4.17.6",
+    "lodash": "^4.17.21"
   },
   "source": "src/index.ts",
   "types": "dist/index.d.ts",
