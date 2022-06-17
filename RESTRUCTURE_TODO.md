@@ -3,7 +3,6 @@
 So far I've restructured the major parts of the project. There is still quite a bit to do though. It might be easier
 to reference here while I'm actively working on it than put in a separate app:
 
-- Add back StyleLint to UI projects and to the frontend
 - Add back Taskfiles but, this time, create them for each project and include in main Taskfile
   - Where it makes sense, use TurboRepo run commands within main Taskfile
   - Create tasks for not just running JavaScript project but also individual Docker containers

@@ -19,3 +19,9 @@ const count = ref(1)
     </template>
   </button>
 </template>
+
+<style lang="scss" scoped>
+button {
+  font-size: 4rem;
+}
+</style>

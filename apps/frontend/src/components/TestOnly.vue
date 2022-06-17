@@ -4,7 +4,7 @@ import { createPrimClient } from "@doseofted/prim-rpc"
 import * as exampleServer from "@doseofted/prim-example"
 import type * as exampleClient from "@doseofted/prim-example"
 import { HelloWorld } from "@doseofted/prim-docs"
-// import "@doseofted/prim-docs/style.css"
+import "@doseofted/prim-docs/style.css"
 
 const primLocal = createPrimClient({ server: true }, exampleServer)
 const expectedMessage = ref("")
@@ -44,28 +44,28 @@ onMounted(async () => {
 
 <style>
 body {
-	margin: 0;
-	background-color: #fff;
+  margin: 0;
+  background-color: #fff;
 }
 
 .greeting {
-	display: flex;
-	justify-content: center;
-	align-items: center;
-	width: 100%;
-	min-height: 100vh;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  width: 100%;
+  min-height: 100vh;
 }
 
 .you {
-	transition: color 1s;
-	color: #fff;
+  transition: color 1s;
+  color: #fff;
 }
 
 .you.matches {
-	color: #2aa;
+  color: #2aa;
 }
 
 .you.errored {
-	color: #a22;
+  color: #a22;
 }
 </style>
