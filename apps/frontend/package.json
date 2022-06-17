@@ -27,18 +27,6 @@
     "jsdom": "^19.0.0",
     "typescript": "^4.5.4",
     "vite": "^2.9.9",
-    "vite-plugin-dts": "^1.2.0",
     "vue-tsc": "^0.34.7"
-  },
-  "files": [
-    "dist"
-  ],
-  "main": "./dist/lib.umd.js",
-  "module": "./dist/lib.es.js",
-  "exports": {
-    ".": {
-      "import": "./dist/lib.es.js",
-      "require": "./dist/lib.umd.js"
-    }
   }
 }
