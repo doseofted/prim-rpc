@@ -1,7 +1,7 @@
 <script setup lang="ts">
-import HelloWorld from "./components/HelloWorld.vue"
+import TestOnly from "./components/TestOnly.vue"
 </script>
 
 <template>
-  <HelloWorld msg="Prim" />
+  <TestOnly />
 </template>

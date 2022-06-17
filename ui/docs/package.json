@@ -35,6 +35,7 @@
   ],
   "main": "./dist/lib.umd.js",
   "module": "./dist/lib.es.js",
+  "types": "./dist/lib.d.ts",
   "exports": {
     ".": {
       "import": "./dist/lib.es.js",
