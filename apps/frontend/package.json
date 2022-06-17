@@ -19,10 +19,10 @@
     "test": "vitest"
   },
   "dependencies": {
-    "vue": "^3.2.25",
-    "@doseofted/prim-rpc": "workspace:*",
     "@doseofted/prim-docs": "workspace:*",
-    "@doseofted/prim-example": "workspace:*"
+    "@doseofted/prim-example": "workspace:*",
+    "@doseofted/prim-rpc": "workspace:*",
+    "vue": "^3.2.25"
   },
   "devDependencies": {
     "@types/node": "^17.0.44",
