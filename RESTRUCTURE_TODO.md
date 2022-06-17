@@ -14,6 +14,7 @@ to reference here while I'm actively working on it than put in a separate app:
   - Image size in development will be large (mostly dev node_modules) but with production settings, the image should be much smaller without needing to create an entirely separate configuration
   - Consider creating Compose files for each project and referencing them in `COMPOSE_FILE` to avoid having all project configuration in one single Compose file (not sure yet if this would be more or less messy)
 - Consider using husky for git hooks and "changesets" tool (this may have to be done later, not really critical)
+- Search for all added `eslint-disable` in files and try resolving each issue, otherwise lax the rules a bit (they're nearly impossible to follow now)
 
 
 There are probably a few things I left out. Scan over the "old-structure" folder to ensure everything needed is there.
