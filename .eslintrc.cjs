@@ -8,8 +8,14 @@ const withBaseRule = (name, opts, js = false) => (js ? { [name]: opts } : {
 const rule = (name, opts) => [withBaseRule(name, opts, true), withBaseRule(name, opts)]
 // !SECTION utilities
 
+/**
+ * @type {{
+ * 	typescript: Partial<import("eslint").Linter.RulesRecord>,
+ * 	javascript: Partial<import("eslint").Linter.RulesRecord>
+ * }}
+ */
 const sharedRules = (() => {
-	let typescript = {}; let javascript = {}
+	let typescript = {}, javascript = {}
 	void [
 		// LINK https://typescript-eslint.io/rules/brace-style/
 		rule("brace-style", ["error", "1tbs", { "allowSingleLine": true }]),
@@ -29,6 +35,7 @@ const sharedRules = (() => {
 	return { typescript, javascript }
 })()
 
+/** @type {import("eslint").ESLint.ConfigData} */
 module.exports = {
 	root: true,
 	parser: "@typescript-eslint/parser",
