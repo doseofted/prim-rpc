@@ -1,0 +1,51 @@
+version: "3"
+
+tasks:
+  # NOTE: `mkcert` must be installed on the host, since a containerized version would install CA in its own stores
+  cert:
+    desc: "Create a certificate to be used in development, trusted by the host system (requires `mkcert`)"
+    status:
+      - "test -f data/server/dev-cert.pem"
+      - "test -f data/server/dev-key.pem"
+    cmds:
+      - "mkdir -p data/server"
+      - |
+        mkcert \
+          -key-file "data/server/dev-key.pem" \
+          -cert-file "data/server/dev-cert.pem" \
+          {{.HOST}} "*.{{.HOST}}" localhost 127.0.0.1 ::1
+
+  dns:
+    desc: "Run a DNS server for development, useful for resolving '*.test' TLDs using devices on the same network"
+    vars:
+      DNS_BIND:
+        sh: "pnpm --silent zx misc/dns-answer-address.mjs --begin=192"
+      DNS_TLD: "test"
+    cmds:
+      - "docker pull coredns/coredns:1.8.4"
+      - |
+        docker run -it --rm --name coredns \
+          -v "$(pwd)/misc/dev.Corefile:/root/Corefile" \
+          -p "{{.DNS_BIND}}:53:53/tcp" -p "{{.DNS_BIND}}:53:53/udp" \
+          -e "DNS_BIND={{.DNS_BIND}}" \
+          -e "DNS_TLD={{.DNS_TLD}}" \
+          coredns/coredns:1.8.4 \
+          -conf /root/Corefile
+
+  clean:
+    desc: "Remove locally built files from the project, useful for a clean run"
+    cmds:
+      # Remove Task cache
+      - "rm -fr .task"
+      # Remove Parcel cache
+      - "rm -fr .parcel-cache"
+      # and root node modules
+      - "rm -fr node_modules"
+      # Remove all node_modules in apps and related libraries
+      - "find ./apps -name 'node_modules' -type d -prune -exec rm -rf '{}' \\;"
+      - "find ./libs -name 'node_modules' -type d -prune -exec rm -rf '{}' \\;"
+      - "find ./ui -name 'node_modules' -type d -prune -exec rm -rf '{}' \\;"
+      # Now that node_modules are gone, delete dist folders (doing after deletion of node_modules so modules aren't included)
+      - "find ./project -name 'dist' -type d -prune -exec rm -rf '{}' \\;"
+      - "find ./libraries -name 'dist' -type d -prune -exec rm -rf '{}' \\;"
+      - "echo \"You'll need to remove data/* as root. The .env file in this project was kept.\""

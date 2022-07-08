@@ -1,0 +1,15 @@
+# https://taskfile.dev
+version: "3"
+
+includes:
+  dev: ./misc/Taskfile.dev.yml
+  # "dc" as in "Docker Compose"
+  # dc: ./misc/Taskfile.dc.yml
+  # "js" as in "JavaScript"
+  # js: ./misc/Taskfile.js.yml
+
+tasks:
+
+  default:
+    cmds:
+      - "task --list"

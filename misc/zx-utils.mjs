@@ -1,5 +1,5 @@
 #!/usr/bin/env zx
-import { echo as baseEcho, chalk } from "zx"
+import { $, echo as baseEcho, chalk } from "zx"
 /**
  * Log output with given prefix and highlight variables. Use like so:
  * 
