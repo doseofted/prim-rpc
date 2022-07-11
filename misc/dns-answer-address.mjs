@@ -14,18 +14,15 @@ $.silent = true
 export function ipAddressForCoreDns(startsWith = "") {
 	const networks = networkInterfaces()
 	delete networks.lo
-	const interfaces = Object.keys(networks)
-	if (interfaces.length === 1) {
-		const network = networks[interfaces[0]]
-		const foundIpv4 = network.find(n => n.family === "IPv4")
-		const foundIpv6 = network.find(n => n.family === "IPv6")
-		return (foundIpv4 ?? foundIpv6)?.address
-	}
 	if (!startsWith) {
 		Object.values(networks).flat()[0]?.address ?? ""
 	}
 	return Object.values(networks).flat().find(n => n.address.startsWith(startsWith))?.address ?? ""
 }
 
+if (argv.help || argv.h) {
+	echo`Pass \`--begin\` flag with beginning of an IP address to echo the first found IP address from network interfaces.`
+	process.exit(0)
+}
 const startsWith = String(argv.begin ?? "")
 echo(ipAddressForCoreDns(startsWith))
