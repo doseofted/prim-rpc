@@ -46,6 +46,7 @@ tasks:
       - "find ./libs -name 'node_modules' -type d -prune -exec rm -rf '{}' \\;"
       - "find ./ui -name 'node_modules' -type d -prune -exec rm -rf '{}' \\;"
       # Now that node_modules are gone, delete dist folders (doing after deletion of node_modules so modules aren't included)
-      - "find ./project -name 'dist' -type d -prune -exec rm -rf '{}' \\;"
-      - "find ./libraries -name 'dist' -type d -prune -exec rm -rf '{}' \\;"
+      - "find ./apps -name 'dist' -type d -prune -exec rm -rf '{}' \\;"
+      - "find ./libs -name 'dist' -type d -prune -exec rm -rf '{}' \\;"
+      - "find ./ui -name 'dist' -type d -prune -exec rm -rf '{}' \\;"
       - "echo \"You'll need to remove data/* as root. The .env file in this project was kept.\""
