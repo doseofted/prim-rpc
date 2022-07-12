@@ -1,7 +1,13 @@
 version: 3
 
 tasks:
-  build-base:
+  base:build:
     desc: "Build base image with installed node modules and built dependencies."
     cmds:
-      - "docker build -f Monorepo.Dockerfile -t monorepo-build ."
+      - "docker build -f Monorepo.Dockerfile -t doseofted/monorepo-build ."
+
+  base:run:
+    desc: "Interactively run base image, usually for fixing potential build issues"
+    ignore_error: true
+    cmds:
+      - "docker run -it --rm doseofted/monorepo-build"

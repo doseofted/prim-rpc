@@ -2,14 +2,14 @@ import { oops, sayHello, sayHelloAlternative, typeMessage, withCallback } from "
 
 it("should say hello", async () => {
 	expect(
-		await sayHello({ greeting: "Hey", name: "Ted" })
+		await sayHello({ greeting: "Hey", name: "Ted" }),
 	).toBe("Hey Ted!")
 })
 
 
 it("should say hello, using alternate syntax", async () => {
 	expect(
-		await sayHelloAlternative("Hey", "Ted")
+		await sayHelloAlternative("Hey", "Ted"),
 	).toBe("Hey Ted!")
 })
 

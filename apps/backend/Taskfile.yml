@@ -1,0 +1,31 @@
+version: 3
+
+tasks:
+  check: "pnpm tsc --noEmit"
+  lint: "pnpm lint"
+
+  test:
+    desc: "Test the backend"
+    cmds:
+      - "pnpm test"
+
+  build:
+    desc: "Build the backend once (also runs a type-check and lints code)"
+    deps:
+      - "check"
+      - "lint"
+    cmds:
+      - "pnpm parcel build"
+
+  watch:
+    desc: "Build the backend and watch for changes"
+    cmds:
+      - "pnpm parcel watch"
+
+  dev: "pnpm dev"
+
+  dev-test:
+    desc: "test"
+    deps:
+      - watch
+      - dev

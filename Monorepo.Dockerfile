@@ -35,3 +35,5 @@ RUN pnpm build-libs
 COPY --chown=node ui ui
 RUN pnpm install --offline --frozen-lockfile
 RUN pnpm build-ui
+# If image is used directly, drop into shell for debugging
+CMD [ "/bin/bash" ]

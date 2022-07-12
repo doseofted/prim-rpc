@@ -17,6 +17,8 @@
     "ws": "^8.6.0"
   },
   "scripts": {
+    "parcel": "parcel",
+    "tsc": "tsc",
     "watch": "parcel watch",
     "build": "parcel build",
     "check": "tsc --noEmit",

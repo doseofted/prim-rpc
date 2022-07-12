@@ -59,9 +59,15 @@
 			"vue"
 		],
 		"yaml.schemas": {
-			"https://raw.githubusercontent.com/compose-spec/compose-spec/master/schema/compose-spec.json": "dc.*.yml",
+			"https://raw.githubusercontent.com/compose-spec/compose-spec/master/schema/compose-spec.json": "compose.*.yml",
 			"https://json.schemastore.org/taskfile.json": "Taskfile.*.yml"
 		},
+		"json.schemas": [
+			{
+				"fileMatch": ["nodemon.json"],
+				"url": "https://raw.githubusercontent.com/SchemaStore/schemastore/master/src/schemas/json/nodemon.json"
+			}
+		],
 		"files.associations": {
 			"*.Corefile": "caddyfile"
 		},
@@ -84,7 +90,11 @@
 			"doseofted",
 			"fastify",
 			"Klingenberg",
+			"pnpm",
 			"websockets"
+		],
+		"cSpell.enableFiletypes": [
+			"dockerfile"
 		],
 	},
 	"extensions": {
