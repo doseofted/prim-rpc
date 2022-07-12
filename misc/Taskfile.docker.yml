@@ -1,0 +1,7 @@
+version: 3
+
+tasks:
+  build-base:
+    desc: "Build base image with installed node modules and built dependencies."
+    cmds:
+      - "docker build -f Monorepo.Dockerfile -t monorepo-build ."

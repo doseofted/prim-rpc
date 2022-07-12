@@ -13,6 +13,8 @@ USER node
 # `pnpm config` is alias for `npm config` and `store-dir` is specific to pnpm
 # LINK https://pnpm.io/npmrc#store-dir
 RUN pnpm config set store-dir /home/node/.pnpm-store
+# Create generic project folder in home and assign to correct user
+RUN mkdir -p /home/node/project && chown node /home/node/project
 WORKDIR /home/node/project
 # Lockfiles should be copied first when `pnpm fetch` command is used
 # LINK https://pnpm.io/cli/fetch#usage-scenario

@@ -3,9 +3,7 @@ version: 3
 
 includes:
   dev: ./misc/Taskfile.dev.yml
-  # "dc" as in "Docker Compose"
-  # dc: ./misc/Taskfile.dc.yml
-  # "js" as in "JavaScript"
+  docker: ./misc/Taskfile.docker.yml
   # js: ./misc/Taskfile.js.yml
 
 tasks:
