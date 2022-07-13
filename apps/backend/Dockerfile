@@ -10,6 +10,8 @@ RUN pnpm install --offline --frozen-lockfile
 # Build the project
 COPY --chown=node . .
 RUN pnpm build
-CMD [ "pnpm", "dev" ]
+
+ENV NODE_ENV=development
+CMD [ "pnpm", "zx", "entrypoint.mjs" ]
 
 # TODO: add a production stage for running in production
