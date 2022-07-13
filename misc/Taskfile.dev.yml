@@ -32,27 +32,24 @@ tasks:
           coredns/coredns:1.8.4 \
           -conf /root/Corefile
 
-
-  clean-node-modules:
-    cmds:
-      # Remove root node modules
-      - "rm -fr node_modules"
-      # Remove all node_modules in apps and related libraries
-      - "find ./apps -name 'node_modules' -type d -prune -exec rm -rf '{}' \\;"
-      - "find ./libs -name 'node_modules' -type d -prune -exec rm -rf '{}' \\;"
-      - "find ./ui -name 'node_modules' -type d -prune -exec rm -rf '{}' \\;"
+  # Remove all node_modules (useful especially in container environments when only production dependencies are needed)
+  clean-node-modules: "find . -name node_modules -type d -prune -exec rm -fr {} +"
+  # Remove all distributable files, useful before uploading a package to a registry
+  clean-distributable: "find . -name dist -type d -prune -exec rm -fr {} +"
 
   clean:
     desc: "Remove locally built files from the project, useful for a clean run"
     deps:
       - "clean-node-modules"
+      - "clean-distributable"
     cmds:
+      # Remove all node_modules first
+      - task: clean-node-modules
+      # Now that node_modules are gone, delete dist folders (doing after deletion of node_modules so modules aren't included)
+      - task: clean-distributable
       # Remove Task cache
       - "rm -fr .task"
       # Remove Parcel cache
       - "rm -fr .parcel-cache"
-      # Now that node_modules are gone, delete dist folders (doing after deletion of node_modules so modules aren't included)
-      - "find ./apps -name 'dist' -type d -prune -exec rm -rf '{}' \\;"
-      - "find ./libs -name 'dist' -type d -prune -exec rm -rf '{}' \\;"
-      - "find ./ui -name 'dist' -type d -prune -exec rm -rf '{}' \\;"
+      # Task doesn't run as root and it could be dangerous to remove project data, so this will be a manual step
       - "echo \"You'll need to remove data/* as root. The .env file in this project was kept.\""
