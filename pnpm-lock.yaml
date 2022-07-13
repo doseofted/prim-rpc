@@ -15,7 +15,7 @@ importers:
       eslint: ^8.19.0
       eslint-plugin-vue: ^9.2.0
       jest: ^28.1.3
-      parcel: ^2.6.0
+      parcel: ^2.6.2
       postcss: ^8.4.14
       postcss-html: ^1.5.0
       sass: ^1.53.0
@@ -246,7 +246,7 @@ packages:
       '@babel/compat-data': 7.18.8
       '@babel/core': 7.18.6
       '@babel/helper-validator-option': 7.18.6
-      browserslist: 4.21.1
+      browserslist: 4.21.2
       semver: 6.3.0
     dev: true
 
@@ -1128,7 +1128,7 @@ packages:
       '@parcel/workers': 2.6.2_@parcel+core@2.6.2
       abortcontroller-polyfill: 1.7.3
       base-x: 3.0.9
-      browserslist: 4.21.1
+      browserslist: 4.21.2
       clone: 2.1.2
       dotenv: 7.0.0
       dotenv-expand: 5.1.0
@@ -1321,7 +1321,7 @@ packages:
       '@parcel/plugin': 2.6.2_@parcel+core@2.6.2
       '@parcel/source-map': 2.1.0
       '@parcel/utils': 2.6.2
-      browserslist: 4.21.1
+      browserslist: 4.21.2
       nullthrows: 1.1.1
     transitivePeerDependencies:
       - '@parcel/core'
@@ -1573,7 +1573,7 @@ packages:
       '@parcel/plugin': 2.6.2_@parcel+core@2.6.2
       '@parcel/source-map': 2.1.0
       '@parcel/utils': 2.6.2
-      browserslist: 4.21.1
+      browserslist: 4.21.2
       json5: 2.2.1
       nullthrows: 1.1.1
       semver: 5.7.1
@@ -1590,7 +1590,7 @@ packages:
       '@parcel/plugin': 2.6.2_@parcel+core@2.6.2
       '@parcel/source-map': 2.1.0
       '@parcel/utils': 2.6.2
-      browserslist: 4.21.1
+      browserslist: 4.21.2
       nullthrows: 1.1.1
     transitivePeerDependencies:
       - '@parcel/core'
@@ -1637,7 +1637,7 @@ packages:
       '@parcel/utils': 2.6.2
       '@parcel/workers': 2.6.2_@parcel+core@2.6.2
       '@swc/helpers': 0.4.3
-      browserslist: 4.21.1
+      browserslist: 4.21.2
       detect-libc: 1.0.3
       nullthrows: 1.1.1
       regenerator-runtime: 0.13.9
@@ -2718,15 +2718,15 @@ packages:
     resolution: {integrity: sha512-9o5UecI3GhkpM6DrXr69PblIuWxPKk9Y0jHBRhdocZ2y7YECBFCsHm79Pr3OyR2AvjhDkabFJaDJMYRazHgsow==}
     dev: true
 
-  /browserslist/4.21.1:
-    resolution: {integrity: sha512-Nq8MFCSrnJXSc88yliwlzQe3qNe3VntIjhsArW9IJOEPSHNx23FalwApUVbzAWABLhYJJ7y8AynWI/XM8OdfjQ==}
+  /browserslist/4.21.2:
+    resolution: {integrity: sha512-MonuOgAtUB46uP5CezYbRaYKBNt2LxP0yX+Pmj4LkcDFGkn9Cbpi83d9sCjwQDErXsIJSzY5oKGDbgOlF/LPAA==}
     engines: {node: ^6 || ^7 || ^8 || ^9 || ^10 || ^11 || ^12 || >=13.7}
     hasBin: true
     dependencies:
       caniuse-lite: 1.0.30001366
       electron-to-chromium: 1.4.188
       node-releases: 2.0.6
-      update-browserslist-db: 1.0.4_browserslist@4.21.1
+      update-browserslist-db: 1.0.4_browserslist@4.21.2
     dev: true
 
   /bs-logger/0.2.6:
@@ -7124,13 +7124,13 @@ packages:
     engines: {node: '>= 0.8'}
     dev: true
 
-  /update-browserslist-db/1.0.4_browserslist@4.21.1:
+  /update-browserslist-db/1.0.4_browserslist@4.21.2:
     resolution: {integrity: sha512-jnmO2BEGUjsMOe/Fg9u0oczOe/ppIDZPebzccl1yDWGLFP16Pa1/RM5wEoKYPG2zstNcDuAStejyxsOuKINdGA==}
     hasBin: true
     peerDependencies:
       browserslist: '>= 4.21.0'
     dependencies:
-      browserslist: 4.21.1
+      browserslist: 4.21.2
       escalade: 3.1.1
       picocolors: 1.0.0
     dev: true
