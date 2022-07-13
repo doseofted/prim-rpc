@@ -22,7 +22,7 @@
     "vue": "^3.2.25"
   },
   "devDependencies": {
-    "@types/node": "^17.0.44",
+    "@types/node": "^18.0.3",
     "@vitejs/plugin-vue": "^2.3.3",
     "@vue/test-utils": "^2.0.0",
     "jsdom": "^20.0.0",
