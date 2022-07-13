@@ -30,4 +30,5 @@ tasks:
       - |
         docker run -it --rm \
           -v "$(pwd)/src:/home/node/project/apps/backend/src" \
+          -p 3001:3001 \
           doseofted/prim-backend-dev {{.CLI_ARGS}}

@@ -9,6 +9,11 @@ includes:
   backend:
     taskfile: ./apps/backend/Taskfile.yml
     dir: ./apps/backend
+    optional: true
+  frontend:
+    taskfile: ./apps/frontend/Taskfile.yml
+    dir: ./apps/frontend
+    optional: true
 
 tasks:
 
