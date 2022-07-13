@@ -1,16 +1,11 @@
 version: 3
 
 tasks:
-  # Run dependencies as cmds so they run sequentially (it's slower this way but otherwise output is unreadable)
-  build-dependencies:
-    cmds:
-      - task: :docker:base:build
-      - tasK: :docker:prod:build
 
   build:
     desc: "Build frontend image for production use"
     deps:
-      - build-dependencies
+      - :docker:build-base-images
     cmds:
       - "docker build -t doseofted/prim-frontend ."
 
@@ -24,7 +19,7 @@ tasks:
   dev:
     desc: "Build and run frontend image targeting \"dev\" stage with src folder mounted to host"
     deps:
-      - build-dependencies
+      - :docker:build-base-images
     cmds:
       - "docker build -t doseofted/prim-frontend-dev --target=dev ."
       - |

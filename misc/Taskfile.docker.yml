@@ -26,3 +26,10 @@ tasks:
       - "prod:build"
     cmds:
       - "docker run -it --rm doseofted/monorepo-production"
+
+  # NOTE: below is used as a step in apps/** Taskfiles
+  # Run dependencies as cmds so they run sequentially (it's slower this way but otherwise output is unreadable)
+  build-base-images:
+    cmds:
+      - task: base:build
+      - tasK: prod:build
