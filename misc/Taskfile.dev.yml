@@ -54,17 +54,18 @@ tasks:
   clean-node-modules: "find . -name node_modules -type d -prune -exec rm -fr {} +"
   # Remove all distributable files, useful before uploading a package to a registry
   clean-distributable: "find . -name dist -type d -prune -exec rm -fr {} +"
+  # clean all TurboRepo cache
+  clean-turbo: "find . -name .turbo -type d -prune -exec rm -fr {} +"
 
   clean:
     desc: "Remove locally built files from the project, useful for a clean run"
-    deps:
-      - "clean-node-modules"
-      - "clean-distributable"
     cmds:
       # Remove all node_modules first
       - task: clean-node-modules
       # Now that node_modules are gone, delete dist folders (doing after deletion of node_modules so modules aren't included)
       - task: clean-distributable
+      # Remove TurboRepo cache
+      - task: clean-turbo
       # Remove Task cache
       - "rm -fr .task"
       # Remove Parcel cache
