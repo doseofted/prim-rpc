@@ -14,4 +14,14 @@ RUN pnpm build
 ENV NODE_ENV=development
 CMD [ "pnpm", "zx", "entrypoint.mjs" ]
 
-# TODO: add a production stage for running in production
+FROM dev as dev-cleanup
+WORKDIR /home/node/project
+# RUN find . -name 'node_modules' -type d -prune -exec rm -rf '{}' \\;
+# RUN task dev:clean-node-modules
+
+
+FROM doseofted/monorepo-prod:latest as prod
+COPY --chown=node --from=dev-cleanup /home/node/project/misc /home/node/project/misc
+COPY --chown=node --from=dev-cleanup /home/node/project/libs /home/node/project/libs
+COPY --chown=node --from=dev-cleanup /home/node/project/ui /home/node/project/ui
+COPY --chown=node --from=dev-cleanup /home/node/project/apps /home/node/project/apps

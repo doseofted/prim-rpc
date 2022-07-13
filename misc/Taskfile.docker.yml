@@ -4,10 +4,25 @@ tasks:
   base:build:
     desc: "Build base image with installed node modules and built dependencies."
     cmds:
-      - "docker build -f Monorepo.Dockerfile -t doseofted/monorepo-build ."
+      - "docker build -f Monorepo.base.Dockerfile -t doseofted/monorepo-build ."
 
   base:run:
     desc: "Interactively run base image, usually for fixing potential build issues"
     ignore_error: true
+    deps:
+      - "base:build"
     cmds:
       - "docker run -it --rm doseofted/monorepo-build"
+
+  prod:build:
+    desc: "Build production base image to be used by other services in production"
+    cmds:
+      - "docker build -f Monorepo.prod.Dockerfile -t doseofted/monorepo-production ."
+
+  prod:run:
+    desc: "Interactively run production base image, usually for fixing potential build issues"
+    ignore_error: true
+    deps:
+      - "prod:build"
+    cmds:
+      - "docker run -it --rm doseofted/monorepo-production"
