@@ -2,9 +2,13 @@
 version: 3
 
 includes:
+  # Project-wide includes
   dev: ./misc/Taskfile.dev.yml
   docker: ./misc/Taskfile.docker.yml
-  # js: ./misc/Taskfile.js.yml
+  # Sub-project-specific includes
+  backend:
+    taskfile: ./apps/backend/Taskfile.yml
+    dir: ./apps/backend
 
 tasks:
 

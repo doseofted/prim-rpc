@@ -91,6 +91,7 @@
 			"fastify",
 			"Klingenberg",
 			"pnpm",
+			"Taskfile",
 			"websockets"
 		],
 		"cSpell.enableFiletypes": [

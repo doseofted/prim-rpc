@@ -1,6 +1,6 @@
 {
   "ignoreRoot": [".git"],
-  "watch": ["src"],
+  "watch": ["dist"],
   "ext": "ts,js,json",
   "delay": 100
 }

@@ -29,5 +29,6 @@ COPY --chown=node --from=dev-cleanup /home/node/project/apps /home/node/project/
 # Install only dependencies needed in production
 RUN pnpm install --prod --offline --frozen-lockfile
 # Run the project with production settings
+WORKDIR /home/node/project/apps/backend
 ENV NODE_ENV=production
 CMD [ "pnpm", "zx", "entrypoint.mjs" ]
