@@ -13,6 +13,9 @@ const inDevelopment = process.env.NODE_ENV === "development"
 if (inDevelopment) {
 	processes.dev = $`pnpm dev --host`
 } else {
+	// TODO: determine if preview command should be used at all or if project should just switch to Nuxt
+	// `preview` will keep container open and allow for debugging of differences between dev/prod builds
+	// but built files will be served by Caddy rather than using `preview`
 	processes.app = $`pnpm preview --host`
 }
 

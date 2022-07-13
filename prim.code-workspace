@@ -1,6 +1,10 @@
 {
   "folders": [
 		{
+			"name": "🌲 Project Root",
+			"path": "."
+		},
+		{
 			"name": "📙 Prim RPC",
 			"path": "./libs/prim"
 		},
@@ -23,10 +27,6 @@
 		{
 			"name": "🌐 Example Backend",
 			"path": "./apps/backend"
-		},
-		{
-			"name": "🌲 Project Root",
-			"path": "."
 		}
 	],
 	"settings": {
