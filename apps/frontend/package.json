@@ -10,10 +10,13 @@
   },
   "scripts": {
     "build": "vite build",
+    "build:client": "vite build --ssrManifest --outDir dist/client",
+    "build:server": "vite build --ssr src/entry.server.ts --outDir dist/server",
     "watch": "vite build --watch",
     "check": "vue-tsc --noEmit",
     "dev": "vite",
     "preview": "vite preview",
+    "preview-test": "node server.mjs",
     "lint": "eslint --ext .js,.vue,.ts .",
     "lint-style": "stylelint '**/*.{css,scss,vue}'",
     "test": "vitest"
@@ -22,6 +25,9 @@
     "@doseofted/prim-docs": "workspace:*",
     "@doseofted/prim-example": "workspace:*",
     "@doseofted/prim-rpc": "workspace:*",
+    "h3": "^0.7.10",
+    "listhen": "^0.2.13",
+    "serve-static": "^1.15.0",
     "vue": "^3.2.25"
   },
   "devDependencies": {
@@ -31,6 +37,7 @@
     "jsdom": "^20.0.0",
     "typescript": "^4.7.4",
     "vite": "^2.9.9",
+    "vue-router": "^4.1.2",
     "vue-tsc": "^0.38.5"
   }
 }

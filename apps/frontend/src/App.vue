@@ -1,7 +1,11 @@
-<script setup lang="ts">
-import TestOnly from "./components/TestOnly.vue"
-</script>
-
 <template>
-  <TestOnly />
+  <div>
+    <router-view v-slot="{ Component }">
+      <Suspense>
+        <div>
+          <component :is="Component" />
+        </div>
+      </Suspense>
+    </router-view>
+  </div>
 </template>

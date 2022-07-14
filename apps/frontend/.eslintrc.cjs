@@ -1,3 +1,4 @@
+/** @type {import("eslint").ESLint.ConfigData} */
 module.exports = {
 	root: false,
 	// LINK https://eslint.vuejs.org/user-guide/#how-to-use-a-custom-parser
@@ -18,4 +19,13 @@ module.exports = {
 	env: {
 		"browser": true,
 	},
+	overrides: [
+		{
+			files: "src/pages/*.vue",
+			rules: {
+				// don't consider pages in this rule
+				"vue/multi-word-component-names": "off",
+			},
+		},
+	],
 }
