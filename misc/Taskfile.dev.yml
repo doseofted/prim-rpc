@@ -14,7 +14,7 @@ tasks:
         mkcert \
           -key-file "data/server/dev-key.pem" \
           -cert-file "data/server/dev-cert.pem" \
-          {{.HOST}} "*.{{.HOST}}" localhost 127.0.0.1 ::1
+          {{.WEBSITE_HOST}} "*.{{.WEBSITE_HOST}}" localhost 127.0.0.1 ::1
 
   dns:
     desc: "Run a DNS server for development, useful for resolving '*.test' TLDs using devices on the same network"

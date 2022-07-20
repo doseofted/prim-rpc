@@ -13,9 +13,9 @@ tasks:
 
   logs:
     desc: "[{{.CHOSEN_ENV}}] Show and follow recent logs for running services"
-    interactive: true
     cmds:
-      - "docker compose logs -f --tail=25"
+      - cmd: "docker compose logs -f --tail=25"
+        ignore_error: true
 
   up:
     desc: "[{{.CHOSEN_ENV}}] Start all services in project"
