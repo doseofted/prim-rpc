@@ -18,9 +18,23 @@ services:
   postgres:
     image: postgres:14.4
     environment:
-      - POSTGRES_DB="prim"
-      - POSTGRES_USER="proper"
-      - POSTGRES_PASSWORD
+      &database-creds
+      POSTGRES_DB: "prim"
+      POSTGRES_USER: "proper"
+      POSTGRES_PASSWORD: $POSTGRES_PASSWORD
     volumes:
       - ./data/postgres:/var/lib/postgresql/data
+    restart: "no"
+
+  # backend that will serve the API
+  backend:
+    environment:
+      <<: *database-creds
+      WEBSITE_HOST: $WEBSITE_HOST
+    restart: "no"
+
+  # frontend used to serve UI that communicates with API
+  frontend:
+    environment:
+      WEBSITE_HOST: $WEBSITE_HOST
     restart: "no"

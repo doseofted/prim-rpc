@@ -9,3 +9,9 @@ services:
 
   postgres:
     restart: "always"
+
+  backend:
+    restart: "always"
+
+  frontend:
+    restart: "always"

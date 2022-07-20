@@ -32,4 +32,4 @@ tasks:
   build-base-images:
     cmds:
       - task: base:build
-      - tasK: prod:build
+      - task: prod:build

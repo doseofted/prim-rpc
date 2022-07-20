@@ -10,3 +10,5 @@ services:
       - ./proxy/staging.Caddyfile:/etc/caddy/Caddyfile:ro
 
   # postgres:
+  # backend:
+  # frontend:
