@@ -32,6 +32,7 @@ services:
   backend:
     build:
       context: ./apps/backend
+      target: dev
     ports:
       - "3001:3001"
     volumes:
@@ -40,6 +41,7 @@ services:
   frontend:
     build:
       context: ./apps/frontend
+      target: dev
     ports:
       - "3000:3000"
       - "24678:24678"

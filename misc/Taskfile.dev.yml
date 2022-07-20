@@ -1,6 +1,7 @@
 version: 3
 
 tasks:
+
   # NOTE: `mkcert` must be installed on the host, since a containerized version would install CA in its own stores
   cert:
     desc: "Create a certificate to be used in development, trusted by the host system (requires `mkcert`)"

@@ -11,7 +11,13 @@ services:
     restart: "always"
 
   backend:
+    build:
+      context: ./apps/backend
+      target: prod
     restart: "always"
 
   frontend:
+    build:
+      context: ./apps/frontend
+      target: prod
     restart: "always"

@@ -1,7 +1,7 @@
 {
   "folders": [
 		{
-			"name": "🌲 Project Root",
+			"name": "🌳 Project Root",
 			"path": "."
 		},
 		{
@@ -27,6 +27,10 @@
 		{
 			"name": "🌐 Example Backend",
 			"path": "./apps/backend"
+		},
+		{
+			"name": "☁️ Reverse Proxy",
+			"path": "./proxy"
 		}
 	],
 	"settings": {

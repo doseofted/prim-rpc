@@ -2,9 +2,29 @@
 version: 3
 
 includes:
+
   # Project-wide includes
   dev: ./misc/Taskfile.dev.yml
   docker: ./misc/Taskfile.docker.yml
+
+  # Environment-specific Docker Compose configuration
+  compose:dev: &base-compose
+    taskfile: ./misc/Taskfile.compose.yml
+    optional: true
+    vars:
+      COMPOSE_FILE: "compose.yml:compose.dev.yml:misc/compose.sync.yml"
+      CHOSEN_ENV: "development"
+  compose:prod:
+    <<: *base-compose
+    vars:
+      COMPOSE_FILE: "compose.yml:compose.prod.yml"
+      CHOSEN_ENV: "production"
+  compose:staging:
+    <<: *base-compose
+    vars:
+      COMPOSE_FILE: "compose.yml:compose.prod.yml:compose.staging.yml"
+      CHOSEN_ENV: "staging"
+
   # Sub-project-specific includes
   backend:
     taskfile: ./apps/backend/Taskfile.yml
@@ -20,6 +40,7 @@ includes:
     optional: true
 
 tasks:
+
   default:
     cmds:
       - "task --list"

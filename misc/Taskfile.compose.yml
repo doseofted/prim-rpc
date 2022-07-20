@@ -1,0 +1,34 @@
+version: 3
+
+env:
+  COMPOSE_PATH_SEPARATOR: "{{.COMPOSE_PATH_SEPARATOR}}"
+  COMPOSE_FILE: "{{.COMPOSE_FILE}}"
+
+tasks:
+
+  ps:
+    desc: "[{{.CHOSEN_ENV}}] List all running service names"
+    cmds:
+      - "docker compose ps --services"
+
+  logs:
+    desc: "[{{.CHOSEN_ENV}}] Show and follow recent logs for running services"
+    interactive: true
+    cmds:
+      - "docker compose logs -f --tail=25"
+
+  up:
+    desc: "[{{.CHOSEN_ENV}}] Start all services in project"
+    deps:
+      # NOTE: some Compose command may need to be moved to separate Taskfile (like Taskfile.common.yml)
+      # especially tasks where commands vary between environment (for instance "up" task needs dependencies built in
+      # development but dependencies are pulled from registry in production)
+      - :docker:build-base-images
+    cmds:
+      - cmd: "docker compose up -d"
+      - task: logs
+
+  down:
+    desc: "[{{.CHOSEN_ENV}}] Stop all running services"
+    cmds:
+      - "docker compose down"
