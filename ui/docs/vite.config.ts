@@ -17,7 +17,7 @@ const config: UserConfig & { test?: VitestConfig } = {
 			formats: ["es", "umd"],
 			entry: resolvePath(__dirname, "src/lib.ts"),
 			name: "lib",
-			fileName: (format) => `lib.${format}.js`,
+			fileName: (format) => `lib.${format}.${format === "es" ? "m" : "c"}js`,
 		},
 		rollupOptions: {
 			// make sure to externalize deps that shouldn't be bundled

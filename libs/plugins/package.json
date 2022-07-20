@@ -30,7 +30,7 @@
     "socket.io-client": "^4.5.0",
     "supertest": "^6.2.3",
     "superwstest": "^2.0.2",
-    "ws": "^8.6.0"
+    "ws": "^8.8.1"
   },
   "source": "src/index.ts",
   "types": "dist/index.d.ts",

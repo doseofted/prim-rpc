@@ -14,7 +14,7 @@
     "@doseofted/prim-rpc": "workspace:*",
     "@fastify/cors": "^8.0.0",
     "fastify": "^4.0.3",
-    "ws": "^8.6.0"
+    "ws": "^8.8.1"
   },
   "scripts": {
     "watch": "parcel watch",

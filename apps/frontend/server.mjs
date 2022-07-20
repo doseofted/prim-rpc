@@ -26,7 +26,7 @@ export async function createServer() {
 	await app.register(middie)
 	/** @type {import('vite').ViteDevServer|null} */ let vite = null
 	if (!isProd) {
-		const { default: viteImport } = await import("vite")
+		const viteImport = await import("vite")
 		vite = await viteImport.createServer({
 			root: process.cwd(),
 			logLevel: isTest ? "error" : "info",
@@ -56,7 +56,7 @@ export async function createServer() {
 				template = htmlProductionUse
 				// eslint-disable-next-line @typescript-eslint/ban-ts-comment
 				// @ts-ignore
-				render = (await import("./dist/server/entry.server.js"))?.render
+				render = (await import("./dist/server/entry.server.mjs"))?.render
 			}
 			const appHtml = await render(url, ssrManifest)
 			const html = template?.replace("<!--ssr-outlet-->", appHtml)
