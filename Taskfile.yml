@@ -14,9 +14,12 @@ includes:
     taskfile: ./apps/frontend/Taskfile.yml
     dir: ./apps/frontend
     optional: true
+  proxy:
+    taskfile: ./proxy/Taskfile.yml
+    dir: ./proxy
+    optional: true
 
 tasks:
-
   default:
     cmds:
       - "task --list"

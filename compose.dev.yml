@@ -1,0 +1,18 @@
+version: '3'
+
+services:
+  caddy:
+    build:
+      context: ./proxy
+      target: dev
+    volumes:
+      - ./proxy/base.Caddyfile:/etc/caddy/base.Caddyfile:ro
+      - ./proxy/dev.Caddyfile:/etc/caddy/Caddyfile:ro
+      - ./data/server/dev-cert.pem:/etc/caddy/local/dev-cert.pem:ro
+      - ./data/server/dev-key.pem:/etc/caddy/local/dev-key.pem:ro
+    ports:
+      - "2019:2019"
+
+  postgres:
+    ports: 
+      - "5432:5432"

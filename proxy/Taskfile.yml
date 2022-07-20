@@ -1,0 +1,46 @@
+version: 3
+
+env:
+  WEBSITE_HOST: "prim.localhost"
+  ADMIN_EMAIL: "ted@doseofted.com"
+
+tasks:
+
+  build:
+    desc: "Build Caddy image for production use"
+    vars:
+      BUILD_STAGE: "prod"
+    cmds:
+      - "docker build -t doseofted/prim-proxy --target={{.BUILD_STAGE}} ."
+
+  run:
+    cmds:
+      - |
+        docker run -it --rm \
+          -p 80:80 -p 443:443 \
+          -e WEBSITE_HOST -e ADMIN_EMAIL \
+          doseofted/prim-proxy {{.CLI_ARGS}}
+
+  dev:
+    desc: "Run frontend image in dev mode"
+    deps:
+      - task: build
+        vars: { BUILD_STAGE: "{{.TASK}}" }
+    cmds:
+      - task: run
+
+  prod:
+    desc: "Run frontend image in production mode"
+    deps:
+      - task: build
+        vars: { BUILD_STAGE: "{{.TASK}}" }
+    cmds:
+      - task: run
+
+  staging:
+    desc: "Run frontend image in production mode"
+    deps:
+      - task: build
+        vars: { BUILD_STAGE: "{{.TASK}}" }
+    cmds:
+      - task: run

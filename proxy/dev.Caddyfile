@@ -5,12 +5,12 @@ import base.Caddyfile
   local_certs
 }
 
-www.{$HOST} {
+www.{$WEBSITE_HOST} {
   import dev_certificates
-  redir https://{$HOST}{uri}
+  redir https://{$WEBSITE_HOST}{uri}
 }
 
-{$HOST} {
+{$WEBSITE_HOST} {
   encode zstd gzip
   import dev_certificates
   # NOTE: use dev server in development
@@ -22,7 +22,7 @@ www.{$HOST} {
   reverse_proxy frontend:3000
 }
 
-api.{$HOST} {
+api.{$WEBSITE_HOST} {
   encode zstd gzip
   import dev_certificates
   reverse_proxy backend:3001
