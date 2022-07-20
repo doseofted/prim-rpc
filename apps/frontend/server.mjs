@@ -76,5 +76,5 @@ export async function createServer() {
 
 if (!isTest) {
 	const { app } = await createServer()
-	app.listen({ port: 6173, host: "0.0.0.0" })
+	app.listen({ port: 3000, host: "0.0.0.0" })
 }

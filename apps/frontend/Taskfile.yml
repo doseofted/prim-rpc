@@ -25,5 +25,5 @@ tasks:
       - |
         docker run -it --rm \
           -v "$(pwd)/src:/home/node/project/apps/frontend/src" \
-          -p 3000:3000 \
+          -p 3000:3000 -p 24678:24678 \
           doseofted/prim-frontend-dev {{.CLI_ARGS}}

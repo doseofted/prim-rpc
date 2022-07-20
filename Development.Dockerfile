@@ -4,7 +4,7 @@ FROM node:16.15-bullseye
 USER root
 # Install PNPM
 RUN corepack enable
-RUN corepack prepare pnpm@7.5.1 --activate
+RUN corepack prepare pnpm@7.5.2 --activate
 # Install Task
 RUN sh -c "$(curl --location https://taskfile.dev/install.sh)" -- -d -b /usr/local/bin
 # Install Caddy
