@@ -1,11 +1,12 @@
-/// <reference types="vitest" />
 import { defineConfig } from "vite"
 import { resolve as resolvePath } from "node:path"
 import vue from "@vitejs/plugin-vue"
 import dts from "vite-plugin-dts"
+import type { UserConfig as VitestConfig } from "vitest"
+import type { UserConfig } from "vite"
 
 // https://vitejs.dev/config/
-export default defineConfig({
+const config: UserConfig & { test?: VitestConfig } = {
 	plugins: [vue(), dts()],
 	test: {
 		globals: true,
@@ -31,4 +32,6 @@ export default defineConfig({
 			},
 		},
 	},
-})
+}
+
+export default defineConfig(config)
