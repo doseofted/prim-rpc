@@ -23,6 +23,3 @@ node_modules
 .task/*
 # Don't need to commit JavaScript-specific, built, distributable files
 dist
-# Nuxt-specific folders don't need to be tracked
-.nuxt
-.output

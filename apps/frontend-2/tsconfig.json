@@ -1,9 +1,0 @@
-{
-  // https://v3.nuxtjs.org/concepts/typescript
-  // "compilerOptions": {
-  //   "types": [
-  //     "vitest/globals"
-  //   ]
-  // },
-  "extends": "./.nuxt/tsconfig.json"
-}
