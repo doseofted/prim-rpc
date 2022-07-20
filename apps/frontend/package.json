@@ -11,7 +11,7 @@
   "scripts": {
     "build": "vite build",
     "build:client": "vite build --ssrManifest --outDir dist/client",
-    "build:server": "vite build --ssr src/entry.server.ts --outDir dist/server",
+    "build:server": "vite build --ssr src/entry.server.ts --target=esnext --outDir dist/server",
     "watch": "vite build --watch",
     "check": "vue-tsc --noEmit",
     "dev": "vite",

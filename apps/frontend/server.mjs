@@ -17,7 +17,11 @@ function relativeToProject (relativePath) {
 export async function createServer() {
 	const htmlProductionLocation = relativeToProject("dist/client/index.html")
 	const htmlProductionUse = isProd ? readFileSync(htmlProductionLocation, "utf-8") : ""
-	const { default: ssrManifest } = isProd ? (await import("./dist/client/ssr-manifest.json")) : {}
+	// eslint-disable-next-line @typescript-eslint/ban-ts-comment
+	// @ts-ignore
+	const { default: ssrManifest } = isProd ? (await import("./dist/client/ssr-manifest.json", {
+		assert: { type: "json" },
+	})) : {}
 	const app = Fastify()
 	await app.register(middie)
 	/** @type {import('vite').ViteDevServer|null} */ let vite = null
@@ -50,6 +54,8 @@ export async function createServer() {
 				render = (await vite?.ssrLoadModule("/src/entry.server.ts"))?.render
 			} else {
 				template = htmlProductionUse
+				// eslint-disable-next-line @typescript-eslint/ban-ts-comment
+				// @ts-ignore
 				render = (await import("./dist/server/entry.server.js"))?.render
 			}
 			const appHtml = await render(url, ssrManifest)
