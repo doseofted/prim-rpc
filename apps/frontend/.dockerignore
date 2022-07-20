@@ -11,3 +11,6 @@ node_modules
 .task
 # Distributable files are built in container, don't copy into container from host
 dist
+# Don't copy Nuxt-specific build output or related configuration
+.output
+.nuxt

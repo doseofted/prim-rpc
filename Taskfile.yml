@@ -14,6 +14,10 @@ includes:
     taskfile: ./apps/frontend/Taskfile.yml
     dir: ./apps/frontend
     optional: true
+  frontend2:
+    taskfile: ./apps/frontend-2/Taskfile.yml
+    dir: ./apps/frontend-2
+    optional: true
 
 tasks:
 
