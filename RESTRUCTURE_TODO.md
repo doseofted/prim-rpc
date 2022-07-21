@@ -6,6 +6,7 @@ to reference here while I'm actively working on it than put in a separate todo a
 - Set up an "entrypoint" script that will build/watch all `libs/*` and `ui/*` folders for use with Docker Compose
   - Also consider swapping out `CMD` in Dockerfile with entrypoint to keep container open (or keep `/bin/bash` and replace in Compose config)
 - Delete `old-structure` once verified important parts of old structure are present in new structure
+- Add back a JS "setup" task that will build all parts of project outside of containers (for building type definitions in code editor) 
 - Go through frontend and backend and make them actually run in container (but remember that they should be able to be ran outside of a container if needed as well)
 
 Todo after restructure:

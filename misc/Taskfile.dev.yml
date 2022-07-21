@@ -48,7 +48,7 @@ tasks:
       - "pnpm outdated -r"
       # Upgrade all dependencies to latest
       - "pnpm upgrade -r --interactive --latest"
-      - "echo \"In event of issues after upgrading, try `task dev:clean` then reinstall. If all else fails, delete lockfile.\""
+      - "echo 'In event of issues after upgrading, try `task dev:clean` then reinstall. If all else fails, delete lockfile.'"
 
   # Remove all node_modules (useful especially in container environments when only production dependencies are needed)
   clean-node-modules: "find . -name node_modules -type d -prune -exec rm -fr {} +"
