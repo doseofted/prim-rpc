@@ -8,7 +8,7 @@ tasks:
       - task: :compose:prod:up-base
 
   dev:up:
-    desc: "[dev] Start all services in project"
+    desc: "[development] Start all services in project"
     deps:
       - :docker:build-base-images
       - :dev:cert

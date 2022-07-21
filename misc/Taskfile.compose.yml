@@ -27,3 +27,15 @@ tasks:
     desc: "[{{.CHOSEN_ENV}}] Stop all running services"
     cmds:
       - "docker compose down"
+
+  exe:
+    desc: "[{{.CHOSEN_ENV}}] Run shell in running service, like so: `task {{.TASK}} -- backend`"
+    interactive: true
+    cmds:
+      - "docker compose exec {{.CLI_ARGS}} bash"
+
+  run:
+    desc: "[{{.CHOSEN_ENV}}] Run shell in one-off service, like so: `task {{.TASK}} -- backend`"
+    interactive: true
+    cmds:
+      - "docker compose run {{.CLI_ARGS}} bash"
