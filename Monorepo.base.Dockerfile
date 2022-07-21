@@ -22,7 +22,7 @@ WORKDIR /home/node/project
 COPY --chown=node pnpm-*.yaml package.json ./
 RUN pnpm fetch
 # Copy miscellaneous configuration related to project that could be used in container
-COPY --chown=node .eslint* .nvmrc .parcelrc jest.config.cjs Taskfile.yml tsconfig.json turbo.json  ./
+COPY --chown=node .eslint* .nvmrc .parcelrc jest.config.cjs Taskfile.yml tsconfig.json turbo.json build-deps.mjs  ./
 COPY --chown=node misc misc
 
 FROM monorepo-install as monorepo-build
@@ -35,5 +35,6 @@ RUN pnpm build-libs
 COPY --chown=node ui ui
 RUN pnpm install --offline --frozen-lockfile
 RUN pnpm build-ui
+ENV NODE_ENV=development
 # If image is used directly, drop into shell for debugging
-CMD [ "/bin/bash" ]
+CMD [ "pnpm", "build-deps" ]

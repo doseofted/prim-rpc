@@ -18,7 +18,7 @@ tasks:
 
   # NOTE: used in "common" Taskfile
   # LINK ./Taskfile.common.yml
-  up-base:
+  up-only:
     cmds:
       - cmd: "docker compose up -d"
       - task: logs

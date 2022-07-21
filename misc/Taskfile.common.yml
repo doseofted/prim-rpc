@@ -5,7 +5,7 @@ tasks:
   prod:up:
     desc: "[production] Start all services in project"
     cmds:
-      - task: :compose:prod:up-base
+      - task: :compose:prod:up-only
 
   dev:up:
     desc: "[development] Start all services in project"
@@ -13,9 +13,9 @@ tasks:
       - :docker:build-base-images
       - :dev:cert
     cmds:
-      - task: :compose:dev:up-base
+      - task: :compose:dev:up-only
 
   staging:up:
     desc: "[staging] Start all services in project"
     cmds:
-      - task: :compose:staging:up-base
+      - task: :compose:staging:up-only

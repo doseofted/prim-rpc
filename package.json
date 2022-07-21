@@ -13,6 +13,7 @@
   "scripts": {
     "turbo": "turbo run",
     "zx": "zx",
+    "build-deps": "zx build-deps.mjs",
     "watch-libs": "parcel watch 'libs/*'",
     "build-libs": "parcel build 'libs/*'",
     "watch-ui": "turbo run watch --filter=./ui/**",

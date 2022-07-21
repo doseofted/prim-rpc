@@ -3,6 +3,7 @@ version: "3"
 services:
   # reverse proxy for all other services
   caddy:
+    image: doseofted/prim-proxy:latest
     environment:
       - WEBSITE_HOST
       - ADMIN_EMAIL
@@ -28,6 +29,7 @@ services:
 
   # backend that will serve the API
   backend:
+    image: doseofted/prim-backend:latest
     environment:
       <<: *database-creds
       WEBSITE_HOST: $WEBSITE_HOST
@@ -35,6 +37,7 @@ services:
 
   # frontend used to serve UI that communicates with API
   frontend:
+    image: doseofted/prim-frontend:latest
     environment:
-      WEBSITE_HOST: $WEBSITE_HOST
+      - WEBSITE_HOST
     restart: "no"

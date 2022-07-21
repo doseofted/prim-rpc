@@ -1,4 +1,4 @@
-version: '3'
+version: "3"
 
 services:
   caddy:
@@ -19,6 +19,7 @@ services:
 
   # libraries is a development-only image used to easily rebuild dependencies
   libraries:
+    image: doseofted/monorepo-build:latest
     build:
       dockerfile: Monorepo.base.Dockerfile
     volumes:
@@ -26,7 +27,7 @@ services:
       - ./libs/example/src:/home/node/project/libs/example/src
       - ./libs/plugins/src:/home/node/project/libs/plugins/src
       - ./libs/prim/src:/home/node/project/libs/prim/src
-      - ./ui/docs/src:/home/node/project/libs/docs/src
+      - ./ui/docs/src:/home/node/project/ui/docs/src
     restart: "no"
 
   backend:
