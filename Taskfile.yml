@@ -9,6 +9,7 @@ includes:
   # Project-wide includes
   dev: ./misc/Taskfile.dev.yml
   docker: ./misc/Taskfile.docker.yml
+  compose: ./misc/Taskfile.common.yml
 
   # Environment-specific Docker Compose configuration
   compose:dev: &base-compose

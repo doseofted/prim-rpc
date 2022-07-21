@@ -1,7 +1,6 @@
 version: 3
 
 env:
-  COMPOSE_PATH_SEPARATOR: "{{.COMPOSE_PATH_SEPARATOR}}"
   COMPOSE_FILE: "{{.COMPOSE_FILE}}"
 
 tasks:
@@ -17,13 +16,9 @@ tasks:
       - cmd: "docker compose logs -f --tail=25"
         ignore_error: true
 
-  up:
-    desc: "[{{.CHOSEN_ENV}}] Start all services in project"
-    deps:
-      # NOTE: some Compose command may need to be moved to separate Taskfile (like Taskfile.common.yml)
-      # especially tasks where commands vary between environment (for instance "up" task needs dependencies built in
-      # development but dependencies are pulled from registry in production)
-      - :docker:build-base-images
+  # NOTE: used in "common" Taskfile
+  # LINK ./Taskfile.common.yml
+  up-base:
     cmds:
       - cmd: "docker compose up -d"
       - task: logs
