@@ -8,7 +8,7 @@ Keep it simple. Prim is a headless content manager. Creation of "ideas," bluepri
 
 Functions required for easy access to this data such as roles, permissions, translations, draft status, and annotations should be created and managed by the application as "ideas" themselves (the system should be able to manage itself, although there will always be exceptions).
 
-All communication between server and client (whether administation interface or developer-created interface) is done over HTTP and Websocket, with functions formatted loosely as JSON-RPC and response data sent back over JSON-RPC using JSON-LD-like structures for linked data including paging. Structures for JSON could possibly be validated with JSON-Schema standard for tasks such as defining requests and response shapes or even partially defining "things" themselves. All data is assumed to be flat, that is, without hierarchy. Hierarchy may be defined by the developer through linked structures but shouldn't be recognized in Prim for simplicity. Websocket connections are useful for finding linked data structures since the connection is kept open once a "thing" is received through an RPC call. RPC Calls can be optimized for linked data often so that it's readily available if requested or a parameter could be defined to expand references only if absolutely needed (because this should be simple). A benefit of basing communication on JSON is that it will be fairly easy to create type definitions that could be shared with a client.
+All communication between server and client (whether administration interface or developer-created interface) is done over HTTP and Websocket, with functions formatted loosely as JSON-RPC and response data sent back over JSON-RPC using JSON-LD-like structures for linked data including paging. Structures for JSON could possibly be validated with JSON-Schema standard for tasks such as defining requests and response shapes or even partially defining "things" themselves. All data is assumed to be flat, that is, without hierarchy. Hierarchy may be defined by the developer through linked structures but shouldn't be recognized in Prim for simplicity. Websocket connections are useful for finding linked data structures since the connection is kept open once a "thing" is received through an RPC call. RPC Calls can be optimized for linked data often so that it's readily available if requested or a parameter could be defined to expand references only if absolutely needed (because this should be simple). A benefit of basing communication on JSON is that it will be fairly easy to create type definitions that could be shared with a client.
 
 ## The Details
 
@@ -25,11 +25,11 @@ Prim will be made up of several low-level libraries to ensure ease-of-developmen
 
 This is a project is intended to be flexible but selects a few tools to make development easier. It is a monorepo composed of:
 
-- **Libraries**: A set of shared libraries written in TypeScript and built with Parcel that, for the most part, can be used in both the Frontend and Backend. Most project logic should be contained in libraries and utilized by the frontend and backend, described next.
+- **Libraries and UI**: A set of shared libraries written in TypeScript and built with Parcel that, for the most part, can be used in both the Frontend and Backend. Most project logic should be contained in libraries and utilized by the frontend and backend, described next.
 - **Backend**: Fastify server written in TypeScript built with Parcel that runs behind Caddy, a reverse proxy server.
 - **Frontend**: A Vue app written in TypeScript built with Vite. Capacitor is used to serve native platforms.
 
-All of these services are set up and configured through Docker Compose to easily set up the project so that all parts can be developed locally. In development, source folders are watched so services are rebuilt in the running containers, including libraries that frontend and backend depend on. In production, the same configuration can be used to run the project with Docker Swarm.
+All of these services are set up and configured through Docker Compose to easily set up the project so that all parts can be developed locally. In development, source folders are watched so services are rebuilt in the running containers, including libraries that frontend and backend depend on.
 
 The goal is to synchronize steps taken to run a project in all environments (for example: dev, staging, prod), simplify development of all parts of the project by completing prerequisite steps in containers that are configured to work together with working versions of dependencies, and allow easy cross-platform development of the project by minimizing the amount of steps required to setup the project itself.
 
@@ -37,7 +37,7 @@ The goal is to synchronize steps taken to run a project in all environments (for
 
 In development, most project setup will be completed through use of containers configured with Docker Compose. Some other dependencies are needed for a better development experience.
 
-Follow steps below to setup a development environment. `nvm`, `task`, `mkcert`, `docker`, and `docker-compose` are suggested.
+Follow steps below to setup a development environment. `nvm`, `task`, `mkcert`, `docker`, and `docker compose` are suggested.
 
 1. Install [nvm](https://github.com/nvm-sh/nvm) and run `nvm use` in this project to set the utilized Node version (or download given version in `.nvmrc`).
 2. Run `corepack enable` so package managers defined in `package.json` files are utilized (`pnpm`). Otherwise, install version of `pnpm` given in `package.json`.

@@ -1,0 +1,43 @@
+version: "3"
+
+services:
+  # reverse proxy for all other services
+  caddy:
+    image: doseofted/prim-proxy:latest
+    environment:
+      - WEBSITE_HOST
+      - ADMIN_EMAIL
+    volumes:
+      - ./data/caddy/config:/config
+      - ./data/caddy/data:/data
+    ports:
+      - "80:80"
+      - "443:443"
+    restart: "no"
+
+  # database available for use in project
+  postgres:
+    image: postgres:14.4
+    environment:
+      &database-creds
+      POSTGRES_DB: "prim"
+      POSTGRES_USER: "proper"
+      POSTGRES_PASSWORD: $POSTGRES_PASSWORD
+    volumes:
+      - ./data/postgres:/var/lib/postgresql/data
+    restart: "no"
+
+  # backend that will serve the API
+  backend:
+    image: doseofted/prim-backend:latest
+    environment:
+      <<: *database-creds
+      WEBSITE_HOST: $WEBSITE_HOST
+    restart: "no"
+
+  # frontend used to serve UI that communicates with API
+  frontend:
+    image: doseofted/prim-frontend:latest
+    environment:
+      - WEBSITE_HOST
+    restart: "no"

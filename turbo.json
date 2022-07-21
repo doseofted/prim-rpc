@@ -1,0 +1,32 @@
+{
+  "$schema": "https://turborepo.org/schema.json",
+  "baseBranch": "origin/main",
+  "globalDependencies": [],
+  "pipeline": {
+    "lint": {
+      "dependsOn": []
+    },
+    "check": {
+      "dependsOn": []
+    },
+    "build": {
+      "dependsOn": ["^build", "check", "lint"],
+      "outputs": ["dist/**"]
+    },
+    "watch": {
+      "dependsOn": ["^build"],
+      "outputs": ["dist/**"]
+    },
+    "dev": {
+      "dependsOn": ["^build"],
+      "outputs": ["dist/**"]
+    },
+    "@doseofted/prim-docs#preview": {
+      "dependsOn": ["build"],
+      "outputs": ["dist/**"]
+    },
+    "lint-style": {
+      "dependsOn": []
+    }
+  }
+}

@@ -1,24 +1,36 @@
 {
   "folders": [
 		{
-			"name": "Prim",
+			"name": "🌳 Project Root",
 			"path": "."
 		},
 		{
-			"name": "Libraries",
-			"path": "./libraries"
+			"name": "📙 Prim RPC",
+			"path": "./libs/prim"
 		},
 		{
-			"name": "Frontend",
-			"path": "./project/frontend"
+			"name": "📙 Prim Plugins",
+			"path": "./libs/plugins"
 		},
 		{
-			"name": "Backend",
-			"path": "./project/backend"
+			"name": "📙 Example Library",
+			"path": "./libs/example"
 		},
 		{
-			"name": "Server",
-			"path": "./project/server"
+			"name": "⚙️ Prim Docs UI",
+			"path": "./ui/docs"
+		},
+		{
+			"name": "🌐 Example Frontend",
+			"path": "./apps/frontend"
+		},
+		{
+			"name": "🌐 Example Backend",
+			"path": "./apps/backend"
+		},
+		{
+			"name": "☁️ Reverse Proxy",
+			"path": "./proxy"
 		}
 	],
 	"settings": {
@@ -31,13 +43,9 @@
 		"editor.codeActionsOnSave": {
 			"source.fixAll": true
 		},
+		"editor.linkedEditing": true,
 		"editor.formatOnPaste": true,
-		"explorer.autoReveal": false,
-		"css.lint.unknownAtRules": "ignore",
-		"scss.lint.unknownAtRules": "ignore",
-		"css.validate": false,
-		"less.validate": false,
-		"scss.validate": false,
+		"workbench.editor.pinnedTabSizing": "compact",
 		"npm.packageManager": "auto",
 		"stylelint.validate": [
 			"css",
@@ -46,6 +54,7 @@
 			"scss",
 			"vue"
 		],
+		"typescript.tsdk": "🌲 Project Root/node_modules/typescript/lib",
 		"eslint.validate": [
 			"javascript",
 			"javascriptreact",
@@ -53,23 +62,24 @@
 			"typescriptreact",
 			"vue"
 		],
-		"eslint.workingDirectories": [
-			"./project/frontend",
-			"./project/backend",
-			"./libraries/packages"
-		],
 		"yaml.schemas": {
-			"https://raw.githubusercontent.com/compose-spec/compose-spec/master/schema/compose-spec.json": "dc.*.yml",
+			"https://raw.githubusercontent.com/compose-spec/compose-spec/master/schema/compose-spec.json": "compose.*.yml",
 			"https://json.schemastore.org/taskfile.json": "Taskfile.*.yml"
+		},
+		"json.schemas": [
+			{
+				"fileMatch": ["nodemon.json"],
+				"url": "https://raw.githubusercontent.com/SchemaStore/schemastore/master/src/schemas/json/nodemon.json"
+			}
+		],
+		"files.associations": {
+			"*.Corefile": "caddyfile"
 		},
 		"peacock.color": "#57b0ca",
 		"peacock.affectStatusAndTitleBorders": true,
 		"peacock.affectTitleBar": false,
 		"peacock.affectActivityBar": false,
 		"peacock.showColorInStatusBar": false,
-		"workbench.editor.pinnedTabSizing": "compact",
-		"editor.linkedEditing": true,
-		"typescript.tsdk": "Prim/node_modules/typescript/lib",
 		"workbench.colorCustomizations": {
 			"sash.hoverBorder": "#7ec2d6",
 			"statusBar.background": "#57b0ca",
@@ -79,14 +89,29 @@
 			"statusBarItem.remoteBackground": "#57b0ca",
 			"statusBarItem.remoteForeground": "#15202b"
 		},
+		"cSpell.words": [
+			"defu",
+			"doseofted",
+			"fastify",
+			"Klingenberg",
+			"pnpm",
+			"Taskfile",
+			"websockets"
+		],
+		"cSpell.enableFiletypes": [
+			"dockerfile"
+		],
 	},
 	"extensions": {
 		"recommendations": [
+			"redhat.vscode-yaml",
+			"zamerick.vscode-caddyfile-syntax",
 			"ms-azuretools.vscode-docker",
 			"dbaeumer.vscode-eslint",
 			"stylelint.vscode-stylelint",
 			"vue.volar",
-			"bradlc.vscode-tailwindcss",
+			"irongeek.vscode-env",
+			"streetsidesoftware.code-spell-checker"
 		],
 		"unwantedRecommendations": [
 			"octref.vetur"

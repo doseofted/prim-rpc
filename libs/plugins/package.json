@@ -1,0 +1,43 @@
+{
+  "name": "@doseofted/prim-plugins",
+  "version": "0.0.1",
+  "description": "Plugins for using Prim with server/client frameworks",
+  "license": "UNLICENSED",
+  "author": {
+    "name": "Ted Klingenberg",
+    "email": "ted@doseofted.com",
+    "url": "https://doseofted.com/"
+  },
+  "dependencies": {
+    "@doseofted/prim-rpc": "workspace:*"
+  },
+  "scripts": {
+    "watch": "parcel watch",
+    "build": "parcel build",
+    "check": "tsc --noEmit",
+    "test": "jest",
+    "lint": "eslint ."
+  },
+  "devDependencies": {
+    "@doseofted/prim-example": "workspace:*",
+    "@types/express": "^4.17.13",
+    "@types/supertest": "^2.0.12",
+    "@types/ws": "^8.5.3",
+    "axios": "^0.27.2",
+    "express": "^4.18.1",
+    "fastify": "^4.0.3",
+    "socket.io": "^4.5.0",
+    "socket.io-client": "^4.5.0",
+    "supertest": "^6.2.3",
+    "superwstest": "^2.0.2",
+    "ws": "^8.8.1"
+  },
+  "source": "src/index.ts",
+  "types": "dist/index.d.ts",
+  "main": "dist/main.cjs",
+  "module": "dist/module.mjs",
+  "exports": {
+    "import": "./dist/module.mjs",
+    "require": "./dist/main.cjs"
+  }
+}

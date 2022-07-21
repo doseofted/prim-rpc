@@ -1,0 +1,29 @@
+import base.Caddyfile
+
+{
+  import log_options
+  local_certs
+}
+
+www.{$WEBSITE_HOST} {
+  import dev_certificates
+  redir https://{$WEBSITE_HOST}{uri}
+}
+
+{$WEBSITE_HOST} {
+  encode zstd gzip
+  import dev_certificates
+  # NOTE: use dev server in development
+  @websockets {
+    header Connection *Upgrade*
+    header Upgrade websocket
+  }
+  reverse_proxy @websockets frontend:24678
+  reverse_proxy frontend:3000
+}
+
+api.{$WEBSITE_HOST} {
+  encode zstd gzip
+  import dev_certificates
+  reverse_proxy backend:3001
+}

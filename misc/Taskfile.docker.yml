@@ -1,0 +1,36 @@
+version: 3
+
+tasks:
+
+  base:build:
+    desc: "Build base image with installed node modules and built dependencies."
+    cmds:
+      - "docker build -f Monorepo.base.Dockerfile -t doseofted/monorepo-build {{.CLI_ARGS}} ."
+
+  base:run:
+    desc: "Interactively run base image, usually for fixing potential build issues"
+    ignore_error: true
+    deps:
+      - "base:build"
+    cmds:
+      - "docker run -it --rm doseofted/monorepo-build"
+
+  prod:build:
+    desc: "Build production base image to be used by other services in production"
+    cmds:
+      - "docker build -f Monorepo.prod.Dockerfile -t doseofted/monorepo-production {{.CLI_ARGS}} ."
+
+  prod:run:
+    desc: "Interactively run production base image, usually for fixing potential build issues"
+    ignore_error: true
+    deps:
+      - "prod:build"
+    cmds:
+      - "docker run -it --rm doseofted/monorepo-production"
+
+  # NOTE: below is used as a step in apps/** Taskfiles
+  # Run dependencies as cmds so they run sequentially (it's slower this way but otherwise output is unreadable)
+  build-base-images:
+    cmds:
+      - task: base:build
+      - task: prod:build

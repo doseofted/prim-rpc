@@ -1,33 +1,54 @@
 {
-	"name": "@doseofted/prim-monorepo",
-	"private": true,
-	"author": {
-		"name": "Ted Klingenberg",
-		"email": "ted@doseofted.com",
-		"url": "https://doseofted.com/"
-	},
-	"scripts": {
-		"zx": "zx",
-		"packages:dev": "parcel watch 'libraries/packages/*'",
-		"packages:build": "parcel build 'libraries/packages/*'",
-		"libraries:test": "jest --watch",
-		"frontend": "pnpm --filter='@doseofted/prim-frontend'",
-		"backend": "pnpm --filter='@doseofted/prim-backend'"
-	},
-	"packageManager": "pnpm@7.0.1",
-	"devDependencies": {
-		"@parcel/core": "^2.5.0",
-		"@parcel/packager-ts": "2.5.0",
-		"@parcel/transformer-typescript-types": "2.5.0",
-		"@parcel/transformer-vue": "2.5.0",
-		"@typescript-eslint/eslint-plugin": "^5.23.0",
-		"@typescript-eslint/parser": "^5.23.0",
-		"eslint": "^8.15.0",
-		"jest": "^28.1.0",
-		"parcel": "^2.5.0",
-		"postcss": "^8.4.13",
-		"ts-jest": "^28.0.2",
-		"typescript": "^4.6.4",
-		"zx": "6.1.0"
-	}
+  "name": "@doseofted/prim-monorepo",
+  "description": "Not a headless CMS but better.",
+  "author": {
+    "name": "Ted Klingenberg",
+    "email": "ted@doseofted.com",
+    "url": "https://doseofted.com/"
+  },
+  "version": "0.0.1",
+  "packageManager": "pnpm@7.5.2",
+  "license": "UNLICENSED",
+  "private": true,
+  "scripts": {
+    "turbo": "turbo run",
+    "zx": "zx",
+    "build-deps": "zx build-deps.mjs",
+    "watch-libs": "parcel watch 'libs/*'",
+    "build-libs": "parcel build 'libs/*'",
+    "watch-ui": "turbo run watch --filter=./ui/**",
+    "build-ui": "turbo run build --filter=./ui/**",
+    "watch-apps": "turbo run dev --filter=./apps/**",
+    "build-apps": "turbo run build --filter=./apps/**",
+    "test": "jest",
+    "lint": "turbo run lint",
+    "lint-style": "turbo run lint-style"
+  },
+  "dependencies": {
+    "zx": "^7.0.7"
+  },
+  "devDependencies": {
+    "@parcel/config-default": "^2.6.2",
+    "@parcel/core": "^2.6.2",
+    "@parcel/packager-ts": "^2.6.2",
+    "@parcel/transformer-typescript-types": "^2.6.2",
+    "@parcel/validator-typescript": "^2.6.2",
+    "@types/jest": "^28.1.6",
+    "@typescript-eslint/eslint-plugin": "^5.30.7",
+    "@typescript-eslint/parser": "^5.30.7",
+    "eslint": "^8.20.0",
+    "eslint-plugin-vue": "^9.2.0",
+    "jest": "^28.1.3",
+    "parcel": "^2.6.2",
+    "postcss": "^8.4.14",
+    "postcss-html": "^1.5.0",
+    "sass": "^1.53.0",
+    "stylelint": "^14.9.1",
+    "stylelint-config-recommended-vue": "^1.4.0",
+    "stylelint-config-standard-scss": "^5.0.0",
+    "ts-jest": "^28.0.7",
+    "turbo": "^1.3.2",
+    "typescript": "^4.7.4",
+    "vitest": "^0.18.1"
+  }
 }

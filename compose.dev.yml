@@ -1,0 +1,52 @@
+version: "3"
+
+services:
+  caddy:
+    build:
+      context: ./proxy
+      target: dev
+    volumes:
+      - ./proxy/base.Caddyfile:/etc/caddy/base.Caddyfile:ro
+      - ./proxy/dev.Caddyfile:/etc/caddy/Caddyfile:ro
+      - ./data/server/dev-cert.pem:/etc/caddy/local/dev-cert.pem:ro
+      - ./data/server/dev-key.pem:/etc/caddy/local/dev-key.pem:ro
+    ports:
+      - "2019:2019"
+
+  postgres:
+    ports: 
+      - "5432:5432"
+
+  # libraries is a development-only image used to easily rebuild dependencies
+  libraries:
+    image: doseofted/monorepo-build:latest
+    build:
+      dockerfile: Monorepo.base.Dockerfile
+    volumes:
+      # src folder of each dependency so changes get rebuilt
+      - ./libs/example/src:/home/node/project/libs/example/src
+      - ./libs/plugins/src:/home/node/project/libs/plugins/src
+      - ./libs/prim/src:/home/node/project/libs/prim/src
+      - ./ui/docs/src:/home/node/project/ui/docs/src
+    restart: "no"
+
+  backend:
+    build:
+      context: ./apps/backend
+      target: dev
+    ports:
+      - "3001:3001"
+    volumes:
+      - ./apps/backend/src:/home/node/project/apps/backend/src
+
+  frontend:
+    build:
+      context: ./apps/frontend
+      target: dev
+    ports:
+      - "3000:3000"
+      - "24678:24678"
+    volumes:
+      - ./apps/frontend/src:/home/node/project/app/frontend/src
+      - ./apps/frontend/public:/home/node/project/apps/frontend/public
+      - ./apps/frontend/index.html:/home/node/project/apps/frontend/index.html

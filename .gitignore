@@ -1,16 +1,25 @@
-# Project data
+# Don't commit mounted volumes from Docker Compose
 /data/*
+# Keep an empty folder when needed
 !**/.gitkeep
-# Common to all projects
+# Don't commit envionment but keep an example for reference
 .env
+.env.*
+!.env.example
+# Logs don't need to be committed
 *.log
+# Don't need to commit Mac-specific settings
 .DS_Store
-# JavaScript projects
+# Don't need Windows-specific cache either
+Thumbs.db
+[Dd]esktop.ini
+# Node modules are reinstalled on each client (and huge, don't commit)
 node_modules
-dist
-dist-ssr
+# Parcel cache is specific to built artifact, don't commit
 .parcel-cache
-# Other
-/bin/*
-# Folder where Checksums used by Taskfile when fingerprinting files
-/.task/*
+# TurboRepo cache doesn't need to be committed
+.turbo
+# Don't commit Checksums used by Taskfile when fingerprinting files
+.task/*
+# Don't need to commit JavaScript-specific, built, distributable files
+dist

@@ -1,0 +1,22 @@
+import base.Caddyfile
+
+{
+  import log_options
+  email {$ADMIN_EMAIL}
+}
+
+www.{$WEBSITE_HOST} {
+  redir https://{$WEBSITE_HOST}{uri}
+}
+
+{$WEBSITE_HOST} {
+  encode zstd gzip
+  reverse_proxy frontend:3000
+  root * /srv
+  file_server
+}
+
+api.{$WEBSITE_HOST} {
+  encode zstd gzip
+  reverse_proxy backend:3001
+}

@@ -1,7 +1,5 @@
 #!/usr/bin/env zx
-/* eslint-disable no-undef */
-$.verbose = false // toggle off default
-import { echo as baseEcho } from "zx/experimental"
+import { $, echo as baseEcho, chalk } from "zx"
 /**
  * Log output with given prefix and highlight variables. Use like so:
  * 
@@ -13,11 +11,11 @@ import { echo as baseEcho } from "zx/experimental"
  * ```
  */
 function createEcho(prefix = "project") {
-	/** Add color to console logs then echo. */
+	/** Add color to variables in console logs then echo. */
 	return function echo(strings, ...vals) {
 		let str = strings[0]
 		for (let i = 0; i < vals.length; i++) { str += chalk`{green ${vals[i]}}` + strings[i + 1] }
-		baseEcho(chalk`{green.bold [${prefix}]}`, str)
+		baseEcho(chalk.green.bold(`[${prefix}]`), str)
 	}
 }
 const echo = createEcho("zx-utils")
@@ -36,7 +34,5 @@ async function gatherPackageName(packageJson = "package.json") {
 }
 
 const mode = process.env.NODE_ENV || "production"
-
-$.verbose = true // toggle default back on
 
 export { createEcho, gatherPackageName, mode }

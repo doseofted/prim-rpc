@@ -1,67 +1,50 @@
-version: "3"
-
-includes:
-  # "dc" as in "Docker Compose"
-  dc: ./misc/Taskfile.dc.yml
-  # "js" as in "JavaScript"
-  js: ./misc/Taskfile.js.yml
+# https://taskfile.dev
+version: 3
 
 dotenv:
   - ".env"
+
+includes:
+
+  # Project-wide includes
+  dev: ./misc/Taskfile.dev.yml
+  docker: ./misc/Taskfile.docker.yml
+  compose: ./misc/Taskfile.common.yml
+
+  # Environment-specific Docker Compose configuration
+  compose:dev: &base-compose
+    taskfile: ./misc/Taskfile.compose.yml
+    optional: true
+    vars:
+      COMPOSE_FILE: "compose.yml:compose.dev.yml:misc/compose.sync.yml"
+      CHOSEN_ENV: "development"
+  compose:prod:
+    <<: *base-compose
+    vars:
+      COMPOSE_FILE: "compose.yml:compose.prod.yml"
+      CHOSEN_ENV: "production"
+  compose:staging:
+    <<: *base-compose
+    vars:
+      COMPOSE_FILE: "compose.yml:compose.prod.yml:compose.staging.yml"
+      CHOSEN_ENV: "staging"
+
+  # Sub-project-specific includes
+  backend:
+    taskfile: ./apps/backend/Taskfile.yml
+    dir: ./apps/backend
+    optional: true
+  frontend:
+    taskfile: ./apps/frontend/Taskfile.yml
+    dir: ./apps/frontend
+    optional: true
+  proxy:
+    taskfile: ./proxy/Taskfile.yml
+    dir: ./proxy
+    optional: true
 
 tasks:
 
   default:
     cmds:
       - "task --list"
-
-  # NOTE: `mkcert` must be installed on the host, since a containerized version would install CA in its own stores
-  dev:cert:
-    desc: "Create a certifcate to be used in development, trusted by the host system (requires `mkcert`)"
-    status:
-      - "test -f data/server/dev-cert.pem"
-      - "test -f data/server/dev-key.pem"
-    cmds:
-      - "mkdir -p data/server"
-      - |
-        mkcert \
-          -key-file "data/server/dev-key.pem" \
-          -cert-file "data/server/dev-cert.pem" \
-          {{.HOST}} "*.{{.HOST}}" localhost 127.0.0.1 ::1
-
-  dev:dns:
-    desc: "Run a DNS server for development, useful for resolving '*.test' TLDs using devices on the same network"
-    # NOTE: variables below are now set from .env file
-    # vars:
-    #   DNS_BIND:
-    #     sh: "hostname -I | awk '{print $1}'"
-    #   DNS_TLD: "test"
-    cmds:
-      - "docker pull coredns/coredns:1.8.4"
-      - |
-        docker run -it --rm --name coredns \
-          -v "$(pwd)/misc/dev.Corefile:/root/Corefile" \
-          -p "{{.DNS_BIND}}:53:53/tcp" -p "{{.DNS_BIND}}:53:53/udp" \
-          -e "DNS_BIND={{.DNS_BIND}}" \
-          -e "DNS_TLD={{.DNS_TLD}}" \
-          coredns/coredns:1.8.4 \
-          -conf /root/Corefile
-
-  dev:clean:
-    desc: "Remove locally built files from the project, useful for a clean run (data/* must be deleted separately by root)"
-    cmds:
-      # Remove Task cache
-      - "rm -fr .task"
-      # Remove Parcel cache
-      - "rm -fr .parcel-cache"
-      # and root node modules
-      - "rm -fr node_modules"
-      # Remove all node_modules in projects and libraries
-      - "find ./project -name 'node_modules' -type d -prune -exec rm -rf '{}' \\;"
-      - "find ./libraries -name 'node_modules' -type d -prune -exec rm -rf '{}' \\;"
-      # Now that node_modules are gone, delete dist folders (doing after deletion of node_modules so modules aren't included)
-      - "find ./project -name 'dist' -type d -prune -exec rm -rf '{}' \\;"
-      - "find ./libraries -name 'dist' -type d -prune -exec rm -rf '{}' \\;"
-      - "echo \"You'll need to remove data/* as root. The .env file in this project was kept.\""
-      # NOTE: data/* must be deleted by root user
-      # - "rm -fr ./data/*"

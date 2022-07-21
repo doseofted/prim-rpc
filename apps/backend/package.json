@@ -1,0 +1,38 @@
+{
+  "name": "@doseofted/prim-backend",
+  "version": "0.0.1",
+  "description": "An example backend making use of Prim.",
+  "license": "UNLICENSED",
+  "author": {
+    "name": "Ted Klingenberg",
+    "email": "ted@doseofted.com",
+    "url": "https://doseofted.com/"
+  },
+  "dependencies": {
+    "@doseofted/prim-example": "workspace:*",
+    "@doseofted/prim-plugins": "workspace:*",
+    "@doseofted/prim-rpc": "workspace:*",
+    "@fastify/cors": "^8.0.0",
+    "fastify": "^4.0.3",
+    "ws": "^8.8.1"
+  },
+  "scripts": {
+    "watch": "parcel watch",
+    "build": "parcel build",
+    "check": "tsc --noEmit",
+    "test": "jest",
+    "lint": "eslint .",
+    "start": "node dist/module.js",
+    "dev": "nodemon dist/module.js"
+  },
+  "type": "module",
+  "engines": {
+    "node": ">= 16.15.1"
+  },
+  "source": "src/index.ts",
+  "module": "dist/module.js",
+  "devDependencies": {
+    "@types/ws": "^8.5.3",
+    "nodemon": "^2.0.16"
+  }
+}

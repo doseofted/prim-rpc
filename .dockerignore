@@ -1,10 +1,12 @@
-# Files specific to the host system should not be copied into container during build step
-# NOTE: mounted volumes in Compose configuration are copied regardless of this file
-**/node_modules
-**/dist
-**/.parcel-cache
-**/Dockerfile
-**/*.Dockerfile
-project/frontend/android
-project/frontend/ios
-project/frontend/electron
+# Node modules are installed in each container
+node_modules
+# Parcel cache is specific platform it is built on, leave out of container
+.parcel-cache
+# TurboRepo cache doesn't need to be sent to a container
+.turbo
+# Cached status of Task runs doesn't need to be in container
+.task
+# Distributable files are built in container, don't copy into container from host
+dist
+# Ignore data in the root of the project
+/data
