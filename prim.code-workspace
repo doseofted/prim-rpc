@@ -104,10 +104,14 @@
 	},
 	"extensions": {
 		"recommendations": [
+			"redhat.vscode-yaml",
+			"zamerick.vscode-caddyfile-syntax",
 			"ms-azuretools.vscode-docker",
 			"dbaeumer.vscode-eslint",
 			"stylelint.vscode-stylelint",
-			"vue.volar"
+			"vue.volar",
+			"irongeek.vscode-env",
+			"streetsidesoftware.code-spell-checker"
 		],
 		"unwantedRecommendations": [
 			"octref.vetur"

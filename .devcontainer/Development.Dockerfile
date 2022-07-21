@@ -14,7 +14,7 @@ RUN apt install -y debian-keyring debian-archive-keyring apt-transport-https
 RUN curl -1sLf 'https://dl.cloudsmith.io/public/caddy/stable/gpg.key' | gpg --dearmor -o /usr/share/keyrings/caddy-stable-archive-keyring.gpg
 RUN curl -1sLf 'https://dl.cloudsmith.io/public/caddy/stable/debian.deb.txt' | tee /etc/apt/sources.list.d/caddy-stable.list
 RUN apt-get update -qq
-RUN apt-get install -y caddy
+RUN apt-get install -y caddy=2.5.2
 
 USER node
-WORKDIR /home/node/development
+
