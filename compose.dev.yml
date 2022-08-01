@@ -44,7 +44,7 @@ services:
       context: ./apps/frontend
       target: dev
     ports:
-      - "3000:3000"
+      - "5173:5173"
       - "24678:24678"
     volumes:
       - ./apps/frontend/src:/home/node/project/app/frontend/src

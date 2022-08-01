@@ -1,11 +1,12 @@
 import { defineConfig } from "vite"
 import vue from "@vitejs/plugin-vue"
+import pages from "vite-plugin-pages"
 import type { UserConfig as VitestConfig } from "vitest"
 import type { UserConfig } from "vite"
 
 // https://vitejs.dev/config/
 const config: UserConfig & { test?: VitestConfig } = {
-	plugins: [vue()],
+	plugins: [vue(), pages()],
 	test: {
 		globals: true,
 		environment: "jsdom",

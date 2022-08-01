@@ -9,11 +9,9 @@
     "url": "https://doseofted.com/"
   },
   "scripts": {
-    "build:client": "vite build --ssrManifest --outDir dist/client",
-    "build:server": "vite build --ssr src/entry.server.ts --target=esnext --outDir dist/server",
-    "build": "pnpm build:client && pnpm build:server",
-    "watch": "NODE_ENV=development node server.mjs",
-    "start": "NODE_ENV=production node server.mjs",
+    "build": "vite-ssg build",
+    "watch": "vite",
+    "start": "node server.mjs",
     "check": "vue-tsc --noEmit",
     "lint": "eslint --ext .js,.vue,.ts .",
     "lint-style": "stylelint '**/*.{css,scss,vue}'",
@@ -23,19 +21,21 @@
     "@doseofted/prim-docs": "workspace:*",
     "@doseofted/prim-example": "workspace:*",
     "@doseofted/prim-rpc": "workspace:*",
-    "@fastify/middie": "^8.0.0",
+    "@fastify/static": "^6.5.0",
     "fastify": "^4.0.3",
-    "serve-static": "^1.15.0",
-    "vue": "^3.2.25",
-    "vue-router": "^4.1.2"
+    "vue": "^3.2.25"
   },
   "devDependencies": {
     "@types/node": "^18.0.6",
     "@vitejs/plugin-vue": "^3.0.1",
     "@vue/test-utils": "^2.0.0",
+    "@vueuse/head": "^0.7.8",
     "jsdom": "^20.0.0",
     "typescript": "^4.7.4",
     "vite": "^3.0.2",
+    "vite-plugin-pages": "^0.25.0",
+    "vite-ssg": "^0.20.2",
+    "vue-router": "^4.1.2",
     "vue-tsc": "^0.38.9"
   }
 }

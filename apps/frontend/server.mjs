@@ -1,81 +1,15 @@
 // @ts-check
-import path from "node:path"
+import { join as joinPath, dirname } from "node:path"
 import { fileURLToPath } from "node:url"
-import { readFileSync } from "node:fs"
 import Fastify from "fastify"
-import middie from "@fastify/middie"
+import Static from "@fastify/static"
 
-const isTest = process.env.NODE_ENV === "test" || !!process.env.VITE_TEST_BUILD
-const isProd = process.env.NODE_ENV === "production"
+const app = Fastify()
+const projectPath = dirname(fileURLToPath(import.meta.url))
+await app.register(Static,{
+	root: joinPath(projectPath, "dist"),
+})
 
-/** @type {(path: string) => string} */
-function relativeToProject (relativePath) {
-	const projectDirectory = path.dirname(fileURLToPath(import.meta.url))
-	return path.resolve(projectDirectory, relativePath)
-}
-
-export async function createServer() {
-	const htmlProductionLocation = relativeToProject("dist/client/index.html")
-	const htmlProductionUse = isProd ? readFileSync(htmlProductionLocation, "utf-8") : ""
-	// eslint-disable-next-line @typescript-eslint/ban-ts-comment
-	// @ts-ignore
-	const { default: ssrManifest } = isProd ? (await import("./dist/client/ssr-manifest.json", {
-		assert: { type: "json" },
-	})) : {}
-	const app = Fastify()
-	await app.register(middie)
-	/** @type {import('vite').ViteDevServer|null} */ let vite = null
-	if (!isProd) {
-		const viteImport = await import("vite")
-		vite = await viteImport.createServer({
-			root: process.cwd(),
-			logLevel: isTest ? "error" : "info",
-			appType: "custom",
-			server: {
-				middlewareMode: true,
-				watch: {
-					usePolling: true,
-					interval: 100,
-				},
-			},
-		})
-		app.use(vite.middlewares)
-	} else {
-		const { default: serveStatic } = await import("serve-static")
-		app.use("/", serveStatic(relativeToProject("dist/client"), { index: false }))
-	}
-	// eslint-disable-next-line @typescript-eslint/no-unused-vars
-	app.get("/", async (request, reply) => {
-		try {
-			const url = request.url
-			let template, render
-			if (!isProd) {
-				template = readFileSync(relativeToProject("index.html"), "utf-8")
-				template = await vite?.transformIndexHtml(url, template)
-				render = (await vite?.ssrLoadModule("/src/entry.server.ts"))?.render
-			} else {
-				template = htmlProductionUse
-				// eslint-disable-next-line @typescript-eslint/ban-ts-comment
-				// @ts-ignore
-				render = (await import("./dist/server/entry.server.mjs"))?.render
-			}
-			const appHtml = await render(url, ssrManifest)
-			const html = template?.replace("<!--ssr-outlet-->", appHtml)
-			reply.header("Content-Type", "text/html")
-			reply.status(200)
-			reply.send(html)
-		} catch (e) {
-			vite && vite.ssrFixStacktrace(e)
-			console.log(e.stack)
-			reply.status(500)
-			reply.send(e.stack)
-		}
-	})
-
-	return { app, vite }
-}
-
-if (!isTest) {
-	const { app } = await createServer()
-	app.listen({ port: 3000, host: "0.0.0.0" })
-}
+app.listen({ port: 3000, host: "0.0.0.0" }, (e, addr) => {
+	console.log("Listening:", addr)
+})

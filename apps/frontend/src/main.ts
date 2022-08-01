@@ -1,10 +1,7 @@
-import { createSSRApp } from "vue"
+import { ViteSSG } from "vite-ssg"
 import App from "./App.vue"
-import { createRouter } from "./router"
+import routes from "~pages"
 
-export function createApp() {
-	const app = createSSRApp(App)
-	const router = createRouter()
-	app.use(router)
-	return { app, router }
-}
+export const createApp = ViteSSG(App, { routes }, (_ctx) => {
+	// ...
+})
