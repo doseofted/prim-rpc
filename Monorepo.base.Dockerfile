@@ -4,7 +4,7 @@ USER root
 # LINK https://nodejs.org/api/corepack.html#enabling-the-feature
 # NOTE: it seems corepack `enable` and `prepare` need to be separate steps (otherwise correct version is not used)
 RUN corepack enable
-RUN corepack prepare pnpm@7.5.2 --activate
+RUN corepack prepare pnpm@7.7.1 --activate
 # Use Task to make management of project easier
 # LINK https://taskfile.dev/installation/#install-script
 RUN sh -c "$(curl --location https://taskfile.dev/install.sh)" -- -d -b /usr/local/bin
