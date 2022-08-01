@@ -20,8 +20,8 @@
     "build-ui": "turbo run build --filter=./ui/**",
     "watch-apps": "turbo run dev --filter=./apps/**",
     "build-apps": "turbo run build --filter=./apps/**",
-    "test": "jest",
-    "test-2": "turbo run test-2",
+    "test": "turbo run test",
+    "testing": "turbo run testing",
     "lint": "turbo run lint",
     "lint-style": "turbo run lint-style"
   },

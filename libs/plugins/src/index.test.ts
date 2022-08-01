@@ -28,10 +28,6 @@ describe("Fastify plugin is functional", async () => {
 		server.close()
 	})
 	const expectedResult = { result: "Hey Ted!", id: 1 }
-	const modResult = await example.sayHello({ greeting: "Hello", name: "ted"})
-	console.log("module result:", modResult, example)
-	const res = await prim.rpc({body: { method: "sayHello" }, prefix: "/prim", url: "/prim" })
-	console.log("standalone", res)
 	test("should make request over HTTP", async () => {
 		const response = await wsRequest(app.server)
 			.post("/prim")

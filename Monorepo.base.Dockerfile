@@ -22,7 +22,7 @@ WORKDIR /home/node/project
 COPY --chown=node pnpm-*.yaml package.json ./
 RUN pnpm fetch
 # Copy miscellaneous configuration related to project that could be used in container
-COPY --chown=node .eslint* .nvmrc .parcelrc jest.config.cjs Taskfile.yml tsconfig.json turbo.json build-deps.mjs  ./
+COPY --chown=node .eslint* .nvmrc .parcelrc Taskfile.yml tsconfig.json turbo.json build-deps.mjs  ./
 COPY --chown=node misc misc
 
 FROM monorepo-install as monorepo-build

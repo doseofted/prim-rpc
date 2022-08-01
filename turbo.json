@@ -3,7 +3,11 @@
   "baseBranch": "origin/main",
   "globalDependencies": [],
   "pipeline": {
-    "test-2": {
+    "test": {
+      "dependsOn": [],
+      "cache": false
+    },
+    "testing": {
       "dependsOn": [],
       "cache": false
     },

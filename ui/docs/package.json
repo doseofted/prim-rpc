@@ -16,7 +16,8 @@
     "preview": "vite preview",
     "lint": "eslint --ext .js,.vue,.ts .",
     "lint-style": "stylelint '**/*.{css,scss,vue}'",
-    "test": "vitest"
+    "test": "vitest run",
+    "testing": "vitest watch"
   },
   "dependencies": {
     "vue": "^3.2.25"

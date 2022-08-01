@@ -20,7 +20,8 @@
     "watch": "parcel watch",
     "build": "parcel build",
     "check": "tsc --noEmit",
-    "test": "jest",
+    "test": "vitest run",
+    "testing": "vitest watch",
     "lint": "eslint .",
     "start": "node dist/module.js",
     "dev": "nodemon dist/module.js"

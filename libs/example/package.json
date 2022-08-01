@@ -12,8 +12,8 @@
     "watch": "parcel watch",
     "build": "parcel build",
     "check": "tsc --noEmit",
-    "test": "jest",
-    "test-2": "vitest run",
+    "test": "vitest run",
+    "testing": "vitest watch",
     "lint": "eslint ."
   },
   "source": "src/index.ts",

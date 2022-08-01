@@ -63,7 +63,7 @@ describe("Prim Client can call deeply nested methods", () => {
 })
 
 describe("Prim Client can throw errors", () => {
-	// LINK https://jestjs.io/docs/expect#rejects
+	// LINK https://vitest.dev/api/#rejects
 	test("with local source", () => {
 		const { oops } = createPrimClient({ server: true }, exampleServer)
 		expect(() => {
@@ -83,7 +83,6 @@ describe("Prim Client can throw errors", () => {
 })
 
 describe("Prim Client can use callbacks", () => {
-	// LINK https://jestjs.io/docs/expect#rejects
 	test("with local source", async () => {
 		await new Promise<void>(resolve => {
 			const { withCallback } = createPrimClient({ server: true }, exampleServer)
