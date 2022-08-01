@@ -39,5 +39,5 @@ services:
   frontend:
     image: doseofted/prim-frontend:latest
     environment:
-      - WEBSITE_HOST
+      VITE_WEBSITE_HOST: $WEBSITE_HOST
     restart: "no"
