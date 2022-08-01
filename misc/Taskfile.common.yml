@@ -14,6 +14,8 @@ tasks:
       - :dev:cert
     cmds:
       - task: :compose:dev:up-only
+        vars:
+          CLI_ARGS: --build
 
   staging:up:
     desc: "[staging] Start all services in project"

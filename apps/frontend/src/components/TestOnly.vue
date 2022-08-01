@@ -10,7 +10,6 @@ const primLocal = createPrimClient({ server: true }, exampleServer)
 const expectedMessage = ref("")
 const exampleArgs = { greeting: "Hey", name: "Ted" }
 const host = import.meta.env.VITE_WEBSITE_HOST
-console.log(host)
 
 const { sayHello, typeMessage } = createPrimClient<typeof exampleClient>({
 	endpoint: `https://api.${host}/prim`,

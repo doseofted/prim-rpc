@@ -20,7 +20,7 @@ tasks:
   # LINK ./Taskfile.common.yml
   up-only:
     cmds:
-      - cmd: "docker compose up -d"
+      - cmd: "docker compose up -d {{.CLI_ARGS}}"
       - task: logs
 
   down:
