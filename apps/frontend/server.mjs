@@ -30,6 +30,7 @@ export async function createServer() {
 		vite = await viteImport.createServer({
 			root: process.cwd(),
 			logLevel: isTest ? "error" : "info",
+			appType: "custom",
 			server: {
 				middlewareMode: true,
 				watch: {
