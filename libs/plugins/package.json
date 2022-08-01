@@ -16,6 +16,8 @@
     "build": "parcel build",
     "check": "tsc --noEmit",
     "test": "jest",
+    "test-2": "vitest run",
+    "testing": "vitest watch",
     "lint": "eslint ."
   },
   "devDependencies": {

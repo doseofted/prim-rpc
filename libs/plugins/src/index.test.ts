@@ -1,5 +1,6 @@
+import { describe, test, beforeEach, afterEach, expect } from "vitest"
 import wsRequest from "superwstest"
-import example from "@doseofted/prim-example"
+import * as example from "@doseofted/prim-example"
 import { createPrimServer } from "@doseofted/prim-rpc"
 import { primExpressMiddleware, primFastifyPlugin, primWebSocketServerSetup } from "."
 import express from "express"
@@ -10,10 +11,10 @@ import type { Server } from "http"
 // TODO: move tests to their own files where it makes sense
 // for instance, functions in client.ts would be defined in client.test.ts
 
-describe("Fastify plugin is functional", () => {
+describe("Fastify plugin is functional", async () => {
 	const prim = createPrimServer(example)
 	const app = Fastify()
-	void app.register(primFastifyPlugin, { prim, prefix: "/prim" })
+	await app.register(primFastifyPlugin, { prim, prefix: "/prim" })
 	const server = app.server
 	const websocket = new WebSocketServer({ server })
 	primWebSocketServerSetup(prim, websocket)
@@ -23,11 +24,15 @@ describe("Fastify plugin is functional", () => {
 			server.listen(0, "localhost", () => { resolve(true) })
 		})
 	})
-	afterEach((done) => {
-		server.close(done)
+	afterEach(() => {
+		server.close()
 	})
 	const expectedResult = { result: "Hey Ted!", id: 1 }
-	it("should make request over HTTP", async () => {
+	const modResult = await example.sayHello({ greeting: "Hello", name: "ted"})
+	console.log("module result:", modResult, example)
+	const res = await prim.rpc({body: { method: "sayHello" }, prefix: "/prim", url: "/prim" })
+	console.log("standalone", res)
+	test("should make request over HTTP", async () => {
 		const response = await wsRequest(app.server)
 			.post("/prim")
 			.send({
@@ -75,13 +80,16 @@ describe("Express plugin is functional", () => {
 	app.use(express.json())
 	app.use(primExpressMiddleware(prim, "/prim"))
 	let server: Server
-	beforeEach((done) => {
-		server = app.listen(0, "localhost", done)
+	beforeEach(async () => {
+		await new Promise<void>((resolve) => {
+			const done = () => resolve()
+			server = app.listen(0, "localhost", done)
+		})
 	})
-	afterEach((done) => {
-		server.close(done)
+	afterEach(() => {
+		server.close()
 	})
-	it("should make request over HTTP", async () => {
+	test("should make request over HTTP", async () => {
 		const response = await wsRequest(server)
 			.post("/prim")
 			.send({

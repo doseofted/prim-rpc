@@ -1,3 +1,4 @@
+import { describe, test, expect } from "vitest"
 import { createPrimClient, createPrimServer } from "."
 import type * as exampleClient from "@doseofted/prim-example"
 import * as exampleServer from "@doseofted/prim-example"
@@ -83,39 +84,43 @@ describe("Prim Client can throw errors", () => {
 
 describe("Prim Client can use callbacks", () => {
 	// LINK https://jestjs.io/docs/expect#rejects
-	test("with local source", (done) => {
-		const { withCallback } = createPrimClient({ server: true }, exampleServer)
-		const results: string[] = []
-		withCallback((message) => {
-			results.push(message)
-			if (results.length === 2) {
-				expect(results).toEqual(["You're using Prim.", "Still using Prim!"])
-				done()
-			}
+	test("with local source", async () => {
+		await new Promise<void>(resolve => {
+			const { withCallback } = createPrimClient({ server: true }, exampleServer)
+			const results: string[] = []
+			withCallback((message) => {
+				results.push(message)
+				if (results.length === 2) {
+					expect(results).toEqual(["You're using Prim.", "Still using Prim!"])
+					resolve()
+				}
+			})
 		})
 	})
-	test("with remote source", (done) => {
-		const results: string[] = []
-		const prim = createPrimServer(exampleServer)
-		const { withCallback } = createPrimClient<typeof exampleClient>({
-			socket(_endpoint, { connected, response, ended }) {
-				prim.ws.on("response", (answer) => { response(answer) })
-				prim.ws.on("ended", () => { ended() })
-				setTimeout(() => {
-					connected()
-				}, 0)
-				// FIXME: find out why sending RPC call here causes error (webosocket still works?)
-				const send = () => ({}) // (body: RpcCall) => { prim.rpc({ body }) }
-				return { send }
-			},
-			client: async (_endpoint, body) => prim.rpc({ body }),
-		})
-		withCallback((message) => {
-			results.push(message)
-			if (results.length === 2) {
-				expect(results).toEqual(["You're using Prim.", "Still using Prim!"])
-				done()
-			}
+	test("with remote source", async () => {
+		await new Promise<void>(resolve => {
+			const results: string[] = []
+			const prim = createPrimServer(exampleServer)
+			const { withCallback } = createPrimClient<typeof exampleClient>({
+				socket(_endpoint, { connected, response, ended }) {
+					prim.ws.on("response", (answer) => { response(answer) })
+					prim.ws.on("ended", () => { ended() })
+					setTimeout(() => {
+						connected()
+					}, 0)
+					// FIXME: find out why sending RPC call here causes error (webosocket still works?)
+					const send = () => ({}) // (body: RpcCall) => { prim.rpc({ body }) }
+					return { send }
+				},
+				client: async (_endpoint, body) => prim.rpc({ body }),
+			})
+			withCallback((message) => {
+				results.push(message)
+				if (results.length === 2) {
+					expect(results).toEqual(["You're using Prim.", "Still using Prim!"])
+					resolve()
+				}
+			})
 		})
 	})
 })
@@ -209,6 +214,6 @@ describe("Prim can batch requests", () => {
 			sayHello({ greeting: "Hey", name: "Ted" }),
 			sayHelloAlternative("Hey", "Ted"),
 		]
-		expect(await Promise.all(results)).toEqual(await Promise.all(expected))
+		await expect(Promise.all(results)).resolves.toEqual(await Promise.all(expected))
 	})
 })

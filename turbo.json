@@ -3,6 +3,10 @@
   "baseBranch": "origin/main",
   "globalDependencies": [],
   "pipeline": {
+    "test-2": {
+      "dependsOn": [],
+      "cache": false
+    },
     "lint": {
       "dependsOn": []
     },
@@ -15,11 +19,11 @@
     },
     "watch": {
       "dependsOn": ["^build"],
-      "outputs": ["dist/**"]
+      "cache": false
     },
     "dev": {
       "dependsOn": ["^build"],
-      "outputs": ["dist/**"]
+      "cache": false
     },
     "@doseofted/prim-docs#preview": {
       "dependsOn": ["build"],

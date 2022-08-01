@@ -21,6 +21,7 @@
     "watch-apps": "turbo run dev --filter=./apps/**",
     "build-apps": "turbo run build --filter=./apps/**",
     "test": "jest",
+    "test-2": "turbo run test-2",
     "lint": "turbo run lint",
     "lint-style": "turbo run lint-style"
   },
@@ -36,6 +37,7 @@
     "@types/jest": "^28.1.6",
     "@typescript-eslint/eslint-plugin": "^5.30.7",
     "@typescript-eslint/parser": "^5.30.7",
+    "@vitest/ui": "^0.20.2",
     "eslint": "^8.20.0",
     "eslint-plugin-vue": "^9.2.0",
     "jest": "^28.1.3",

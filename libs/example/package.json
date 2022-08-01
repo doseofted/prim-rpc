@@ -13,6 +13,7 @@
     "build": "parcel build",
     "check": "tsc --noEmit",
     "test": "jest",
+    "test-2": "vitest run",
     "lint": "eslint ."
   },
   "source": "src/index.ts",
