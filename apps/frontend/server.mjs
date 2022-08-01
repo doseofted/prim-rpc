@@ -10,6 +10,6 @@ await app.register(Static,{
 	root: joinPath(projectPath, "dist"),
 })
 
-app.listen({ port: 3000, host: "0.0.0.0" }, (e, addr) => {
+app.listen({ port: 5173, host: "0.0.0.0" }, (e, addr) => {
 	console.log("Listening:", addr)
 })

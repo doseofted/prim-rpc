@@ -14,10 +14,14 @@ services:
     build:
       context: ./apps/backend
       target: prod
+    environment:
+      - NODE_ENV=production
     restart: "always"
 
   frontend:
     build:
       context: ./apps/frontend
       target: prod
+    environment:
+      - NODE_ENV=production
     restart: "always"
