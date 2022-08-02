@@ -18,7 +18,7 @@
       "dependsOn": ["^build"]
     },
     "build": {
-      "dependsOn": ["^build", "check", "lint"],
+      "dependsOn": ["^build"],
       "outputs": ["dist/**"]
     },
     "watch": {

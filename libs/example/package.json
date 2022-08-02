@@ -9,7 +9,7 @@
     "url": "https://doseofted.com/"
   },
   "scripts": {
-    "watch": "parcel watch",
+    "watch": "parcel watch --no-hmr",
     "build": "parcel build",
     "check": "tsc --noEmit",
     "test": "vitest run",
