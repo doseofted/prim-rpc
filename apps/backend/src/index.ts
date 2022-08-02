@@ -7,18 +7,20 @@ import { WebSocketServer } from "ws"
 import * as example from "@doseofted/prim-example"
 import { createPrimServer } from "@doseofted/prim-rpc"
 import { primFastifyPlugin, primWebSocketServerSetup } from "@doseofted/prim-plugins"
+import { default as jsonHandler } from "superjson"
 
-const fastify = Fastify()
+const fastify = Fastify({ logger: true })
 const websocket = new WebSocketServer({ server: fastify.server })
 
-const prim = createPrimServer(example)
-void fastify.register(primFastifyPlugin, { prim, prefix: "/prim" })
+const prim = createPrimServer(example, { jsonHandler })
+await fastify.register(primFastifyPlugin, { prim, prefix: "/prim" })
 primWebSocketServerSetup(prim, websocket)
-void fastify.register(Cors, { origin: `https://${process.env.WEBSITE_HOST}` })
+await fastify.register(Cors, { origin: `https://${process.env.WEBSITE_HOST}` })
 
+const contained = JSON.parse(process.env.CONTAINED ?? "false") === true
 try {
-	void fastify.listen({ port: 3001, host: "0.0.0.0" })
-	fastify.log.info("Server is listening.")
+	const host = contained ? "::" : "localhost"
+	await fastify.listen({ port: 3001, host })
 } catch (err) {
 	if (err) {
 		fastify.log.error(err)

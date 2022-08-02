@@ -27,3 +27,10 @@ tasks:
           -v "$(pwd)/src:/home/node/project/apps/frontend/src" \
           -p 3000:3000 -p 24678:24678 \
           doseofted/prim-frontend-dev {{.CLI_ARGS}}
+
+  entrypoint:
+    desc: "Run frontend's entrypoint for full development setup"
+    env:
+      NODE_ENV: development
+    cmds:
+      - pnpm entrypoint

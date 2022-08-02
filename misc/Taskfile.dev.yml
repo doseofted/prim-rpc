@@ -38,6 +38,14 @@ tasks:
     cmds:
       - "pnpm install"
 
+  setup:
+    desc: "Set up project for development (rerun on major changes)"
+    deps:
+      - cert
+      - install
+    cmds:
+      - pnpm build
+
   upgrade:
     desc: "Upgrade node modules to latest versions across project"
     ignore_error: true

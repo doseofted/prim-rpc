@@ -10,7 +10,8 @@
 		"esModuleInterop": true,
 		// A config suggestion from Parcel:
 		// LINK https://parceljs.org/languages/typescript/#isolatedmodules
-		"isolatedModules": true
+		"isolatedModules": true,
+		"module": "ESNext"
 	},
 	"include": [
 		// include all source code

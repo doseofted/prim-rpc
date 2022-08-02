@@ -42,8 +42,15 @@ export interface PrimWebSocketFunctionEvents {
 	ended: () => void
 }
 
-export type PrimClientFunction = (endpoint: string, jsonBody: RpcCall|RpcCall[], jsonHandler?: JSON) => Promise<RpcAnswer|RpcAnswer[]>
-export type PrimSocketFunction = (endpoint: string, events: PrimWebSocketFunctionEvents, jsonHandler?: JSON) => ({
+export interface JsonHandler {
+	// eslint-disable-next-line @typescript-eslint/no-explicit-any
+	stringify: (json: unknown) => string
+	// eslint-disable-next-line @typescript-eslint/no-explicit-any
+	parse: <T = any>(string: string) => T
+}
+
+export type PrimClientFunction = (endpoint: string, jsonBody: RpcCall|RpcCall[], jsonHandler?: JsonHandler) => Promise<RpcAnswer|RpcAnswer[]>
+export type PrimSocketFunction = (endpoint: string, events: PrimWebSocketFunctionEvents, jsonHandler?: JsonHandler) => ({
 	send: (message: RpcCall|RpcCall[]) => void
 })
 
@@ -66,7 +73,7 @@ export interface PrimOptions {
 	 *
 	 * Given object is required to have both a `.stringify()` and `.parse()` method.
 	 */
-	jsonHandler?: JSON
+	jsonHandler?: JsonHandler
 	/**
 	 * When used from the client, override the HTTP framework used for requests (default is browser's `fetch()`)
 	 * @param endpoint The configured `option.endpoint` on created instance

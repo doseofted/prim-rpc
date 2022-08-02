@@ -5,8 +5,9 @@ import * as exampleServer from "@doseofted/prim-example"
 import type * as exampleClient from "@doseofted/prim-example"
 import { HelloWorld } from "@doseofted/prim-docs"
 import "@doseofted/prim-docs/style.css"
+import { default as jsonHandler } from "superjson"
 
-const primLocal = createPrimClient({ server: true }, exampleServer)
+const primLocal = createPrimClient({ server: true, jsonHandler }, exampleServer)
 const expectedMessage = ref("")
 const exampleArgs = { greeting: "Hey", name: "Ted" }
 const host = import.meta.env.VITE_WEBSITE_HOST
@@ -14,6 +15,7 @@ const host = import.meta.env.VITE_WEBSITE_HOST
 const { sayHello, typeMessage } = createPrimClient<typeof exampleClient>({
 	endpoint: `https://api.${host}/prim`,
 	clientBatchTime: 10,
+	jsonHandler,
 })
 const message = ref<string>()
 const matches = computed(() => message.value === expectedMessage.value)

@@ -33,6 +33,7 @@ services:
     environment:
       <<: *database-creds
       WEBSITE_HOST: $WEBSITE_HOST
+      CONTAINED: "true"
     restart: "no"
 
   # frontend used to serve UI that communicates with API
@@ -40,4 +41,5 @@ services:
     image: doseofted/prim-frontend:latest
     environment:
       VITE_WEBSITE_HOST: $WEBSITE_HOST
+      CONTAINED: "true"
     restart: "no"

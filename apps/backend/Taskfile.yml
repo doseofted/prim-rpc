@@ -26,3 +26,10 @@ tasks:
           -v "$(pwd)/src:/home/node/project/apps/backend/src" \
           -p 3001:3001 \
           doseofted/prim-backend-dev {{.CLI_ARGS}}
+
+  entrypoint:
+    desc: "Run backend's entrypoint for full development setup"
+    env:
+      NODE_ENV: development
+    cmds:
+      - pnpm entrypoint
