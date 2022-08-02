@@ -13,7 +13,6 @@
     "watch": "vite build --watch",
     "check": "vue-tsc --noEmit",
     "dev": "vite",
-    "preview": "vite preview",
     "lint": "eslint --ext .js,.vue,.ts .",
     "lint-style": "stylelint '**/*.{css,scss,vue}'",
     "test": "vitest run",

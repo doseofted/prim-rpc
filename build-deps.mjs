@@ -18,6 +18,7 @@ if (inDevelopment) {
 	watch(libsPath, { ignored: /node_modules/, ignoreInitial: true })
 		.on("all", async (_e, p) => {
 			const relativePath = path.relative(libsPath, p)
+			if (!relativePath.includes("src/")) { return }
 			const projectPath = relativePath.split(path.sep)[0]
 			const filter = "." + path.sep + path.join("libs", projectPath)
 			const createProc = () => {
