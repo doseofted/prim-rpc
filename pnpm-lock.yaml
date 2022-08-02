@@ -7,11 +7,13 @@ importers:
       '@parcel/config-default': ^2.6.2
       '@parcel/core': ^2.6.2
       '@parcel/packager-ts': ^2.6.2
+      '@parcel/reporter-cli': ^2.6.2
       '@parcel/transformer-typescript-types': ^2.6.2
       '@parcel/validator-typescript': ^2.6.2
       '@typescript-eslint/eslint-plugin': ^5.32.0
       '@typescript-eslint/parser': ^5.32.0
       '@vitest/ui': ^0.20.2
+      chokidar: ^3.5.3
       eslint: ^8.21.0
       eslint-plugin-vue: ^9.3.0
       parcel: ^2.6.2
@@ -23,6 +25,7 @@ importers:
       stylelint-config-standard-scss: ^5.0.0
       turbo: ^1.4.0
       typescript: ^4.7.4
+      vite: ^3.0.4
       vitest: ^0.20.2
       zx: ^7.0.8
     dependencies:
@@ -31,11 +34,13 @@ importers:
       '@parcel/config-default': 2.6.2_t5vtpv47misdigjotdrv7ondeu
       '@parcel/core': 2.6.2
       '@parcel/packager-ts': 2.6.2_@parcel+core@2.6.2
+      '@parcel/reporter-cli': 2.6.2_@parcel+core@2.6.2
       '@parcel/transformer-typescript-types': 2.6.2_oyagtvpm5cqz6yd27ydlw6jokm
       '@parcel/validator-typescript': 2.6.2_oyagtvpm5cqz6yd27ydlw6jokm
       '@typescript-eslint/eslint-plugin': 5.32.0_iosr3hrei2tubxveewluhu5lhy
       '@typescript-eslint/parser': 5.32.0_qugx7qdu5zevzvxaiqyxfiwquq
       '@vitest/ui': 0.20.2
+      chokidar: 3.5.3
       eslint: 8.21.0
       eslint-plugin-vue: 9.3.0_eslint@8.21.0
       parcel: 2.6.2_postcss@8.4.14
@@ -47,6 +52,7 @@ importers:
       stylelint-config-standard-scss: 5.0.0_uyk3cwxn3favstz4untq233szu
       turbo: 1.4.0
       typescript: 4.7.4
+      vite: 3.0.4_sass@1.54.0
       vitest: 0.20.2_wgmdbfl2yqieogyunpswohna6q
 
   apps/backend:
@@ -58,6 +64,7 @@ importers:
       '@types/ws': ^8.5.3
       fastify: ^4.3.0
       nodemon: ^2.0.16
+      superjson: ^1.9.1
       ws: ^8.8.1
     dependencies:
       '@doseofted/prim-example': link:../../libs/example
@@ -65,6 +72,7 @@ importers:
       '@doseofted/prim-rpc': link:../../libs/prim
       '@fastify/cors': 8.0.0
       fastify: 4.3.0
+      superjson: 1.9.1
       ws: 8.8.1
     devDependencies:
       '@types/ws': 8.5.3
@@ -82,6 +90,7 @@ importers:
       '@vueuse/head': ^0.7.9
       fastify: ^4.3.0
       jsdom: ^20.0.0
+      superjson: ^1.9.1
       typescript: ^4.7.4
       vite: ^3.0.4
       vite-plugin-pages: ^0.25.0
@@ -102,6 +111,7 @@ importers:
       '@vue/test-utils': 2.0.2_vue@3.2.37
       '@vueuse/head': 0.7.9_vue@3.2.37
       jsdom: 20.0.0
+      superjson: 1.9.1
       typescript: 4.7.4
       vite: 3.0.4
       vite-plugin-pages: 0.25.0_vite@3.0.4
@@ -2327,6 +2337,12 @@ packages:
     resolution: {integrity: sha512-JxbCBUdrfr6AQjOXrxoTvAMJO4HBTUIlBzslcJPAz+/KT8yk53fXun51u+RenNYvad/+Vc2DIz5o9UxlCDymFQ==}
     dev: true
 
+  /copy-anything/3.0.2:
+    resolution: {integrity: sha512-CzATjGXzUQ0EvuvgOCI6A4BGOo2bcVx8B+eC2nF862iv9fopnPQwlrbACakNCHRIJbCSBj+J/9JeDf60k64MkA==}
+    engines: {node: '>=12.13'}
+    dependencies:
+      is-what: 4.1.7
+
   /cors/2.8.5:
     resolution: {integrity: sha512-KIHbLJqu73RGr/hnbrO9uBeixNGuvSQjul/jdFvS/KFSIH1hWVd1ng7zOHx+YrEfInLG7q4n6GHQ9cDtxv/P6g==}
     engines: {node: '>= 0.10'}
@@ -4034,6 +4050,10 @@ packages:
       get-intrinsic: 1.1.2
     dev: true
 
+  /is-what/4.1.7:
+    resolution: {integrity: sha512-DBVOQNiPKnGMxRMLIYSwERAS5MVY1B7xYiGnpgctsOFvVDz9f9PFXXxMcTOHuoqYp4NK9qFYQaIC1NRRxLMpBQ==}
+    engines: {node: '>=12.13'}
+
   /isarray/2.0.5:
     resolution: {integrity: sha512-xHjhDr3cNBK0BzdUJSPXZntQUx/mwMS5Rw4A7lPJ90XGAO6ISP/ePDNuo0vhqOZU+UD5JoodwCAAoZQd3FeAKw==}
     dev: true
@@ -5642,6 +5662,12 @@ packages:
     transitivePeerDependencies:
       - supports-color
     dev: true
+
+  /superjson/1.9.1:
+    resolution: {integrity: sha512-oT3HA2nPKlU1+5taFgz/HDy+GEaY+CWEbLzaRJVD4gZ7zMVVC4GDNFdgvAZt6/VuIk6D2R7RtPAiCHwmdzlMmg==}
+    engines: {node: '>=10'}
+    dependencies:
+      copy-anything: 3.0.2
 
   /supertest/6.2.4:
     resolution: {integrity: sha512-M8xVnCNv+q2T2WXVzxDECvL2695Uv2uUj2O0utxsld/HRyJvOU8W9f1gvsYxSNU4wmIe0/L/ItnpU4iKq0emDA==}
