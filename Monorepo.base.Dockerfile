@@ -30,7 +30,7 @@ FROM monorepo-install as monorepo-build
 # First, start with libraries used in the project
 COPY --chown=node libs libs
 RUN pnpm install --offline --frozen-lockfile
-RUN pnpm build-libs
+RUN pnpm build --filter=./libs
 ENV NODE_ENV=development
-# If image is used directly, drop into shell for debugging
-CMD [ "pnpm", "build-deps" ]
+# Entrypoint will watch libs and rebuild with Turborepo commands in development
+CMD [ "pnpm", "entrypoint" ]
