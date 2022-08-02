@@ -9,7 +9,7 @@ services:
       - dist-example:/home/node/project/libs/example/dist
       - dist-plugins:/home/node/project/libs/plugins/dist
       - dist-prim:/home/node/project/libs/prim/dist
-      - dist-docs:/home/node/project/ui/docs/dist
+      - dist-docs:/home/node/project/libs/docs/dist
 
   backend:
     volumes: *dist-shared
