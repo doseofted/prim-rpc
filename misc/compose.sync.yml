@@ -5,14 +5,20 @@ services:
   libraries:
     volumes:
       # dist folder of each dependency to sync to other containers
-      &distributable-shared
-      - ./libs/example/dist:/home/node/project/libs/example/dist
-      - ./libs/plugins/dist:/home/node/project/libs/plugins/dist
-      - ./libs/prim/dist:/home/node/project/libs/prim/dist
-      - ./ui/docs/dist:/home/node/project/ui/docs/dist
+      &dist-shared
+      - dist-example:/home/node/project/libs/example/dist
+      - dist-plugins:/home/node/project/libs/plugins/dist
+      - dist-prim:/home/node/project/libs/prim/dist
+      - dist-docs:/home/node/project/ui/docs/dist
 
   backend:
-    volumes: *distributable-shared
+    volumes: *dist-shared
 
   frontend:
-    volumes: *distributable-shared
+    volumes: *dist-shared
+
+volumes:
+  dist-example:
+  dist-plugins:
+  dist-prim:
+  dist-docs:

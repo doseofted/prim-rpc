@@ -31,6 +31,7 @@ const config: UserConfig & { test?: VitestConfig } = {
 				},
 			},
 		},
+		// emptyOutDir: false,
 	},
 }
 
