@@ -12,10 +12,10 @@
       "cache": false
     },
     "lint": {
-      "dependsOn": []
+      "dependsOn": ["^build"]
     },
     "check": {
-      "dependsOn": []
+      "dependsOn": ["^build"]
     },
     "build": {
       "dependsOn": ["^build", "check", "lint"],

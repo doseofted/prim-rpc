@@ -54,7 +54,6 @@
 			"scss",
 			"vue"
 		],
-		"typescript.tsdk": "🌲 Project Root/node_modules/typescript/lib",
 		"eslint.validate": [
 			"javascript",
 			"javascriptreact",

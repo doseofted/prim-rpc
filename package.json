@@ -7,12 +7,14 @@
     "url": "https://doseofted.com/"
   },
   "version": "0.0.1",
-  "packageManager": "pnpm@7.5.2",
+  "packageManager": "pnpm@7.7.1",
   "license": "UNLICENSED",
   "private": true,
   "scripts": {
     "turbo": "turbo run",
     "zx": "zx",
+    "build": "turbo run build",
+    "watch": "turbo run watch",
     "build-deps": "zx build-deps.mjs",
     "watch-libs": "parcel watch 'libs/*'",
     "build-libs": "parcel build 'libs/*'",
@@ -26,7 +28,7 @@
     "lint-style": "turbo run lint-style"
   },
   "dependencies": {
-    "zx": "^7.0.7"
+    "zx": "^7.0.8"
   },
   "devDependencies": {
     "@parcel/config-default": "^2.6.2",
@@ -34,20 +36,20 @@
     "@parcel/packager-ts": "^2.6.2",
     "@parcel/transformer-typescript-types": "^2.6.2",
     "@parcel/validator-typescript": "^2.6.2",
-    "@typescript-eslint/eslint-plugin": "^5.30.7",
-    "@typescript-eslint/parser": "^5.30.7",
+    "@typescript-eslint/eslint-plugin": "^5.32.0",
+    "@typescript-eslint/parser": "^5.32.0",
     "@vitest/ui": "^0.20.2",
-    "eslint": "^8.20.0",
-    "eslint-plugin-vue": "^9.2.0",
+    "eslint": "^8.21.0",
+    "eslint-plugin-vue": "^9.3.0",
     "parcel": "^2.6.2",
     "postcss": "^8.4.14",
     "postcss-html": "^1.5.0",
-    "sass": "^1.53.0",
+    "sass": "^1.54.0",
     "stylelint": "^14.9.1",
     "stylelint-config-recommended-vue": "^1.4.0",
     "stylelint-config-standard-scss": "^5.0.0",
-    "turbo": "^1.3.2",
+    "turbo": "^1.4.0",
     "typescript": "^4.7.4",
-    "vitest": "^0.18.1"
+    "vitest": "^0.20.2"
   }
 }
