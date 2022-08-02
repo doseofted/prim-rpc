@@ -13,12 +13,12 @@
 			"path": "./libs/plugins"
 		},
 		{
-			"name": "📙 Example Library",
+			"name": "📗 Example Library",
 			"path": "./libs/example"
 		},
 		{
-			"name": "⚙️ Prim Docs UI",
-			"path": "./ui/docs"
+			"name": "📘 Prim Docs UI",
+			"path": "./libs/docs"
 		},
 		{
 			"name": "🌐 Example Frontend",

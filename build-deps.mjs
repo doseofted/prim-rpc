@@ -12,7 +12,6 @@ process.on("SIGTERM", () => { // sigterm received from docker-compose
 const inDevelopment = process.env.NODE_ENV === "development"
 if (inDevelopment) {
 	processes.buildLibs = $`pnpm watch-libs`
-	processes.buildUi = $`pnpm watch-ui`
 } else {
 	processes.tail = $`tail -f /dev/null`
 }

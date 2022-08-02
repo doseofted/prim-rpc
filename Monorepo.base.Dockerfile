@@ -31,10 +31,6 @@ FROM monorepo-install as monorepo-build
 COPY --chown=node libs libs
 RUN pnpm install --offline --frozen-lockfile
 RUN pnpm build-libs
-# Next, build interface components used in apps
-COPY --chown=node ui ui
-RUN pnpm install --offline --frozen-lockfile
-RUN pnpm build-ui
 ENV NODE_ENV=development
 # If image is used directly, drop into shell for debugging
 CMD [ "pnpm", "build-deps" ]
