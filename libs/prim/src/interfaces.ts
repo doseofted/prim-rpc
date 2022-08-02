@@ -44,9 +44,9 @@ export interface PrimWebSocketFunctionEvents {
 
 export interface JsonHandler {
 	// eslint-disable-next-line @typescript-eslint/no-explicit-any
-	stringify: (json: unknown) => string
+	stringify?: (json: unknown) => string
 	// eslint-disable-next-line @typescript-eslint/no-explicit-any
-	parse: <T = any>(string: string) => T
+	parse?: <T = any>(string: string) => T
 }
 
 export type PrimClientFunction = (endpoint: string, jsonBody: RpcCall|RpcCall[], jsonHandler?: JsonHandler) => Promise<RpcAnswer|RpcAnswer[]>
