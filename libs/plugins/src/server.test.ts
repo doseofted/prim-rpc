@@ -7,6 +7,7 @@ import express from "express"
 import Fastify from "fastify"
 import { WebSocketServer } from "ws"
 import type { Server } from "http"
+import jsonHandler from "superjson"
 
 // TODO: move tests to their own files where it makes sense
 // for instance, functions in client.ts would be defined in client.test.ts
@@ -67,6 +68,43 @@ describe("Fastify plugin is functional", async () => {
 			.close()
 			.expectClosed()
 	}) */
+})
+
+describe("Fastify plugin works with alternative JSON handler", async () => {
+	const prim = createPrimServer(example, { jsonHandler })
+	const app = Fastify()
+	await app.register(primFastifyPlugin, { prim, prefix: "/prim" })
+	const server = app.server
+	const websocket = new WebSocketServer({ server })
+	primWebSocketServerSetup(prim, websocket)
+	beforeEach(async () => {
+		await app.ready()
+		await new Promise(resolve => {
+			server.listen(0, "localhost", () => { resolve(true) })
+		})
+	})
+	afterEach(() => {
+		server.close()
+	})
+	const date = new Date()
+	const expectedResult = { id: 1, result: await example.whatIsDayAfter(date) }
+	test("over HTTP", async () => {
+		// client should transform body into superjson's form to match server
+		const superJsonBody = JSON.parse(jsonHandler.stringify({
+			id: 1,
+			method: "whatIsDayAfter",
+			params: [date],
+		})) as object
+		const response = await wsRequest(app.server)
+			.post("/prim")
+			.send(superJsonBody)
+			.set("Accept", "application/json")
+		// expect(response.headers["Content-Type"]).toBe(prefix)
+		// console.log(response.body)
+		const superjsonResponse = jsonHandler.parse(JSON.stringify(response.body))
+		expect(response.status).toEqual(200)
+		expect(superjsonResponse).toEqual(expectedResult)
+	})
 })
 
 describe("Express plugin is functional", () => {

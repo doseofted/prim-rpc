@@ -157,6 +157,7 @@ importers:
       fastify: ^4.3.0
       socket.io: ^4.5.0
       socket.io-client: ^4.5.0
+      superjson: ^1.9.1
       supertest: ^6.2.3
       superwstest: ^2.0.3
       ws: ^8.8.1
@@ -172,6 +173,7 @@ importers:
       fastify: 4.3.0
       socket.io: 4.5.1
       socket.io-client: 4.5.1
+      superjson: 1.9.1
       supertest: 6.2.4
       superwstest: 2.0.3_supertest@6.2.4
       ws: 8.8.1

@@ -79,22 +79,41 @@ export function createPrimServer<T extends Record<V, T[V]>, V extends keyof T = 
 			}
 			return { method, params, id }
 		})()
+		// TODO: find out how to deal with pre-parsed JSON. Fastify and Express/body-parser don't seem to provide string.
+		// Ideally JSON handler could be flexible enough to even handle YAML (not that you would) however when I'm provided
+		// an object and and custom JSON handler, I have to stringify result to use the given handler.
+		// However, I may want to
 		let { body } = given
 		// if given a JSON handler, use that parser rather than using result of parser used by server
 		// (it's encouraged to pass body as string from server when using separate JSON handler)
+		console.log("server given body", body, givenOptions.jsonHandler !== JSON, JSON === JSON)
 		if (givenOptions.jsonHandler !== JSON) {
 			if (typeof body !== "string") {
-				body = givenOptions.jsonHandler.stringify(body)
+				// since alternative JSON handling library will likely expect a string, transform given body to a string if
+				// server framework used with Prim has already parsed body.
+				// While ideally the server framework would just provide a string to Prim for parsing, most users of frameworks
+				// like Express will use body-parser which already transforms body without leaving a "raw body" for me to use
+				// NOTE: using native stringify instead of given JSON handler because input needs to be in format expected by
+				// JSON handler
+				body = JSON.stringify(body)
 			}
 			body = givenOptions.jsonHandler.parse(body)
 		} else if (typeof body === "string") {
 			// if custom handler is not given but body is still string, parse it using default JSON handler
 			body = givenOptions.jsonHandler.parse(body)
 		}
-		const callWithDefaults = (body: Partial<RpcCall>) => {
+		console.log("new body:", body)
+		const callWithDefaults = async (body: Partial<RpcCall>) => {
 			// TODO: stop defu from concatenating params
 			const rpc = defu<Partial<RpcCall>, RpcCall>(body, { id: nanoid(), method: "default" })
-			return makeRpcCall(rpc)
+			const result = await makeRpcCall(rpc)
+			// NOTE: use native JSON parse to keep any data that custom JSON handler added
+			// (for instance, superjson's meta property)
+			const resultParsed: typeof result = givenOptions.jsonHandler === JSON
+				? result
+				: JSON.parse(givenOptions.jsonHandler.stringify(result))
+			console.log("Returning result:", resultParsed)
+			return resultParsed
 		}
 		// if RPC calls are batched, answer all calls, otherwise answer the single RPC call
 		if (Array.isArray(body)) {

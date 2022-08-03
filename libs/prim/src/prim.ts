@@ -15,7 +15,6 @@ import mitt from "mitt"
 import { RpcCall, PrimOptions, RpcAnswer, PrimWebSocketEvents, PrimHttpEvents } from "./interfaces"
 import { createPrimOptions } from "./options"
 import { RpcErr, RpcError } from "./error"
-// Prim is intended to be used as ES Module but "lodash-es" is included in CJS bundle to avoid require() of ES module
 import { get as getProperty, remove as removeFromArray } from "lodash-es"
 
 /**
