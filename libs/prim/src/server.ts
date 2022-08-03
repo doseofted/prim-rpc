@@ -86,7 +86,7 @@ export function createPrimServer<T extends Record<V, T[V]>, V extends keyof T = 
 		let { body } = given
 		// if given a JSON handler, use that parser rather than using result of parser used by server
 		// (it's encouraged to pass body as string from server when using separate JSON handler)
-		if (givenOptions.jsonHandler !== JSON) {
+		if (givenOptions.jsonHandler !== JSON && typeof body !== "undefined") {
 			if (typeof body !== "string") {
 				// since alternative JSON handling library will likely expect a string, transform given body to a string if
 				// server framework used with Prim has already parsed body.
