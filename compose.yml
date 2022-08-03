@@ -41,5 +41,5 @@ services:
     image: doseofted/prim-frontend:latest
     environment:
       VITE_WEBSITE_HOST: $WEBSITE_HOST
-      CONTAINED: "true"
+      VITE_CONTAINED: "true"
     restart: "no"

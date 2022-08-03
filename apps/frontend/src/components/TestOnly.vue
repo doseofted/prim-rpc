@@ -13,7 +13,7 @@ const exampleArgs = { greeting: "Hey", name: "Ted" }
 const host = import.meta.env.VITE_WEBSITE_HOST
 
 const { sayHello, typeMessage } = createPrimClient<typeof exampleClient>({
-	endpoint: `https://api.${host}/prim`,
+	endpoint: import.meta.env.VITE_CONTAINED ? `https://api.${host}/prim` : "http://localhost:3001/prim",
 	clientBatchTime: 10,
 	// jsonHandler,
 })
