@@ -23,6 +23,9 @@ import type { Server as SocketIoServer } from "socket.io"
  */
 export const primFastifyPlugin: FastifyPluginAsync<{ prim: PrimServer, prefix?: string }> = async (fastify, options) => {
 	const { prefix = "/prim", prim } = options
+	// TODO: consider using "raw-body" module to get body as string to avoid extra stringify of JSON by Prim
+	// LINK: https://github.com/fastify/fastify/issues/707#issuecomment-364803293
+	// fastify.addContentTypeParser("*", (req, done) => { done() })
 	fastify.route<{ Body: RpcCall, Params: { method?: string } }>({
 		method: ["POST", "GET"],
 		url: "*", // NOTE: fastify handles prefix already

@@ -51,13 +51,21 @@ describe("Prim can use alternative JSON handler", () => {
 	// JSON handler is only useful with remote source (no local source test needed)
 	test("with remote source", async () => {
 		const prim = createPrimServer(exampleServer, { jsonHandler })
+		const date = new Date()
+		const expectedResult = await exampleServer.whatIsDayAfter(date)
 		const { whatIsDayAfter } = createPrimClient<typeof exampleClient>({
-			client: async (_endpoint, body) => prim.rpc({ body }),
+			client: async (_endpoint, bodyGiven, jsonHandler) => {
+				const body = jsonHandler.stringify(bodyGiven)
+				const found = await prim.rpc({ body })
+				console.log("found something:", found)
+				return jsonHandler.parse(JSON.stringify(found))
+			},
 			jsonHandler,
 		})
-		const date = new Date()
 		const result = await whatIsDayAfter(date)
-		expect(result).toEqual(await exampleServer.whatIsDayAfter(date))
+		console.log(result, expectedResult)
+		
+		expect(result).toEqual(expectedResult)
 		expect(result).toBeInstanceOf(Date)
 	})
 })

@@ -7,7 +7,7 @@ import { WebSocketServer } from "ws"
 import * as example from "@doseofted/prim-example"
 import { createPrimServer } from "@doseofted/prim-rpc"
 import { primFastifyPlugin, primWebSocketServerSetup } from "@doseofted/prim-plugins"
-import { default as jsonHandler } from "superjson"
+import jsonHandler from "superjson"
 
 const contained = JSON.parse(process.env.CONTAINED ?? "false") === true
 

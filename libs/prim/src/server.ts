@@ -86,7 +86,6 @@ export function createPrimServer<T extends Record<V, T[V]>, V extends keyof T = 
 		let { body } = given
 		// if given a JSON handler, use that parser rather than using result of parser used by server
 		// (it's encouraged to pass body as string from server when using separate JSON handler)
-		console.log("server given body", body, givenOptions.jsonHandler !== JSON, JSON === JSON)
 		if (givenOptions.jsonHandler !== JSON) {
 			if (typeof body !== "string") {
 				// since alternative JSON handling library will likely expect a string, transform given body to a string if
@@ -102,17 +101,17 @@ export function createPrimServer<T extends Record<V, T[V]>, V extends keyof T = 
 			// if custom handler is not given but body is still string, parse it using default JSON handler
 			body = givenOptions.jsonHandler.parse(body)
 		}
-		console.log("new body:", body)
 		const callWithDefaults = async (body: Partial<RpcCall>) => {
 			// TODO: stop defu from concatenating params
 			const rpc = defu<Partial<RpcCall>, RpcCall>(body, { id: nanoid(), method: "default" })
 			const result = await makeRpcCall(rpc)
 			// NOTE: use native JSON parse to keep any data that custom JSON handler added
 			// (for instance, superjson's meta property)
+			// TODO: if server framework used with Prim accepts text, JSON.parse is not needed
+			// (in which case remove the statement and just set Content-Type header in the used Prim Plugin)
 			const resultParsed: typeof result = givenOptions.jsonHandler === JSON
 				? result
 				: JSON.parse(givenOptions.jsonHandler.stringify(result))
-			console.log("Returning result:", resultParsed)
 			return resultParsed
 		}
 		// if RPC calls are batched, answer all calls, otherwise answer the single RPC call
