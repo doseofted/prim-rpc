@@ -88,3 +88,18 @@ tasks:
       - "rm -fr .parcel-cache"
       # Task doesn't run as root and it could be dangerous to remove project data, so this will be a manual step
       - "echo \"You'll need to remove data/* as root. The .env file in this project was kept.\""
+
+  build-libs:
+    cmds:
+      - pnpm entrypoint
+    env:
+      NODE_ENV: "development"
+  local-parallel:
+    deps:
+      - build-libs
+      - :frontend:entrypoint
+  local:
+    desc: "Run a local development environment watching and running all parts of project without the use of containers"
+    cmds:
+      - task: install
+      - task: local-parallel
