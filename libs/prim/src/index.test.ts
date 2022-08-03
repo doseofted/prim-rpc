@@ -3,6 +3,7 @@ import { createPrimClient, createPrimServer } from "."
 import type * as exampleClient from "@doseofted/prim-example"
 import * as exampleServer from "@doseofted/prim-example"
 import type { RpcAnswer } from "./interfaces"
+import jsonHandler from "superjson"
 
 // TODO: move tests to their own files where it makes sense
 // for instance, functions in options.ts would be defined in options.test.ts
@@ -43,6 +44,21 @@ describe("Prim Client can call methods directly", () => {
 		})
 		const result = await sayHello({ greeting: "Hey", name: "Ted" })
 		expect(result).toEqual("Hey Ted!")
+	})
+})
+
+describe("Prim can use alternative JSON handler", () => {
+	// JSON handler is only useful with remote source (no local source test needed)
+	test("with remote source", async () => {
+		const prim = createPrimServer(exampleServer, { jsonHandler })
+		const { whatIsDayAfter } = createPrimClient<typeof exampleClient>({
+			client: async (_endpoint, body) => prim.rpc({ body }),
+			jsonHandler,
+		})
+		const date = new Date()
+		const result = await whatIsDayAfter(date)
+		expect(result).toEqual(await exampleServer.whatIsDayAfter(date))
+		expect(result).toBeInstanceOf(Date)
 	})
 })
 

@@ -187,6 +187,7 @@ importers:
       mitt: ^3.0.0
       nanoid: ^4.0.0
       proxy-deep: ^3.1.1
+      superjson: ^1.9.1
       ufo: ^0.8.4
     dependencies:
       defu: 6.0.0
@@ -200,6 +201,7 @@ importers:
       '@types/lodash': 4.14.182
       '@types/lodash-es': 4.17.6
       lodash: 4.17.21
+      superjson: 1.9.1
 
 packages:
 

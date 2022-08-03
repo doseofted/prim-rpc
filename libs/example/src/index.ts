@@ -66,3 +66,7 @@ export function typeMessage(message: string, typeLetter: (typed: string) => void
 		}, ++timeout * speed)
 	})
 }
+
+export async function whatIsDayAfter (day: Date) {
+	return new Date(day.valueOf() + (1000 * 60 * 60 * 24))
+}
