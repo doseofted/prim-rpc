@@ -5,7 +5,7 @@ import * as exampleServer from "@doseofted/prim-example"
 import type * as exampleClient from "@doseofted/prim-example"
 import { HelloWorld } from "@doseofted/prim-docs"
 import "@doseofted/prim-docs/style.css"
-import { default as jsonHandler } from "superjson"
+import jsonHandler from "superjson"
 
 const primLocal = createPrimClient({ server: true, jsonHandler }, exampleServer)
 const expectedMessage = ref("")
