@@ -1,3 +1,4 @@
+enum Status { Idea, Implemented, PartiallyImplemented, Rejected }
 // import type { Asyncify } from "type-fest"
 /* eslint-disable @typescript-eslint/no-unused-vars */
 /**
@@ -28,7 +29,7 @@
  * but it would be nice to have a tight integration
  * with a UI framework so boilerplate code doesn't need to be written.
  */
-let reactiveInterfaceIdea: unknown
+let reactiveInterfaceIdea: Status.Idea
 
 /**
  * NOTE: implemented with HTTP, still might be nice to also allow option of sending requests over websocket (individually, not batched)
@@ -57,7 +58,7 @@ let reactiveInterfaceIdea: unknown
  * batched requests over websocket or batched HTTP requests, since implementing both may take more time. Ideally,
  * I could implement both over WebSocket with HTTP fallback if client is not setup, by using generic events.
  */
-let batchRequests: unknown
+let batchRequests: Status.PartiallyImplemented
 
 /**
  * Allow uploads of images by supporting multipart form data. Each field could be considered a property of an object
@@ -111,7 +112,7 @@ let batchRequests: unknown
  * specific HTTP/WS client which is fine if I write a Prim Plugin to support it but it would make it harder if someone
  * was to decide to write their own Prim Plugin).
  */
-let imageUploadsAndFormSupport: unknown
+let imageUploadsAndFormSupport: Status.Idea
 
 /**
  * Support object variable types like `Date` over network requests with Prim by using a separate JSON
@@ -126,7 +127,7 @@ let imageUploadsAndFormSupport: unknown
  * called, I could encapsulate each client plugin with a function that provides options. This way I could pass in
  * a separate JSON parsing library (such as "superjson" or even something as simple as  "json-bigint") to the client.
  */
-let nextIdea: unknown
+let customJsonHandling: Status.Implemented
 
 /**
  * When a request comes into Prim Server, send the answer over a list of configured webhooks.
@@ -134,7 +135,7 @@ let nextIdea: unknown
  * the server to contact each configured endpoint. I could potentially allow for a filter on what answers
  * to forward to webhook endpoints (for instance, regex or glob that matches function names)
  */
-let webhooks: unknown
+let webhooks: Status.Idea
 
 /**
  * Use Prim for easy IPC. The way this would work is to set up a Prim Client on the renderer process that communicates
@@ -154,7 +155,7 @@ let webhooks: unknown
  * that returns the result gathered from the Prim Server (regardless of whether function is local to main process
  * or a call to a remote server).
  */
-let electronSupport: unknown
+let electronSupport: Status.Idea
 
 /**
  * Currently I have to make each function async (regardless of whether promises are used) that type definitions are
@@ -176,41 +177,6 @@ let electronSupport: unknown
  * I could use the "type-fest" module for this since they have some type that could be helpful such as `SetReturnType`,
  * `Schema`, `IterableElement` and most importantly: `Asyncify`
  */
-let autoTransformModuleType: unknown
-// NOTE: types below seem to work, now I need to test it in the library 😀
-
-// interface toBeTransform {
-// 	test: (what: string) => string
-// 	callback?: (what: string, cb: () => boolean) => void
-// 	alreadyPromise?: () => Promise<boolean>
-// 	arrayForSomeReason?: [
-// 		() => void,
-// 		(what: string) => string,
-// 	],
-// 	somethingElse?: boolean
-// 	subModule: {
-// 		please: (hello: string, name: string) => string
-// 	}
-// }
-// type PromisifiedModule<ModuleGiven extends object> = {
-// 	[Key in keyof ModuleGiven]: ModuleGiven[Key] extends (...args: unknown[]) => unknown
-// 		? Asyncify<ModuleGiven[Key]>
-// 		: ModuleGiven[Key] extends object
-// 			? PromisifiedModule<ModuleGiven[Key]>
-// 			: ModuleGiven[Key]
-// }
-// type transformedType = PromisifiedModule<toBeTransform>
-// const testing: toBeTransform = {
-// 	test(what: string) {
-// 		return "what: " + what
-// 	},
-// 	subModule: {
-// 		please(hello, name) {
-// 			return hello + name
-// 		},
-// 	},
-// }
-// const testingPromise = testing as unknown as PromisifiedModule<toBeTransform>
-// const uhm = async () => await testingPromise.subModule.please("work", "prim")
+let autoTransformModuleType: Status.Implemented
 
 export {}
