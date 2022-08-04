@@ -52,19 +52,16 @@ describe("Prim can use alternative JSON handler", () => {
 	test("with remote source", async () => {
 		const prim = createPrimServer(exampleServer, { jsonHandler })
 		const date = new Date()
-		const expectedResult = await exampleServer.whatIsDayAfter(date)
+		const expectedResult = exampleServer.whatIsDayAfter(date)
 		const { whatIsDayAfter } = createPrimClient<typeof exampleClient>({
 			client: async (_endpoint, bodyGiven, jsonHandler) => {
 				const body = jsonHandler.stringify(bodyGiven)
 				const found = await prim.rpc({ body })
-				console.log("found something:", found)
 				return jsonHandler.parse(JSON.stringify(found))
 			},
 			jsonHandler,
 		})
 		const result = await whatIsDayAfter(date)
-		console.log(result, expectedResult)
-		
 		expect(result).toEqual(expectedResult)
 		expect(result).toBeInstanceOf(Date)
 	})
@@ -90,10 +87,10 @@ describe("Prim Client can throw errors", () => {
 	// LINK https://vitest.dev/api/#rejects
 	test("with local source", () => {
 		const { oops } = createPrimClient({ server: true }, exampleServer)
-		expect(() => {
+		void expect(async () => {
 			// eslint-disable-next-line @typescript-eslint/await-thenable
-			oops()
-		}).toThrow("My bad.")
+			await oops()
+		}).rejects.toThrow("My bad.")
 	})
 	test("with remote source", () => {
 		const prim = createPrimServer(exampleServer)
@@ -112,7 +109,7 @@ describe("Prim Client can use callbacks", () => {
 		await new Promise<void>(resolve => {
 			const { withCallback } = createPrimClient({ server: true }, exampleServer)
 			const results: string[] = []
-			withCallback((message) => {
+			void withCallback((message) => {
 				results.push(message)
 				if (results.length === 2) {
 					expect(results).toEqual(["You're using Prim.", "Still using Prim!"])
@@ -138,7 +135,7 @@ describe("Prim Client can use callbacks", () => {
 				},
 				client: async (_endpoint, body) => prim.rpc({ body }),
 			})
-			withCallback((message) => {
+			void withCallback((message) => {
 				results.push(message)
 				if (results.length === 2) {
 					expect(results).toEqual(["You're using Prim.", "Still using Prim!"])

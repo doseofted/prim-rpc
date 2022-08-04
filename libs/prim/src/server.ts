@@ -32,7 +32,8 @@ export interface PrimServer {
  * @param givenModule If `options.server` is true, provide the module where functions should be resolved
  * @returns A function that expects JSON resembling an RPC call
  */
-export function createPrimServer<T extends Record<V, T[V]>, V extends keyof T = keyof T>(givenModule?: T, options?: PrimOptions): PrimServer {
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+export function createPrimServer<T extends object = any>(givenModule?: T, options?: PrimOptions): PrimServer {
 	const ws = mitt<PrimWebSocketEvents>()
 	const givenOptions = createPrimOptions(options)
 	// if server is false, Prim Server should forward request to another Prim Server otherwise resolve locally
@@ -44,12 +45,13 @@ export function createPrimServer<T extends Record<V, T[V]>, V extends keyof T = 
 		// const args = Array.isArray(params) ? params : [params]
 		try {
 			const methodExpanded = method.split("/")
-			const target = getProperty<T, keyof T>(prim, methodExpanded as [keyof T])
+			// eslint-disable-next-line @typescript-eslint/no-explicit-any
+			const target = getProperty<typeof prim, keyof typeof prim>(prim, methodExpanded as [keyof T]) as (...args: any[]) => any
 			// console.log(methodExpanded)
 			// TODO: go through params and look for callbacks, using configured "options.socket" to send back response
 			if (Array.isArray(params)) {
-				return { result: await target(...params as unknown[]), id }
-			} else {
+				return { result: await target(...params), id }
+			} else if (typeof target === "function") {
 				return { result: await target(params), id }
 			}
 		} catch (e: unknown) {

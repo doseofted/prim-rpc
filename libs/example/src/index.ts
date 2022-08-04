@@ -16,7 +16,7 @@ export const you = "Ted"
  * @param options Options used for greeting
  * @returns A nice greeting
  */
-export async function sayHello (options: { greeting?: string, name?: string }) {
+export function sayHello (options: { greeting?: string, name?: string }) {
 	const { greeting, name } = options
 	return `${greeting ?? "Hello"} ${name ?? "you"}!`
 }
@@ -28,7 +28,7 @@ export async function sayHello (options: { greeting?: string, name?: string }) {
  * @param name What's your name?
  * @returns A nice greeting
  */
-export async function sayHelloAlternative(greeting: string, name: string) {
+export function sayHelloAlternative(greeting: string, name: string) {
 	return `${greeting ?? "Hello"} ${name ?? "you"}!`
 }
 
@@ -67,6 +67,6 @@ export function typeMessage(message: string, typeLetter: (typed: string) => void
 	})
 }
 
-export async function whatIsDayAfter (day: Date) {
+export function whatIsDayAfter (day: Date) {
 	return new Date(day.valueOf() + (1000 * 60 * 60 * 24))
 }

@@ -102,4 +102,5 @@ tasks:
     desc: "Run a local development environment watching and running all parts of project without the use of containers"
     cmds:
       - task: install
+      - pnpm build
       - task: local-parallel

@@ -16,15 +16,16 @@ import { RpcCall, PrimOptions, RpcAnswer, PrimWebSocketEvents, PrimHttpEvents } 
 import { createPrimOptions } from "./options"
 import { RpcErr, RpcError } from "./error"
 import { get as getProperty, remove as removeFromArray } from "lodash-es"
-// import type { Asyncify } from "type-fest"
+import type { Asyncify } from "type-fest"
 
-// type PromisifiedModule<ModuleGiven extends object> = {
-// 	[Key in keyof ModuleGiven]: ModuleGiven[Key] extends (...args: unknown[]) => unknown
-// 		? Asyncify<ModuleGiven[Key]>
-// 		: ModuleGiven[Key] extends object
-// 			? PromisifiedModule<ModuleGiven[Key]>
-// 			: ModuleGiven[Key]
-// }
+type PromisifiedModule<ModuleGiven extends object> = {
+	// eslint-disable-next-line @typescript-eslint/no-explicit-any
+	[Key in keyof ModuleGiven]: ModuleGiven[Key] extends (...args: any[]) => any
+		? Asyncify<ModuleGiven[Key]>
+		: ModuleGiven[Key] extends object
+			? PromisifiedModule<ModuleGiven[Key]>
+			: ModuleGiven[Key]
+}
 
 /**
  * Prim-RPC can be used to write plain functions on the server and then call them easily from the client.
@@ -36,7 +37,7 @@ import { get as getProperty, remove as removeFromArray } from "lodash-es"
  * @returns A wrapper function around the given module or type definitions used for calling functions from server
  */
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
-export function createPrimClient<T extends object = any>(options?: PrimOptions, givenModule?: T) {
+export function createPrimClient<T extends object = any>(options?: PrimOptions, givenModule?: T): PromisifiedModule<T> {
 	const configured = createPrimOptions(options)
 	const empty = {} as T // when not given on client-side, treat empty object as T
 	// SECTION proxy to resolve function calls
@@ -182,5 +183,5 @@ export function createPrimClient<T extends object = any>(options?: PrimOptions, 
 		batchedRequests()
 	})
 	// !SECTION
-	return proxy  // as unknown as PromisifiedModule<T>
+	return proxy as unknown as PromisifiedModule<T>
 }
