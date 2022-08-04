@@ -1,3 +1,4 @@
+import type { Asyncify } from "type-fest"
 /* eslint-disable @typescript-eslint/no-unused-vars */
 /**
  * IDEA: consider creating createPrimUniversal that creates two instances of Prim, one for
@@ -154,5 +155,48 @@ let webhooks: unknown
  * or a call to a remote server).
  */
 let electronSupport: unknown
+
+/**
+ * Currently I have to make each function async (regardless of whether promises are used) that type definitions are
+ * correct when accessed from the client (because function is going over the internet). However, that function doesn't
+ * need to be async on the server and becomes a nuisance because otherwise plain functions now need to be async if they
+ * depend on a result of that function used in Prim client.
+ *
+ * Technically, the function doesn't have to be async because you can await anything including non-promises but since
+ * TypeScript complains I could see someone potentially making all functions async which is a nuisance. This is
+ * especially problematic because if someone edits that code and their IDE doesn't do type-checking, they may expect
+ * that a function returns a regular value (when called on the server, not client of course) not knowing that it's
+ * actually wrapped in a promise.
+ *
+ * So, ideally I'd be able to take the module types given to the Prim client and deeply convert all contained functions
+ * to an async function since all functions are async on the client regardless of TypeScript types. The types used
+ * now are not correct since I'm actually returning a proxy object and the actual return type on the the client is a
+ * promise. I just need to make the types reflect this.
+ *
+ * I could use the "type-fest" module for this since they have some type that could be helpful such as `SetReturnType`,
+ * `Schema`, `IterableElement` and most importantly: `Asyncify`
+ */
+let autoTransformModuleType: unknown
+// NOTE: types below seem to work, now I need to test it in the library 😀
+
+interface toBeTransform {
+	test: (what: string) => string
+	callback: (what: string, cb: () => boolean) => void
+	alreadyPromise: () => Promise<boolean>
+	arrayForSomeReason: [
+		() => void,
+		(what: string) => string,
+	],
+	somethingElse: boolean
+}
+
+type PromisifiedModule<ModuleGiven extends object> = {
+	[Key in keyof ModuleGiven]: ModuleGiven[Key] extends (...args: unknown[]) => unknown
+		? Asyncify<ModuleGiven[Key]>
+		: ModuleGiven[Key] extends object
+			? PromisifiedModule<ModuleGiven[Key]>
+			: ModuleGiven[Key]
+}
+type transformedType = PromisifiedModule<toBeTransform>
 
 export {}

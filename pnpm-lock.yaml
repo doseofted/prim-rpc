@@ -190,6 +190,7 @@ importers:
       nanoid: ^4.0.0
       proxy-deep: ^3.1.1
       superjson: ^1.9.1
+      type-fest: ^2.18.0
       ufo: ^0.8.4
     dependencies:
       defu: 6.0.0
@@ -204,6 +205,7 @@ importers:
       '@types/lodash-es': 4.17.6
       lodash: 4.17.21
       superjson: 1.9.1
+      type-fest: 2.18.0
 
 packages:
 
@@ -6049,6 +6051,11 @@ packages:
   /type-fest/0.8.1:
     resolution: {integrity: sha512-4dbzIzqvjtgiM5rw1k5rEHtBANKmdudhGyBEajN01fEyhaAIhsoKNy6y7+IN93IfpFtwY9iqi7kD+xwKhQsNJA==}
     engines: {node: '>=8'}
+    dev: true
+
+  /type-fest/2.18.0:
+    resolution: {integrity: sha512-pRS+/yrW5TjPPHNOvxhbNZexr2bS63WjrMU8a+VzEBhUi9Tz1pZeD+vQz3ut0svZ46P+SRqMEPnJmk2XnvNzTw==}
+    engines: {node: '>=12.20'}
     dev: true
 
   /type-is/1.6.18:

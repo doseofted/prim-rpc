@@ -29,7 +29,8 @@
     "@types/lodash": "^4.14.182",
     "@types/lodash-es": "^4.17.6",
     "lodash": "^4.17.21",
-    "superjson": "^1.9.1"
+    "superjson": "^1.9.1",
+    "type-fest": "^2.18.0"
   },
   "source": "src/index.ts",
   "types": "dist/index.d.ts",
