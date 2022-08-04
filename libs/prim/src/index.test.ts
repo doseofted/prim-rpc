@@ -90,9 +90,9 @@ describe("Prim Client can throw errors", () => {
 	// LINK https://vitest.dev/api/#rejects
 	test("with local source", () => {
 		const { oops } = createPrimClient({ server: true }, exampleServer)
-		expect(async () => {
+		expect(() => {
 			// eslint-disable-next-line @typescript-eslint/await-thenable
-			await oops()
+			oops()
 		}).toThrow("My bad.")
 	})
 	test("with remote source", () => {
