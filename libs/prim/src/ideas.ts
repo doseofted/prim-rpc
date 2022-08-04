@@ -1,4 +1,4 @@
-import type { Asyncify } from "type-fest"
+// import type { Asyncify } from "type-fest"
 /* eslint-disable @typescript-eslint/no-unused-vars */
 /**
  * IDEA: consider creating createPrimUniversal that creates two instances of Prim, one for
@@ -179,24 +179,38 @@ let electronSupport: unknown
 let autoTransformModuleType: unknown
 // NOTE: types below seem to work, now I need to test it in the library 😀
 
-interface toBeTransform {
-	test: (what: string) => string
-	callback: (what: string, cb: () => boolean) => void
-	alreadyPromise: () => Promise<boolean>
-	arrayForSomeReason: [
-		() => void,
-		(what: string) => string,
-	],
-	somethingElse: boolean
-}
-
-type PromisifiedModule<ModuleGiven extends object> = {
-	[Key in keyof ModuleGiven]: ModuleGiven[Key] extends (...args: unknown[]) => unknown
-		? Asyncify<ModuleGiven[Key]>
-		: ModuleGiven[Key] extends object
-			? PromisifiedModule<ModuleGiven[Key]>
-			: ModuleGiven[Key]
-}
-type transformedType = PromisifiedModule<toBeTransform>
+// interface toBeTransform {
+// 	test: (what: string) => string
+// 	callback?: (what: string, cb: () => boolean) => void
+// 	alreadyPromise?: () => Promise<boolean>
+// 	arrayForSomeReason?: [
+// 		() => void,
+// 		(what: string) => string,
+// 	],
+// 	somethingElse?: boolean
+// 	subModule: {
+// 		please: (hello: string, name: string) => string
+// 	}
+// }
+// type PromisifiedModule<ModuleGiven extends object> = {
+// 	[Key in keyof ModuleGiven]: ModuleGiven[Key] extends (...args: unknown[]) => unknown
+// 		? Asyncify<ModuleGiven[Key]>
+// 		: ModuleGiven[Key] extends object
+// 			? PromisifiedModule<ModuleGiven[Key]>
+// 			: ModuleGiven[Key]
+// }
+// type transformedType = PromisifiedModule<toBeTransform>
+// const testing: toBeTransform = {
+// 	test(what: string) {
+// 		return "what: " + what
+// 	},
+// 	subModule: {
+// 		please(hello, name) {
+// 			return hello + name
+// 		},
+// 	},
+// }
+// const testingPromise = testing as unknown as PromisifiedModule<toBeTransform>
+// const uhm = async () => await testingPromise.subModule.please("work", "prim")
 
 export {}
