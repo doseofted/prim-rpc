@@ -124,10 +124,12 @@ importers:
   libs/docs:
     specifiers:
       '@types/node': ^18.6.3
+      '@unocss/reset': ^0.45.5
       '@vitejs/plugin-vue': ^3.0.1
       '@vue/test-utils': ^2.0.0
       '@vueuse/core': ^9.1.0
       jsdom: ^20.0.0
+      pts: ^0.10.12
       typescript: ^4.7.4
       unocss: ^0.45.5
       vite: ^3.0.4
@@ -138,10 +140,12 @@ importers:
       vue: 3.2.37
     devDependencies:
       '@types/node': 18.6.3
+      '@unocss/reset': 0.45.5
       '@vitejs/plugin-vue': 3.0.1_vite@3.0.4+vue@3.2.37
       '@vue/test-utils': 2.0.2_vue@3.2.37
       '@vueuse/core': 9.1.0_vue@3.2.37
       jsdom: 20.0.0
+      pts: 0.10.12
       typescript: 4.7.4
       unocss: 0.45.5_vite@3.0.4
       vite: 3.0.4
@@ -1898,7 +1902,7 @@ packages:
       '@unocss/scope': 0.45.5
       '@unocss/transformer-directives': 0.45.5
       magic-string: 0.26.2
-      vite: 3.0.4_sass@1.54.0
+      vite: 3.0.4
     dev: true
 
   /@vitejs/plugin-vue/3.0.1_vite@3.0.4+vue@3.2.37:
@@ -5320,6 +5324,10 @@ packages:
 
   /pstree.remy/1.1.8:
     resolution: {integrity: sha512-77DZwxQmxKnu3aR542U+X8FypNzbfJ+C5XQDk3uWjWxn6151aIMGthWYRXTqT1E5oJvg+ljaa2OJi+VfvCOQ8w==}
+    dev: true
+
+  /pts/0.10.12:
+    resolution: {integrity: sha512-kTBupxp7B/sW/iiOjqhiJ9artcvhw3KXtMzdy8zCAX0zwDPHPBoSqPUvoCpRZmdu8jtRBwQV/eE0HzoHU3NyYQ==}
     dev: true
 
   /punycode/2.1.1:
