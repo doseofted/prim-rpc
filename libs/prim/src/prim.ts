@@ -18,9 +18,10 @@ import { RpcErr, RpcError } from "./error"
 import { get as getProperty, remove as removeFromArray } from "lodash-es"
 import type { Asyncify } from "type-fest"
 
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+type AnyFunction = (...args: any[]) => any
 type PromisifiedModule<ModuleGiven extends object> = {
-	// eslint-disable-next-line @typescript-eslint/no-explicit-any
-	[Key in keyof ModuleGiven]: ModuleGiven[Key] extends (...args: any[]) => any
+	[Key in keyof ModuleGiven]: ModuleGiven[Key] extends AnyFunction
 		? Asyncify<ModuleGiven[Key]>
 		: ModuleGiven[Key] extends object
 			? PromisifiedModule<ModuleGiven[Key]>
