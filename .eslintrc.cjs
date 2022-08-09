@@ -36,23 +36,27 @@ const sharedRules = (() => {
 })()
 
 /** @type {import("eslint").ESLint.ConfigData} */
-module.exports = {
+const config = {
 	root: true,
-	extends: [
-		"eslint:recommended",
-	],
 	parserOptions: {
 		ecmaVersion: "latest",
 		sourceType: "module",
-	},
-	rules: {
-		...sharedRules.javascript,
 	},
 	env: {
 		"node": true,
 		"es6": true,
 	},
+	rules: {},
 	overrides: [
+		{
+			files: ["*.js", "*.jsx", "*.mjs", "*.cjs"],
+			extends: [
+				"eslint:recommended",
+			],
+			rules: {
+				...sharedRules.javascript,
+			},
+		},
 		{
 			files: ["*.ts", "*.tsx"],
 			parser: "@typescript-eslint/parser",
@@ -80,3 +84,5 @@ module.exports = {
 		},
 	],
 }
+// console.log(JSON.stringify(config, null, "  "))
+module.exports = config
