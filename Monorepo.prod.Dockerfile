@@ -1,5 +1,5 @@
 # This image is intended to act as a base in production and will have additional files built on top of it
-FROM node:16.15-bullseye-slim as production-base
+FROM node:18.7-bullseye-slim as production-base
 USER root
 # PNPM will be used to install production dependencies
 RUN corepack enable

@@ -1,4 +1,4 @@
-FROM node:16.15-bullseye as monorepo-install
+FROM node:18.7-bullseye as monorepo-install
 USER root
 # Corepack is still experimental and not enabled by default
 # LINK https://nodejs.org/api/corepack.html#enabling-the-feature

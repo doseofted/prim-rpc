@@ -21,3 +21,8 @@ tasks:
     desc: "[staging] Start all services in project"
     cmds:
       - task: :compose:staging:up-only
+
+  clear:
+    desc: "Clear dangling build cache, images, networks, etc. (pass `--all` as needed)"
+    cmds:
+      - docker system prune {{.CLI_ARGS}}
