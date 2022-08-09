@@ -4,10 +4,15 @@ import vue from "@vitejs/plugin-vue"
 import dts from "vite-plugin-dts"
 import type { UserConfig as VitestConfig } from "vitest"
 import type { UserConfig } from "vite"
+import unocss from "unocss/vite"
 
 // https://vitejs.dev/config/
 const config: UserConfig & { test?: VitestConfig } = {
-	plugins: [vue(), dts()],
+	plugins: [
+		vue(),
+		dts(),
+		unocss(),
+	],
 	test: {
 		globals: true,
 		environment: "jsdom",

@@ -34,8 +34,10 @@ tasks:
           -conf /root/Corefile
 
   install:
-    desc: "Install node modules"
+    desc: "Set Node version and install node modules with PNPM"
     cmds:
+      - "corepack enable"
+      - "pnpm env use --global 18.7.0"
       - "pnpm install"
 
   setup:

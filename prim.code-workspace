@@ -101,6 +101,7 @@
 		"cSpell.enableFiletypes": [
 			"dockerfile"
 		],
+		"unocss.root": "./",
 	},
 	"extensions": {
 		"recommendations": [
