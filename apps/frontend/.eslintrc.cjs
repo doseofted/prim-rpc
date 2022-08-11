@@ -3,7 +3,6 @@ module.exports = {
 	root: false,
 	overrides: [{
 		files: ["*.ts", "*.tsx"],
-		// LINK https://eslint.vuejs.org/user-guide/#how-to-use-a-custom-parser
 		parser: "@typescript-eslint/parser",
 		parserOptions: {
 			sourceType: "module",
@@ -12,7 +11,6 @@ module.exports = {
 			"@typescript-eslint",
 			"solid",
 		],
-		// LINK https://eslint.vuejs.org/user-guide/#bundle-configurations
 		extends: [
 			"eslint:recommended",
 			"plugin:@typescript-eslint/recommended",

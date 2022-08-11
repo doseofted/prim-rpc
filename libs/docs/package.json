@@ -11,15 +11,12 @@
   "scripts": {
     "build": "vite build",
     "watch": "vite build --watch",
-    "check": "vue-tsc --noEmit",
+    "check": "tsc --noEmit",
     "dev": "vite",
     "lint": "eslint --ext .js,.jsx,.ts,.tsx .",
     "lint-style": "stylelint '**/*.{css,scss}'",
     "test": "vitest run",
     "testing": "vitest watch"
-  },
-  "dependencies": {
-    "vue": "^3.2.25"
   },
   "devDependencies": {
     "@types/lodash-es": "^4.17.6",

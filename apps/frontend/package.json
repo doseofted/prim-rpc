@@ -12,7 +12,7 @@
     "build": "vite build",
     "watch": "vite",
     "start": "node server.mjs",
-    "check": "vue-tsc --noEmit",
+    "check": "tsc --noEmit",
     "lint": "eslint --ext .js,.jsx,.ts,.tsx .",
     "lint-style": "stylelint '**/*.{css,scss}'",
     "test": "vitest run",

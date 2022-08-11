@@ -30,15 +30,11 @@ const config: UserConfig & { test?: VitestConfig } = {
 			fileName: (format) => `lib.${format}.${format === "es" ? "m" : "c"}js`,
 		},
 		rollupOptions: {
-			// make sure to externalize deps that shouldn't be bundled
-			// into your library
-			// external: ["solid-js", "styled-components"],
+			// externalize deps that shouldn't be bundled
+			// external: [],
+			// provide global variables to use in the UMD build
 			// output: {
-			// 	// Provide global variables to use in the UMD build
-			// 	// for externalized deps
-			// 	globals: {
-			// 		vue: "Vue",
-			// 	},
+			// 	globals: {},
 			// },
 		},
 		// emptyOutDir: false,

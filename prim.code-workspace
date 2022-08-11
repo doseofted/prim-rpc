@@ -53,16 +53,14 @@
 			"css",
 			"less",
 			"postcss",
-			"scss",
-			"vue"
+			"scss"
 		],
 		"eslint.format.enable": true,
 		"eslint.validate": [
 			"javascript",
 			"javascriptreact",
 			"typescript",
-			"typescriptreact",
-			"vue"
+			"typescriptreact"
 		],
 		"yaml.schemas": {
 			"https://raw.githubusercontent.com/compose-spec/compose-spec/master/schema/compose-spec.json": "compose.*.yml",
@@ -114,12 +112,8 @@
 			"ms-azuretools.vscode-docker",
 			"dbaeumer.vscode-eslint",
 			"stylelint.vscode-stylelint",
-			"vue.volar",
 			"irongeek.vscode-env",
 			"streetsidesoftware.code-spell-checker"
-		],
-		"unwantedRecommendations": [
-			"octref.vetur"
 		]
 	}
 }
