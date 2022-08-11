@@ -15,14 +15,16 @@ importers:
       '@vitest/ui': ^0.20.2
       chokidar: ^3.5.3
       eslint: ^8.21.0
+      eslint-plugin-solid: ^0.7.1
       eslint-plugin-vue: ^9.3.0
       parcel: ^2.6.2
       postcss: ^8.4.14
       postcss-html: ^1.5.0
       sass: ^1.54.0
       stylelint: ^14.9.1
+      stylelint-config-recommended: ^8.0.0
+      stylelint-config-recommended-scss: ^7.0.0
       stylelint-config-recommended-vue: ^1.4.0
-      stylelint-config-standard-scss: ^5.0.0
       turbo: ^1.4.0
       typescript: ^4.7.4
       unocss: ^0.45.5
@@ -43,14 +45,16 @@ importers:
       '@vitest/ui': 0.20.2
       chokidar: 3.5.3
       eslint: 8.21.0
+      eslint-plugin-solid: 0.7.1_qugx7qdu5zevzvxaiqyxfiwquq
       eslint-plugin-vue: 9.3.0_eslint@8.21.0
       parcel: 2.6.2_postcss@8.4.14
       postcss: 8.4.14
       postcss-html: 1.5.0
       sass: 1.54.0
       stylelint: 14.9.1
+      stylelint-config-recommended: 8.0.0_stylelint@14.9.1
+      stylelint-config-recommended-scss: 7.0.0_uyk3cwxn3favstz4untq233szu
       stylelint-config-recommended-vue: 1.4.0_5rxrxgs7sjazj2ve56ds3kmipi
-      stylelint-config-standard-scss: 5.0.0_uyk3cwxn3favstz4untq233szu
       turbo: 1.4.0
       typescript: 4.7.4
       unocss: 0.45.5_vite@3.0.4
@@ -152,21 +156,13 @@ importers:
 
   libs/docs-2:
     specifiers:
-      '@types/jsdom': ^20.0.0
       '@types/lodash-es': ^4.17.6
       '@types/node': ^18.6.3
       '@unocss/reset': ^0.45.5
-      eslint: ^8.21.0
-      eslint-plugin-solid: ^0.7.1
-      jsdom: ^20.0.0
       lodash-es: ^4.17.21
       solid-js: ^1.4.8
       solid-styled-components: ^0.28.4
       solid-testing-library: ^0.3.0
-      stylelint: ^14.9.1
-      stylelint-config-recommended: ^8.0.0
-      stylelint-config-styled-components: ^0.1.1
-      stylelint-processor-styled-components: ^1.10.0
       typescript: ^4.7.4
       unocss: ^0.45.5
       vite: ^3.0.4
@@ -176,21 +172,13 @@ importers:
     dependencies:
       vue: 3.2.37
     devDependencies:
-      '@types/jsdom': 20.0.0
       '@types/lodash-es': 4.17.6
       '@types/node': 18.6.3
       '@unocss/reset': 0.45.5
-      eslint: 8.21.0
-      eslint-plugin-solid: 0.7.1_qugx7qdu5zevzvxaiqyxfiwquq
-      jsdom: 20.0.0
       lodash-es: 4.17.21
       solid-js: 1.4.8
       solid-styled-components: 0.28.4_solid-js@1.4.8
       solid-testing-library: 0.3.0_solid-js@1.4.8
-      stylelint: 14.9.1
-      stylelint-config-recommended: 8.0.0_stylelint@14.9.1
-      stylelint-config-styled-components: 0.1.1
-      stylelint-processor-styled-components: 1.10.0
       typescript: 4.7.4
       unocss: 0.45.5_vite@3.0.4
       vite: 3.0.4
@@ -1927,14 +1915,6 @@ packages:
       '@types/istanbul-lib-report': 3.0.0
     dev: true
 
-  /@types/jsdom/20.0.0:
-    resolution: {integrity: sha512-YfAchFs0yM1QPDrLm2VHe+WHGtqms3NXnXAMolrgrVP6fgBHHXy1ozAbo/dFtPNtZC/m66bPiCTWYmqp1F14gA==}
-    dependencies:
-      '@types/node': 18.6.3
-      '@types/tough-cookie': 4.0.2
-      parse5: 7.0.0
-    dev: true
-
   /@types/json-schema/7.0.11:
     resolution: {integrity: sha512-wOuvG1SN4Us4rez+tylwwwCV1psiNVOkJeM3AUWUNWg/jDQY2+HE/444y5gc+jBmRqASOm2Oeh5c1axHobwRKQ==}
     dev: true
@@ -2005,10 +1985,6 @@ packages:
     resolution: {integrity: sha512-X3HPWTwXRerBZS7Mo1k6vMVR1Z6zmJcDVn5O/31whe0tnjE4te6ZJSJGq1RiqHPjzPdMTfjCFogDJmwng9xHaQ==}
     dependencies:
       '@types/superagent': 4.1.15
-    dev: true
-
-  /@types/tough-cookie/4.0.2:
-    resolution: {integrity: sha512-Q5vtl1W5ue16D+nIaW8JWebSSraJVlK+EthKn7e7UcD4KWsaSJ8BqGPXNaPghgtcn/fhvrN17Tv8ksUsQpiplw==}
     dev: true
 
   /@types/web-bluetooth/0.0.15:
@@ -2299,7 +2275,7 @@ packages:
       '@unocss/scope': 0.45.5
       '@unocss/transformer-directives': 0.45.5
       magic-string: 0.26.2
-      vite: 3.0.4
+      vite: 3.0.4_sass@1.54.0
     dev: true
 
   /@vitejs/plugin-vue/3.0.1_vite@3.0.4+vue@3.2.37:
@@ -5714,10 +5690,6 @@ packages:
     resolution: {integrity: sha512-NOT9AcKiDGpnV/HBhI22Str++XWcErO/bALvHCuhv33owZW/CjH8KAFLZDCmu3727sihe0wTxpDhyGc6M8qacQ==}
     dev: true
 
-  /picocolors/0.2.1:
-    resolution: {integrity: sha512-cMlDqaLEqfSaW8Z7N5Jw+lyIW869EzT73/F5lhtY9cLGoVxSXznfgfXMO0Z5K0o0Q2TkTXq+0KFsdnSe3jDViA==}
-    dev: true
-
   /picocolors/1.0.0:
     resolution: {integrity: sha512-1fygroTLlHu66zi26VoTDv8yRgm0Fccecssto+MhsZ0D/DGW2sm8E8AjW7NU5VVTRt5GxbeZ5qBuJr+HyLYkjQ==}
 
@@ -5796,14 +5768,6 @@ packages:
 
   /postcss-value-parser/4.2.0:
     resolution: {integrity: sha512-1NNCs6uurfkVbeXG4S8JFT9t19m45ICnif8zWLd5oPSZ50QnwMfK+H3jv408d4jw/7Bttv5axS5IiHoLaVNHeQ==}
-    dev: true
-
-  /postcss/7.0.39:
-    resolution: {integrity: sha512-yioayjNbHn6z1/Bywyb2Y4s3yvDAeXGOyxqD+LnVOinq6Mdmd++SW2wUNVzavyyHxd6+DxzWGIuosg6P1Rj8uA==}
-    engines: {node: '>=6.0.0'}
-    dependencies:
-      picocolors: 0.2.1
-      source-map: 0.6.1
     dev: true
 
   /postcss/8.4.14:
@@ -6549,42 +6513,6 @@ packages:
       stylelint: ^14.8.0
     dependencies:
       stylelint: 14.9.1
-    dev: true
-
-  /stylelint-config-standard-scss/5.0.0_uyk3cwxn3favstz4untq233szu:
-    resolution: {integrity: sha512-zoXLibojHZYPFjtkc4STZtAJ2yGTq3Bb4MYO0oiyO6f/vNxDKRcSDZYoqN260Gv2eD5niQIr1/kr5SXlFj9kcQ==}
-    peerDependencies:
-      stylelint: ^14.9.0
-    dependencies:
-      stylelint: 14.9.1
-      stylelint-config-recommended-scss: 7.0.0_uyk3cwxn3favstz4untq233szu
-      stylelint-config-standard: 26.0.0_stylelint@14.9.1
-    transitivePeerDependencies:
-      - postcss
-    dev: true
-
-  /stylelint-config-standard/26.0.0_stylelint@14.9.1:
-    resolution: {integrity: sha512-hUuB7LaaqM8abvkOO84wh5oYSkpXgTzHu2Zza6e7mY+aOmpNTjoFBRxSLlzY0uAOMWEFx0OMKzr+reG1BUtcqQ==}
-    peerDependencies:
-      stylelint: ^14.9.0
-    dependencies:
-      stylelint: 14.9.1
-      stylelint-config-recommended: 8.0.0_stylelint@14.9.1
-    dev: true
-
-  /stylelint-config-styled-components/0.1.1:
-    resolution: {integrity: sha512-z5Xz/9GmvxO6e/DLzBMwkB85zHxEEjN6K7Cj80Bi+o/9vR9eS3GX3E9VuMnX9WLFYulqbqLtTapGGY28JBiy9Q==}
-    dev: true
-
-  /stylelint-processor-styled-components/1.10.0:
-    resolution: {integrity: sha512-g4HpN9rm0JD0LoHuIOcd/FIjTZCJ0ErQ+dC3VTxp+dSvnkV+MklKCCmCQEdz5K5WxF4vPuzfVgdbSDuPYGZhoA==}
-    dependencies:
-      '@babel/parser': 7.18.10
-      '@babel/traverse': 7.18.11
-      micromatch: 4.0.5
-      postcss: 7.0.39
-    transitivePeerDependencies:
-      - supports-color
     dev: true
 
   /stylelint-scss/4.3.0_stylelint@14.9.1:
