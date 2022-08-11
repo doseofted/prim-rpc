@@ -125,6 +125,45 @@ importers:
       vue-router: 4.1.3_vue@3.2.37
       vue-tsc: 0.39.4_typescript@4.7.4
 
+  apps/frontend-2:
+    specifiers:
+      '@doseofted/prim-docs': workspace:*
+      '@doseofted/prim-example': workspace:*
+      '@doseofted/prim-rpc': workspace:*
+      '@fastify/static': ^6.5.0
+      '@types/lodash-es': ^4.17.6
+      '@types/node': ^18.6.3
+      '@unocss/reset': ^0.45.5
+      fastify: ^4.3.0
+      lodash-es: ^4.17.21
+      solid-js: ^1.4.8
+      solid-styled-components: ^0.28.4
+      solid-testing-library: ^0.3.0
+      superjson: ^1.9.1
+      typescript: ^4.7.4
+      vite: ^3.0.4
+      vite-plugin-pages: ^0.25.0
+      vite-plugin-solid: ^2.3.0
+    dependencies:
+      '@doseofted/prim-docs': link:../../libs/docs
+      '@doseofted/prim-example': link:../../libs/example
+      '@doseofted/prim-rpc': link:../../libs/prim
+      '@fastify/static': 6.5.0
+      fastify: 4.3.0
+    devDependencies:
+      '@types/lodash-es': 4.17.6
+      '@types/node': 18.6.3
+      '@unocss/reset': 0.45.5
+      lodash-es: 4.17.21
+      solid-js: 1.4.8
+      solid-styled-components: 0.28.4_solid-js@1.4.8
+      solid-testing-library: 0.3.0_solid-js@1.4.8
+      superjson: 1.9.1
+      typescript: 4.7.4
+      vite: 3.0.4
+      vite-plugin-pages: 0.25.0_vite@3.0.4
+      vite-plugin-solid: 2.3.0_solid-js@1.4.8+vite@3.0.4
+
   libs/docs:
     specifiers:
       '@types/node': ^18.6.3
@@ -3200,7 +3239,7 @@ packages:
       isarray: 2.0.5
       object-is: 1.1.5
       object-keys: 1.1.1
-      object.assign: 4.1.2
+      object.assign: 4.1.3
       regexp.prototype.flags: 1.4.3
       side-channel: 1.0.4
       which-boxed-primitive: 1.0.2
@@ -5438,16 +5477,6 @@ packages:
   /object-keys/1.1.1:
     resolution: {integrity: sha512-NuAESUOUMrlIXOfHKzD6bpPu3tYt3xvjNdRIQ+FeT0lNb4K8WR70CaDxhuNguS2XG+GjkyMwOzsN5ZktImfhLA==}
     engines: {node: '>= 0.4'}
-    dev: true
-
-  /object.assign/4.1.2:
-    resolution: {integrity: sha512-ixT2L5THXsApyiUPYKmW+2EHpXXe5Ii3M+f4e+aJFAHao5amFRW6J0OO6c/LU8Be47utCx2GL89hxGB6XSmKuQ==}
-    engines: {node: '>= 0.4'}
-    dependencies:
-      call-bind: 1.0.2
-      define-properties: 1.1.4
-      has-symbols: 1.0.3
-      object-keys: 1.1.1
     dev: true
 
   /object.assign/4.1.3:
