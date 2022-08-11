@@ -3,10 +3,10 @@ import backend from "./client"
 
 const App: Component = () => {
 	const [typed, setTyped] = createSignal("")
-	const [hello] = createResource(() => backend.sayHello({ name: "Ted" }))
+	const [hello] = createResource(() => backend.sayHello({ greeting: "Hey", name: "Ted" }))
 	createEffect(() => {
-		console.log("created", 3)
 		if (hello.loading) { return }
+		// eslint-disable-next-line solid/reactivity
 		void backend.typeMessage(hello() ?? "", (letter) => {
 			setTyped(typed().concat(letter))
 		}, 50)
