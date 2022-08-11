@@ -1,21 +1,26 @@
-import { defineConfig } from "vite"
 import { resolve as resolvePath } from "node:path"
-import vue from "@vitejs/plugin-vue"
+import { defineConfig } from "vite"
 import dts from "vite-plugin-dts"
+import solid from "vite-plugin-solid"
+import unocss from "unocss/vite"
 import type { UserConfig as VitestConfig } from "vitest"
 import type { UserConfig } from "vite"
-import unocss from "unocss/vite"
 
 // https://vitejs.dev/config/
 const config: UserConfig & { test?: VitestConfig } = {
 	plugins: [
-		vue(),
+		solid(),
 		dts(),
 		unocss(),
 	],
 	test: {
-		globals: true,
 		environment: "jsdom",
+		transformMode: {
+			web: [/.[jt]sx?/],
+		},
+		deps: {
+			registerNodeLoader: true,
+		},
 	},
 	build: {
 		lib: {
@@ -27,14 +32,14 @@ const config: UserConfig & { test?: VitestConfig } = {
 		rollupOptions: {
 			// make sure to externalize deps that shouldn't be bundled
 			// into your library
-			external: ["vue"],
-			output: {
-				// Provide global variables to use in the UMD build
-				// for externalized deps
-				globals: {
-					vue: "Vue",
-				},
-			},
+			// external: ["solid-js", "styled-components"],
+			// output: {
+			// 	// Provide global variables to use in the UMD build
+			// 	// for externalized deps
+			// 	globals: {
+			// 		vue: "Vue",
+			// 	},
+			// },
 		},
 		// emptyOutDir: false,
 	},

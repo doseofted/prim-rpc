@@ -1,22 +1,22 @@
 /** @type {import("eslint").ESLint.ConfigData} */
 module.exports = {
-	root: true,
+	root: false,
 	overrides: [{
-		files: ["*.vue", "*.ts", "*.tsx"],
+		files: ["*.ts", "*.tsx"],
 		// LINK https://eslint.vuejs.org/user-guide/#how-to-use-a-custom-parser
-		parser: "vue-eslint-parser",
+		parser: "@typescript-eslint/parser",
 		parserOptions: {
-			parser: "@typescript-eslint/parser",
 			sourceType: "module",
 		},
 		plugins: [
 			"@typescript-eslint",
+			"solid",
 		],
 		// LINK https://eslint.vuejs.org/user-guide/#bundle-configurations
 		extends: [
 			"eslint:recommended",
 			"plugin:@typescript-eslint/recommended",
-			"plugin:vue/vue3-recommended",
+			"plugin:solid/typescript",
 		],
 		env: {
 			"browser": true,

@@ -1,4 +1,6 @@
-import HelloWorld from "./components/HelloWorld.vue"
+import App from "./components/App/App"
+import "./index.css"
 import "uno.css"
+// import "@unocss/reset/tailwind.css"
 
-export { HelloWorld }
+export { App }
