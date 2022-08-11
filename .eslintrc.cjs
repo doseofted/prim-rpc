@@ -68,10 +68,15 @@ const config = {
 			],
 			parserOptions: {
 				tsconfigRootDir: __dirname,
+				sourceType: "module",
 				project: [
 					"./tsconfig.json",
-					"./libs/*/tsconfig.json",
+					"./libs/**/tsconfig.json",
+					"./apps/**/tsconfig.json",
 				],
+				ecmaFeatures: {
+					jsx: true,
+				},
 			},
 			extends: [
 				"eslint:recommended",

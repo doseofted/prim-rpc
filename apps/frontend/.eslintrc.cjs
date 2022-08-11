@@ -10,6 +10,7 @@ module.exports = {
 				ecmaFeatures: {
 					jsx: true,
 				},
+				project: "./apps/frontend/tsconfig.json",
 			},
 			plugins: [
 				"@typescript-eslint",
@@ -22,13 +23,6 @@ module.exports = {
 			],
 			env: {
 				"browser": true,
-			},
-		},
-		{
-			files: ["*.tsx"],
-			rules: {
-				// NOTE: this is a workaround until I find out how to let ESLint know JSX element's return types
-				"@typescript-eslint/no-unsafe-return": "off",
 			},
 		},
 	],
