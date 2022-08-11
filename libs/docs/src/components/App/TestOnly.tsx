@@ -1,4 +1,4 @@
-import { createSignal, JSX } from "solid-js"
+import { createSignal } from "solid-js"
 import { styled } from "solid-styled-components"
 
 function TestOnly() {
@@ -10,7 +10,7 @@ function TestOnly() {
 		>
 			This is a{hover() ? " hover" : ""} test
 		</Div>
-	) as JSX.Element
+	)
 }
 
 const Div = styled("div")`

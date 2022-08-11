@@ -1,4 +1,4 @@
-import { Component, createEffect, createResource, createSignal, JSX } from "solid-js"
+import { Component, createEffect, createResource, createSignal } from "solid-js"
 import backend from "./client"
 
 const App: Component = () => {
@@ -15,7 +15,7 @@ const App: Component = () => {
 		<div>
 			<p>{typed()}</p>
 		</div>
-	) as JSX.Element
+	)
 }
 
 export default App

@@ -41,6 +41,9 @@ const config = {
 	parserOptions: {
 		ecmaVersion: "latest",
 		sourceType: "module",
+		ecmaFeatures: {
+			jsx: true,
+		},
 	},
 	env: {
 		"node": true,

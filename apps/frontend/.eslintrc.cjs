@@ -1,23 +1,35 @@
 /** @type {import("eslint").ESLint.ConfigData} */
 module.exports = {
 	root: false,
-	overrides: [{
-		files: ["*.ts", "*.tsx"],
-		parser: "@typescript-eslint/parser",
-		parserOptions: {
-			sourceType: "module",
+	overrides: [
+		{
+			files: ["*.ts", "*.tsx"],
+			parser: "@typescript-eslint/parser",
+			parserOptions: {
+				sourceType: "module",
+				ecmaFeatures: {
+					jsx: true,
+				},
+			},
+			plugins: [
+				"@typescript-eslint",
+				"solid",
+			],
+			extends: [
+				"eslint:recommended",
+				"plugin:@typescript-eslint/recommended",
+				"plugin:solid/typescript",
+			],
+			env: {
+				"browser": true,
+			},
 		},
-		plugins: [
-			"@typescript-eslint",
-			"solid",
-		],
-		extends: [
-			"eslint:recommended",
-			"plugin:@typescript-eslint/recommended",
-			"plugin:solid/typescript",
-		],
-		env: {
-			"browser": true,
+		{
+			files: ["*.tsx"],
+			rules: {
+				// NOTE: this is a workaround until I find out how to let ESLint know JSX element's return types
+				"@typescript-eslint/no-unsafe-return": "off",
+			},
 		},
-	}],
+	],
 }
