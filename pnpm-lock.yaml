@@ -16,7 +16,6 @@ importers:
       chokidar: ^3.5.3
       eslint: ^8.21.0
       eslint-plugin-solid: ^0.7.1
-      eslint-plugin-vue: ^9.3.0
       parcel: ^2.6.2
       postcss: ^8.4.14
       postcss-html: ^1.5.0
@@ -24,7 +23,6 @@ importers:
       stylelint: ^14.9.1
       stylelint-config-recommended: ^8.0.0
       stylelint-config-recommended-scss: ^7.0.0
-      stylelint-config-recommended-vue: ^1.4.0
       turbo: ^1.4.0
       typescript: ^4.7.4
       unocss: ^0.45.5
@@ -46,7 +44,6 @@ importers:
       chokidar: 3.5.3
       eslint: 8.21.0
       eslint-plugin-solid: 0.7.1_qugx7qdu5zevzvxaiqyxfiwquq
-      eslint-plugin-vue: 9.3.0_eslint@8.21.0
       parcel: 2.6.2_postcss@8.4.14
       postcss: 8.4.14
       postcss-html: 1.5.0
@@ -54,7 +51,6 @@ importers:
       stylelint: 14.9.1
       stylelint-config-recommended: 8.0.0_stylelint@14.9.1
       stylelint-config-recommended-scss: 7.0.0_uyk3cwxn3favstz4untq233szu
-      stylelint-config-recommended-vue: 1.4.0_5rxrxgs7sjazj2ve56ds3kmipi
       turbo: 1.4.0
       typescript: 4.7.4
       unocss: 0.45.5_vite@3.0.4
@@ -3760,24 +3756,6 @@ packages:
       - typescript
     dev: true
 
-  /eslint-plugin-vue/9.3.0_eslint@8.21.0:
-    resolution: {integrity: sha512-iscKKkBZgm6fGZwFt6poRoWC0Wy2dQOlwUPW++CiPoQiw1enctV2Hj5DBzzjJZfyqs+FAXhgzL4q0Ww03AgSmQ==}
-    engines: {node: ^14.17.0 || >=16.0.0}
-    peerDependencies:
-      eslint: ^6.2.0 || ^7.0.0 || ^8.0.0
-    dependencies:
-      eslint: 8.21.0
-      eslint-utils: 3.0.0_eslint@8.21.0
-      natural-compare: 1.4.0
-      nth-check: 2.1.1
-      postcss-selector-parser: 6.0.10
-      semver: 7.3.7
-      vue-eslint-parser: 9.0.3_eslint@8.21.0
-      xml-name-validator: 4.0.0
-    transitivePeerDependencies:
-      - supports-color
-    dev: true
-
   /eslint-scope/5.1.1:
     resolution: {integrity: sha512-2NxwbF/hZ0KpepYN0cNbo+FN6XoK7GaHlQhgx/hIZl6Va0bF45RQOOwhLIy8lQDbuCiadSLCBnH2CFYquit5bw==}
     engines: {node: '>=8.0.0'}
@@ -6498,17 +6476,6 @@ packages:
       inline-style-parser: 0.1.1
     dev: true
 
-  /stylelint-config-html/1.1.0_5rxrxgs7sjazj2ve56ds3kmipi:
-    resolution: {integrity: sha512-IZv4IVESjKLumUGi+HWeb7skgO6/g4VMuAYrJdlqQFndgbj6WJAXPhaysvBiXefX79upBdQVumgYcdd17gCpjQ==}
-    engines: {node: ^12 || >=14}
-    peerDependencies:
-      postcss-html: ^1.0.0
-      stylelint: '>=14.0.0'
-    dependencies:
-      postcss-html: 1.5.0
-      stylelint: 14.9.1
-    dev: true
-
   /stylelint-config-recommended-scss/7.0.0_uyk3cwxn3favstz4untq233szu:
     resolution: {integrity: sha512-rGz1J4rMAyJkvoJW4hZasuQBB7y9KIrShb20l9DVEKKZSEi1HAy0vuNlR8HyCKy/jveb/BdaQFcoiYnmx4HoiA==}
     peerDependencies:
@@ -6520,20 +6487,6 @@ packages:
       stylelint-scss: 4.3.0_stylelint@14.9.1
     transitivePeerDependencies:
       - postcss
-    dev: true
-
-  /stylelint-config-recommended-vue/1.4.0_5rxrxgs7sjazj2ve56ds3kmipi:
-    resolution: {integrity: sha512-DVJqyX2KvMCn9U0+keL12r7xlsH26K4Vg8NrIZuq5MoF7g82DpMp326Om4E0Q+Il1o+bTHuUyejf2XAI0iD04Q==}
-    engines: {node: ^12 || >=14}
-    peerDependencies:
-      postcss-html: ^1.0.0
-      stylelint: '>=14.0.0'
-    dependencies:
-      postcss-html: 1.5.0
-      semver: 7.3.7
-      stylelint: 14.9.1
-      stylelint-config-html: 1.1.0_5rxrxgs7sjazj2ve56ds3kmipi
-      stylelint-config-recommended: 8.0.0_stylelint@14.9.1
     dev: true
 
   /stylelint-config-recommended/8.0.0_stylelint@14.9.1:
@@ -7373,24 +7326,6 @@ packages:
         optional: true
     dependencies:
       vue: 3.2.37
-    dev: true
-
-  /vue-eslint-parser/9.0.3_eslint@8.21.0:
-    resolution: {integrity: sha512-yL+ZDb+9T0ELG4VIFo/2anAOz8SvBdlqEnQnvJ3M7Scq56DvtjY0VY88bByRZB0D4J0u8olBcfrXTVONXsh4og==}
-    engines: {node: ^14.17.0 || >=16.0.0}
-    peerDependencies:
-      eslint: '>=6.0.0'
-    dependencies:
-      debug: 4.3.4
-      eslint: 8.21.0
-      eslint-scope: 7.1.1
-      eslint-visitor-keys: 3.3.0
-      espree: 9.3.3
-      esquery: 1.4.0
-      lodash: 4.17.21
-      semver: 7.3.7
-    transitivePeerDependencies:
-      - supports-color
     dev: true
 
   /vue-router/4.1.3_vue@3.2.37:
