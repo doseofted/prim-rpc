@@ -1,10 +1,10 @@
-import { defineConfig } from "vite"
-import solid from 'vite-plugin-solid'
 import { resolve as resolvePath } from "node:path"
+import { defineConfig } from "vite"
 import dts from "vite-plugin-dts"
+import solid from "vite-plugin-solid"
+import unocss from "unocss/vite"
 import type { UserConfig as VitestConfig } from "vitest"
 import type { UserConfig } from "vite"
-import unocss from "unocss/vite"
 
 // https://vitejs.dev/config/
 const config: UserConfig & { test?: VitestConfig } = {
@@ -16,11 +16,11 @@ const config: UserConfig & { test?: VitestConfig } = {
 	test: {
 		environment: "jsdom",
 		transformMode: {
-      web: [/.[jt]sx?/],
-    },
-    deps: {
-      registerNodeLoader: true,
-    },
+			web: [/.[jt]sx?/],
+		},
+		deps: {
+			registerNodeLoader: true,
+		},
 	},
 	build: {
 		lib: {
