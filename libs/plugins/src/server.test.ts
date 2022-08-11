@@ -87,7 +87,7 @@ describe("Fastify plugin works with alternative JSON handler", async () => {
 		server.close()
 	})
 	const date = new Date()
-	const expectedResult = { id: 1, result: await example.whatIsDayAfter(date) }
+	const expectedResult = { id: 1, result: example.whatIsDayAfter(date) }
 	test("over HTTP", async () => {
 		// client should transform body into superjson's form to match server
 		const superJsonBody = JSON.parse(jsonHandler.stringify({

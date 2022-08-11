@@ -1,4 +1,4 @@
-import { Component, createMemo, lazy } from "solid-js"
+import { Component, createMemo, JSX, lazy } from "solid-js"
 import { styled, css } from "solid-styled-components"
 import { useMouse, useWindowSize } from "../../composables"
 
@@ -25,7 +25,7 @@ const App: Component<Props> = (props) => {
 			<p class={paragraph}>Your mouse is at ({mouse().x}, {mouse().y})</p>
 			<p class={paragraph}>From center: {Math.round(distance())}</p>
 			<TestOnly />
-		</BgGray>
+		</BgGray> as JSX.Element
 	)
 }
 

@@ -104,6 +104,7 @@
 			"dockerfile"
 		],
 		"unocss.root": "./",
+		"typescript.tsdk": "🌳 Project Root/node_modules/typescript/lib",
 	},
 	"extensions": {
 		"recommendations": [

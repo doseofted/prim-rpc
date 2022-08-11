@@ -1,4 +1,4 @@
-import { Component, createEffect, createResource, createSignal } from "solid-js"
+import { Component, createEffect, createResource, createSignal, JSX } from "solid-js"
 import backend from "./client"
 
 const App: Component = () => {
@@ -7,15 +7,15 @@ const App: Component = () => {
 	createEffect(() => {
 		if (hello.loading) { return }
 		// eslint-disable-next-line solid/reactivity
-		void backend.typeMessage(hello() ?? "", (letter) => {
+		void backend.typeMessage(hello() ?? "", letter => {
 			setTyped(typed().concat(letter))
-		}, 50)
+		}, 100)
 	})
 	return (
 		<div>
 			<p>{typed()}</p>
 		</div>
-	)
+	) as JSX.Element
 }
 
 export default App

@@ -77,9 +77,6 @@ const config = {
 			],
 			rules: {
 				...sharedRules.typescript,
-				// Prim allows this functionality so don't report it as error
-				// LINK https://typescript-eslint.io/rules/await-thenable/
-				"@typescript-eslint/await-thenable": "error",
 			},
 		},
 	],
