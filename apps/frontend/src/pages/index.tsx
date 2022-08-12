@@ -6,7 +6,9 @@ import { ParentEvent } from "./what"
 
 const App: Component = () => {
 	const [typed, setTyped] = createSignal("")
-	const [hello] = createResource(() => backend.sayHello({ greeting: "Hey", name: "Ted" }))
+	const [textInput, setTextInput] = createSignal("")
+	const [name, setName] = createSignal("Ted")
+	const [hello] = createResource(name, (name) => backend.sayHello({ greeting: "Hey", name }))
 	createEffect(() => {
 		if (hello.loading) { return }
 		// eslint-disable-next-line solid/reactivity
@@ -32,6 +34,14 @@ const App: Component = () => {
 				onMouseEnter={() => setHover(true)}
 				onMouseLeave={() => setHover(false)}
 			/>
+			<div class="flex gap-4">
+				<input
+					type="text" class="border-gray border rounded-full px-6 py-1"
+					value={textInput()}
+					onChange={(e) => { setTextInput(e.currentTarget.value) }}
+				/>
+				<button class="bg-gray hover:bg-light-gray px-6 py-1 rounded-full" onClick={() => setName(textInput())}>Change Text</button>
+			</div>
 			<p>{typed()}</p>
 			<p>You are {hover() ? "" : "not"} hovering.</p>
 			<ParentEvent>
