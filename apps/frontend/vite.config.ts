@@ -12,7 +12,7 @@ const config: UserConfig & { test?: VitestConfig } = {
 	plugins: [
 		solid(),
 		unocss(),
-		pages(),
+		pages({ exclude: ["**/*.test.tsx"] }),
 	],
 	test: {
 		environment: "jsdom",

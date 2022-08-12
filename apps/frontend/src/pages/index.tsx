@@ -1,5 +1,6 @@
 import { Component, createEffect, createResource, createSignal } from "solid-js"
-import backend from "./client"
+import { Title } from "@solidjs/meta"
+import backend from "../client"
 
 const App: Component = () => {
 	const [typed, setTyped] = createSignal("")
@@ -11,11 +12,13 @@ const App: Component = () => {
 			setTyped(typed().concat(letter))
 		}, 100)
 	})
-	return (
+	return <>
 		<div>
+			<Title>Example Broken Test</Title>
+
 			<p>{typed()}</p>
 		</div>
-	)
+	</>
 }
 
 export default App

@@ -1,10 +1,10 @@
 import { describe, expect, test } from "vitest"
 import { render } from "solid-testing-library"
-import App from "./App"
+import Index from "./index"
 
-describe("<TestOnly />", () => {
+describe("<Index />", () => {
 	test("it will render message", () => {
-		const { unmount, container } = render(() => <App />)
+		const { unmount, container } = render(() => <Index />)
 		const app = container.firstChild as HTMLDivElement
 		expect(app.innerHTML).toContain("Hello")
 		unmount()
