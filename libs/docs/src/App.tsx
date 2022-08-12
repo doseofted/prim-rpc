@@ -1,12 +1,12 @@
 import { Component, createMemo, lazy } from "solid-js"
 import { styled, css } from "solid-styled-components"
-import { useMouse, useWindowSize } from "../../composables"
+import { useMouse, useWindowSize } from "./composables"
 
 interface Props {
 	hello?: string
 }
 
-const TestOnly = lazy(() => import("./TestOnly"))
+const TestOnly = lazy(() => import("./components/TestOnly"))
 
 const App: Component<Props> = (props) => {
 	const { mouse, onMouseMove } = useMouse()
@@ -24,7 +24,7 @@ const App: Component<Props> = (props) => {
 			</p>
 			<p class={paragraph}>Your mouse is at ({mouse().x}, {mouse().y})</p>
 			<p class={paragraph}>From center: {Math.round(distance())}</p>
-			<TestOnly />
+			<TestOnly class={paragraph} />
 		</BgGray>
 	)
 }
