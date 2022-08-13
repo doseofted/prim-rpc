@@ -49,11 +49,12 @@ export function createPrimServer<T extends object = any>(givenModule?: T, option
 			const target = getProperty<typeof prim, keyof typeof prim>(prim, methodExpanded as [keyof T]) as (...args: any[]) => any
 			// console.log(methodExpanded)
 			// TODO: go through params and look for callbacks, using configured "options.socket" to send back response
-			if (Array.isArray(params)) {
-				return { result: await target(...params), id }
-			} else if (typeof target === "function") {
-				return { result: await target(params), id }
-			}
+			return { result: await Reflect.apply(target, undefined, params), id }
+			// if (Array.isArray(params)) {
+			// 	return { result: await target(...params), id }
+			// } else if (typeof target === "function") {
+			// 	return { result: await target(params), id }
+			// }
 		} catch (e: unknown) {
 			const err = e as RpcError<unknown>
 			// don't throw on server, simply return error to be interpreted as error on receiving client
