@@ -11,7 +11,7 @@ import jsonHandler from "superjson"
 describe("Prim instantiates", () => {
 	// use case: not sure yet, possibly to return optimistic local result while waiting on remote result
 	test("client instantiation, local source", () => {
-		const prim = createPrimClient({ server: true }, exampleServer)
+		const prim = createPrimClient({}, exampleServer)
 		expect(typeof prim.sayHelloAlternative === "function").toBeTruthy()
 	})
 	// use case: to contact remote server from client app (most common)
@@ -33,7 +33,7 @@ describe("Prim instantiates", () => {
 
 describe("Prim Client can call methods directly", () => {
 	test("with local source", async () => {
-		const { sayHello } = createPrimClient({ server: true }, exampleServer)
+		const { sayHello } = createPrimClient({}, exampleServer)
 		const result = await sayHello({ greeting: "Hey", name: "Ted" })
 		expect(result).toEqual("Hey Ted!")
 	})
@@ -69,7 +69,7 @@ describe("Prim can use alternative JSON handler", () => {
 
 describe("Prim Client can call deeply nested methods", () => {
 	test("with local source", async () => {
-		const prim = createPrimClient({ server: true }, exampleServer)
+		const prim = createPrimClient({}, exampleServer)
 		const result = await prim.testLevel2.testLevel1.sayHello({ greeting: "Hey", name: "Ted" })
 		expect(result).toEqual("Hey Ted!")
 	})
@@ -86,7 +86,7 @@ describe("Prim Client can call deeply nested methods", () => {
 describe("Prim Client can throw errors", () => {
 	// LINK https://vitest.dev/api/#rejects
 	test("with local source", () => {
-		const { oops } = createPrimClient({ server: true }, exampleServer)
+		const { oops } = createPrimClient({}, exampleServer)
 		void expect(async () => {
 			// eslint-disable-next-line @typescript-eslint/await-thenable
 			await oops()
@@ -107,7 +107,7 @@ describe("Prim Client can throw errors", () => {
 describe("Prim Client can use callbacks", () => {
 	test("with local source", async () => {
 		await new Promise<void>(resolve => {
-			const { withCallback } = createPrimClient({ server: true }, exampleServer)
+			const { withCallback } = createPrimClient({}, exampleServer)
 			const results: string[] = []
 			void withCallback((message) => {
 				results.push(message)
@@ -161,7 +161,6 @@ describe("Prim Server can call methods with RPC", () => {
 	test("from another Prim Server", async () => {
 		const primRemoteServer = createPrimServer(exampleServer)
 		const primServer = createPrimServer<typeof exampleClient>(undefined, {
-			server: false, // set to false so Prim will communicate with another server
 			client: async (_endpoint, body) => primRemoteServer.rpc({ body }),
 		})
 		const result = await primServer.rpc({

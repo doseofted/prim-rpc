@@ -36,8 +36,7 @@ export interface PrimServer {
 export function createPrimServer<T extends object = any>(givenModule?: T, options?: PrimOptions): PrimServer {
 	const ws = mitt<PrimWebSocketEvents>()
 	const givenOptions = createPrimOptions(options)
-	// if server is false, Prim Server should forward request to another Prim Server otherwise resolve locally
-	if (options?.server === undefined) { givenOptions.server = true } // assume `server` is true if option was not given
+	// Prim Server should forward request to another Prim Server otherwise resolve locally
 	givenOptions.internal = { event: ws }
 	const prim = createPrimClient<typeof givenModule>(givenOptions, givenModule)
 	const makeRpcCall = async (rpc: RpcCall): Promise<RpcAnswer> => {
@@ -49,7 +48,6 @@ export function createPrimServer<T extends object = any>(givenModule?: T, option
 			const target = getProperty<typeof prim, keyof typeof prim>(prim, methodExpanded as [keyof T]) as (...args: any[]) => any
 			// console.log(methodExpanded)
 			// TODO: go through params and look for callbacks, using configured "options.socket" to send back response
-			// TODO: con
 			const args = Array.isArray(params) ? params : [params]
 			return { result: await Reflect.apply(target, undefined, args), id }
 			// if (Array.isArray(params)) {

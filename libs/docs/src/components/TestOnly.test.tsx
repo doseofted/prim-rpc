@@ -6,9 +6,9 @@ describe("<TestOnly />", () => {
 	test("it will render message", () => {
 		const { unmount, container } = render(() => <TestOnly />)
 		const testOnly = container.firstChild as HTMLDivElement
-		expect(testOnly.innerHTML).toBe("This is a test")
+		expect(testOnly.innerHTML).toContain("This is a<!----> test")
 		fireEvent.mouseEnter(testOnly)
-		expect(testOnly.innerHTML).toBe("This is a hover test")
+		expect(testOnly.innerHTML).toContain("This is a hover<!----> test")
 		unmount()
 	})
 })

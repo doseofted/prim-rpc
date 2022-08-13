@@ -1,5 +1,4 @@
 import { Component, createEffect, createResource, createSignal, onMount } from "solid-js"
-import { Title } from "@solidjs/meta"
 import backend from "../client"
 import { TestOnly } from "@doseofted/prim-docs"
 import { ParentEvent } from "./what"
@@ -25,7 +24,6 @@ const App: Component = () => {
 	onMount(() => console.log())
 	return <>
 		<div>
-			<Title>Example Broken Test</Title>
 			<TestOnly
 				// eslint-disable-next-line @typescript-eslint/no-unsafe-return
 				// ref={e => setElem(e)}
@@ -44,6 +42,7 @@ const App: Component = () => {
 			</div>
 			<p>{typed()}</p>
 			<p>You are {hover() ? "" : "not"} hovering.</p>
+			<p>Hello</p>
 			<ParentEvent>
 				<p>Outer</p>
 			</ParentEvent>

@@ -13,8 +13,6 @@ import { defu } from "defu"
 export function createPrimOptions(options?: PrimOptions) {
 	// first initialize given options and values for which to fallback
 	const configured: PrimOptions = defu<PrimOptions, PrimOptions>(options, {
-		// by default, it should be assumed that function is used client-side (assumed value for easier developer use from client-side)
-		server: false,
 		// if endpoint is not given then assume endpoint is relative to current url, following suggested `/prim` for Prim-RPC calls
 		endpoint: "/prim", // NOTE this should be overridden on the client
 		wsEndpoint: "", // if not provided, Prim will try to use endpoint as websocket (useful when http/ws are on same path)

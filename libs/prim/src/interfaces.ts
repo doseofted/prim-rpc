@@ -69,8 +69,6 @@ export type PrimSocketFunction = (endpoint: string, events: PrimWebSocketFunctio
 })
 
 export interface PrimOptions {
-	/** `true` when Prim-RPC is used from server. A module to be resolved should also be given as argument to `createPrim` */
-	server?: boolean
 	/** When `options.server` is `false`, provide the server URL where Prim is being used, to be used from `options.client` */
 	endpoint?: string
 	/** When `options.server` is `false` and websocket endpoint is different from HTTP endpoint, provide the websocket URL where Prim is being used, to be used from `options.socket` */
