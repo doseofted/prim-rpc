@@ -37,8 +37,8 @@ export function createPrimOptions(options?: PrimOptions) {
 			const ws = new WebSocket(endpoint)
 			ws.onopen = connected
 			ws.onmessage = (({ data: message }) => {
-				// eslint-disable-next-line @typescript-eslint/no-unsafe-argument
-				response(jsonHandler.parse(message))
+				// NOTE: binary data is not expected so message should be passed to JSON handler as a string
+				response(jsonHandler.parse(String(message)))
 			})
 			ws.onclose = ended
 			const send = (msg: unknown) => {
