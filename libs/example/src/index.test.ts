@@ -1,17 +1,13 @@
 import { expect, test } from "vitest"
 import { oops, sayHello, sayHelloAlternative, typeMessage, withCallback } from "./index"
 
-test("should say hello", async () => {
-	expect(
-		await sayHello({ greeting: "Hey", name: "Ted" }),
-	).toBe("Hey Ted!")
+test("should say hello", () => {
+	expect(sayHello({ greeting: "Hey", name: "Ted" })).toBe("Hey Ted!")
 })
 
 
-test("should say hello, using alternate syntax", async () => {
-	expect(
-		await sayHelloAlternative("Hey", "Ted"),
-	).toBe("Hey Ted!")
+test("should say hello, using alternate syntax", () => {
+	expect(sayHelloAlternative("Hey", "Ted")).toBe("Hey Ted!")
 })
 
 

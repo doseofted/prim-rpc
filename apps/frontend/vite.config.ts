@@ -1,5 +1,6 @@
 import { defineConfig } from "vite"
-import vue from "@vitejs/plugin-vue"
+import solid from "vite-plugin-solid"
+import unocss from "unocss/vite"
 import pages from "vite-plugin-pages"
 import type { UserConfig as VitestConfig } from "vitest"
 import type { UserConfig } from "vite"
@@ -8,10 +9,19 @@ const contained = JSON.parse(process.env.VITE_CONTAINED ?? "false") === true
 
 // https://vitejs.dev/config/
 const config: UserConfig & { test?: VitestConfig } = {
-	plugins: [vue(), pages()],
+	plugins: [
+		solid(),
+		unocss(),
+		pages({ exclude: ["**/*.test.tsx"] }),
+	],
 	test: {
-		globals: true,
 		environment: "jsdom",
+		transformMode: {
+			web: [/.[jt]sx?/],
+		},
+		deps: {
+			registerNodeLoader: true,
+		},
 	},
 	server: contained ? {
 		host: "0.0.0.0", // needed for Docker
@@ -23,4 +33,5 @@ const config: UserConfig & { test?: VitestConfig } = {
 		},
 	} : {},
 }
+
 export default defineConfig(config)

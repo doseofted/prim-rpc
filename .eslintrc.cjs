@@ -36,23 +36,30 @@ const sharedRules = (() => {
 })()
 
 /** @type {import("eslint").ESLint.ConfigData} */
-module.exports = {
+const config = {
 	root: true,
-	extends: [
-		"eslint:recommended",
-	],
 	parserOptions: {
 		ecmaVersion: "latest",
 		sourceType: "module",
-	},
-	rules: {
-		...sharedRules.javascript,
+		ecmaFeatures: {
+			jsx: true,
+		},
 	},
 	env: {
 		"node": true,
 		"es6": true,
 	},
+	rules: {},
 	overrides: [
+		{
+			files: ["*.js", "*.jsx", "*.mjs", "*.cjs"],
+			extends: [
+				"eslint:recommended",
+			],
+			rules: {
+				...sharedRules.javascript,
+			},
+		},
 		{
 			files: ["*.ts", "*.tsx"],
 			parser: "@typescript-eslint/parser",
@@ -61,10 +68,15 @@ module.exports = {
 			],
 			parserOptions: {
 				tsconfigRootDir: __dirname,
+				sourceType: "module",
 				project: [
 					"./tsconfig.json",
-					"./libs/*/tsconfig.json",
+					"./libs/**/tsconfig.json",
+					"./apps/**/tsconfig.json",
 				],
+				ecmaFeatures: {
+					jsx: true,
+				},
 			},
 			extends: [
 				"eslint:recommended",
@@ -73,10 +85,9 @@ module.exports = {
 			],
 			rules: {
 				...sharedRules.typescript,
-				// Prim allows this functionality so don't report it as error
-				// LINK https://typescript-eslint.io/rules/await-thenable/
-				"@typescript-eslint/await-thenable": "error",
 			},
 		},
 	],
 }
+// console.log(JSON.stringify(config, null, "  "))
+module.exports = config

@@ -1,21 +1,36 @@
+/** @type {import("eslint").ESLint.ConfigData} */
 module.exports = {
 	root: false,
-	// LINK https://eslint.vuejs.org/user-guide/#how-to-use-a-custom-parser
-	parser: "vue-eslint-parser",
-	parserOptions: {
-		parser: "@typescript-eslint/parser",
-		sourceType: "module",
-	},
-	plugins: [
-		"@typescript-eslint",
+	overrides: [
+		{
+			files: ["*.ts", "*.tsx"],
+			parser: "@typescript-eslint/parser",
+			parserOptions: {
+				sourceType: "module",
+				ecmaFeatures: {
+					jsx: true,
+				},
+				project: "./libs/docs/tsconfig.json",
+			},
+			plugins: [
+				"@typescript-eslint",
+				"solid",
+			],
+			extends: [
+				"eslint:recommended",
+				"plugin:@typescript-eslint/recommended",
+				"plugin:solid/typescript",
+			],
+			env: {
+				"browser": true,
+			},
+		},
+		{
+			files: ["*.tsx"],
+			rules: {
+			// NOTE: this is a workaround until I find out how to let ESLint know JSX element's return types
+				"@typescript-eslint/no-unsafe-return": "off",
+			},
+		},
 	],
-	// LINK https://eslint.vuejs.org/user-guide/#bundle-configurations
-	extends: [
-		"eslint:recommended",
-		"plugin:@typescript-eslint/recommended",
-		"plugin:vue/vue3-recommended",
-	],
-	env: {
-		"browser": true,
-	},
 }

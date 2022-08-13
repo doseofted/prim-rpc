@@ -75,7 +75,9 @@ export function createPrimClient<T extends object = any>(options?: PrimOptions, 
 					callbacksGiven = true
 					const generatedId = "_cb_" + nanoid()
 					// eslint-disable-next-line @typescript-eslint/no-unused-vars
-					const unbind = wsEvent.on("response", (msg) => {
+					const func = (msg: RpcAnswer) => {
+						console.log(this.path, generatedId, msg.id, msg.result)
+						
 						if (msg.id !== generatedId) { return }
 						if (Array.isArray(msg.result)) {
 							a(...msg.result as unknown[])
@@ -85,8 +87,9 @@ export function createPrimClient<T extends object = any>(options?: PrimOptions, 
 						// TODO: it's hard to unbind until I know callback won't fire anymore. I may need to just move old events
 						// to a de-prioritized list so the list of events doesn't become unwieldy and potentially slow down new
 						// callbacks/events
-						// unbind()
-					})
+						// wsEvent.off("response", func)
+					}
+					wsEvent.on("response", func)
 					return generatedId
 				})
 				const rpc: RpcCall = { method: this.path.join("/"), params: args, id: nanoid() }
