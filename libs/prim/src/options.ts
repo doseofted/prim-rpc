@@ -21,6 +21,7 @@ export function createPrimOptions(options?: PrimOptions) {
 		// batch time of 0 turns off batching while anything > 0 batches requests
 		clientBatchTime: 0,
 		// allow options of using a different JSON parsing/conversion library (for instance, "superjson")
+		// TODO: allow interface to be passed as generic from client so custom JSON options can be used such as parse options, if provided by library
 		jsonHandler: JSON,
 		// `client()` is intended to be overridden so as not to force any one HTTP framework but default is fine for most cases
 		client: async (endpoint, jsonBody, jsonHandler) => {
@@ -29,8 +30,6 @@ export function createPrimOptions(options?: PrimOptions) {
 				headers: { "Content-Type": "application/json" },
 				body: jsonHandler.stringify(jsonBody),
 			})
-			// RPC result should be returned on success and RPC error thrown if errored
-			// eslint-disable-next-line @typescript-eslint/no-unsafe-return
 			return jsonHandler.parse(await result.text())
 		},
 		// same with socket, usually the default WebSocket client is fine but the choice to change should be there

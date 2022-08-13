@@ -14,9 +14,8 @@ import { nanoid } from "nanoid"
 import mitt from "mitt"
 import { get as getProperty, remove as removeFromArray } from "lodash-es"
 import type { Asyncify } from "type-fest"
-import { RpcCall, PrimOptions, RpcAnswer, PrimWebSocketEvents, PrimHttpEvents } from "./interfaces"
+import { RpcCall, PrimOptions, RpcAnswer, PrimWebSocketEvents, PrimHttpEvents, QueuedHttpCall, PromiseResolveStatus } from "./interfaces"
 import { createPrimOptions } from "./options"
-import { RpcErr } from "./error"
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 type AnyFunction = (...args: any[]) => any
@@ -44,9 +43,10 @@ const CB_PREFIX = "_cb_"
  */
 export function createPrimClient<T extends object = object>(options?: PrimOptions, givenModule?: T): PromisifiedModule<T> {
 	const configured = createPrimOptions(options)
-	// SECTION proxy to resolve function calls
+	// SECTION Proxy to handle function calls
 	const proxy = new ProxyDeep<T>(givenModule, {
 		apply(_target, targetContext, args: unknown[]) {
+			// SECTION Server-side module handling
 			const targetFunction = getProperty<T, keyof T>(givenModule, this.path as [keyof T])
 			const targetIsCallable = typeof targetFunction === "function"
 			if (targetIsCallable) {
@@ -61,7 +61,8 @@ export function createPrimClient<T extends object = object>(options?: PrimOption
 				const functionResult = Reflect.apply(targetFunction, targetContext, argsWithListeners) as unknown
 				return functionResult
 			}
-			// if on client, send off request to server
+			// !SECTION
+			// SECTION Client-side module handling
 			let callbacksWereGiven = false
 			args = args.map((arg) => {
 				const callbackArg = typeof arg === "function" ? arg : false
@@ -69,14 +70,15 @@ export function createPrimClient<T extends object = object>(options?: PrimOption
 				const callbackReferenceIdentifier = [CB_PREFIX, nanoid()].join("")
 				const handleRpcCallbackResult = (msg: RpcAnswer) => {
 					if (msg.id !== callbackReferenceIdentifier) { return }
-					// Reflect.apply(callbackArg, undefined, msg.result)
-					if (Array.isArray(msg.result)) {
-						callbackArg(...msg.result as unknown[])
-					} else {
-						callbackArg(msg.result)
-					}
+					const targetArgs = Array.isArray(msg.result) ? msg.result : [msg.result]
+					Reflect.apply(callbackArg, undefined, targetArgs)
+					// if (Array.isArray(msg.result)) {
+					// 	callbackArg(...msg.result as unknown[])
+					// } else {
+					// 	callbackArg(msg.result)
+					// }
 					// NOTE: it's hard to unbind until I know that callback won't fire anymore
-					// wsEvent.off("response", func)
+					// wsEvent.off("response", handleRpcCallbackResult)
 				}
 				wsEvent.on("response", handleRpcCallbackResult)
 				return callbackReferenceIdentifier
@@ -93,15 +95,16 @@ export function createPrimClient<T extends object = object>(options?: PrimOption
 					if (rpc.id !== answer.id) { return }
 					if (answer.error) {
 						// TODO: remove usage of RpcError elsewhere in Prim and, from server, serialize
-						// instances of `Error` and fallback to custom JSON handler if provided to serialize
+						// instances of `Error` and fallback to custom JSON handler if provided to serialize errors
 						reject(answer.error)
 					} else {
 						resolve(answer.result as unknown)
 					}
 				})
 			})
-			httpEvent.emit("queue", { rpc, result })
+			httpEvent.emit("queue", { rpc, result, resolved: PromiseResolveStatus.UNHANDLED })
 			return result
+			// !SECTION
 		},
 		get(_target, _prop, _receiver) {
 			return this.nest(() => undefined)
@@ -115,68 +118,66 @@ export function createPrimClient<T extends object = object>(options?: PrimOption
 			wsEvent.emit("response", given)
 		}
 		const ended = () => {
-			sendMessage = setupWebsocket
+			sendMessage = createWebsocket
 			wsEvent.emit("ended")
 		}
 		const connected = () => {
-			// wsEvent.emit("connected")
 			// NOTE connect event should only happen once so initial message will be sent then
 			send(initialMessage)
+			wsEvent.emit("connected")
 		}
 		const wsEndpoint = configured.wsEndpoint || configured.endpoint.replace(/^http(s?)/g, "ws$1")
 		const { send } = configured.socket(wsEndpoint, { connected, response, ended }, configured.jsonHandler)
 		sendMessage = send
 	}
-	/** Internal function referenced when a WebSocket connection has not been created yet */
-	const setupWebsocket = (msg: RpcCall) => createWebsocket(msg)
-	/** Sets up WebSocket if needed, then sends a message */
-	let sendMessage: (message: RpcCall) => void = setupWebsocket
+	/** Sets up WebSocket if needed otherwise sends a message over websocket */
+	let sendMessage: (message: RpcCall) => void = createWebsocket
 	// !SECTION
-	// SECTION: batched HTTP calls
-	const queuedCalls: { rpc: RpcCall, result: Promise<RpcAnswer>, resolved?: "yes" | "pending" }[] = []
+	// SECTION: batched HTTP events
+	const queuedCalls: QueuedHttpCall[] = []
 	const httpEvent = mitt<PrimHttpEvents>()
 	let timer: ReturnType<typeof setTimeout>
-	const batchedRequests = () => {
-		if (timer) { return }
-		timer = setTimeout(() => {
-			const rpcList = queuedCalls.filter(c => !c.resolved)
-			rpcList.forEach(r => { r.resolved = "pending" })
-			clearTimeout(timer); timer = undefined
-			const rpcCalls = rpcList.map(r => r.rpc)
-			configured.client(configured.endpoint, rpcCalls.length === 1 ? rpcCalls[0] : rpcCalls, configured.jsonHandler)
-				.then(answer => {
-					// return either the single result or the list of results to caller
-					if (Array.isArray(answer)) {
-						answer.forEach(a => {
-							httpEvent.emit("response", a)
-						})
-					} else {
-						httpEvent.emit("response", answer)
-					}
-				})
-				// TODO: determine if `RpcAnswer[]` is the right type here (it may need to be an error)
-				.catch((error: RpcErr|RpcAnswer[]) => {
-					if (Array.isArray(error)) {
-						// multiple errors given, return each error result to caller
-						error.forEach(e => { httpEvent.emit("response", e) })
-					} else {
-						// one error was given even though there may be multiple results, return that error to caller
-						rpcList.forEach(r => {
-							const id = r.rpc.id
-							httpEvent.emit("response", { id, error })
-						})
-					}
-				}).finally(() => {
-					// mark all RPC in this list as resolved so they can be removed, without removing other pending requests
-					rpcList.forEach(r => { r.resolved = "yes" })
-					removeFromArray(queuedCalls, given => given.resolved === "yes")
-				})
-		}, configured.clientBatchTime)
-	}
+	// when an RPC is added to the list, prepare request to be sent to server (either immediately or in a batch)
 	httpEvent.on("queue", (given) => {
 		queuedCalls.push(given)
 		batchedRequests()
 	})
+	const batchedRequests = () => {
+		if (timer) { return }
+		timer = setTimeout(() => {
+			const rpcList = queuedCalls.filter(c => c.resolved === PromiseResolveStatus.UNHANDLED)
+			rpcList.forEach(r => { r.resolved = PromiseResolveStatus.PENDING })
+			clearTimeout(timer); timer = undefined
+			const rpcCallList = rpcList.map(r => r.rpc)
+			const { endpoint, jsonHandler } = configured
+			const rpcCallOrCalls = rpcCallList.length === 1 ? rpcCallList[0] : rpcCallList
+			configured.client(endpoint, rpcCallOrCalls, jsonHandler).then(answers => {
+				// return either the single result or the batched results to caller
+				if (Array.isArray(answers)) {
+					answers.forEach(answer => { httpEvent.emit("response", answer) })
+				} else {
+					const answer = answers
+					httpEvent.emit("response", answer)
+				}
+			}).catch((errors: RpcAnswer[]) => {
+				if (Array.isArray(errors)) {
+					// multiple errors given, return each error result to caller
+					errors.forEach(error => { httpEvent.emit("response", error) })
+				} else {
+					// one error was given but there may be multiple results, return that error to caller
+					rpcList.forEach(r => {
+						const error = errors
+						const id = r.rpc.id
+						httpEvent.emit("response", { id, error })
+					})
+				}
+			}).finally(() => {
+				// mark all RPC in this list as resolved so they can be removed, without removing other pending requests
+				rpcList.forEach(r => { r.resolved = PromiseResolveStatus.YES })
+				removeFromArray(queuedCalls, given => given.resolved === PromiseResolveStatus.YES)
+			})
+		}, configured.clientBatchTime)
+	}
 	// !SECTION
-	return proxy as unknown as PromisifiedModule<T>
+	return proxy as PromisifiedModule<T>
 }

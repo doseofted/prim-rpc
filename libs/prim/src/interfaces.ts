@@ -19,7 +19,7 @@ export interface RpcAnswer<Result = any, Error = any> extends RpcBase {
 export interface PrimHttpQueueItem {
 	rpc: RpcCall
 	result: Promise<RpcAnswer>,
-	resolved?: "yes"|"pending"
+	resolved: PromiseResolveStatus
 }
 
 export type PrimHttpEvents = {
@@ -40,6 +40,19 @@ export interface PrimWebSocketFunctionEvents {
 	// response: (answer: RpcAnswer|RpcAnswer[]) => void
 	response: (answer: RpcAnswer) => void
 	ended: () => void
+}
+export enum PromiseResolveStatus {
+	/** Promise has not been created yet */
+	UNHANDLED,
+	/** Promise has been created but not yet resolved */
+	PENDING,
+	/** Promise has resolved */
+	YES,
+}
+export interface QueuedHttpCall {
+	rpc: RpcCall
+	result: Promise<RpcAnswer>
+	resolved?: PromiseResolveStatus
 }
 
 export interface JsonHandler {
@@ -76,7 +89,14 @@ export interface PrimOptions {
 	 */
 	jsonHandler?: JsonHandler
 	/**
-	 * When used from the client, override the HTTP framework used for requests (default is browser's `fetch()`)
+	 * When used from the client, override the HTTP framework used for requests (default is browser's `fetch()`).
+	 * Client should:
+	 * 
+	 *    1. Stringify given RPC with JSON handler
+	 *    2. Send off request
+	 *    3. Parse given result with given JSON handler
+	 *    4. If used client doesn't throw on a <300 HTTP error, manually throw if `.error` is given
+	 * 
 	 * @param endpoint The configured `option.endpoint` on created instance
 	 * @param jsonBody RPC to be stringified before being sent to server
 	 * @param jsonHandler Provide a custom handler for JSON, with `.stringify()` and `.parse()` methods
