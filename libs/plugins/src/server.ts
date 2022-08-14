@@ -83,7 +83,7 @@ export const primExpressMiddleware = (prim: PrimServer, prefix = "/prim") => {
 export const primWebSocketServerSetup = (prim: PrimServer, socket: WebSocketServer) => {
 	const jsonHandler = prim.opts.jsonHandler ?? JSON
 	socket.on("connection", (ws) => {
-		// prim.ws.emit("connect")
+		prim.ws.emit("connected")
 		ws.on("message", (data) => {
 			const rpc = jsonHandler.parse(String(data))
 			prim.rpc(rpc).then(_result => {
@@ -117,7 +117,7 @@ export const primWebSocketServerSetup = (prim: PrimServer, socket: WebSocketServ
 export const primSocketIoServerSetup = (prim: PrimServer, socket: SocketIoServer) => {
 	const jsonHandler = prim.opts.jsonHandler ?? JSON
 	socket.on("connection", (ws) => {
-		// prim.ws.emit("connect")
+		prim.ws.emit("connected")
 		ws.on("prim", (data) => {
 			const rpc = jsonHandler.parse(String(data))
 			prim.rpc(rpc)

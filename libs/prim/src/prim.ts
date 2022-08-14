@@ -190,5 +190,6 @@ export function createPrimClient<
 		}, configured.clientBatchTime)
 	}
 	// !SECTION
-	return proxy as PromisifiedModule<ModuleType>
+	const client = proxy as PromisifiedModule<ModuleType>
+	return client
 }

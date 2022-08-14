@@ -179,4 +179,19 @@ let electronSupport: Status.Idea
  */
 let autoTransformModuleType: Status.Implemented
 
+/**
+ * Consider adding `fetch()` method that can be used to fetch given URL. So instead of just returning the client,
+ * I would return `{ client, fetch }`. For instance:
+ *
+ * If developer gets first page of data (where `.getData(page: number)`):
+ * ```
+ * const data = await prim.client.getData(1)
+ * // data == { given: "something", page: 1, nextPage: "/prim/sayHello?page=2" }
+ * ```
+ * 
+ * Instead of calling `prim.client.getData(data.page + 1)`, I could call `prim.fetch(data.nextPage)`
+ * to make use of Prim-RPC's handling of GET requests.
+ */
+let fetchFromPrimRpcResult: Status.Idea
+
 export {}
