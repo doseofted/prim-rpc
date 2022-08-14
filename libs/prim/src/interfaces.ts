@@ -63,12 +63,12 @@ export interface JsonHandler {
 }
 // type JsonHandlerOptional  = Partial<JsonHandler>
 
-export type PrimClientFunction = (endpoint: string, jsonBody: RpcCall|RpcCall[], jsonHandler: JsonHandler) => Promise<RpcAnswer|RpcAnswer[]>
-export type PrimSocketFunction = (endpoint: string, events: PrimWebSocketFunctionEvents, jsonHandler: JsonHandler) => ({
+export type PrimClientFunction<J = JsonHandler> = (endpoint: string, jsonBody: RpcCall|RpcCall[], jsonHandler: J) => Promise<RpcAnswer|RpcAnswer[]>
+export type PrimSocketFunction<J = JsonHandler> = (endpoint: string, events: PrimWebSocketFunctionEvents, jsonHandler: J) => ({
 	send: (message: RpcCall|RpcCall[]) => void
 })
 
-export interface PrimOptions<M extends object = object, J extends JsonHandler = JsonHandler /* JSON */> {
+export interface PrimOptions<M extends object = object, J extends JsonHandler = JsonHandler> {
 	/**
 	 * Module to use with Prim. When a function call is made, given module will be used first, otherwise an RPC will
 	 * be made.
@@ -116,7 +116,7 @@ export interface PrimOptions<M extends object = object, J extends JsonHandler = 
 	 * @param jsonBody RPC to be stringified before being sent to server
 	 * @param jsonHandler Provided handler for JSON, with `.stringify()` and `.parse()` methods
 	 */
-	client?: PrimClientFunction
+	client?: PrimClientFunction<J>
 	/**
 	 * You may override the WS framework used for handling callbacks on RPC requests (the default is the WebSocket API).
 	 * A custom client should:
@@ -133,7 +133,7 @@ export interface PrimOptions<M extends object = object, J extends JsonHandler = 
 	 * @param events: An object containing several callbacks that should be called when event happens on websocket
 	 * @param jsonHandler Provided handler for JSON, with `.stringify()` and `.parse()` methods
 	 */
-	socket?: PrimSocketFunction
+	socket?: PrimSocketFunction<J>
 	/** Properties belonging to `internal` are for internal use by Prim-RPC. */
 	internal?: {
 		/** Event emitter to be shared with Prim Server, if websocket events are used */

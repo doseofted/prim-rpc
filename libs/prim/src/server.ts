@@ -1,7 +1,7 @@
 /* eslint-disable @typescript-eslint/no-unsafe-argument */
 /* eslint-disable @typescript-eslint/no-unsafe-assignment */
 import { RpcError } from "./error"
-import { createPrimClient } from "./prim"
+import { AnyFunction, createPrimClient } from "./prim"
 import { CommonFrameworkOptions, PrimOptions, PrimWebSocketEvents, RpcAnswer, RpcCall } from "./interfaces"
 import { get as getProperty } from "lodash-es"
 import { defu } from "defu"
@@ -33,19 +33,22 @@ export interface PrimServer {
  * @returns A function that expects JSON resembling an RPC call
  */
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
-export function createPrimServer<T extends object = any>(givenModule?: T, options?: PrimOptions): PrimServer {
+export function createPrimServer<
+	// eslint-disable-next-line @typescript-eslint/no-unused-vars
+	ModuleType extends OptionsType["module"] = object,
+	OptionsType extends PrimOptions = PrimOptions,
+>(options?: PrimOptions): PrimServer {
 	const ws = mitt<PrimWebSocketEvents>()
-	const givenOptions = createPrimOptions(options)
+	const givenOptions = createPrimOptions(options) as OptionsType
 	// Prim Server should forward request to another Prim Server otherwise resolve locally
 	givenOptions.internal = { event: ws }
-	const prim = createPrimClient<typeof givenModule>(givenOptions, givenModule)
+	const prim = createPrimClient(givenOptions)
 	const makeRpcCall = async (rpc: RpcCall): Promise<RpcAnswer> => {
 		const { method, params, id } = rpc
 		// const args = Array.isArray(params) ? params : [params]
 		try {
 			const methodExpanded = method.split("/")
-			// eslint-disable-next-line @typescript-eslint/no-explicit-any
-			const target = getProperty<typeof prim, keyof typeof prim>(prim, methodExpanded as [keyof T]) as (...args: any[]) => any
+			const target = getProperty(prim, methodExpanded) as AnyFunction
 			// console.log(methodExpanded)
 			// TODO: go through params and look for callbacks, using configured "options.socket" to send back response
 			const args = Array.isArray(params) ? params : [params]

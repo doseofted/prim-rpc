@@ -47,12 +47,12 @@ const baseOptions = (): PrimOptions =>({
  * @param options Given options by developer
  * @returns Options with defaults set
  */
-export function createPrimOptions(options?: PrimOptions) {
+export function createPrimOptions<OptionsType extends PrimOptions = PrimOptions>(options?: OptionsType) {
 	// first initialize given options and values for which to fallback
-	const configured: PrimOptions = defu<PrimOptions, PrimOptions>(options, {
+	const configured = defu<PrimOptions, PrimOptions>(options, {
 		...baseOptions(),
 		// these options should not be passed by a developer but are used internally
 		internal: {},
-	})
+	}) as OptionsType
 	return configured
 }

@@ -18,7 +18,7 @@ import { RpcCall, PrimOptions, RpcAnswer, PrimWebSocketEvents, PrimHttpEvents, Q
 import { createPrimOptions } from "./options"
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
-type AnyFunction = (...args: any[]) => any
+export type AnyFunction = (...args: any[]) => any
 type PromisifiedModule<ModuleGiven extends object> = {
 	[Key in keyof ModuleGiven]: ModuleGiven[Key] extends AnyFunction
 		? Asyncify<ModuleGiven[Key]>
@@ -40,13 +40,17 @@ type PromisifiedModule<ModuleGiven extends object> = {
  * @param givenModule If `options.server` is true, provide the module where functions should be resolved
  * @returns A wrapper function around the given module or type definitions used for calling functions from server
  */
-export function createPrimClient<T extends object = object>(options?: PrimOptions, givenModule?: T): PromisifiedModule<T> {
+export function createPrimClient<
+	ModuleType extends OptionsType["module"] = object,
+	OptionsType extends PrimOptions = PrimOptions,
+>(options?: OptionsType): PromisifiedModule<ModuleType> {
 	const configured = createPrimOptions(options)
+	const givenModule = configured.module as ModuleType
 	// SECTION Proxy to handle function calls
-	const proxy = new ProxyDeep<T>(givenModule ?? ({} as T), {
+	const proxy = new ProxyDeep<ModuleType>(givenModule ?? ({} as ModuleType), {
 		apply(_target, targetContext, args: unknown[]) {
 			// SECTION Server-side module handling
-			const targetFunction = getProperty<T, keyof T>(givenModule, this.path as [keyof T])
+			const targetFunction = getProperty<ModuleType, keyof ModuleType>(givenModule, this.path as [keyof ModuleType])
 			const targetIsCallable = typeof targetFunction === "function"
 			if (targetIsCallable) {
 				// if an argument is a callback reference, the created callback below will send the result back to client
@@ -72,7 +76,9 @@ export function createPrimClient<T extends object = object>(options?: PrimOption
 					const targetArgs = Array.isArray(msg.result) ? msg.result : [msg.result]
 					Reflect.apply(callbackArg, undefined, targetArgs)
 					// NOTE: it's hard to unbind until I know that callback won't fire anymore
-					// wsEvent.off("response", handleRpcCallbackResult)
+					wsEvent.on("ended", () => {
+						wsEvent.off("response", handleRpcCallbackResult)
+					})
 				}
 				wsEvent.on("response", handleRpcCallbackResult)
 				return callbackReferenceIdentifier
@@ -81,7 +87,7 @@ export function createPrimClient<T extends object = object>(options?: PrimOption
 			if (callbacksWereGiven) {
 				// TODO: add fallback in case client cannot support websocket
 				const result = new Promise<RpcAnswer>((resolve, reject) => {
-					wsEvent.on("response", answer => {
+					wsEvent.on("response", (answer) => {
 						if (rpc.id !== answer.id) { return }
 						if (answer.error) {
 							// TODO: remove usage of RpcError elsewhere in Prim and, from server, serialize
@@ -184,5 +190,5 @@ export function createPrimClient<T extends object = object>(options?: PrimOption
 		}, configured.clientBatchTime)
 	}
 	// !SECTION
-	return proxy as PromisifiedModule<T>
+	return proxy as PromisifiedModule<ModuleType>
 }
