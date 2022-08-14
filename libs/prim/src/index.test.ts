@@ -2,7 +2,7 @@ import { describe, test, expect } from "vitest"
 import { createPrimClient, createPrimServer } from "."
 import type * as exampleClient from "@doseofted/prim-example"
 import * as exampleServer from "@doseofted/prim-example"
-import type { RpcAnswer } from "./interfaces"
+import type { RpcAnswer, RpcCall } from "./interfaces"
 import jsonHandler from "superjson"
 
 // TODO: move tests to their own files where it makes sense
@@ -123,14 +123,13 @@ describe("Prim Client can use callbacks", () => {
 			const results: string[] = []
 			const prim = createPrimServer(exampleServer)
 			const { withCallback } = createPrimClient<typeof exampleClient>({
-				socket(_endpoint, { connected, response, ended }) {
+				socket(_endpoint, { connected, response, ended }, _jsonHandler) {
 					prim.ws.on("response", (answer) => { response(answer) })
 					prim.ws.on("ended", () => { ended() })
 					setTimeout(() => {
 						connected()
 					}, 0)
-					// FIXME: find out why sending RPC call here causes error (webosocket still works?)
-					const send = () => ({}) // (body: RpcCall) => { prim.rpc({ body }) }
+					const send = (body: RpcCall|RpcCall[]) => { void prim.rpc({ body }) }
 					return { send }
 				},
 				client: async (_endpoint, body) => prim.rpc({ body }),

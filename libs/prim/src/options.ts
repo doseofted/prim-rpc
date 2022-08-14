@@ -29,11 +29,11 @@ const baseOptions = (): PrimOptions =>({
 	socket: (endpoint, { connected, response, ended }, jsonHandler) => {
 		const ws = new WebSocket(endpoint)
 		ws.onopen = connected
+		ws.onclose = ended
 		ws.onmessage = (({ data: message }) => {
 			// NOTE: binary data is not expected so message should be passed to JSON handler as a string
 			response(jsonHandler.parse(String(message)))
 		})
-		ws.onclose = ended
 		const send = (msg: unknown) => {
 			ws.send(jsonHandler.stringify(msg))
 		}

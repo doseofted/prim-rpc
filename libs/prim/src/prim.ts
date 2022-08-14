@@ -71,11 +71,6 @@ export function createPrimClient<T extends object = object>(options?: PrimOption
 					if (msg.id !== callbackReferenceIdentifier) { return }
 					const targetArgs = Array.isArray(msg.result) ? msg.result : [msg.result]
 					Reflect.apply(callbackArg, undefined, targetArgs)
-					// if (Array.isArray(msg.result)) {
-					// 	callbackArg(...msg.result as unknown[])
-					// } else {
-					// 	callbackArg(msg.result)
-					// }
 					// NOTE: it's hard to unbind until I know that callback won't fire anymore
 					// wsEvent.off("response", handleRpcCallbackResult)
 				}
@@ -84,10 +79,21 @@ export function createPrimClient<T extends object = object>(options?: PrimOption
 			})
 			const rpc: RpcCall = { method: this.path.join("/"), params: args, id: nanoid() }
 			if (callbacksWereGiven) {
+				// TODO: add fallback in case client cannot support websocket
+				const result = new Promise<RpcAnswer>((resolve, reject) => {
+					wsEvent.on("response", answer => {
+						if (rpc.id !== answer.id) { return }
+						if (answer.error) {
+							// TODO: remove usage of RpcError elsewhere in Prim and, from server, serialize
+							// instances of `Error` and fallback to custom JSON handler if provided to serialize errors
+							reject(answer.error)
+						} else {
+							resolve(answer.result as unknown)
+						}
+					})
+				})
 				sendMessage(rpc)
-				// TODO: primServer doesn't seem to respond with callback results unless I send HTTP request first (find out why)
-				// TODO: once fixed, I can return in this block and avoid extra HTTP request
-				// return
+				return result
 			}
 			const result = new Promise<RpcAnswer>((resolve, reject) => {
 				httpEvent.on("response", (answer) => {
@@ -101,7 +107,7 @@ export function createPrimClient<T extends object = object>(options?: PrimOption
 					}
 				})
 			})
-			httpEvent.emit("queue", { rpc, result, resolved: PromiseResolveStatus.UNHANDLED })
+			httpEvent.emit("queue", { rpc, result, resolved: PromiseResolveStatus.Unhandled })
 			return result
 			// !SECTION
 		},
@@ -122,8 +128,8 @@ export function createPrimClient<T extends object = object>(options?: PrimOption
 		}
 		const connected = () => {
 			// NOTE connect event should only happen once so initial message will be sent then
-			send(initialMessage)
 			wsEvent.emit("connected")
+			send(initialMessage)
 		}
 		const wsEndpoint = configured.wsEndpoint || configured.endpoint.replace(/^http(s?)/g, "ws$1")
 		const { send } = configured.socket(wsEndpoint, { connected, response, ended }, configured.jsonHandler)
@@ -144,8 +150,8 @@ export function createPrimClient<T extends object = object>(options?: PrimOption
 	const batchedRequests = () => {
 		if (timer) { return }
 		timer = setTimeout(() => {
-			const rpcList = queuedCalls.filter(c => c.resolved === PromiseResolveStatus.UNHANDLED)
-			rpcList.forEach(r => { r.resolved = PromiseResolveStatus.PENDING })
+			const rpcList = queuedCalls.filter(c => c.resolved === PromiseResolveStatus.Unhandled)
+			rpcList.forEach(r => { r.resolved = PromiseResolveStatus.Pending })
 			clearTimeout(timer); timer = undefined
 			const rpcCallList = rpcList.map(r => r.rpc)
 			const { endpoint, jsonHandler } = configured
@@ -172,8 +178,8 @@ export function createPrimClient<T extends object = object>(options?: PrimOption
 				}
 			}).finally(() => {
 				// mark all RPC in this list as resolved so they can be removed, without removing other pending requests
-				rpcList.forEach(r => { r.resolved = PromiseResolveStatus.YES })
-				removeFromArray(queuedCalls, given => given.resolved === PromiseResolveStatus.YES)
+				rpcList.forEach(r => { r.resolved = PromiseResolveStatus.Resolved })
+				removeFromArray(queuedCalls, given => given.resolved === PromiseResolveStatus.Resolved)
 			})
 		}, configured.clientBatchTime)
 	}

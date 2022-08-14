@@ -82,6 +82,7 @@ export function createPrimServer<T extends object = any>(givenModule?: T, option
 			}
 			return { method, params, id }
 		})()
+		// console.log("path body:", bodyFromPath)
 		// TODO: find out how to deal with pre-parsed JSON. Fastify and Express/body-parser don't seem to provide string.
 		// Ideally JSON handler could be flexible enough to even handle YAML (not that you would) however when I'm provided
 		// an object and and custom JSON handler, I have to stringify result to use the given handler.

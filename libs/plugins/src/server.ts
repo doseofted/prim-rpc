@@ -86,7 +86,11 @@ export const primWebSocketServerSetup = (prim: PrimServer, socket: WebSocketServ
 		// prim.ws.emit("connect")
 		ws.on("message", (data) => {
 			const rpc = jsonHandler.parse(String(data))
-			prim.rpc(rpc)
+			prim.rpc(rpc).then(_result => {
+				// TODO: add websocket send for RPC to avoid using HTTP when socket is open
+				// console.log(rpc, result)
+				// if (result) { ws.send(jsonHandler.stringify(result)) }
+			})
 			prim.ws.on("response", (cbAnswer) => {
 				ws.send(jsonHandler.stringify(cbAnswer))
 			})

@@ -43,11 +43,11 @@ export interface PrimWebSocketFunctionEvents {
 }
 export enum PromiseResolveStatus {
 	/** Promise has not been created yet */
-	UNHANDLED,
+	Unhandled,
 	/** Promise has been created but not yet resolved */
-	PENDING,
+	Pending,
 	/** Promise has resolved */
-	YES,
+	Resolved,
 }
 export interface QueuedHttpCall {
 	rpc: RpcCall
@@ -68,7 +68,7 @@ export type PrimSocketFunction = (endpoint: string, events: PrimWebSocketFunctio
 	send: (message: RpcCall|RpcCall[]) => void
 })
 
-export interface PrimOptions<M extends object = object, J extends JsonHandler = JSON> {
+export interface PrimOptions<M extends object = object, J extends JsonHandler = JsonHandler /* JSON */> {
 	/**
 	 * Module to use with Prim. When a function call is made, given module will be used first, otherwise an RPC will
 	 * be made.
