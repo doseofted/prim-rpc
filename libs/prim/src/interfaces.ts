@@ -68,10 +68,21 @@ export type PrimSocketFunction = (endpoint: string, events: PrimWebSocketFunctio
 	send: (message: RpcCall|RpcCall[]) => void
 })
 
-export interface PrimOptions {
-	/** When `options.server` is `false`, provide the server URL where Prim is being used, to be used from `options.client` */
+export interface PrimOptions<M extends object = object, J extends JsonHandler = JSON> {
+	/**
+	 * Module to use with Prim. When a function call is made, given module will be used first, otherwise an RPC will
+	 * be made.
+	 */
+	module?: M
+	/**
+	 * Provide the server URL where Prim is being used. This will be provided to the HTTP client as the endpoint
+	 * parameter.
+	 */
 	endpoint?: string
-	/** When `options.server` is `false` and websocket endpoint is different from HTTP endpoint, provide the websocket URL where Prim is being used, to be used from `options.socket` */
+	/**
+	 * Provide the server URL where Prim is being used. This will be provided to the WS client as the endpoint parameter.
+	 * If not provided, the HTTP `endpoint` option will be attempted with the WebSocket protocol.
+	 */
 	wsEndpoint?: string
 	/**
 	 * If zero, don't batch RPC calls. If non-zero then wait a short time, in milliseconds, before sending HTTP requests.
@@ -81,33 +92,49 @@ export interface PrimOptions {
 	 */
 	clientBatchTime?: number
 	/**
-	 * Usually default of `JSON` is sufficient but parsing/conversion of more complex types may benefit from other JSON handling libraries.
+	 * Usually the default of `JSON` is sufficient but parsing/conversion of more complex types may benefit from other
+	 * JSON handling libraries.
 	 *
-	 * Given object is required to have both a `.stringify()` and `.parse()` method.
+	 * Given module is required to have both a `.stringify(obj)` and `.parse(str)` method. If chosen JSON handler requires
+	 * additional options, it is recommended to create the stringify/parse functions and wrap the intended JSON handler
+	 * in these functions.
 	 */
-	jsonHandler?: JsonHandler
+	jsonHandler?: J
 	/**
-	 * When used from the client, override the HTTP framework used for requests (default is browser's `fetch()`).
-	 * Client should:
+	 * You may override the HTTP framework used for RPC requests (the default is the Fetch API).
+	 * A custom client should:
 	 * 
-	 *    1. Stringify given RPC with JSON handler
-	 *    2. Send off request
-	 *    3. Parse given result with given JSON handler
-	 *    4. If used client doesn't throw on a <300 HTTP error, manually throw if `.error` is given
+	 *    1. Stringify given RPC with chosen JSON handler
+	 *    2. Send off request to the server
+	 *    3. Parse given response with chosen JSON handler
+	 *    4. Resolve on success and reject on error
 	 * 
-	 * @param endpoint The configured `option.endpoint` on created instance
+	 * You may also choose to use another protocol altogether as long as it can become compatible with the interface
+	 * that Prim-RPC expects (for instance: inter-process communication).
+	 *
+	 * @param endpoint The configured `endpoint` on created instance
 	 * @param jsonBody RPC to be stringified before being sent to server
-	 * @param jsonHandler Provide a custom handler for JSON, with `.stringify()` and `.parse()` methods
+	 * @param jsonHandler Provided handler for JSON, with `.stringify()` and `.parse()` methods
 	 */
 	client?: PrimClientFunction
 	/**
-	 * Use a given WebSocket framework and utilize generic websocket events given over function.
+	 * You may override the WS framework used for handling callbacks on RPC requests (the default is the WebSocket API).
+	 * A custom client should:
 	 *
-	 * @param endpoint The configured `option.endpoint` on created instance
+	 *    1. Open a new websocket
+	 *    2. Call `events.connected()` and `events.ended()` when websocket is opened and closed
+	 *    3. Parse messages received using given JSON handler and call `events.response()` with the result
+	 *    4. Create a function that sends messages over WebSocket. Return this as a method on an object named `.send()`
+	 * 
+	 * You may also choose to use another protocol altogether as long as it can become compatible with the interface
+	 * that Prim-RPC expects (for instance: HTTP long-polling).
+	 *
+	 * @param endpoint The configured `wsEndpoint` on created instance
 	 * @param events: An object containing several callbacks that should be called when event happens on websocket
-	 * @param jsonHandler Provide a custom handler for JSON, with `.stringify()` and `.parse()` methods
+	 * @param jsonHandler Provided handler for JSON, with `.stringify()` and `.parse()` methods
 	 */
 	socket?: PrimSocketFunction
+	/** Properties belonging to `internal` are for internal use by Prim-RPC. */
 	internal?: {
 		/** Event emitter to be shared with Prim Server, if websocket events are used */
 		event?: Emitter<PrimWebSocketEvents>
