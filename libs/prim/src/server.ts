@@ -1,7 +1,7 @@
 /* eslint-disable @typescript-eslint/no-unsafe-argument */
 /* eslint-disable @typescript-eslint/no-unsafe-assignment */
 import { RpcError } from "./error"
-import { AnyFunction, createPrimClient } from "./prim"
+import { AnyFunction, createPrimClient } from "./client"
 import { CommonFrameworkOptions, PrimOptions, PrimWebSocketEvents, RpcAnswer, RpcCall } from "./interfaces"
 import { get as getProperty } from "lodash-es"
 import { defu } from "defu"
@@ -45,13 +45,12 @@ export function createPrimServer<
 	const prim = createPrimClient(givenOptions)
 	const makeRpcCall = async (rpc: RpcCall): Promise<RpcAnswer> => {
 		const { method, params, id } = rpc
-		// const args = Array.isArray(params) ? params : [params]
+		const args = Array.isArray(params) ? params : [params]
 		try {
 			const methodExpanded = method.split("/")
 			const target = getProperty(prim, methodExpanded) as AnyFunction
 			// console.log(methodExpanded)
 			// TODO: go through params and look for callbacks, using configured "options.socket" to send back response
-			const args = Array.isArray(params) ? params : [params]
 			return { result: await Reflect.apply(target, undefined, args), id }
 			// if (Array.isArray(params)) {
 			// 	return { result: await target(...params), id }

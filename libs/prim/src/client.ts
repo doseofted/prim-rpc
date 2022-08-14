@@ -3,7 +3,7 @@
  * then make those same function calls on the client as if they were written
  * there but instead receive a response from the server, with proper type
  * definitions.
- * 
+ *
  * This is basically a way for me to avoid REST and just write plain functions.
  * It can be used with any server framework as long as a plugin is written for
  * `createPrimServer` and can be used with any HTTP request library on the
@@ -14,7 +14,7 @@ import { nanoid } from "nanoid"
 import mitt from "mitt"
 import { get as getProperty, remove as removeFromArray } from "lodash-es"
 import type { Asyncify } from "type-fest"
-import { RpcCall, PrimOptions, RpcAnswer, PrimWebSocketEvents, PrimHttpEvents, QueuedHttpCall, PromiseResolveStatus } from "./interfaces"
+import { RpcCall, PrimOptions, RpcAnswer, PrimWebSocketEvents, PrimHttpEvents, PromiseResolveStatus, PrimHttpQueueItem } from "./interfaces"
 import { createPrimOptions } from "./options"
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -90,8 +90,6 @@ export function createPrimClient<
 					wsEvent.on("response", (answer) => {
 						if (rpc.id !== answer.id) { return }
 						if (answer.error) {
-							// TODO: remove usage of RpcError elsewhere in Prim and, from server, serialize
-							// instances of `Error` and fallback to custom JSON handler if provided to serialize errors
 							reject(answer.error)
 						} else {
 							resolve(answer.result as unknown)
@@ -105,8 +103,6 @@ export function createPrimClient<
 				httpEvent.on("response", (answer) => {
 					if (rpc.id !== answer.id) { return }
 					if (answer.error) {
-						// TODO: remove usage of RpcError elsewhere in Prim and, from server, serialize
-						// instances of `Error` and fallback to custom JSON handler if provided to serialize errors
 						reject(answer.error)
 					} else {
 						resolve(answer.result as unknown)
@@ -145,7 +141,7 @@ export function createPrimClient<
 	let sendMessage: (message: RpcCall) => void = createWebsocket
 	// !SECTION
 	// SECTION: batched HTTP events
-	const queuedCalls: QueuedHttpCall[] = []
+	const queuedCalls: PrimHttpQueueItem[] = []
 	const httpEvent = mitt<PrimHttpEvents>()
 	let timer: ReturnType<typeof setTimeout>
 	// when an RPC is added to the list, prepare request to be sent to server (either immediately or in a batch)

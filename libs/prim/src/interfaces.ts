@@ -49,11 +49,6 @@ export enum PromiseResolveStatus {
 	/** Promise has resolved */
 	Resolved,
 }
-export interface QueuedHttpCall {
-	rpc: RpcCall
-	result: Promise<RpcAnswer>
-	resolved?: PromiseResolveStatus
-}
 
 export interface JsonHandler {
 	// eslint-disable-next-line @typescript-eslint/no-explicit-any

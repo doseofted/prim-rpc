@@ -1,4 +1,4 @@
-import { createPrimClient } from "./prim"
+import { createPrimClient } from "./client"
 import { createPrimServer } from "./server"
 import { RpcError } from "./error"
 
