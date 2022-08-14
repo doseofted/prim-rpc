@@ -1,5 +1,4 @@
 enum Status { Idea, Implemented, PartiallyImplemented, Rejected }
-// import type { Asyncify } from "type-fest"
 /* eslint-disable @typescript-eslint/no-unused-vars */
 /**
  * IDEA: consider creating createPrimUniversal that creates two instances of Prim, one for
@@ -32,7 +31,6 @@ enum Status { Idea, Implemented, PartiallyImplemented, Rejected }
 let reactiveInterfaceIdea: Status.Idea
 
 /**
- * NOTE: implemented with HTTP, still might be nice to also allow option of sending requests over websocket (individually, not batched)
  *
  * When using graphql, I get to batch what would usually be many separate requests into one single request. With REST,
  * each request has to made individually unless batched together by the server by exposing an endpoint dedicated to
@@ -58,7 +56,7 @@ let reactiveInterfaceIdea: Status.Idea
  * batched requests over websocket or batched HTTP requests, since implementing both may take more time. Ideally,
  * I could implement both over WebSocket with HTTP fallback if client is not setup, by using generic events.
  */
-let batchRequests: Status.PartiallyImplemented
+let batchRequests: Status.Implemented
 
 /**
  * Allow uploads of images by supporting multipart form data. Each field could be considered a property of an object
@@ -154,6 +152,8 @@ let webhooks: Status.Idea
  * Note that the main process will need a handle for the event sent from the preload script. This should be a function
  * that returns the result gathered from the Prim Server (regardless of whether function is local to main process
  * or a call to a remote server).
+ * 
+ * NOTE: this will be best implemented as a "plugin" using "@doseofted/prim-plugins"
  */
 let electronSupport: Status.Idea
 
