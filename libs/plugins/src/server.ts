@@ -36,7 +36,8 @@ export const primFastifyPlugin: FastifyPluginAsync<{ prim: PrimServer, prefix?: 
 		method: ["POST", "GET"],
 		url: "*", // NOTE: fastify handles prefix already
 		handler: async ({ url, body }, reply) => {
-			const response = await prim.rpc({ prefix, url, body })
+			const client = prim()
+			const response = await client.rpc({ prefix, url, body })
 			// TODO: consider adding headers for return type (for instance, JSON headers or, just an idea,
 			// alternative headers if custom JSON handler is used like YAML even though that's arguably a bad idea)
 			reply.send(response)

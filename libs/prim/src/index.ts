@@ -8,3 +8,4 @@ export {
 export type {
 	PrimOptions, RpcAnswer, RpcCall, PrimClientFunction, PrimSocketFunction,
 } from "./interfaces"
+export type { PrimServer } from "./server"
