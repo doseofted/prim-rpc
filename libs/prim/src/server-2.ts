@@ -52,6 +52,12 @@ export function createPrimServer<
 	return {
 		prepareCall(given) {
 			// ...
+			// TODO: add valid handling of URL parameters if method is POST, like the following as examples:
+			// Object argument: /prim?sayHello?greeting=Hey&name=Ted
+			// Positional args: /prim?sayHelloAlternative?0=Hey&1=Ted
+			// NOTE: nested queries should either be added later with a lot of consideration or ignored
+			// since this makes queries too complicated to read (at this point, just POST it)
+			// If not a GET and instead a POST request, parse the body of the request
 		},
 		async rpc(given) {
 			// eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
@@ -71,6 +77,8 @@ export function createPrimServer<
 		},
 		prepareSend(given) {
 			// ...
+			// TODO: make sure JSON header is added and return is either 200 (resolved),
+			// 400 (maybe, represents: method doesn't exist), or 500 (rejected)
 		},
 	}
 }
