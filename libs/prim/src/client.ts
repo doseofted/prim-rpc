@@ -67,7 +67,7 @@ export function createPrimClient<
 			// !SECTION
 			// SECTION Client-side module handling
 			let callbacksWereGiven = false
-			args = args.map((arg) => {
+			const params = args.map((arg) => {
 				const callbackArg = typeof arg === "function" ? arg : false
 				if (callbackArg) { callbacksWereGiven = true } else { return arg }
 				const callbackReferenceIdentifier = [CB_PREFIX, nanoid()].join("")
@@ -83,7 +83,7 @@ export function createPrimClient<
 				wsEvent.on("response", handleRpcCallbackResult)
 				return callbackReferenceIdentifier
 			})
-			const rpc: RpcCall = { method: this.path.join("/"), params: args, id: nanoid() }
+			const rpc: RpcCall = { method: this.path.join("/"), params, id: nanoid() }
 			if (callbacksWereGiven) {
 				// TODO: add fallback in case client cannot support websocket
 				const result = new Promise<RpcAnswer>((resolve, reject) => {
