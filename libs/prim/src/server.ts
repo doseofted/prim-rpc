@@ -2,7 +2,7 @@
 /* eslint-disable @typescript-eslint/no-unsafe-assignment */
 import { RpcError } from "./error"
 import { AnyFunction, createPrimClient } from "./client"
-import { CommonFrameworkOptions, PrimOptions, PrimWebSocketEvents, RpcAnswer, RpcCall } from "./interfaces"
+import { CommonFrameworkOptions_Old, PrimOptions, PrimWebSocketEvents, RpcAnswer, RpcCall } from "./interfaces"
 import { get as getProperty } from "lodash-es"
 import { defu } from "defu"
 import { nanoid } from "nanoid"
@@ -15,7 +15,7 @@ import { createPrimOptions } from "./options"
 // and handle conditions like querystring in path, or body not being converted to string yet
 
 export interface PrimServer {
-	rpc: (given: CommonFrameworkOptions) => Promise<RpcAnswer|RpcAnswer[]>
+	rpc: (given: CommonFrameworkOptions_Old) => Promise<RpcAnswer|RpcAnswer[]>
 	ws: Emitter<PrimWebSocketEvents>
 	// TODO: consider alternate way of passing options to websocket plugin on server,
 	// since they can't be modified here (because they've already been used)
@@ -41,7 +41,7 @@ export function createPrimServer<
 	const ws = mitt<PrimWebSocketEvents>()
 	const givenOptions = createPrimOptions(options) as OptionsType
 	// Prim Server should forward request to another Prim Server otherwise resolve locally
-	givenOptions.internal = { event: ws }
+	givenOptions.internal = { socketEvent: ws }
 	const prim = createPrimClient(givenOptions)
 	const makeRpcCall = async (rpc: RpcCall): Promise<RpcAnswer> => {
 		const { method, params, id } = rpc
@@ -69,7 +69,7 @@ export function createPrimServer<
 	}
 	// NOTE: accepts JSON body or variant given in path like so:
 	// /prefix/sayHello?-id=123&-=Hello&-=Ted
-	const rpc = async (given: CommonFrameworkOptions) => {
+	const rpc = async (given: CommonFrameworkOptions_Old) => {
 		const { url: urlGiven, prefix = "/prim" } = given
 		const url = parseURL(urlGiven)
 		const query = getQuery(url.search)

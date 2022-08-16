@@ -4,9 +4,7 @@ import { defu } from "defu"
 // TODO: consider separating server-specific options from client options so I can reduce the number
 // of options given on the client
 
-const baseOptions = (): PrimOptions =>({
-	// TODO: add fallback presets for "development" and "production"
-	// preset: "development",
+const createBaseOptions = (): PrimOptions => ({
 	// if endpoint is not given then assume endpoint is relative to current url, following suggested `/prim` for Prim-RPC calls
 	endpoint: "/prim",
 	// if not provided, Prim will try to use endpoint as websocket (useful when http/ws are on same path)
@@ -39,6 +37,8 @@ const baseOptions = (): PrimOptions =>({
 		}
 		return { send }
 	},
+	// these options should not be passed by a developer but are used internally
+	internal: {},
 })
 
 /**
@@ -49,10 +49,7 @@ const baseOptions = (): PrimOptions =>({
  */
 export function createPrimOptions<OptionsType extends PrimOptions = PrimOptions>(options?: OptionsType) {
 	// first initialize given options and values for which to fallback
-	const configured = defu<PrimOptions, PrimOptions>(options, {
-		...baseOptions(),
-		// these options should not be passed by a developer but are used internally
-		internal: {},
-	}) as OptionsType
+	const baseOptions = createBaseOptions()
+	const configured = defu<PrimOptions, PrimOptions>(options, baseOptions) as OptionsType
 	return configured
 }

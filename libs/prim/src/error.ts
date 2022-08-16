@@ -1,5 +1,5 @@
 export interface RpcErr<Data = unknown> {
-	code: number
+	code?: number
 	message: string
 	data?: Data
 }

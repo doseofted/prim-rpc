@@ -1,3 +1,9 @@
+/**
+ * NOTE: Prim calls on client-side plugins so all plugins should be provided
+ * as an option to Prim. This is unlike server plugins of which instead call
+ * on Prim.
+ */
+
 /* eslint-disable @typescript-eslint/no-unsafe-return */
 /* eslint-disable @typescript-eslint/no-unsafe-argument */
 /* eslint-disable @typescript-eslint/no-unsafe-assignment */

@@ -1,5 +1,4 @@
-import { Emitter } from "mitt"
-import { RpcErr } from "./error"
+import type { Emitter } from "mitt"
 interface RpcBase {
 	id?: string | number
 }
@@ -13,7 +12,7 @@ export interface RpcCall<Method = string, Params = any> extends RpcBase {
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 export interface RpcAnswer<Result = any, Error = any> extends RpcBase {
 	result?: Result
-	error?: RpcErr<Error>
+	error?: Error
 }
 
 export interface PrimHttpQueueItem {
@@ -50,6 +49,8 @@ export enum PromiseResolveStatus {
 	Resolved,
 }
 
+export type OptionsPresetFallback = "development"|"production"
+
 export interface JsonHandler {
 	// eslint-disable-next-line @typescript-eslint/no-explicit-any
 	stringify: (json: unknown) => string
@@ -64,6 +65,12 @@ export type PrimSocketFunction<J = JsonHandler> = (endpoint: string, events: Pri
 })
 
 export interface PrimOptions<M extends object = object, J extends JsonHandler = JsonHandler> {
+	/**
+	 * This option is not yet implemented.
+	 *
+	 * Choose a preset to fallback on if any options are not provided. By default, no preset is used.
+	 */
+	preset?: OptionsPresetFallback
 	/**
 	 * Module to use with Prim. When a function call is made, given module will be used first, otherwise an RPC will
 	 * be made.
@@ -129,18 +136,42 @@ export interface PrimOptions<M extends object = object, J extends JsonHandler = 
 	 * @param jsonHandler Provided handler for JSON, with `.stringify()` and `.parse()` methods
 	 */
 	socket?: PrimSocketFunction<J>
+	// TODO: Prim Server should create these options and hold references. This will be removed.
 	/** Properties belonging to `internal` are for internal use by Prim-RPC. */
 	internal?: {
-		/** Event emitter to be shared with Prim Server, if websocket events are used */
-		event?: Emitter<PrimWebSocketEvents>
+		/** Event emitter for callbacks to be shared with Prim Server (typically WebSocket-related) */
+		socketEvent?: Emitter<PrimWebSocketEvents>
+		// TODO: determine if this is useful (overriding client as option of Prim client may be enough)
+		/** Event emitter for RPC to be shared with Prim Server */
+		clientEvent?: Emitter<PrimHttpEvents>
 	}
+}
+
+export interface CommonServerGivenOptions {
+	url: string
+	method: string
+	body?: string
+}
+
+export interface CommonServerResponseOptions {
+	status: string
+	headers: { [header: string]: string }
+	body: string
+}
+
+export interface PrimServerOptions extends PrimOptions {
+	/**
+	 * The path prefix as used on the request. When processing GET requests to Prim-RPC, the prefix will
+	 * be removed from the function name.
+	 */
+	prefix?: string
 }
 
 /**
  * Common properties given by server frameworks so generic `createPrimServer`
  * can translate generic request into RPC.
  */
-export interface CommonFrameworkOptions {
+export interface CommonFrameworkOptions_Old {
 	/** The prefix where Prim lives, to be removed from the path. By default: `/prim` */
 	prefix?: string
 	/** The URL before parsing querystring */

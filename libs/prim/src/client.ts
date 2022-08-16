@@ -119,7 +119,7 @@ export function createPrimClient<
 	})
 	// !SECTION
 	// SECTION: WebSocket event handling
-	const wsEvent = configured.internal.event ?? mitt<PrimWebSocketEvents>()
+	const wsEvent = configured.internal.socketEvent ?? mitt<PrimWebSocketEvents>()
 	function createWebsocket(initialMessage: RpcCall) {
 		const response = (given: RpcAnswer) => {
 			wsEvent.emit("response", given)
@@ -142,7 +142,7 @@ export function createPrimClient<
 	// !SECTION
 	// SECTION: batched HTTP events
 	const queuedCalls: PrimHttpQueueItem[] = []
-	const httpEvent = mitt<PrimHttpEvents>()
+	const httpEvent = configured.internal.clientEvent ?? mitt<PrimHttpEvents>()
 	let timer: ReturnType<typeof setTimeout>
 	// when an RPC is added to the list, prepare request to be sent to server (either immediately or in a batch)
 	httpEvent.on("queue", (given) => {

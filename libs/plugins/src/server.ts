@@ -1,3 +1,9 @@
+/**
+ * NOTE: Server frameworks call on Prim so all "plugins" here are really plugins
+ * for server frameworks and not for Prim (whereas Prim client plugins are intended
+ * to be options, or "plugins," for Prim).
+ */
+
 /* eslint-disable @typescript-eslint/require-await */
 /* eslint-disable @typescript-eslint/no-unsafe-argument */
 /* eslint-disable @typescript-eslint/no-floating-promises */

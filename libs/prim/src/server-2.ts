@@ -1,25 +1,33 @@
-/* eslint-disable @typescript-eslint/no-unsafe-argument */
-/* eslint-disable @typescript-eslint/no-unsafe-assignment */
-import { RpcError } from "./error"
-import { AnyFunction, createPrimClient } from "./client"
-import { CommonFrameworkOptions, PrimOptions, PrimWebSocketEvents, RpcAnswer, RpcCall } from "./interfaces"
 import { get as getProperty } from "lodash-es"
-import { defu } from "defu"
-import { nanoid } from "nanoid"
-import { getQuery, parseURL } from "ufo"
-import mitt, { Emitter } from "mitt"
+import mitt from "mitt"
+import { AnyFunction, createPrimClient } from "./client"
+import { CommonServerGivenOptions, CommonServerResponseOptions, PrimServerOptions, PrimWebSocketEvents, RpcAnswer, RpcCall } from "./interfaces"
 import { createPrimOptions } from "./options"
 
-// TODO: make this work with methods called in path over GET request
-// the function should be restructured to accept: path, body, querystring
-// and handle conditions like querystring in path, or body not being converted to string yet
-
 export interface PrimServer {
-	rpc: (given: CommonFrameworkOptions) => Promise<RpcAnswer|RpcAnswer[]>
-	ws: Emitter<PrimWebSocketEvents>
-	// TODO: consider alternate way of passing options to websocket plugin on server,
-	// since they can't be modified here (because they've already been used)
-	opts: PrimOptions
+	/**
+	 * Step 1: Passing common parameters used by server frameworks to Prim, gather the
+	 * prepared RPC call from the request. See `.rpc()` for next step.
+	 */
+	prepareCall: (given: CommonServerGivenOptions) => RpcCall
+	/**
+	 * Step 2: Using the result of `.prepareCall()`, use the RPC to get a result from Prim.
+	 * See `.prepareSend()` for next step.
+	 */
+	rpc: (given: RpcCall) => Promise<RpcAnswer>
+	/**
+	 * Step 3: Using the result of `.rpc()`, prepare the result to be sent with the server framework.
+	 * See `.handleCallback()` for optional next step.
+	 */
+	prepareSend: (given: RpcAnswer) => CommonServerResponseOptions
+	/**
+	 * Handle callbacks on any function called for Prim server. This function should be executed
+	 * on new connections ...maybe.
+	 * 
+	 * TODO: figure out best to handle websockets, both in terms of callbacks and handling
+	 * RPC calls over websocket, if not already handled
+	 */
+	handleCallback: () => void
 }
 
 /**
@@ -36,7 +44,33 @@ export interface PrimServer {
 export function createPrimServer<
 	// eslint-disable-next-line @typescript-eslint/no-unused-vars
 	ModuleType extends OptionsType["module"] = object,
-	OptionsType extends PrimOptions = PrimOptions,
->(options?: PrimOptions): PrimServer {
-
+	OptionsType extends PrimServerOptions = PrimServerOptions,
+>(options?: PrimServerOptions): PrimServer {
+	const configured = createPrimOptions(options)
+	const socketEvent = mitt<PrimWebSocketEvents>()
+	configured.internal = { socketEvent }
+	return {
+		prepareCall(given) {
+			// ...
+		},
+		async rpc(given) {
+			// eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
+			const { method, params, id } = given
+			try {
+				// NOTE: new Prim client should be created on each request so callback results are not shared
+				const prim = createPrimClient(configured)
+				const methodExpanded = method.split("/")
+				const target = getProperty(prim, methodExpanded) as AnyFunction
+				const args = Array.isArray(params) ? params : [params]
+				// eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
+				return { result: await Reflect.apply(target, undefined, args), id }
+			} catch (error) {
+				// eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
+				return { error, id }
+			}
+		},
+		prepareSend(given) {
+			// ...
+		},
+	}
 }
