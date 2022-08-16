@@ -1,10 +1,11 @@
-import { PrimOptions } from "./interfaces"
+import { PrimOptions, PrimServerOptions } from "./interfaces"
 import { defu } from "defu"
 
 // TODO: consider separating server-specific options from client options so I can reduce the number
 // of options given on the client
 
-const createBaseOptions = (): PrimOptions => ({
+const createBaseClientOptions = (): PrimOptions => ({
+	// SECTION: client
 	// if endpoint is not given then assume endpoint is relative to current url, following suggested `/prim` for Prim-RPC calls
 	endpoint: "/prim",
 	// if not provided, Prim will try to use endpoint as websocket (useful when http/ws are on same path)
@@ -37,9 +38,25 @@ const createBaseOptions = (): PrimOptions => ({
 		}
 		return { send }
 	},
+	// !SECTION
+	// SECTION Client and server
 	// these options should not be passed by a developer but are used internally
 	internal: {},
+	// !SECTION
 })
+
+const createBaseServerOptions = (): PrimServerOptions => ({
+	...createBaseClientOptions(),
+	// the default prefix will likely be overridden
+	prefix: "/prim",
+	callbackHandler() {
+		console.log("Prim-RPC's callback handler was not implemented")
+	},
+	methodHandler() {
+		console.log("Prim-RPC's callback handler was not implemented")
+	},
+})
+
 
 /**
  * Set default options including creation of default clients used by Prim.
@@ -47,9 +64,9 @@ const createBaseOptions = (): PrimOptions => ({
  * @param options Given options by developer
  * @returns Options with defaults set
  */
-export function createPrimOptions<OptionsType extends PrimOptions = PrimOptions>(options?: OptionsType) {
+export function createPrimOptions<OptionsType extends PrimOptions = PrimOptions>(options?: OptionsType, server = false) {
 	// first initialize given options and values for which to fallback
-	const baseOptions = createBaseOptions()
+	const baseOptions = !server ? createBaseServerOptions() : createBaseClientOptions()
 	const configured = defu<PrimOptions, PrimOptions>(options, baseOptions) as OptionsType
 	return configured
 }

@@ -199,7 +199,12 @@ export interface PrimServerOptions<C = unknown> extends PrimOptions {
 	 * Context of server being used, passed from a function called by the server framework
 	 * which returns the parameters to be used. This type is the return type of that function.
 	 */
-	context: () => C
+	context?: () => C
+	/**
+	 * Options intended to be used from Prim's client
+	 * TODO: consider splitting client options to this property
+	 */
+	// clientOptions?: PrimOptions
 }
 
 export type PrimServerSocketAnswer = (result: string) => void
@@ -209,15 +214,6 @@ export interface PrimServerConnectedActions {
 }
 export interface PrimServerSocketEvents {
 	connected: () => PrimServerConnectedActions
-}
-
-export interface PrimServerSocketEvents_Old {
-	connected: () => void
-	// TODO: consider moving ended and rpc events below into parameters of
-	// connected event so that a Prim instance can be passed to events that
-	// only happen once a connection is established
-	ended: () => void
-	rpc: (data: string, send: PrimServerSocketAnswer) => void
 }
 
 export interface PrimServerActions {
@@ -278,17 +274,3 @@ export interface PrimServerEvents {
 // 		})
 // 	})
 // }
-
-/**
- * Common properties given by server frameworks so generic `createPrimServer`
- * can translate generic request into RPC.
- */
-export interface CommonFrameworkOptions_Old {
-	/** The prefix where Prim lives, to be removed from the path. By default: `/prim` */
-	prefix?: string
-	/** The URL before parsing querystring */
-	url?: string
-	/** The JSON body, which should already be formatted as RPC */
-	// eslint-disable-next-line @typescript-eslint/no-explicit-any
-	body?: any
-}
