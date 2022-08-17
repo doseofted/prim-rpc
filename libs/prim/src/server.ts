@@ -15,7 +15,6 @@ import {
 // matching `afterCall()`
 // beforeCall: <Params = unknown[]>(params: Params, ctx: Context) => Params
 // afterCall: <Return = unknown>(returned: Return, ctx: Context) => Return
-export type PrimServer = () => PrimServerActionsExtended
 /**
  * Unlike `createPrimClient()`, this function is designed purely for the server. Rather than integrating directly with a
  * server framework, it is meant to be given an RPC call (either over JSON or GET params) and return the result as an
@@ -32,7 +31,7 @@ export function createPrimServer<
 	// eslint-disable-next-line @typescript-eslint/no-unused-vars
 	ModuleType extends OptionsType["module"] = object,
 	OptionsType extends PrimServerOptions = PrimServerOptions,
->(options?: PrimServerOptions): PrimServer {
+>(options?: PrimServerOptions): () => PrimServerActionsExtended {
 	// NOTE: server options may include client options but only server options should be used
 	// client options should be re-instantiated on every request
 	// TODO: instead of merging options, considering adding client options to server options as separate property
@@ -129,7 +128,8 @@ export function createPrimServer<
 			}
 			return { call, prepareCall, rpc, prepareSend }
 		}
-		return { client }
+		const options = serverOptions
+		return { client, options }
 	}
 
 	function createSocketEvents (): PrimServerSocketEvents {

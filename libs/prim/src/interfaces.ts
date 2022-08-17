@@ -163,25 +163,14 @@ export interface CommonServerSimpleGivenOptions {
 	body?: string
 }
 
-/**
- * Common options for servers that simplify usage of "node:http"
- */
-export interface CommonServerComplexGivenOptions {
-	/** Path of URL, generally provided over more complex frameworks */
-	path?: string
-	/** Many servers will parse the query string for you as an object */
-	query?: { [key: string]:  string|string[] }
-	/** HTTP method */
-	method?: string
-	/** The body of the request, possibly already parsed with server's JSON handler */
-	body?: string|unknown
-}
-
 export interface CommonServerResponseOptions {
 	status: number
 	headers: { [header: string]: string }
 	body: string
 }
+
+export type PrimServerMethodHandler<T extends object = object> = (actions: PrimServerEvents, options?: T) => void
+export type PrimServerSocketHandler<T = unknown> = (events: PrimServerSocketEvents, options?: T) => void
 
 export interface PrimServerOptions<C = unknown> extends PrimOptions {
 	/**
@@ -189,12 +178,15 @@ export interface PrimServerOptions<C = unknown> extends PrimOptions {
 	 * be removed from the function name.
 	 */
 	prefix?: string
-	methodHandler?: (actions: PrimServerEvents) => void
+	/**
+	 * Configure your HTTP server to automatically send results from given RPC calls.
+	 */
+	methodHandler?: PrimServerMethodHandler
 	/**
 	 * Configure your own WebSocket server to automatically receive and send messages
 	 * that Prim-RPC expects.
 	 */
-	callbackHandler?: (events: PrimServerSocketEvents) => void
+	callbackHandler?: PrimServerSocketHandler
 	/**
 	 * Context of server being used, passed from a function called by the server framework
 	 * which returns the parameters to be used. This type is the return type of that function.
@@ -240,6 +232,7 @@ export interface PrimServerActionsExtended extends PrimServerActions {
 
 export interface PrimServerEvents {
 	client: () => PrimServerActionsExtended
+	options: PrimServerOptions
 }
 
 // implementation 1 for server plugin handling some websocket server
