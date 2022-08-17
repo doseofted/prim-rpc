@@ -2,7 +2,7 @@ import { describe, test, expect } from "vitest"
 import { createPrimClient, createPrimServer } from "."
 import type * as exampleClient from "@doseofted/prim-example"
 import * as exampleServer from "@doseofted/prim-example"
-import type { RpcAnswer, RpcCall } from "./interfaces"
+import type { PrimClientFunction, PrimServerActions, PrimServerActionsExtended, RpcAnswer, RpcCall } from "./interfaces"
 import jsonHandler from "superjson"
 
 const module = exampleServer
@@ -25,14 +25,27 @@ describe("Prim instantiates", () => {
 	// use case: to respond to client app (most common)
 	test("server instantiation, local source", () => {
 		const prim = createPrimServer({ module })
-		expect(typeof prim.rpc === "function").toBeTruthy()
+		expect(typeof prim().call === "function").toBeTruthy()
 	})
 	// use case: to chain multiple Prim servers together (TODO feature itself not implemented yet)
 	test("server instantiation, remote source", () => {
 		const prim = createPrimServer<IModule>()
-		expect(typeof prim.rpc === "function").toBeTruthy()
+		expect(typeof prim().call === "function").toBeTruthy()
 	})
 })
+
+/**
+ * A simple client for Prim to simulate a function call to a server
+ * (without a real server, just the Prim Server instance)
+ */
+const newTestClient = (prim: () => PrimServerActionsExtended) => {
+	const client: PrimClientFunction = async (_endpoint, bodyRpc, jsonHandler) => {
+		const body = jsonHandler.stringify(bodyRpc)
+		const { body: resultStr } = await prim().call( { body })
+		return jsonHandler.parse(resultStr)
+	}
+	return client
+}
 
 describe("Prim Client can call methods directly", () => {
 	test("with local source", async () => {
@@ -42,9 +55,8 @@ describe("Prim Client can call methods directly", () => {
 	})
 	test("with remote source", async () => {
 		const prim = createPrimServer({ module })
-		const { sayHello } = createPrimClient<IModule>({
-			client: async (_endpoint, body) => prim.rpc( { body }),
-		})
+		const client = newTestClient(prim)
+		const { sayHello } = createPrimClient<IModule>({ client })
 		const result = await sayHello({ greeting: "Hey", name: "Ted" })
 		expect(result).toEqual("Hey Ted!")
 	})

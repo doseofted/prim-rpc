@@ -1,9 +1,12 @@
 import { createPrimClient } from "./client"
 import { createPrimServer } from "./server"
+import { PromiseResolveStatus } from "./interfaces"
 
 export {
 	createPrimClient,
 	createPrimServer,
+	// TODO: remove this export without breaking prim-plugins package
+	PromiseResolveStatus,
 }
 
 export type {

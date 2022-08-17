@@ -1,5 +1,5 @@
 import type { PrimServerMethodHandler, PrimServerEvents } from "@doseofted/prim-rpc"
-import type { Application, Request, Response, NextFunction } from "express"
+import type * as Express from "express"
 
 // TODO: test this plugin
 
@@ -22,7 +22,7 @@ interface PrimExpressPluginOptions { prim: PrimServerEvents }
 // eslint-disable-next-line @typescript-eslint/require-await
 export const expressPrimPlugin = (options: PrimExpressPluginOptions) => {
 	const { prim } = options
-	const handler = async (req: Request, res: Response, _next :NextFunction) => {
+	const handler = async (req: Express.Request, res: Express.Response, _next: Express.NextFunction) => {
 		const { method, originalUrl: url } = req
 		// NOTE: this middleware should be loaded before body-parser
 		const body = await new Promise<string>(resolve => {
@@ -43,7 +43,7 @@ export const expressPrimPlugin = (options: PrimExpressPluginOptions) => {
 	return handler
 }
 
-interface MethodExpressOptions { app: Application }
+interface MethodExpressOptions { app: Express.Application }
 /**
  * A Prim plugin used to register itself with Express. Use like so:
  *
