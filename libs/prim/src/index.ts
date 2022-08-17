@@ -1,15 +1,21 @@
-import { createPrimClient } from "./prim"
+import { createPrimClient } from "./client"
 import { createPrimServer } from "./server"
-import { RpcError } from "./error"
+import { PromiseResolveStatus } from "./interfaces"
 
 export {
-	createPrimClient, createPrimServer, RpcError,
+	createPrimClient,
+	createPrimServer,
+	// TODO: remove this export without breaking prim-plugins package
+	PromiseResolveStatus,
 }
-
-import type { RpcErr } from "./error"
-import type { PrimOptions, RpcAnswer, RpcCall, PrimClientFunction, PrimSocketFunction } from "./interfaces"
-import type { PrimServer } from "./server"
 
 export type {
-	PrimOptions, RpcAnswer, RpcCall, PrimClientFunction, PrimSocketFunction, RpcErr, PrimServer,
-}
+	// Basic RPC structures
+	RpcAnswer, RpcCall,
+	// Prim-RPC options, both server and client side
+	PrimOptions, PrimServerOptions,
+	// client-side functions for sending RPCs
+	PrimClientFunction, PrimSocketFunction,
+	// server-side functions for handling RPCs
+	PrimServerMethodHandler, PrimServerSocketHandler,
+} from "./interfaces"

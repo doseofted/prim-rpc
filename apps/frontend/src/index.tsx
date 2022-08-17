@@ -4,6 +4,7 @@ import "./index.css"
 import "uno.css"
 import "@unocss/reset/tailwind.css"
 import { Router, useRoutes } from "@solidjs/router"
+import { Title } from "@solidjs/meta"
 import { MetaProvider } from "@solidjs/meta"
 import pages from "~solid-pages"
 
@@ -13,6 +14,7 @@ render(
 		const Routes = useRoutes(pages)
 		return (
 			<MetaProvider>
+				<Title>Example Broken Test</Title>
 				<Router>
 					<Routes />
 				</Router>
