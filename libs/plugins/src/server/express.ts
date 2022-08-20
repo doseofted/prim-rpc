@@ -22,7 +22,8 @@ interface PrimExpressPluginOptions { prim: PrimServerEvents }
 // eslint-disable-next-line @typescript-eslint/require-await
 export const expressPrimPlugin = (options: PrimExpressPluginOptions) => {
 	const { prim } = options
-	const handler = async (req: Express.Request, res: Express.Response, _next: Express.NextFunction) => {
+	const handler = async (req: Express.Request, res: Express.Response, next: Express.NextFunction) => {
+		if (!req.path.startsWith(prim.options.prefix)) { next(); return }
 		const { method, originalUrl: url } = req
 		// NOTE: this middleware should be loaded before body-parser
 		const body = await new Promise<string>(resolve => {
