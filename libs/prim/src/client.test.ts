@@ -183,11 +183,11 @@ function newTestClient (commonOptions: PrimOptions = {}): PrimOptions {
 		let wsConnection: ConnectedEvent
 		wsServer.on("connected", ws => {
 			wsConnection = ws
-			connected()
 			ws.on("messageServer", (msg) => {
 				console.log("received", msg)
 				response(jsonHandler.parse(msg))
 			})
+			connected()
 		})
 		setTimeout(() => {
 			wsServer.emit("connect")
