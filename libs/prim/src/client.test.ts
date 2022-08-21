@@ -1,10 +1,10 @@
 import { describe, test, expect } from "vitest"
-import { createPrimClient, createPrimServer } from "."
+import { createPrimClient } from "."
 import type * as exampleClient from "@doseofted/prim-example"
 import * as exampleServer from "@doseofted/prim-example"
-import type { PrimClientFunction, PrimOptions, PrimServerOptions, PrimSocketFunction } from "./interfaces"
-import mitt, { Emitter } from "mitt"
+import type { PrimServerOptions } from "./interfaces"
 import jsonHandler from "superjson"
+import { newTestClients } from "./preparation.test"
 
 const module = exampleServer
 type IModule = typeof exampleClient
@@ -31,7 +31,7 @@ describe("Prim Client can call methods directly", () => {
 		expect(result).toEqual(expected)
 	})
 	test("with remote source", async () => {
-		const { client, socket } = newTestClient()
+		const { client, socket } = newTestClients({ module })
 		const prim = createPrimClient<IModule>({ client, socket })
 		const params = { greeting: "Hey", name: "Ted" }
 		const expected = module.sayHello(params)
@@ -43,8 +43,8 @@ describe("Prim Client can call methods directly", () => {
 test("Prim Client can use alternative JSON handler", async () => {
 	// JSON handler is only useful with remote source (no local source test needed)
 	const commonOptions: PrimServerOptions = { jsonHandler }
-	const testingOptions = newTestClient(commonOptions)
-	const prim = createPrimClient<IModule>({ ...commonOptions, ...testingOptions })
+	const { client, socket } = newTestClients({ ...commonOptions, module })
+	const prim = createPrimClient<IModule>({ ...commonOptions, client, socket })
 	const date = new Date()
 	const expected = module.whatIsDayAfter(date)
 	const result = await prim.whatIsDayAfter(date)
@@ -61,7 +61,7 @@ describe("Prim Client can call deeply nested methods", () => {
 		expect(result).toEqual(expected)
 	})
 	test("with remote source", async () => {
-		const { client, socket } = newTestClient()
+		const { client, socket } = newTestClients({ module })
 		const prim = createPrimClient<IModule>({ client, socket })
 		const params = { greeting: "Yo", name: "Ted" }
 		const expected = module.testLevel2.testLevel1.sayHello(params)
@@ -85,7 +85,7 @@ describe("Prim Client can throw errors", () => {
 		expect(result).toThrow(expected)
 	})
 	test("with remote source, default JSON handler", async () => {
-		const { client, socket } = newTestClient()
+		const { client, socket } = newTestClients({ module })
 		const prim = createPrimClient<IModule>({ client, socket })
 		const result = () => prim.oops()
 		await expect(result()).rejects.toThrow(expected)
@@ -93,7 +93,7 @@ describe("Prim Client can throw errors", () => {
 	})
 	test("with remote source and custom JSON handler", async () => {
 		const commonOptions = { jsonHandler }
-		const { client, socket } = newTestClient(commonOptions)
+		const { client, socket } = newTestClients({ ...commonOptions, module })
 		const prim = createPrimClient<IModule>({ ...commonOptions, client, socket })
 		const result = () => prim.oops()
 		await expect(result()).rejects.toThrow(expected)
@@ -116,12 +116,11 @@ describe("Prim Client can make use of callbacks", () => {
 		expect(results).toEqual(["You're using Prim.", "Still using Prim!"])
 	})
 	test("with remote source", async () => {
-		const { client, socket } = newTestClient()
+		const { client, socket } = newTestClients({ module })
 		const prim = createPrimClient<IModule>({ client, socket })
 		const results = await new Promise<string[]>(resolve => {
 			const results: string[] = []
 			void prim.withCallback((message) => {
-				console.log("message given", message)
 				results.push(message)
 				if (results.length === 2) {
 					resolve(results)
@@ -131,72 +130,3 @@ describe("Prim Client can make use of callbacks", () => {
 		expect(results).toEqual(["You're using Prim.", "Still using Prim!"])
 	})
 })
-
-/**
- * A simple client for Prim to simulate a function call to a server
- * (without a real server, just the Prim Server instance)
- * 
- * @param commonOptions Client options that should also be shared with server
- * @returns Clients for Prim Client, used to communicate directly with Prim Server
- */
-function newTestClient (commonOptions: PrimOptions = {}): PrimOptions {
-	/** Represents WebSocket connection */
-	type ConnectedEvent = Emitter<{ messageClient: string, messageServer: string, ended: void }>
-	/** Represents potential WebSocket server */
-	const wsServer = mitt<{ connect: void, connected: ConnectedEvent }>()
-	/** Represents potential HTTP server */
-	const httpServer = mitt<{ request: string, response: string }>()
-	createPrimServer({
-		module,
-		...commonOptions,
-		callbackHandler({ connected }) {
-			wsServer.on("connect", () => {
-				const { call, ended } = connected()
-				const wsConnection: ConnectedEvent = mitt()
-				wsConnection.on("messageClient", (m) => {
-					call(String(m), (data) => {
-						wsConnection.emit("messageServer", data)
-					})
-					wsConnection.on("ended", ended)
-				})
-				wsServer.emit("connected", wsConnection)
-			})
-		},
-		methodHandler({ client }) {
-			// eslint-disable-next-line @typescript-eslint/no-misused-promises
-			httpServer.on("request", async (body) => {
-				const { call } = client()
-				const response = await call({ body: String(body) })
-				httpServer.emit("response", response.body)
-			})
-		},
-	})
-	const client: PrimClientFunction = (_endpoint, bodyRpc, jsonHandler) => new Promise(resolve => {
-		const body = jsonHandler.stringify(bodyRpc)
-		httpServer.on("response", (body) => {
-			resolve(jsonHandler.parse(body))
-		})
-		httpServer.emit("request", body)
-	})
-	const socket: PrimSocketFunction = (_endpoint, { connected, ended: _ended, response }, jsonHandler) => {
-		// NOTE: no need to call `ended` in test client unless destroyed
-		let wsConnection: ConnectedEvent
-		wsServer.on("connected", ws => {
-			wsConnection = ws
-			ws.on("messageServer", (msg) => {
-				console.log("received", msg)
-				response(jsonHandler.parse(msg))
-			})
-			connected()
-		})
-		setTimeout(() => {
-			wsServer.emit("connect")
-		}, 0)
-		return {
-			send(msg) {
-				wsConnection.emit("messageClient", jsonHandler.stringify(msg))
-			},
-		}
-	}
-	return { client, socket }
-}
