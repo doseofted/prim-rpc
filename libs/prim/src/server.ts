@@ -42,7 +42,7 @@ function createServerActions (serverOptions: PrimServerOptions, instance?: Retur
 				parseBooleans: true,
 				parseNumbers: true,
 			})
-			const id = "-" in query ? String(query["-"]) : ""
+			const id = "-" in query ? String(query["-"]) : undefined
 			delete query["-"]
 			const entries = Object.entries(query)
 			// determine if positional arguments were given (must start at 0, none can be missing)

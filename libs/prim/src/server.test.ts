@@ -1,7 +1,9 @@
 import { describe, test, expect } from "vitest"
 import { createPrimServer } from "."
+import { RpcAnswer, RpcCall } from "./interfaces"
 import type * as exampleClient from "@doseofted/prim-example"
 import * as exampleServer from "@doseofted/prim-example"
+import queryString from "query-string"
 
 const module = exampleServer
 type IModule = typeof exampleClient
@@ -18,3 +20,46 @@ describe("Prim server instantiates", () => {
 		expect(typeof prim().call === "function").toBeTruthy()
 	})
 })
+
+describe("Prim Server can call methods with local module", () => {
+	const prim = createPrimServer({ module, prefix: "/prim" })
+
+	test("using a URL", async () => {
+		const client = prim()
+		const url = queryString.stringifyUrl({
+			url: "/prim/sayHello",
+			query: {
+				greeting: "Salut",
+				name: "Ted",
+			},
+		})
+		const response = await client.call({ method: "GET", url })
+		const result = JSON.parse(response.body) as RpcAnswer
+		expect(result).toEqual({ result: "Salut Ted!" })
+	})
+	test("using a JSON body", async () => {
+		const client = prim()
+		const call: RpcCall = {
+			method: "sayHello",
+			params: {
+				greeting: "Hola",
+				name: "Ted",
+			},
+			id: 1,
+		}
+		const body = JSON.stringify(call)
+		const response = await client.call({ method: "POST", body })
+		const result = JSON.parse(response.body) as RpcAnswer
+		expect(result).toEqual({ result: "Hola Ted!", id: 1 })
+	})
+})
+
+// describe("Prim Server can call remote methods without module", () => {
+// 	// TODO: test Prim Server communication with another Prim server
+// 	// (for example, if function is not available on server then it may be available on some other server or it could be
+// 	// used to call a Prim Server hosted by someone else (so you could cache results on your own server if needed)
+// })
+
+// describe("Prim Server can answer batch calls", () => {
+// 	// NOTE: this could possibly be moved to the client since the client tests also test the Prim Server
+// })

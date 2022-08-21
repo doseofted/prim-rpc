@@ -13,57 +13,6 @@ test("dummy", () => expect(1).toBe(1))
 // TODO: move tests to their own files where it makes sense
 // for instance, functions in options.ts would be defined in options.test.ts
 
-// describe("Prim Server can call methods with RPC", () => {
-// 	test("with local modules", async () => {
-// 		const prim = createPrimServer({ module })
-// 		const result = await prim.rpc({
-// 			body: {
-// 				id: 1,
-// 				method: "testLevel2/testLevel1/sayHello",
-// 				params: { greeting: "Hey", name: "Ted" },
-// 			},
-// 		})
-// 		expect(result).toEqual({ result: "Hey Ted!", id: 1 })
-// 	})
-// 	test("from another Prim Server", async () => {
-// 		const primRemoteServer = createPrimServer({ module })
-// 		const primServer = createPrimServer<IModule>({
-// 			client: async (_endpoint, body) => primRemoteServer.rpc({ body }),
-// 		})
-// 		const result = await primServer.rpc({
-// 			body: {
-// 				id: 1,
-// 				method: "testLevel2/testLevel1/sayHello",
-// 				params: { greeting: "Hey", name: "Ted" },
-// 			},
-// 		})
-// 		expect(result).toEqual({ result: "Hey Ted!", id: 1 })
-// 	})
-// })
-
-// describe("Prim Server can call methods with RPC via URL", () => {
-// 	test("Locally", async () => {
-// 		const prim = createPrimServer({ module })
-// 		const result = await prim.rpc({
-// 			url: "/prim/testLevel2/testLevel1/sayHello?-id=1&greeting=Hey&name=Ted",
-// 			prefix: "/prim",
-// 		})
-// 		expect(result).toEqual({ result: "Hey Ted!", id: "1" })
-// 	})
-// 	test("From another Prim-Server", async () => {
-// 		const primServer = createPrimServer({ module })
-// 		const primRemoteServer = createPrimServer({
-// 			module,
-// 			client: async (body) => primServer.rpc({ body }),
-// 		})
-// 		const result = await primRemoteServer.rpc({
-// 			url: "/prim/testLevel2/testLevel1/sayHelloAlternative?-id=1&-=Hey&-=Ted",
-// 			prefix: "/prim",
-// 		})
-// 		expect(result).toEqual({ result: "Hey Ted!", id: "1" })
-// 	})
-// })
-
 // // TODO: write test for batch calls over HTTP
 // describe("Prim can batch requests", () => {
 // 	test("server can handle batch requests", async () => {
