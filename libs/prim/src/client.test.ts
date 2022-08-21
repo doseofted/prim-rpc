@@ -71,24 +71,24 @@ describe("Prim Client can call deeply nested methods", () => {
 })
 
 describe("Prim Client can throw errors", () => {
-	const expected = () => {
+	const expected = (() => {
 		try {
 			return module.oops()
 		} catch (error) {
 			if (error instanceof Error) { return error.message }
 			return "?"
 		}
-	}
+	})()
 	test("with local source", () => {
 		const prim = createPrimClient({ module })
 		const result = () => prim.oops()
-		expect(result).toThrow(expected())
+		expect(result).toThrow(expected)
 	})
 	test("with remote source, default JSON handler", async () => {
 		const { client, socket } = newTestClient()
 		const prim = createPrimClient<IModule>({ client, socket })
 		const result = () => prim.oops()
-		await expect(result()).rejects.toThrow(expected())
+		await expect(result()).rejects.toThrow(expected)
 		await expect(result()).rejects.toBeInstanceOf(Error)
 	})
 	test("with remote source and custom JSON handler", async () => {
@@ -96,8 +96,39 @@ describe("Prim Client can throw errors", () => {
 		const { client, socket } = newTestClient(commonOptions)
 		const prim = createPrimClient<IModule>({ ...commonOptions, client, socket })
 		const result = () => prim.oops()
-		await expect(result()).rejects.toThrow(expected())
+		await expect(result()).rejects.toThrow(expected)
 		await expect(result()).rejects.toBeInstanceOf(Error)
+	})
+})
+
+describe("Prim Client can make use of callbacks", () => {
+	test("with local source", async () => {
+		const prim = createPrimClient({ module })
+		const results = await new Promise<string[]>(resolve => {
+			const results: string[] = []
+			void prim.withCallback((message) => {
+				results.push(message)
+				if (results.length === 2) {
+					resolve(results)
+				}
+			})
+		})
+		expect(results).toEqual(["You're using Prim.", "Still using Prim!"])
+	})
+	test("with remote source", async () => {
+		const { client, socket } = newTestClient()
+		const prim = createPrimClient<IModule>({ client, socket })
+		const results = await new Promise<string[]>(resolve => {
+			const results: string[] = []
+			void prim.withCallback((message) => {
+				console.log("message given", message)
+				results.push(message)
+				if (results.length === 2) {
+					resolve(results)
+				}
+			})
+		})
+		expect(results).toEqual(["You're using Prim.", "Still using Prim!"])
 	})
 })
 
@@ -122,11 +153,13 @@ function newTestClient (commonOptions: PrimOptions = {}): PrimOptions {
 			wsServer.on("connect", () => {
 				const { call, ended } = connected()
 				const wsConnection: ConnectedEvent = mitt()
-				wsServer.emit("connected", wsConnection)
 				wsConnection.on("messageClient", (m) => {
-					call(String(m), (data) => { wsConnection.emit("messageServer", data) })
+					call(String(m), (data) => {
+						wsConnection.emit("messageServer", data)
+					})
 					wsConnection.on("ended", ended)
 				})
+				wsServer.emit("connected", wsConnection)
 			})
 		},
 		methodHandler({ client }) {
@@ -151,12 +184,17 @@ function newTestClient (commonOptions: PrimOptions = {}): PrimOptions {
 		wsServer.on("connected", ws => {
 			wsConnection = ws
 			connected()
-			ws.on("messageServer", (msg) => { response(jsonHandler.parse(msg)) })
+			ws.on("messageServer", (msg) => {
+				console.log("received", msg)
+				response(jsonHandler.parse(msg))
+			})
 		})
-		wsServer.emit("connect")
+		setTimeout(() => {
+			wsServer.emit("connect")
+		}, 0)
 		return {
 			send(msg) {
-				wsConnection?.emit("messageClient", jsonHandler.stringify(msg))
+				wsConnection.emit("messageClient", jsonHandler.stringify(msg))
 			},
 		}
 	}

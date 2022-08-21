@@ -91,6 +91,7 @@ export function createPrimClient<
 					wsEvent.on("response", (answer) => {
 						if (rpc.id !== answer.id) { return }
 						if (answer.error) {
+							// TODO: if callback result, handle potential Errors (as given in options)
 							reject(answer.error)
 						} else {
 							resolve(answer.result)

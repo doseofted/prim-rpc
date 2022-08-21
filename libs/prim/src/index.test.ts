@@ -13,47 +13,6 @@ test("dummy", () => expect(1).toBe(1))
 // TODO: move tests to their own files where it makes sense
 // for instance, functions in options.ts would be defined in options.test.ts
 
-// describe("Prim Client can use callbacks", () => {
-// 	test("with local source", async () => {
-// 		await new Promise<void>(resolve => {
-// 			const { withCallback } = createPrimClient({ module })
-// 			const results: string[] = []
-// 			void withCallback((message) => {
-// 				results.push(message)
-// 				if (results.length === 2) {
-// 					expect(results).toEqual(["You're using Prim.", "Still using Prim!"])
-// 					resolve()
-// 				}
-// 			})
-// 		})
-// 	})
-// 	test("with remote source", async () => {
-// 		await new Promise<void>(resolve => {
-// 			const results: string[] = []
-// 			const prim = createPrimServer({ module })
-// 			const { withCallback } = createPrimClient<IModule>({
-// 				socket(_endpoint, { connected, response, ended }, _jsonHandler) {
-// 					prim.ws.on("response", (answer) => { response(answer) })
-// 					prim.ws.on("ended", () => { ended() })
-// 					setTimeout(() => {
-// 						connected()
-// 					}, 0)
-// 					const send = (body: RpcCall|RpcCall[]) => { void prim.rpc({ body }) }
-// 					return { send }
-// 				},
-// 				client: async (_endpoint, body) => prim.rpc({ body }),
-// 			})
-// 			void withCallback((message) => {
-// 				results.push(message)
-// 				if (results.length === 2) {
-// 					expect(results).toEqual(["You're using Prim.", "Still using Prim!"])
-// 					resolve()
-// 				}
-// 			})
-// 		})
-// 	})
-// })
-
 // describe("Prim Server can call methods with RPC", () => {
 // 	test("with local modules", async () => {
 // 		const prim = createPrimServer({ module })
