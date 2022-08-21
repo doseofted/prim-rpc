@@ -48,7 +48,7 @@ interface PrimWebSocketFunctionEvents {
 }
 // !SECTION
 
-// SECTION Options
+// SECTION Client options
 export interface JsonHandler {
 	// eslint-disable-next-line @typescript-eslint/no-explicit-any
 	stringify: (json: unknown) => string

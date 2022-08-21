@@ -63,20 +63,21 @@ function createServerActions (serverOptions: PrimServerOptions, instance?: Retur
 		const { method, params, id } = given
 		try {
 			// NOTE: new Prim client should be created on each request so callback results are not shared
-			const { client, socketEvent: event } = instance ?? createPrimInstance()
+			const { client, socketEvent: event } = instance ?? createPrimInstance(serverOptions)
 			const methodExpanded = method.split("/")
 			const target = getProperty(client, methodExpanded) as AnyFunction
 			const args = Array.isArray(params) ? params : [params]
 			if (cbResults) { event.on("response", cbResults) }
 			// eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
-			return { result: await Reflect.apply(target, undefined, args), id }
+			const result: RpcAnswer = await Reflect.apply(target, undefined, args)
+			return { result, id }
 		} catch (error) {
 			// eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
 			return { error, id }
 		}
 	}
 	const prepareSend = (given: RpcAnswer): CommonServerResponseOptions => {
-		const body = jsonHandler.stringify(given.result)
+		const body = jsonHandler.stringify(given)
 		// NOTE: body length is generally handled by server framework, I think
 		const headers = { "Content-Type": "application/json" }
 		const status = given.error ? 500 : (given.result ? 200 : 400)
@@ -103,7 +104,7 @@ function createServerEvents (serverOptions: PrimServerOptions): PrimServerEvents
 
 function createSocketEvents (serverOptions: PrimServerOptions): PrimServerSocketEvents {
 	const connected = () => {
-		const instance = createPrimInstance()
+		const instance = createPrimInstance(serverOptions)
 		const { socketEvent: event } = instance
 		const { prepareCall, rpc: rpcCall, prepareSend } = createServerActions(serverOptions, instance)
 		event.emit("connected")
