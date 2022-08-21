@@ -199,6 +199,7 @@ importers:
       nanoid: ^4.0.0
       proxy-deep: ^3.1.1
       query-string: ^7.1.1
+      serialize-error: ^11.0.0
       superjson: ^1.9.1
       type-fest: ^2.18.0
       ufo: ^0.8.5
@@ -209,6 +210,7 @@ importers:
       nanoid: 4.0.0
       proxy-deep: 3.1.1
       query-string: 7.1.1
+      serialize-error: 11.0.0
       ufo: 0.8.5
     devDependencies:
       '@doseofted/prim-example': link:../example
@@ -5626,6 +5628,13 @@ packages:
     transitivePeerDependencies:
       - supports-color
 
+  /serialize-error/11.0.0:
+    resolution: {integrity: sha512-YKrURWDqcT3VGX/s/pCwaWtpfJEEaEw5Y4gAnQDku92b/HjVj4r4UhA5QrMVMFotymK2wIWs5xthny5SMFu7Vw==}
+    engines: {node: '>=14.16'}
+    dependencies:
+      type-fest: 2.18.0
+    dev: false
+
   /serve-static/1.15.0:
     resolution: {integrity: sha512-XGuRDNjXUijsUL0vl6nSD7cwURuzEgglbOaFuZM9g3kwDXOWVTck0jLzjPzGD+TazWbboZYu52/9/XPdUgne9g==}
     engines: {node: '>= 0.8.0'}
@@ -6417,7 +6426,6 @@ packages:
   /type-fest/2.18.0:
     resolution: {integrity: sha512-pRS+/yrW5TjPPHNOvxhbNZexr2bS63WjrMU8a+VzEBhUi9Tz1pZeD+vQz3ut0svZ46P+SRqMEPnJmk2XnvNzTw==}
     engines: {node: '>=12.20'}
-    dev: true
 
   /type-is/1.6.18:
     resolution: {integrity: sha512-TkRKr9sUTxEH8MdfuCSP7VizJyzRNMjj2J2do2Jr3Kym598JVdEksuzPQCnlFPW4ky9Q+iA+ma9BGm06XQBy8g==}

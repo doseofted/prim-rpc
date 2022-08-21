@@ -95,7 +95,7 @@ export interface PrimOptions<M extends object = object, J extends JsonHandler = 
 	clientBatchTime?: number
 	/**
 	 * Usually the default of `JSON` is sufficient but parsing/conversion of more complex types may benefit from other
-	 * JSON handling libraries.
+	 * JSON handling libraries. The same handler must be used on both the server and client.
 	 *
 	 * Given module is required to have both a `.stringify(obj)` and `.parse(str)` method. If chosen JSON handler requires
 	 * additional options, it is recommended to create the stringify/parse functions and wrap the intended JSON handler
@@ -136,6 +136,15 @@ export interface PrimOptions<M extends object = object, J extends JsonHandler = 
 	 * @param jsonHandler Provided handler for JSON, with `.stringify()` and `.parse()` methods
 	 */
 	socket?: PrimSocketFunction<J>
+	/**
+	 * Whether Errors should be serialized before sending from the server and deserialized when received on the client.
+	 * The default is `true` unless a custom JSON handler is set. You may set this option explicitly to always use your
+	 * preference. When set to `false`, thrown errors are returned to client as an empty object unless your JSON handler
+	 * can stringify `Error` objects.
+	 * 
+	 * This option must be set to the same value on the server and client.
+	 */
+	handleError?: boolean
 	// TODO: Prim Server should create these options and hold references. This will be removed.
 	/** Properties belonging to `internal` are for internal use by Prim-RPC. */
 	internal?: {

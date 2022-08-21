@@ -37,6 +37,11 @@ const createBaseClientOptions = (): PrimOptions => ({
 		}
 		return { send }
 	},
+	// Stringified Errors with the default JSON handler are empty objects
+	// Empty errors could be a source of confusion if an end-user doesn't receive an error on the client when one is
+	// thrown from the server so set this to `true` (if presets are used, this may be set to `false` for
+	// "production" settings)
+	handleError: true,
 	// !SECTION
 	// SECTION Client and server
 	// these options should not be passed by a developer but are used internally
@@ -65,7 +70,11 @@ const createBaseServerOptions = (): PrimServerOptions => ({
  */
 export function createPrimOptions<OptionsType extends PrimOptions = PrimOptions>(options?: OptionsType, server = false) {
 	// first initialize given options and values for which to fallback
+	const overrideBaseOptions = {} as OptionsType
+	if (options?.jsonHandler) {
+		overrideBaseOptions.handleError = false
+	}
 	const baseOptions = !server ? createBaseServerOptions() : createBaseClientOptions()
-	const configured = defu<PrimOptions, PrimOptions>(options, baseOptions) as OptionsType
+	const configured = defu<PrimOptions, PrimOptions>(options, overrideBaseOptions, baseOptions) as OptionsType
 	return configured
 }

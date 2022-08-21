@@ -8,6 +8,7 @@ import {
 	RpcAnswer, RpcCall, PrimServerSocketAnswer, PrimServerSocketEvents, PrimServerActionsBase, PrimHttpEvents,
 	PrimServerEvents, PrimServerActionsExtended,
 } from "./interfaces"
+import { serializeError } from "serialize-error"
 
 /**
  * 
@@ -25,7 +26,7 @@ function createPrimInstance (options?: PrimServerOptions) {
 }
 
 function createServerActions (serverOptions: PrimServerOptions, instance?: ReturnType<typeof createPrimInstance>): PrimServerActionsBase {
-	const { jsonHandler, prefix: serverPrefix } = serverOptions
+	const { jsonHandler, prefix: serverPrefix, handleError } = serverOptions
 	const prepareCall = (given: CommonServerSimpleGivenOptions = {}): RpcCall => {
 		const { body = "", method = "POST", url: possibleUrl = "" } = given
 		const providedBody = body && method === "POST" 
@@ -71,9 +72,14 @@ function createServerActions (serverOptions: PrimServerOptions, instance?: Retur
 			// eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
 			const result: RpcAnswer = await Reflect.apply(target, undefined, args)
 			return { result, id }
-		} catch (error) {
-			// eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
-			return { error, id }
+		} catch (e) {
+			// JSON.stringify on Error results in an empty object. Since Error is common, serialize it
+			// when a custom JSON handler is not provided
+			if (handleError && e instanceof Error) {
+				const error = serializeError<unknown>(e)
+				return { error, id }
+			}
+			return { error: e, id }
 		}
 	}
 	const prepareSend = (given: RpcAnswer): CommonServerResponseOptions => {

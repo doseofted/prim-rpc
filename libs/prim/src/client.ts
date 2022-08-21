@@ -16,6 +16,7 @@ import { get as getProperty, remove as removeFromArray } from "lodash-es"
 import type { Asyncify } from "type-fest"
 import { RpcCall, PrimOptions, RpcAnswer, PrimWebSocketEvents, PrimHttpEvents, PromiseResolveStatus, PrimHttpQueueItem } from "./interfaces"
 import { createPrimOptions } from "./options"
+import { deserializeError } from "serialize-error"
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 export type AnyFunction = (...args: any[]) => any
@@ -103,6 +104,9 @@ export function createPrimClient<
 				httpEvent.on("response", (answer) => {
 					if (rpc.id !== answer.id) { return }
 					if (answer.error) {
+						if (configured.handleError) {
+							answer.error = deserializeError(answer.error)
+						}
 						reject(answer.error)
 					} else {
 						resolve(answer.result)
