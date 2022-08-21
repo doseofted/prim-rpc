@@ -1,7 +1,7 @@
 import type { Emitter } from "mitt"
-interface RpcBase {
-	id?: string|number
-}
+
+// SECTION RPC call and result structure
+interface RpcBase { id?: string|number }
 
 export interface RpcCall<Method = string, Params = unknown> extends RpcBase {
 	method: Method
@@ -11,6 +11,14 @@ export interface RpcCall<Method = string, Params = unknown> extends RpcBase {
 export interface RpcAnswer<Result = unknown, Error = unknown> extends RpcBase {
 	result?: Result
 	error?: Error
+}
+// !SECTION
+
+// SECTION HTTP/WebSocket events
+export enum PromiseResolveStatus {
+	/** Promise has not been created yet */ Unhandled,
+	/** Promise has been created but not yet resolved */ Pending,
+	/** Promise has resolved */ Resolved,
 }
 
 export interface PrimHttpQueueItem {
@@ -31,25 +39,16 @@ export type PrimWebSocketEvents = {
 }
 
 // NOTE: all functions' params must match type of same name given above
-export interface PrimWebSocketFunctionEvents {
+interface PrimWebSocketFunctionEvents {
 	connected: () => void
 	// NOTE: I don't need to return multiple answers unless batching is allowed over websocket (not needed)
 	// response: (answer: RpcAnswer|RpcAnswer[]) => void
 	response: (answer: PrimWebSocketEvents["response"]) => void
 	ended: () => void
 }
+// !SECTION
 
-export enum PromiseResolveStatus {
-	/** Promise has not been created yet */
-	Unhandled,
-	/** Promise has been created but not yet resolved */
-	Pending,
-	/** Promise has resolved */
-	Resolved,
-}
-
-export type OptionsPresetFallback = "development"|"production"
-
+// SECTION Options
 export interface JsonHandler {
 	// eslint-disable-next-line @typescript-eslint/no-explicit-any
 	stringify: (json: unknown) => string
@@ -62,6 +61,8 @@ export type PrimClientFunction<J = JsonHandler> = (endpoint: string, jsonBody: R
 export type PrimSocketFunction<J = JsonHandler> = (endpoint: string, events: PrimWebSocketFunctionEvents, jsonHandler: J) => ({
 	send: (message: RpcCall|RpcCall[]) => void
 })
+
+type OptionsPresetFallback = "development"|"production"
 
 export interface PrimOptions<M extends object = object, J extends JsonHandler = JsonHandler> {
 	/**
@@ -145,7 +146,9 @@ export interface PrimOptions<M extends object = object, J extends JsonHandler = 
 		clientEvent?: Emitter<PrimHttpEvents>
 	}
 }
+// !SECTION
 
+// SECTION Server calls
 /**
  * Common options for servers that are just lightweight extensions of "node:http".
  * 
@@ -162,13 +165,18 @@ export interface CommonServerSimpleGivenOptions {
 }
 
 export interface CommonServerResponseOptions {
+	/** HTTP status code */
 	status: number
+	/** Headers, as generally formatted for most Node servers */
 	headers: { [header: string]: string }
+	/** Body of result, as a string */
 	body: string
 }
+// !SECTION
 
+// SECTION Server options
 export type PrimServerMethodHandler<T extends object = object> = (actions: PrimServerEvents, options?: T) => void
-export type PrimServerSocketHandler<T = unknown> = (events: PrimServerSocketEvents, options?: T) => void
+export type PrimServerCallbackHandler<T = unknown> = (events: PrimServerSocketEvents, options?: T) => void
 
 export interface PrimServerOptions<C = unknown> extends PrimOptions {
 	/**
@@ -184,7 +192,7 @@ export interface PrimServerOptions<C = unknown> extends PrimOptions {
 	 * Configure your own WebSocket server to automatically receive and send messages
 	 * that Prim-RPC expects.
 	 */
-	callbackHandler?: PrimServerSocketHandler
+	callbackHandler?: PrimServerCallbackHandler
 	/**
 	 * Context of server being used, passed from a function called by the server framework
 	 * which returns the parameters to be used. This type is the return type of that function.
@@ -198,7 +206,7 @@ export interface PrimServerOptions<C = unknown> extends PrimOptions {
 }
 
 export type PrimServerSocketAnswer = (result: string) => void
-export interface PrimServerConnectedActions {
+interface PrimServerConnectedActions {
 	ended: () => void
 	call: (data: string, send: PrimServerSocketAnswer) => void
 }
@@ -206,7 +214,7 @@ export interface PrimServerSocketEvents {
 	connected: () => PrimServerConnectedActions
 }
 
-export interface PrimServerActions {
+export interface PrimServerActionsBase {
 	/**
 	 * Step 1: Passing common parameters used by server frameworks to Prim, gather the
 	 * prepared RPC call from the request. See `.rpc()` for next step.
@@ -224,7 +232,7 @@ export interface PrimServerActions {
 	prepareSend: (given: RpcAnswer) => CommonServerResponseOptions
 }
 
-export interface PrimServerActionsExtended extends PrimServerActions {
+export interface PrimServerActionsExtended extends PrimServerActionsBase {
 	/**
 	 * This function prepares a useable result for common server frameworks
 	 * using common options that most servers provide. It is a shortcut for
@@ -239,36 +247,3 @@ export interface PrimServerEvents {
 	client: () => PrimServerActionsExtended
 	options: PrimServerOptions
 }
-
-// implementation 1 for server plugin handling some websocket server
-// const wss = new WSExample()
-// function testonly ({ connected, ended, rpc }: PrimServerSocketEvents) {
-// 	wss.on("connection", (ws) => {
-// 		connected()
-// 		ws.on("message", (d) => {
-// 			rpc(String(d), a => ws.send(a))
-// 		})
-// 		ws.on("close", () => {
-// 			ended()
-// 		})
-// 	})
-// }
-
-// implementation 2 for server plugin handling some websocket server
-// NOTE: this version considers the fact that "rpc" and "ended" events depend
-// on a particular instance of Prim to be created once connection is created
-// and destroyed once websocket connection is destroyed
-// const wss = new WSExample()
-// function testonly (connected: PrimServerSocketEvents) {
-// 	wss.on("connection", (ws) => {
-// 		const { rpc, ended } = connected()
-// 		ws.on("message", (data) => {
-// 			const result = rpc(String(data), answer => {
-// 				ws.send(answer)
-// 			})
-// 		})
-// 		ws.on("close", () => {
-// 			ended()
-// 		})
-// 	})
-// }

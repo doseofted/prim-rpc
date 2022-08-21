@@ -5,7 +5,7 @@ import { createPrimClient, AnyFunction } from "./client"
 import { createPrimOptions } from "./options"
 import {
 	CommonServerSimpleGivenOptions, CommonServerResponseOptions, PrimServerOptions, PrimWebSocketEvents,
-	RpcAnswer, RpcCall, PrimServerSocketAnswer, PrimServerSocketEvents, PrimServerActions, PrimHttpEvents,
+	RpcAnswer, RpcCall, PrimServerSocketAnswer, PrimServerSocketEvents, PrimServerActionsBase, PrimHttpEvents,
 	PrimServerEvents, PrimServerActionsExtended,
 } from "./interfaces"
 
@@ -24,7 +24,7 @@ function createPrimInstance (options?: PrimServerOptions) {
 	return { client, socketEvent, clientEvent, configured }
 }
 
-function createServerActions (serverOptions: PrimServerOptions, instance?: ReturnType<typeof createPrimInstance>): PrimServerActions {
+function createServerActions (serverOptions: PrimServerOptions, instance?: ReturnType<typeof createPrimInstance>): PrimServerActionsBase {
 	const { jsonHandler, prefix: serverPrefix } = serverOptions
 	const prepareCall = (given: CommonServerSimpleGivenOptions = {}): RpcCall => {
 		const { body = "", method = "POST", url: possibleUrl = "" } = given
@@ -157,6 +157,7 @@ export function createPrimServer<
 	const serverOptions = createPrimOptions(options, true)
 	serverOptions.callbackHandler?.(createSocketEvents(serverOptions))
 	serverOptions.methodHandler?.(createServerEvents(serverOptions))
+	// NOTE: return actions so a new client is used every time
 	return createServerEvents(serverOptions).client
 }
 
