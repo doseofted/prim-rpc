@@ -9,6 +9,124 @@ import {
 	PrimServerEvents, PrimServerActionsExtended,
 } from "./interfaces"
 
+/**
+ * 
+ * @param options Options for Prim server, including client options
+ * @returns A `client` used for RPC calls, `configured` settings for Prim Server,
+ * and event handlers for generic events used when making WS/HTTP calls
+ */
+function createPrimInstance (options?: PrimServerOptions) {
+	const configured = createPrimOptions(options)
+	const socketEvent = mitt<PrimWebSocketEvents>()
+	const clientEvent = mitt<PrimHttpEvents>()
+	configured.internal = { socketEvent, clientEvent }
+	const client = createPrimClient(configured)
+	return { client, socketEvent, clientEvent, configured }
+}
+
+function createServerActions (serverOptions: PrimServerOptions, instance?: ReturnType<typeof createPrimInstance>): PrimServerActions {
+	const { jsonHandler, prefix: serverPrefix } = serverOptions
+	const prepareCall = (given: CommonServerSimpleGivenOptions = {}): RpcCall => {
+		const { body = "", method = "POST", url: possibleUrl = "" } = given
+		const providedBody = body && method === "POST" 
+		if (providedBody) {
+			const prepared = jsonHandler.parse<RpcCall>(given.body)
+			return prepared
+		}
+		const providedUrl = possibleUrl !== "" && method === "GET"
+		if (providedUrl) {
+			const positional = []
+			const { query, url } = queryString.parseUrl(possibleUrl, {
+				arrayFormat: "comma",
+				parseBooleans: true,
+				parseNumbers: true,
+			})
+			const id = "-" in query ? String(query["-"]) : ""
+			delete query["-"]
+			const entries = Object.entries(query)
+			// determine if positional arguments were given (must start at 0, none can be missing)
+			for (const [possibleIndex, value] of entries) {
+				const index = Number.isInteger(possibleIndex) ? parseInt(possibleIndex) : false
+				if (index === false) { break }
+				const nextIndex = index === 0 || typeof positional[index - 1] !== "undefined"
+				if (!nextIndex) { break }
+				positional[index] = value
+			}
+			const params = (positional.length > 0 && positional.length === entries.length) ? positional : query
+			const method = url.replace(serverPrefix + "/", "")
+			return { id, method, params }
+		}
+		// TODO: handle invalid requests
+	}
+	const rpc = async (given: RpcCall, cbResults?: (a: RpcAnswer) => void): Promise<RpcAnswer> => {
+		// eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
+		const { method, params, id } = given
+		try {
+			// NOTE: new Prim client should be created on each request so callback results are not shared
+			const { client, socketEvent: event } = instance ?? createPrimInstance()
+			const methodExpanded = method.split("/")
+			const target = getProperty(client, methodExpanded) as AnyFunction
+			const args = Array.isArray(params) ? params : [params]
+			if (cbResults) { event.on("response", cbResults) }
+			// eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
+			return { result: await Reflect.apply(target, undefined, args), id }
+		} catch (error) {
+			// eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
+			return { error, id }
+		}
+	}
+	const prepareSend = (given: RpcAnswer): CommonServerResponseOptions => {
+		const body = jsonHandler.stringify(given.result)
+		// NOTE: body length is generally handled by server framework, I think
+		const headers = { "Content-Type": "application/json" }
+		const status = given.error ? 500 : (given.result ? 200 : 400)
+		return { body, headers, status }
+	}
+	return { prepareCall, rpc, prepareSend }
+}
+
+
+function createServerEvents (serverOptions: PrimServerOptions): PrimServerEvents {
+	const client = () => {
+		const { prepareCall, rpc, prepareSend } = createServerActions(serverOptions)
+		const call = async (given: CommonServerSimpleGivenOptions): Promise<CommonServerResponseOptions> => {
+			const preparedParams = prepareCall(given)
+			const result = await rpc(preparedParams)
+			const preparedResult = prepareSend(result)
+			return preparedResult
+		}
+		return { call, prepareCall, rpc, prepareSend }
+	}
+	const options = serverOptions
+	return { client, options }
+}
+
+function createSocketEvents (serverOptions: PrimServerOptions): PrimServerSocketEvents {
+	const connected = () => {
+		const instance = createPrimInstance()
+		const { socketEvent: event } = instance
+		const { prepareCall, rpc: rpcCall, prepareSend } = createServerActions(serverOptions, instance)
+		event.emit("connected")
+		const ended = () => {
+			event.emit("ended")
+			event.all.clear()
+		}
+		const call = async (body: string, send: PrimServerSocketAnswer) => {
+			// TODO: find out if I'm attaching too many event listeners here
+			event.on("response", (data) => {
+				const { body } = prepareSend(data)
+				send(body)
+			})
+			const preparedParams = prepareCall({ body })
+			const result = await rpcCall(preparedParams)
+			const preparedResult = prepareSend(result)
+			send(preparedResult.body)			
+		}
+		return { ended, call }
+	}
+	return { connected }
+}
+
 // NOTE: these functions may be moved and should be used for transforming input before/after
 // calling example function: `hello()`. So, a function named `beforeHello()` would be called
 // with parameters matching `beforeCall()` and `afterHello()` would be called with parameters
@@ -37,128 +155,9 @@ export function createPrimServer<
 	// TODO: instead of merging options, considering adding client options to server options as separate property
 	// and creating client options separately from server
 	const serverOptions = createPrimOptions(options, true)
-	serverOptions.callbackHandler?.(createSocketEvents())
-	serverOptions.methodHandler?.(createServerEvents())
-	const { jsonHandler, prefix: serverPrefix } = serverOptions
-
-	function createPrimInstance () {
-		const configured = createPrimOptions(options)
-		const socketEvent = mitt<PrimWebSocketEvents>()
-		const clientEvent = mitt<PrimHttpEvents>()
-		configured.internal = { socketEvent, clientEvent }
-		const client = createPrimClient(configured)
-		return { client, socketEvent, clientEvent, configured }
-	}
-
-	function createServerActions (instance?: ReturnType<typeof createPrimInstance>): PrimServerActions {
-		const prepareCall = (given: CommonServerSimpleGivenOptions = {}): RpcCall => {
-			const { body = "", method = "POST", url: possibleUrl = "" } = given
-			const providedBody = body && method === "POST" 
-			if (providedBody) {
-				const prepared = jsonHandler.parse<RpcCall>(given.body)
-				return prepared
-			}
-			const providedUrl = possibleUrl !== "" && method === "GET"
-			if (providedUrl) {
-				const positional = []
-				const { query, url } = queryString.parseUrl(possibleUrl, {
-					arrayFormat: "comma",
-					parseBooleans: true,
-					parseNumbers: true,
-				})
-				const id = "-" in query ? String(query["-"]) : ""
-				delete query["-"]
-				const entries = Object.entries(query)
-				// determine if positional arguments were given (must start at 0, none can be missing)
-				for (const [possibleIndex, value] of entries) {
-					const index = Number.isInteger(possibleIndex) ? parseInt(possibleIndex) : false
-					if (index === false) { break }
-					const nextIndex = index === 0 || typeof positional[index - 1] !== "undefined"
-					if (!nextIndex) { break }
-					positional[index] = value
-				}
-				const params = (positional.length > 0 && positional.length === entries.length) ? positional : query
-				const method = url.replace(serverPrefix + "/", "")
-				return { id, method, params }
-			}
-			// TODO: handle invalid requests
-		}
-		const rpc = async (given: RpcCall, cbResults?: (a: RpcAnswer) => void): Promise<RpcAnswer> => {
-			// eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
-			const { method, params, id } = given
-			try {
-				// NOTE: new Prim client should be created on each request so callback results are not shared
-				const { client, socketEvent: event } = instance ?? createPrimInstance()
-				const methodExpanded = method.split("/")
-				const target = getProperty(client, methodExpanded) as AnyFunction
-				const args = Array.isArray(params) ? params : [params]
-				if (cbResults) { event.on("response", cbResults) }
-				// eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
-				return { result: await Reflect.apply(target, undefined, args), id }
-			} catch (error) {
-				// eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
-				return { error, id }
-			}
-		}
-		const prepareSend = (given: RpcAnswer): CommonServerResponseOptions => {
-			const body = jsonHandler.stringify(given.result)
-			// NOTE: body length is generally handled by server framework, I think
-			const headers = { "Content-Type": "application/json" }
-			const status = given.error ? 500 : (given.result ? 200 : 400)
-			return { body, headers, status }
-		}
-		return { prepareCall, rpc, prepareSend }
-	}
-
-	function createServerEvents (): PrimServerEvents {
-		const client = () => {
-			const { prepareCall, rpc, prepareSend } = createServerActions()
-			/**
-			 * This function prepares a useable result for common server frameworks
-			 * using common options that most servers provide. It is a shortcut for
-			 * other processing steps for Prim-RPC.
-			 * 
-			 * This calls, in order, `.prepareCall()`, `.rpc()`, and `.prepapreSend()`
-			 */
-			const call = async (given: CommonServerSimpleGivenOptions): Promise<CommonServerResponseOptions> => {
-				const preparedParams = prepareCall(given)
-				const result = await rpc(preparedParams)
-				const preparedResult = prepareSend(result)
-				return preparedResult
-			}
-			return { call, prepareCall, rpc, prepareSend }
-		}
-		const options = serverOptions
-		return { client, options }
-	}
-
-	function createSocketEvents (): PrimServerSocketEvents {
-		const connected = () => {
-			const instance = createPrimInstance()
-			const { socketEvent: event } = instance
-			const { prepareCall, rpc: rpcCall, prepareSend } = createServerActions(instance)
-			event.emit("connected")
-			const ended = () => {
-				event.emit("ended")
-				event.all.clear()
-			}
-			const call = async (body: string, send: PrimServerSocketAnswer) => {
-				// TODO: find out if I'm attaching too many event listeners here
-				event.on("response", (data) => {
-					const { body } = prepareSend(data)
-					send(body)
-				})
-				const preparedParams = prepareCall({ body })
-				const result = await rpcCall(preparedParams)
-				const preparedResult = prepareSend(result)
-				send(preparedResult.body)			
-			}
-			return { ended, call }
-		}
-		return { connected }
-	}
-
-	return createServerEvents().client
+	serverOptions.callbackHandler?.(createSocketEvents(serverOptions))
+	serverOptions.methodHandler?.(createServerEvents(serverOptions))
+	return createServerEvents(serverOptions).client
 }
 
 // IDEA: Prim should accept HTTP handler to automatically register server framework plugins

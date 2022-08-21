@@ -92,7 +92,7 @@ export function createPrimClient<
 						if (answer.error) {
 							reject(answer.error)
 						} else {
-							resolve(answer.result as unknown)
+							resolve(answer.result)
 						}
 					})
 				})
@@ -105,7 +105,7 @@ export function createPrimClient<
 					if (answer.error) {
 						reject(answer.error)
 					} else {
-						resolve(answer.result as unknown)
+						resolve(answer.result)
 					}
 				})
 			})

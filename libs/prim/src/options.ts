@@ -30,8 +30,7 @@ const createBaseClientOptions = (): PrimOptions => ({
 		ws.onopen = connected
 		ws.onclose = ended
 		ws.onmessage = (({ data: message }) => {
-			// NOTE: binary data is not expected so message should be passed to JSON handler as a string
-			response(jsonHandler.parse(String(message)))
+			response(jsonHandler.parse(message as string))
 		})
 		const send = (msg: unknown) => {
 			ws.send(jsonHandler.stringify(msg))

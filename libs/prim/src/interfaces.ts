@@ -1,16 +1,14 @@
 import type { Emitter } from "mitt"
 interface RpcBase {
-	id?: string | number
+	id?: string|number
 }
 
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
-export interface RpcCall<Method = string, Params = any> extends RpcBase {
+export interface RpcCall<Method = string, Params = unknown> extends RpcBase {
 	method: Method
 	params?: Params
 }
 
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
-export interface RpcAnswer<Result = any, Error = any> extends RpcBase {
+export interface RpcAnswer<Result = unknown, Error = unknown> extends RpcBase {
 	result?: Result
 	error?: Error
 }
@@ -227,6 +225,13 @@ export interface PrimServerActions {
 }
 
 export interface PrimServerActionsExtended extends PrimServerActions {
+	/**
+	 * This function prepares a useable result for common server frameworks
+	 * using common options that most servers provide. It is a shortcut for
+	 * other processing steps of Prim-RPC.
+	 * 
+	 * This calls, in order, `.prepareCall()`, `.rpc()`, and `.prepareSend()`
+	 */
 	call: (given: CommonServerSimpleGivenOptions) => Promise<CommonServerResponseOptions>
 }
 
