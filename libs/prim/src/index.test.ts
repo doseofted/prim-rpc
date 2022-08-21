@@ -1,102 +1,17 @@
-import { describe, test, expect } from "vitest"
-import { createPrimClient, createPrimServer } from "."
-import type * as exampleClient from "@doseofted/prim-example"
-import * as exampleServer from "@doseofted/prim-example"
-import type { PrimClientFunction, PrimServerActionsExtended, RpcAnswer, RpcCall } from "./interfaces"
-import jsonHandler from "superjson"
+import { test, expect } from "vitest"
+// import { createPrimClient, createPrimServer } from "."
+// import type * as exampleClient from "@doseofted/prim-example"
+// import * as exampleServer from "@doseofted/prim-example"
+// import type { PrimClientFunction, PrimServerActionsExtended, RpcAnswer, RpcCall } from "./interfaces"
+// import jsonHandler from "superjson"
 
-const module = exampleServer
-type IModule = typeof exampleClient
+// const module = exampleServer
+// type IModule = typeof exampleClient
 
 test("dummy", () => expect(1).toBe(1))
 
 // TODO: move tests to their own files where it makes sense
 // for instance, functions in options.ts would be defined in options.test.ts
-
-// /**
-//  * A simple client for Prim to simulate a function call to a server
-//  * (without a real server, just the Prim Server instance)
-//  */
-// function newTestClient (prim: () => PrimServerActionsExtended) {
-// 	const client: PrimClientFunction = async (_endpoint, bodyRpc, jsonHandler) => {
-// 		const body = jsonHandler.stringify(bodyRpc)
-// 		const { body: resultStr } = await prim().call( { body })
-// 		return jsonHandler.parse(resultStr)
-// 	}
-// 	return client
-// }
-
-// describe("Prim Client can call methods directly", () => {
-// 	test("with local source", async () => {
-// 		const { sayHello } = createPrimClient({ module })
-// 		const result = await sayHello({ greeting: "Hey", name: "Ted" })
-// 		expect(result).toEqual("Hey Ted!")
-// 	})
-// 	test("with remote source", async () => {
-// 		const prim = createPrimServer({ module })
-// 		const client = newTestClient(prim)
-// 		const { sayHello } = createPrimClient<IModule>({ client })
-// 		const result = await sayHello({ greeting: "Hey", name: "Ted" })
-// 		expect(result).toEqual("Hey Ted!")
-// 	})
-// })
-
-// describe("Prim can use alternative JSON handler", () => {
-// 	// JSON handler is only useful with remote source (no local source test needed)
-// 	test("with remote source", async () => {
-// 		const prim = createPrimServer({ module, jsonHandler })
-// 		const date = new Date()
-// 		const expectedResult = exampleServer.whatIsDayAfter(date)
-// 		const { whatIsDayAfter } = createPrimClient<IModule>({
-// 			jsonHandler,
-// 			client: async (_endpoint, bodyGiven, jsonHandler) => {
-// 				const body = jsonHandler.stringify(bodyGiven)
-// 				const found = await prim.rpc({ body })
-// 				return jsonHandler.parse(JSON.stringify(found))
-// 			},
-// 		})
-// 		const result = await whatIsDayAfter(date)
-// 		expect(result).toEqual(expectedResult)
-// 		expect(result).toBeInstanceOf(Date)
-// 	})
-// })
-
-// describe("Prim Client can call deeply nested methods", () => {
-// 	test("with local source", async () => {
-// 		const prim = createPrimClient({ module })
-// 		const result = await prim.testLevel2.testLevel1.sayHello({ greeting: "Hey", name: "Ted" })
-// 		expect(result).toEqual("Hey Ted!")
-// 	})
-// 	test("with remote source", async () => {
-// 		const prim = createPrimServer({ module })
-// 		const { testLevel2 } = createPrimClient<IModule>({
-// 			client: async (_endpoint, body) => prim.rpc({ body }),
-// 		})
-// 		const result = await testLevel2.testLevel1.sayHello({ greeting: "Hey", name: "Ted" })
-// 		expect(result).toEqual("Hey Ted!")
-// 	})
-// })
-
-// describe("Prim Client can throw errors", () => {
-// 	// LINK https://vitest.dev/api/#rejects
-// 	test("with local source", () => {
-// 		const { oops } = createPrimClient({ module })
-// 		void expect(async () => {
-// 			// eslint-disable-next-line @typescript-eslint/await-thenable
-// 			await oops()
-// 		}).rejects.toThrow("My bad.")
-// 	})
-// 	test("with remote source", () => {
-// 		const prim = createPrimServer({ module })
-// 		const { oops } = createPrimClient<IModule>({
-// 			client: async (_endpoint, body) => prim.rpc({ body }),
-// 		})
-// 		void expect(async () => {
-// 			// eslint-disable-next-line @typescript-eslint/await-thenable
-// 			await oops()
-// 		}).rejects.toThrow("My bad.")
-// 	})
-// })
 
 // describe("Prim Client can use callbacks", () => {
 // 	test("with local source", async () => {
