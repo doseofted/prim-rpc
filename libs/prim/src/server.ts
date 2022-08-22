@@ -100,13 +100,12 @@ function createServerActions (serverOptions: PrimServerOptions, instance?: Retur
 		const statuses = answers.map(answer => answer.error ? 500 : (answer.result ? 200 : 400))
 		const notOkay = statuses.filter(stat => stat !== 200)
 		const errored = statuses.filter(stat => stat === 500)
-		// NOTE: return 200:okay, 400:missing, 500:error for single RPC call and +1 if batched
-		const status = (notOkay.length > 0 ? (errored.length > 0 ? 501 : 401) : 201) - (answers.length === 1 ? 1 : 0)
+		// NOTE: return 200:okay, 400:missing, 500:error if any call has that status
+		const status = notOkay.length > 0 ? (errored.length > 0 ? 500 : 400) : 200
 		return { body, headers, status }
 	}
 	return { prepareCall, prepareRpc, prepareSend }
 }
-
 
 function createServerEvents (serverOptions: PrimServerOptions): PrimServerEvents {
 	const client = () => {

@@ -71,7 +71,7 @@ export function newTestClients (commonOptions: PrimOptions = {}): Pick<PrimOptio
 	return { client, socket }
 }
 
-test("Client is working", () => {
+test("Prepared client is working", () => {
 	// TODO: add some other test for testing client that doesn't overlap with client tests
 	const { client, socket } = newTestClients({ module: exampleServer })
 	expect(client).toBeTypeOf("function")
