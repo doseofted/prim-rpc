@@ -27,11 +27,11 @@ function createPrimInstance (options?: PrimServerOptions) {
 
 function createServerActions (serverOptions: PrimServerOptions, instance?: ReturnType<typeof createPrimInstance>): PrimServerActionsBase {
 	const { jsonHandler, prefix: serverPrefix, handleError } = serverOptions
-	const prepareCall = (given: CommonServerSimpleGivenOptions = {}): RpcCall => {
+	const prepareCall = (given: CommonServerSimpleGivenOptions = {}): RpcCall|RpcCall[] => {
 		const { body = "", method = "POST", url: possibleUrl = "" } = given
 		const providedBody = body && method === "POST" 
 		if (providedBody) {
-			const prepared = jsonHandler.parse<RpcCall>(given.body)
+			const prepared = jsonHandler.parse<RpcCall|RpcCall[]>(given.body)
 			return prepared
 		}
 		const providedUrl = possibleUrl !== "" && method === "GET"
@@ -59,51 +59,65 @@ function createServerActions (serverOptions: PrimServerOptions, instance?: Retur
 		}
 		// TODO: handle invalid requests
 	}
-	const rpc = async (given: RpcCall, cbResults?: (a: RpcAnswer) => void): Promise<RpcAnswer> => {
-		// eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
-		const { method, params, id } = given
-		try {
-			// NOTE: new Prim client should be created on each request so callback results are not shared
-			const { client, socketEvent: event } = instance ?? createPrimInstance(serverOptions)
-			console.log("given method", method, given)
-			const methodExpanded = method.split("/")
-			const target = getProperty(client, methodExpanded) as AnyFunction
-			const args = Array.isArray(params) ? params : [params]
-			if (cbResults) { event.on("response", cbResults) }
+	const prepareRpc = async (
+		calls: RpcCall|RpcCall[],
+		cbResults?: (a: RpcAnswer) => void,
+	): Promise<RpcAnswer|RpcAnswer[]> => {
+		// NOTE: new Prim client should be created on each request so callback results are not shared
+		const { client, socketEvent: event } = instance ?? createPrimInstance(serverOptions)
+		const callList = Array.isArray(calls) ? calls : [calls]
+		const answeringCalls = callList.map(async (given): Promise<RpcAnswer> => {
 			// eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
-			const result: RpcAnswer = await Reflect.apply(target, undefined, args)
-			return { result, id }
-		} catch (e) {
-			// JSON.stringify on Error results in an empty object. Since Error is common, serialize it
-			// when a custom JSON handler is not provided
-			if (handleError && e instanceof Error) {
-				const error = serializeError<unknown>(e)
-				return { error, id }
+			const { method, params, id } = given
+			try {
+				console.log("given method", method, given)
+				const methodExpanded = method.split("/")
+				const target = getProperty(client, methodExpanded) as AnyFunction
+				const args = Array.isArray(params) ? params : [params]
+				if (cbResults) { event.on("response", cbResults) }
+				// eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
+				const result: RpcAnswer = await Reflect.apply(target, undefined, args)
+				return { result, id }
+			} catch (e) {
+				// JSON.stringify on Error results in an empty object. Since Error is common, serialize it
+				// when a custom JSON handler is not provided
+				if (handleError && e instanceof Error) {
+					const error = serializeError<unknown>(e)
+					return { error, id }
+				}
+				// eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
+				return { error: e, id }
 			}
-			return { error: e, id }
-		}
+		})
+		const answeredCalls = await Promise.all(answeringCalls)
+		return answeredCalls.length === 1 ? answeredCalls[0] : answeredCalls
 	}
-	const prepareSend = (given: RpcAnswer): CommonServerResponseOptions => {
+	const prepareSend = (given: RpcAnswer|RpcAnswer[]): CommonServerResponseOptions => {
 		const body = jsonHandler.stringify(given)
 		// NOTE: body length is generally handled by server framework, I think
 		const headers = { "Content-Type": "application/json" }
-		const status = given.error ? 500 : (given.result ? 200 : 400)
+		const answers = Array.isArray(given) ? given : [given]
+		const statuses = answers.map(answer => answer.error ? 500 : (answer.result ? 200 : 400))
+		const notOkay = statuses.filter(stat => stat !== 200)
+		const errored = statuses.filter(stat => stat === 500)
+		// NOTE: return 200:okay, 400:missing, 500:error for single RPC call and +1 if batched
+		const status = (notOkay.length > 0 ? (errored.length > 0 ? 501 : 401) : 201) - (answers.length === 1 ? 1 : 0)
 		return { body, headers, status }
 	}
-	return { prepareCall, rpc, prepareSend }
+	return { prepareCall, prepareRpc, prepareSend }
 }
 
 
 function createServerEvents (serverOptions: PrimServerOptions): PrimServerEvents {
 	const client = () => {
-		const { prepareCall, rpc, prepareSend } = createServerActions(serverOptions)
+		const { prepareCall, prepareRpc, prepareSend } = createServerActions(serverOptions)
 		const call = async (given: CommonServerSimpleGivenOptions): Promise<CommonServerResponseOptions> => {
 			const preparedParams = prepareCall(given)
-			const result = await rpc(preparedParams)
+			const result = await prepareRpc(preparedParams)
 			const preparedResult = prepareSend(result)
 			return preparedResult
 		}
-		return { call, prepareCall, rpc, prepareSend }
+		return { call, prepareCall, prepareRpc, prepareSend }
 	}
 	const options = serverOptions
 	return { client, options }
@@ -113,7 +127,7 @@ function createSocketEvents (serverOptions: PrimServerOptions): PrimServerSocket
 	const connected = () => {
 		const instance = createPrimInstance(serverOptions)
 		const { socketEvent: event } = instance
-		const { prepareCall, rpc: rpcCall, prepareSend } = createServerActions(serverOptions, instance)
+		const { prepareCall, prepareRpc: rpcCall, prepareSend } = createServerActions(serverOptions, instance)
 		event.emit("connected")
 		const ended = () => {
 			event.emit("ended")

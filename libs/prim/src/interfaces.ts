@@ -228,17 +228,17 @@ export interface PrimServerActionsBase {
 	 * Step 1: Passing common parameters used by server frameworks to Prim, gather the
 	 * prepared RPC call from the request. See `.rpc()` for next step.
 	 */
-	prepareCall: (given: CommonServerSimpleGivenOptions) => RpcCall
+	prepareCall: (given: CommonServerSimpleGivenOptions) => RpcCall|RpcCall[]
 	/**
 	 * Step 2: Using the result of `.prepareCall()`, use the RPC to get a result from Prim.
 	 * See `.prepareSend()` for next step.
 	 */
-	rpc: (given: RpcCall) => Promise<RpcAnswer>
+	prepareRpc: (given: RpcCall|RpcCall[]) => Promise<RpcAnswer|RpcAnswer[]>
 	/**
 	 * Step 3: Using the result of `.rpc()`, prepare the result to be sent with the server framework.
 	 * See `.handleCallback()` for optional next step.
 	 */
-	prepareSend: (given: RpcAnswer) => CommonServerResponseOptions
+	prepareSend: (given: RpcAnswer|RpcAnswer[]) => CommonServerResponseOptions
 }
 
 export interface PrimServerActionsExtended extends PrimServerActionsBase {
