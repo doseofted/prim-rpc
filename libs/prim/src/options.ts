@@ -13,8 +13,8 @@ const createBaseClientOptions = (): PrimOptions => ({
 	// batch time of 0 turns off batching while anything > 0 batches requests
 	clientBatchTime: 0,
 	// allow options of using a different JSON parsing/conversion library (for instance, "superjson")
-	// TODO: allow interface to be passed as generic from client so custom JSON options can be used such as parse options, if provided by library
-	jsonHandler: JSON,
+	// NOTE: JSON properties are not enumerable so create an object with enumerable properties referencing JSON methods
+	jsonHandler: { stringify: JSON.stringify, parse: JSON.parse },
 	// `client()` is intended to be overridden so as not to force any one HTTP framework but default is fine for most cases
 	client: async (endpoint, jsonBody, jsonHandler) => {
 		const result = await fetch(endpoint, {
@@ -57,7 +57,7 @@ const createBaseServerOptions = (): PrimServerOptions => ({
 		console.log("Prim-RPC's callback handler was not implemented")
 	},
 	methodHandler() {
-		console.log("Prim-RPC's callback handler was not implemented")
+		console.log("Prim-RPC's method handler was not implemented")
 	},
 })
 

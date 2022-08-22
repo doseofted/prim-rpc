@@ -17,7 +17,7 @@ describe("Prim server instantiates", () => {
 	})
 	// use case: to chain multiple Prim servers together (TODO feature itself not implemented yet)
 	test("with remote module", () => {
-		// NOTE: this test isn't useful yet (need to find a way to test remote module)
+		// NOTE: this test isn't useful yet (need to find a way to test remote module here or remove test)
 		const prim = createPrimServer<IModule>()
 		expect(typeof prim().call === "function").toBeTruthy()
 	})
@@ -25,7 +25,6 @@ describe("Prim server instantiates", () => {
 
 describe("Prim Server can call methods with local module", () => {
 	const prim = createPrimServer({ module, prefix: "/prim" })
-
 	test("using a URL", async () => {
 		const client = prim()
 		const url = queryString.stringifyUrl({
@@ -51,9 +50,6 @@ describe("Prim Server can call methods with local module", () => {
 })
 
 test("Prim Server can call remote methods (without module directly)", async () => {
-	// TODO: test Prim Server communication with another Prim server
-	// (for example, if function is not available on server then it may be available on some other server or it could be
-	// used to call a Prim Server hosted by someone else (so you could cache results on your own server if needed)
 	const { client, socket } = newTestClients({ module })
 	const prim = createPrimServer<IModule>({ client, socket })
 	const primClient = prim()
