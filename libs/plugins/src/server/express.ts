@@ -34,7 +34,7 @@ export const expressPrimPlugin = (options: PrimExpressPluginOptions) => {
 			// TODO: consider other methods of handling error
 			req.on("error", () => resolve(""))
 		})
-		const response = await prim.client().call({ method, url, body })
+		const response = await prim.server().call({ method, url, body })
 		res.status(response.status)
 		for (const [headerName, headerValue] of Object.entries(response.headers)) {
 			res.header(headerName, headerValue)
