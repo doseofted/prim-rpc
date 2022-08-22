@@ -65,6 +65,7 @@ function createServerActions (serverOptions: PrimServerOptions, instance?: Retur
 		try {
 			// NOTE: new Prim client should be created on each request so callback results are not shared
 			const { client, socketEvent: event } = instance ?? createPrimInstance(serverOptions)
+			console.log("given method", method, given)
 			const methodExpanded = method.split("/")
 			const target = getProperty(client, methodExpanded) as AnyFunction
 			const args = Array.isArray(params) ? params : [params]

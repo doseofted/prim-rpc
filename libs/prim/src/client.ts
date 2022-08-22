@@ -164,6 +164,9 @@ export function createPrimClient<
 			const { endpoint, jsonHandler } = configured
 			const rpcCallOrCalls = rpcCallList.length === 1 ? rpcCallList[0] : rpcCallList
 			configured.client(endpoint, rpcCallOrCalls, jsonHandler).then(answers => {
+				if (configured.clientBatchTime > 0) {
+					console.log("batch", answers)
+				}
 				// return either the single result or the batched results to caller
 				if (Array.isArray(answers)) {
 					answers.forEach(answer => { httpEvent.emit("response", answer) })
@@ -177,6 +180,7 @@ export function createPrimClient<
 					errors.forEach(error => { httpEvent.emit("response", error) })
 				} else {
 					// one error was given but there may be multiple results, return that error to caller
+					// TODO: ensure only errored results are thrown and others resolve (when calls are batched)
 					rpcList.forEach(r => {
 						const error = errors
 						const id = r.rpc.id

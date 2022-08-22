@@ -22,7 +22,7 @@ describe("Prim client instantiates", () => {
 	})
 })
 
-describe("Prim Client can call methods directly", () => {
+describe("Prim Client can call methods with a single parameter", () => {
 	test("with local source", async () => {
 		const prim = createPrimClient({ module })
 		const params = { greeting: "Hi", name: "Ted" }
@@ -36,6 +36,24 @@ describe("Prim Client can call methods directly", () => {
 		const params = { greeting: "Hey", name: "Ted" }
 		const expected = module.sayHello(params)
 		const result = await prim.sayHello(params)
+		expect(result).toEqual(expected)
+	})
+})
+
+describe("Prim Client can call methods with positional parameters", () => {
+	test("with local source", async () => {
+		const prim = createPrimClient({ module })
+		const params = ["Hi", "Ted"] as const
+		const expected = module.sayHelloAlternative(...params)
+		const result = await prim.sayHelloAlternative(...params)
+		expect(result).toEqual(expected)
+	})
+	test("with remote source", async () => {
+		const { client, socket } = newTestClients({ module })
+		const prim = createPrimClient<IModule>({ client, socket })
+		const params = ["Hey", "Ted"] as const
+		const expected = module.sayHelloAlternative(...params)
+		const result = await prim.sayHelloAlternative(...params)
 		expect(result).toEqual(expected)
 	})
 })
@@ -129,4 +147,19 @@ describe("Prim Client can make use of callbacks", () => {
 		})
 		expect(results).toEqual(["You're using Prim.", "Still using Prim!"])
 	})
+})
+
+test("Prim Client can batch RPC calls over HTTP", async () => {
+	const { client, socket } = newTestClients({ module })
+	const prim = createPrimClient<IModule>({ client, socket, clientBatchTime: 15 })
+	// NOTE: can't seem to narrow down chosen type for array (linked possibly related issue)
+	// LINK: https://github.com/microsoft/TypeScript/issues/27808
+	const calls = <M extends typeof prim|typeof module>(m: M) => [
+		m.sayHello({ greeting: "Hi", name: "Ted"}),
+		m.sayHelloAlternative("Hey", "Ted"),
+	]
+	const expected = calls(module)
+	const result = Promise.all(calls(prim))
+	void result.then(r => console.log("resolved batch call:", r))
+	await expect(result).resolves.toEqual(expected)
 })
