@@ -7,7 +7,7 @@ import { WebSocketServer } from "ws"
 import jsonHandler from "superjson"
 import * as module from "@doseofted/prim-example"
 import { createPrimServer } from "@doseofted/prim-rpc"
-import { primMethodFastify, primMethodWs } from "@doseofted/prim-plugins"
+import { primMethodFastify, primCallbackWs } from "@doseofted/prim-plugins"
 
 const contained = JSON.parse(process.env.CONTAINED ?? "false") === true
 
@@ -20,7 +20,7 @@ createPrimServer({
 	module,
 	jsonHandler,
 	methodHandler: primMethodFastify({ fastify }),
-	callbackHandler: primMethodWs({ wss }),
+	callbackHandler: primCallbackWs({ wss }),
 })
 
 try {
