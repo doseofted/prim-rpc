@@ -4,6 +4,7 @@ import { RpcAnswer, RpcCall } from "./interfaces"
 import type * as exampleClient from "@doseofted/prim-example"
 import * as exampleServer from "@doseofted/prim-example"
 import queryString from "query-string"
+import { newTestClients } from "./preparation.test"
 
 const module = exampleServer
 type IModule = typeof exampleClient
@@ -16,6 +17,7 @@ describe("Prim server instantiates", () => {
 	})
 	// use case: to chain multiple Prim servers together (TODO feature itself not implemented yet)
 	test("with remote module", () => {
+		// NOTE: this test isn't useful yet (need to find a way to test remote module)
 		const prim = createPrimServer<IModule>()
 		expect(typeof prim().call === "function").toBeTruthy()
 	})
@@ -28,10 +30,7 @@ describe("Prim Server can call methods with local module", () => {
 		const client = prim()
 		const url = queryString.stringifyUrl({
 			url: "/prim/sayHello",
-			query: {
-				greeting: "Salut",
-				name: "Ted",
-			},
+			query: { greeting: "Salut", name: "Ted" },
 		})
 		const response = await client.call({ method: "GET", url })
 		const result = JSON.parse(response.body) as RpcAnswer
@@ -41,10 +40,7 @@ describe("Prim Server can call methods with local module", () => {
 		const client = prim()
 		const call: RpcCall = {
 			method: "sayHello",
-			params: {
-				greeting: "Hola",
-				name: "Ted",
-			},
+			params: { greeting: "Hola", name: "Ted" },
 			id: 1,
 		}
 		const body = JSON.stringify(call)
@@ -54,11 +50,23 @@ describe("Prim Server can call methods with local module", () => {
 	})
 })
 
-// describe("Prim Server can call remote methods without module", () => {
-// 	// TODO: test Prim Server communication with another Prim server
-// 	// (for example, if function is not available on server then it may be available on some other server or it could be
-// 	// used to call a Prim Server hosted by someone else (so you could cache results on your own server if needed)
-// })
+test("Prim Server can call remote methods (without module directly)", async () => {
+	// TODO: test Prim Server communication with another Prim server
+	// (for example, if function is not available on server then it may be available on some other server or it could be
+	// used to call a Prim Server hosted by someone else (so you could cache results on your own server if needed)
+	const { client, socket } = newTestClients({ module })
+	const prim = createPrimServer<IModule>({ client, socket })
+	const primClient = prim()
+	const call: RpcCall = {
+		method: "sayHello",
+		params: { greeting: "Hellooo", name: "Ted" },
+		id: 1,
+	}
+	const body = JSON.stringify(call)
+	const response = await primClient.call({ method: "POST", body })
+	const result = JSON.parse(response.body) as RpcAnswer
+	expect(result).toEqual({ result: "Hellooo Ted!", id: 1 })
+})
 
 // describe("Prim Server can answer batch calls", () => {
 // 	// NOTE: this could possibly be moved to the client since the client tests also test the Prim Server

@@ -18,30 +18,6 @@ export function newTestClients (commonOptions: PrimOptions = {}): Pick<PrimOptio
 	const wsServer = mitt<{ connect: void, connected: ConnectedEvent }>()
 	/** Represents potential HTTP server */
 	const httpServer = mitt<{ request: string, response: string }>()
-	createPrimServer({
-		...commonOptions,
-		callbackHandler({ connected }) {
-			wsServer.on("connect", () => {
-				const { call, ended } = connected()
-				const wsConnection: ConnectedEvent = mitt()
-				wsConnection.on("messageClient", (m) => {
-					call(String(m), (data) => {
-						wsConnection.emit("messageServer", data)
-					})
-					wsConnection.on("ended", ended)
-				})
-				wsServer.emit("connected", wsConnection)
-			})
-		},
-		methodHandler({ client }) {
-			// eslint-disable-next-line @typescript-eslint/no-misused-promises
-			httpServer.on("request", async (body) => {
-				const { call } = client()
-				const response = await call({ body: String(body) })
-				httpServer.emit("response", response.body)
-			})
-		},
-	})
 	const client: PrimClientFunction = (_endpoint, bodyRpc, jsonHandler) => new Promise(resolve => {
 		const body = jsonHandler.stringify(bodyRpc)
 		httpServer.on("response", (body) => {
@@ -68,6 +44,30 @@ export function newTestClients (commonOptions: PrimOptions = {}): Pick<PrimOptio
 			},
 		}
 	}
+	createPrimServer({
+		...commonOptions,
+		callbackHandler({ connected }) {
+			wsServer.on("connect", () => {
+				const { call, ended } = connected()
+				const wsConnection: ConnectedEvent = mitt()
+				wsConnection.on("messageClient", (m) => {
+					call(String(m), (data) => {
+						wsConnection.emit("messageServer", data)
+					})
+					wsConnection.on("ended", ended)
+				})
+				wsServer.emit("connected", wsConnection)
+			})
+		},
+		methodHandler({ client }) {
+			// eslint-disable-next-line @typescript-eslint/no-misused-promises
+			httpServer.on("request", async (body) => {
+				const { call } = client()
+				const response = await call({ body: String(body) })
+				httpServer.emit("response", response.body)
+			})
+		},
+	})
 	return { client, socket }
 }
 
