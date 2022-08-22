@@ -54,10 +54,10 @@ const createBaseServerOptions = (): PrimServerOptions => ({
 	// the default prefix will likely be overridden
 	prefix: "/prim",
 	callbackHandler() {
-		console.log("Prim-RPC's callback handler was not implemented")
+		console.debug("Prim-RPC's callback handler was not implemented")
 	},
 	methodHandler() {
-		console.log("Prim-RPC's method handler was not implemented")
+		console.debug("Prim-RPC's method handler was not implemented")
 	},
 })
 
@@ -74,7 +74,7 @@ export function createPrimOptions<OptionsType extends PrimOptions = PrimOptions>
 	if (options?.jsonHandler) {
 		overrideBaseOptions.handleError = false
 	}
-	const baseOptions = !server ? createBaseServerOptions() : createBaseClientOptions()
+	const baseOptions = server ? createBaseServerOptions() : createBaseClientOptions()
 	const configured = defu<PrimOptions, PrimOptions>(options, overrideBaseOptions, baseOptions) as OptionsType
 	return configured
 }

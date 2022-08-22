@@ -59,10 +59,10 @@ export function newTestClients (commonOptions: PrimOptions = {}): Pick<PrimOptio
 				wsServer.emit("connected", wsConnection)
 			})
 		},
-		methodHandler({ client }) {
+		methodHandler({ server }) {
 			// eslint-disable-next-line @typescript-eslint/no-misused-promises
 			httpServer.on("request", async (body) => {
-				const { call } = client()
+				const { call } = server()
 				const response = await call({ body: String(body) })
 				httpServer.emit("response", response.body)
 			})

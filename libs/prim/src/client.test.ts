@@ -149,6 +149,11 @@ describe("Prim Client can make use of callbacks", () => {
 	})
 })
 
+// TODO: consider case where callbacks are used and result is returned (withCall)
+// this could be tested by testing a function:
+// `typeMessage(msg: string, transform: "upper"|"lower"|"none", cb: (letter: string) => void): string`
+// (typeMessage return type is void today)
+
 describe("Prim Client can batch RPC calls over HTTP", () => {
 	test("when all results are successful", async () => {
 		const { client, socket } = newTestClients({ module })

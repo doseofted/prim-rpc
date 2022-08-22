@@ -6,7 +6,8 @@ import { createPrimOptions } from "./options"
 import {
 	CommonServerSimpleGivenOptions, CommonServerResponseOptions, PrimServerOptions, PrimWebSocketEvents,
 	RpcAnswer, RpcCall, PrimServerSocketAnswer, PrimServerSocketEvents, PrimServerActionsBase, PrimHttpEvents,
-	PrimServerEvents, PrimServerActionsExtended,
+	PrimServerEvents,
+	PrimServer,
 } from "./interfaces"
 import { serializeError } from "serialize-error"
 
@@ -107,7 +108,7 @@ function createServerActions (serverOptions: PrimServerOptions, instance?: Retur
 }
 
 function createServerEvents (serverOptions: PrimServerOptions): PrimServerEvents {
-	const client = () => {
+	const server = () => {
 		const { prepareCall, prepareRpc, prepareSend } = createServerActions(serverOptions)
 		const call = async (given: CommonServerSimpleGivenOptions): Promise<CommonServerResponseOptions> => {
 			const preparedParams = prepareCall(given)
@@ -117,8 +118,7 @@ function createServerEvents (serverOptions: PrimServerOptions): PrimServerEvents
 		}
 		return { call, prepareCall, prepareRpc, prepareSend }
 	}
-	const options = serverOptions
-	return { client, options }
+	return { server, options: serverOptions }
 }
 
 function createSocketEvents (serverOptions: PrimServerOptions): PrimServerSocketEvents {
@@ -165,20 +165,28 @@ function createSocketEvents (serverOptions: PrimServerOptions): PrimServerSocket
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 export function createPrimServer<
 	// eslint-disable-next-line @typescript-eslint/no-unused-vars
-	Context extends ReturnType<OptionsType["context"]> = never, 
-	// eslint-disable-next-line @typescript-eslint/no-unused-vars
 	ModuleType extends OptionsType["module"] = object,
+	// eslint-disable-next-line @typescript-eslint/no-unused-vars
+	Context extends ReturnType<OptionsType["context"]> = never, 
 	OptionsType extends PrimServerOptions = PrimServerOptions,
->(options?: PrimServerOptions): () => PrimServerActionsExtended {
+>(options?: PrimServerOptions): PrimServer {
 	// NOTE: server options may include client options but only server options should be used
 	// client options should be re-instantiated on every request
 	// TODO: instead of merging options, considering adding client options to server options as separate property
 	// and creating client options separately from server
 	const serverOptions = createPrimOptions(options, true)
-	serverOptions.callbackHandler?.(createSocketEvents(serverOptions))
-	serverOptions.methodHandler?.(createServerEvents(serverOptions))
+	// TODO: consider emitting some kind of event once handlers are configured (for all that have resolved promises)
+	// this could be useful for plugins of a server framework where plugins must be given and resolved in order
+	const handlersRegistered = Promise.allSettled([
+		serverOptions.callbackHandler?.(createSocketEvents(serverOptions)),
+		serverOptions.methodHandler?.(createServerEvents(serverOptions)),
+	]).then(p => p.map(r => r.status === "fulfilled").reduce((p, n) => p && n, true))
 	// NOTE: return actions so a new client is used every time
-	return createServerEvents(serverOptions).client
+	return {
+		...createServerEvents(serverOptions),
+		options: Object.freeze(Object.assign({}, serverOptions)),
+		handlersRegistered,
+	}
 }
 
 // IDEA: Prim should accept HTTP handler to automatically register server framework plugins

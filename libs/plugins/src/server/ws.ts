@@ -1,4 +1,4 @@
-import type { PrimServerSocketHandler } from "@doseofted/prim-rpc"
+import type { PrimServerCallbackHandler } from "@doseofted/prim-rpc"
 import type { WebSocketServer } from "ws"
 
 // TODO: test this plugin
@@ -22,7 +22,7 @@ interface MethodWsOptions { wss: WebSocketServer }
  * })
  * ```
  */
-export const primMethodWs = (options: MethodWsOptions): PrimServerSocketHandler => {
+export const primMethodWs = (options: MethodWsOptions): PrimServerCallbackHandler => {
 	const { wss: webSocketServer } = options
 	return prim => {
 		webSocketServer.on("connection", (ws) => {

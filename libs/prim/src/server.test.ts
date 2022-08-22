@@ -13,37 +13,36 @@ describe("Prim server instantiates", () => {
 	// use case: to respond to client app (most common)
 	test("with local module", () => {
 		const prim = createPrimServer({ module })
-		expect(typeof prim().call === "function").toBeTruthy()
+		expect(typeof prim.server().call === "function").toBeTruthy()
 	})
-	// use case: to chain multiple Prim servers together (TODO feature itself not implemented yet)
 	test("with remote module", () => {
 		// NOTE: this test isn't useful yet (need to find a way to test remote module here or remove test)
 		const prim = createPrimServer<IModule>()
-		expect(typeof prim().call === "function").toBeTruthy()
+		expect(typeof prim.server().call === "function").toBeTruthy()
 	})
 })
 
 describe("Prim Server can call methods with local module", () => {
 	const prim = createPrimServer({ module, prefix: "/prim" })
 	test("using a URL", async () => {
-		const client = prim()
+		const server = prim.server()
 		const url = queryString.stringifyUrl({
 			url: "/prim/sayHello",
 			query: { greeting: "Salut", name: "Ted" },
 		})
-		const response = await client.call({ method: "GET", url })
+		const response = await server.call({ method: "GET", url })
 		const result = JSON.parse(response.body) as RpcAnswer
 		expect(result).toEqual({ result: "Salut Ted!" })
 	})
 	test("using a JSON body", async () => {
-		const client = prim()
+		const server = prim.server()
 		const call: RpcCall = {
 			method: "sayHello",
 			params: { greeting: "Hola", name: "Ted" },
 			id: 1,
 		}
 		const body = JSON.stringify(call)
-		const response = await client.call({ method: "POST", body })
+		const response = await server.call({ method: "POST", body })
 		const result = JSON.parse(response.body) as RpcAnswer
 		expect(result).toEqual({ result: "Hola Ted!", id: 1 })
 	})
@@ -52,14 +51,14 @@ describe("Prim Server can call methods with local module", () => {
 test("Prim Server can call remote methods (without module directly)", async () => {
 	const { client, socket } = newTestClients({ module })
 	const prim = createPrimServer<IModule>({ client, socket })
-	const primClient = prim()
+	const server = prim.server()
 	const call: RpcCall = {
 		method: "sayHello",
 		params: { greeting: "Hellooo", name: "Ted" },
 		id: 1,
 	}
 	const body = JSON.stringify(call)
-	const response = await primClient.call({ method: "POST", body })
+	const response = await server.call({ method: "POST", body })
 	const result = JSON.parse(response.body) as RpcAnswer
 	expect(result).toEqual({ result: "Hellooo Ted!", id: 1 })
 })

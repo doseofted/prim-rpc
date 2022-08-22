@@ -37,7 +37,7 @@ export const fastifyPrimPlugin: FastifyPluginAsync<PrimFastifyPluginOptions> = a
 		url: prim.options.prefix,
 		handler: async (request, reply) => {
 			const { body, method, raw: { url } } = request
-			const response = await prim.client().call({ method, url, body })
+			const response = await prim.server().call({ method, url, body })
 			void reply.status(response.status).headers(response.headers).send(response.body)
 		},
 	})

@@ -184,8 +184,8 @@ export interface CommonServerResponseOptions {
 // !SECTION
 
 // SECTION Server options
-export type PrimServerMethodHandler<T extends object = object> = (actions: PrimServerEvents, options?: T) => void
-export type PrimServerCallbackHandler<T = unknown> = (events: PrimServerSocketEvents, options?: T) => void
+export type PrimServerMethodHandler<T extends object = object> = (actions: PrimServerEvents, options?: T) => void|Promise<void>
+export type PrimServerCallbackHandler<T = unknown> = (events: PrimServerSocketEvents, options?: T) => void|Promise<void>
 
 export interface PrimServerOptions<C = unknown> extends PrimOptions {
 	/**
@@ -226,7 +226,7 @@ export interface PrimServerSocketEvents {
 export interface PrimServerActionsBase {
 	/**
 	 * Step 1: Passing common parameters used by server frameworks to Prim, gather the
-	 * prepared RPC call from the request. See `.rpc()` for next step.
+	 * prepared RPC call from the request. See `.prepareRpc()` for next step.
 	 */
 	prepareCall: (given: CommonServerSimpleGivenOptions) => RpcCall|RpcCall[]
 	/**
@@ -236,9 +236,10 @@ export interface PrimServerActionsBase {
 	prepareRpc: (given: RpcCall|RpcCall[]) => Promise<RpcAnswer|RpcAnswer[]>
 	/**
 	 * Step 3: Using the result of `.rpc()`, prepare the result to be sent with the server framework.
-	 * See `.handleCallback()` for optional next step.
 	 */
 	prepareSend: (given: RpcAnswer|RpcAnswer[]) => CommonServerResponseOptions
+	// TODO: consider adding `.handleCallback()` as optional next step, if server actions are called directly
+	// instead of using a `methodHandler` or `callbackHandler` (likely to only be used for testing directly)
 }
 
 export interface PrimServerActionsExtended extends PrimServerActionsBase {
@@ -253,6 +254,11 @@ export interface PrimServerActionsExtended extends PrimServerActionsBase {
 }
 
 export interface PrimServerEvents {
-	client: () => PrimServerActionsExtended
+	server: () => PrimServerActionsExtended
 	options: PrimServerOptions
+}
+
+export interface PrimServer extends PrimServerEvents {
+	options: PrimServerOptions
+	handlersRegistered: Promise<boolean>
 }
