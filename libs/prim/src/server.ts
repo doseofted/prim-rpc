@@ -70,7 +70,6 @@ function createServerActions (serverOptions: PrimServerOptions, instance?: Retur
 			// eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
 			const { method, params, id } = given
 			try {
-				console.log("given method", method, given)
 				const methodExpanded = method.split("/")
 				const target = getProperty(client, methodExpanded) as AnyFunction
 				const args = Array.isArray(params) ? params : [params]

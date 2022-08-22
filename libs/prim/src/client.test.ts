@@ -149,17 +149,39 @@ describe("Prim Client can make use of callbacks", () => {
 	})
 })
 
-test("Prim Client can batch RPC calls over HTTP", async () => {
-	const { client, socket } = newTestClients({ module })
-	const prim = createPrimClient<IModule>({ client, socket, clientBatchTime: 15 })
-	// NOTE: can't seem to narrow down chosen type for array (linked possibly related issue)
-	// LINK: https://github.com/microsoft/TypeScript/issues/27808
-	const calls = <M extends typeof prim|typeof module>(m: M) => [
-		m.sayHello({ greeting: "Hi", name: "Ted"}),
-		m.sayHelloAlternative("Hey", "Ted"),
-	]
-	const expected = calls(module)
-	const result = Promise.all(calls(prim))
-	void result.then(r => console.log("resolved batch call:", r))
-	await expect(result).resolves.toEqual(expected)
+describe("Prim Client can batch RPC calls over HTTP", () => {
+	test("when all results are successful", async () => {
+		const { client, socket } = newTestClients({ module })
+		const prim = createPrimClient<IModule>({ client, socket, clientBatchTime: 15 })
+		// NOTE: can't seem to narrow down chosen type for array (linked possibly related issue)
+		// LINK: https://github.com/microsoft/TypeScript/issues/27808
+		const calls = <M extends typeof prim|typeof module>(m: M) => [
+			m.sayHello({ greeting: "Hi", name: "Ted"}),
+			m.sayHelloAlternative("Hey", "Ted"),
+		]
+		const expected = calls(module)
+		const result = Promise.all(calls(prim))
+		await expect(result).resolves.toEqual(expected)
+	})
+
+	test("when a result is an error", async () => {
+		const { client, socket } = newTestClients({ module })
+		const prim = createPrimClient<IModule>({ client, socket, clientBatchTime: 15 })
+		const calls = <M extends typeof prim|typeof module>(m: M) => {
+			// NOTE: for this test, it's important that functions are not awaited so that they are called within batch time
+			const results: unknown[] = []
+			results.push(m.sayHello({ greeting: "Hi", name: "Ted"}))
+			results.push(m.sayHelloAlternative("Hey", "Ted"))
+			try {
+				results.push(m.oops())
+			} catch (error) {
+				results.push(error)
+			}
+			return results
+		}
+		const expected = calls(module)
+		// eslint-disable-next-line @typescript-eslint/no-unsafe-return
+		const result = Promise.allSettled(calls(prim)).then(list => list.map(r => "value" in r ? r.value : r.reason))
+		await expect(result).resolves.toEqual(expected)
+	})
 })
