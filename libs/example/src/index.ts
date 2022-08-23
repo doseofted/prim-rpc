@@ -72,4 +72,6 @@ export function whatIsDayAfter (day: Date) {
 	return new Date(day.valueOf() + (1000 * 60 * 60 * 24))
 }
 
-export default sayHello
+export default function (...params: unknown[]) {
+	return { params: params.length === 1 ? params[0] : params }
+}

@@ -26,7 +26,7 @@ createPrimServer(options)
 // used with client for wider range of parsed JSON types
 createPrimServer({
 	...options,
-	prefix: "/prim/super",
+	prefix: "/prim-super",
 	jsonHandler,
 })
 

@@ -30,7 +30,7 @@ function createServerActions (serverOptions: PrimServerOptions, instance?: Retur
 	const { jsonHandler, prefix: serverPrefix, handleError } = serverOptions
 	const prepareCall = (given: CommonServerSimpleGivenOptions = {}): RpcCall|RpcCall[] => {
 		const { body = "", method = "POST", url: possibleUrl = "" } = given
-		const providedBody = body && method === "POST" 
+		const providedBody = body && method === "POST"
 		if (providedBody) {
 			const prepared = jsonHandler.parse<RpcCall|RpcCall[]>(given.body)
 			return prepared
