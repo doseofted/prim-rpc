@@ -147,7 +147,7 @@ function createSocketEvents (serverOptions: PrimServerOptions): PrimServerSocket
 		}
 		return { ended, call }
 	}
-	return { connected }
+	return { connected, options: serverOptions }
 }
 
 // NOTE: these functions may be moved and should be used for transforming input before/after

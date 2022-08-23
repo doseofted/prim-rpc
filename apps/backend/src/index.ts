@@ -16,18 +16,20 @@ await fastify.register(Cors, { origin: contained ? `https://${process.env.WEBSIT
 const wss = new WebSocketServer({ server: fastify.server })
 
 // to be used for manual calls
-const options = {
+createPrimServer({
 	prefix: "/prim",
 	module,
 	methodHandler: primMethodFastify({ fastify }),
-	callbackHandler: primCallbackWs({ wss }),
-}
-createPrimServer(options)
+	// FIXME: can't initialize websocket plugin twice, find workaround (WS plugin for Fastify might integrate better?)
+	// LINK https://github.com/websockets/ws#multiple-servers-sharing-a-single-https-server
+})
 // used with client for wider range of parsed JSON types
 createPrimServer({
-	...options,
 	prefix: "/prim-super",
 	jsonHandler,
+	module,
+	methodHandler: primMethodFastify({ fastify }),
+	callbackHandler: primCallbackWs({ wss }),
 })
 
 try {

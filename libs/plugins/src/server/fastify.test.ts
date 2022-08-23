@@ -66,3 +66,6 @@ describe("Fastify plugin is functional as Fastify plugin", async () => {
 		expect(response.body).toEqual(expected)
 	})
 })
+
+// TODO: add tests for both GET and POST requests
+// TODO: consider multiple instances of Prim server attached to Fastify

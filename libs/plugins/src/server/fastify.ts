@@ -31,7 +31,7 @@ export const fastifyPrimPlugin: FastifyPluginAsync<PrimFastifyPluginOptions> = a
 		}
 	})
 	fastify.route<{ Body: string }>({
-		method: "POST",
+		method: ["GET", "POST"],
 		url: prim.options.prefix,
 		handler: async (request, reply) => {
 			const { body, method, raw: { url } } = request

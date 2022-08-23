@@ -221,6 +221,7 @@ interface PrimServerConnectedActions {
 }
 export interface PrimServerSocketEvents {
 	connected: () => PrimServerConnectedActions
+	options: PrimServerOptions
 }
 
 export interface PrimServerActionsBase {
