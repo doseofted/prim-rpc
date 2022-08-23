@@ -110,7 +110,71 @@ let batchRequests: Status.Implemented
  * specific HTTP/WS client which is fine if I write a Prim Plugin to support it but it would make it harder if someone
  * was to decide to write their own Prim Plugin).
  */
-let imageUploadsAndFormSupport: Status.Idea
+let imageUploadsAndFormSupport: Status.PartiallyRejected // see idea about context, request hooks, and uploads below
+
+/**
+ * Prim RPC is not really intended to work with parameters provided over the given network protocol but is instead
+ * a way to handle parameters with just the programming language, JavaScript. However, sometimes fields provided
+ * over HTTP may be useful for transitioning or to prevent repetitive tasks (like passing a token for each function
+ * call that requires it when you would simply set an HTTP header in a regular request).
+ * 
+ * One way of easing this transition would be to pass the context to each function through the use of hooks that
+ * run before and after a function call. These would be something like a "method hook" and would look like this:
+ * 
+ * ```ts
+ * type Context = { req: express.Request, res: express.Response }
+ * const callSayHello: PrimCall<typeof sayHello, Context> = (params, context) => params
+ * function sayHello() { ... }
+ * const sendSayHello: PrimSend<typeof sayHello, Context> = (returned, context) => returned
+ * ```
+ * 
+ * Note: context bit and how it is provided is explained later.
+ * 
+ * So, the server would first look for `module.sayHello` and if pre-hook `call____` exists where ____ is the function
+ * name then that function would be called with the parameters array as the first argument and server context as
+ * second. The pre-hook would return the modified parameters to be used in `sayHello` (for instance, values known only
+ * on server). The return value of `sayhello`
+ * is passed to the post-hook, `send___`, as the first argument, context as second. The modified return value is
+ * returned to the client (value may be modified, for instance, to ensure structure of return result). 
+ * 
+ * These method hooks would allow someone to validate given data with a pre-hook and then validate the result with a
+ * post-hook. This way the method itself doesn't need to do basic validation of its given data (some will always be
+ * required, of course). This also means that validation steps could be shared, so a single pre-hook or post-hook
+ * could be defined and shared with each function like so:
+ * 
+ * ```ts
+ * import { authorizeUser } from "./predefined-hooks"
+ * const callSayHello = authorizeUser
+ * function sayHello() { ... }
+ * ```
+ * 
+ * The context part would be established by whatever server framework is being used. So, for instance, if you're
+ * using the Express Prim plugin, then on each request, it would call some function `setContext({ req, res })`. The
+ * value would then be passed to hooks on the requested method. The context type would be passed to Prim Server's
+ * generic parameters, like so (since I don't think this can be inferred):
+ * 
+ * ```ts
+ * type MethodContext = { req: express.Request, res: express.Response }
+ * type WsContext = { ws: WebSocket.WebSocket }
+ * const server = createPrimServer<MethodContext, WsContext>({ ... }) // for example
+ * ```
+ * 
+ * This could even be used to support transformations on the request. For instance, Prim doesn't currently support
+ * file uploads using FormData but if you used FormData to upload a file and then attached the JSON data
+ * (RPC call in my case) as a field on that form (I believe GraphQL multipart upload spec and Google Drive API take
+ * that method but I'm not sure) then you could process the file with the context in the request hook and then
+ * pass that parameter from the pre-hook as a filepath string (for example) so it becomes useable from the called
+ * Prim Server method.
+ * 
+ * However, now that I think about it, if the request contains FormData then the pre-hook would not be able to parse
+ * parameters yet. I'll need to keep thinking on this one. Adding hooks may not be initially supported and if they are,
+ * handling multipart data probably wont be the initial concern.
+ * 
+ * Maybe `imageUploadsAndFormSupport` idea above would be a better option (to support FormData, not base64 strings,
+ * bad idea) to handle file uploads. Regardless, hooks would be very useful for verifiying data and working with
+ * context provided over the HTTP/WS request.
+ */
+let requestHooksContextAndFileUpload: Status.Idea
 
 /**
  * Support object variable types like `Date` over network requests with Prim by using a separate JSON
@@ -287,7 +351,7 @@ let fetchFromPrimRpcResult: Status.Idea
  * - Parameters given to a method's callback must be supported by the configured JSON handler
  * - Methods on client must be awaited (result is fetched from server)
  * - Callbacks on server must be awaited (result is fetched from client)
- *   - Callbacks cannot return a value ...yet. I'd like to fix this.
+ *   - TODO: Callbacks cannot return a value ...yet. I'd like to fix this.
  */
 let supportChainedCallsAndClosures: Status.PartiallyRejected // for now
 
