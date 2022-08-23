@@ -25,7 +25,7 @@
     "testing": "vitest watch",
     "lint": "eslint .",
     "start": "node dist/module.js",
-    "dev": "nodemon dist/module.js",
+    "dev": "nodemon --inspect dist/module.js",
     "entrypoint": "zx entrypoint.mjs"
   },
   "type": "module",
