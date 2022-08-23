@@ -28,7 +28,7 @@ describe("Fastify plugin is functional as Prim Plugin", () => {
 				method: "sayHello",
 				params,
 			})
-			.set("Accept", "application/json")
+			.set("accept", "application/json")
 		// eslint-disable-next-line @typescript-eslint/no-unsafe-member-access
 		expect(response.headers["content-type"]).toContain("application/json")
 		expect(response.status).toEqual(200)
@@ -59,7 +59,7 @@ describe("Fastify plugin is functional as Fastify plugin", async () => {
 				method: "sayHello",
 				params,
 			})
-			.set("Accept", "application/json")
+			.set("accept", "application/json")
 		// eslint-disable-next-line @typescript-eslint/no-unsafe-member-access
 		expect(response.headers["content-type"]).toContain("application/json")
 		expect(response.status).toEqual(200)

@@ -15,12 +15,19 @@ const fastify = Fastify({ logger: true })
 await fastify.register(Cors, { origin: contained ? `https://${process.env.WEBSITE_HOST}` : "http://localhost:5173" })
 const wss = new WebSocketServer({ server: fastify.server })
 
-createPrimServer({
+// to be used for manual calls
+const options = {
 	prefix: "/prim",
 	module,
-	jsonHandler,
 	methodHandler: primMethodFastify({ fastify }),
 	callbackHandler: primCallbackWs({ wss }),
+}
+createPrimServer(options)
+// used with client for wider range of parsed JSON types
+createPrimServer({
+	...options,
+	prefix: "/prim/super",
+	jsonHandler,
 })
 
 try {

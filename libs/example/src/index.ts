@@ -17,7 +17,7 @@ export const you = "Ted"
  * @returns A nice greeting
  */
 export function sayHello (options: { greeting?: string, name?: string }) {
-	const { greeting, name } = options
+	const { greeting, name } = options ?? {}
 	return `${greeting ?? "Hello"} ${name ?? "you"}!`
 }
 
@@ -71,3 +71,5 @@ export function typeMessage(message: string, typeLetter: (typed: string) => void
 export function whatIsDayAfter (day: Date) {
 	return new Date(day.valueOf() + (1000 * 60 * 60 * 24))
 }
+
+export default sayHello

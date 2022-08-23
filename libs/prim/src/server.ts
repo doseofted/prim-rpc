@@ -48,17 +48,19 @@ function createServerActions (serverOptions: PrimServerOptions, instance?: Retur
 			const entries = Object.entries(query)
 			// determine if positional arguments were given (must start at 0, none can be missing)
 			for (const [possibleIndex, value] of entries) {
-				const index = Number.isInteger(possibleIndex) ? parseInt(possibleIndex) : false
-				if (index === false) { break }
+				const index = Number.parseInt(possibleIndex)
+				if (Number.isNaN(index)) { break }
 				const nextIndex = index === 0 || typeof positional[index - 1] !== "undefined"
 				if (!nextIndex) { break }
 				positional[index] = value
 			}
 			const params = (positional.length > 0 && positional.length === entries.length) ? positional : query
-			const method = url.replace(serverPrefix + "/", "")
+			let method = url.replace(RegExp("^" + serverPrefix + "\\/?"), "")
+			method = method !== "" ? method : "default"
 			return { id, method, params }
 		}
-		// TODO: handle invalid requests
+		// NOTE: consider failing instead of falling back to default export
+		return { method: "default" }
 	}
 	const prepareRpc = async (
 		calls: RpcCall|RpcCall[],
@@ -125,20 +127,21 @@ function createSocketEvents (serverOptions: PrimServerOptions): PrimServerSocket
 	const connected = () => {
 		const instance = createPrimInstance(serverOptions)
 		const { socketEvent: event } = instance
-		const { prepareCall, prepareRpc: rpcCall, prepareSend } = createServerActions(serverOptions, instance)
+		const { prepareCall, prepareRpc, prepareSend } = createServerActions(serverOptions, instance)
 		event.emit("connected")
 		const ended = () => {
 			event.emit("ended")
 			event.all.clear()
 		}
 		const call = async (body: string, send: PrimServerSocketAnswer) => {
-			// TODO: find out if I'm attaching too many event listeners here
+			// clear previous responses (FIXME: don't stop listening to other responses when new call is made)
+			event.off("response")
 			event.on("response", (data) => {
 				const { body } = prepareSend(data)
 				send(body)
 			})
 			const preparedParams = prepareCall({ body })
-			const result = await rpcCall(preparedParams)
+			const result = await prepareRpc(preparedParams)
 			const preparedResult = prepareSend(result)
 			send(preparedResult.body)			
 		}

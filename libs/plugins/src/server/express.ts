@@ -1,8 +1,6 @@
 import type { PrimServerMethodHandler, PrimServerEvents } from "@doseofted/prim-rpc"
 import type * as Express from "express"
 
-// TODO: test this plugin
-
 interface PrimExpressPluginOptions { prim: PrimServerEvents }
 /**
  * An Express plugin used to register Prim with the server. Use like so:

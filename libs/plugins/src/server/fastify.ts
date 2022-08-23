@@ -1,8 +1,6 @@
 import type { PrimServerMethodHandler, PrimServerEvents } from "@doseofted/prim-rpc"
 import type { FastifyPluginAsync, FastifyInstance, FastifyError } from "fastify"
 
-// TODO: test this plugin
-
 interface PrimFastifyPluginOptions { prim: PrimServerEvents }
 /**
  * A Fastify plugin used to register Prim with the server. Use like so:
@@ -34,7 +32,16 @@ export const fastifyPrimPlugin: FastifyPluginAsync<PrimFastifyPluginOptions> = a
 	})
 	fastify.route<{ Body: string }>({
 		method: ["POST", "GET"],
-		url: prim.options.prefix,
+		url: prim.options.prefix + "/*",
+		handler: async (request, reply) => {
+			const { body, method, raw: { url } } = request
+			const response = await prim.server().call({ method, url, body })
+			void reply.status(response.status).headers(response.headers).send(response.body)
+		},
+	})
+	fastify.route<{ Body: string }>({
+		method: ["POST", "GET"],
+		url: prim.options.prefix + "*",
 		handler: async (request, reply) => {
 			const { body, method, raw: { url } } = request
 			const response = await prim.server().call({ method, url, body })

@@ -8,8 +8,8 @@ const host = import.meta.env.VITE_WEBSITE_HOST as string
 const contained = import.meta.env.VITE_CONTAINED as string
 const backend = createPrimClient<typeof exampleClient>({
 	endpoint: contained
-		? `https://api.${host}/prim`
-		: "http://localhost:3001/prim",
+		? `https://api.${host}/prim/super`
+		: "http://localhost:3001/prim/super",
 	clientBatchTime: 10,
 	jsonHandler,
 })

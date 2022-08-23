@@ -1,8 +1,6 @@
 import type { PrimServerCallbackHandler } from "@doseofted/prim-rpc"
 import type { WebSocketServer } from "ws"
 
-// TODO: test this plugin
-
 interface MethodWsOptions { wss: WebSocketServer }
 /**
  * A Prim plugin used to register itself with the "ws" module. The callback handler plugin is often used in conjunction
@@ -44,7 +42,8 @@ export const primCallbackWs = (options: MethodWsOptions): PrimServerCallbackHand
 	return prim => {
 		webSocketServer.on("connection", (ws) => {
 			const { ended, call } = prim.connected()
-			ws.on("ended", () => { ended() })
+			ws.on("close", () => { ended() })
+			ws.on("error", () => { ended() })
 			ws.on("message", (m) => {
 				call(String(m), (data) => {
 					ws.send(data)
