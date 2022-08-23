@@ -37,6 +37,7 @@ const App: Component = () => {
 					type="text" class="border-gray border rounded-full px-6 py-1"
 					value={textInput()}
 					onChange={(e) => { setTextInput(e.currentTarget.value) }}
+					onKeyUp={e => e.key === "Enter" ? (setName(textInput()) && setTextInput("")) : null}
 				/>
 				<button class="bg-gray hover:bg-light-gray px-6 py-1 rounded-full" onClick={() => setName(textInput())}>Change Text</button>
 			</div>

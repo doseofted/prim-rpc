@@ -1,8 +1,6 @@
 import type { PrimServerMethodHandler, PrimServerEvents } from "@doseofted/prim-rpc"
 import type * as Express from "express"
 
-// TODO: test this plugin
-
 interface PrimExpressPluginOptions { prim: PrimServerEvents }
 /**
  * An Express plugin used to register Prim with the server. Use like so:
@@ -22,7 +20,8 @@ interface PrimExpressPluginOptions { prim: PrimServerEvents }
 // eslint-disable-next-line @typescript-eslint/require-await
 export const expressPrimPlugin = (options: PrimExpressPluginOptions) => {
 	const { prim } = options
-	const handler = async (req: Express.Request, res: Express.Response, _next: Express.NextFunction) => {
+	const handler = async (req: Express.Request, res: Express.Response, next: Express.NextFunction) => {
+		if (!req.path.startsWith(prim.options.prefix)) { next(); return }
 		const { method, originalUrl: url } = req
 		// NOTE: this middleware should be loaded before body-parser
 		const body = await new Promise<string>(resolve => {
@@ -33,7 +32,7 @@ export const expressPrimPlugin = (options: PrimExpressPluginOptions) => {
 			// TODO: consider other methods of handling error
 			req.on("error", () => resolve(""))
 		})
-		const response = await prim.client().call({ method, url, body })
+		const response = await prim.server().call({ method, url, body })
 		res.status(response.status)
 		for (const [headerName, headerValue] of Object.entries(response.headers)) {
 			res.header(headerName, headerValue)

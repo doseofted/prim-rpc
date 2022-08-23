@@ -4,7 +4,7 @@ export {
 	// Express-related plugins
 	primMethodExpress, expressPrimPlugin,
 	// ws-module-related plugin
-	primMethodWs,
+	primCallbackWs,
 } from "./server"
 export {
 	createPrimAxiosClient,

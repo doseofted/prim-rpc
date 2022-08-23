@@ -17,5 +17,5 @@ export type {
 	// client-side functions for sending RPCs
 	PrimClientFunction, PrimSocketFunction,
 	// server-side functions for handling RPCs
-	PrimServerMethodHandler, PrimServerSocketHandler,
+	PrimServerMethodHandler, PrimServerCallbackHandler,
 } from "./interfaces"

@@ -16,6 +16,7 @@ import { get as getProperty, remove as removeFromArray } from "lodash-es"
 import type { Asyncify } from "type-fest"
 import { RpcCall, PrimOptions, RpcAnswer, PrimWebSocketEvents, PrimHttpEvents, PromiseResolveStatus, PrimHttpQueueItem } from "./interfaces"
 import { createPrimOptions } from "./options"
+import { deserializeError } from "serialize-error"
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 export type AnyFunction = (...args: any[]) => any
@@ -90,9 +91,10 @@ export function createPrimClient<
 					wsEvent.on("response", (answer) => {
 						if (rpc.id !== answer.id) { return }
 						if (answer.error) {
+							// TODO: if callback result, handle potential Errors (as given in options)
 							reject(answer.error)
 						} else {
-							resolve(answer.result as unknown)
+							resolve(answer.result)
 						}
 					})
 				})
@@ -103,9 +105,12 @@ export function createPrimClient<
 				httpEvent.on("response", (answer) => {
 					if (rpc.id !== answer.id) { return }
 					if (answer.error) {
+						if (configured.handleError) {
+							answer.error = deserializeError(answer.error)
+						}
 						reject(answer.error)
 					} else {
-						resolve(answer.result as unknown)
+						resolve(answer.result)
 					}
 				})
 			})
@@ -172,6 +177,7 @@ export function createPrimClient<
 					errors.forEach(error => { httpEvent.emit("response", error) })
 				} else {
 					// one error was given but there may be multiple results, return that error to caller
+					// TODO: ensure only errored results are thrown and others resolve (when calls are batched)
 					rpcList.forEach(r => {
 						const error = errors
 						const id = r.rpc.id

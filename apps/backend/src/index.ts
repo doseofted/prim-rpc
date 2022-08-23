@@ -7,7 +7,7 @@ import { WebSocketServer } from "ws"
 import jsonHandler from "superjson"
 import * as module from "@doseofted/prim-example"
 import { createPrimServer } from "@doseofted/prim-rpc"
-import { primMethodFastify, primMethodWs } from "@doseofted/prim-plugins"
+import { primMethodFastify, primCallbackWs } from "@doseofted/prim-plugins"
 
 const contained = JSON.parse(process.env.CONTAINED ?? "false") === true
 
@@ -15,12 +15,21 @@ const fastify = Fastify({ logger: true })
 await fastify.register(Cors, { origin: contained ? `https://${process.env.WEBSITE_HOST}` : "http://localhost:5173" })
 const wss = new WebSocketServer({ server: fastify.server })
 
+// to be used for manual calls
 createPrimServer({
 	prefix: "/prim",
 	module,
-	jsonHandler,
 	methodHandler: primMethodFastify({ fastify }),
-	callbackHandler: primMethodWs({ wss }),
+	// FIXME: can't initialize websocket plugin twice, find workaround (WS plugin for Fastify might integrate better?)
+	// LINK https://github.com/websockets/ws#multiple-servers-sharing-a-single-https-server
+})
+// used with client for wider range of parsed JSON types
+createPrimServer({
+	prefix: "/prim-super",
+	jsonHandler,
+	module,
+	methodHandler: primMethodFastify({ fastify }),
+	callbackHandler: primCallbackWs({ wss }),
 })
 
 try {
