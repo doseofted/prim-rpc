@@ -29,9 +29,6 @@ type PromisifiedModule<ModuleGiven extends object> = {
 }
 /** Callback prefix */ const CB_PREFIX = "_cb_"
 
-// NOTE: `options.server` is useless, just detect if module is given and set internal flag that client is used on server
-// NOTE: add presets option for dev and production to configure which fallback settings to use when not provided
-
 /**
  * Prim-RPC can be used to write plain functions on the server and then call them easily from the client.
  * On the server, Prim-RPC is given parameters from a server framework to find the designated function on each request.
@@ -60,6 +57,10 @@ export function createPrimClient<
 					if (!argIsReferenceToCallback) { return arg }
 					return (...cbArgs: unknown[]) => {
 						wsEvent.emit("response", { result: cbArgs, id: arg })
+						// NOTE: today, callbacks can be called but server cannot see return value given by client
+						// TODO: when callback given to method defined on client returns value, emit event to server
+						// TODO: listen for callback return value on server, return value to called method as callback return value
+						// NOTE: return value of callback on server will have to be awaited since result is from client
 					}
 				})
 				const functionResult = Reflect.apply(targetFunction, targetContext, argsWithListeners) as unknown

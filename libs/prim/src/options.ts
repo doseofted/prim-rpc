@@ -3,6 +3,7 @@ import { defu } from "defu"
 
 // TODO: consider separating server-specific options from client options so I can reduce the number
 // of options given on the client
+// TODO: add presets option for dev and production to configure which fallback settings to use when not provided
 
 const createBaseClientOptions = (): PrimOptions => ({
 	// SECTION: client

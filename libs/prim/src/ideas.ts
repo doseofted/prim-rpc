@@ -1,4 +1,4 @@
-enum Status { Idea, Implemented, PartiallyImplemented, Rejected }
+enum Status { Idea, Implemented, PartiallyImplemented, Rejected, PartiallyRejected }
 /* eslint-disable @typescript-eslint/no-unused-vars */
 /**
  * IDEA: consider creating createPrimUniversal that creates two instances of Prim, one for
@@ -193,5 +193,102 @@ let autoTransformModuleType: Status.Implemented
  * to make use of Prim-RPC's handling of GET requests.
  */
 let fetchFromPrimRpcResult: Status.Idea
+
+/**
+ * Prim can make function calls and listen for events over callbacks. The next step would be to support
+ * closures given over callbacks or returned from a function. This would required the callback handler (usually a
+ * WebSocket connection) and would ideally work very similar to how callbacks are handled today.
+ * 
+ * For reference, today, callbacks given on the client are turned into special "callback identifier strings" that, when
+ * sent to the server, are identified and turned into callbacks that, once executed, are turned into events that trigger
+ * a message to be sent back to the client.
+ * 
+ * These messages are simply values supported by the JSON handler right now. To support closures, any value given that
+ * is a function would be turned into a "function reference identifier string," the function itself saved to a variable
+ * in the current callback handler session (a WebSocket connection usually) so it can be called later, and then the
+ * client would transform the given identifier into a function that, once called, would send an event to the function
+ * on the server triggering the saved function in the handler session. The reason the function needs to be saved to a
+ * variable is because this function is a closure and that reference would otherwise be lost once the function call or
+ * callback is made.
+ * 
+ * This would need to happen over and over again between the server and the client so that any time a function call is
+ * passed, it gets called, whether that is on the client or the server. This could allow for complex calls to be made
+ * like so:
+ * 
+ * ```ts
+ * // some made up API using initialized Prim Client (quick, bad example):
+ * prim.updateUser(userId, { name: "Ted" }, async (updatedUser, getBlogPosts) => {
+ *   console.log(updatedUser.name)
+ *   const posts = await getBlogPosts()
+ *   console.log(posts)
+ * })
+ * ```
+ * 
+ * One problem to note with supporting closures is actually the same problem with using callbacks. These references
+ * need to be stored and since the thing being stored is a reference to a function that storage cannot be external
+ * like a redis database. It should also be noted that this only works with the server where a function call is made
+ * although this shouldn't be an issue for most cases since the WebSocket connection should be kept with a single
+ * server (methods calls to server may possibly round-robin across multiple servers but callback handlers are generally
+ * used with the first server that is contacted, of course if that connection is lost then so are all handlers).
+ * 
+ * It's also worth noting that a closure may not be the direct parameter of the function so a given object that contains
+ * functions would either be lost when sent to the client or references would need to be found and stored (possibly
+ * a whole bunch of them) on the object deeply.
+ * 
+ * Yet another problem is a closure that returns a value (the obvious use case for a closure or any function call).
+ * Each returned value from that closure would need to be a promise which would not agree with the TypeScript
+ * definitions unless I was to go through all parameters and make all callbacks return promises like I did with
+ * `PromisifiedModule<M>` (which I already thought wasn't possible, not even sure how that would work with parameters).
+ * Even if I was to update the TypeScript definitions, I would still need to make those closures return actual promises
+ * which could be done by awaiting the event from the server/client. Since the closures could be nested, I may even
+ * need to create some dedicated "Prim Callback Client" to handle these kind of events and the temporary functions
+ * for which it would work on.
+ * 
+ * The issue with supporting closures given to a callback is also related to supporting chained function calls like so:
+ * 
+ * ```ts
+ * // example of function returning an object with functions (or an instantiated object from class)
+ * const user = await primClient.getUsername("doseofted").setFirstName("Ted").update(updated => {
+ *   console.log("Status:", updated)
+ * })
+ * console.log("New first name:", user.firstName)
+ * // example of function directly returning function
+ * const result = await primClient.add(5)(5)
+ * console.log(result, result === 10)
+ * ```
+ * 
+ * The first example would be incredibly useful because a function could return an instantiated object and I could
+ * call methods of that object (super useful for working with an ORM). Chaining methods share the same difficulties as
+ * supporting closures. Chaining could happen multiple times (e.g. `client.set(0).add(5).subtract(3).multiply(5)`) so
+ * the server would need to store these references for the callback session, possibly a whole bunch. Each part of chain
+ * could return any type of object so knowing which functions references to save and which are return values would
+ * be difficult.
+ * 
+ * One unique issue with supporting chained calls is that Promises returned from Prim Client would need to be extended
+ * so that another function call could be made without having to await the previous function (Prim Client would in turn
+ * need to internally await each chained call). This would also involve updating the TypeScript definitions again to
+ * support some form of an extended Promise (which may be possible but TypeScript definitions will become even more
+ * complicated). This extended promise would possibly become another dedicated client like "Prim Chained Client"
+ * that shares some functionality with the closure handler, yet another possible Prim client.
+ * 
+ * To sum this up, this would be very difficult to implement, would possibly be confusing for developers since not
+ * all use cases could be supported initially, will make maintenance of the project difficult, and may not be
+ * reasonably accomplished by a single developer in a reasonable amount of time.
+ *
+ * I still think it might be worth (possibly) exploring in the future if the project finds success.
+ * 
+ * Today, Prim is a simple RPC library so, in that sense, the functionality at least matches
+ * common uses of RPC-like frameworks like GraphQL and gRPC. By allowing communication from client to server
+ * (method calls) and vice versa (with callbacks), the tool also provides a clean way of performing HTTP/WS using
+ * regular functions without having to touch the protocols themselves. for simplicity's sake, that may be enough as
+ * long as Prim RPC's restrictions are communicated clearly:
+ * 
+ * - Returned values from a module's methods must be supported by the configured JSON handler
+ * - Parameters given to a method's callback must be supported by the configured JSON handler
+ * - Methods on client must be awaited (result is fetched from server)
+ * - Callbacks on server must be awaited (result is fetched from client)
+ *   - Callbacks cannot return a value ...yet. I'd like to fix this.
+ */
+let supportChainedCallsAndClosures: Status.PartiallyRejected // for now
 
 export {}
