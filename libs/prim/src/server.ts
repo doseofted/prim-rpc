@@ -79,6 +79,8 @@ function createServerActions (serverOptions: PrimServerOptions, instance?: Retur
 				if (cbResults) { event.on("response", cbResults) }
 				// eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
 				const result: RpcAnswer = await Reflect.apply(target, undefined, args)
+				// TODO: today, result must be supported by JSON handler but consider supporting returned functions
+				// in the same way that callback are supported today (by passing reference to client)
 				return { result, id }
 			} catch (e) {
 				// JSON.stringify on Error results in an empty object. Since Error is common, serialize it

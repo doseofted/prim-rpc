@@ -176,6 +176,129 @@ let imageUploadsAndFormSupport: Status.PartiallyRejected // see idea about conte
  */
 let requestHooksContextAndFileUpload: Status.Idea
 
+
+/**
+ * # Idea
+ * 
+ * Prim-RPC is intended to handle JSON-based RPC messages but since it doesn't really care what server you use because
+ * server actions are generic and provided to plugins, those plugins could support file uploads. For instance, someone
+ * could make an RPC request through multipart data by first sending the RPC as a field (the JSON payload as value) and
+ * then the file as a second field (remember that order is important since a user may choose to respond to given RPC 
+ * while file is still processing, maybe passing callback to show status of upload).
+ * 
+ * This would require each plugin to handle a condition where given request body is either multipart or a JSON body.
+ * This would make plugins much more difficult to write since each framework has their own method of supporting
+ * multipart data that's not part of the framework itself (Fastify has @fastify/multipart based on busboy,
+ * Express has Multer also based on busboy, busboy could be used on an "node:http" server, or something that's not
+ * based on busboy could be used such as formidable which has middleware for Express and "node:http").
+ * 
+ * Prim-RPC shouldn't really dictate how RPC is sent and received from the server (leave this to plugins) but it should
+ * probably specify the RPC structure including how file uploads should be referenced, this way plugins can be written
+ * that either support multipart operations or at least so that plugins can be created in a consistent way,
+ * transforming given data to a form that can be understood from RPC call and in a way that the developer can understand
+ * regardless of how they want to process uploads.
+ * 
+ * ## Possible Implementation
+ * 
+ * The easiest way to do this would be to process each upload and pass it as a reference to the RPC call. I still need
+ * to read up on how multipart works but below is a pseudo-form to demonstrate how this might work in Prim-RPC.
+ * 
+ * ```txt
+ * Content-Type: multipart/form-data; boundary=prim-boundary
+ * 
+ * --prim-boundary
+ * Content-Disposition: form-data; name="prim-rpc"
+ * 
+ * { "method": "uploadFile", "params": ["_bin_some-identifier", "_cb_upload-progress"] }
+ * --prim-boundary
+ * Content-Disposition: form-data; name="_bin_some-identifier"; filename="hello.txt"
+ * Content-Type: text/plain
+ *
+ * My name is Ted.
+ * --prim-boundary--
+ * ```
+ * 
+ * In this example, a single RPC call is made and a file is passed as the first parameter and the second is a callback
+ * intended to show progress of the upload (let's pretend this file is much larger). This function is defined by the
+ * user so the function call could have any structure. The call could look like this for example:
+ * 
+ * ```ts
+ * const fileInput: HTMLInputElement = document.getElementById("file-input")
+ * const file = new Blob([input.files[0]])
+ * const result = await prim.uploadFile(file, progress => console.log("Progress:", progress))
+ * console.log(result === "processing") // we'll know when finished by listening for events on callback
+ * ```
+ * 
+ * When a file is passed as a parameter, the Prim client should be able to determine that it is a Blob/File and needs to
+ * be treated separately. There should probably be an added restriction in Prim that binary data needs to be a direct
+ * parameter of the function call so that objects don't need to be deeply inspected for binary data, similar to how
+ * callbacks are only processed if they are a direct parameter of function (for example, 
+ * `typeMessage("message", { cb: letter => console.log(letter) })` couldn't work because 2nd parameter is object).
+ * 
+ * The processing on the client should happen in the given plugin. A fourth parameter could be passed to the HTTP plugin
+ * that is a helper function for creating FormData. This helper function could even be a separate plugin in itself,
+ * like one to create FormData or if another format is chosen, a plugin to create that structure. The plugin
+ * would need to look at parameters in the RPC call and replace them with an identifier prefixed `_bin_` to reference
+ * the file in the FormData it creates. An example plugin using fetch is below:
+ * 
+ * ```ts
+ * createPrimClient({
+ *   client: async (endpoint, jsonBody, jsonHandler, formHandler) => {
+ *     const form = formHandler?.(jsonBody)
+ *     const body = form.data ?? jsonHandler.stringify(jsonBody)
+ *     const headers = { "content-type": "application/json", ...form.headers }
+ *     fetch(endpoint, { body, ... })
+ *   }
+ * })
+ * ```
+ * 
+ * `formHandler` in this example reads jsonBody.params for Blobs and replaces them with and keeps track of references.
+ * The found Blobs are then used to construct FormData that starts with modified RPC in `jsonBody` as the first field
+ * and then any binary data as additional fields with the names of each field being a reference to the parameter
+ * prefixed `_bin_`. The structure of this plugin should probably be rethought so it's easier to use but this would
+ * at least be functional (I think).
+ * 
+ * The next part is processing this request on the server. Each plugin would need to opt-in to support reading given
+ * multipart data. So, for instance in a Fastify plugin, I could toggle a plugin option, like `useMultipart` that would
+ * let the plugin read form data, triggering the `.call()` method when the "prim-rpc" field is processed. The references
+ * starting with `_bin_` would need to be replaced with some sort of event listener that would return a result to the
+ * called function. This is difficult because Prim may have to dictate what format is used (likely a Buffer). However,
+ * it's possible someone may want to read file as a whole (which would mean giving the function a promise), or someone
+ * may just want the filename (also a promise but with the contents being a short string, the filename). This
+ * transformation from input given to the multipart handler in a Prim Plugin to the format expected by the function
+ * would probably need to be handled by the plugin. Since the type on the browser (probably a Blob) and server
+ * (probably a Buffer or a Promise<string> containing the filename) will differ, the Prim client would also need to
+ * transform these types so that the function can be defined with the intended type on the server but transformed on
+ * the client (expanding the definition of `PromisifiedModule` today with custom type provided to Prim server over
+ * some newly defined TypeScript generic, which is to say: this would become difficult fast).
+ * 
+ * However, if all of these parts could be implemented, then I could handle file uploads in Prim through the use
+ * of plugins.
+ * 
+ * ## Alternatives
+ * 
+ * It's also worth noting alternatives to using multipart data. Multipart is the most widely supported, popular for
+ * uploading files, and (relatively) simple which is why it's considered, in the same way JSON is chosen for RPC in
+ * this project because supported, simple, and popular.
+ * 
+ * One alternative is BSON but I've yet to find a way to use this in the browser for file uploads and it's not supported
+ * well (or at all for some) by server frameworks. This would be ideal since I can still think in terms of JSON however
+ * even in a world where this is possible, it would probably be difficult to separate the file upload from the RPC call
+ * meaning RPC responses would be delayed by the upload. However, I don't know enough about BSON to say for sure.
+ * 
+ * Another alternative is to just upload files using the configured websocket. While it's easy to send binary data
+ * over WebSocket, the request structure isn't as defined as it is with multipart data over HTTP, meaning that would
+ * become a responsibility of this project (no thank you). This could implemented as a plugin for websocket connections 
+ * (maybe) but to officially support would be very, very difficult.
+ * 
+ * A couple useable alternatives, and the options Prim will suggest for its first release, is to either:
+ * 
+ * - handle uploads in a custom Prim plugin (without direct Prim RPC integration, this would probably be hacky)
+ * - upload very small files by base64 encoding them (not an option for larger files like images)
+ * - upload files with your HTTP framework in a defined route outside of Prim
+ */
+let fileUploadsAsPartOfPrimPlugin: Status.Idea
+
 /**
  * Support object variable types like `Date` over network requests with Prim by using a separate JSON
  * stringify/parsing library that can understand those requests. This is something that tRPC supports right now
@@ -348,11 +471,39 @@ let fetchFromPrimRpcResult: Status.Idea
  * long as Prim RPC's restrictions are communicated clearly:
  * 
  * - Returned values from a module's methods must be supported by the configured JSON handler
+ *   - TODO: consider supporting returned functions in the same way that callbacks are supported
  * - Parameters given to a method's callback must be supported by the configured JSON handler
  * - Methods on client must be awaited (result is fetched from server)
  * - Callbacks on server must be awaited (result is fetched from client)
  *   - TODO: Callbacks cannot return a value ...yet. I'd like to fix this.
  */
 let supportChainedCallsAndClosures: Status.PartiallyRejected // for now
+
+/**
+ * There's the possibility that types for functions on the server will be specific to Node while types given
+ * from the client will differ. One example involves file uploads as hinted at in idea `fileUploadsAsPartOfPrimPlugin`.
+ * In that example, a file is a Blob on the client but a Buffer on the server. While there's a lot of work to support
+ * file uploads, this idea simply references replacing one type with another.
+ * 
+ * Today I'm transforming the given module type to Prim Client so that every function returns a promise because the
+ * Prim Client will return a promise through its proxy since the result is from the server (even though the function
+ * defined on the server may not be a promise at all). This same `PromisifiedModule` could be extended so that given
+ * types in a function's parameters or return type are transformed on the client.
+ * 
+ * Doing so would make the following code valid:
+ * 
+ * ```ts
+ * // defined on server
+ * function sayHello(str: Buffer): Buffer {... }
+ * // on client (parameter is string, not Buffer)
+ * const result = await prim.sayHello("Ted")
+ * console.log(typeof result === "string")
+ * ```
+ * 
+ * Of course, I might be able to pass in a string to the client without TypeScript complaining but the server
+ * will still reject it. In order to transform the actual string, I would need to consider adding pre-hooks and
+ * post-hooks like I talk in the idea labelled `requestHooksContextAndFileUpload` above.
+ */
+let transformTypeScriptTypes: Status.PartiallyImplemented
 
 export {}

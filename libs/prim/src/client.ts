@@ -102,6 +102,9 @@ export function createPrimClient<
 				sendMessage(rpc)
 				return result
 			}
+			// TODO: consider extending Promise to include methods like `.refetch()` or `.stopListening()` (for callbacks)
+			// NOTE: if promises are extended, this also needs to be done on results returned with callbacks (above)
+			// NOTE: If I ever decide to chain methods, those methods would also have to extend the Promise
 			const result = new Promise<RpcAnswer>((resolve, reject) => {
 				httpEvent.on("response", (answer) => {
 					if (rpc.id !== answer.id) { return }
