@@ -62,6 +62,7 @@ export const testLevel2 = { testLevel1 }
  * 
  * @param ok - Is it okay to fail?
  * @returns A message
+ * @throws An error: "My bad."
  * 
  * @public
  */
