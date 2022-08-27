@@ -22,7 +22,10 @@
   "main": "dist/main.cjs",
   "module": "dist/module.mjs",
   "exports": {
-    "import": "./dist/module.mjs",
-    "require": "./dist/main.cjs"
+    ".": {
+      "import": "./dist/module.mjs",
+      "require": "./dist/main.cjs"
+    },
+    "./dist/docs.json": "./dist/docs.json"
   }
 }
