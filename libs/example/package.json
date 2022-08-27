@@ -12,6 +12,7 @@
     "watch": "parcel watch --no-hmr",
     "build": "parcel build",
     "check": "tsc --noEmit",
+    "document": "typedoc src/index.ts --json dist/docs.json",
     "test": "vitest run",
     "testing": "vitest watch",
     "lint": "eslint ."
