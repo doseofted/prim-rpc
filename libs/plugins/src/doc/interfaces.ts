@@ -71,6 +71,8 @@ interface PrimRpcModuleShape {
 
 /** Prim RPC documentation, generated from a TypeDoc export */
 export interface PrimRpcDocs extends PrimRpcDocReferences {
+	/** Name of the module (package name) */
+	moduleName: string
 	/** The shape of the module including direct methods and any nested modules */
 	shape: PrimRpcModuleShape
 }
