@@ -1,4 +1,4 @@
-interface RpcParam {
+export interface RpcParam {
 	/** Parameter name */
 	name: string
 	/** A type as defined on Prim Docs's root object */
@@ -9,7 +9,7 @@ interface RpcParam {
 	comment: string
 }
 
-interface RpcReturned {
+export interface RpcReturned {
 	/** A type as defined on Prim Docs's root object */
 	type: PrimDocRootRef
 	/** Identifier used to access name given by `.type` */
@@ -18,7 +18,7 @@ interface RpcReturned {
 	comment: string
 }
 
-interface RpcMethodDocs {
+export interface RpcMethodDocs {
 	/** Method name */
 	name: string
 	/** Comment given for the method */
@@ -31,7 +31,7 @@ interface RpcMethodDocs {
 	throws: RpcReturned
 }
 
-interface RpcTypeDocs {
+export interface RpcTypeDocs {
 	/** Value of `intrinsic` will determine what property on object should be accessed */
 	intrinsic: "type"|"object"|"array"
 	/** If not an object or array, `.type` is the type of parameter expected, native to the language */
@@ -44,29 +44,35 @@ interface RpcTypeDocs {
 	array?: RpcTypeDocs[],
 }
 
-interface PrimRpcDocReferences {
+export interface RpcMethodDocsById {
+	[id: string]: RpcMethodDocs
+}
+
+export interface RpcTypeDocsById {
+	[id: string]: RpcTypeDocs
+}
+
+export interface PrimRpcDocReferences {
 	/** Methods grouped by a generated identifier. Objects with call signatures */
-	method: {
-		[id: string]: RpcMethodDocs
-	},
+	method: RpcMethodDocsById,
 	/** All types referenced in methods on module, grouped by generated identifiers */
-	type: {
-		[id: string]: RpcTypeDocs
-	}
+	type: RpcTypeDocsById
 }
 /** A type that is recognized by `PrimDocReferences` and has values */
-type PrimDocRootRef = keyof PrimRpcDocReferences
+export type PrimDocRootRef = keyof PrimRpcDocReferences|"shape"|"unknown"
 
-interface PrimRpcModuleShape {
+export interface PrimRpcModuleShapeGiven {
+	/** Type used to access Prim Docs' properties and find a specific ID */
+	type: PrimDocRootRef
+	/** ID used to reference root property named with value of `.type` on Prim Docs root object */
+	id: string
+	/** If given option has properties, those will be nested under `.shape` */
+	shape?: PrimRpcModuleShape
+}
+
+export interface PrimRpcModuleShape {
 	/** Either a method name or property used to access a submodule */
-	[property: string]: {
-		/** Type used to access Prim Docs' properties and find a specific ID */
-		type: PrimDocRootRef
-		/** ID used to reference root property named with value of `.type` on Prim Docs root object */
-		id: string
-		/** If given option has properties, those will be nested under `.shape` */
-		shape: PrimRpcModuleShape
-	}
+	[property: string]: PrimRpcModuleShapeGiven
 }
 
 /** Prim RPC documentation, generated from a TypeDoc export */
