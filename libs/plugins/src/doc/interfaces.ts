@@ -2,19 +2,25 @@ export interface RpcParam {
 	/** Parameter name */
 	name: string
 	/** A type as defined on Prim Docs's root object */
-	type: PrimDocRootRef
+	ref: PrimDocRootRef
 	/** Identifier used to access name given by `.type` */
 	id: string
 	/** Comment for parameter value */
 	comment: string
 }
 
-export interface RpcReturned {
+export interface RpcReturns {
 	/** A type as defined on Prim Docs's root object */
-	type: PrimDocRootRef
+	ref: PrimDocRootRef
 	/** Identifier used to access name given by `.type` */
 	id: string
-	/** Comment for return or thrown value */
+	/** Comment for return value */
+	comment: string
+}
+
+// NOTE: it doesn't appear TypeDoc returns the type given to `@throws` comment
+export interface RpcThrows {
+	/** Condition on which functions throws, a comment */
 	comment: string
 }
 
@@ -26,9 +32,9 @@ export interface RpcMethodDocs {
 	/** Parameters expected by this overload of the method */
 	params: RpcParam[],
 	/** Return type of the method */
-	returns: RpcReturned,
+	returns: RpcReturns,
 	/** The type of error that is thrown directly by (and only by) this method */
-	throws: RpcReturned
+	throws: RpcThrows
 }
 
 export interface RpcTypeDocs {
@@ -45,7 +51,7 @@ export interface RpcTypeDocs {
 }
 
 export interface RpcMethodDocsById {
-	[id: string]: RpcMethodDocs
+	[id: string]: RpcMethodDocs[] // potentially multiple call signatures
 }
 
 export interface RpcTypeDocsById {
@@ -63,8 +69,8 @@ export type PrimDocRootRef = keyof PrimRpcDocReferences|"shape"|"unknown"
 
 export interface PrimRpcModuleShapeGiven {
 	/** Type used to access Prim Docs' properties and find a specific ID */
-	type: PrimDocRootRef
-	/** ID used to reference root property named with value of `.type` on Prim Docs root object */
+	ref: PrimDocRootRef
+	/** ID used to reference root property on Prim Docs object */
 	id: string
 	/** If given option has properties, those will be nested under `.shape` */
 	shape?: PrimRpcModuleShape
