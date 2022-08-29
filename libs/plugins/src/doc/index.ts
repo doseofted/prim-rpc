@@ -1,40 +1,10 @@
 // FIXME: I'm writing logic for docs in the prim-plugins module now but this should move into its own module eventually
 import { JSONOutput, ReflectionKind } from "typedoc"
-import { findChildrenOfType, parseComment } from "./helpers"
+import { parseComment } from "./helpers"
 import {
 	PrimDocRootRef, PrimRpcDocs, PrimRpcModuleShape, PrimRpcModuleShapeGiven, RpcMethodDocs, RpcMethodDocsById, RpcParam,
 	RpcReturns, RpcThrows, RpcTypeDocsById,
 } from "./interfaces"
-
-/**
- * @deprecated
- */
-export function oldParseModule (docs: JSONOutput.ProjectReflection) {
-	const { name: module } = docs
-	const methodList = findChildrenOfType("Functions", docs)
-		.map(methodGiven => {
-			const { name: method, signatures } = methodGiven
-			const overloads  = signatures
-				.filter(sig => sig.kindString === "Call signature")
-				.map(signature => {
-					const comment = parseComment(signature.comment)
-					const returns = parseComment(signature.comment, "@returns")
-					const params = signature.parameters.map(param => {
-						const name = param.name
-						const comment = parseComment(param.comment)
-						const type = param?.type.type // TODO: handle reflection
-						return { name, comment, type }
-					})
-					return { comment, returns, params }
-				})
-			return { method, overloads }
-		})
-	const methods: { [method: string]: typeof methodList["0"]["overloads"]} = {}
-	for (const method of methodList) {
-		methods[method.method] = method.overloads
-	}
-	return { module, methods, submodules: {} }
-}
 
 let fakeId = 0
 /** To be replaced with real generator later */
@@ -78,9 +48,10 @@ function determinePrimType (given: JSONOutput.DeclarationReflection): TypePrimIn
 			return "function"
 		} else if (given.children) {
 			// TODO: determine if object has callable properties
-			const containsFunctions = given.children
-				.map(c => determinePrimType(c)).filter(c => c === "function").length > 0
-			return containsFunctions ? "module" : "variable"
+			const givenFunctions = given.children
+				.map(c => determinePrimType(c)).filter(c => c === "function")
+			console.log(given.name, givenFunctions)
+			return givenFunctions.length > 0 ? "module" : "variable"
 		}
 	}
 	const { type } = given.type
@@ -88,6 +59,7 @@ function determinePrimType (given: JSONOutput.DeclarationReflection): TypePrimIn
 		return "variable"
 	} else if (type === "reflection") { // need to narrow down
 		const { declaration } = given.type
+		console.log("please", given.name, declaration)
 		return determinePrimType(declaration)
 	}
 }
@@ -120,6 +92,7 @@ function navigateChildren (docs: JSONOutput.DeclarationReflection): ReturnedChil
 			case ReflectionKind.Namespace: {
 				const givenType = determinePrimType(child)
 				const moduleLike = givenType === "module"
+				console.log(givenType, child.type.type, child.name)
 				if (moduleLike && child.type.type === "reflection") {
 					const childDetails = navigateChildren(child.type.declaration)
 					const moduleShape: PrimRpcModuleShapeGiven = {
@@ -145,7 +118,7 @@ function navigateChildren (docs: JSONOutput.DeclarationReflection): ReturnedChil
 					}
 					type[typeShape.id] = {
 						intrinsic: "type",
-						type: "unknown", // temporary
+						type: child.name, // debugging only
 					}
 				}
 				break
@@ -156,6 +129,13 @@ function navigateChildren (docs: JSONOutput.DeclarationReflection): ReturnedChil
 	return { shape, method, type }
 }
 
+/**
+ * Create documentation for a module used with Prim, as JSON. Used as input
+ * for Prim Docs UI to create a documentation page.
+ *
+ * @param docs Output of TypeDoc documentation for module used with Prim
+ * @returns Prim-specific documentation for RPC calls
+ */
 export function createDocsForModule(docs: unknown): PrimRpcDocs {
 	const likelyDocs = docs as JSONOutput.ProjectReflection
 	const moduleName = likelyDocs.name
