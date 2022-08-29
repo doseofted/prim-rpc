@@ -45,6 +45,7 @@ type TypePrimInterpret = "function"|"module"|"variable"|"reflection"
 function determinePrimType (given: JSONOutput.DeclarationReflection): TypePrimInterpret {
 	if (!given.type) {
 		if (given.signatures) {
+			console.log("is function", given.name)
 			return "function"
 		} else if (given.children) {
 			// TODO: determine if object has callable properties
