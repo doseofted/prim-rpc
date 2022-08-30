@@ -506,4 +506,96 @@ let supportChainedCallsAndClosures: Status.PartiallyRejected // for now
  */
 let transformTypeScriptTypes: Status.PartiallyImplemented
 
+/**
+ * It could be dangerous to export an entire module it may export more than just the functions needed by Prim RPC.
+ * Even with carefully controlled exports, there are some parts of an export that shouldn't be called. These are two
+ * different scenarios but both concern security of the server. This idea should fix both.
+ * 
+ * The first scenario concerns unintended exports. For instance, if I define a single function `sayHello()`, I would
+ * not want someone to call `sayHello.apply(...)` or `sayHello.toString()`. To prevent this, I could search the given
+ * path of the RPC call, such as `sayHello/toString` and prevent running the given function (toString) if it belongs to
+ * another function (sayHello). This however would prevent someone from defining another function on a function object
+ * which may be inconvenient.
+ * 
+ * For instance, if I a defined a `docs()` function on a function object that returns
+ * documentation for that function, like `sayHello.docs()`, where `sayHello` is a function, this would not work if I
+ * implemented the path technique described above (some developers may use this feature of JavaScript where functions
+ * are objects). This also would not prevent someone from calling a method or some function defined on a regular
+ * variable. This leads me to the second scenario.
+ * 
+ * The second scenario concerns how a module is exported. For instance, when a variable is exported from a module.
+ * Consider this example:
+ * 
+ * ```ts
+ * export const serverSecret = process.env.SERVER_SECRET ?? ""
+ * export function authenticateUser () { ... }
+ * ```
+ * While this code should (probably) not be written in the first place, if someone exports a secret then it could
+ * be exposed if used with Prim RPC Server. While `serverSecret` is not callable from the server,
+ * `serverSecret.toString()` very well could be. This is the case with most variables and their built-in methods.
+ * Since I don't have a way to differentiate between a module export and a variable export (that I know of), then I
+ * need some other method of defining which functions are allowed to be exposed on the Prim Server.
+ * 
+ * While one of the goals of Prim RPC is to keep server-specific code outside of the module, this may be an instance
+ * where it's necessary. I can think of two ways to prevent unintended exported functions.
+ * 
+ * The first way is probably the simplest: check for a property `.rpc` (or some custom property name defined on the
+ * server) for a `true` value on a function and only call the function when it exists. As an example:
+ * 
+ * ```ts
+ * function sayHello() { ... }
+ * sayHello.rpc = true
+ * function topSecret() { ... }
+ * const serverSecret = process.env.SERVER_SECRET ?? ""
+ * ```
+ * 
+ * Since Prim RPC Server would check for `.rpc` property then `topSecret()` and `serverSecret` are not callable from the
+ * server while `sayHello()` would be callable from the server. By default, any methods defined on a function object
+ * should also not be callable (using path blocking method described in first scenario) which means `sayHello.docs()`
+ * would not be callable from the server by default. However, these methods could be useful so, as an additional
+ * option, I think a Prim RPC Server option of `allowMethodsOnFunctions` should be defined so that methods can be
+ * called. Since this could be dangerous, the option should be an allow-list of method names allowed on any function.
+ * Like so:
+ * 
+ * ```ts
+ * const prim = createPrimServer({
+ *   module,
+ *   ...otherOptions,
+ *   allowMethodsOnFunctions: ["docs"] // by default: `false`
+ * })
+ * ```
+ * 
+ * This would allow `sayHello.docs()` to be called when `.rpc` is `true` but would prevent other default methods or
+ * other custom methods on a function object from being called, like `sayHello.toString()`.
+ * 
+ * This method as described in the second scenario would work well but does require explicitly defined properties on
+ * the module's methods. These are not server-specific which is good but it may become tedious. Adding to the Function
+ * prototype or extending a Function class is also out of consideration since this leads to unpredictable code, doesn't
+ * play well with TypeScript, and is generally frowned upon (including by myself).
+ * I think another option could be presented to prevent needing to define `.rpc` property on every function. While it
+ * may keep the module itself clean of extra `.rpc` properties, it may be just as tedious. I could define an object as
+ * an option of Prim Server that defined allowed functions, like so:
+ * 
+ *  * ```ts
+ * const prim = createPrimServer({
+ *   module,
+ *   allowedFunctions: {
+ *     sayHello: true,
+ *     someSubmodule: {
+ *     someFunction: true
+ *   },
+ *   allowMethodsOnFunctions: false
+ * })
+ * ```
+ * 
+ * So, with this `allowedFunctions` option, `sayHello` and `someSubmodule/someFunction` are callable but nothing else
+ * in the module is callable. I think the `.rpc` property is much cleaner and also clearer because it's defined
+ * alongside the function so I may not include this option (but maybe it's a nice alternative, if a developer would
+ * like to use a few methods of some downloaded package directly). To implement the feature with proper TypeScript
+ * types, I could use `Schema<Module, boolean>` given by the type-fest package to allow properties of module to be
+ * auto-suggested with a value of boolean for each function.
+ * 
+ */
+let exposedRpc: Status.Idea
+
 export {}
