@@ -318,7 +318,27 @@ let customJsonHandling: Status.Implemented
  * When a request comes into Prim Server, send the answer over a list of configured webhooks.
  * This can be done by using the client option configured with Prim except I'll just be using it from
  * the server to contact each configured endpoint. I could potentially allow for a filter on what answers
- * to forward to webhook endpoints (for instance, regex or glob that matches function names)
+ * to forward to webhook endpoints (for instance, regex or glob that matches function names).
+ * 
+ * Webhooks can be complicated when you consider adding signatures, limiting sent webhooks to each endpoint, or
+ * possibly restricting data sent back. These tasks should not be the responsibility of Prim Server but
+ * rather some library dedicated to that functionality, especially since most developers probably won't generate their
+ * own webhooks for RPC. Instead of sending webhooks directly with the client, it might be worth considering adding
+ * an event emitter on RPC calls that could be used to send webhooks using separate code.
+ * 
+ * This might look like this, configured:
+ * 
+ * ```ts
+ * const prim = createPrimServer({
+ *   // using default `client` option in this Prim Server
+ *   webhooks: {
+ *     endpoint: "https://example.com/" // to be used with configured client
+ *     send: {
+ *       sayHello: true
+ *     }
+ *   }
+ * })
+ * ```
  */
 let webhooks: Status.Idea
 
