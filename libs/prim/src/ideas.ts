@@ -321,26 +321,26 @@ let customJsonHandling: Status.Implemented
  * to forward to webhook endpoints (for instance, regex or glob that matches function names).
  * 
  * Webhooks can be complicated when you consider adding signatures, limiting sent webhooks to each endpoint, or
- * possibly restricting data sent back. These tasks should not be the responsibility of Prim Server but
- * rather some library dedicated to that functionality, especially since most developers probably won't generate their
- * own webhooks for RPC. Instead of sending webhooks directly with the client, it might be worth considering adding
- * an event emitter on RPC calls that could be used to send webhooks using separate code.
+ * possibly restricting data sent back. It also varies for each server sending those webhooks.
  * 
- * This might look like this, configured:
+ * These tasks should not be the responsibility of Prim Server but
+ * rather some library dedicated to that functionality, especially since most developers probably won't generate their
+ * own webhooks for RPC. Instead of sending webhooks directly with Prim's client, it might be worth considering adding
+ * an event emitter on RPC calls that could be used in a generic way, for instance, to send webhooks.
+ * 
+ * A simple event handler may look like this (if more are added then I might consider
+ * exposing emitter itself with syntax like `prim.on("...")`):
  * 
  * ```ts
  * const prim = createPrimServer({
  *   // using default `client` option in this Prim Server
- *   webhooks: {
- *     endpoint: "https://example.com/" // to be used with configured client
- *     send: {
- *       sayHello: true
- *     }
+ *   onCall: (rpc: RpcResult & RpcAnswer) {
+ *     // do something (maybe send webhook to some list of configured endpoints)
  *   }
  * })
  * ```
  */
-let webhooks: Status.Idea
+let webhooksOrEventEmitter: Status.Idea
 
 /**
  * Use Prim for easy IPC. The way this would work is to set up a Prim Client on the renderer process that communicates
