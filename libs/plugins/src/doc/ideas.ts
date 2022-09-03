@@ -142,7 +142,7 @@ let runtimeDocumentation: Status.Idea
  * that types for each function will be duplicated for each method if used more than once but
  * this does make documentation simpler to create since I don't have to keep track of types.
  * 
- * As an example of documentation shape (in YAML so it' easier for me to type):
+ * As an example of documentation shape (in YAML so it's easier for me to type):
  * 
  * ```yaml
  * module:

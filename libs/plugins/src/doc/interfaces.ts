@@ -91,7 +91,7 @@ interface PrimRpcStructure {
 }
 
 /**
- * Functions used as RPC, documented.
+ * Functions used as RPC, organized by module and documented.
  */
 export interface PrimRpcDocs {
 	/**

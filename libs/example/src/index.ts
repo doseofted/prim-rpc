@@ -1,3 +1,5 @@
+import * as additional from "./submodule"
+
 /**
  * This is an example of a module that could be used with Prim (the server, not data manager aspect of the project).
  * Prim is intended to be a content manager but to make development easier, I plan to build a server structure
@@ -6,6 +8,8 @@
  * This is an example and should be used for tests with Prim. This may move to an `example.test.ts` file once
  * a testing framework is setup.
  */
+
+export { additional }
 
 /**
  * Not me.
@@ -59,7 +63,12 @@ export const testLevel1 = {
  * 
  * @public
  */
-export const testLevel2 = { testLevel1 }
+export const testLevel2 = {
+	testLevel1,
+	logMessage(message: string) {
+		console.log(message)
+	},
+}
 
 /**
  * It throws on purpose.
@@ -117,6 +126,18 @@ export function whatIsDayAfter (day: Date) {
 	return new Date(day.valueOf() + (1000 * 60 * 60 * 24))
 }
 
+type AddableThing = number|string
+export function addThings (...things: number[]): number
+export function addThings (...things: string[]): string
+export function addThings (...things: AddableThing[]): AddableThing {
+	/** Workaround for function overload... this is just an example */
+	const sameType = <X>(given: unknown): given is X => true
+	return things.reduce((p, n) =>
+		(sameType<string>(p) && sameType<string>(n))
+			? p + n : (sameType<number>(p) && sameType<number>(n))
+				? p + n : 0)
+}
+
 /**
  * 
  * @param params - Any kind of parameter really
@@ -127,5 +148,3 @@ export function whatIsDayAfter (day: Date) {
 export default function (...params: unknown[]) {
 	return { params: params.length === 1 ? params[0] : params }
 }
-
-export { uhOhClosures, guessTheOperation } from "./submodule"
