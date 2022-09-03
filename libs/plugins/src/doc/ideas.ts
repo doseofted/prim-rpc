@@ -244,13 +244,25 @@ let runtimeDocumentation: Status.Idea
  *   items:
  *     - type: "number"
  *     - type: "number"
- * # additional types could be represented with this structure like so:
+ * # additional types could be represented with this structure like...:
+ * # an enum
  * typed:
  *   type: "enum"
  *   members:
  *     - "PENDING"
  *     - "SUCCESS"
  *     - "FAILED"
+ * # A "type" for the above "typed" property would be the name of the enum:
+ * type: "StatusesEnum"
+ * # union types
+ * typed:
+ *   - type: "string"
+ *   - type: "object"
+ *     properties:
+ *       - someProperty: "string"
+ *       - someOtherProp: "number"
+ * # Above demonstrates "typed" but a "type" for a union would look like this:
+ * type: ["string", "object"]
  * ```
  * 
  * This would allow more flexibility but is harder to read however It think it may be

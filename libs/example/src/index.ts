@@ -14,6 +14,10 @@
  */
 export const you = "Ted"
 
+export enum Test { What = 5 }
+
+/** Options used for greeting */
+export interface Greeting { greeting?: string, name?: string }
 /**
  * Say hello. A test with an object parameter.
  *
@@ -22,7 +26,7 @@ export const you = "Ted"
  * 
  * @public
  */
-export function sayHello (options: { greeting?: string, name?: string }) {
+export function sayHello (options?: Greeting) {
 	const { greeting, name } = options ?? {}
 	return `${greeting ?? "Hello"} ${name ?? "you"}!`
 }

@@ -334,7 +334,7 @@ let customJsonHandling: Status.Implemented
  * ```ts
  * const prim = createPrimServer({
  *   // using default `client` option in this Prim Server
- *   onCall: (rpc: RpcResult & RpcAnswer) {
+ *   onCall: (rpc: RpcCall & RpcAnswer) {
  *     // do something (maybe send webhook to some list of configured endpoints)
  *   }
  * })

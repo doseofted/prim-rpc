@@ -1,90 +1,123 @@
-export interface RpcParam {
-	/** Parameter name */
+type TypeKind = "object"|"primitive"|"interface"|"array"|"enum"|"function"
+/** Properties given in most properties of documentation */
+interface TsTypeCommon {
+	/**
+	 * Comment, if any, given on the type and usually formatted as Markdown
+	 */
+	comment?: string
+}
+/** Properties that usually deal with types */
+interface TsTypeBase extends TsTypeCommon {
+	/**
+	 * The name of the type. It could be:
+	 * 
+	 *   - A primitive type like "string" or "number"
+	 *   - An object like "Date" or "Error"
+	 *   - A defined type like an interface/type/enum in TypeScript
+	 */
 	name: string
-	/** A type as defined on Prim Docs's root object */
-	ref: PrimDocRootRef
-	/** Identifier used to access name given by `.type` */
-	id: string
-	/** Comment for parameter value */
-	comment: string
+	/**
+	 * The kind of type given. This is used to determine what properties are given
+	 * on some given type. For instance, if "kind" is "object" then you may expect
+	 * to find a property named "properties" to describe that object.
+	 */
+	kind: TypeKind
+	/**
+	 * Given type can be omitted when `true`
+	 */
+	optional?: true
 }
-
-export interface RpcReturns {
-	/** A type as defined on Prim Docs's root object */
-	ref: PrimDocRootRef
-	/** Identifier used to access name given by `.type` */
-	id: string
-	/** Comment for return value */
-	comment: string
+/** Variant of `TsTypeBase` specific to given `.kind` */
+interface TsTypeSimple extends TsTypeBase {
+	kind: "object"|"primitive"
 }
-
-// NOTE: it doesn't appear TypeDoc returns the type given to `@throws` comment
-export interface RpcThrows {
-	/** Condition on which functions throws, a comment */
-	comment: string
+/** Variant of `TsTypeBase` specific to given `.kind` */
+interface TsTypeInterface extends TsTypeBase {
+	kind: "interface"
+	/** Properties defined on the interface */
+	properties: {
+		[key: string|number|symbol]: TsType
+	}
 }
+/** Variant of `TsTypeBase` specific to given `.kind` */
+interface TsTypeArray extends TsTypeBase {
+	kind: "array"
+	/** Determine if given type is intended to be used as a tuple or list */
+	tuple: boolean
+	items: TsType[]
+}
+/** Variant of `TsTypeBase` specific to given `.kind` */
+interface TsTypeEnum extends TsTypeBase {
+	kind: "enum"
+	/** Members of enum given as key-value pairs */
+	members: {
+		[name: string]: string|number
+	}
+}
+/** Variant of `TsTypeBase` specific to given `.kind` */
+interface TsTypeFunction extends TsTypeBase {
+	kind: "function"
+	signatures: PrimRpcSignature[]
+}
+/** A type for documentation that may be narrowed down to a specific kind */
+type TsType = TsTypeSimple|TsTypeInterface|TsTypeArray|TsTypeEnum|TsTypeFunction
 
-export interface RpcMethodDocs {
-	/** Method name */
+/** Details concerning a throw directly from a given function */
+// eslint-disable-next-line @typescript-eslint/no-empty-interface
+interface PrimRpcThrow extends TsTypeCommon {}
+/** Return value type for function with comment specific to function */
+interface PrimRpcReturn extends TsTypeCommon {
+	type: TsType[]
+}
+/** Parameter for function with comment specific to function  */
+interface PrimRpcParam extends TsTypeCommon {
+	type: TsType[]
+}
+/** A call signature for a function. Usually there is only one but a function could be overloaded */
+interface PrimRpcSignature extends TsTypeCommon {
+	/** Name of the function, same for all call signatures */
 	name: string
-	/** Comment given for the method */
-	comment: string
-	/** Parameters expected by this overload of the method */
-	params: RpcParam[],
-	/** Return type of the method */
-	returns: RpcReturns,
-	/** The type of error that is thrown directly by (and only by) this method */
-	throws: RpcThrows
+	/** Parameters expected by function */
+	params: PrimRpcParam[]
+	/** Return value for function */
+	returns: PrimRpcReturn
+	/** Throw condition, if any is given */
+	throws: PrimRpcThrow
 }
 
-export interface RpcTypeDocs {
-	/** Value of `intrinsic` will determine what property on object should be accessed */
-	intrinsic: "type"|"object"|"array"
-	/** If not an object or array, `.type` is the type of parameter expected, native to the language */
-	type?: string
-	/** If given type has properties, they will be listed under `.object` */
-	object?: {
-		[prop: string]: RpcTypeDocs
-	},
-	/** If given type is an array (or tuple-like), types will be listed under `.array` */
-	array?: RpcTypeDocs[],
+interface PrimRpcStructure {
+	/** The name of a module/module-like variable or a method name on that module */
+	[moduleOrMethodName: string]: PrimRpcStructure|PrimRpcSignature[]
 }
 
-export interface RpcMethodDocsById {
-	[id: string]: RpcMethodDocs[] // potentially multiple call signatures
-}
-
-export interface RpcTypeDocsById {
-	[id: string]: RpcTypeDocs
-}
-
-export interface PrimRpcDocReferences {
-	/** Methods grouped by a generated identifier. Objects with call signatures */
-	method: RpcMethodDocsById,
-	/** All types referenced in methods on module, grouped by generated identifiers */
-	type: RpcTypeDocsById
-}
-/** A type that is recognized by `PrimDocReferences` and has values */
-export type PrimDocRootRef = keyof PrimRpcDocReferences|"shape"|"unknown"
-
-export interface PrimRpcModuleShapeGiven {
-	/** Type used to access Prim Docs' properties and find a specific ID */
-	ref: PrimDocRootRef
-	/** ID used to reference root property on Prim Docs object */
-	id: string
-	/** If given option has properties, those will be nested under `.shape` */
-	shape?: PrimRpcModuleShape
-}
-
-export interface PrimRpcModuleShape {
-	/** Either a method name or property used to access a submodule */
-	[property: string]: PrimRpcModuleShapeGiven
-}
-
-/** Prim RPC documentation, generated from a TypeDoc export */
-export interface PrimRpcDocs extends PrimRpcDocReferences {
-	/** Name of the module (package name) */
-	moduleName: string
-	/** The shape of the module including direct methods and any nested modules */
-	shape: PrimRpcModuleShape
+/**
+ * Functions used as RPC, documented.
+ */
+export interface PrimRpcDocs {
+	/**
+	 * The module structure, including submodules, and all of its methods.
+	 * 
+	 * To navigate the structure, loop through object entries.
+	 * If given object value is an object, it is a submodule and if it is an array
+	 * then it is a list of call signatures for a function defined on the module.
+	 */
+	structure: PrimRpcStructure
+	/**
+	 * A list of method paths in the module as a one-dimensional list to easily
+	 * find method names in the given `.structure`. Path separator is "/".
+	 * 
+	 * This can be easily used with the "get" method provided in libraries like
+	 * [Lodash](https://lodash.com/docs#get) or
+	 * [Just](https://github.com/angus-c/just#just-safe-get).
+	 */
+	methods: string[]
+	/**
+	 * A list of module paths in the module as a one-dimensional list to easily
+	 * find module names in the given `.structure`. Path separator is "/".
+	 * 
+	 * This can be easily used with the "get" method provided in libraries like
+	 * [Lodash](https://lodash.com/docs#get) or
+	 * [Just](https://github.com/angus-c/just#just-safe-get).
+	 */
+	modules: string[]
 }
