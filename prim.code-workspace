@@ -6,7 +6,7 @@
 		},
 		{
 			"name": "📙 Prim RPC",
-			"path": "./libs/prim"
+			"path": "./libs/rpc"
 		},
 		{
 			"name": "📙 Prim Plugins",

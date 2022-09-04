@@ -1,6 +1,6 @@
 import { JSONOutput } from "typedoc"
-import { getDeclarationPropReflected, isTypeDoc, parseComment } from "./helpers"
-import { PrimRpcDocs, PrimRpcSignature, TsType, TypeKindRestricted } from "./interfaces"
+import { getDeclarationPropReflected, isTypeDoc /* parseComment */ } from "./helpers"
+import { PrimRpcDocs /* PrimRpcSignature, TsType, TypeKindRestricted */ } from "./interfaces"
 
 /**
  * TODO: Find a way to process detailed information about types. To properly
@@ -22,30 +22,31 @@ import { PrimRpcDocs, PrimRpcSignature, TsType, TypeKindRestricted } from "./int
  * 
  * @param given a type to be understood
  */
-function handleType (given: JSONOutput.DeclarationReflection): TsType {
-	const name = given.name
-	const comment = parseComment(given.comment)
-	return { name, comment, kind: "primitive" } // NOTE: replace primitive later
-}
+// function handleType (given: JSONOutput.DeclarationReflection): TsType {
+// 	const name = given.name
+// 	const comment = parseComment(given.comment)
+// 	return { name, comment, kind: "primitive" } // NOTE: replace primitive later
+// }
 
 function handleFunction (given: JSONOutput.DeclarationReflection, path: string[]) {
 	const padding = " ".repeat(path.length * 2)
 	const pathParts = path.concat(given.name)
 	const pathName = pathParts.join("/")
-	const signatures = getDeclarationPropReflected(given, "signatures").value
-	signatures.forEach(signature => {
-		const name = given.name
-		const comment = parseComment(signature.comment)
-		const params = signature.parameters.map(param => {
-			const name = param.name
-			const comment = parseComment(param.comment)
-			const type = handleType(param)
-			return { name, comment, type }
-		})
-		const sig: PrimRpcSignature = { name, comment, params }
-		console.log(padding, pathName + "(" + params.map(p => p.name).join(", ") + ")", sig)
-		return sig
-	})
+	// const signatures = getDeclarationPropReflected(given, "signatures").value
+	console.log(padding, pathName)
+	// signatures.forEach(signature => {
+	// 	const name = given.name
+	// 	const comment = parseComment(signature.comment)
+	// 	const params = signature.parameters.map(param => {
+	// 		const name = param.name
+	// 		const comment = parseComment(param.comment)
+	// 		const type = handleType(param)
+	// 		return { name, comment, type }
+	// 	})
+	// 	const sig: PrimRpcSignature = { name, comment, params }
+	// 	console.log(padding, pathName + "(" + params.map(p => p.name).join(", ") + ")", sig)
+	// 	return sig
+	// })
 }
 
 /**
