@@ -1,13 +1,13 @@
-type TypeKind = "object"|"primitive"|"interface"|"array"|"enum"|"function"
+export type TypeKindRestricted = "object"|"primitive"|"interface"|"array"|"enum"|"function"
 /** Properties given in most properties of documentation */
-interface TsTypeCommon {
+export interface TsTypeCommon {
 	/**
 	 * Comment, if any, given on the type and usually formatted as Markdown
 	 */
 	comment?: string
 }
 /** Properties that usually deal with types */
-interface TsTypeBase extends TsTypeCommon {
+export interface TsTypeBase extends TsTypeCommon {
 	/**
 	 * The name of the type. It could be:
 	 * 
@@ -21,18 +21,18 @@ interface TsTypeBase extends TsTypeCommon {
 	 * on some given type. For instance, if "kind" is "object" then you may expect
 	 * to find a property named "properties" to describe that object.
 	 */
-	kind: TypeKind
+	kind: TypeKindRestricted
 	/**
 	 * Given type can be omitted when `true`
 	 */
 	optional?: true
 }
 /** Variant of `TsTypeBase` specific to given `.kind` */
-interface TsTypeSimple extends TsTypeBase {
+export interface TsTypeSimple extends TsTypeBase {
 	kind: "object"|"primitive"
 }
 /** Variant of `TsTypeBase` specific to given `.kind` */
-interface TsTypeInterface extends TsTypeBase {
+export interface TsTypeInterface extends TsTypeBase {
 	kind: "interface"
 	/** Properties defined on the interface */
 	properties: {
@@ -40,14 +40,14 @@ interface TsTypeInterface extends TsTypeBase {
 	}
 }
 /** Variant of `TsTypeBase` specific to given `.kind` */
-interface TsTypeArray extends TsTypeBase {
+export interface TsTypeArray extends TsTypeBase {
 	kind: "array"
 	/** Determine if given type is intended to be used as a tuple or list */
 	tuple: boolean
 	items: TsType[]
 }
 /** Variant of `TsTypeBase` specific to given `.kind` */
-interface TsTypeEnum extends TsTypeBase {
+export interface TsTypeEnum extends TsTypeBase {
 	kind: "enum"
 	/** Members of enum given as key-value pairs */
 	members: {
@@ -55,26 +55,26 @@ interface TsTypeEnum extends TsTypeBase {
 	}
 }
 /** Variant of `TsTypeBase` specific to given `.kind` */
-interface TsTypeFunction extends TsTypeBase {
+export interface TsTypeFunction extends TsTypeBase {
 	kind: "function"
 	signatures: PrimRpcSignature[]
 }
 /** A type for documentation that may be narrowed down to a specific kind */
-type TsType = TsTypeSimple|TsTypeInterface|TsTypeArray|TsTypeEnum|TsTypeFunction
+export type TsType = TsTypeSimple|TsTypeInterface|TsTypeArray|TsTypeEnum|TsTypeFunction
 
 /** Details concerning a throw directly from a given function */
 // eslint-disable-next-line @typescript-eslint/no-empty-interface
-interface PrimRpcThrow extends TsTypeCommon {}
+export interface PrimRpcThrow extends TsTypeCommon {}
 /** Return value type for function with comment specific to function */
-interface PrimRpcReturn extends TsTypeCommon {
+export interface PrimRpcReturn extends TsTypeCommon {
 	type: TsType[]
 }
 /** Parameter for function with comment specific to function  */
-interface PrimRpcParam extends TsTypeCommon {
+export interface PrimRpcParam extends TsTypeCommon {
 	type: TsType[]
 }
 /** A call signature for a function. Usually there is only one but a function could be overloaded */
-interface PrimRpcSignature extends TsTypeCommon {
+export interface PrimRpcSignature extends TsTypeCommon {
 	/** Name of the function, same for all call signatures */
 	name: string
 	/** Parameters expected by function */
@@ -85,7 +85,7 @@ interface PrimRpcSignature extends TsTypeCommon {
 	throws: PrimRpcThrow
 }
 
-interface PrimRpcStructure {
+export interface PrimRpcStructure {
 	/** The name of a module/module-like variable or a method name on that module */
 	[moduleOrMethodName: string]: PrimRpcStructure|PrimRpcSignature[]
 }
