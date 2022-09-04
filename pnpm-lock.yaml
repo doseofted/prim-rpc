@@ -129,11 +129,14 @@ importers:
 
   libs/docs:
     specifiers:
+      '@doseofted/prim-example': workspace:*
       typedoc: ^0.23.11
       typescript: ^4.7.4
     dependencies:
       typedoc: 0.23.11_typescript@4.7.4
       typescript: 4.7.4
+    devDependencies:
+      '@doseofted/prim-example': link:../example
 
   libs/example:
     specifiers: {}
