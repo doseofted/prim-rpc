@@ -1,36 +1,31 @@
 import { JSONOutput } from "typedoc"
 import { getDeclarationPropReflected, isTypeDoc, parseComment } from "./helpers"
-import { PrimRpcDocs, TsType } from "./interfaces"
+import { PrimRpcDocs, PrimRpcSignature, TsType, TypeKindRestricted } from "./interfaces"
 
+/**
+ * TODO: Find a way to process detailed information about types. To properly
+ * document TypeScript types is a huge task so for now I need to reduce types
+ * down to something simple that can be understood by from a documentation UI.
+ * 
+ * This is a huge task since it means supporting each individual TypeScript type
+ * like unions, enums, interfaces, types, optional types and handling of those
+ * types inside of other types, and reference reflections,
+ * and documenting these types in a way that can be easily consumed. TypeScript
+ * is obviously the easiest way to define these types but navigating an AST is
+ * not an option for someone utilizing this library. Even navigating TypeDoc's
+ * processed type information is complicated even though it's much simpler than
+ * parsing the tree itself.
+ * 
+ * Ideally, I could convert this to some standard schema like JSON Schema so that
+ * a documentation UI can easily validate types (since documentation should be
+ * interactive and let you actually make requests).
+ * 
+ * @param given a type to be understood
+ */
 function handleType (given: JSONOutput.DeclarationReflection): TsType {
 	const name = given.name
 	const comment = parseComment(given.comment)
-	const givenType = given.type && given.type.type
-	const kind = (() => {
-		switch (givenType) {
-			case "intrinsic":
-			case "reference": {
-				return "object" as const
-			}
-		}
-	})()
-	switch (kind) {
-		// case "primitive":
-		case "object": {
-			return {
-				kind,
-				name,
-				comment,
-			}
-		}
-		default: {
-			return {
-				kind: "primitive",
-				name,
-				comment,
-			}
-		}
-	}
+	return { name, comment, kind: "primitive" } // NOTE: replace primitive later
 }
 
 function handleFunction (given: JSONOutput.DeclarationReflection, path: string[]) {
@@ -41,9 +36,15 @@ function handleFunction (given: JSONOutput.DeclarationReflection, path: string[]
 	signatures.forEach(signature => {
 		const name = given.name
 		const comment = parseComment(signature.comment)
-		const params = signature.parameters.map(param => handleType(param))
-		const test = { name, comment }
-		console.log(padding, pathName, test, params)
+		const params = signature.parameters.map(param => {
+			const name = param.name
+			const comment = parseComment(param.comment)
+			const type = handleType(param)
+			return { name, comment, type }
+		})
+		const sig: PrimRpcSignature = { name, comment, params }
+		console.log(padding, pathName + "(" + params.map(p => p.name).join(", ") + ")", sig)
+		return sig
 	})
 }
 

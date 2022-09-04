@@ -1,3 +1,4 @@
+/** the kind determines what properties are associated with given kind */
 export type TypeKindRestricted = "object"|"primitive"|"interface"|"array"|"enum"|"function"
 /** Properties given in most properties of documentation */
 export interface TsTypeCommon {
@@ -12,8 +13,9 @@ export interface TsTypeBase extends TsTypeCommon {
 	 * The name of the type. It could be:
 	 * 
 	 *   - A primitive type like "string" or "number"
-	 *   - An object like "Date" or "Error"
+	 *   - An object reference like "Date" or "Error"
 	 *   - A defined type like an interface/type/enum in TypeScript
+	 *     - Types usually have additional properties
 	 */
 	name: string
 	/**
@@ -71,6 +73,7 @@ export interface PrimRpcReturn extends TsTypeCommon {
 }
 /** Parameter for function with comment specific to function  */
 export interface PrimRpcParam extends TsTypeCommon {
+	name: string
 	type: TsType[]
 }
 /** A call signature for a function. Usually there is only one but a function could be overloaded */
