@@ -1,4 +1,5 @@
-import { JSONOutput, ReflectionKind } from "typedoc"
+import { ReflectionKind } from "typedoc"
+import type { JSONOutput } from "typedoc"
 
 // export function findChildrenOfType(type: string, given: JSONOutput.DeclarationReflection) {
 // 	const ids = given.groups.find(g => g.title === type).children

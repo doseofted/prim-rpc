@@ -1,4 +1,4 @@
-import { JSONOutput } from "typedoc"
+import type { JSONOutput } from "typedoc"
 import { getDeclarationPropReflected, isTypeDoc /* parseComment */ } from "./helpers"
 import { PrimRpcDocs /* PrimRpcSignature, TsType, TypeKindRestricted */ } from "./interfaces"
 
