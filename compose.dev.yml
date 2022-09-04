@@ -27,7 +27,7 @@ services:
       - ./libs/example/src:/home/node/project/libs/example/src
       - ./libs/plugins/src:/home/node/project/libs/plugins/src
       - ./libs/prim/src:/home/node/project/libs/prim/src
-      - ./libs/docs/src:/home/node/project/libs/docs/src
+      - ./libs/ui/src:/home/node/project/libs/ui/src
     restart: "no"
 
   backend:

@@ -10,7 +10,7 @@ module.exports = {
 				ecmaFeatures: {
 					jsx: true,
 				},
-				project: "./libs/docs/tsconfig.json",
+				project: "./libs/ui/tsconfig.json",
 			},
 			plugins: [
 				"@typescript-eslint",

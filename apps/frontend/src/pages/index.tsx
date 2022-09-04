@@ -1,6 +1,6 @@
 import { Component, createEffect, createResource, createSignal, onMount } from "solid-js"
 import backend from "../client"
-import { TestOnly } from "@doseofted/prim-docs"
+import { TestOnly } from "@doseofted/prim-ui"
 import { ParentEvent } from "./what"
 
 const App: Component = () => {

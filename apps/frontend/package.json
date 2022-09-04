@@ -20,7 +20,7 @@
     "entrypoint": "zx entrypoint.mjs"
   },
   "dependencies": {
-    "@doseofted/prim-docs": "workspace:*",
+    "@doseofted/prim-ui": "workspace:*",
     "@doseofted/prim-example": "workspace:*",
     "@doseofted/prim-rpc": "workspace:*",
     "@fastify/static": "^6.5.0",

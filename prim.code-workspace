@@ -17,8 +17,8 @@
 			"path": "./libs/example"
 		},
 		{
-			"name": "📘 Prim Docs UI",
-			"path": "./libs/docs"
+			"name": "📘 Prim UI",
+			"path": "./libs/ui"
 		},
 		{
 			"name": "🌐 Example Frontend",
