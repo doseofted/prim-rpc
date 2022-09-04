@@ -130,12 +130,19 @@ type AddableThing = number|string
 export function addThings (...things: number[]): number
 export function addThings (...things: string[]): string
 export function addThings (...things: AddableThing[]): AddableThing {
+	const unique = new Set(things.map(t => typeof t))
 	/** Workaround for function overload... this is just an example */
-	const sameType = <X>(given: unknown): given is X => true
-	return things.reduce((p, n) =>
-		(sameType<string>(p) && sameType<string>(n))
-			? p + n : (sameType<number>(p) && sameType<number>(n))
-				? p + n : 0)
+	const expected = <X>(given: unknown, type: string): given is X => Array.from(unique)[0] === type
+	if (unique.size > 1) {
+		throw new Error("Does not compute. I mean it does but kinda unpredictable, right?")
+	}
+	if (expected<string[]>(things, "string")) {
+		return things.reduce((p, n) => p + n)
+	} else if (expected<number[]>(things, "number")) {
+		return things.reduce((p, n) => p + n)
+	} else {
+		throw new Error("Only strings and numbers are supported. Sincerely sorry.")
+	}
 }
 
 /**
