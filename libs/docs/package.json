@@ -1,0 +1,30 @@
+{
+  "name": "@doseofted/prim-docs",
+  "version": "0.0.1",
+  "description": "Documentation logic for Prim RPC",
+  "license": "UNLICENSED",
+  "author": {
+    "name": "Ted Klingenberg",
+    "email": "ted@doseofted.com",
+    "url": "https://doseofted.com/"
+  },
+  "scripts": {
+    "watch": "parcel watch --no-hmr",
+    "build": "parcel build",
+    "check": "tsc --noEmit",
+    "test": "vitest run",
+    "testing": "vitest watch",
+    "lint": "eslint ."
+  },
+  "source": "src/index.ts",
+  "types": "dist/index.d.ts",
+  "main": "dist/main.cjs",
+  "module": "dist/module.mjs",
+  "exports": {
+    ".": {
+      "import": "./dist/module.mjs",
+      "require": "./dist/main.cjs"
+    },
+    "./dist/docs.json": "./dist/docs.json"
+  }
+}

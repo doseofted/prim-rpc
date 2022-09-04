@@ -9,16 +9,20 @@
 			"path": "./libs/rpc"
 		},
 		{
-			"name": "📙 Prim Plugins",
+			"name": "📙 Prim RPC Plugins",
 			"path": "./libs/plugins"
+		},
+		{
+			"name": "📙 Prim RPC Docs",
+			"path": "./libs/docs"
+		},
+		{
+			"name": "📘 Prim RPC UI",
+			"path": "./libs/ui"
 		},
 		{
 			"name": "📗 Example Library",
 			"path": "./libs/example"
-		},
-		{
-			"name": "📘 Prim UI",
-			"path": "./libs/ui"
 		},
 		{
 			"name": "🌐 Example Frontend",
