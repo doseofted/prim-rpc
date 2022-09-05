@@ -270,4 +270,80 @@ let runtimeDocumentation: Status.Idea
  */
 let newDocumentationStructure: Status.Idea
 
+/**
+ * Implementing a JSON representation of types is difficult. TypeScript is the best format for utilizing types but
+ * can't be easily read for the purpose of documentation. TypeDoc is the next best bet but even that can be difficult
+ * to read and even if it can be read by a documentation tool, it can't be validated for any kind of interactive
+ * documentation (without creating an additional tool for that express purpose).
+ * 
+ * JSON Schema would be a great tool for documenting types but it's intentionally very limited to support just JSON.
+ * It's a great choice for a documentation tool because it's (relatively) easy to read, has available validators like
+ * AJV, and is just generally popular and understood. It can also be serialized so that the schema can exist as a string
+ * that could be sent over the network (this is important because run-time documentation could be sent over the network
+ * this way, as described in `runtimeDocumentation`). A tool like Zod would be useful since it supports way more types
+ * than JSON Schema but doesn't appear to serialize to a string except through other tools that interpret the Zod
+ * schemas which are also very limited. It's also not a standard (just popular now and fairly recently)
+ * 
+ * That said, JSON Schema doesn't support even basic primitive types in JavaScript or advanced types like BigInt,
+ * RegExp, or of course: functions, since Prim RPC supports callbacks. Of course, RPC doesn't support these either since
+ * everything needs to be serialized. Maybe I'm thinking of documentation at the wrong level. While the documentation
+ * tool should document types expected by the function, validations/schema may not need to document these types.
+ * 
+ * For instance, if a function expects a Date parameter then the documentation tool should reflect this. However, a Date
+ * can't be sent over the network. If a Date parameter is used with Prim RPC then it's assumed that the JSON library
+ * used with Prim supports serialization/deserialization of Dates. So, instead of validating the Date, I could simply
+ * validate that the unknown type is a string. Of course this may not always be the case. Maybe there's a JSON library
+ * that converts Dates into a JSON object. It can still be serialized into the RPC but I can't assume that type is
+ * always a string.
+ * 
+ * So, it's hard to validate the actual RPC since usage of the RPC with Prim may require a certain JSON handler which
+ * could transform that JSON in unpredictable ways (who knows, maybe it's even YAML). This flexibility of Prim makes
+ * it harder to document any code that's used with it. This may mean that I should instead document types as shown
+ * in generated TypeDoc. The reason I'm trying to avoid using TypeDoc output in the first place is because it's
+ * complicated to read from the documentation (and I'd like to encourage new doc generators and themes which need
+ * to be easy to develop).
+ * 
+ * In order to use JSON Schema, I would need to extend it. This seems to be allowed however JSON schema validators will
+ * just skip these properties (note that AJV will actually fail on custom properties if strict mode is `true`).
+ * By extending it I would need to make sure that established properties of JSON schema are valid. So, if I allow an
+ * "undefined" type, the `.type` property in JSON Schema would need to be something else since "undefined" isn't 
+ * allowed in the schema. Instead, I would need to create a custom property to document the actual type
+ */
+let restructuredTypes: Status.Rejected
+
+/**
+ * I'm thinking of types all wrong. This is too complicated. The documentation tool should simply display the name
+ * of the type. When you see the string reference to the name, you should understand it. For instance, if you see
+ * a parameter on a function with a type of "Date" then you know to pass a JavaScript Date. When you a return a value
+ * of "string" you know to use a string. If a function expects one parameter named "options" which has an interface,
+ * then the type is "object", not "interface" or the name of the interface. If a function accepts a callback, the type
+ * is "function", not the actual typed call signature. Types should either be a primitive type or a reference to
+ * an object. That's it.
+ * 
+ * TypeScript support or advanced schemas are too complicated. It's the reason I'm not using the
+ * types provided through TypeDoc. Attempts to simplify this data will fail because TypeDoc is already summing up type
+ * information. The problem is that this type information is complicated and even in it's simplest form will remain
+ * complicated.
+ * 
+ * I still think types should still be supported to some degree, possibly even with very limited validation. One of the
+ * biggest benefits of Prim RPC is that you get a typed client that's near identical to what you're actually requesting
+ * from the server. The reason this works so well is because Prim RPC simply takes advantage of tools that exist today:
+ * no additional languages like GraphQL's SDLs or Protobufs. I didn't need to create a separate language. If I start
+ * adding types to this documentation tool, I won't be creating a new language but I would need to create some kind
+ * of standard (even if not official or well structured) that can represent TypeScript types. That's too much for a
+ * project in this stage.
+ * 
+ * These types provided to the client (TypeScript definitions from the server) also don't need to be validated in an
+ * interactive documentation tool. That validation will already happen in the code so duplicating that functionality
+ * in a user interface that is simply used to document code wouldn't be super useful. Instead it's useful to provide
+ * definitions in a way that can be viewed, so that you can understand what's expected (if expected type is an object,
+ * it may be useful to know what shape/structure that object should take) but this doesn't need to be validated.
+ * The code already should do that if types are provided to the client. TypeScript does this well (arguably). I don't
+ * need to recreate the same kind of type restrictions in a documentation tool. Instead, I can provide some basic
+ * type information using a simpler interface resembling JSON Schema but not necessarily JSON Schema. This way I don't
+ * have to follow a restrictive standard to take advantage of some other tool's validation logic but I can still
+ * show types in documentation (they just won't validated from the documentation UI).
+ */
+let typesForReal: Status.Idea
+
 export {}

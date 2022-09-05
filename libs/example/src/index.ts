@@ -1,3 +1,12 @@
+/**
+ * Example library
+ * 
+ * @packageDocumentation
+ * @public
+ * 
+ * @nonsense Hello
+ * @fakeFlag
+ */
 import * as additional from "./submodule"
 
 /**
@@ -8,7 +17,6 @@ import * as additional from "./submodule"
  * This is an example and should be used for tests with Prim. This may move to an `example.test.ts` file once
  * a testing framework is setup.
  */
-
 export { additional }
 
 /**

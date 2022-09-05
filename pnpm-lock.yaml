@@ -130,9 +130,13 @@ importers:
   libs/docs:
     specifiers:
       '@doseofted/prim-example': workspace:*
+      '@sinclair/typebox': ^0.24.35
+      '@types/json-schema': ^7.0.11
       typedoc: ^0.23.11
       typescript: ^4.7.4
     dependencies:
+      '@sinclair/typebox': 0.24.35
+      '@types/json-schema': 7.0.11
       typedoc: 0.23.11_typescript@4.7.4
       typescript: 4.7.4
     devDependencies:
@@ -1761,6 +1765,10 @@ packages:
       string-argv: 0.3.1
     dev: true
 
+  /@sinclair/typebox/0.24.35:
+    resolution: {integrity: sha512-iN6ehuDndiTiDz2F+Orv/+oHJR+PrGv+38oghCddpsW4YEZl5qyLsWxSwYUWrKEOfjpGtXDFW6scJtjpzSLeSw==}
+    dev: false
+
   /@socket.io/component-emitter/3.1.0:
     resolution: {integrity: sha512-+9jVqKhRSpsc591z5vX+X5Yyw+he/HCB4iQ/RYxw35CEPaY1gnsNE43nf9n9AaYjAQrTiI/mOwKUKdUs9vf7Xg==}
     dev: true
@@ -1914,7 +1922,6 @@ packages:
 
   /@types/json-schema/7.0.11:
     resolution: {integrity: sha512-wOuvG1SN4Us4rez+tylwwwCV1psiNVOkJeM3AUWUNWg/jDQY2+HE/444y5gc+jBmRqASOm2Oeh5c1axHobwRKQ==}
-    dev: true
 
   /@types/lodash-es/4.17.6:
     resolution: {integrity: sha512-R+zTeVUKDdfoRxpAryaQNRKk3105Rrgx2CFRClIgRGaqDTdjsm8h6IYA8ir584W3ePzkZfst5xIgDwYrlh9HLg==}
