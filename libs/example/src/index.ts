@@ -135,8 +135,11 @@ export function whatIsDayAfter (day: Date) {
 }
 
 type AddableThing = number|string
+/** Add two numbers */
 export function addThings (...things: number[]): number
+/** Add two strings */
 export function addThings (...things: string[]): string
+/** Add two things */
 export function addThings (...things: AddableThing[]): AddableThing {
 	const unique = new Set(things.map(t => typeof t))
 	/** Workaround for function overload... this is just an example */

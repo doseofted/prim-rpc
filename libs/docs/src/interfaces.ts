@@ -1,5 +1,3 @@
-import { JSONSchema7 } from "@types/json-schema"
-
 /**
  * the kind determines what properties are associated with given kind
  * 
@@ -158,15 +156,11 @@ export interface PrimRpcDocs extends PrimRpcStructure {
 }
 
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
-const example: PrimRpcDocs = {
+const example = {
 	name: "@doseofted/prim-example",
 	comment: "Test ",
-	methods: [
-		"sayHello",
-	],
-	modules: [],
-	structure: {
-		sayHello: [
+	methods: {
+		"sayHello": [
 			{
 				name: "sayHello",
 				params: [{
@@ -191,5 +185,9 @@ const example: PrimRpcDocs = {
 				},
 			},
 		],
+	},
+	modules: [],
+	structure: {
+		sayHello: true,
 	},
 }

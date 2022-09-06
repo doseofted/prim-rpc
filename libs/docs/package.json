@@ -34,6 +34,7 @@
     "typescript": "^4.7.4"
   },
   "devDependencies": {
-    "@doseofted/prim-example": "workspace:*"
+    "@doseofted/prim-example": "workspace:*",
+    "type-fest": "^2.18.0"
   }
 }

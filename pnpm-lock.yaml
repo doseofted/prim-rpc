@@ -132,6 +132,7 @@ importers:
       '@doseofted/prim-example': workspace:*
       '@sinclair/typebox': ^0.24.35
       '@types/json-schema': ^7.0.11
+      type-fest: ^2.18.0
       typedoc: ^0.23.11
       typescript: ^4.7.4
     dependencies:
@@ -141,6 +142,7 @@ importers:
       typescript: 4.7.4
     devDependencies:
       '@doseofted/prim-example': link:../example
+      type-fest: 2.18.0
 
   libs/example:
     specifiers: {}
