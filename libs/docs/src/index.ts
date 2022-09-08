@@ -1,6 +1,8 @@
 import type { JSONOutput } from "typedoc"
+import type { SetOptional } from "type-fest"
+import { set as setProperty } from "lodash-es"
 import { getDeclarationPropReflected, isTypeDoc, parseComment } from "./helpers"
-import { PrimRpcDocs, PrimMethod, PrimModule, PrimModuleStructure } from "./interfaces"
+import { PrimRpcDocs, PrimMethod, PrimModule } from "./interfaces"
 
 function handleType (given: JSONOutput.DeclarationReflection) {
 	const name = given.name
@@ -49,11 +51,20 @@ function navigateProperties (given: JSONOutput.DeclarationReflection, docs: Prim
 	})
 }
 
+function addModuleToDocs(docs: SetOptional<PrimRpcDocs, "docs"|"props">, module: PrimModule) {
+	const pathParts = module.path.split("/").flatMap(path => ["props", path]).filter(path => path).slice(1)
+	pathParts.push("docs")
+	const index = docs.modules.push(module) - 1
+	const reference: PrimRpcDocs["docs"] = ["modules", index]
+	return setProperty<PrimRpcDocs>(docs, pathParts, reference)
+}
 
-function addMethodToDocs(docs: PrimRpcDocs, method: PrimMethod) {
-	const documentation = docs
-	// TODO: add to docs structure based on given `method.path`
-	docs.methods.push(method)
+function addMethodsToDocs(docs: SetOptional<PrimRpcDocs, "docs"|"props">, method: PrimMethod) {
+	const pathParts = method.path.split("/").flatMap(path => ["props", path]).filter(path => path).slice(1)
+	pathParts.push("docs")
+	const index = docs.methods.push(method) - 1
+	const reference: PrimRpcDocs["docs"] = ["modules", index]
+	return setProperty<PrimRpcDocs>(docs, pathParts, reference)
 }
 
 /**
@@ -68,19 +79,14 @@ export function createDocsForModule(given: unknown): PrimRpcDocs {
 	if (!isTypeDoc(given)) {
 		throw new Error("Given documentation was not understood as TypeDoc format")
 	}
-	// const methods: PrimMethod[] = []
-	const modules: PrimModule[] = []
-	const index = modules.push({
+	const docsStarter: SetOptional<PrimRpcDocs, "docs"|"props"> = { modules: [], methods: [] }
+	const docs = addModuleToDocs(docsStarter, {
 		name: given.name,
 		comment: parseComment(given.comment),
 		flags: given.flags,
 		path: "",
-	}) - 1
-	const structure: PrimModuleStructure = {
-		docs: ["modules", index],
-		props: {},
-	}
-	const docs: PrimRpcDocs = { ...structure, modules, methods: [] }
+	})
+	console.log(docs)
 	navigateProperties(given, docs)
 	return {
 		props: {
