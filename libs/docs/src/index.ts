@@ -18,7 +18,6 @@ function handleType (_given: JSONOutput.SomeType): PrimType["type"] {
  * @param path Path of current method
  */
 function handleMethodLike (given: JSONOutput.DeclarationReflection, docs: PrimRpcDocs, path: string[]) {
-	const padding = " ".repeat(path.length * 2)
 	const pathParts = path.concat(given.name)
 	const signatures: PrimMethodSignature[] = getDeclarationPropReflected(given, "signatures").value.map(signature => {
 		const comment = parseComment(signature.comment)
@@ -39,7 +38,8 @@ function handleMethodLike (given: JSONOutput.DeclarationReflection, docs: PrimRp
 		}
 		return { comment, flags, params, returns, throws }
 	})
-	console.log(padding, pathParts.join("/"))
+	// const padding = " ".repeat(path.length * 2)
+	// console.log(padding, pathParts.join("/"))
 	addMethodToDocs(docs, {
 		name: given.name,
 		path: pathParts.join("/"),

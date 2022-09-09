@@ -1,17 +1,24 @@
+// import * as example from "@doseofted/prim-example"
 import exampleDocs from "@doseofted/prim-example/dist/docs.json"
-import { createDocsForModule } from "./"
 import { test, expect } from "vitest"
-import { Type } from "@sinclair/typebox"
+import { createDocsForModule } from "./"
 
-test("Parse module", () => {
-	// eslint-disable-next-line @typescript-eslint/no-unsafe-argument, @typescript-eslint/no-explicit-any
-	const parsed = createDocsForModule(exampleDocs)
-	// console.log(JSON.stringify(parsed.props, null, "  "))
-	expect(parsed).not.toBeNull()
+test("Basic documentation structure to be generated", () => {
+	const docs = createDocsForModule(exampleDocs)
+	// console.log(JSON.stringify(docs.props, null, "  "))
+	expect(docs).toBeTypeOf("object")
+	expect(docs).toHaveProperty("docs")
+	expect(docs).toHaveProperty("props")
+	expect(docs).toHaveProperty("methods")
+	expect(docs).toHaveProperty("modules")
 })
 
-test("try typebox", () => {
-	const fun = Type.String({ $id: "T", cool: true })
-	const trying = Type.Union([Type.Boolean(), Type.Ref(fun)])
-	console.log(JSON.stringify(trying))
-})
+// test("Generated documentation should follow module structure", () => {
+// 	const docs = createDocsForModule(exampleDocs)
+// 	// console.log(JSON.stringify(docs.props, null, "  "))
+// 	function findFunctions(given: Record<string, unknown>) {
+// 		Object.entries(given)
+// 	}
+// 	findFunctions(example)
+// 	console.log(docs)
+// })
