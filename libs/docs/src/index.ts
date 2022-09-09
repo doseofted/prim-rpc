@@ -1,6 +1,6 @@
 import type { JSONOutput } from "typedoc"
 import type { SetOptional } from "type-fest"
-import { set as setProperty } from "lodash-es"
+import { /* get as getProperty, */ set as setProperty } from "lodash-es"
 import { getDeclarationPropReflected, isTypeDoc, parseComment } from "./helpers"
 import { PrimRpcDocs, PrimMethod, PrimModule, PrimMethodSignature, PrimParam, PrimType, PrimReturn, PrimThrow } from "./interfaces"
 
@@ -129,4 +129,19 @@ export function createDocsForModule(given: unknown): PrimRpcDocs {
 	navigateModuleLike(given, docs)
 	// console.log(JSON.stringify(docs, null, "  "))
 	return docs
+}
+
+/**
+ * Simple convenience function to get documentation for reference inside of Prim RPC Docs structure (`.props`)
+ *
+ * @param docs RPc documentation
+ * @param given Property found in documentation structure
+ * @returns Documentation for requested module or method
+ */
+export function findDocumentationForGiven(docs: PrimRpcDocs, [type, index]: PrimRpcDocs["docs"]) {
+	return docs?.[type]?.[index]
+}
+
+export function loopDocumentationEntries(_docs: PrimRpcDocs) {
+	// Object.entries(docs).map(([key, val]) => {})
 }
