@@ -3,7 +3,7 @@ FROM node:18.9-bullseye-slim as production-base
 USER root
 # PNPM will be used to install production dependencies
 RUN corepack enable
-RUN corepack prepare pnpm@7.7.1 --activate
+RUN corepack prepare pnpm@7.11.0 --activate
 USER node
 RUN pnpm config set store-dir /home/node/.pnpm-store
 # Setup the project folder with proper permissions

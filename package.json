@@ -7,7 +7,7 @@
     "url": "https://doseofted.com/"
   },
   "version": "0.0.1",
-  "packageManager": "pnpm@7.7.1",
+  "packageManager": "pnpm@7.11.0",
   "license": "UNLICENSED",
   "private": true,
   "scripts": {
