@@ -7,9 +7,16 @@ import { PrimRpcDocs, PrimMethod, PrimModule, PrimMethodSignature, PrimParam, Pr
 function handleType (_given: JSONOutput.SomeType): PrimType["type"] {
 	// const name = given.name
 	// const comment = parseComment(given.comment)
-	return "undefined"
+	return "undefined" // TODO: add types
 }
 
+/**
+ * Inspect the parts of given object for function-like things
+ *
+ * @param given Given function-like object that has a call signature
+ * @param docs RPC documentation in-progress
+ * @param path Path of current method
+ */
 function handleMethodLike (given: JSONOutput.DeclarationReflection, docs: PrimRpcDocs, path: string[]) {
 	const padding = " ".repeat(path.length * 2)
 	const pathParts = path.concat(given.name)
@@ -40,6 +47,13 @@ function handleMethodLike (given: JSONOutput.DeclarationReflection, docs: PrimRp
 	})
 }
 
+/**
+ * Add a module to documentation
+ *
+ * @param docs RPC documentation in-progress
+ * @param module Given module in expected format
+ * @returns a copy of given documentation, with changes
+ */
 function addModuleToDocs(docs: SetOptional<PrimRpcDocs, "docs"|"props">, module: PrimModule) {
 	const pathParts = module.path.split("/").filter(path => path).flatMap(path => ["props", path])
 	pathParts.push("docs")
@@ -48,6 +62,13 @@ function addModuleToDocs(docs: SetOptional<PrimRpcDocs, "docs"|"props">, module:
 	return setProperty<PrimRpcDocs>(docs, pathParts, reference)
 }
 
+/**
+ * Add a method to documentation
+ *
+ * @param docs RPC documentation in-progress
+ * @param method Given method in expected format
+ * @returns a copy of given documentation, with changes
+ */
 function addMethodToDocs(docs: SetOptional<PrimRpcDocs, "docs"|"props">, method: PrimMethod) {
 	const pathParts = method.path.split("/").filter(path => path).flatMap(path => ["props", path])
 	pathParts.push("docs")
@@ -106,6 +127,6 @@ export function createDocsForModule(given: unknown): PrimRpcDocs {
 	// NOTE: `.docs` property will be overridden later
 	const docs: PrimRpcDocs = { modules: [], methods: [], props: {}, docs: ["modules", 0] }
 	navigateModuleLike(given, docs)
-	console.log(JSON.stringify(docs, null, "  "))
+	// console.log(JSON.stringify(docs, null, "  "))
 	return docs
 }
