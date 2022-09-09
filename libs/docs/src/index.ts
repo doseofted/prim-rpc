@@ -40,6 +40,12 @@ function handleFunction (given: JSONOutput.DeclarationReflection, path: string[]
  * @param path - The path given given at level (for recursion)
  */
 function navigateProperties (given: JSONOutput.DeclarationReflection, docs: PrimRpcDocs, path: string[] = []) {
+	addModuleToDocs(docs, {
+		name: given.name,
+		comment: parseComment(given.comment),
+		flags: given.flags,
+		path: path.join("/"),
+	})
 	given.children.forEach(child => {
 		const hasSignature = getDeclarationPropReflected(child, "signatures")
 		const hasChildren = getDeclarationPropReflected(child, "children")
@@ -86,8 +92,9 @@ export function createDocsForModule(given: unknown): PrimRpcDocs {
 		flags: given.flags,
 		path: "",
 	})
-	console.log(docs)
 	navigateProperties(given, docs)
+	console.log(docs)
+
 	return {
 		props: {
 			test: {
