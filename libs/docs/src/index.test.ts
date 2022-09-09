@@ -1,11 +1,12 @@
 // import * as example from "@doseofted/prim-example"
 import exampleDocs from "@doseofted/prim-example/dist/docs.json"
 import { test, expect } from "vitest"
-import { createDocsForModule } from "./"
+import { createDocsForModule, helpers } from "./"
 
 test("Basic documentation structure to be generated", () => {
 	const docs = createDocsForModule(exampleDocs)
 	// console.log(JSON.stringify(docs.props, null, "  "))
+	console.log(helpers.iterateDocs(docs, "methods", docs.props?.testLevel2 ?? docs, false))
 	expect(docs).toBeTypeOf("object")
 	expect(docs).toHaveProperty("docs")
 	expect(docs).toHaveProperty("props")
