@@ -1,4 +1,4 @@
-import type { JSONOutput } from "typedoc"
+import { JSONOutput } from "typedoc"
 import type { SetOptional } from "type-fest"
 import { /* get as getProperty, */ set as setProperty } from "lodash-es"
 import { getDeclarationPropReflected, isTypeDoc, parseComment } from "./helpers/create"
