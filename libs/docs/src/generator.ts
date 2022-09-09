@@ -94,6 +94,7 @@ function navigateModuleLike (given: JSONOutput.DeclarationReflection, docs: Prim
 	const givenChildren = getDeclarationPropReflected(given, "children")
 	const children = givenChildren.reflected?.children ?? givenChildren.given?.children ?? []
 	children.forEach(child => {
+		// NOTE: if function has properties (like `.rpc`), it will probably have a signature **and** children
 		const hasSignature = getDeclarationPropReflected(child, "signatures")
 		const hasChildren = getDeclarationPropReflected(child, "children")
 		if (hasSignature.value) {
@@ -132,3 +133,4 @@ export function createDocsForModule(given: unknown): PrimRpcDocs {
 	// console.log(JSON.stringify(docs, null, "  "))
 	return docs
 }
+// TODO: support both `.rpc` on functions and schema limit provided to Prim Server to limit documentation

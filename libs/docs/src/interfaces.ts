@@ -20,10 +20,18 @@ export interface PrimMethod {
 	name: string
 	path: string
 	signatures: PrimMethodSignature[]
+	// method could have properties (like `.rpc`)
+	// TODO: add props
+	props?: {
+		[prop: string]: PrimType
+	}
 }
 
 export interface PrimParam extends PrimType, PrimComment {
 	name: string
+	// given parameter could be "rest" parameter which may need to be treated differently
+	// TODO: add support for this
+	isRest?: boolean
 }
 export interface PrimReturn extends PrimType, PrimComment {}
 // eslint-disable-next-line @typescript-eslint/no-empty-interface

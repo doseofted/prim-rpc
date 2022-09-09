@@ -42,6 +42,7 @@ export function sayHello (options?: Greeting) {
 	const { greeting, name } = options ?? {}
 	return `${greeting ?? "Hello"} ${name ?? "you"}!`
 }
+sayHello.rpc = true
 
 /**
  * An alternative to `sayHello` that uses positional arguments.
