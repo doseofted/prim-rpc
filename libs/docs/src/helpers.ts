@@ -29,7 +29,7 @@ export function getDeclarationPropReflected<
 /** Parse given comment as Markdown. Pass `tagged` to get a comment for a block tag. */
 export function parseComment (comment: JSONOutput.Comment, tagged?: string): string {
 	const output = tagged
-		? parseComment({ summary: comment.blockTags?.find(tag => tag.name === tagged)?.content })
+		? parseComment({ summary: comment?.blockTags?.find(tag => tag.name === tagged)?.content })
 		: comment?.summary?.map(sum => sum.text).reduce((p, n) => p + n, "")
 	return output ?? ""
 }
