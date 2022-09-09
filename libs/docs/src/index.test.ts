@@ -6,7 +6,7 @@ import { Type } from "@sinclair/typebox"
 test("Parse module", () => {
 	// eslint-disable-next-line @typescript-eslint/no-unsafe-argument, @typescript-eslint/no-explicit-any
 	const parsed = createDocsForModule(exampleDocs)
-	console.log(JSON.stringify(parsed.props, null, "  "))
+	// console.log(JSON.stringify(parsed.props, null, "  "))
 	expect(parsed).not.toBeNull()
 })
 

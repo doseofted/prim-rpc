@@ -1,4 +1,4 @@
-import type { JSONOutput } from "typedoc"
+import type { JSONOutput, ReflectionKind } from "typedoc"
 import type { SetOptional } from "type-fest"
 import { set as setProperty } from "lodash-es"
 import { getDeclarationPropReflected, isTypeDoc, parseComment } from "./helpers"
@@ -40,26 +40,35 @@ function handleFunction (given: JSONOutput.DeclarationReflection, path: string[]
  * @param path - The path given given at level (for recursion)
  */
 function navigateProperties (given: JSONOutput.DeclarationReflection, docs: PrimRpcDocs, path: string[] = []) {
-	addModuleToDocs(docs, {
-		name: given.name,
-		comment: parseComment(given.comment),
-		flags: given.flags,
-		path: path.join("/"),
-	})
-	given.children.forEach(child => {
+	let containsFunctions = false
+	const givenChildren = getDeclarationPropReflected(given, "children")
+	const children = givenChildren.reflected?.children ?? givenChildren.given?.children ?? []
+	children.forEach(child => {
 		const hasSignature = getDeclarationPropReflected(child, "signatures")
 		const hasChildren = getDeclarationPropReflected(child, "children")
 		if (hasSignature.value) {
 			handleFunction(hasSignature.given, path)
+			containsFunctions = true
 		} else if (hasChildren.value) {
-			navigateProperties(hasChildren.reflected ?? hasChildren.given, docs, path.concat(child.name))
+			containsFunctions = navigateProperties(hasChildren.given, docs, path.concat(child.name))
 		}
 	})
+	if (containsFunctions) {
+		addModuleToDocs(docs, {
+			name: given.name,
+			comment: parseComment(given.comment),
+			flags: given.flags,
+			path: path.join("/"),
+		})
+	}
+	return containsFunctions
 }
 
 function addModuleToDocs(docs: SetOptional<PrimRpcDocs, "docs"|"props">, module: PrimModule) {
-	const pathParts = module.path.split("/").flatMap(path => ["props", path]).filter(path => path).slice(1)
+	const pathParts = module.path.split("/").filter(path => path).flatMap(path => ["props", path]) // .slice(1)
 	pathParts.push("docs")
+	// pathParts.unshift("props")
+	console.log(module.name, pathParts)
 	const index = docs.modules.push(module) - 1
 	const reference: PrimRpcDocs["docs"] = ["modules", index]
 	return setProperty<PrimRpcDocs>(docs, pathParts, reference)
@@ -85,16 +94,15 @@ export function createDocsForModule(given: unknown): PrimRpcDocs {
 	if (!isTypeDoc(given)) {
 		throw new Error("Given documentation was not understood as TypeDoc format")
 	}
-	const docsStarter: SetOptional<PrimRpcDocs, "docs"|"props"> = { modules: [], methods: [] }
-	const docs = addModuleToDocs(docsStarter, {
-		name: given.name,
-		comment: parseComment(given.comment),
-		flags: given.flags,
-		path: "",
-	})
-	navigateProperties(given, docs)
-	console.log(docs)
-
+	const docs: SetOptional<PrimRpcDocs, "docs"|"props"> = { modules: [], methods: [] }
+	// const docs = addModuleToDocs(docsStarter, {
+	// 	name: given.name,
+	// 	comment: parseComment(given.comment),
+	// 	flags: given.flags,
+	// 	path: "",
+	// })
+	navigateProperties(given, docs as PrimRpcDocs)
+	console.log(JSON.stringify(docs.props, null, "  "))
 	return {
 		props: {
 			test: {
