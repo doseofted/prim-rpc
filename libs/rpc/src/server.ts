@@ -77,6 +77,10 @@ function createServerActions (serverOptions: PrimServerOptions, instance?: Retur
 				const target = getProperty(client, methodExpanded) as AnyFunction
 				const args = Array.isArray(params) ? params : [params]
 				if (cbResults) { event.on("response", cbResults) }
+				// TODO: if `methodExpanded.at(-2)` is a function, call that instead of `methodExpanded.at(-1)`
+				// this is to prevent someone from calling function properties like `call`, `apply`, and `bind`
+				// TODO: regarding TODO above, consider only blocking properties listed above and not custom defined properties
+				// on function (so a developer could call custom function defined on Function Object, like `myFunction.docs()`)
 				// eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
 				const result: RpcAnswer = await Reflect.apply(target, undefined, args)
 				// TODO: today, result must be supported by JSON handler but consider supporting returned functions

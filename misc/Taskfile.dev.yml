@@ -37,7 +37,7 @@ tasks:
     desc: "Set Node version and install node modules with PNPM"
     cmds:
       - "corepack enable"
-      - "pnpm env use --global 18.7.0"
+      - "pnpm env use --global 18.9.0"
       - "pnpm install"
 
   setup:

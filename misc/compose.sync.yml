@@ -8,7 +8,8 @@ services:
       &dist-shared
       - dist-example:/home/node/project/libs/example/dist
       - dist-plugins:/home/node/project/libs/plugins/dist
-      - dist-prim:/home/node/project/libs/prim/dist
+      - dist-rpc:/home/node/project/libs/rpc/dist
+      - dist-ui:/home/node/project/libs/ui/dist
       - dist-docs:/home/node/project/libs/docs/dist
 
   backend:
@@ -20,5 +21,6 @@ services:
 volumes:
   dist-example:
   dist-plugins:
-  dist-prim:
+  dist-rpc:
+  dist-ui:
   dist-docs:

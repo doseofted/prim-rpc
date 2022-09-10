@@ -1,6 +1,4 @@
 /**
- * Everyone seeks closure. Even developers.
- * 
  * @param prefix - Prefix of console log ran by closure.
  * @returns Closure that logs your message (it's even prefixed)
  * 

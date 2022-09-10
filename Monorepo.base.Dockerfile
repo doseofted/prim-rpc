@@ -1,10 +1,10 @@
-FROM node:18.7-bullseye as monorepo-install
+FROM node:18.9-bullseye as monorepo-install
 USER root
 # Corepack is still experimental and not enabled by default
 # LINK https://nodejs.org/api/corepack.html#enabling-the-feature
 # NOTE: it seems corepack `enable` and `prepare` need to be separate steps (otherwise correct version is not used)
 RUN corepack enable
-RUN corepack prepare pnpm@7.7.1 --activate
+RUN corepack prepare pnpm@7.11.0 --activate
 # Use Task to make management of project easier
 # LINK https://taskfile.dev/installation/#install-script
 RUN sh -c "$(curl --location https://taskfile.dev/install.sh)" -- -d -b /usr/local/bin
