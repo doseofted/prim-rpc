@@ -11,7 +11,7 @@ import {
  */
 export function findDocsReference(docs: Partial<PrimRpcDocs>, given?: PrimModuleStructure|PrimRpcDocs["docs"]) {
 	const [type, index] = Array.isArray(given) ? given : given.docs
-	console.log(type, index)
+	// console.log(type, index)
 	return docs?.[type]?.[index]
 }
 
