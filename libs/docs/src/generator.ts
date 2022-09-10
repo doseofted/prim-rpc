@@ -3,13 +3,34 @@ import type { SetOptional } from "type-fest"
 import { /* get as getProperty, */ set as setProperty } from "lodash-es"
 import { getDeclarationPropReflected, isTypeDoc, parseComment } from "./helpers/create"
 import {
-	PrimRpcDocs, PrimMethod, PrimModule, PrimMethodSignature, PrimParam, PrimType, PrimReturn, PrimThrow,
+	PrimRpcDocs, PrimMethod, PrimModule, PrimMethodSignature, PrimParam, PrimType, PrimReturn, PrimThrow, BasicTypes, CommonTypes,
 } from "./interfaces"
 
-function handleType (_given: JSONOutput.SomeType): PrimType["type"] {
-	// const name = given.name
-	// const comment = parseComment(given.comment)
-	return "undefined" // TODO: add types
+function handleType (given: JSONOutput.SomeType): PrimType["type"] {
+	if (given.type === "array") {
+		return "Array"
+	}
+	if (given.type === "intrinsic") {
+		/** Types that appear to be used with "intrinsic" in TypeDoc */
+		const available: Record<string, BasicTypes|CommonTypes> = {
+			"string": "string",
+			"number": "number",
+			"boolean": "boolean",
+			"null": "null",
+			"bigint": "bigint",
+			"void": "undefined",
+			"symbol": "symbol", // TODO: make sure TypeDoc considers "symbol" intrinsic (probably)
+		}
+		return available[given.name] ?? "unknown"
+	}
+	if (given.type === "reference") {
+		return "Object"
+	}
+	if (given.type === "reflection" && given.declaration.signatures && given.declaration.signatures.length > 0) {
+		return "Function"
+	}
+	return "unknown"
+	// TODO: add ".typed" details
 }
 
 /**
@@ -50,27 +71,7 @@ function handleMethodLike (given: JSONOutput.DeclarationReflection, docs: PrimRp
 }
 
 /**
- * Generic version of `addModuleToDocs()` and `addMethodToDocs()`.
- * See these functions for details of how to use.
- */
-/* function addThingToDocs<
-	Type extends PrimRootStructureKeys,
-	Thing extends (Type extends "modules" ? PrimModule : Type extends "methods" ? PrimMethod : never),
->(docs: SetOptional<PrimRpcDocs, "docs"|"props">, type: Type, thing: Thing) {
-	const pathParts = thing.path.split("/").filter(path => path).flatMap(path => ["props", path])
-	pathParts.push("docs")
-	const index = (() => {
-		switch (type) {
-			case "modules": return docs.modules.push(thing as PrimModule) - 1
-			case "methods": return docs.methods.push(thing as PrimMethod) - 1
-		}
-	})()
-	const reference: PrimRpcDocs["docs"] = [type, index]
-	return setProperty<PrimRpcDocs>(docs, pathParts, reference)
-} */
-
-/**
- * Add a module to documentation
+ * Add a module to documentation. This is functionally very similar to `addMethodToDocs()`
  *
  * @param docs RPC documentation in-progress
  * @param module Given module in expected format

@@ -3,8 +3,8 @@ import type { JSONSchema7 } from "json-schema"
 // NOTE: when adding a new "type", consider if it can be used as input on docs page
 /** Primitive types and the "object" type */
 export type BasicTypes = "string"|"number"|"bigint"|"boolean"|"symbol"|"undefined"|"null"|"Object"
-/** Object types that are commonly thought of as basic language constructs themselves */
-export type CommonTypes = "Function"|"Array"
+/** Object types that are commonly thought of as basic language constructs themselves (also, "unknown" where not implemented yet) */
+export type CommonTypes = "Function"|"Array"|"unknown"
 export interface PrimType {
 	/** Type as given in JavaScript, including common objects */
 	type: BasicTypes|CommonTypes
@@ -29,9 +29,6 @@ export interface PrimMethod {
 
 export interface PrimParam extends PrimType, PrimComment {
 	name: string
-	// given parameter could be "rest" parameter which may need to be treated differently
-	// TODO: add support for this
-	isRest?: boolean
 }
 export interface PrimReturn extends PrimType, PrimComment {}
 // eslint-disable-next-line @typescript-eslint/no-empty-interface
@@ -57,7 +54,7 @@ export type PrimRootStructureKeys = keyof Omit<PrimRpcDocs, "props"|"docs">
 export interface PrimModuleStructure {
 	docs: [key: PrimRootStructureKeys, index: number]
 	props?: {
-		[moduleOrMerhodName: string]: PrimModuleStructure
+		[moduleOrMethodName: string]: PrimModuleStructure
 	}
 }
 
