@@ -1,3 +1,4 @@
+import { get as getProperty } from "lodash-es"
 import {
 	PrimRpcDocs, PrimMethod, PrimModule, PrimModuleStructure, PrimRootStructureKeys,
 } from "../interfaces"
@@ -9,9 +10,8 @@ import {
  * @param given Property found in documentation structure
  * @returns Documentation for requested module or method
  */
-export function findDocsReference(docs: Partial<PrimRpcDocs>, given?: PrimModuleStructure|PrimRpcDocs["docs"]) {
+export function findDocsReference(docs: Partial<PrimRpcDocs>, given?: PrimModuleStructure|PrimModuleStructure["docs"]) {
 	const [type, index] = Array.isArray(given) ? given : given.docs
-	// console.log(type, index)
 	return docs?.[type]?.[index]
 }
 
@@ -42,4 +42,33 @@ export function iterateDocs<T extends PrimRootStructureKeys, U extends T extends
 		}
 	}
 	return methods
+}
+
+/**
+ * Given a method's documentation, find the actual method in the documented module.
+ *
+ * @param docs Prim RPC docs
+ * @param module Module that documentation references
+ * @param given The method's documentation
+ * @returns The method itself
+ */
+export function getFunctionForDocumentation<
+	Given extends (...args: unknown[]) => unknown = (...args: unknown[]) => unknown,
+>(
+	docs: PrimRpcDocs,
+	module: unknown,
+	given: PrimMethod|PrimModuleStructure|PrimModuleStructure["docs"],
+): Given {
+	if (Array.isArray(given) && given[0] === "methods") {
+		const methodFound = findDocsReference(docs, given)
+		if (methodFound) {
+			return getProperty(module, methodFound.path) as Given
+		}
+	}
+	if ("docs" in given) {
+		return getFunctionForDocumentation(docs, module, given.docs)
+	}
+	if ("name" in given) {
+		return getProperty(module, given.path) as Given
+	}
 }
