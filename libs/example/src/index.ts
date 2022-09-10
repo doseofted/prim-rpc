@@ -8,6 +8,7 @@
  * @fakeFlag
  */
 import * as additional from "./submodule"
+// import things, { ThingInstance, Things } from "./things"
 
 /**
  * This is an example of a module that could be used with Prim (the server, not data manager aspect of the project).
@@ -17,7 +18,8 @@ import * as additional from "./submodule"
  * This is an example and should be used for tests with Prim. This may move to an `example.test.ts` file once
  * a testing framework is setup.
  */
-export { additional }
+export { additional /* things, Things */ }
+// export type { ThingInstance }
 
 /**
  * Not me.

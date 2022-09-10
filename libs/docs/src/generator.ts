@@ -50,6 +50,26 @@ function handleMethodLike (given: JSONOutput.DeclarationReflection, docs: PrimRp
 }
 
 /**
+ * Generic version of `addModuleToDocs()` and `addMethodToDocs()`.
+ * See these functions for details of how to use.
+ */
+/* function addThingToDocs<
+	Type extends PrimRootStructureKeys,
+	Thing extends (Type extends "modules" ? PrimModule : Type extends "methods" ? PrimMethod : never),
+>(docs: SetOptional<PrimRpcDocs, "docs"|"props">, type: Type, thing: Thing) {
+	const pathParts = thing.path.split("/").filter(path => path).flatMap(path => ["props", path])
+	pathParts.push("docs")
+	const index = (() => {
+		switch (type) {
+			case "modules": return docs.modules.push(thing as PrimModule) - 1
+			case "methods": return docs.methods.push(thing as PrimMethod) - 1
+		}
+	})()
+	const reference: PrimRpcDocs["docs"] = [type, index]
+	return setProperty<PrimRpcDocs>(docs, pathParts, reference)
+} */
+
+/**
  * Add a module to documentation
  *
  * @param docs RPC documentation in-progress
@@ -57,6 +77,7 @@ function handleMethodLike (given: JSONOutput.DeclarationReflection, docs: PrimRp
  * @returns a copy of given documentation, with changes
  */
 function addModuleToDocs(docs: SetOptional<PrimRpcDocs, "docs"|"props">, module: PrimModule) {
+	// return addThingToDocs(docs, "modules", module)
 	const pathParts = module.path.split("/").filter(path => path).flatMap(path => ["props", path])
 	pathParts.push("docs")
 	const index = docs.modules.push(module) - 1
@@ -72,6 +93,7 @@ function addModuleToDocs(docs: SetOptional<PrimRpcDocs, "docs"|"props">, module:
  * @returns a copy of given documentation, with changes
  */
 function addMethodToDocs(docs: SetOptional<PrimRpcDocs, "docs"|"props">, method: PrimMethod) {
+	// return addThingToDocs(docs, "methods", method)
 	const pathParts = method.path.split("/").filter(path => path).flatMap(path => ["props", path])
 	pathParts.push("docs")
 	const index = docs.methods.push(method) - 1
@@ -80,28 +102,54 @@ function addMethodToDocs(docs: SetOptional<PrimRpcDocs, "docs"|"props">, method:
 }
 
 /**
+ * Given some type that references another type in the TypeDoc documentation,
+ * navigate the TypeDoc structure for the actual referenced type.
+ */
+function queryGivenReference (given: JSONOutput.DeclarationReflection, id: number): JSONOutput.DeclarationReflection|void {
+	const givenChildren = getDeclarationPropReflected(given, "children")
+	const children = givenChildren.reflected?.children ?? givenChildren.given?.children ?? []
+	for (const child of children) {
+		if (child.id === id) { return child }
+		const found = queryGivenReference(child, id)
+		if (found) { return found }
+	}
+	return
+}
+
+/**
  * Navigate TSDoc children and look for things with call signatures. Rather than
  * inspecting the kind, just look for a `.signature` property to treat as a method
  * and look for a `.children` property to look for a module-like object.
  * 
- * @param given - Given TypeDoc information
+ * @param root - Given TypeDoc information, in full
+ * @param given - Given TypeDoc information for given level (used in recursion)
  * @param docs - In-progress RPC documentation
  * @param path - Path of current module
  * @returns whether the given object contains functions
  */
-function navigateModuleLike (given: JSONOutput.DeclarationReflection, docs: PrimRpcDocs, path: string[] = []) {
+function navigateModuleLike (
+	root: JSONOutput.ProjectReflection,
+	given: JSONOutput.DeclarationReflection,
+	docs: PrimRpcDocs,
+	path: string[] = [],
+) {
 	let containsFunctions = false
 	const givenChildren = getDeclarationPropReflected(given, "children")
 	const children = givenChildren.reflected?.children ?? givenChildren.given?.children ?? []
 	children.forEach(child => {
 		// NOTE: if function has properties (like `.rpc`), it will probably have a signature **and** children
-		const hasSignature = getDeclarationPropReflected(child, "signatures")
-		const hasChildren = getDeclarationPropReflected(child, "children")
+		const referencedIdentifier = (child.type && child.type.type === "query" && child.type.queryType.id) || false
+		// if given type is "query" then use the given ID to find the referenced type
+		const childActual = (typeof referencedIdentifier === "number"
+			? queryGivenReference(root, referencedIdentifier)
+			: child) || child
+		const hasSignature = getDeclarationPropReflected(childActual, "signatures")
+		const hasChildren = getDeclarationPropReflected(childActual, "children")
 		if (hasSignature.value) {
 			handleMethodLike(hasSignature.given, docs, path)
 			containsFunctions = true
 		} else if (hasChildren.value) {
-			containsFunctions = navigateModuleLike(hasChildren.given, docs, path.concat(child.name))
+			containsFunctions = navigateModuleLike(root, hasChildren.given, docs, path.concat(child.name))
 		}
 	})
 	if (containsFunctions) {
@@ -129,7 +177,7 @@ export function createDocsForModule(given: unknown): PrimRpcDocs {
 	}
 	// NOTE: `.docs` property will be overridden later
 	const docs: PrimRpcDocs = { modules: [], methods: [], props: {}, docs: ["modules", 0] }
-	navigateModuleLike(given, docs)
+	navigateModuleLike(given, given, docs)
 	// console.log(JSON.stringify(docs, null, "  "))
 	return docs
 }
