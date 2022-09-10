@@ -47,28 +47,28 @@ export function iterateDocs<T extends PrimRootStructureKeys, U extends T extends
 /**
  * Given a method's documentation, find the actual method in the documented module.
  *
- * @param docs Prim RPC docs
+ * @param docs Prim RPC docs for module
  * @param module Module that documentation references
- * @param given The method's documentation
- * @returns The method itself
+ * @param methodDocs The method's documentation within Prim RPC docs
+ * @returns The method requested in your module
  */
 export function getFunctionForDocumentation<
 	Given extends (...args: unknown[]) => unknown = (...args: unknown[]) => unknown,
 >(
 	docs: PrimRpcDocs,
 	module: unknown,
-	given: PrimMethod|PrimModuleStructure|PrimModuleStructure["docs"],
+	methodDocs: PrimMethod|PrimModuleStructure|PrimModuleStructure["docs"],
 ): Given {
-	if (Array.isArray(given) && given[0] === "methods") {
-		const methodFound = findDocsReference(docs, given)
+	if (Array.isArray(methodDocs) && methodDocs[0] === "methods") {
+		const methodFound = findDocsReference(docs, methodDocs)
 		if (methodFound) {
 			return getProperty(module, methodFound.path) as Given
 		}
 	}
-	if ("docs" in given) {
-		return getFunctionForDocumentation(docs, module, given.docs)
+	if ("docs" in methodDocs) {
+		return getFunctionForDocumentation(docs, module, methodDocs.docs)
 	}
-	if ("name" in given) {
-		return getProperty(module, given.path) as Given
+	if ("name" in methodDocs) {
+		return getProperty(module, methodDocs.path.split("/")) as Given
 	}
 }

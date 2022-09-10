@@ -7,7 +7,7 @@ import { PrimModuleStructure, PrimRpcDocs } from "./interfaces"
 
 test("Basic documentation structure can be generated", () => {	
 	const docs = createDocsForModule(exampleDocs)
-	console.log(JSON.stringify(docs.methods, null, "  "))
+	// console.log(JSON.stringify(docs.methods, null, "  "))
 	expect(docs).toBeTypeOf("object")
 	expect(docs).toHaveProperty("docs")
 	expect(docs).toHaveProperty("props")

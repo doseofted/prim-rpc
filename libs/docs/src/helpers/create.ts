@@ -5,7 +5,7 @@ import { ReflectionKind, JSONOutput } from "typedoc"
 // 	return given.children.filter(c => ids.includes(c.id))
 // }
 
-/** Determine if given structure is a TypDoc */
+/** Determine if given structure is a TypeDoc */
 export function isTypeDoc (docs: unknown): docs is JSONOutput.ProjectReflection {
 	const likelyDocs = docs as JSONOutput.ProjectReflection
 	return typeof likelyDocs === "object" && likelyDocs.kind === ReflectionKind.Project
