@@ -17,7 +17,7 @@
     "lint": "eslint ."
   },
   "dependencies": {
-    "defu": "^6.0.0",
+    "defu": "^6.1.0",
     "lodash-es": "^4.17.21",
     "mitt": "^3.0.0",
     "nanoid": "^4.0.0",
@@ -28,11 +28,11 @@
   },
   "devDependencies": {
     "@doseofted/prim-example": "workspace:*",
-    "@types/lodash": "^4.14.182",
+    "@types/lodash": "^4.14.185",
     "@types/lodash-es": "^4.17.6",
     "lodash": "^4.17.21",
     "superjson": "^1.9.1",
-    "type-fest": "^2.18.0"
+    "type-fest": "^2.19.0"
   },
   "source": "src/index.ts",
   "types": "dist/index.d.ts",

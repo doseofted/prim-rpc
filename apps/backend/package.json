@@ -12,8 +12,8 @@
     "@doseofted/prim-example": "workspace:*",
     "@doseofted/prim-plugins": "workspace:*",
     "@doseofted/prim-rpc": "workspace:*",
-    "@fastify/cors": "^8.0.0",
-    "fastify": "^4.3.0",
+    "@fastify/cors": "^8.1.0",
+    "fastify": "^4.5.3",
     "superjson": "^1.9.1",
     "ws": "^8.8.1"
   },

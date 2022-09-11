@@ -76,6 +76,6 @@ export function createPrimOptions<OptionsType extends PrimOptions = PrimOptions>
 		overrideBaseOptions.handleError = false
 	}
 	const baseOptions = server ? createBaseServerOptions() : createBaseClientOptions()
-	const configured = defu<PrimOptions, PrimOptions>(options, overrideBaseOptions, baseOptions) as OptionsType
+	const configured = defu<PrimOptions, PrimOptions[]>(options, overrideBaseOptions, baseOptions) as OptionsType
 	return configured
 }
