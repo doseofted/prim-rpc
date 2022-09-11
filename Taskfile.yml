@@ -18,16 +18,19 @@ includes:
     vars:
       COMPOSE_FILE: "compose.yml:compose.dev.yml:misc/compose.sync.yml"
       CHOSEN_ENV: "development"
+      CHOSEN_PREFIX: "dev"
   compose:prod:
     <<: *base-compose
     vars:
       COMPOSE_FILE: "compose.yml:compose.prod.yml"
       CHOSEN_ENV: "production"
+      CHOSEN_PREFIX: "prod"
   compose:staging:
     <<: *base-compose
     vars:
       COMPOSE_FILE: "compose.yml:compose.prod.yml:compose.staging.yml"
       CHOSEN_ENV: "staging"
+      CHOSEN_PREFIX: "staging"
 
   # Sub-project-specific includes
   backend:
