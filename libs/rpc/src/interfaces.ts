@@ -215,9 +215,26 @@ export interface PrimServerOptions<C = unknown> extends PrimOptions {
 }
 
 export type PrimServerSocketAnswer = (result: string) => void
+export type PrimServerSocketAnswerRpc = (result: RpcAnswer|RpcAnswer[]) => void
 interface PrimServerConnectedActions {
+	/**
+	 * Call when the connection to the server terminates
+	 */
 	ended: () => void
+	/**
+	 * Given data over a WebSocket as a stringified RPC call, run the RPC,
+	 * and get back the result as a stringified response to be sent in callback.
+	 *
+	 * Alternatively, call `.rpc()` to run a processed RPC call and receive
+	 * a response as an object (to be stringified manually, as needed).
+	 * Do not run both `.call()` and `.rpc()`. Instead, choose one or the other.
+	 */
 	call: (data: string, send: PrimServerSocketAnswer) => void
+	/**
+	 * Given an RPC call, get an answer back, to be sent in callback. This is an
+	 * alternative to `.call()` (useful for debugging or non-server contexts)
+	 */
+	rpc: (data: RpcCall|RpcCall[], send: PrimServerSocketAnswerRpc) => void
 }
 export interface PrimServerSocketEvents {
 	connected: () => PrimServerConnectedActions

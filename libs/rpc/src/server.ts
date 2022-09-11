@@ -8,6 +8,7 @@ import {
 	RpcAnswer, RpcCall, PrimServerSocketAnswer, PrimServerSocketEvents, PrimServerActionsBase, PrimHttpEvents,
 	PrimServerEvents,
 	PrimServer,
+	PrimServerSocketAnswerRpc,
 } from "./interfaces"
 import { serializeError } from "serialize-error"
 
@@ -133,7 +134,7 @@ function createSocketEvents (serverOptions: PrimServerOptions): PrimServerSocket
 	const connected = () => {
 		const instance = createPrimInstance(serverOptions)
 		const { socketEvent: event } = instance
-		const { prepareCall, prepareRpc, prepareSend } = createServerActions(serverOptions, instance)
+		const { prepareCall, prepareRpc: prepareRpcBase, prepareSend } = createServerActions(serverOptions, instance)
 		event.emit("connected")
 		const ended = () => {
 			event.emit("ended")
@@ -147,11 +148,24 @@ function createSocketEvents (serverOptions: PrimServerOptions): PrimServerSocket
 				send(body)
 			})
 			const preparedParams = prepareCall({ body })
-			const result = await prepareRpc(preparedParams)
+			const result = await prepareRpcBase(preparedParams)
 			const preparedResult = prepareSend(result)
 			send(preparedResult.body)			
 		}
-		return { ended, call }
+		const rpc = async (body: RpcCall|RpcCall[], send: PrimServerSocketAnswerRpc) => {
+			// clear previous responses (FIXME: don't stop listening to other responses when new call is made)
+			event.off("response")
+			event.on("response", (data) => {
+				send(data)
+			})
+			const result = await prepareRpcBase(body)
+			send(result)			
+		}
+		// TODO: return `prepare...()` functions below, in event that something more than `call()` is needed
+		// for example, in the Prim Server plugin for Web Workers (where `body` is not given).
+		// Alternatively, I could create a function `rpc(body: RpcCall, cb: (result: RpcAnswer) => void)` that skips
+		// processing of server-given options and response (however, `rpc()` and `call()` should not be called at same time)
+		return { ended, call, rpc }
 	}
 	return { connected, options: serverOptions }
 }
