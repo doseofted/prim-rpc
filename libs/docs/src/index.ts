@@ -1,6 +1,7 @@
 import { createDocsForModule } from "./generator"
-import * as helpers from "./helpers/read"
+import { findDocsReference, getFunctionForDocumentation, iterateDocs } from "./helpers/read"
 
+const helpers = { findDocsReference, getFunctionForDocumentation, iterateDocs }
 export {
 	createDocsForModule,
 	helpers,

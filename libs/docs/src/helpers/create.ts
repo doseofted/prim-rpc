@@ -1,4 +1,4 @@
-import { ReflectionKind, JSONOutput } from "typedoc"
+import type { JSONOutput } from "typedoc"
 
 // export function findChildrenOfType(type: string, given: JSONOutput.DeclarationReflection) {
 // 	const ids = given.groups.find(g => g.title === type).children
@@ -8,7 +8,7 @@ import { ReflectionKind, JSONOutput } from "typedoc"
 /** Determine if given structure is a TypeDoc */
 export function isTypeDoc (docs: unknown): docs is JSONOutput.ProjectReflection {
 	const likelyDocs = docs as JSONOutput.ProjectReflection
-	return typeof likelyDocs === "object" && likelyDocs.kind === ReflectionKind.Project
+	return typeof likelyDocs === "object" && likelyDocs.kind === 1 // ReflectionKind.Project === 1
 }
 
 /** Find property on given declaration regardless of whether type is reflected */

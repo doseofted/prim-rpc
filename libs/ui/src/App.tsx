@@ -1,5 +1,6 @@
 import { Component, createMemo, lazy } from "solid-js"
 import { styled, css } from "solid-styled-components"
+import Docs from "./components/Docs"
 import { useMouse, useWindowSize } from "./composables"
 
 interface Props {
@@ -25,6 +26,7 @@ const App: Component<Props> = (props) => {
 			<p class={paragraph}>Your mouse is at ({mouse().x}, {mouse().y})</p>
 			<p class={paragraph}>From center: {Math.round(distance())}</p>
 			<TestOnly class={paragraph} />
+			<Docs />
 		</BgGray>
 	)
 }
