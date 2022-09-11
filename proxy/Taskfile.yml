@@ -22,7 +22,7 @@ tasks:
           doseofted/prim-proxy {{.CLI_ARGS}}
 
   dev:
-    desc: "Run frontend image in dev mode"
+    desc: "Run Caddy image in dev mode"
     deps:
       - task: build
         vars: { BUILD_STAGE: "{{.TASK}}" }
@@ -30,7 +30,7 @@ tasks:
       - task: run
 
   prod:
-    desc: "Run frontend image in production mode"
+    desc: "Run Caddy image in production mode"
     deps:
       - task: build
         vars: { BUILD_STAGE: "{{.TASK}}" }
@@ -38,7 +38,7 @@ tasks:
       - task: run
 
   staging:
-    desc: "Run frontend image in production mode"
+    desc: "Run Caddy image in staging mode"
     deps:
       - task: build
         vars: { BUILD_STAGE: "{{.TASK}}" }
