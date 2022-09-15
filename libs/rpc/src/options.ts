@@ -17,7 +17,7 @@ const createBaseClientOptions = (): PrimOptions => ({
 	// NOTE: JSON properties are not enumerable so create an object with enumerable properties referencing JSON methods
 	jsonHandler: { stringify: JSON.stringify, parse: JSON.parse },
 	// `client()` is intended to be overridden so as not to force any one HTTP framework but default is fine for most cases
-	client: async (endpoint, jsonBody, jsonHandler) => {
+	client: async (endpoint, jsonBody, jsonHandler, _blobs = {}) => {
 		const result = await fetch(endpoint, {
 			method: "POST",
 			headers: { "Content-Type": "application/json" },
@@ -26,7 +26,7 @@ const createBaseClientOptions = (): PrimOptions => ({
 		return jsonHandler.parse(await result.text())
 	},
 	// same with socket, usually the default WebSocket client is fine but the choice to change should be given
-	socket: (endpoint, { connected, response, ended }, jsonHandler) => {
+	socket: (endpoint, { connected, response, ended }, jsonHandler, _blobs = {}) => {
 		const ws = new WebSocket(endpoint)
 		ws.onopen = connected
 		ws.onclose = ended

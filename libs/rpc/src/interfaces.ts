@@ -56,9 +56,10 @@ export interface JsonHandler {
 	parse: <T = any>(string: string) => T
 }
 // type JsonHandlerOptional  = Partial<JsonHandler>
-
-export type PrimClientFunction<J = JsonHandler> = (endpoint: string, jsonBody: RpcCall|RpcCall[], jsonHandler: J) => Promise<RpcAnswer|RpcAnswer[]>
-export type PrimSocketFunction<J = JsonHandler> = (endpoint: string, events: PrimWebSocketFunctionEvents, jsonHandler: J) => ({
+/** The record key is a string prefixed with `_bin_` and the value is the Blob */
+export type BlobRecords = Record<string, Blob>
+export type PrimClientFunction<J = JsonHandler> = (endpoint: string, jsonBody: RpcCall|RpcCall[], jsonHandler: J, blobs?: BlobRecords) => Promise<RpcAnswer|RpcAnswer[]>
+export type PrimSocketFunction<J = JsonHandler> = (endpoint: string, events: PrimWebSocketFunctionEvents, jsonHandler: J, blobs?: BlobRecords) => ({
 	send: (message: RpcCall|RpcCall[]) => void
 })
 
@@ -96,10 +97,14 @@ export interface PrimOptions<M extends object = object, J extends JsonHandler = 
 	/**
 	 * Usually the default of `JSON` is sufficient but parsing/conversion of more complex types may benefit from other
 	 * JSON handling libraries. The same handler must be used on both the server and client.
+	 * 
+	 * For example, `superjson` is great for parsing additional JavaScript types, `@msgpack/msgpack` may be useful for
+	 * binary data, `devalue` is useful for cyclical references, or `destr` for someone security-minded.
+	 * These are only examples and you can use any JSON handler.
 	 *
-	 * Given module is required to have both a `.stringify(obj)` and `.parse(str)` method. If chosen JSON handler requires
-	 * additional options, it is recommended to create the stringify/parse functions and wrap the intended JSON handler
-	 * in these functions.
+	 * Given handler is required to have both a `.stringify(obj)` and `.parse(str)` method. If chosen JSON handler requires
+	 * additional options or doesn't have these methods, it is recommended to create the stringify/parse functions
+	 * and wrap the intended JSON handler in these functions.
 	 */
 	jsonHandler?: J
 	/**
@@ -117,6 +122,7 @@ export interface PrimOptions<M extends object = object, J extends JsonHandler = 
 	 * @param endpoint The configured `endpoint` on created instance
 	 * @param jsonBody RPC to be stringified before being sent to server
 	 * @param jsonHandler Provided handler for JSON, with `.stringify()` and `.parse()` methods
+	 * @param blobs If given RPC has binary data it will be referenced here by its string identifier in the RPC
 	 */
 	client?: PrimClientFunction<J>
 	/**
@@ -134,6 +140,7 @@ export interface PrimOptions<M extends object = object, J extends JsonHandler = 
 	 * @param endpoint The configured `wsEndpoint` on created instance
 	 * @param events: An object containing several callbacks that should be called when event happens on websocket
 	 * @param jsonHandler Provided handler for JSON, with `.stringify()` and `.parse()` methods
+	 * @param blobs If given RPC has binary data it will be referenced here by its string identifier in the RPC
 	 */
 	socket?: PrimSocketFunction<J>
 	/**
@@ -145,6 +152,21 @@ export interface PrimOptions<M extends object = object, J extends JsonHandler = 
 	 * This option must be set to the same value on the server and client.
 	 */
 	handleError?: boolean
+	/**
+	 * This option only applies if you need to upload files (otherwise, you can ignore).
+	 *
+	 * Prim RPC creates RPC calls formatted as JSON. JSON, by itself, doesn't support binary data. When a function is
+	 * called that has `Blob`-like parameters and this option is `true` (the default), this library will extract that
+	 * data into a separate object and replace the binary data in the JSON with a string identifier (prefixed `_bin_`).
+	 * 
+	 * It is up to the provided client/server plugins as to how it will handle this data when this option is `true`.
+	 * When this option is set to `false`, it is up to your configured JSON handler to handle that binary data.
+	 *
+	 * If you use a custom JSON handler that supports binary data (maybe you use msgpack, BSON, convert binary to base64,
+	 * or ),
+	 * then you may toggle this option `false` to prevent Prim from extracting binary data.
+	 */
+	handleBlobs?: boolean
 	// TODO: Prim Server should create these options and hold references. This will be removed.
 	/** Properties belonging to `internal` are for internal use by Prim-RPC. */
 	internal?: {

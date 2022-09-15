@@ -14,7 +14,10 @@ import { nanoid } from "nanoid"
 import mitt from "mitt"
 import { get as getProperty, remove as removeFromArray } from "lodash-es"
 import type { Asyncify } from "type-fest"
-import { RpcCall, PrimOptions, RpcAnswer, PrimWebSocketEvents, PrimHttpEvents, PromiseResolveStatus, PrimHttpQueueItem } from "./interfaces"
+import {
+	RpcCall, PrimOptions, RpcAnswer, PrimWebSocketEvents, PrimHttpEvents,
+	PromiseResolveStatus, PrimHttpQueueItem, BlobRecords,
+} from "./interfaces"
 import { createPrimOptions } from "./options"
 import { deserializeError } from "serialize-error"
 
@@ -28,6 +31,7 @@ type PromisifiedModule<ModuleGiven extends object> = {
 			: ModuleGiven[Key]
 }
 /** Callback prefix */ const CB_PREFIX = "_cb_"
+/** Binary prefix (Blob/File) */ const BLOB_PREFIX = "_bin_"
 
 /**
  * Prim-RPC can be used to write plain functions on the server and then call them easily from the client.
@@ -69,9 +73,20 @@ export function createPrimClient<
 			// !SECTION
 			// SECTION Client-side module handling
 			let callbacksWereGiven = false
+			const blobs: BlobRecords = {} // TODO: send blobs to websocket/http clients
 			const params = args.map((arg) => {
+				// TODO: handle binary object within array/object argument (not just direct arguments)
+				const binaryArg = arg instanceof Blob ? arg : false
+				if (configured.handleBlobs && binaryArg) {
+					const binaryIdentifier = [BLOB_PREFIX, nanoid()].join("")
+					blobs[binaryIdentifier] = binaryArg
+					return binaryIdentifier
+				}
 				const callbackArg = typeof arg === "function" ? arg : false
-				if (callbackArg) { callbacksWereGiven = true } else { return arg }
+				if (!callbackArg) {
+					return arg
+				}
+				callbacksWereGiven = true
 				const callbackReferenceIdentifier = [CB_PREFIX, nanoid()].join("")
 				const handleRpcCallbackResult = (msg: RpcAnswer) => {
 					if (msg.id !== callbackReferenceIdentifier) { return }
