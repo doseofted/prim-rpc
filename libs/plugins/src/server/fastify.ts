@@ -1,7 +1,15 @@
 import type { PrimServerMethodHandler, PrimServerEvents } from "@doseofted/prim-rpc"
-import type { FastifyPluginAsync, FastifyInstance, FastifyError } from "fastify"
+import type { FastifyPluginAsync, FastifyInstance, FastifyError, FastifyPluginCallback, RawServerDefault, FastifyTypeProviderDefault } from "fastify"
+import type { FastifyMultipartAttactFieldsToBodyOptions, FastifyMultipartOptions } from "@fastify/multipart"
 
-interface PrimFastifyPluginOptions { prim: PrimServerEvents }
+interface PrimFastifyPluginOptions {
+	prim: PrimServerEvents,
+	multipartPlugin?: FastifyPluginCallback< // NOTE: interface for @fastify/multipart plugin
+	FastifyMultipartOptions|FastifyMultipartAttactFieldsToBodyOptions,
+	RawServerDefault,
+	FastifyTypeProviderDefault
+	>
+}
 /**
  * A Fastify plugin used to register Prim with the server. Use like so:
  * 
@@ -19,7 +27,10 @@ interface PrimFastifyPluginOptions { prim: PrimServerEvents }
  */
 // eslint-disable-next-line @typescript-eslint/require-await
 export const fastifyPrimPlugin: FastifyPluginAsync<PrimFastifyPluginOptions> = async (fastify, options) => {
-	const { prim } = options
+	const { prim, multipartPlugin } = options
+	if (multipartPlugin) {
+		await fastify.register(multipartPlugin)
+	}
 	// LINK https://github.com/fastify/help/issues/158#issuecomment-1086190754
 	fastify.addContentTypeParser("application/json", { parseAs: "string" }, (_req, body, done) => {
 		try {
@@ -34,6 +45,8 @@ export const fastifyPrimPlugin: FastifyPluginAsync<PrimFastifyPluginOptions> = a
 		method: ["GET", "POST"],
 		url: prim.options.prefix,
 		handler: async (request, reply) => {
+			// TODO: read RPC for `_bin_` references and call `request.files()` only when needed
+			// let a = request.files()
 			const { body, method, raw: { url } } = request
 			const response = await prim.server().call({ method, url, body })
 			void reply.status(response.status).headers(response.headers).send(response.body)
@@ -70,6 +83,6 @@ interface MethodFastifyOptions { fastify: FastifyInstance }
 export const primMethodFastify = (options: MethodFastifyOptions): PrimServerMethodHandler => {
 	const { fastify } = options
 	return prim => {
-		void fastify.register(fastifyPrimPlugin, { prim })
+		void fastify.register(fastifyPrimPlugin, {...options, prim })
 	}
 }
