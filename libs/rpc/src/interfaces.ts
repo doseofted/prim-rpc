@@ -61,7 +61,7 @@ export interface JsonHandler {
 export type BlobRecords = Record<string, Blob>
 export type PrimClientFunction<J = JsonHandler> = (endpoint: string, jsonBody: RpcCall|RpcCall[], jsonHandler: J, blobs?: BlobRecords) => Promise<RpcAnswer|RpcAnswer[]>
 export type PrimSocketFunction<J = JsonHandler> = (endpoint: string, events: PrimWebSocketFunctionEvents, jsonHandler: J) => ({
-	send: (message: RpcCall|RpcCall[], blobs?: BlobRecords) => void
+	send: (message: RpcCall, blobs?: BlobRecords) => void
 })
 
 type OptionsPresetFallback = "development"|"production"

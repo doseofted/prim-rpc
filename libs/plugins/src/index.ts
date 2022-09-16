@@ -9,5 +9,8 @@ export {
 	primMethodWebWorker, primCallbackWebWorker,
 } from "./server"
 export {
+	// Browser-native clients
+	createFetchClient, createWebSocketClient,
+	// Axios client plugin
 	createPrimAxiosClient,
 } from "./client"

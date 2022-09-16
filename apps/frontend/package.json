@@ -23,6 +23,7 @@
     "@doseofted/prim-example": "workspace:*",
     "@doseofted/prim-rpc": "workspace:*",
     "@doseofted/prim-ui": "workspace:*",
+    "@doseofted/prim-plugins": "workspace:*",
     "@fastify/static": "^6.5.0",
     "fastify": "^4.5.3"
   },

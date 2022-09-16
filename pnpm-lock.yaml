@@ -87,6 +87,7 @@ importers:
   apps/frontend:
     specifiers:
       '@doseofted/prim-example': workspace:*
+      '@doseofted/prim-plugins': workspace:*
       '@doseofted/prim-rpc': workspace:*
       '@doseofted/prim-ui': workspace:*
       '@fastify/static': ^6.5.0
@@ -107,6 +108,7 @@ importers:
       vite-plugin-solid: ^2.3.0
     dependencies:
       '@doseofted/prim-example': link:../../libs/example
+      '@doseofted/prim-plugins': link:../../libs/plugins
       '@doseofted/prim-rpc': link:../../libs/rpc
       '@doseofted/prim-ui': link:../../libs/ui
       '@fastify/static': 6.5.0
