@@ -25,6 +25,7 @@ export interface PrimHttpQueueItem {
 	rpc: RpcCall
 	result: Promise<RpcAnswer>,
 	resolved: PromiseResolveStatus
+	blobs: BlobRecords
 }
 
 export type PrimHttpEvents = {
@@ -59,8 +60,8 @@ export interface JsonHandler {
 /** The record key is a string prefixed with `_bin_` and the value is the Blob */
 export type BlobRecords = Record<string, Blob>
 export type PrimClientFunction<J = JsonHandler> = (endpoint: string, jsonBody: RpcCall|RpcCall[], jsonHandler: J, blobs?: BlobRecords) => Promise<RpcAnswer|RpcAnswer[]>
-export type PrimSocketFunction<J = JsonHandler> = (endpoint: string, events: PrimWebSocketFunctionEvents, jsonHandler: J, blobs?: BlobRecords) => ({
-	send: (message: RpcCall|RpcCall[]) => void
+export type PrimSocketFunction<J = JsonHandler> = (endpoint: string, events: PrimWebSocketFunctionEvents, jsonHandler: J) => ({
+	send: (message: RpcCall|RpcCall[], blobs?: BlobRecords) => void
 })
 
 type OptionsPresetFallback = "development"|"production"

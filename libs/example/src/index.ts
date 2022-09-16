@@ -160,9 +160,9 @@ export function addThings (...things: AddableThing[]): AddableThing {
 }
 
 /** Server-provided details */
-interface ServerImaginaryProfile { name: string, password: string, email: string, picture: string }
+export interface ServerImaginaryProfile { name: string, password: string, email: string, picture: string }
 /** Client-provided details */
-interface ClientImaginaryProfile { name: string, password: string, email: string, picture: Blob }
+export interface ClientImaginaryProfile { name: string, password: string, email: string, picture: Blob }
 export function createImaginaryProfile(input: ServerImaginaryProfile): boolean
 export function createImaginaryProfile(input: ClientImaginaryProfile): boolean
 export function createImaginaryProfile(input: ServerImaginaryProfile|ClientImaginaryProfile) {

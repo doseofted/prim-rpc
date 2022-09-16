@@ -1,4 +1,4 @@
-import { PrimOptions, PrimServerOptions } from "./interfaces"
+import { BlobRecords, PrimOptions, PrimServerOptions, RpcCall } from "./interfaces"
 import { defu } from "defu"
 
 // TODO: consider separating server-specific options from client options so I can reduce the number
@@ -17,24 +17,49 @@ const createBaseClientOptions = (): PrimOptions => ({
 	// NOTE: JSON properties are not enumerable so create an object with enumerable properties referencing JSON methods
 	jsonHandler: { stringify: JSON.stringify, parse: JSON.parse },
 	// `client()` is intended to be overridden so as not to force any one HTTP framework but default is fine for most cases
-	client: async (endpoint, jsonBody, jsonHandler, _blobs = {}) => {
-		const result = await fetch(endpoint, {
-			method: "POST",
-			headers: { "Content-Type": "application/json" },
-			body: jsonHandler.stringify(jsonBody),
-		})
+	client: async (endpoint, jsonBody, jsonHandler, blobs = {}) => {
+		let fetchOptions: RequestInit = {}
+		const blobList = Object.entries(blobs)
+		if (blobList.length > 0) {
+			const data = new FormData()
+			data.append("rpc", jsonHandler.stringify(jsonBody))
+			for (const [key, blob] of blobList) {
+				data.append(key, blob)
+			}
+			fetchOptions = {
+				method: "POST",
+				body: data,
+			}
+		} else {
+			fetchOptions = {
+				method: "POST",
+				headers: { "Content-Type": "application/json" },
+				body: jsonHandler.stringify(jsonBody),
+			}
+		}
+		const result = await fetch(endpoint, fetchOptions)
 		return jsonHandler.parse(await result.text())
 	},
 	// same with socket, usually the default WebSocket client is fine but the choice to change should be given
-	socket: (endpoint, { connected, response, ended }, jsonHandler, _blobs = {}) => {
+	socket: (endpoint, { connected, response, ended }, jsonHandler) => {
 		const ws = new WebSocket(endpoint)
 		ws.onopen = connected
 		ws.onclose = ended
 		ws.onmessage = (({ data: message }) => {
 			response(jsonHandler.parse(message as string))
 		})
-		const send = (msg: unknown) => {
+		const send = (msg: RpcCall|RpcCall[], blobs: BlobRecords) => {
 			ws.send(jsonHandler.stringify(msg))
+			const blobList = Object.entries(blobs)
+			if (blobList.length < 1) { return }
+			for (const [key, blob] of blobList) {
+				// NOTE: this will likely destroy the blob (find alternative way of sending ID, maybe sequential messages)
+				// const test = new Blob([`[${key}]`, blob], { type: blob.type })
+				// ws.send(test)
+				// NOTE: this may work since websocket messages are ordered but may mean extra processing server-side
+				ws.send(key)
+				ws.send(blob)
+			}
 		}
 		return { send }
 	},

@@ -73,7 +73,7 @@ export function createPrimClient<
 			// !SECTION
 			// SECTION Client-side module handling
 			let callbacksWereGiven = false
-			const blobs: BlobRecords = {} // TODO: send blobs to websocket/http clients
+			const blobs: BlobRecords = {}
 			const params = args.map((arg) => {
 				// TODO: handle binary object within array/object argument (not just direct arguments)
 				const binaryArg = arg instanceof Blob ? arg : false
@@ -114,7 +114,7 @@ export function createPrimClient<
 						}
 					})
 				})
-				sendMessage(rpc)
+				sendMessage(rpc, blobs)
 				return result
 			}
 			// TODO: consider extending Promise to include methods like `.refetch()` or `.stopListening()` (for callbacks)
@@ -133,7 +133,7 @@ export function createPrimClient<
 					}
 				})
 			})
-			httpEvent.emit("queue", { rpc, result, resolved: PromiseResolveStatus.Unhandled })
+			httpEvent.emit("queue", { rpc, result, blobs, resolved: PromiseResolveStatus.Unhandled })
 			return result
 			// !SECTION
 		},
@@ -144,7 +144,7 @@ export function createPrimClient<
 	// !SECTION
 	// SECTION: WebSocket event handling
 	const wsEvent = configured.internal.socketEvent ?? mitt<PrimWebSocketEvents>()
-	function createWebsocket(initialMessage: RpcCall) {
+	function createWebsocket(initialMessage: RpcCall, initialBlobs: BlobRecords) {
 		const response = (given: RpcAnswer) => {
 			wsEvent.emit("response", given)
 		}
@@ -155,14 +155,14 @@ export function createPrimClient<
 		const connected = () => {
 			// NOTE connect event should only happen once so initial message will be sent then
 			wsEvent.emit("connected")
-			send(initialMessage)
+			send(initialMessage, initialBlobs)
 		}
 		const wsEndpoint = configured.wsEndpoint || configured.endpoint.replace(/^http(s?)/g, "ws$1")
 		const { send } = configured.socket(wsEndpoint, { connected, response, ended }, configured.jsonHandler)
 		sendMessage = send
 	}
 	/** Sets up WebSocket if needed otherwise sends a message over websocket */
-	let sendMessage: (message: RpcCall) => void = createWebsocket
+	let sendMessage: (message: RpcCall, blobs: BlobRecords) => void = createWebsocket
 	// !SECTION
 	// SECTION: batched HTTP events
 	const queuedCalls: PrimHttpQueueItem[] = []
@@ -180,9 +180,11 @@ export function createPrimClient<
 			rpcList.forEach(r => { r.resolved = PromiseResolveStatus.Pending })
 			clearTimeout(timer); timer = undefined
 			const rpcCallList = rpcList.map(r => r.rpc)
+			const blobs: BlobRecords = {}
+			Object.assign(blobs, ...rpcList.map(r => r.blobs))
 			const { endpoint, jsonHandler } = configured
 			const rpcCallOrCalls = rpcCallList.length === 1 ? rpcCallList[0] : rpcCallList
-			configured.client(endpoint, rpcCallOrCalls, jsonHandler).then(answers => {
+			configured.client(endpoint, rpcCallOrCalls, jsonHandler, blobs).then(answers => {
 				// return either the single result or the batched results to caller
 				if (Array.isArray(answers)) {
 					answers.forEach(answer => { httpEvent.emit("response", answer) })
