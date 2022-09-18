@@ -46,7 +46,12 @@ export const fastifyPrimPlugin: FastifyPluginAsync<PrimFastifyPluginOptions> = a
 		url: prim.options.prefix,
 		handler: async (request, reply) => {
 			// TODO: read RPC for `_bin_` references and call `request.files()` only when needed
-			// let a = request.files()
+			if (multipartPlugin) {
+				const parts = request.files()
+				for await (const part of parts) {
+					console.log("Given a file:", part)
+				}
+			}
 			const { body, method, raw: { url } } = request
 			const response = await prim.server().call({ method, url, body })
 			void reply.status(response.status).headers(response.headers).send(response.body)
@@ -63,7 +68,14 @@ export const fastifyPrimPlugin: FastifyPluginAsync<PrimFastifyPluginOptions> = a
 	})
 }
 
-interface MethodFastifyOptions { fastify: FastifyInstance }
+interface MethodFastifyOptions {
+	fastify: FastifyInstance
+	multipartPlugin?: FastifyPluginCallback< // NOTE: interface for @fastify/multipart plugin
+	FastifyMultipartOptions|FastifyMultipartAttactFieldsToBodyOptions,
+	RawServerDefault,
+	FastifyTypeProviderDefault
+	>
+}
 /**
  * A Prim plugin used to register itself with Fastify. Use like so:
  * 

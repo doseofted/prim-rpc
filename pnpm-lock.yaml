@@ -67,6 +67,7 @@ importers:
       '@doseofted/prim-plugins': workspace:*
       '@doseofted/prim-rpc': workspace:*
       '@fastify/cors': ^8.1.0
+      '@fastify/multipart': ^7.1.2
       '@types/ws': ^8.5.3
       fastify: ^4.5.3
       nodemon: ^2.0.16
@@ -77,6 +78,7 @@ importers:
       '@doseofted/prim-plugins': link:../../libs/plugins
       '@doseofted/prim-rpc': link:../../libs/rpc
       '@fastify/cors': 8.1.0
+      '@fastify/multipart': 7.1.2
       fastify: 4.5.3
       superjson: 1.9.1
       ws: 8.8.1
@@ -654,7 +656,6 @@ packages:
     engines: {node: '>=10.17.0'}
     dependencies:
       text-decoding: 1.0.0
-    dev: true
 
   /@fastify/cors/8.1.0:
     resolution: {integrity: sha512-1OmjwyxQZ8GePxa5t1Rpsn2qS56+1ouKMvZufpgJWhXtoCeM/ffA+PsNW8pyslPr4W0E27gVoFqtvHwhXW1U2w==}
@@ -685,7 +686,6 @@ packages:
       hexoid: 1.0.0
       secure-json-parse: 2.5.0
       stream-wormhole: 1.1.0
-    dev: true
 
   /@fastify/static/6.5.0:
     resolution: {integrity: sha512-WEk6iqgejA6ivjkvbJ47A+uMci225z5lZwLXCXZS3ZYR/kYje1gzzarkKKGL6TWpBw6smkOzxA7dfEoY0347Nw==}
@@ -3210,7 +3210,6 @@ packages:
     resolution: {integrity: sha512-+uw1inIHVPQoaVuHzRyXd21icM+cnt4CzD5rW+NC1wjOUSTOs+Te7FOv7AhN7vS9x/oIyhLP5PR1H+phQAHu5Q==}
     dependencies:
       once: 1.4.0
-    dev: true
 
   /engine.io-client/6.2.2:
     resolution: {integrity: sha512-8ZQmx0LQGRTYkHuogVZuGSpDqYZtCM/nv8zQ68VZ+JkOpazJ7ICdsSpaO6iXwvaU30oFg5QJOJWj8zWqhbKjkQ==}
@@ -4293,7 +4292,6 @@ packages:
   /hexoid/1.0.0:
     resolution: {integrity: sha512-QFLV0taWQOZtvIRIAdBChesmogZrtuXvVWsFHZTk2SU+anspqZ2vMnoLg7IE1+Uk16N19APic1BuF8bC8c2m5g==}
     engines: {node: '>=8'}
-    dev: true
 
   /hosted-git-info/2.8.9:
     resolution: {integrity: sha512-mxIDAb9Lsm6DoOJ7xH+5+X4y1LU/4Hi50L9C5sIswK3JzULS4bwk1FvjdBgvYR4bzT4tuUQiC15FE2f5HbLvYw==}
@@ -6312,7 +6310,6 @@ packages:
   /stream-wormhole/1.1.0:
     resolution: {integrity: sha512-gHFfL3px0Kctd6Po0M8TzEvt3De/xu6cnRrjlfYNhwbhLPLwigI2t1nc6jrzNuaYg5C4YF78PPFuQPzRiqn9ew==}
     engines: {node: '>=4.0.0'}
-    dev: true
 
   /strict-uri-encode/2.0.0:
     resolution: {integrity: sha512-QwiXZgpRcKkhTj2Scnn++4PKtWsH0kpzZ62L2R6c/LUVYv7hVnZqcg2+sMuT6R7Jusu1vviK/MFsu6kNJfWlEQ==}
@@ -6614,7 +6611,6 @@ packages:
 
   /text-decoding/1.0.0:
     resolution: {integrity: sha512-/0TJD42KDnVwKmDK6jj3xP7E2MG7SHAOG4tyTgyUCRPdHwvkquYNLEQltmdMa3owq3TkddCVcTsoctJI8VQNKA==}
-    dev: true
 
   /text-table/0.2.0:
     resolution: {integrity: sha512-N+8UisAXDGk8PFXP4HAzVR9nbfmVJ3zYLAWiTIoqC5v5isinhr+r5uaO8+7r3BMfuNIufIsA7RdpVgacC2cSpw==}

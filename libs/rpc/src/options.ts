@@ -38,6 +38,8 @@ const createBaseClientOptions = (): PrimOptions => ({
 	// thrown from the server so set this to `true` (if presets are used, this may be set to `false` for
 	// "production" settings)
 	handleError: true,
+	// Assume that default JSON handler is used and handle blobs separately from JSON
+	handleBlobs: true,
 	// !SECTION
 	// SECTION Client and server
 	// these options should not be passed by a developer but are used internally
