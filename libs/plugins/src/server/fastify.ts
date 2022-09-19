@@ -1,6 +1,6 @@
 import type { PrimServerMethodHandler, PrimServerEvents } from "@doseofted/prim-rpc"
 import type { FastifyPluginAsync, FastifyInstance, FastifyError, FastifyPluginCallback, RawServerDefault, FastifyTypeProviderDefault } from "fastify"
-import type { FastifyMultipartAttactFieldsToBodyOptions, FastifyMultipartOptions } from "@fastify/multipart"
+import type { FastifyMultipartAttactFieldsToBodyOptions, FastifyMultipartOptions, MultipartFile, MultipartValue } from "@fastify/multipart"
 
 interface PrimFastifyPluginOptions {
 	prim: PrimServerEvents,
@@ -9,6 +9,7 @@ interface PrimFastifyPluginOptions {
 	RawServerDefault,
 	FastifyTypeProviderDefault
 	>
+	fileSizeLimitBytes?: number
 }
 /**
  * A Fastify plugin used to register Prim with the server. Use like so:
@@ -27,7 +28,7 @@ interface PrimFastifyPluginOptions {
  */
 // eslint-disable-next-line @typescript-eslint/require-await
 export const fastifyPrimPlugin: FastifyPluginAsync<PrimFastifyPluginOptions> = async (fastify, options) => {
-	const { prim, multipartPlugin } = options
+	const { prim, multipartPlugin, fileSizeLimitBytes: fileSize } = options
 	if (multipartPlugin) {
 		await fastify.register(multipartPlugin)
 	}
@@ -46,14 +47,28 @@ export const fastifyPrimPlugin: FastifyPluginAsync<PrimFastifyPluginOptions> = a
 		url: prim.options.prefix,
 		handler: async (request, reply) => {
 			// TODO: read RPC for `_bin_` references and call `request.files()` only when needed
+			const blobs: { [identifier: string]: unknown } = {}
+			let bodyForm: string
 			if (multipartPlugin) {
-				const parts = request.files()
+				// NOTE: @fastify/multipart doesn't seem to let me use `MultipartValue` type from `.parts()` so this is a workaround
+				// eslint-disable-next-line @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-explicit-any
+				const parts: AsyncIterableIterator<MultipartFile & MultipartValue<string>> = request.parts({ limits: { fileSize } }) as AsyncIterableIterator<any>
 				for await (const part of parts) {
-					console.log("Given a file:", part)
+					if (!part.file && part.fieldname === "rpc") {
+						bodyForm = part.value
+					} else if (part.file && part.fieldname.startsWith("_bin_")) {
+						// TODO: this needs to be streamed rather than placing the entire file in memory
+						blobs[part.fieldname] = await part.toBuffer()
+					}
 				}
+				// const files = await request.saveRequestFiles({ limits: { fileSize }})
+				// for (const file of files) {
+				// 	blobs[file.fieldname] = file.filepath
+				// }
 			}
-			const { body, method, raw: { url } } = request
-			const response = await prim.server().call({ method, url, body })
+			const { body: bodyReq, method, raw: { url } } = request
+			const body = bodyForm ?? bodyReq
+			const response = await prim.server().call({ method, url, body }, blobs)
 			void reply.status(response.status).headers(response.headers).send(response.body)
 		},
 	})
@@ -75,6 +90,7 @@ interface MethodFastifyOptions {
 	RawServerDefault,
 	FastifyTypeProviderDefault
 	>
+	fileSizeLimitBytes: number
 }
 /**
  * A Prim plugin used to register itself with Fastify. Use like so:

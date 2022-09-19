@@ -1,7 +1,7 @@
 import { get as getProperty } from "lodash-es"
 import mitt from "mitt"
 import queryString from "query-string"
-import { createPrimClient, AnyFunction } from "./client"
+import { createPrimClient, AnyFunction, BLOB_PREFIX } from "./client"
 import { createPrimOptions } from "./options"
 import {
 	CommonServerSimpleGivenOptions, CommonServerResponseOptions, PrimServerOptions, PrimWebSocketEvents,
@@ -65,6 +65,7 @@ function createServerActions (serverOptions: PrimServerOptions, instance?: Retur
 	}
 	const prepareRpc = async (
 		calls: RpcCall|RpcCall[],
+		blobs: Record<string, unknown> = {},
 		cbResults?: (a: RpcAnswer) => void,
 	): Promise<RpcAnswer|RpcAnswer[]> => {
 		// NOTE: new Prim client should be created on each request so callback results are not shared
@@ -76,7 +77,32 @@ function createServerActions (serverOptions: PrimServerOptions, instance?: Retur
 			try {
 				const methodExpanded = method.split("/")
 				const target = getProperty(client, methodExpanded) as AnyFunction
-				const args = Array.isArray(params) ? params : [params]
+				let args = Array.isArray(params) ? params : [params]
+				if (Object.entries(blobs).length > 0) {
+					args = args.map(arg => {
+						if (typeof arg === "string" && arg.startsWith(BLOB_PREFIX)) {
+							return blobs[arg] ?? arg
+						}
+						if (typeof arg === "object") {
+							for (const [key, val] of Object.entries(arg as unknown)) {
+								if (typeof val === "string" && val.startsWith(BLOB_PREFIX)) {
+									// eslint-disable-next-line @typescript-eslint/no-unsafe-member-access
+									arg[key] = blobs[val] ?? val
+								}
+							}
+							return arg as unknown
+						}
+						if (Array.isArray(arg)) {
+							return arg.map(given => {
+								if (typeof given === "string" && given.startsWith(BLOB_PREFIX)) {
+									return blobs[given] ?? given
+								}
+								return given as unknown
+							})
+						}
+						return arg as unknown
+					})
+				}
 				if (cbResults) { event.on("response", cbResults) }
 				// TODO: if `methodExpanded.at(-2)` is a function, call that instead of `methodExpanded.at(-1)`
 				// this is to prevent someone from calling function properties like `call`, `apply`, and `bind`
@@ -119,9 +145,12 @@ function createServerActions (serverOptions: PrimServerOptions, instance?: Retur
 function createServerEvents (serverOptions: PrimServerOptions): PrimServerEvents {
 	const server = () => {
 		const { prepareCall, prepareRpc, prepareSend } = createServerActions(serverOptions)
-		const call = async (given: CommonServerSimpleGivenOptions): Promise<CommonServerResponseOptions> => {
+		const call = async (
+			given: CommonServerSimpleGivenOptions,
+			blobs: Record<string, unknown> = {},
+		): Promise<CommonServerResponseOptions> => {
 			const preparedParams = prepareCall(given)
-			const result = await prepareRpc(preparedParams)
+			const result = await prepareRpc(preparedParams, blobs)
 			const preparedResult = prepareSend(result)
 			return preparedResult
 		}

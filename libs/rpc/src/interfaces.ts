@@ -51,7 +51,6 @@ interface PrimWebSocketFunctionEvents {
 
 // SECTION Client options
 export interface JsonHandler {
-	// eslint-disable-next-line @typescript-eslint/no-explicit-any
 	stringify: (json: unknown) => string
 	// eslint-disable-next-line @typescript-eslint/no-explicit-any
 	parse: <T = any>(string: string) => T
@@ -61,6 +60,12 @@ export interface JsonHandler {
 export type BlobRecords = Record<string, Blob>
 export type PrimClientFunction<J = JsonHandler> = (endpoint: string, jsonBody: RpcCall|RpcCall[], jsonHandler: J, blobs?: BlobRecords) => Promise<RpcAnswer|RpcAnswer[]>
 export type PrimSocketFunction<J = JsonHandler> = (endpoint: string, events: PrimWebSocketFunctionEvents, jsonHandler: J) => ({
+	/**
+	 * Send given RPC call over the WebSocket
+	 * 
+	 * @param message The RPC call to send (use JSON handler provided to stringify before sending over WebSocket)
+	 * @param blobs If given RPC has binary data it will be referenced here by its string identifier in the RPC
+	 */
 	send: (message: RpcCall, blobs?: BlobRecords) => void
 })
 
@@ -141,7 +146,6 @@ export interface PrimOptions<M extends object = object, J extends JsonHandler = 
 	 * @param endpoint The configured `wsEndpoint` on created instance
 	 * @param events: An object containing several callbacks that should be called when event happens on websocket
 	 * @param jsonHandler Provided handler for JSON, with `.stringify()` and `.parse()` methods
-	 * @param blobs If given RPC has binary data it will be referenced here by its string identifier in the RPC
 	 */
 	socket?: PrimSocketFunction<J>
 	/**
@@ -274,7 +278,7 @@ export interface PrimServerActionsBase {
 	 * Step 2: Using the result of `.prepareCall()`, use the RPC to get a result from Prim.
 	 * See `.prepareSend()` for next step.
 	 */
-	prepareRpc: (given: RpcCall|RpcCall[]) => Promise<RpcAnswer|RpcAnswer[]>
+	prepareRpc: (given: RpcCall|RpcCall[], blobs?: Record<string, unknown>) => Promise<RpcAnswer|RpcAnswer[]>
 	/**
 	 * Step 3: Using the result of `.rpc()`, prepare the result to be sent with the server framework.
 	 */
@@ -291,7 +295,7 @@ export interface PrimServerActionsExtended extends PrimServerActionsBase {
 	 * 
 	 * This calls, in order, `.prepareCall()`, `.rpc()`, and `.prepareSend()`
 	 */
-	call: (given: CommonServerSimpleGivenOptions) => Promise<CommonServerResponseOptions>
+	call: (given: CommonServerSimpleGivenOptions, blobs?: Record<string, unknown>) => Promise<CommonServerResponseOptions>
 }
 
 export interface PrimServerEvents {

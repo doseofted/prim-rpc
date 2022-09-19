@@ -30,8 +30,8 @@ type PromisifiedModule<ModuleGiven extends object> = {
 			? PromisifiedModule<ModuleGiven[Key]>
 			: ModuleGiven[Key]
 }
-/** Callback prefix */ const CB_PREFIX = "_cb_"
-/** Binary prefix (Blob/File) */ const BLOB_PREFIX = "_bin_"
+/** Callback prefix */ export const CB_PREFIX = "_cb_"
+/** Binary prefix (Blob/File) */ export const BLOB_PREFIX = "_bin_"
 
 /**
  * Prim-RPC can be used to write plain functions on the server and then call them easily from the client.
