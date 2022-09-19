@@ -1,7 +1,7 @@
 import { get as getProperty } from "lodash-es"
 import mitt from "mitt"
 import queryString from "query-string"
-import { createPrimClient, AnyFunction, BLOB_PREFIX } from "./client"
+import { createPrimClient, AnyFunction } from "./client"
 import { createPrimOptions } from "./options"
 import {
 	CommonServerSimpleGivenOptions, CommonServerResponseOptions, PrimServerOptions, PrimWebSocketEvents,
@@ -11,6 +11,7 @@ import {
 	PrimServerSocketAnswerRpc,
 } from "./interfaces"
 import { serializeError } from "serialize-error"
+import { mergeBlobLikeWithGiven } from "./blobs"
 
 /**
  * 
@@ -77,32 +78,10 @@ function createServerActions (serverOptions: PrimServerOptions, instance?: Retur
 			try {
 				const methodExpanded = method.split("/")
 				const target = getProperty(client, methodExpanded) as AnyFunction
-				let args = Array.isArray(params) ? params : [params]
-				if (Object.entries(blobs).length > 0) {
-					args = args.map(arg => {
-						if (typeof arg === "string" && arg.startsWith(BLOB_PREFIX)) {
-							return blobs[arg] ?? arg
-						}
-						if (typeof arg === "object") {
-							for (const [key, val] of Object.entries(arg as unknown)) {
-								if (typeof val === "string" && val.startsWith(BLOB_PREFIX)) {
-									// eslint-disable-next-line @typescript-eslint/no-unsafe-member-access
-									arg[key] = blobs[val] ?? val
-								}
-							}
-							return arg as unknown
-						}
-						if (Array.isArray(arg)) {
-							return arg.map(given => {
-								if (typeof given === "string" && given.startsWith(BLOB_PREFIX)) {
-									return blobs[given] ?? given
-								}
-								return given as unknown
-							})
-						}
-						return arg as unknown
-					})
-				}
+				const argsArray = Array.isArray(params) ? params : [params]
+				const args = Object.entries(blobs).length > 0
+					? argsArray.map(arg => mergeBlobLikeWithGiven(arg, blobs))
+					: argsArray
 				if (cbResults) { event.on("response", cbResults) }
 				// TODO: if `methodExpanded.at(-2)` is a function, call that instead of `methodExpanded.at(-1)`
 				// this is to prevent someone from calling function properties like `call`, `apply`, and `bind`

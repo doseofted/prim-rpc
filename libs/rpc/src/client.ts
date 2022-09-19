@@ -20,6 +20,7 @@ import {
 } from "./interfaces"
 import { createPrimOptions } from "./options"
 import { deserializeError } from "serialize-error"
+import { handlePossibleBlobs } from "./blobs"
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 export type AnyFunction = (...args: any[]) => any
@@ -75,36 +76,12 @@ export function createPrimClient<
 			let callbacksWereGiven = false
 			const blobs: BlobRecords = {}
 			const params = args.map((arg) => {
-				// TODO: handle binary object within array/object argument (not just direct arguments)
 				if (configured.handleBlobs) {
-					const binaryArg = arg instanceof Blob ? arg : false
-					if (binaryArg) {
-						const binaryIdentifier = [BLOB_PREFIX, nanoid()].join("")
-						blobs[binaryIdentifier] = binaryArg
-						return binaryIdentifier
+					const [replacedArg, newBlobs] = handlePossibleBlobs(arg)
+					for (const [key, val] of Object.entries(newBlobs)) {
+						blobs[key] = val
 					}
-					if (typeof arg === "object") {
-						for (const [key, val] of Object.entries(arg)) {
-							if (val instanceof Blob) {
-								const binaryIdentifier = [BLOB_PREFIX, nanoid()].join("")
-								arg[key] = binaryIdentifier
-								blobs[binaryIdentifier] = val
-							}
-						}
-						if (Object.keys(blobs).length > 0) {
-							return arg
-						}
-					}
-					if (Array.isArray(arg) && arg.filter(a => a instanceof Blob).length > 0) {
-						return arg.map(val => {
-							if (val instanceof Blob) {
-								const binaryIdentifier = [BLOB_PREFIX, nanoid()].join("")
-								blobs[binaryIdentifier] = val
-								return binaryIdentifier
-							}
-							return val as unknown
-						})
-					}
+					return replacedArg
 				}
 				const callbackArg = typeof arg === "function" ? arg : false
 				if (!callbackArg) {
