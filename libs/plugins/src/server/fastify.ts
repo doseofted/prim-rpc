@@ -2,14 +2,17 @@ import type { PrimServerMethodHandler, PrimServerEvents } from "@doseofted/prim-
 import type { FastifyPluginAsync, FastifyInstance, FastifyError, FastifyPluginCallback, RawServerDefault, FastifyTypeProviderDefault } from "fastify"
 import type { FastifyMultipartAttactFieldsToBodyOptions, FastifyMultipartOptions, MultipartFile, MultipartValue } from "@fastify/multipart"
 
-interface PrimFastifyPluginOptions {
-	prim: PrimServerEvents,
+interface SharedFastifyOptions {
 	multipartPlugin?: FastifyPluginCallback< // NOTE: interface for @fastify/multipart plugin
 	FastifyMultipartOptions|FastifyMultipartAttactFieldsToBodyOptions,
 	RawServerDefault,
 	FastifyTypeProviderDefault
 	>
 	fileSizeLimitBytes?: number
+}
+
+interface PrimFastifyPluginOptions extends SharedFastifyOptions {
+	prim: PrimServerEvents
 }
 /**
  * A Fastify plugin used to register Prim with the server. Use like so:
@@ -83,14 +86,8 @@ export const fastifyPrimPlugin: FastifyPluginAsync<PrimFastifyPluginOptions> = a
 	})
 }
 
-interface MethodFastifyOptions {
+interface MethodFastifyOptions extends SharedFastifyOptions {
 	fastify: FastifyInstance
-	multipartPlugin?: FastifyPluginCallback< // NOTE: interface for @fastify/multipart plugin
-	FastifyMultipartOptions|FastifyMultipartAttactFieldsToBodyOptions,
-	RawServerDefault,
-	FastifyTypeProviderDefault
-	>
-	fileSizeLimitBytes: number
 }
 /**
  * A Prim plugin used to register itself with Fastify. Use like so:
