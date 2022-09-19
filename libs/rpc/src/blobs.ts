@@ -49,6 +49,7 @@ export function handlePossibleBlobs(given: unknown): [given: unknown, blobs: Rec
 		})
 		return [replaced, blobs]
 	}
+	return [given, blobs]
 }
 
 /**

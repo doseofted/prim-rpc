@@ -78,10 +78,13 @@ export function createPrimClient<
 			const params = args.map((arg) => {
 				if (configured.handleBlobs) {
 					const [replacedArg, newBlobs] = handlePossibleBlobs(arg)
-					for (const [key, val] of Object.entries(newBlobs)) {
+					const blobEntries = Object.entries(newBlobs)
+					for (const [key, val] of blobEntries) {
 						blobs[key] = val
 					}
-					return replacedArg
+					if (blobEntries.length > 0) {
+						return replacedArg
+					}
 				}
 				const callbackArg = typeof arg === "function" ? arg : false
 				if (!callbackArg) {
