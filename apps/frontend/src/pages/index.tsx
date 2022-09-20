@@ -3,15 +3,29 @@ import { Component, splitProps } from "solid-js"
 import backend from "../client"
 
 /** Helper to get entries from given the form as a record */
-function formEntries<Expected>(form: HTMLFormElement) {
-	const formData = new FormData(form)
-	const data: Record<string, FormDataEntryValue> = {}
-	formData.forEach((val, key) => data[key] = val)
+function formEntries<Expected>(maybeForm: unknown): Expected | false {
+	const givenForm = (form: unknown): form is HTMLFormElement =>
+		typeof HTMLFormElement === "function" && maybeForm instanceof HTMLFormElement
+	if (!givenForm(maybeForm)) { return false }
+	const formData = new FormData(maybeForm)
+	const data: Record<string, FormDataEntryValue | FormDataEntryValue[]> = {}
+	formData.forEach((val, key) => {
+		if (data[key]) {
+			const previous = data[key]
+			if (Array.isArray(previous)) {
+				previous.push(val)
+			} else {
+				data[key] = [previous, val]
+			}
+		} else {
+			data[key] = val
+		}
+	})
 	return data as unknown as Expected
 }
 
 /** A simple form item */
-const FormItem: Component<{ id: string, type: string, label: string, autocomplete?: string, name: string }> = (props) => {
+const FormItem: Component<{ id: string, type: string, label: string, autocomplete?: string, name: string, multiple?: boolean }> = (props) => {
 	// const [model] = createSignal("")
 	const [given, misc] = splitProps(props, ["id", "label", "type"])
 	return (
@@ -33,8 +47,10 @@ const FormItem: Component<{ id: string, type: string, label: string, autocomplet
 async function formSubmit(event: Event & { currentTarget: HTMLFormElement }) {
 	event.preventDefault()
 	const entries = formEntries<ClientImaginaryProfile>(event.currentTarget)
-	const profile = await backend.createImaginaryProfile(entries)
-	console.log("Server response:", profile)
+	if (entries) {
+		const profile = await backend.createImaginaryProfile(entries)
+		console.log("Server response:", profile)
+	}
 }
 
 const App: Component = () => {

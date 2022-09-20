@@ -8,7 +8,8 @@ interface SharedFastifyOptions {
 	RawServerDefault,
 	FastifyTypeProviderDefault
 	>
-	fileSizeLimitBytes?: number
+	fileSizeLimitBytes?: number,
+	// handleFile: (part: MultipartFile) => void|Promise<void>
 }
 
 interface PrimFastifyPluginOptions extends SharedFastifyOptions {
@@ -33,7 +34,10 @@ interface PrimFastifyPluginOptions extends SharedFastifyOptions {
 export const fastifyPrimPlugin: FastifyPluginAsync<PrimFastifyPluginOptions> = async (fastify, options) => {
 	const { prim, multipartPlugin, fileSizeLimitBytes: fileSize } = options
 	if (multipartPlugin) {
-		await fastify.register(multipartPlugin)
+		await fastify.register(multipartPlugin, /* {
+			attachFieldsToBody: true,
+			onFile,
+		} */)
 	}
 	// LINK https://github.com/fastify/help/issues/158#issuecomment-1086190754
 	fastify.addContentTypeParser("application/json", { parseAs: "string" }, (_req, body, done) => {
@@ -54,18 +58,25 @@ export const fastifyPrimPlugin: FastifyPluginAsync<PrimFastifyPluginOptions> = a
 			let bodyForm: string
 			if (multipartPlugin) {
 				// NOTE: @fastify/multipart doesn't seem to let me use `MultipartValue` type from `.parts()` so this is a workaround
-				// eslint-disable-next-line @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-explicit-any
-				const parts: AsyncIterableIterator<MultipartFile & MultipartValue<string>> = request.parts({ limits: { fileSize } }) as AsyncIterableIterator<any>
+				// eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
+				const parts: AsyncIterableIterator<MultipartFile & MultipartValue<string>> = request.parts({
+					limits: { fileSize },
+				// eslint-disable-next-line @typescript-eslint/no-explicit-any
+				}) as AsyncIterableIterator<any>
 				for await (const part of parts) {
 					if (!part.file && part.fieldname === "rpc") {
 						bodyForm = part.value
 					} else if (part.file && part.fieldname.startsWith("_bin_")) {
 						// TODO: this needs to be streamed rather than placing the entire file in memory
 						blobs[part.fieldname] = await part.toBuffer()
+						// const stream = new Writable()
+						// pipeline(part.file, stream)
+						// blobs[part.fieldname] = stream
 					}
 				}
 				// const files = await request.saveRequestFiles({ limits: { fileSize }})
 				// for (const file of files) {
+				// 	console.log(file.fields)
 				// 	blobs[file.fieldname] = file.filepath
 				// }
 			}

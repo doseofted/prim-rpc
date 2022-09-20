@@ -2,6 +2,30 @@ import { nanoid } from "nanoid"
 import { BLOB_PREFIX } from "./client"
 
 /**
+ * Helper to get entries from given the form as a record
+ * (which can then be used to get Blobs)
+ * 
+ * NOTE: this hasn't been tested in Prim RPC yet
+ */
+function handlePossibleForm(form: HTMLFormElement) {
+	const formData = new FormData(form)
+	const data: Record<string, FormDataEntryValue|FormDataEntryValue[]> = {}
+	formData.forEach((val, key) => {
+		if (data[key]) {
+			const previous = data[key]
+			if (Array.isArray(previous)) {
+				previous.push(val)
+			} else {
+				data[key] = [previous, val]
+			}
+		} else {
+			data[key] = val
+		}
+	})
+	return data
+}
+
+/**
  * Given a Blob, return an identifier. If given an object or an array,
  * search those structures for a Blob and return the object with Blobs replaced
  * by an identifier.
@@ -15,6 +39,13 @@ import { BLOB_PREFIX } from "./client"
 export function handlePossibleBlobs(given: unknown): [given: unknown, blobs: Record<string, Blob>] {
 	const blobs: Record<string, Blob> = {}
 	const binaryGiven = given instanceof Blob ? given : false
+	// FIXME: consider either removing direct HTMLFormElement support or further testing to ensure this works
+	const givenForm = (maybeForm: unknown): maybeForm is HTMLFormElement =>
+		typeof HTMLFormElement === "function" && maybeForm instanceof HTMLFormElement
+	if (givenForm(given)) { // form was given that possibly contains blobs
+		const newGiven = handlePossibleForm(given)
+		return handlePossibleBlobs(newGiven)
+	}
 	if (binaryGiven) { // blob was given directly
 		const binaryIdentifier = [BLOB_PREFIX, nanoid()].join("")
 		blobs[binaryIdentifier] = binaryGiven
