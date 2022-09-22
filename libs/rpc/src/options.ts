@@ -33,6 +33,10 @@ const createBaseClientOptions = (): PrimOptions => ({
 		}
 		return { send }
 	},
+	// a developer may specify an allow list if there's not direct access to the module
+	allowList: {},
+	// by default, only functions provided can be called (not their methods, if any are defined)
+	methodsOnMethods: [],
 	// Stringified Errors with the default JSON handler are empty objects
 	// Empty errors could be a source of confusion if an end-user doesn't receive an error on the client when one is
 	// thrown from the server so set this to `true` (if presets are used, this may be set to `false` for

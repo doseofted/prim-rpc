@@ -1,4 +1,5 @@
 import type { Emitter } from "mitt"
+import type { Schema } from "type-fest"
 
 // SECTION RPC call and result structure
 interface RpcBase { id?: string|number }
@@ -148,6 +149,26 @@ export interface PrimOptions<M extends object = object, J extends JsonHandler = 
 	 * @param jsonHandler Provided handler for JSON, with `.stringify()` and `.parse()` methods
 	 */
 	socket?: PrimSocketFunction<J>
+	/**
+	 * By default, methods in a module used with Prim+RPC cannot be called via RPC. Instead, methods must be explicitly be
+	 * allowed by either specifying a flag on the function or adding that function to an "allow-list" (this option).
+	 *
+	 * Specify an object that follows the structure of the provided module where values are flags specifying whether
+	 * to allow RPC to that method. For instance, if a module exports a single function `sayHello()`, the allow-list
+	 * would look like `{ sayHello: true }`.
+	 * 
+	 * If given function specifies a `.rpc` boolean property with a value of `true` then those functions do not need
+	 * to be added to the allow-list.
+	 */
+	allowList?: Schema<M, boolean>
+	/**
+	 * In JavaScript, functions are objects. Those objects can have methods. This means that functions can have methods.
+	 * 
+	 * By default, methods on functions are not allowed as RPC. You may optionally allow some methods by specifying
+	 * a list of those names in this option. For instance, if this option is set to `["docs"]` then that means you
+	 * could call `sayHello.docs()` where `sayHello` is another function.
+	 */
+	methodsOnMethods?: string[]
 	/**
 	 * Whether Errors should be serialized before sending from the server and deserialized when received on the client.
 	 * The default is `true` unless a custom JSON handler is set. You may set this option explicitly to always use your
