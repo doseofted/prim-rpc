@@ -5,6 +5,7 @@
 		// CommonJS resolution (Parcel will still create require/module bundles)
 		// LINK https://www.typescriptlang.org/tsconfig#moduleResolution
 		"moduleResolution": "Node",
+		"module": "Node16",
 		// suggested by TS-Jest CLI when not set to `true` in tsconfig.json
 		"esModuleInterop": true,
 		// A config suggestion from Parcel:

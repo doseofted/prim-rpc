@@ -1,7 +1,20 @@
 import type { PrimServerMethodHandler, PrimServerEvents } from "@doseofted/prim-rpc"
-import type { FastifyPluginAsync, FastifyInstance, FastifyError } from "fastify"
+import type { FastifyPluginAsync, FastifyInstance, FastifyError, FastifyPluginCallback, RawServerDefault, FastifyTypeProviderDefault } from "fastify"
+import type { FastifyMultipartAttactFieldsToBodyOptions, FastifyMultipartOptions, MultipartFile, MultipartValue } from "@fastify/multipart"
 
-interface PrimFastifyPluginOptions { prim: PrimServerEvents }
+interface SharedFastifyOptions {
+	multipartPlugin?: FastifyPluginCallback< // NOTE: interface for @fastify/multipart plugin
+	FastifyMultipartOptions|FastifyMultipartAttactFieldsToBodyOptions,
+	RawServerDefault,
+	FastifyTypeProviderDefault
+	>
+	fileSizeLimitBytes?: number,
+	// handleFile: (part: MultipartFile) => void|Promise<void>
+}
+
+interface PrimFastifyPluginOptions extends SharedFastifyOptions {
+	prim: PrimServerEvents
+}
 /**
  * A Fastify plugin used to register Prim with the server. Use like so:
  * 
@@ -19,7 +32,13 @@ interface PrimFastifyPluginOptions { prim: PrimServerEvents }
  */
 // eslint-disable-next-line @typescript-eslint/require-await
 export const fastifyPrimPlugin: FastifyPluginAsync<PrimFastifyPluginOptions> = async (fastify, options) => {
-	const { prim } = options
+	const { prim, multipartPlugin, fileSizeLimitBytes: fileSize } = options
+	if (multipartPlugin) {
+		await fastify.register(multipartPlugin, /* {
+			attachFieldsToBody: true,
+			onFile,
+		} */)
+	}
 	// LINK https://github.com/fastify/help/issues/158#issuecomment-1086190754
 	fastify.addContentTypeParser("application/json", { parseAs: "string" }, (_req, body, done) => {
 		try {
@@ -34,8 +53,36 @@ export const fastifyPrimPlugin: FastifyPluginAsync<PrimFastifyPluginOptions> = a
 		method: ["GET", "POST"],
 		url: prim.options.prefix,
 		handler: async (request, reply) => {
-			const { body, method, raw: { url } } = request
-			const response = await prim.server().call({ method, url, body })
+			// TODO: read RPC for `_bin_` references and call `request.files()` only when needed
+			const blobs: { [identifier: string]: unknown } = {}
+			let bodyForm: string
+			if (multipartPlugin) {
+				// NOTE: @fastify/multipart doesn't seem to let me use `MultipartValue` type from `.parts()` so this is a workaround
+				// eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
+				const parts: AsyncIterableIterator<MultipartFile & MultipartValue<string>> = request.parts({
+					limits: { fileSize },
+				// eslint-disable-next-line @typescript-eslint/no-explicit-any
+				}) as AsyncIterableIterator<any>
+				for await (const part of parts) {
+					if (!part.file && part.fieldname === "rpc") {
+						bodyForm = part.value
+					} else if (part.file && part.fieldname.startsWith("_bin_")) {
+						// TODO: this needs to be streamed rather than placing the entire file in memory
+						blobs[part.fieldname] = await part.toBuffer()
+						// const stream = new Writable()
+						// pipeline(part.file, stream)
+						// blobs[part.fieldname] = stream
+					}
+				}
+				// const files = await request.saveRequestFiles({ limits: { fileSize }})
+				// for (const file of files) {
+				// 	console.log(file.fields)
+				// 	blobs[file.fieldname] = file.filepath
+				// }
+			}
+			const { body: bodyReq, method, raw: { url } } = request
+			const body = bodyForm ?? bodyReq
+			const response = await prim.server().call({ method, url, body }, blobs)
 			void reply.status(response.status).headers(response.headers).send(response.body)
 		},
 	})
@@ -50,7 +97,9 @@ export const fastifyPrimPlugin: FastifyPluginAsync<PrimFastifyPluginOptions> = a
 	})
 }
 
-interface MethodFastifyOptions { fastify: FastifyInstance }
+interface MethodFastifyOptions extends SharedFastifyOptions {
+	fastify: FastifyInstance
+}
 /**
  * A Prim plugin used to register itself with Fastify. Use like so:
  * 
@@ -70,6 +119,6 @@ interface MethodFastifyOptions { fastify: FastifyInstance }
 export const primMethodFastify = (options: MethodFastifyOptions): PrimServerMethodHandler => {
 	const { fastify } = options
 	return prim => {
-		void fastify.register(fastifyPrimPlugin, { prim })
+		void fastify.register(fastifyPrimPlugin, {...options, prim })
 	}
 }

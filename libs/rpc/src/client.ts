@@ -14,9 +14,13 @@ import { nanoid } from "nanoid"
 import mitt from "mitt"
 import { get as getProperty, remove as removeFromArray } from "lodash-es"
 import type { Asyncify } from "type-fest"
-import { RpcCall, PrimOptions, RpcAnswer, PrimWebSocketEvents, PrimHttpEvents, PromiseResolveStatus, PrimHttpQueueItem } from "./interfaces"
+import {
+	RpcCall, PrimOptions, RpcAnswer, PrimWebSocketEvents, PrimHttpEvents,
+	PromiseResolveStatus, PrimHttpQueueItem, BlobRecords,
+} from "./interfaces"
 import { createPrimOptions } from "./options"
 import { deserializeError } from "serialize-error"
+import { handlePossibleBlobs } from "./blobs"
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 export type AnyFunction = (...args: any[]) => any
@@ -27,7 +31,8 @@ type PromisifiedModule<ModuleGiven extends object> = {
 			? PromisifiedModule<ModuleGiven[Key]>
 			: ModuleGiven[Key]
 }
-/** Callback prefix */ const CB_PREFIX = "_cb_"
+/** Callback prefix */ export const CB_PREFIX = "_cb_"
+/** Binary prefix (Blob/File) */ export const BLOB_PREFIX = "_bin_"
 
 /**
  * Prim-RPC can be used to write plain functions on the server and then call them easily from the client.
@@ -69,9 +74,23 @@ export function createPrimClient<
 			// !SECTION
 			// SECTION Client-side module handling
 			let callbacksWereGiven = false
+			const blobs: BlobRecords = {}
 			const params = args.map((arg) => {
+				if (configured.handleBlobs) {
+					const [replacedArg, newBlobs] = handlePossibleBlobs(arg)
+					const blobEntries = Object.entries(newBlobs)
+					for (const [key, val] of blobEntries) {
+						blobs[key] = val
+					}
+					if (blobEntries.length > 0) {
+						return replacedArg
+					}
+				}
 				const callbackArg = typeof arg === "function" ? arg : false
-				if (callbackArg) { callbacksWereGiven = true } else { return arg }
+				if (!callbackArg) {
+					return arg
+				}
+				callbacksWereGiven = true
 				const callbackReferenceIdentifier = [CB_PREFIX, nanoid()].join("")
 				const handleRpcCallbackResult = (msg: RpcAnswer) => {
 					if (msg.id !== callbackReferenceIdentifier) { return }
@@ -99,7 +118,7 @@ export function createPrimClient<
 						}
 					})
 				})
-				sendMessage(rpc)
+				sendMessage(rpc, blobs)
 				return result
 			}
 			// TODO: consider extending Promise to include methods like `.refetch()` or `.stopListening()` (for callbacks)
@@ -118,7 +137,7 @@ export function createPrimClient<
 					}
 				})
 			})
-			httpEvent.emit("queue", { rpc, result, resolved: PromiseResolveStatus.Unhandled })
+			httpEvent.emit("queue", { rpc, result, blobs, resolved: PromiseResolveStatus.Unhandled })
 			return result
 			// !SECTION
 		},
@@ -129,7 +148,7 @@ export function createPrimClient<
 	// !SECTION
 	// SECTION: WebSocket event handling
 	const wsEvent = configured.internal.socketEvent ?? mitt<PrimWebSocketEvents>()
-	function createWebsocket(initialMessage: RpcCall) {
+	function createWebsocket(initialMessage: RpcCall, initialBlobs: BlobRecords) {
 		const response = (given: RpcAnswer) => {
 			wsEvent.emit("response", given)
 		}
@@ -140,14 +159,14 @@ export function createPrimClient<
 		const connected = () => {
 			// NOTE connect event should only happen once so initial message will be sent then
 			wsEvent.emit("connected")
-			send(initialMessage)
+			send(initialMessage, initialBlobs)
 		}
 		const wsEndpoint = configured.wsEndpoint || configured.endpoint.replace(/^http(s?)/g, "ws$1")
 		const { send } = configured.socket(wsEndpoint, { connected, response, ended }, configured.jsonHandler)
 		sendMessage = send
 	}
 	/** Sets up WebSocket if needed otherwise sends a message over websocket */
-	let sendMessage: (message: RpcCall) => void = createWebsocket
+	let sendMessage: (message: RpcCall, blobs: BlobRecords) => void = createWebsocket
 	// !SECTION
 	// SECTION: batched HTTP events
 	const queuedCalls: PrimHttpQueueItem[] = []
@@ -165,9 +184,11 @@ export function createPrimClient<
 			rpcList.forEach(r => { r.resolved = PromiseResolveStatus.Pending })
 			clearTimeout(timer); timer = undefined
 			const rpcCallList = rpcList.map(r => r.rpc)
+			const blobs: BlobRecords = {}
+			Object.assign(blobs, ...rpcList.map(r => r.blobs))
 			const { endpoint, jsonHandler } = configured
 			const rpcCallOrCalls = rpcCallList.length === 1 ? rpcCallList[0] : rpcCallList
-			configured.client(endpoint, rpcCallOrCalls, jsonHandler).then(answers => {
+			configured.client(endpoint, rpcCallOrCalls, jsonHandler, blobs).then(answers => {
 				// return either the single result or the batched results to caller
 				if (Array.isArray(answers)) {
 					answers.forEach(answer => { httpEvent.emit("response", answer) })

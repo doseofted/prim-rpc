@@ -11,6 +11,7 @@ import {
 	PrimServerSocketAnswerRpc,
 } from "./interfaces"
 import { serializeError } from "serialize-error"
+import { mergeBlobLikeWithGiven } from "./blobs"
 
 /**
  * 
@@ -65,6 +66,7 @@ function createServerActions (serverOptions: PrimServerOptions, instance?: Retur
 	}
 	const prepareRpc = async (
 		calls: RpcCall|RpcCall[],
+		blobs: Record<string, unknown> = {},
 		cbResults?: (a: RpcAnswer) => void,
 	): Promise<RpcAnswer|RpcAnswer[]> => {
 		// NOTE: new Prim client should be created on each request so callback results are not shared
@@ -76,7 +78,10 @@ function createServerActions (serverOptions: PrimServerOptions, instance?: Retur
 			try {
 				const methodExpanded = method.split("/")
 				const target = getProperty(client, methodExpanded) as AnyFunction
-				const args = Array.isArray(params) ? params : [params]
+				const argsArray = Array.isArray(params) ? params : [params]
+				const args = Object.entries(blobs).length > 0
+					? argsArray.map(arg => mergeBlobLikeWithGiven(arg, blobs))
+					: argsArray
 				if (cbResults) { event.on("response", cbResults) }
 				// TODO: if `methodExpanded.at(-2)` is a function, call that instead of `methodExpanded.at(-1)`
 				// this is to prevent someone from calling function properties like `call`, `apply`, and `bind`
@@ -119,9 +124,12 @@ function createServerActions (serverOptions: PrimServerOptions, instance?: Retur
 function createServerEvents (serverOptions: PrimServerOptions): PrimServerEvents {
 	const server = () => {
 		const { prepareCall, prepareRpc, prepareSend } = createServerActions(serverOptions)
-		const call = async (given: CommonServerSimpleGivenOptions): Promise<CommonServerResponseOptions> => {
+		const call = async (
+			given: CommonServerSimpleGivenOptions,
+			blobs: Record<string, unknown> = {},
+		): Promise<CommonServerResponseOptions> => {
 			const preparedParams = prepareCall(given)
-			const result = await prepareRpc(preparedParams)
+			const result = await prepareRpc(preparedParams, blobs)
 			const preparedResult = prepareSend(result)
 			return preparedResult
 		}

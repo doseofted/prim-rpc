@@ -1,6 +1,6 @@
 import { describe, expect, test } from "vitest"
 import { render } from "solid-testing-library"
-import Index from "./index"
+import Index from "./testing"
 
 describe("<Index />", () => {
 	test("it will render message", () => {

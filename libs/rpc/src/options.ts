@@ -1,4 +1,4 @@
-import { PrimOptions, PrimServerOptions } from "./interfaces"
+import { PrimOptions, PrimServerOptions, RpcCall } from "./interfaces"
 import { defu } from "defu"
 
 // TODO: consider separating server-specific options from client options so I can reduce the number
@@ -17,24 +17,19 @@ const createBaseClientOptions = (): PrimOptions => ({
 	// NOTE: JSON properties are not enumerable so create an object with enumerable properties referencing JSON methods
 	jsonHandler: { stringify: JSON.stringify, parse: JSON.parse },
 	// `client()` is intended to be overridden so as not to force any one HTTP framework but default is fine for most cases
-	client: async (endpoint, jsonBody, jsonHandler) => {
-		const result = await fetch(endpoint, {
-			method: "POST",
-			headers: { "Content-Type": "application/json" },
-			body: jsonHandler.stringify(jsonBody),
-		})
-		return jsonHandler.parse(await result.text())
+	// eslint-disable-next-line @typescript-eslint/require-await
+	client: async (_endpoint, jsonBody) => {
+		const error = "Prim-RPC's client plugin was not provided"
+		if (Array.isArray(jsonBody)) {
+			return jsonBody.map(({ id })=> ({ id, error }))
+		}
+		return { error, id: jsonBody.id }
 	},
 	// same with socket, usually the default WebSocket client is fine but the choice to change should be given
-	socket: (endpoint, { connected, response, ended }, jsonHandler) => {
-		const ws = new WebSocket(endpoint)
-		ws.onopen = connected
-		ws.onclose = ended
-		ws.onmessage = (({ data: message }) => {
-			response(jsonHandler.parse(message as string))
-		})
-		const send = (msg: unknown) => {
-			ws.send(jsonHandler.stringify(msg))
+	socket: (_endpoint, { response }) => {
+		const error = "Prim-RPC's socket plugin was not provided"
+		const send = (msg: RpcCall) => {
+			response({ id: msg.id, error })
 		}
 		return { send }
 	},
@@ -43,6 +38,8 @@ const createBaseClientOptions = (): PrimOptions => ({
 	// thrown from the server so set this to `true` (if presets are used, this may be set to `false` for
 	// "production" settings)
 	handleError: true,
+	// Assume that default JSON handler is used and handle blobs separately from JSON
+	handleBlobs: true,
 	// !SECTION
 	// SECTION Client and server
 	// these options should not be passed by a developer but are used internally

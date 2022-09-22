@@ -159,6 +159,21 @@ export function addThings (...things: AddableThing[]): AddableThing {
 	}
 }
 
+/** Server-provided details */
+export interface ServerImaginaryProfile { name: string, password: string, email: string, picture: string }
+/** Client-provided details */
+export interface ClientImaginaryProfile { name: string, password: string, email: string, picture: Blob }
+export function createImaginaryProfile(input: ServerImaginaryProfile): boolean
+export function createImaginaryProfile(input: ClientImaginaryProfile): boolean
+export function createImaginaryProfile(input: ServerImaginaryProfile|ClientImaginaryProfile) {
+	const isServerSide = (given: typeof input): given is ServerImaginaryProfile => !(input.picture instanceof Blob)
+	if (isServerSide(input)) {
+		console.log("Look, a profile:", input)
+		return true
+	}
+	return false
+}
+
 /**
  * 
  * @param params - Any kind of parameter really

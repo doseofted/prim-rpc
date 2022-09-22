@@ -2,6 +2,7 @@
 /* eslint-disable @typescript-eslint/no-unsafe-call */
 /* eslint-disable @typescript-eslint/no-unsafe-assignment */
 import Fastify from "fastify"
+import multipartPlugin from "@fastify/multipart"
 import Cors from "@fastify/cors"
 import { WebSocketServer } from "ws"
 import jsonHandler from "superjson"
@@ -28,7 +29,7 @@ createPrimServer({
 	prefix: "/prim-super",
 	jsonHandler,
 	module,
-	methodHandler: primMethodFastify({ fastify }),
+	methodHandler: primMethodFastify({ fastify, multipartPlugin }),
 	callbackHandler: primCallbackWs({ wss }),
 })
 
