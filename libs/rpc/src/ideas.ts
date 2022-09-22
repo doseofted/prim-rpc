@@ -285,6 +285,12 @@ let requestHooksContextAndFileUpload: Status.Idea
  * well (or at all for some) by server frameworks. This would be ideal since I can still think in terms of JSON however
  * even in a world where this is possible, it would probably be difficult to separate the file upload from the RPC call
  * meaning RPC responses would be delayed by the upload. However, I don't know enough about BSON to say for sure.
+ *
+ * There's also @msgpack/msgpack which is binary and may be easier to use in the browser. It's not as widely supported
+ * but it appears to be easier to support than BSON. The problem is that I'm not sure that I can send that binary
+ * data from a browser without using FormData. If I end up using FormData, this isn't an alternative but rather a
+ * very similar solution to "Possible Implementation" above with the only difference being that the entire RPC
+ * is sent as binary data instead of splitting it up by identifiers in the RPC.
  * 
  * Another alternative is to just upload files using the configured websocket. While it's easy to send binary data
  * over WebSocket, the request structure isn't as defined as it is with multipart data over HTTP, meaning that would
@@ -297,7 +303,7 @@ let requestHooksContextAndFileUpload: Status.Idea
  * - upload very small files by base64 encoding them (not an option for larger files like images)
  * - upload files with your HTTP framework in a defined route outside of Prim
  */
-let fileUploadsAsPartOfPrimPlugin: Status.Idea
+let fileUploadsAsPartOfPrimPlugin: Status.PartiallyImplemented
 
 /**
  * Support object variable types like `Date` over network requests with Prim by using a separate JSON
@@ -616,6 +622,6 @@ let transformTypeScriptTypes: Status.PartiallyImplemented
  * auto-suggested with a value of boolean for each function.
  * 
  */
-let exposedRpc: Status.Idea
+let exposedRpc: Status.Implemented
 
 export {}
