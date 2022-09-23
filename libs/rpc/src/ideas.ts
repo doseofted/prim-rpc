@@ -624,4 +624,48 @@ let transformTypeScriptTypes: Status.PartiallyImplemented
  */
 let exposedRpc: Status.Implemented
 
+/**
+ * This idea is really two ideas but they're related, I think. Once implemented, it may also make ideas like
+ * `supportChainedCallsAndClosures` easier to support.
+ * 
+ * The first goal is to support return values on callbacks. Today, if you use a callback provided from the
+ * client then those arguments are sent to the client when it is executed on the server. However, if that
+ * function then returns a value then the server cannot receive that. This is (possibly) a common use
+ * case for callbacks so it should probably be supported in Prim. This will hopefully borrow a lot of logic
+ * from the client so that when that callback returns a value then the client intercepts that value and sends
+ * it back to the server. Of course, for this to work then any callbacks defined on the server should be defined
+ * as async (or return a Promise) since the result needs to be awaited from the client. This is similar to how
+ * all functions called on the client must be awaited since this result is from the server. Example definition:
+ * 
+ * ```ts
+ * export async function testing123 (callbackThatReturnsNumber: () => Promise<number>|number) {
+ *   const numberResult = await callbackThatReturnsNumber()
+ *   // typeof numberResult === "number"
+ * }
+ * ```
+ * 
+ * The second idea is to support returned closures from a called method on the client. This is somewhat
+ * similar to the first idea except the logic is reversed. In this case, the reference to the function is
+ * stored on the server and the client sends a second request over WebSocket for the previously given function
+ * (this is similar to how callback references are resolved on the client but instead needs to work on the server).
+ * Similar to callbacks, function references are stored except on the server this time. Just like callbacks,
+ * the usage of any kind of closure should be limited and used carefully since function references are stored on
+ * the server. Example (arguably a bad one, but demonstrates the point regardless):
+ * 
+ * ```ts
+ * // server
+ * export async function createAccount(details: { email: string, password: string }) {
+ *   const record = await someDatabase.add(details)
+ *   function addProfilePicture (photo: string) {
+ *     await record.update({ photo })
+ *   }
+ *   return addProfilePicture
+ * }
+ * // client
+ * const addProfilePicture = await createAccount({ email: "ted@doseofted.com", "aGoodPasswordNotThisOne" })
+ * await addProfilePicture(someUploadedPhoto)
+ * ```
+ */
+let supportReturnValuesOnCallbacksAndReturnedFunctionOnMethod: Status.Idea
+
 export {}
