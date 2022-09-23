@@ -233,21 +233,29 @@ importers:
     specifiers:
       '@doseofted/prim-docs': workspace:*
       '@doseofted/prim-example': workspace:*
+      '@tweakpane/core': ^1.1.0
       '@types/lodash-es': ^4.17.6
       '@types/node': ^18.7.16
       '@unocss/reset': ^0.45.18
+      color2k: ^2.0.0
       lodash-es: ^4.17.21
+      popmotion: ^11.0.5
       solid-js: ^1.5.4
       solid-styled-components: ^0.28.4
       solid-testing-library: ^0.3.0
+      tweakpane: ^3.1.0
       typescript: ^4.7.4
       unocss: ^0.45.18
       vite: ^3.1.0
       vite-plugin-dts: ^1.5.0
       vite-plugin-solid: ^2.3.0
+    dependencies:
+      color2k: 2.0.0
+      popmotion: 11.0.5
     devDependencies:
       '@doseofted/prim-docs': link:../docs
       '@doseofted/prim-example': link:../example
+      '@tweakpane/core': 1.1.0
       '@types/lodash-es': 4.17.6
       '@types/node': 18.7.16
       '@unocss/reset': 0.45.18
@@ -255,6 +263,7 @@ importers:
       solid-js: 1.5.4
       solid-styled-components: 0.28.4_solid-js@1.5.4
       solid-testing-library: 0.3.0_solid-js@1.5.4
+      tweakpane: 3.1.0
       typescript: 4.7.4
       unocss: 0.45.18_vite@3.1.0
       vite: 3.1.0
@@ -1808,6 +1817,10 @@ packages:
       path-browserify: 1.0.1
     dev: true
 
+  /@tweakpane/core/1.1.0:
+    resolution: {integrity: sha512-vbbiQb+aoFI13lIbE7DJvhHZVE1YlUpGoaAamSpU6wLp2jA3VowS1wfRJBBB8IBCYm7nF6ULl7zfJKxl1XdyfA==}
+    dev: true
+
   /@types/argparse/1.0.38:
     resolution: {integrity: sha512-ebDJ9b0e702Yr7pWgB0jzm+CX4Srzz8RcXtLJDJB+BSccqMa36uyH/zUsSYao5+BD1ytv3k3rPYCq4mAE1hsXA==}
     dev: true
@@ -2327,7 +2340,7 @@ packages:
       '@unocss/scope': 0.45.18
       '@unocss/transformer-directives': 0.45.18
       magic-string: 0.26.3
-      vite: 3.1.0_sass@1.54.9
+      vite: 3.1.0
     dev: true
 
   /@vitest/ui/0.23.2:
@@ -2781,6 +2794,10 @@ packages:
   /color-name/1.1.4:
     resolution: {integrity: sha512-dOy+3AuW3a2wNbZHIuMZpTcgjGuLU/uBL/ubcZF9OXbDo8ff4O8yVp5Bf0efS8uEoYo5q4Fx7dY9OgQGXgAsQA==}
     dev: true
+
+  /color2k/2.0.0:
+    resolution: {integrity: sha512-DWX9eXOC4fbJNiuvdH4QSHvvfLWyFo9TuFp7V9OzdsbPAdrWAuYc8qvFP2bIQ/LKh4LrAVnJ6vhiQYPvAHdtTg==}
+    dev: false
 
   /colord/2.9.3:
     resolution: {integrity: sha512-jeC1axXpnb0/2nn/Y1LPuLdgXBLH7aDcHu4KEKfqw3CUhX7ZpfBSlPKyqXE6btIgEzfWtrX3/tyBCaCvXvMkOw==}
@@ -4040,6 +4057,12 @@ packages:
     resolution: {integrity: sha512-buRG0fpBtRHSTCOASe6hD258tEubFoRLb4ZNA6NxMVHNw2gOcwHo9wyablzMzOA5z9xA9L1KNjk/Nt6MT9aYow==}
     engines: {node: '>= 0.6'}
 
+  /framesync/6.1.2:
+    resolution: {integrity: sha512-jBTqhX6KaQVDyus8muwZbBeGGP0XgujBRbQ7gM7BRdS3CadCZIHiawyzYLnafYcvZIh5j8WE7cxZKFn7dXhu9g==}
+    dependencies:
+      tslib: 2.4.0
+    dev: false
+
   /fresh/0.5.2:
     resolution: {integrity: sha1-PYyt2Q2XZWn6g1qx+OSyOhBWBac=}
     engines: {node: '>= 0.6'}
@@ -4292,6 +4315,10 @@ packages:
   /hexoid/1.0.0:
     resolution: {integrity: sha512-QFLV0taWQOZtvIRIAdBChesmogZrtuXvVWsFHZTk2SU+anspqZ2vMnoLg7IE1+Uk16N19APic1BuF8bC8c2m5g==}
     engines: {node: '>=8'}
+
+  /hey-listen/1.0.8:
+    resolution: {integrity: sha512-COpmrF2NOg4TBWUJ5UVyaCU2A88wEMkUPK4hNqyCkqHbxT92BbvfjoSozkAIIm6XhicGlJHhFdullInrdhwU8Q==}
+    dev: false
 
   /hosted-git-info/2.8.9:
     resolution: {integrity: sha512-mxIDAb9Lsm6DoOJ7xH+5+X4y1LU/4Hi50L9C5sIswK3JzULS4bwk1FvjdBgvYR4bzT4tuUQiC15FE2f5HbLvYw==}
@@ -5626,6 +5653,15 @@ packages:
       sonic-boom: 3.2.0
       thread-stream: 2.2.0
 
+  /popmotion/11.0.5:
+    resolution: {integrity: sha512-la8gPM1WYeFznb/JqF4GiTkRRPZsfaj2+kCxqQgr2MJylMmIKUwBfWW8Wa5fml/8gmtlD5yI01MP1QCZPWmppA==}
+    dependencies:
+      framesync: 6.1.2
+      hey-listen: 1.0.8
+      style-value-types: 5.1.2
+      tslib: 2.4.0
+    dev: false
+
   /postcss-html/1.5.0:
     resolution: {integrity: sha512-kCMRWJRHKicpA166kc2lAVUGxDZL324bkj/pVOb6RhjB0Z5Krl7mN0AsVkBhVIRZZirY0lyQXG38HCVaoKVNoA==}
     engines: {node: ^12 || >=14}
@@ -6392,6 +6428,13 @@ packages:
       inline-style-parser: 0.1.1
     dev: true
 
+  /style-value-types/5.1.2:
+    resolution: {integrity: sha512-Vs9fNreYF9j6W2VvuDTP7kepALi7sk0xtk2Tu8Yxi9UoajJdEVpNpCov0HsLTqXvNGKX+Uv09pkozVITi1jf3Q==}
+    dependencies:
+      hey-listen: 1.0.8
+      tslib: 2.4.0
+    dev: false
+
   /stylelint-config-recommended-scss/7.0.0_74u2qasxp5mudia6vln5kcfuni:
     resolution: {integrity: sha512-rGz1J4rMAyJkvoJW4hZasuQBB7y9KIrShb20l9DVEKKZSEi1HAy0vuNlR8HyCKy/jveb/BdaQFcoiYnmx4HoiA==}
     peerDependencies:
@@ -6712,7 +6755,6 @@ packages:
 
   /tslib/2.4.0:
     resolution: {integrity: sha512-d6xOpEDfsi2CZVlPQzGeux8XMwLT9hssAsaPYExaQMuYskwb+x1x7J371tWlbBdWHroy99KnVB6qIkUbs5X3UQ==}
-    dev: true
 
   /tsutils/3.21.0_typescript@4.7.4:
     resolution: {integrity: sha512-mHKK3iUXL+3UF6xL5k0PEhKRUBKPBCv/+RkEOpjRWxxx27KKRBmmA60A9pgOUvMi8GKhRMPEmjBRPzs2W7O1OA==}
@@ -6855,6 +6897,10 @@ packages:
       turbo-windows-32: 1.4.6
       turbo-windows-64: 1.4.6
       turbo-windows-arm64: 1.4.6
+    dev: true
+
+  /tweakpane/3.1.0:
+    resolution: {integrity: sha512-PGAp/LPQdHwzL7/iAW4lV1p9iPQTti7YMjMWO48CoYjvZRS59RmgQnhEGzKzqST1JnmOYmQUjTe8bdhlZRJs5A==}
     dev: true
 
   /type-check/0.3.2:

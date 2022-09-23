@@ -1,7 +1,9 @@
-import { Component, createMemo, lazy } from "solid-js"
+import { Component, createMemo, createSignal, lazy } from "solid-js"
 import { styled, css } from "solid-styled-components"
 import Docs from "./components/Docs"
+import { Light } from "./components/Light"
 import { useMouse, useWindowSize } from "./composables"
+import { addInputSignal } from "./testing"
 
 interface Props {
 	hello?: string
@@ -18,8 +20,14 @@ const App: Component<Props> = (props) => {
 		const y = Math.pow(centerY - mouse().y, 2)
 		return Math.sqrt(x + y)
 	})
+	const [brightness, setBrightness] = createSignal(0.5)
+	const [color, setColor] = createSignal("#52ceff")
+	// eslint-disable-next-line solid/reactivity
+	addInputSignal([brightness, setBrightness], "brightness", { min: 0, max: 1 })
+	// eslint-disable-next-line solid/reactivity
+	addInputSignal([color, setColor], "color")
 	return (
-		<BgGray onMouseMove={onMouseMove} class="font-mono">
+		<BgGray onMouseMove={onMouseMove} class="!font-mono">
 			<p class={paragraph}>
 				Hello {props.hello ?? "you"}.
 			</p>
@@ -27,6 +35,7 @@ const App: Component<Props> = (props) => {
 			<p class={paragraph}>From center: {Math.round(distance())}</p>
 			<TestOnly class={paragraph} />
 			<Docs />
+			<Light brightness={brightness()} color={color()} size={300} />
 		</BgGray>
 	)
 }
