@@ -22,6 +22,10 @@ interface Props {
 	/** Rotation given in degrees */
 	rotation?: number
 }
+/**
+ * A simple radial gradient with control that is intended to represent
+ * some light source.
+ */
 export const Light: Component<Props> = (given) => {
 	const props = mergeProps({
 		size: "300px",

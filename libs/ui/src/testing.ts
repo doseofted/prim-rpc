@@ -1,5 +1,5 @@
 import { Signal, onCleanup, onMount } from "solid-js"
-import { Pane as PaneType, InputParams, InputBindingApi } from "tweakpane"
+import { Pane as PaneType, InputParams, InputBindingApi, FolderApi } from "tweakpane"
 
 let pane: PaneType|undefined
 if (import.meta.env.DEV) {
@@ -7,12 +7,12 @@ if (import.meta.env.DEV) {
 	pane = new Pane()
 }
 
-function addInputFromSignal<T>(signal: Signal<T>, key: string, params?: InputParams) {
+function addInputFromSignal<T>(signal: Signal<T>, key: string, params?: InputParams, folder?: FolderApi) {
 	const [given, setGiven] = signal
 	let input: InputBindingApi<unknown, unknown>|undefined
 	onCleanup(() => {
 		if (!input) { return }
-		pane?.remove(input)
+		(folder ?? pane)?.remove(input)
 		input = undefined
 	})
 	onMount(() => {
@@ -25,7 +25,7 @@ function addInputFromSignal<T>(signal: Signal<T>, key: string, params?: InputPar
 				return true
 			},
 		})
-		input = pane?.addInput(compatible, key, params)
+		input = (folder ?? pane)?.addInput(compatible, key, params)
 	})
 	return signal
 }
