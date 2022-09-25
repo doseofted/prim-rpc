@@ -285,6 +285,12 @@ let requestHooksContextAndFileUpload: Status.Idea
  * well (or at all for some) by server frameworks. This would be ideal since I can still think in terms of JSON however
  * even in a world where this is possible, it would probably be difficult to separate the file upload from the RPC call
  * meaning RPC responses would be delayed by the upload. However, I don't know enough about BSON to say for sure.
+ *
+ * There's also @msgpack/msgpack which is binary and may be easier to use in the browser. It's not as widely supported
+ * but it appears to be easier to support than BSON. The problem is that I'm not sure that I can send that binary
+ * data from a browser without using FormData. If I end up using FormData, this isn't an alternative but rather a
+ * very similar solution to "Possible Implementation" above with the only difference being that the entire RPC
+ * is sent as binary data instead of splitting it up by identifiers in the RPC.
  * 
  * Another alternative is to just upload files using the configured websocket. While it's easy to send binary data
  * over WebSocket, the request structure isn't as defined as it is with multipart data over HTTP, meaning that would
@@ -297,7 +303,7 @@ let requestHooksContextAndFileUpload: Status.Idea
  * - upload very small files by base64 encoding them (not an option for larger files like images)
  * - upload files with your HTTP framework in a defined route outside of Prim
  */
-let fileUploadsAsPartOfPrimPlugin: Status.Idea
+let fileUploadsAsPartOfPrimPlugin: Status.PartiallyImplemented
 
 /**
  * Support object variable types like `Date` over network requests with Prim by using a separate JSON
@@ -616,6 +622,50 @@ let transformTypeScriptTypes: Status.PartiallyImplemented
  * auto-suggested with a value of boolean for each function.
  * 
  */
-let exposedRpc: Status.Idea
+let exposedRpc: Status.Implemented
+
+/**
+ * This idea is really two ideas but they're related, I think. Once implemented, it may also make ideas like
+ * `supportChainedCallsAndClosures` easier to support.
+ * 
+ * The first goal is to support return values on callbacks. Today, if you use a callback provided from the
+ * client then those arguments are sent to the client when it is executed on the server. However, if that
+ * function then returns a value then the server cannot receive that. This is (possibly) a common use
+ * case for callbacks so it should probably be supported in Prim. This will hopefully borrow a lot of logic
+ * from the client so that when that callback returns a value then the client intercepts that value and sends
+ * it back to the server. Of course, for this to work then any callbacks defined on the server should be defined
+ * as async (or return a Promise) since the result needs to be awaited from the client. This is similar to how
+ * all functions called on the client must be awaited since this result is from the server. Example definition:
+ * 
+ * ```ts
+ * export async function testing123 (callbackThatReturnsNumber: () => Promise<number>|number) {
+ *   const numberResult = await callbackThatReturnsNumber()
+ *   // typeof numberResult === "number"
+ * }
+ * ```
+ * 
+ * The second idea is to support returned closures from a called method on the client. This is somewhat
+ * similar to the first idea except the logic is reversed. In this case, the reference to the function is
+ * stored on the server and the client sends a second request over WebSocket for the previously given function
+ * (this is similar to how callback references are resolved on the client but instead needs to work on the server).
+ * Similar to callbacks, function references are stored except on the server this time. Just like callbacks,
+ * the usage of any kind of closure should be limited and used carefully since function references are stored on
+ * the server. Example (arguably a bad one, but demonstrates the point regardless):
+ * 
+ * ```ts
+ * // server
+ * export async function createAccount(details: { email: string, password: string }) {
+ *   const record = await someDatabase.add(details)
+ *   function addProfilePicture (photo: string) {
+ *     await record.update({ photo })
+ *   }
+ *   return addProfilePicture
+ * }
+ * // client
+ * const addProfilePicture = await createAccount({ email: "ted@doseofted.com", "aGoodPasswordNotThisOne" })
+ * await addProfilePicture(someUploadedPhoto)
+ * ```
+ */
+let supportReturnValuesOnCallbacksAndReturnedFunctionOnMethod: Status.Idea
 
 export {}

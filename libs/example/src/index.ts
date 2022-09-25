@@ -58,6 +58,7 @@ sayHello.rpc = true
 export function sayHelloAlternative(greeting: string, name: string) {
 	return `${greeting ?? "Hello"} ${name ?? "you"}!`
 }
+sayHelloAlternative.rpc = true
 
 /**
  * This is an example of an entire that module that might be exported.
@@ -69,6 +70,11 @@ export const testLevel1 = {
 	sayHelloAlternative,
 }
 
+export function logMessage(message: string) {
+	console.log(message)
+}
+logMessage.rpc = true
+
 /**
  * A module inside of a module. A module turducken.
  * 
@@ -76,9 +82,7 @@ export const testLevel1 = {
  */
 export const testLevel2 = {
 	testLevel1,
-	logMessage(message: string) {
-		console.log(message)
-	},
+	logMessage,
 }
 
 /**
@@ -94,6 +98,7 @@ export function oops(ok = false) {
 	if (!ok) { throw new Error("My bad.") }
 	return "I did it again."
 }
+oops.rpc = true
 
 /**
  * This function makes use of a callback. Sometimes I don't need to be clever.
@@ -108,6 +113,7 @@ export function withCallback(cb: (message: string) => void) {
 		cb("Still using Prim!")
 	}, 100)
 }
+withCallback.rpc = true
 
 /**
  * Type a message. Now with configurable type speed.
@@ -125,6 +131,7 @@ export function typeMessage(message: string, typeLetter: (typed: string) => void
 		}, ++timeout * speed)
 	})
 }
+typeMessage.rpc = true
 
 /**
  * Probably tomorrow.
@@ -136,6 +143,7 @@ export function typeMessage(message: string, typeLetter: (typed: string) => void
 export function whatIsDayAfter (day: Date) {
 	return new Date(day.valueOf() + (1000 * 60 * 60 * 24))
 }
+whatIsDayAfter.rpc = true
 
 type AddableThing = number|string
 /** Add two numbers */
@@ -158,6 +166,7 @@ export function addThings (...things: AddableThing[]): AddableThing {
 		throw new Error("Only strings and numbers are supported. Sincerely sorry.")
 	}
 }
+addThings.rpc = true
 
 /** Server-provided details */
 export interface ServerImaginaryProfile { name: string, password: string, email: string, picture: string }
@@ -173,6 +182,7 @@ export function createImaginaryProfile(input: ServerImaginaryProfile|ClientImagi
 	}
 	return false
 }
+createImaginaryProfile.rpc = true
 
 /**
  * 

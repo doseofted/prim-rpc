@@ -56,7 +56,7 @@ export const fastifyPrimPlugin: FastifyPluginAsync<PrimFastifyPluginOptions> = a
 			// TODO: read RPC for `_bin_` references and call `request.files()` only when needed
 			const blobs: { [identifier: string]: unknown } = {}
 			let bodyForm: string
-			if (multipartPlugin) {
+			if (multipartPlugin && request.isMultipart()) {
 				// NOTE: @fastify/multipart doesn't seem to let me use `MultipartValue` type from `.parts()` so this is a workaround
 				// eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
 				const parts: AsyncIterableIterator<MultipartFile & MultipartValue<string>> = request.parts({

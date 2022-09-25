@@ -21,6 +21,7 @@
   "devDependencies": {
     "@doseofted/prim-docs": "workspace:*",
     "@doseofted/prim-example": "workspace:*",
+    "@tweakpane/core": "^1.1.0",
     "@types/lodash-es": "^4.17.6",
     "@types/node": "^18.7.16",
     "@unocss/reset": "^0.45.18",
@@ -28,6 +29,7 @@
     "solid-js": "^1.5.4",
     "solid-styled-components": "^0.28.4",
     "solid-testing-library": "^0.3.0",
+    "tweakpane": "^3.1.0",
     "typescript": "^4.7.4",
     "unocss": "^0.45.18",
     "vite": "^3.1.0",
@@ -49,5 +51,9 @@
       "import": "./dist/style.css",
       "require": "./dist/style.css"
     }
+  },
+  "dependencies": {
+    "color2k": "^2.0.0",
+    "popmotion": "^11.0.5"
   }
 }

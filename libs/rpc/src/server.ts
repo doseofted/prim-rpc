@@ -70,25 +70,50 @@ function createServerActions (serverOptions: PrimServerOptions, instance?: Retur
 		cbResults?: (a: RpcAnswer) => void,
 	): Promise<RpcAnswer|RpcAnswer[]> => {
 		// NOTE: new Prim client should be created on each request so callback results are not shared
-		const { client, socketEvent: event } = instance ?? createPrimInstance(serverOptions)
+		const { client, socketEvent: event, configured } = instance ?? createPrimInstance(serverOptions)
 		const callList = Array.isArray(calls) ? calls : [calls]
 		const answeringCalls = callList.map(async (given): Promise<RpcAnswer> => {
 			// eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
 			const { method, params, id } = given
 			try {
 				const methodExpanded = method.split("/")
-				const target = getProperty(client, methodExpanded) as AnyFunction
+				// using `configured.module` if module was provided directly to server
+				const targetLocal = getProperty(configured.module, methodExpanded) as AnyFunction & { rpc?: boolean }
+				// using `client` to request remote module if not provided directly to server
+				const targetRemote = getProperty(client, methodExpanded) as AnyFunction & { rpc?: boolean }
+				const target = targetLocal ?? targetRemote
+				if (targetLocal) { // these checks only apply if module is provided directly (TBD on actual server with module)
+					if (methodExpanded.length > 1) {
+						const previousPath = getProperty(configured.module, methodExpanded.slice(0, -1)) as unknown
+						const disallowedMethodOnMethod = typeof previousPath === "function"
+							&& !serverOptions.methodsOnMethods.includes(methodExpanded.slice(-1)[0])
+						if (disallowedMethodOnMethod) {
+							return { error: "Given method on method was not allowed" }
+						}
+					}
+					if (typeof target === "undefined") {
+						return { error: "Requested method was not found" }
+					}
+					if (typeof target !== "function") {
+						return { error: "Requested method is not callable" }
+					}
+					const methodAllowedDirectly = "rpc" in target && typeof target.rpc == "boolean" && target.rpc
+					if (!methodAllowedDirectly) {
+						const allowedInSchema = Object.entries(serverOptions.allowList ?? {}).length > 0
+							&& !!getProperty(serverOptions.allowList, methodExpanded)
+						if (!allowedInSchema) {
+							return { error: "Method not allowed" }
+						}
+					}
+				}
 				const argsArray = Array.isArray(params) ? params : [params]
 				const args = Object.entries(blobs).length > 0
 					? argsArray.map(arg => mergeBlobLikeWithGiven(arg, blobs))
 					: argsArray
 				if (cbResults) { event.on("response", cbResults) }
-				// TODO: if `methodExpanded.at(-2)` is a function, call that instead of `methodExpanded.at(-1)`
-				// this is to prevent someone from calling function properties like `call`, `apply`, and `bind`
-				// TODO: regarding TODO above, consider only blocking properties listed above and not custom defined properties
-				// on function (so a developer could call custom function defined on Function Object, like `myFunction.docs()`)
+				// NOTE: use `remoteTarget` (even if target is local) to ensure callbacks are handled properly by Prim client
 				// eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
-				const result: RpcAnswer = await Reflect.apply(target, undefined, args)
+				const result: RpcAnswer = await Reflect.apply(targetRemote, undefined, args)
 				// TODO: today, result must be supported by JSON handler but consider supporting returned functions
 				// in the same way that callback are supported today (by passing reference to client)
 				return { result, id }
