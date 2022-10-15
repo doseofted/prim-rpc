@@ -16,9 +16,13 @@
     "lint": "eslint --ext .js,.jsx,.ts,.tsx .",
     "lint-style": "stylelint '**/*.{css,scss}'",
     "test": "vitest run",
-    "testing": "vitest watch"
+    "testing": "vitest watch",
+    "mit:build": "mitosis build --config mitosis.config.cjs"
   },
   "devDependencies": {
+    "@builder.io/eslint-plugin-mitosis": "^0.0.10",
+    "@builder.io/mitosis": "^0.0.72",
+    "@builder.io/mitosis-cli": "^0.0.31",
     "@doseofted/prim-docs": "workspace:*",
     "@doseofted/prim-example": "workspace:*",
     "@tweakpane/core": "^1.1.0",
@@ -26,6 +30,7 @@
     "@types/node": "^18.7.16",
     "@unocss/reset": "^0.45.18",
     "lodash-es": "^4.17.21",
+    "prettier": "^2.7.1",
     "solid-js": "^1.5.4",
     "solid-styled-components": "^0.28.4",
     "solid-testing-library": "^0.3.0",

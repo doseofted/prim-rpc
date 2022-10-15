@@ -15,11 +15,13 @@ module.exports = {
 			plugins: [
 				"@typescript-eslint",
 				"solid",
+				"@builder.io/mitosis",
 			],
 			extends: [
 				"eslint:recommended",
 				"plugin:@typescript-eslint/recommended",
 				"plugin:solid/typescript",
+				"plugin:@builder.io/mitosis/recommended",
 			],
 			env: {
 				"browser": true,
