@@ -1,7 +1,8 @@
-import { Component, createEffect, createMemo, mergeProps } from "solid-js"
+import { Component, createEffect, createMemo, mergeProps, onCleanup, onMount } from "solid-js"
 import { styled } from "solid-styled-components"
 import { lighten, toRgba, transparentize } from "color2k"
 import { easeIn, easeOut } from "popmotion"
+import { CanvasSpace } from "pts"
 
 const limitRange = (given: number, min: number, max: number) => Math.min(Math.max(given, min), max)
 
@@ -77,7 +78,25 @@ export const Light: Component<Props> = (given) => {
 		mix-blend-mode: screen;
 		position: absolute;
 	`
-	return (
+	// eslint-disable-next-line prefer-const
+	let canvas: HTMLCanvasElement | undefined = undefined
+	let space: CanvasSpace | undefined
+	onMount(() => {
+		if (!canvas) { return }
+		space = new CanvasSpace(canvas)
+		space.setup({ bgcolor: "#fff" })
+		const form = space.getForm()
+		space.add(() => {
+			if (!space) { return }
+			form.point(space.pointer, 10)
+		})
+		space.play().bindMouse()
+	})
+	onCleanup(() => {
+		space?.dispose()
+	})
+	return <>
+		<canvas ref={canvas} />
 		<Container
 			size={size()}
 			brightness={props.brightness}
@@ -87,5 +106,5 @@ export const Light: Component<Props> = (given) => {
 			offset={offset()}
 			rotation={rotation()}
 		/>
-	)
+	</>
 }
