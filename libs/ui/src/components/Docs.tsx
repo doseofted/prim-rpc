@@ -1,20 +1,20 @@
-import { Component, For, JSX } from "solid-js"
-import docs from "@doseofted/prim-example/dist/docs.json"
-import { createDocsForModule, helpers, PrimModule } from "@doseofted/prim-docs"
+import { Component, createEffect, createMemo, For, JSX } from "solid-js"
+import { createDocsForModule, helpers } from "@doseofted/prim-docs"
 
 interface Props extends JSX.HTMLAttributes<HTMLDivElement> {
-	name?: string
+	docs?: unknown
 }
 
-const Docs: Component<Props> = (p) => {
-	const rpcDocs = createDocsForModule(docs)
-	// eslint-disable-next-line @typescript-eslint/no-unsafe-call, @typescript-eslint/no-unsafe-member-access
-	const moduleName = helpers.findDocsReference(rpcDocs, rpcDocs.docs) as PrimModule
-	console.log(rpcDocs)
+const Docs: Component<Props> = (props) => {
+	const docs = createMemo(() => createDocsForModule(props.docs))
+	const moduleName = createMemo(() => helpers.findDocsReference(docs(), docs().docs))
+	createEffect(() => {
+		console.log("docs:", docs())
+	})
 	return (
-		<div style={{ color: "white" }}>
-			<p>{moduleName.name}</p>
-			<For each={Object.entries(rpcDocs.props ?? {})}>{([key, _val], _index) =>
+		<div>
+			<p>{moduleName().name}</p>
+			<For each={Object.entries(docs().props ?? {})}>{([key, _val]) =>
 				<p>{key}</p>
 			}</For>
 		</div>

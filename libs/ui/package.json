@@ -21,6 +21,7 @@
   "devDependencies": {
     "@doseofted/prim-docs": "workspace:*",
     "@doseofted/prim-example": "workspace:*",
+    "@solidjs/router": "^0.4.3",
     "@tweakpane/core": "^1.1.0",
     "@types/lodash-es": "^4.17.6",
     "@types/node": "^18.7.16",
@@ -30,10 +31,12 @@
     "solid-styled-components": "^0.28.4",
     "solid-testing-library": "^0.3.0",
     "tweakpane": "^3.1.0",
+    "type-fest": "^2.19.0",
     "typescript": "^4.7.4",
     "unocss": "^0.45.18",
     "vite": "^3.1.0",
     "vite-plugin-dts": "^1.5.0",
+    "vite-plugin-pages": "^0.26.0",
     "vite-plugin-solid": "^2.3.0"
   },
   "files": [

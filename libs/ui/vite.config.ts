@@ -3,6 +3,7 @@ import { defineConfig } from "vite"
 import dts from "vite-plugin-dts"
 import solid from "vite-plugin-solid"
 import unocss from "unocss/vite"
+import pages from "vite-plugin-pages"
 import type { UserConfig as VitestConfig } from "vitest"
 import type { UserConfig } from "vite"
 
@@ -12,6 +13,7 @@ const config: UserConfig & { test?: VitestConfig } = {
 		solid(),
 		dts(),
 		unocss(),
+		pages(),
 	],
 	test: {
 		environment: "jsdom",
@@ -25,7 +27,7 @@ const config: UserConfig & { test?: VitestConfig } = {
 	build: {
 		lib: {
 			formats: ["es", "umd"],
-			entry: resolvePath(__dirname, "src/lib.ts"),
+			entry: resolvePath(__dirname, "src/index.lib.ts"),
 			name: "lib",
 			fileName: (format) => `lib.${format}.${format === "es" ? "m" : "c"}js`,
 		},
