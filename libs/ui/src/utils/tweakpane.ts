@@ -68,4 +68,9 @@ function addFolderToPane (options: FolderParams, pane: TabPageApi|FolderApi|Pane
 	})
 }
 
-export { pagePane as pane, addSignalInput, addSignalMonitor, addFolderToPane }
+export {
+	pagePane as pane,
+	addSignalInput,
+	addSignalMonitor,
+	addFolderToPane,
+}
