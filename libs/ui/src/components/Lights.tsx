@@ -31,12 +31,9 @@ export function useLights() {
 
 export const Light: Component = () => {
 	const [, setLights] = useLights() ?? []
-	let div: HTMLDivElement
-	let observer: ResizeObserver
 	onMount(() => {
-		const { x, y } = div.getBoundingClientRect()
 		function setupResizeObserver(givenIndex: number) {
-			observer = new ResizeObserver((entries) => {
+			const observer = new ResizeObserver((entries) => {
 				for (const entry of entries) {
 					const { target } = entry
 					const { x, y } = target.getBoundingClientRect()
@@ -47,8 +44,14 @@ export const Light: Component = () => {
 				}
 			})
 			observer.observe(div)
-			onCleanup(() => observer.disconnect())
+			onCleanup(() => {
+				observer.disconnect()
+				setLights?.(produce(state => {
+					state.splice(givenIndex, 1)
+				}))
+			})
 		}
+		const { x, y } = div.getBoundingClientRect()
 		setLights?.(produce(state => {
 			const givenIndex = state.push({
 				id: state.length + 1,
@@ -59,6 +62,7 @@ export const Light: Component = () => {
 			setupResizeObserver(givenIndex)
 		}))
 	})
+	let div: HTMLDivElement
 	return <div ref={e => div = e} />
 }
 
