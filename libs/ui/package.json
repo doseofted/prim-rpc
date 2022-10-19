@@ -23,6 +23,7 @@
     "@doseofted/prim-example": "workspace:*",
     "@solidjs/router": "^0.4.3",
     "@tweakpane/core": "^1.1.0",
+    "@tweakpane/plugin-essentials": "^0.1.5",
     "@types/lodash-es": "^4.17.6",
     "@types/node": "^18.7.16",
     "@unocss/reset": "^0.45.18",

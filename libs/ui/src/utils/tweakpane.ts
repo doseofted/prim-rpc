@@ -1,12 +1,21 @@
-import { Signal, onCleanup, onMount } from "solid-js"
+import { Signal, onCleanup, onMount, createEffect } from "solid-js"
 import { Pane as PaneType, InputParams, InputBindingApi, FolderApi, Pane, TabPageApi, MonitorBindingApi, MonitorParams, FolderParams } from "tweakpane"
 import type { Promisable } from "type-fest"
+import * as EssentialsPlugin from "@tweakpane/plugin-essentials"
 
 let pagePane: PaneType|undefined
 if (import.meta.env.DEV) {
 	const { Pane } = await import("tweakpane")
 	pagePane = new Pane()
 }
+
+pagePane?.registerPlugin(EssentialsPlugin)
+export interface FpsControls { begin(): void, end(): void }
+export const fps = pagePane?.addBlade({
+	view: "fpsgraph",
+	label: "fps",
+	lineCount: 1,
+}) as unknown as FpsControls
 
 /** Create a proxy object around given signal so that Tweakpane can read/write to signal */
 function createProxyFromSignal<T>(signal: Signal<T>, key: string) {
@@ -29,6 +38,11 @@ function addSignalInput<T>(signal: Signal<T>, key: string, params?: InputParams,
 		if (!input) { return }
 		(await pane)?.remove(input)
 		input = undefined
+	})
+	createEffect(() => {
+		const [given] = signal
+		given()
+		input?.refresh()
 	})
 	// eslint-disable-next-line @typescript-eslint/no-misused-promises
 	onMount(async () => {

@@ -235,6 +235,7 @@ importers:
       '@doseofted/prim-example': workspace:*
       '@solidjs/router': ^0.4.3
       '@tweakpane/core': ^1.1.0
+      '@tweakpane/plugin-essentials': ^0.1.5
       '@types/lodash-es': ^4.17.6
       '@types/node': ^18.7.16
       '@unocss/reset': ^0.45.18
@@ -262,6 +263,7 @@ importers:
       '@doseofted/prim-example': link:../example
       '@solidjs/router': 0.4.3_solid-js@1.5.4
       '@tweakpane/core': 1.1.0
+      '@tweakpane/plugin-essentials': 0.1.5_tweakpane@3.1.0
       '@types/lodash-es': 4.17.6
       '@types/node': 18.7.16
       '@unocss/reset': 0.45.18
@@ -1859,6 +1861,14 @@ packages:
 
   /@tweakpane/core/1.1.0:
     resolution: {integrity: sha512-vbbiQb+aoFI13lIbE7DJvhHZVE1YlUpGoaAamSpU6wLp2jA3VowS1wfRJBBB8IBCYm7nF6ULl7zfJKxl1XdyfA==}
+    dev: true
+
+  /@tweakpane/plugin-essentials/0.1.5_tweakpane@3.1.0:
+    resolution: {integrity: sha512-dt+fwtUEVmBxsVhGNSqtY6dN3rOmxIt3zSA/cSFMs2eBbMrnBTSkJBe2JMXKodTTR6OOFihq6yxyRFqG5wsP3w==}
+    peerDependencies:
+      tweakpane: ^3.1.0
+    dependencies:
+      tweakpane: 3.1.0
     dev: true
 
   /@types/argparse/1.0.38:
