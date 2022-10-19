@@ -1,4 +1,4 @@
-import { Component, onCleanup, onMount, JSX, splitProps, createContext, useContext, createMemo } from "solid-js"
+import { Component, onCleanup, onMount, JSX, splitProps, createContext, useContext, createMemo, createSignal, Accessor, createEffect } from "solid-js"
 import { createStore, produce } from "solid-js/store"
 import { CanvasSpace, Circle, Pt } from "pts"
 import { transparentize } from "color2k"
@@ -16,7 +16,7 @@ interface LightInstance extends LightOptions {
 	y: number
 }
 
-type LightsContextType = [LightInstance[], {
+type LightsContextType = [LightInstance[], Accessor<{ width: number, height: number }>, {
 	createLight(opts: LightOptions, position: [x: number, y: number]): LightInstance
 	retrieveLight(id: string): LightInstance
 	updateLightPosition(id: string, position: [x: number, y: number]): void
@@ -70,8 +70,13 @@ export function Lights(props: LightsProps) {
 			}))
 		},
 	}
+	const winSize = ({ innerWidth: width, innerHeight: height }: typeof window = window) => ({ width, height })
+	const [windowSize, setWindowSize] = createSignal(winSize())
+	const winListener = () => setWindowSize(winSize())
+	onMount(() => window.addEventListener("resize", winListener))
+	onCleanup(() => window.removeEventListener("resize", winListener))
 	return (
-		<LightsContext.Provider value={[lights, operations]}>
+		<LightsContext.Provider value={[lights, windowSize, operations]}>
 			<LightCanvas style={{ position: "absolute", width: "100%", height: "100%", top: 0, left: 0 }} />
 			{props.children}
 		</LightsContext.Provider>
@@ -105,26 +110,33 @@ interface LightProps extends JSX.HTMLAttributes<HTMLDivElement> {
 export const Light: Component<LightProps> = (p) => {
 	const [props, attrs] = splitProps(p, ["children"])
 	let div: HTMLDivElement
-	const [, operations] = useLights() ?? []
+	const [, windowSize, operations] = useLights() ?? []
+	function getCenter(rect: DOMRect) {
+		const { x, y, width, height, left, top } = rect
+		return { x: (x + width - left) / 2 + x, y: (y + height - top) / 2 + y }
+	}
 	onMount(() => {
 		if (!operations) { return }
-		function setupResizeObserver(identifier: string) {
-			const observer = new ResizeObserver((entries) => {
-				for (const entry of entries) {
-					const { target } = entry
-					const { x, y } = target.getBoundingClientRect()
-					operations?.updateLightPosition(identifier, [x, y])
-				}
-			})
-			observer.observe(div)
-			onCleanup(() => {
-				observer.disconnect()
-				operations?.removeLight(identifier)
-			})
-		}
-		const { x, y } = div.getBoundingClientRect()
+		const { x, y } = getCenter(div.getBoundingClientRect())
 		const light = operations.createLight({ brightness: 1, color: "#fff" }, [x, y])
-		setupResizeObserver(light.id)
+		createEffect(() => {
+			if (!windowSize) { return }
+			windowSize()
+			const { x, y } = getCenter(div.getBoundingClientRect())
+			operations?.updateLightPosition(light.id, [x, y])
+		})
+		const observer = new ResizeObserver((entries) => {
+			for (const entry of entries) {
+				const { target } = entry
+				const { x, y } = getCenter(target.getBoundingClientRect())
+				operations?.updateLightPosition(light.id, [x, y])
+			}
+		})
+		observer.observe(div)
+		onCleanup(() => {
+			observer.disconnect()
+			operations?.removeLight(light.id)
+		})
 	})
 	return <div {...attrs} ref={e => div = e}>{props.children}</div>
 }
