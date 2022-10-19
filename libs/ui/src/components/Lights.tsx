@@ -64,6 +64,9 @@ export function Lights(props: LightsProps) {
 			const index = locations[id]
 			setLights(produce(state => {
 				state.splice(index, 1)
+				state.slice(index).map((given, partialIndex) => {
+					locations[given.id] = index + partialIndex
+				})
 			}))
 		},
 	}
