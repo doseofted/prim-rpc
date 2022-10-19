@@ -346,4 +346,75 @@ let restructuredTypes: Status.Rejected
  */
 let typesForReal: Status.Idea
 
+/**
+ * Create a module for Prim that reads the result of module's TypeDoc, or the Prim RPC docs generated from a TypeDoc,
+ * directly and use this to create methods available to call from the server that return JSON schema for those requests.
+ * This would allow a developer to create a JSON file and specify a "$schema" property and then get typed results like
+ * they would as if they were using TypeScript. This would allow non-JavaScript-based languages to get typed suggestions
+ * just as they would in TypeScript. This is comparable to GraphQL language support where extensions may provide
+ * autocompleted suggestions based on the GraphQL schema.
+ * 
+ * Say you have a module that exports one method:
+ * 
+ * ```ts
+ * // file: module.ts (docs are generated at `module-docs.json`)
+ * export default { hello: (name) => `Hello ${name}` }
+ * // file: prim-rpc.ts
+ * import module from "./module.ts"
+ * import moduleDocs from "./module-docs.json"
+ * createPrimServer({
+ *   prefix: "/prim"
+ *   module,
+ *   docs: primRpcSchema(moduleDocs)
+ * })
+ * ```
+ * 
+ * The new function provided by Prim RPC Docs is `primRpcSchema()`. This function would take the documentation and
+ * create a JSON schema available at `/docs/...` routes. So if a developer specified a JSON file below, the RPC would
+ * be typed and become automatically suggested by code editors supporting JSON schema. This would include not just
+ * the structure of the RPC (like method, params) but also the parameters expected (like arg0 is of type string).
+ * 
+ * ```json
+ * {
+ *   "$schema": "http://localhost:3000/prim/docs/hello",
+ *   "method": "hello",
+ *   "params": ["Ted"],
+ * }
+ * ```
+ * 
+ * If this function had multiple call signatures, then those would be listed in the schema using a discriminator that
+ * would specify multiple schemas for that method.
+ * 
+ * This may also be applied to batch requests. The problem today is that batched requests use a top-level array in
+ * request bodies which means that the "$schema" property can't be specified. For this to work, I would need to
+ * restructure the body to have a top-level "methods" keys which contains an array of RPCs. This would allow me to
+ * create a JSON file like so:
+ * 
+ * ```json
+ * {
+ *   "$schema": "http://localhost:3000/prim/docs",
+ *   "methods": [
+ *     {
+ *       "method": "hello",
+ *       "params": ["Ted"],
+ *     },
+ *     {
+ *       "method": "hello",
+ *       "params": ["Not Ted"],
+ *     }
+ *   ]
+ * }
+ * ```
+ * 
+ * On second thought, batched requests may be difficult since any item contained in methods key would then need some
+ * sort of discriminator to determine the types of parameters, based on the method name. I know JSON Schema can support
+ * these kinds of discriminators so it's just a matter of how difficult it is to write code that generates this schema
+ * based on the given documentation (probably not too difficult but it may take some time).
+ * 
+ * **Note:** this feature depends on JSON schema for individual methods in generated docs to be written (adding a
+ * `.typed` field to each method). This is planned but not ready yet. Once this feature is ready, I can start working
+ * on implementing this idea.
+ */
+let typedQueriesWithJsonSchema: Status.Idea
+
 export {}
