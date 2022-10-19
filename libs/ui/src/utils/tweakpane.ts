@@ -11,11 +11,14 @@ if (import.meta.env.DEV) {
 
 pagePane?.registerPlugin(EssentialsPlugin)
 export interface FpsControls { begin(): void, end(): void }
-export const fps = pagePane?.addBlade({
-	view: "fpsgraph",
-	label: "fps",
-	lineCount: 1,
-}) as unknown as FpsControls
+export const fps = (import.meta.env.DEV
+	? pagePane?.addBlade({
+		view: "fpsgraph",
+		label: "fps",
+		lineCount: 1,
+	}) as unknown
+	: { begin: () => undefined, end: () => undefined }
+) as FpsControls
 
 /** Create a proxy object around given signal so that Tweakpane can read/write to signal */
 function createProxyFromSignal<T>(signal: Signal<T>, key: string) {

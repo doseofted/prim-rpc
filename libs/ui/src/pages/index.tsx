@@ -12,9 +12,9 @@ const Index: Component = () => {
 	addSignalMonitor(numSignal, "number", { view: "graph", min: 0, max: 100 }, folder)
 	const TestOnly = () => {
 		const size = () => `${num()}px`
-		return (<div style={{ width: size(), height: size() }} class="bg-gray border-white m-6 border-2">
-			<Light />
-		</div>)
+		return (<Light style={{ width: size(), height: size() }} class="bg-gray border-white m-6 border-2">
+			&hellip;
+		</Light>)
 	}
 	return (
 		<Lights>
