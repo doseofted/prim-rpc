@@ -16,7 +16,7 @@ interface LightInstance extends LightOptions {
 	y: number
 }
 
-type LightsContextType = [LightInstance[], Accessor<{ width: number, height: number }>, {
+type LightsContextType = [LightInstance[], Accessor<{ width: number, height: number }>, Accessor<{ x: number, y: number }>, {
 	createLight(opts: LightOptions, position: [x: number, y: number]): LightInstance
 	retrieveLight(id: string): LightInstance
 	updateLightPosition(id: string, position: [x: number, y: number]): void
@@ -70,14 +70,19 @@ export function Lights(props: LightsProps) {
 			}))
 		},
 	}
-	const winSize = ({ innerWidth: width, innerHeight: height }: typeof window = window) => ({ width, height })
+	const winSize = ({ innerWidth: width, innerHeight: height } = window) => ({ width, height })
 	const [windowSize, setWindowSize] = createSignal(winSize())
 	const winListener = () => setWindowSize(winSize())
 	onMount(() => window.addEventListener("resize", winListener))
 	onCleanup(() => window.removeEventListener("resize", winListener))
+	const scrollPosition = ({ scrollX: x, scrollY: y } = window) => ({ x, y })
+	const scrollListener = () => setScroll(scrollPosition())
+	const [scroll, setScroll] = createSignal(scrollPosition())
+	onMount(() => document.addEventListener("scroll", scrollListener))
+	onCleanup(() => document.removeEventListener("scroll", scrollListener))
 	return (
-		<LightsContext.Provider value={[lights, windowSize, operations]}>
-			<LightCanvas style={{ position: "absolute", width: "100%", height: "100%", top: 0, left: 0 }} />
+		<LightsContext.Provider value={[lights, windowSize, scroll, operations]}>
+			<LightCanvas style={{ position: "fixed", width: "100%", height: "100%", top: 0, left: 0 }} />
 			{props.children}
 		</LightsContext.Provider>
 	)
@@ -110,7 +115,7 @@ interface LightProps extends JSX.HTMLAttributes<HTMLDivElement> {
 export const Light: Component<LightProps> = (p) => {
 	const [props, attrs] = splitProps(p, ["children"])
 	let div: HTMLDivElement
-	const [, windowSize, operations] = useLights() ?? []
+	const [, windowSize, scroll, operations] = useLights() ?? []
 	function getCenter(rect: DOMRect) {
 		const { x, y, width, height, left, top } = rect
 		return { x: (x + width - left) / 2 + x, y: (y + height - top) / 2 + y }
@@ -120,8 +125,7 @@ export const Light: Component<LightProps> = (p) => {
 		const { x, y } = getCenter(div.getBoundingClientRect())
 		const light = operations.createLight({ brightness: 1, color: "#fff" }, [x, y])
 		createEffect(() => {
-			if (!windowSize) { return }
-			windowSize()
+			windowSize?.(); scroll?.()
 			const { x, y } = getCenter(div.getBoundingClientRect())
 			operations?.updateLightPosition(light.id, [x, y])
 		})
