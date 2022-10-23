@@ -15,7 +15,7 @@ const Index: Component = () => {
 	// addSignalMonitor(numSignal, "number", { view: "graph", min: 0, max: 100 }, folder)
 	const TestOnly = () => {
 		const sizeStyle = () => `${count()}px`
-		return (<Light style={{ width: sizeStyle(), height: sizeStyle() }} options={{ size: size(), brightness: brightness() }} class="bg-black border-white m-6 border-2 rounded-full text-white flex justify-center items-center">
+		return (<Light style={{ width: sizeStyle(), height: sizeStyle() }} options={{ size: size(), brightness: brightness() }} class="bg-transparent border-white m-6 border-2 rounded-full text-white flex justify-center items-center">
 			<span class="relative -top-1">&hellip;</span>
 		</Light>)
 	}

@@ -6,6 +6,7 @@ import { fps, FpsControls } from "../utils/tweakpane"
 import { nanoid } from "nanoid"
 import { throttle, clamp, random } from "lodash-es"
 import { GroupLike, PtsCanvasRenderingContext2D } from "pts"
+import { easeIn, easeOut } from "popmotion"
 
 interface LightOptions {
 	brightness: number
@@ -33,7 +34,6 @@ interface LightsProps {
 	fps?: FpsControls
 }
 export function Lights(props: LightsProps) {
-	// eslint-disable-next-line solid/reactivity, @typescript-eslint/no-unused-vars
 	const [lights, setLights] = createStore<LightInstance[]>([])
 	const locations: Record<string, number> = {}
 	const operations = {
@@ -46,6 +46,7 @@ export function Lights(props: LightsProps) {
 			}))
 			return this.retrieveLight(id)
 		},
+		/** NOTE: Returned value is from Solid Store and may need to be wrapped in effect */
 		// eslint-disable-next-line solid/reactivity
 		retrieveLight(id: string) {
 			return lights[locations[id]]
@@ -163,7 +164,6 @@ interface LightCanvasProps extends JSX.HTMLAttributes<HTMLDivElement> {
 }
 /** Canvas where lights are drawn */
 const LightCanvas: Component<LightCanvasProps> = (p) => {
-	// eslint-disable-next-line @typescript-eslint/no-unused-vars
 	const pDefaults = mergeProps<LightCanvasProps[]>({ background: "#2D0D60" }, p)
 	const [props, attrs] = splitProps(pDefaults, ["background"])
 	const [lights = []] = useLights() ?? []
@@ -188,14 +188,15 @@ const LightCanvas: Component<LightCanvasProps> = (p) => {
 			if (!space) { return }
 			form.composite("screen")
 			for (const light of lightsConfigured()) {
-				const { x, y, color: colorStart, size, brightness } = light
+				const { x, y, color, size, brightness } = light
+				const colorStart = transparentize(color, easeIn(clamp(1 - brightness, 0, 1)))
 				const colorEnd = transparentize(colorStart, 1)
 				const center = new Pt(x, y)
-				const circleSize = size * brightness
+				const circleSize = size * clamp(brightness, 0, 1.25)
 				const gradientColor = temporaryGradient(form.ctx, [colorStart, colorEnd])
 				const gradientShape = gradientColor(
-					Circle.fromCenter(center, circleSize * clamp(brightness - 1, 0, 1)),
-					Circle.fromCenter(center, circleSize),
+					Circle.fromCenter(center, circleSize * easeOut(clamp(brightness - 1, 0, 1))),
+					Circle.fromCenter(center, circleSize + 0.01),
 				)
 				form.fill(gradientShape).stroke(false).circle(Circle.fromCenter(center, circleSize))
 			}
