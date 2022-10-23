@@ -1,7 +1,7 @@
 import { Component, onCleanup, onMount, JSX, splitProps, createContext, useContext, createMemo, createSignal, Accessor, createEffect, mergeProps } from "solid-js"
 import { createStore, produce } from "solid-js/store"
 import { CanvasSpace, Circle, Pt } from "pts"
-import { transparentize } from "color2k"
+import { lighten, transparentize } from "color2k"
 import { fps, FpsControls } from "../utils/tweakpane"
 import { nanoid } from "nanoid"
 import { throttle, clamp, random } from "lodash-es"
@@ -189,13 +189,13 @@ const LightCanvas: Component<LightCanvasProps> = (p) => {
 			form.composite("screen")
 			for (const light of lightsConfigured()) {
 				const { x, y, color, size, brightness } = light
-				const colorStart = transparentize(color, easeIn(clamp(1 - brightness, 0, 1)))
+				const colorStart = transparentize(lighten(color, (clamp(brightness, 1.5, 2) - 1.5) * 2), easeIn(clamp(1 - brightness, 0, 1)))
 				const colorEnd = transparentize(colorStart, 1)
 				const center = new Pt(x, y)
-				const circleSize = size * clamp(brightness, 0, 1.25)
+				const circleSize = size * easeOut(brightness / 2)
 				const gradientColor = temporaryGradient(form.ctx, [colorStart, colorEnd])
 				const gradientShape = gradientColor(
-					Circle.fromCenter(center, circleSize * easeOut(clamp(brightness - 1, 0, 1))),
+					Circle.fromCenter(center, circleSize * easeOut(clamp(brightness - 1, 0, 1)) / 2),
 					Circle.fromCenter(center, circleSize + 0.01),
 				)
 				form.fill(gradientShape).stroke(false).circle(Circle.fromCenter(center, circleSize))
