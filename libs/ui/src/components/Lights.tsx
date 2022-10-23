@@ -1,12 +1,15 @@
-import { Component, onCleanup, onMount, JSX, splitProps, createContext, useContext, createMemo, createSignal, Accessor, createEffect } from "solid-js"
+import { Component, onCleanup, onMount, JSX, splitProps, createContext, useContext, createMemo, createSignal, Accessor, createEffect, mergeProps } from "solid-js"
 import { createStore, produce } from "solid-js/store"
 import { CanvasSpace, Circle, Pt } from "pts"
 import { transparentize } from "color2k"
 import { fps, FpsControls } from "../utils/tweakpane"
 import { nanoid } from "nanoid"
+import { throttle, clamp, random } from "lodash-es"
+import { GroupLike, PtsCanvasRenderingContext2D } from "pts"
 
 interface LightOptions {
 	brightness: number
+	size: number
 	color: string
 }
 
@@ -20,7 +23,7 @@ type LightsContextType = [LightInstance[], Accessor<{ width: number, height: num
 	createLight(opts: LightOptions, position: [x: number, y: number]): LightInstance
 	retrieveLight(id: string): LightInstance
 	updateLightPosition(id: string, position: [x: number, y: number]): void
-	updateLightOptions(id: string, options: LightOptions): void
+	updateLightOptions(id: string, options: Partial<LightOptions>): void
 	removeLight(id: string): void
 }]
 const LightsContext = createContext<LightsContextType>()
@@ -54,7 +57,7 @@ export function Lights(props: LightsProps) {
 				state[index] = { ...state[index], x, y }
 			}))
 		},
-		updateLightOptions(id: string, options: LightOptions) {
+		updateLightOptions(id: string, options: Partial<LightOptions>) {
 			const index = locations[id]
 			setLights(produce(state => {
 				state[index] = { ...state[index], ...options }
@@ -93,6 +96,7 @@ export function useLights() {
 
 interface LightProps extends JSX.HTMLAttributes<HTMLDivElement> {
 	children?: JSX.Element | JSX.Element[]
+	options?: Partial<LightOptions>
 }
 /**
  * Place a `Light` component anywhere inside of a `Lights` component and a light
@@ -113,7 +117,12 @@ interface LightProps extends JSX.HTMLAttributes<HTMLDivElement> {
  * ``` 
  */
 export const Light: Component<LightProps> = (p) => {
-	const [props, attrs] = splitProps(p, ["children"])
+	const [props, attrs] = splitProps(p, ["children", "options"])
+	const defaultColors = ["#f0A3FF", "#6D53FF", "#1D0049", "#0069BA", "#5BB8FF"]
+	const color = defaultColors[random(0, defaultColors.length - 1)]
+	const options = createMemo(() => {
+		return { brightness: 1, color, size: 50, ...props.options }
+	})
 	let div: HTMLDivElement
 	const [, windowSize, scroll, operations] = useLights() ?? []
 	function getCenter(rect: DOMRect) {
@@ -123,18 +132,22 @@ export const Light: Component<LightProps> = (p) => {
 	onMount(() => {
 		if (!operations) { return }
 		const { x, y } = getCenter(div.getBoundingClientRect())
-		const light = operations.createLight({ brightness: 1, color: "#fff" }, [x, y])
-		createEffect(() => {
-			windowSize?.(); scroll?.()
+		const light = operations.createLight(options(), [x, y])
+		const updatePosition = throttle(() => {
 			const { x, y } = getCenter(div.getBoundingClientRect())
 			operations?.updateLightPosition(light.id, [x, y])
+		}, 10)
+		createEffect(() => {
+			if (!props.options) { return }
+			operations?.updateLightOptions(light.id, props.options)
+		})
+		createEffect(() => {
+			windowSize?.(); scroll?.()
+			updatePosition()
 		})
 		const observer = new ResizeObserver((entries) => {
-			for (const entry of entries) {
-				const { target } = entry
-				const { x, y } = getCenter(target.getBoundingClientRect())
-				operations?.updateLightPosition(light.id, [x, y])
-			}
+			if (entries.length < 1) { return }
+			updatePosition()
 		})
 		observer.observe(div)
 		onCleanup(() => {
@@ -145,23 +158,29 @@ export const Light: Component<LightProps> = (p) => {
 	return <div {...attrs} ref={e => div = e}>{props.children}</div>
 }
 
-// eslint-disable-next-line @typescript-eslint/no-empty-interface
-interface LightCanvasProps extends JSX.HTMLAttributes<HTMLDivElement> { }
+interface LightCanvasProps extends JSX.HTMLAttributes<HTMLDivElement> {
+	background?: string
+}
 /** Canvas where lights are drawn */
 const LightCanvas: Component<LightCanvasProps> = (p) => {
 	// eslint-disable-next-line @typescript-eslint/no-unused-vars
-	const [_props, attrs] = splitProps(p, [])
+	const pDefaults = mergeProps<LightCanvasProps[]>({ background: "#2D0D60" }, p)
+	const [props, attrs] = splitProps(pDefaults, ["background"])
 	const [lights = []] = useLights() ?? []
 	let canvas: HTMLCanvasElement | undefined
 	let space: CanvasSpace | undefined
-	const lightsConfigured = createMemo(() => lights.map(({ x, y }, i) => {
-		const color = ["#00ffff", "#ffff00", "#ff00ff"][i % 3]
-		return { x, y, color }
+	const lightsConfigured = createMemo(() => lights.map(({ x, y, color, brightness, size }) => {
+		return { x, y, color, brightness, size }
 	}))
+	createEffect(() => {
+		if (!space) { return }
+		if (!props.background) { return }
+		space.background = props.background
+	})
 	onMount(() => {
 		if (!canvas) { return }
 		space = new CanvasSpace(canvas)
-		space.setup({ bgcolor: "#000", resize: true })
+		space.setup({ bgcolor: props.background, resize: true })
 		const form = space.getForm()
 		// eslint-disable-next-line solid/reactivity -- animation function catches signal updates
 		space.add(() => {
@@ -169,13 +188,13 @@ const LightCanvas: Component<LightCanvasProps> = (p) => {
 			if (!space) { return }
 			form.composite("screen")
 			for (const light of lightsConfigured()) {
-				const { x, y, color: colorStart } = light
-				const center = new Pt(x, y)
-				const circleSize = 150
+				const { x, y, color: colorStart, size, brightness } = light
 				const colorEnd = transparentize(colorStart, 1)
-				const gradientColor = form.gradient([colorStart, colorEnd])
+				const center = new Pt(x, y)
+				const circleSize = size * brightness
+				const gradientColor = temporaryGradient(form.ctx, [colorStart, colorEnd])
 				const gradientShape = gradientColor(
-					Circle.fromCenter(center, 0),
+					Circle.fromCenter(center, circleSize * clamp(brightness - 1, 0, 1)),
 					Circle.fromCenter(center, circleSize),
 				)
 				form.fill(gradientShape).stroke(false).circle(Circle.fromCenter(center, circleSize))
@@ -194,3 +213,32 @@ const LightCanvas: Component<LightCanvasProps> = (p) => {
 	)
 }
 
+/**
+ * This is a temporary replacement for PTS gradient method while my PR is being reviewed in the official library.
+ * Replace `temporaryGradient(form.ctx, ...)` with `form.gradient(...)` once approved.
+ *
+ * - [My PR](https://github.com/williamngan/pts/pull/196)
+ * - [Original gradient function](https://github.com/williamngan/pts/blob/5aacde2939e339892fd001885f964d5c52b057c5/src/Canvas.ts#L617-L641)
+ */
+function temporaryGradient(ctx: PtsCanvasRenderingContext2D, stops: [number, string][] | string[]): ((area1: GroupLike, area2?: GroupLike) => CanvasGradient) {
+	const vals: [number, string][] = []
+	if (stops.length < 2) (stops as [number, string][]).push([0.99, "#000"], [1, "#000"])
+
+	for (let i = 0, len = stops.length; i < len; i++) {
+		const t: number = typeof stops[i] === "string" ? i * (1 / (stops.length - 1)) : stops[i][0] as number
+		const v: string = typeof stops[i] === "string" ? stops[i] as string : stops[i][1]
+		vals.push([t, v])
+	}
+
+	return (area1: GroupLike, area2?: GroupLike) => {
+		const grad = area2
+			? ctx.createRadialGradient(area1[0][0], area1[0][1], Math.abs(area1[1][0]), area2[0][0], area2[0][1], Math.abs(area2[1][0]))
+			: ctx.createLinearGradient(area1[0][0], area1[0][1], area1[1][0], area1[1][1])
+
+		for (let i = 0, len = vals.length; i < len; i++) {
+			grad.addColorStop(vals[i][0], vals[i][1])
+		}
+
+		return grad
+	}
+}
