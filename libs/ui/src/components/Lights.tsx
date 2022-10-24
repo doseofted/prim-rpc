@@ -130,8 +130,8 @@ export const Light: Component<LightProps> = (p) => {
 	const [props, attrs] = splitProps(p, ["children", "options"])
 	const defaultColors = ["#f0A3FF", "#6D53FF", "#1D0049", "#0069BA", "#5BB8FF"]
 	const color = defaultColors[random(0, defaultColors.length - 1)]
-	const options = createMemo(() => {
-		return { brightness: 1, color, size: 50, ...props.options }
+	const options = createMemo<LightOptions>(() => {
+		return { brightness: 1, color, size: 50, offset: [0, 0], ...props.options }
 	})
 	let div: HTMLDivElement
 	const [, env, operations] = useLights() ?? []
@@ -192,8 +192,8 @@ const LightCanvas: Component<LightCanvasProps> = (p) => {
 	const [lights = []] = useLights() ?? []
 	let canvas: HTMLCanvasElement | undefined
 	let space: CanvasSpace | undefined
-	const lightsConfigured = createMemo(() => lights.map(({ x, y, color, brightness, size }) => {
-		return { x, y, color, brightness, size }
+	const lightsConfigured = createMemo(() => lights.map(({ x, y, color, brightness, size, offset }) => {
+		return { x, y, color, brightness, size, offset }
 	}))
 	createEffect(() => {
 		if (!space) { return }
@@ -206,13 +206,20 @@ const LightCanvas: Component<LightCanvasProps> = (p) => {
 		space.setup({ bgcolor: props.background, resize: true })
 		const form = space.getForm()
 		// eslint-disable-next-line solid/reactivity -- animation function catches signal updates
+		const positionDelayed: Pt[] = []
 		space.add((_seconds) => {
 			fps.begin()
 			if (!space) { return }
 			form.composite("screen")
-			for (const light of lightsConfigured()) {
-				const { x, y, color, size, brightness } = light
-				const center = new Pt(x, y)
+			for (const [index, light] of lightsConfigured().entries()) {
+				const { x, y, color, size, brightness, offset = [0, 0] } = light
+				const center = new Pt(x + offset[0], y + offset[1])
+				if (!positionDelayed[index]) {
+					positionDelayed[index] = center
+				} else {
+					// NOTE: useful example of delayed movement at https://ptsjs.org/demo/edit/?name=create.gridcells
+					positionDelayed[index] = positionDelayed[index].add(center.subtract(positionDelayed[index]).divide(50))
+				}
 				const colorStart = transparentize(
 					lighten(color, (clamp(brightness, 1.5, 2) - 1.5) * 2),
 					easeIn(clamp(1 - brightness, 0, 1)),
@@ -221,10 +228,10 @@ const LightCanvas: Component<LightCanvasProps> = (p) => {
 				const circleSize = size * easeOut(brightness / 2)
 				const gradientColor = temporaryGradient(form.ctx, [colorStart, colorEnd])
 				const gradientShape = gradientColor(
-					Circle.fromCenter(center, circleSize * easeOut(clamp(brightness - 1, 0, 1)) / 2),
-					Circle.fromCenter(center, circleSize + 0.01),
+					Circle.fromCenter(positionDelayed[index], circleSize * easeOut(clamp(brightness - 1, 0, 1)) / 2),
+					Circle.fromCenter(positionDelayed[index], circleSize + 0.01),
 				)
-				form.fill(gradientShape).stroke(false).circle(Circle.fromCenter(center, circleSize))
+				form.fill(gradientShape).stroke(false).circle(Circle.fromCenter(positionDelayed[index], circleSize))
 			}
 			fps.end()
 		})

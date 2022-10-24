@@ -22,7 +22,7 @@ const Index: Component = () => {
 	return (
 		<Lights>
 			<div class="relative grid w-full grid-cols-2 justify-center place-content-center gap-4 mx-auto p-8 max-w-2xl">
-				<Light options={{ color: "#f00", size: size(), brightness: brightness() }} class="border border-white/50 bg-white/40 backdrop-blur-lg rounded-lg p-8 text-center h-75vh">This is a test.</Light>
+				<Light options={{ color: "#f00", size: size(), brightness: brightness(), offset: [-100, -100] }} class="border border-white/50 bg-white/40 backdrop-blur-lg rounded-lg p-8 text-center h-75vh">This is a test.</Light>
 				<Light options={{ color: "#0f0", size: size(), brightness: brightness() }} class="border border-white/50 bg-white/40 backdrop-blur-lg rounded-lg p-8 text-center h-50vh">Another test!</Light>
 			</div>
 			<div class="lights-and-stuff flex relative flex-wrap justify-center">
