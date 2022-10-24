@@ -140,11 +140,13 @@ export const Light: Component<LightProps> = (p) => {
 	const [props, attrs] = splitProps(p, ["children", "options"])
 	const defaultColors = ["#f0A3FF", "#6D53FF", "#1D0049", "#0069BA", "#5BB8FF"]
 	const color = defaultColors[random(0, defaultColors.length - 1)]
-	const options = createMemo<LightOptions>(() => {
-		return { brightness: 1, color, size: 50, offset: [0, 0], delayStrength: 50, ...props.options }
-	})
-	let div: HTMLDivElement
 	const [, env, operations] = useLights() ?? []
+	const options = createMemo<LightOptions>(() => ({
+		color, size: 50, offset: [0, 0], delayStrength: 50, brightness: 1,
+		...env?.optionsShared(),
+		...props.options,
+	}))
+	let div: HTMLDivElement
 	/** Utility to get center of div relative to the page */
 	function getCenter(rect: DOMRect) {
 		const { x, y, width, height, left, top } = rect
@@ -159,7 +161,7 @@ export const Light: Component<LightProps> = (p) => {
 			operations?.updateLightPosition(light.id, [x, y])
 		}, 10)
 		createEffect(() => {
-			operations?.updateLightOptions(light.id, { ...env?.optionsShared(), ...props.options })
+			operations?.updateLightOptions(light.id, options())
 		})
 		createEffect(() => {
 			env?.windowSize(); env?.scrollPosition()

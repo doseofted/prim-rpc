@@ -26,6 +26,7 @@ function createProxyFromSignal<T>(signal: Signal<T>, key: string) {
 	const compatible = new Proxy({ [key]: given() }, {
 		get: (_target, p, _receiver) => p === key ? given() : undefined,
 		set: (_target, p, value, _receiver) => {
+			// NOTE: setter can't work with object values yet (I may need to use proxy-deep for objects?)
 			const setIt = p === key
 			if (setIt) { setGiven(value) }
 			return setIt
