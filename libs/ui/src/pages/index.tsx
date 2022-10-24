@@ -15,15 +15,20 @@ const Index: Component = () => {
 	// addSignalMonitor(numSignal, "number", { view: "graph", min: 0, max: 100 }, folder)
 	const TestOnly = () => {
 		const sizeStyle = () => `${count()}px`
-		return (<Light style={{ width: sizeStyle(), height: sizeStyle() }} options={{ size: size(), brightness: brightness() }} class="bg-transparent border-white m-6 border-2 rounded-full text-white flex justify-center items-center">
-			<span class="relative -top-1">&hellip;</span>
-		</Light>)
+		return (
+			<Light
+				style={{ width: sizeStyle(), height: sizeStyle() }}
+				class="bg-transparent border-white m-6 border-2 rounded-full text-white flex justify-center items-center"
+			>
+				<span class="relative -top-1">&hellip;</span>
+			</Light>
+		)
 	}
 	return (
-		<Lights>
+		<Lights options={{ size: size(), brightness: brightness() }}>
 			<div class="relative grid w-full grid-cols-2 justify-center place-content-center gap-4 mx-auto p-8 max-w-2xl">
-				<Light options={{ color: "#f00", size: size(), brightness: brightness(), offset: [-100, -100] }} class="border border-white/50 bg-white/40 backdrop-blur-lg rounded-lg p-8 text-center h-75vh">This is a test.</Light>
-				<Light options={{ color: "#0f0", size: size(), brightness: brightness() }} class="border border-white/50 bg-white/40 backdrop-blur-lg rounded-lg p-8 text-center h-50vh">Another test!</Light>
+				<Light options={{ color: "#f00", size: size(), brightness: brightness(), offset: [size(), 0] }} class="border border-white/50 bg-white/40 backdrop-blur-lg rounded-lg p-8 text-center h-75vh">This is a test.</Light>
+				<Light options={{ color: "#0f0", size: size(), brightness: brightness(), offset: [size() * -1, 0] }} class="border border-white/50 bg-white/40 backdrop-blur-lg rounded-lg p-8 text-center h-50vh">Another test!</Light>
 			</div>
 			<div class="lights-and-stuff flex relative flex-wrap justify-center">
 				<For each={new Array(count())}>{() => <TestOnly />}</For>

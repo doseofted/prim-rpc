@@ -3,20 +3,24 @@ import {
 	createMemo, createSignal, Accessor, createEffect, mergeProps,
 } from "solid-js"
 import { createStore, produce } from "solid-js/store"
-import { CanvasSpace, Circle, Pt } from "pts"
+import { CanvasSpace, Circle, Pt, GroupLike, PtsCanvasRenderingContext2D } from "pts"
 import { lighten, transparentize } from "color2k"
-import { fps, FpsControls } from "../utils/tweakpane"
-import { nanoid } from "nanoid"
-import { throttle, clamp, random } from "lodash-es"
-import { GroupLike, PtsCanvasRenderingContext2D } from "pts"
 import { easeIn, easeOut } from "popmotion"
-import { Motion } from "@motionone/solid"
+import { throttle, clamp, random } from "lodash-es"
+import { nanoid } from "nanoid"
+import { fps, FpsControls } from "../utils/tweakpane"
 
 interface LightOptions {
+	/** Brightness from 0-2 */
 	brightness: number
+	/** Size of light itself, unrelated to brightness */
 	size: number
+	/** Color of the light when brightness is 1 */
 	color: string
-	offset?: [x: number, y: number]
+	/** Offset from the light's set position */
+	offset?: [x: number, y: number],
+	/** Delay amount of the offset */
+	delayStrength?: number
 }
 
 interface LightInstance extends LightOptions {
@@ -28,6 +32,7 @@ interface LightInstance extends LightOptions {
 type LightEnv = {
 	windowSize: Accessor<{ width: number, height: number }>
 	scrollPosition: Accessor<{ x: number, y: number }>
+	optionsShared: Accessor<Partial<LightOptions> | undefined>
 }
 type LightsContextType = [LightInstance[], LightEnv, {
 	createLight(opts: LightOptions, position: [x: number, y: number]): LightInstance
@@ -40,17 +45,22 @@ const LightsContext = createContext<LightsContextType>()
 
 interface LightsProps {
 	children: JSX.Element | JSX.Element[]
+	/** Use Tweakpane FPS monitor in development */
 	fps?: FpsControls
+	/** Options used if none are provided to a light, overrides defaults */
+	options?: Partial<LightOptions>
 }
+/** Provider for `Light` component */
 export function Lights(props: LightsProps) {
 	const [lights, setLights] = createStore<LightInstance[]>([])
+	const optionsShared = createMemo(() => props.options)
 	const locations: Record<string, number> = {}
 	const operations = {
 		createLight(options: LightOptions, position: [x: number, y: number]) {
 			const id = nanoid()
 			setLights(produce(state => {
 				const [x, y] = position ?? [0, 0]
-				const index = state.push({ ...options, x, y, id }) - 1
+				const index = state.push({ ...options, ...props.options, x, y, id }) - 1
 				locations[id] = index
 			}))
 			return this.retrieveLight(id)
@@ -70,7 +80,7 @@ export function Lights(props: LightsProps) {
 		updateLightOptions(id: string, options: Partial<LightOptions>) {
 			const index = locations[id]
 			setLights(produce(state => {
-				state[index] = { ...state[index], ...options }
+				state[index] = { ...state[index], ...props.options, ...options }
 			}))
 		},
 		removeLight(id: string) {
@@ -94,13 +104,13 @@ export function Lights(props: LightsProps) {
 	onMount(() => document.addEventListener("scroll", scrollListener))
 	onCleanup(() => document.removeEventListener("scroll", scrollListener))
 	return (
-		<LightsContext.Provider value={[lights, { windowSize, scrollPosition }, operations]}>
+		<LightsContext.Provider value={[lights, { windowSize, scrollPosition, optionsShared }, operations]}>
 			<LightCanvas style={{ position: "fixed", width: "100%", height: "100%", top: 0, left: 0 }} />
 			{props.children}
 		</LightsContext.Provider>
 	)
 }
-export function useLights() {
+function useLights() {
 	return useContext(LightsContext)
 }
 
@@ -131,10 +141,11 @@ export const Light: Component<LightProps> = (p) => {
 	const defaultColors = ["#f0A3FF", "#6D53FF", "#1D0049", "#0069BA", "#5BB8FF"]
 	const color = defaultColors[random(0, defaultColors.length - 1)]
 	const options = createMemo<LightOptions>(() => {
-		return { brightness: 1, color, size: 50, offset: [0, 0], ...props.options }
+		return { brightness: 1, color, size: 50, offset: [0, 0], delayStrength: 50, ...props.options }
 	})
 	let div: HTMLDivElement
 	const [, env, operations] = useLights() ?? []
+	/** Utility to get center of div relative to the page */
 	function getCenter(rect: DOMRect) {
 		const { x, y, width, height, left, top } = rect
 		return { x: (x + width - left) / 2 + x, y: (y + height - top) / 2 + y }
@@ -148,37 +159,29 @@ export const Light: Component<LightProps> = (p) => {
 			operations?.updateLightPosition(light.id, [x, y])
 		}, 10)
 		createEffect(() => {
-			if (!props.options) { return }
-			operations?.updateLightOptions(light.id, props.options)
+			operations?.updateLightOptions(light.id, { ...env?.optionsShared(), ...props.options })
 		})
 		createEffect(() => {
 			env?.windowSize(); env?.scrollPosition()
-			updatePosition()
+			updatePosition() // track position of div given changes to environment
 		})
 		const resizeObserver = new ResizeObserver((entries) => {
 			if (entries.length < 1) { return }
 			updatePosition()
 		})
 		resizeObserver.observe(div)
-		// const mutationObserver = new MutationObserver((mutated) => {
-		// 	const styled = mutated
-		// 		.map(({ attributeName }) => attributeName === "style")
-		// 		.reduce((a, b) => a || b, true)
-		// 	if (styled) { updatePosition() }
-		// })
-		// mutationObserver.observe(div, { attributes: true, attributeFilter: ["style"] })
 		onCleanup(() => {
 			resizeObserver.disconnect()
 			operations?.removeLight(light.id)
 		})
 	})
 	return (
-		<Motion
+		<div
 			{...attrs}
 			ref={e => div = e}
 		>
 			{props.children}
-		</Motion>
+		</div>
 	)
 }
 
@@ -192,9 +195,6 @@ const LightCanvas: Component<LightCanvasProps> = (p) => {
 	const [lights = []] = useLights() ?? []
 	let canvas: HTMLCanvasElement | undefined
 	let space: CanvasSpace | undefined
-	const lightsConfigured = createMemo(() => lights.map(({ x, y, color, brightness, size, offset }) => {
-		return { x, y, color, brightness, size, offset }
-	}))
 	createEffect(() => {
 		if (!space) { return }
 		if (!props.background) { return }
@@ -205,21 +205,25 @@ const LightCanvas: Component<LightCanvasProps> = (p) => {
 		space = new CanvasSpace(canvas)
 		space.setup({ bgcolor: props.background, resize: true })
 		const form = space.getForm()
+		const offsetDelayed: Pt[] = []
 		// eslint-disable-next-line solid/reactivity -- animation function catches signal updates
-		const positionDelayed: Pt[] = []
 		space.add((_seconds) => {
 			fps.begin()
 			if (!space) { return }
 			form.composite("screen")
-			for (const [index, light] of lightsConfigured().entries()) {
-				const { x, y, color, size, brightness, offset = [0, 0] } = light
-				const center = new Pt(x + offset[0], y + offset[1])
-				if (!positionDelayed[index]) {
-					positionDelayed[index] = center
+			for (const [index, light] of lights.entries()) {
+				const { x, y, color, size, brightness, offset: offsetCoords = [0, 0], delayStrength = 1 } = light
+				const delay = clamp(delayStrength, 1, Infinity)
+				let center = new Pt(x, y)
+				const offset = new Pt(offsetCoords)
+				if (!offsetDelayed[index]) {
+					offsetDelayed[index] = offset
 				} else {
 					// NOTE: useful example of delayed movement at https://ptsjs.org/demo/edit/?name=create.gridcells
-					positionDelayed[index] = positionDelayed[index].add(center.subtract(positionDelayed[index]).divide(50))
+					offsetDelayed[index] = offsetDelayed[index]
+						.add(offset.$subtract(offsetDelayed[index]).divide(delay))
 				}
+				center = center.$add(offsetDelayed[index])
 				const colorStart = transparentize(
 					lighten(color, (clamp(brightness, 1.5, 2) - 1.5) * 2),
 					easeIn(clamp(1 - brightness, 0, 1)),
@@ -228,10 +232,10 @@ const LightCanvas: Component<LightCanvasProps> = (p) => {
 				const circleSize = size * easeOut(brightness / 2)
 				const gradientColor = temporaryGradient(form.ctx, [colorStart, colorEnd])
 				const gradientShape = gradientColor(
-					Circle.fromCenter(positionDelayed[index], circleSize * easeOut(clamp(brightness - 1, 0, 1)) / 2),
-					Circle.fromCenter(positionDelayed[index], circleSize + 0.01),
+					Circle.fromCenter(center, circleSize * easeOut(clamp(brightness - 1, 0, 1)) / 2),
+					Circle.fromCenter(center, circleSize + 0.01),
 				)
-				form.fill(gradientShape).stroke(false).circle(Circle.fromCenter(positionDelayed[index], circleSize))
+				form.fill(gradientShape).stroke(false).circle(Circle.fromCenter(center, circleSize))
 			}
 			fps.end()
 		})
