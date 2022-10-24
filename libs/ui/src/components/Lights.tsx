@@ -1,4 +1,7 @@
-import { Component, onCleanup, onMount, JSX, splitProps, createContext, useContext, createMemo, createSignal, Accessor, createEffect, mergeProps } from "solid-js"
+import {
+	Component, onCleanup, onMount, JSX, splitProps, createContext, useContext,
+	createMemo, createSignal, Accessor, createEffect, mergeProps,
+} from "solid-js"
 import { createStore, produce } from "solid-js/store"
 import { CanvasSpace, Circle, Pt } from "pts"
 import { lighten, transparentize } from "color2k"
@@ -7,11 +10,13 @@ import { nanoid } from "nanoid"
 import { throttle, clamp, random } from "lodash-es"
 import { GroupLike, PtsCanvasRenderingContext2D } from "pts"
 import { easeIn, easeOut } from "popmotion"
+import { Motion } from "@motionone/solid"
 
 interface LightOptions {
 	brightness: number
 	size: number
 	color: string
+	offset?: [x: number, y: number]
 }
 
 interface LightInstance extends LightOptions {
@@ -20,7 +25,11 @@ interface LightInstance extends LightOptions {
 	y: number
 }
 
-type LightsContextType = [LightInstance[], Accessor<{ width: number, height: number }>, Accessor<{ x: number, y: number }>, {
+type LightEnv = {
+	windowSize: Accessor<{ width: number, height: number }>
+	scrollPosition: Accessor<{ x: number, y: number }>
+}
+type LightsContextType = [LightInstance[], LightEnv, {
 	createLight(opts: LightOptions, position: [x: number, y: number]): LightInstance
 	retrieveLight(id: string): LightInstance
 	updateLightPosition(id: string, position: [x: number, y: number]): void
@@ -76,16 +85,16 @@ export function Lights(props: LightsProps) {
 	}
 	const winSize = ({ innerWidth: width, innerHeight: height } = window) => ({ width, height })
 	const [windowSize, setWindowSize] = createSignal(winSize())
-	const winListener = () => setWindowSize(winSize())
+	const winListener = throttle(() => setWindowSize(winSize()), 15)
 	onMount(() => window.addEventListener("resize", winListener))
 	onCleanup(() => window.removeEventListener("resize", winListener))
-	const scrollPosition = ({ scrollX: x, scrollY: y } = window) => ({ x, y })
-	const scrollListener = () => setScroll(scrollPosition())
-	const [scroll, setScroll] = createSignal(scrollPosition())
+	const scrollPos = ({ scrollX: x, scrollY: y } = window) => ({ x, y })
+	const scrollListener = throttle(() => setScroll(scrollPos()), 15)
+	const [scrollPosition, setScroll] = createSignal(scrollPos())
 	onMount(() => document.addEventListener("scroll", scrollListener))
 	onCleanup(() => document.removeEventListener("scroll", scrollListener))
 	return (
-		<LightsContext.Provider value={[lights, windowSize, scroll, operations]}>
+		<LightsContext.Provider value={[lights, { windowSize, scrollPosition }, operations]}>
 			<LightCanvas style={{ position: "fixed", width: "100%", height: "100%", top: 0, left: 0 }} />
 			{props.children}
 		</LightsContext.Provider>
@@ -125,7 +134,7 @@ export const Light: Component<LightProps> = (p) => {
 		return { brightness: 1, color, size: 50, ...props.options }
 	})
 	let div: HTMLDivElement
-	const [, windowSize, scroll, operations] = useLights() ?? []
+	const [, env, operations] = useLights() ?? []
 	function getCenter(rect: DOMRect) {
 		const { x, y, width, height, left, top } = rect
 		return { x: (x + width - left) / 2 + x, y: (y + height - top) / 2 + y }
@@ -143,20 +152,34 @@ export const Light: Component<LightProps> = (p) => {
 			operations?.updateLightOptions(light.id, props.options)
 		})
 		createEffect(() => {
-			windowSize?.(); scroll?.()
+			env?.windowSize(); env?.scrollPosition()
 			updatePosition()
 		})
-		const observer = new ResizeObserver((entries) => {
+		const resizeObserver = new ResizeObserver((entries) => {
 			if (entries.length < 1) { return }
 			updatePosition()
 		})
-		observer.observe(div)
+		resizeObserver.observe(div)
+		// const mutationObserver = new MutationObserver((mutated) => {
+		// 	const styled = mutated
+		// 		.map(({ attributeName }) => attributeName === "style")
+		// 		.reduce((a, b) => a || b, true)
+		// 	if (styled) { updatePosition() }
+		// })
+		// mutationObserver.observe(div, { attributes: true, attributeFilter: ["style"] })
 		onCleanup(() => {
-			observer.disconnect()
+			resizeObserver.disconnect()
 			operations?.removeLight(light.id)
 		})
 	})
-	return <div {...attrs} ref={e => div = e}>{props.children}</div>
+	return (
+		<Motion
+			{...attrs}
+			ref={e => div = e}
+		>
+			{props.children}
+		</Motion>
+	)
 }
 
 interface LightCanvasProps extends JSX.HTMLAttributes<HTMLDivElement> {
@@ -183,15 +206,18 @@ const LightCanvas: Component<LightCanvasProps> = (p) => {
 		space.setup({ bgcolor: props.background, resize: true })
 		const form = space.getForm()
 		// eslint-disable-next-line solid/reactivity -- animation function catches signal updates
-		space.add(() => {
+		space.add((_seconds) => {
 			fps.begin()
 			if (!space) { return }
 			form.composite("screen")
 			for (const light of lightsConfigured()) {
 				const { x, y, color, size, brightness } = light
-				const colorStart = transparentize(lighten(color, (clamp(brightness, 1.5, 2) - 1.5) * 2), easeIn(clamp(1 - brightness, 0, 1)))
-				const colorEnd = transparentize(colorStart, 1)
 				const center = new Pt(x, y)
+				const colorStart = transparentize(
+					lighten(color, (clamp(brightness, 1.5, 2) - 1.5) * 2),
+					easeIn(clamp(1 - brightness, 0, 1)),
+				)
+				const colorEnd = transparentize(colorStart, 1)
 				const circleSize = size * easeOut(brightness / 2)
 				const gradientColor = temporaryGradient(form.ctx, [colorStart, colorEnd])
 				const gradientShape = gradientColor(
