@@ -269,22 +269,22 @@ const LightsCanvas: Component<LightCanvasProps> = (p) => {
 		space = new CanvasSpace(canvas)
 		space.setup({ bgcolor: props.background, resize: true })
 		const form = space.getForm()
-		const offsetDelayed: Pt[] = []
-		const rotateDelayed: number[] = []
-		// const ptDelays: { [prop: string]: Pt } = {}
-		// const numberDelays: { [prop: string]: number } = {}
-		// function delayPt (prop: string, given: Pt, delay: number) {
-		// 	ptDelays[prop] = typeof ptDelays[prop] !== "undefined"
-		// 		? ptDelays[prop].$add(given.$subtract(ptDelays[prop]).$divide(delay))
-		// 		: given
-		// 	return ptDelays[prop]
-		// }
-		// function delayNumber(prop: string, given: number, delay: number) {
-		// 	numberDelays[prop] = typeof numberDelays[prop] !== "undefined"
-		// 		? numberDelays[prop] + ((given - numberDelays[prop]) / delay)
-		// 		: given
-		// 	return numberDelays[prop]
-		// }
+		const delays: { [prop: string]: Pt } = {}
+		/**
+		 * Given a `Pt`, delay its movement over time.
+		 * [This example is a useful reference](https://ptsjs.org/demo/edit/?name=create.gridcells).
+		 */
+		function delayPt(given: Pt, delay: number, prop: string | (string | number)[]) {
+			const accessor = Array.isArray(prop) ? prop.join("-") : prop
+			delays[accessor] = typeof delays[accessor] !== "undefined" && delays[accessor] !== given
+				? delays[accessor].$add(given.$subtract(delays[accessor]).$divide(delay))
+				: given
+			return delays[accessor]
+		}
+		/** Same as`delayPt()` but for numbers) */
+		function delayNumber(given: number, delay: number, prop: string | (string | number)[]) {
+			return delayPt(new Pt([given]), delay, prop)[0]
+		}
 		// eslint-disable-next-line solid/reactivity -- animation function catches signal updates
 		space.add((_seconds) => {
 			props.fps?.begin()
@@ -296,26 +296,23 @@ const LightsCanvas: Component<LightCanvasProps> = (p) => {
 					offset: offsetCoords = [0, 0], delay: delayStrength = 1, rotate: rotateAmount = 0,
 				} = light
 				const delay = clamp(delayStrength, 1, Infinity)
+				const brightnessDelayed = delayNumber(brightness, delay, [index, "brightness"])
 				let center = new Pt(position)
 				const offset = new Pt(offsetCoords)
-				// NOTE: useful example of delayed movement at https://ptsjs.org/demo/edit/?name=create.gridcells
-				offsetDelayed[index] = typeof offsetDelayed[index] !== "undefined"
-					? offsetDelayed[index].$add(offset.$subtract(offsetDelayed[index]).$divide(delay))
-					: offset
+				const offsetDelayed = delayPt(offset, delay, [index, "offset"])
 				const rotate = rotateAmount % 360
-				rotateDelayed[index] = typeof rotateDelayed[index] !== "undefined"
-					? rotateDelayed[index] + ((rotate - rotateDelayed[index]) / delay)
-					: rotate
-				center = center.$add(offsetDelayed[index]).rotate2D(rotateDelayed[index] * (Const.pi / 180), center)
+				const rotateDelayed = delayNumber(rotate, delay, [index, "rotate"])
+				center = center.$add(offsetDelayed).rotate2D(rotateDelayed * (Const.pi / 180), center)
 				const colorStart = transparentize(
-					lighten(color, (clamp(brightness, 1.5, 2) - 1.5) * 2),
-					easeIn(clamp(1 - brightness, 0, 1)),
+					lighten(color, (clamp(brightnessDelayed, 1.5, 2) - 1.5) * 2),
+					easeIn(clamp(1 - brightnessDelayed, 0, 1)),
 				)
 				const colorEnd = transparentize(colorStart, 1)
-				const circleSize = size * easeOut(brightness / 2)
+				const sizeDelayed = delayNumber(size, delay, [index, "size"])
+				const circleSize = sizeDelayed * easeOut(brightnessDelayed / 2)
 				const gradientColor = temporaryGradient(form.ctx, [colorStart, colorEnd])
 				const gradientShape = gradientColor(
-					Circle.fromCenter(center, circleSize * easeOut(clamp(brightness - 1, 0, 1)) / 2),
+					Circle.fromCenter(center, circleSize * easeOut(clamp(brightnessDelayed - 1, 0, 1)) / 2),
 					Circle.fromCenter(center, circleSize + 0.01),
 				)
 				const lightShape = Circle.fromCenter(center, circleSize)
