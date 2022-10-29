@@ -45,7 +45,11 @@ type LightsContextType = [LightInstance[], LightEnv, {
 	removeLight(id: string): void
 }]
 const LightsContext = createContext<LightsContextType>()
+function useLights() {
+	return useContext(LightsContext)
+}
 
+// SECTION Lights provider
 interface LightsProps {
 	children: JSX.Element | JSX.Element[]
 	/** Use Tweakpane FPS monitor in development */
@@ -53,7 +57,7 @@ interface LightsProps {
 	/** Options used if none are provided to a light, overrides defaults */
 	options?: Partial<LightOptions>
 }
-/** Provider for `Light` component */
+/** Provider for `Light` components */
 export function Lights(props: LightsProps) {
 	const [lights, setLights] = createStore<LightInstance[]>([])
 	const optionsShared = createMemo(() => props.options)
@@ -109,15 +113,14 @@ export function Lights(props: LightsProps) {
 	onCleanup(() => document.removeEventListener("scroll", scrollListener))
 	return (
 		<LightsContext.Provider value={[lights, { windowSize, scrollPosition, optionsShared }, operations]}>
-			<LightCanvas style={{ position: "fixed", width: "100%", height: "100%", top: 0, left: 0 }} />
+			<LightsCanvas style={{ position: "fixed", width: "100%", height: "100%", top: 0, left: 0 }} />
 			{props.children}
 		</LightsContext.Provider>
 	)
 }
-function useLights() {
-	return useContext(LightsContext)
-}
+// !SECTION
 
+// SECTION Light with attributes
 interface LightProps extends JSX.HTMLAttributes<HTMLDivElement> {
 	children?: JSX.Element | JSX.Element[]
 	options?: Partial<LightOptions>
@@ -193,12 +196,32 @@ export const Light: Component<LightProps> = (p) => {
 		</div>
 	)
 }
+// !SECTION
 
+// SECTION Light with behaviors
+interface LightBehaviorProps extends JSX.HTMLAttributes<HTMLDivElement> {
+	focus?: number
+	jitter?: number
+}
+/**
+ * This is a variant of the `Light` component but its props describe behavior
+ * rather than its attributes. For instance, instead of controlling brightness,
+ * size, position, and rotation individually, change `focus` to control all of them. 
+ */
+export const LightBehavior: Component<LightBehaviorProps> = (p) => {
+	const pDefaults = mergeProps<LightBehaviorProps[]>({ focus: 1, jitter: 0 }, p)
+	const [props, lightRelated] = splitProps(pDefaults, ["focus", "jitter"])
+	const options = createMemo<Partial<LightOptions>>(() => ({}))
+	return <Light {...lightRelated} options={options()} />
+}
+// !SECTION
+
+// SECTION Lights canvas
 interface LightCanvasProps extends JSX.HTMLAttributes<HTMLDivElement> {
 	background?: string
 }
 /** Canvas where lights are drawn */
-const LightCanvas: Component<LightCanvasProps> = (p) => {
+const LightsCanvas: Component<LightCanvasProps> = (p) => {
 	const pDefaults = mergeProps<LightCanvasProps[]>({ background: "#2D0D60" }, p)
 	const [props, attrs] = splitProps(pDefaults, ["background"])
 	const ctx = useLights()
@@ -268,6 +291,7 @@ const LightCanvas: Component<LightCanvasProps> = (p) => {
 		</div>
 	)
 }
+// !SECTION
 
 /**
  * This is a temporary replacement for PTS gradient method while my PR is being reviewed in the official library.
