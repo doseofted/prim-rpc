@@ -8,7 +8,7 @@ import { lighten, transparentize } from "color2k"
 import { easeIn, easeOut } from "popmotion"
 import { throttle, clamp, random } from "lodash-es"
 import { nanoid } from "nanoid"
-import { fps, FpsControls } from "../utils/tweakpane"
+import type { FpsControls } from "../utils/tweakpane"
 
 interface LightOptions {
 	/** Brightness from 0-2 */
@@ -19,7 +19,7 @@ interface LightOptions {
 	color: string
 	/** Offset from the light's set position */
 	offset?: [x: number, y: number],
-	/** Rotation around light's center, excluding offset */
+	/** Rotation around light's center, excluding offset, from 0-360 */
 	rotate?: number
 	/** Delay offset and/or rotation, useful for animations */
 	delay?: number
@@ -50,6 +50,7 @@ function useLights() {
 	return useContext(LightsContext)
 }
 const defaultColors = ["#f0A3FF", "#6D53FF", "#1D0049", "#0069BA", "#5BB8FF"]
+const defaultBackground = "#2D0D60"
 
 // SECTION Lights provider
 interface LightsProps {
@@ -60,6 +61,8 @@ interface LightsProps {
 	options?: Partial<LightOptions>
 	/** Default colors to use for given lights if a color option is not provided (chosen at random) */
 	colors?: string[]
+	/** Background of canvas (set to "transparent" if background is not needed) */
+	background?: string
 }
 /** Provider for `Light` components */
 export function Lights(p: LightsProps) {
@@ -131,7 +134,11 @@ export function Lights(p: LightsProps) {
 			{ windowSize, scrollPosition, optionsShared, colors },
 			operations,
 		]}>
-			<LightsCanvas style={{ position: "fixed", width: "100%", height: "100%", top: 0, left: 0 }} />
+			<LightsCanvas
+				background={props.background}
+				style={{ position: "fixed", width: "100%", height: "100%", top: 0, left: 0 }}
+				fps={props.fps}
+			/>
 			{props.children}
 		</LightsContext.Provider>
 	)
@@ -156,6 +163,9 @@ interface LightProps extends JSX.HTMLAttributes<HTMLDivElement> {
  *   <div class="flex">
  *     <Light>
  *       <p>It glows!</p>
+ *     </Light>
+ *     <Light>
+ *       <p>This glows too!</p>
  *     </Light>
  *   </div>
  * </Lights>
@@ -237,11 +247,12 @@ export const LightBehavior: Component<LightBehaviorProps> = (p) => {
 // SECTION Lights canvas
 interface LightCanvasProps extends JSX.HTMLAttributes<HTMLDivElement> {
 	background?: string
+	fps?: FpsControls
 }
 /** Canvas where lights are drawn */
 const LightsCanvas: Component<LightCanvasProps> = (p) => {
-	const pDefaults = mergeProps<LightCanvasProps[]>({ background: "#2D0D60" }, p)
-	const [props, attrs] = splitProps(pDefaults, ["background"])
+	const pDefaults = mergeProps<LightCanvasProps[]>({ background: defaultBackground }, p)
+	const [props, attrs] = splitProps(pDefaults, ["background", "fps"])
 	const ctx = useLights()
 	// eslint-disable-next-line solid/components-return-once -- component was misused if context is missing
 	if (!ctx) { return <></> }
@@ -260,14 +271,28 @@ const LightsCanvas: Component<LightCanvasProps> = (p) => {
 		const form = space.getForm()
 		const offsetDelayed: Pt[] = []
 		const rotateDelayed: number[] = []
+		// const ptDelays: { [prop: string]: Pt } = {}
+		// const numberDelays: { [prop: string]: number } = {}
+		// function delayPt (prop: string, given: Pt, delay: number) {
+		// 	ptDelays[prop] = typeof ptDelays[prop] !== "undefined"
+		// 		? ptDelays[prop].$add(given.$subtract(ptDelays[prop]).$divide(delay))
+		// 		: given
+		// 	return ptDelays[prop]
+		// }
+		// function delayNumber(prop: string, given: number, delay: number) {
+		// 	numberDelays[prop] = typeof numberDelays[prop] !== "undefined"
+		// 		? numberDelays[prop] + ((given - numberDelays[prop]) / delay)
+		// 		: given
+		// 	return numberDelays[prop]
+		// }
 		// eslint-disable-next-line solid/reactivity -- animation function catches signal updates
 		space.add((_seconds) => {
-			fps.begin()
+			props.fps?.begin()
 			if (!space) { return }
 			form.composite("screen")
 			for (const [index, light] of lights.entries()) {
 				const {
-					position, color, size, brightness,
+					position = [0, 0], color, size, brightness,
 					offset: offsetCoords = [0, 0], delay: delayStrength = 1, rotate: rotateAmount = 0,
 				} = light
 				const delay = clamp(delayStrength, 1, Infinity)
@@ -277,7 +302,7 @@ const LightsCanvas: Component<LightCanvasProps> = (p) => {
 				offsetDelayed[index] = typeof offsetDelayed[index] !== "undefined"
 					? offsetDelayed[index].$add(offset.$subtract(offsetDelayed[index]).$divide(delay))
 					: offset
-				const rotate = rotateAmount
+				const rotate = rotateAmount % 360
 				rotateDelayed[index] = typeof rotateDelayed[index] !== "undefined"
 					? rotateDelayed[index] + ((rotate - rotateDelayed[index]) / delay)
 					: rotate
@@ -296,7 +321,7 @@ const LightsCanvas: Component<LightCanvasProps> = (p) => {
 				const lightShape = Circle.fromCenter(center, circleSize)
 				form.fill(gradientShape).stroke(false).circle(lightShape)
 			}
-			fps.end()
+			props.fps?.end()
 		})
 		space.play()
 	})

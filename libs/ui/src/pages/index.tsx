@@ -1,7 +1,7 @@
 import { Component, createMemo, createSignal, For } from "solid-js"
 import Docs from "../components/Docs"
 import docs from "@doseofted/prim-example/dist/docs.json"
-import { addFolderToPane, addSignalInput } from "../utils/tweakpane"
+import { addFolderToPane, addSignalInput, fps } from "../utils/tweakpane"
 import { Light, Lights } from "../components/Lights"
 
 const Index: Component = () => {
@@ -24,7 +24,12 @@ const Index: Component = () => {
 	// addSignalMonitor(numSignal, "number", { view: "graph", min: 0, max: 100 }, folder)
 	const sizeStyle = () => `${count()}px`
 	return (
-		<Lights options={{ size: size(), brightness: brightness(), offset: offsetFormat(), rotate: rotate() }} colors={["#ff0", "#0ff", "#f0f", "#f00", "#0f0", "#00f"]}>
+		<Lights
+			options={{ size: size(), brightness: brightness(), offset: offsetFormat(), rotate: rotate() }}
+			colors={["#ff0", "#0ff", "#f0f", "#f00", "#0f0", "#00f"]}
+			fps={fps}
+		// background="transparent"
+		>
 			<div class="lights-and-stuff flex relative flex-wrap justify-center">
 				<For each={lights()}>{() => (
 					<Light
