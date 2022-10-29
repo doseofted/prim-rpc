@@ -150,7 +150,7 @@ export const Light: Component<LightProps> = (p) => {
 	const [, env, operations] = ctx
 	const options = createMemo<LightOptions>(() => ({
 		color, size: 50, offset: [0, 0], delay: 50, brightness: 1,
-		...env?.optionsShared(),
+		...env.optionsShared(),
 		...props.options,
 	}))
 	let div: HTMLDivElement
@@ -165,13 +165,13 @@ export const Light: Component<LightProps> = (p) => {
 		const light = operations.createLight(options(), [x, y])
 		const updatePosition = throttle(() => {
 			const { x, y } = getCenter(div.getBoundingClientRect())
-			operations?.updateLightPosition(light.id, [x, y])
+			operations.updateLightPosition(light.id, [x, y])
 		}, 10)
 		createEffect(() => {
-			operations?.updateLightOptions(light.id, options())
+			operations.updateLightOptions(light.id, options())
 		})
 		createEffect(() => {
-			env?.windowSize(); env?.scrollPosition()
+			env.windowSize(); env.scrollPosition()
 			updatePosition() // track position of div given changes to environment
 		})
 		const resizeObserver = new ResizeObserver((entries) => {
@@ -181,7 +181,7 @@ export const Light: Component<LightProps> = (p) => {
 		resizeObserver.observe(div)
 		onCleanup(() => {
 			resizeObserver.disconnect()
-			operations?.removeLight(light.id)
+			operations.removeLight(light.id)
 		})
 	})
 	return (
