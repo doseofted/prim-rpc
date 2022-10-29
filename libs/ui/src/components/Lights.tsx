@@ -3,7 +3,7 @@ import {
 	createMemo, createSignal, Accessor, createEffect, mergeProps,
 } from "solid-js"
 import { createStore, produce } from "solid-js/store"
-import { CanvasSpace, Circle, Pt, GroupLike, PtsCanvasRenderingContext2D } from "pts"
+import { CanvasSpace, Circle, Pt, GroupLike, PtsCanvasRenderingContext2D, Const } from "pts"
 import { lighten, transparentize } from "color2k"
 import { easeIn, easeOut } from "popmotion"
 import { throttle, clamp, random } from "lodash-es"
@@ -19,14 +19,17 @@ interface LightOptions {
 	color: string
 	/** Offset from the light's set position */
 	offset?: [x: number, y: number],
-	/** Delay amount of the offset */
-	delayStrength?: number
+	/** Rotation around light's center, excluding offset */
+	rotate?: number
+	/** Delay offset and/or rotation, useful for animations */
+	delay?: number
 }
 
 interface LightInstance extends LightOptions {
+	/** Unique identifier for given light */
 	id: string
-	x: number
-	y: number
+	/** Position of light, offset is given from this position */
+	position: [x: number, y: number]
 }
 
 type LightEnv = {
@@ -60,7 +63,7 @@ export function Lights(props: LightsProps) {
 			const id = nanoid()
 			setLights(produce(state => {
 				const [x, y] = position ?? [0, 0]
-				const index = state.push({ ...options, ...props.options, x, y, id }) - 1
+				const index = state.push({ ...options, ...props.options, position: [x, y], id }) - 1
 				locations[id] = index
 			}))
 			return this.retrieveLight(id)
@@ -74,7 +77,7 @@ export function Lights(props: LightsProps) {
 			const index = locations[id]
 			setLights(produce(state => {
 				const [x, y] = position
-				state[index] = { ...state[index], x, y }
+				state[index] = { ...state[index], position: [x, y] }
 			}))
 		},
 		updateLightOptions(id: string, options: Partial<LightOptions>) {
@@ -93,11 +96,13 @@ export function Lights(props: LightsProps) {
 			}))
 		},
 	}
+	// track position window resize
 	const winSize = ({ innerWidth: width, innerHeight: height } = window) => ({ width, height })
 	const [windowSize, setWindowSize] = createSignal(winSize())
 	const winListener = throttle(() => setWindowSize(winSize()), 15)
 	onMount(() => window.addEventListener("resize", winListener))
 	onCleanup(() => window.removeEventListener("resize", winListener))
+	// track position on scroll
 	const scrollPos = ({ scrollX: x, scrollY: y } = window) => ({ x, y })
 	const scrollListener = throttle(() => setScroll(scrollPos()), 15)
 	const [scrollPosition, setScroll] = createSignal(scrollPos())
@@ -142,7 +147,7 @@ export const Light: Component<LightProps> = (p) => {
 	const color = defaultColors[random(0, defaultColors.length - 1)]
 	const [, env, operations] = useLights() ?? []
 	const options = createMemo<LightOptions>(() => ({
-		color, size: 50, offset: [0, 0], delayStrength: 50, brightness: 1,
+		color, size: 50, offset: [0, 0], delay: 50, brightness: 1,
 		...env?.optionsShared(),
 		...props.options,
 	}))
@@ -208,24 +213,29 @@ const LightCanvas: Component<LightCanvasProps> = (p) => {
 		space.setup({ bgcolor: props.background, resize: true })
 		const form = space.getForm()
 		const offsetDelayed: Pt[] = []
+		const rotateDelayed: number[] = []
 		// eslint-disable-next-line solid/reactivity -- animation function catches signal updates
 		space.add((_seconds) => {
 			fps.begin()
 			if (!space) { return }
 			form.composite("screen")
 			for (const [index, light] of lights.entries()) {
-				const { x, y, color, size, brightness, offset: offsetCoords = [0, 0], delayStrength = 1 } = light
+				const {
+					position, color, size, brightness,
+					offset: offsetCoords = [0, 0], delay: delayStrength = 1, rotate: rotateAmount = 0,
+				} = light
 				const delay = clamp(delayStrength, 1, Infinity)
-				let center = new Pt(x, y)
+				let center = new Pt(position)
 				const offset = new Pt(offsetCoords)
-				if (!offsetDelayed[index]) {
-					offsetDelayed[index] = offset
-				} else {
-					// NOTE: useful example of delayed movement at https://ptsjs.org/demo/edit/?name=create.gridcells
-					offsetDelayed[index] = offsetDelayed[index]
-						.add(offset.$subtract(offsetDelayed[index]).divide(delay))
-				}
-				center = center.$add(offsetDelayed[index])
+				// NOTE: useful example of delayed movement at https://ptsjs.org/demo/edit/?name=create.gridcells
+				offsetDelayed[index] = offsetDelayed[index]
+					? offsetDelayed[index].$add(offset.$subtract(offsetDelayed[index]).$divide(delay))
+					: offset
+				const rotate = rotateAmount
+				rotateDelayed[index] = rotateDelayed[index]
+					? rotateDelayed[index] + ((rotate - rotateDelayed[index]) / delay)
+					: rotate
+				center = center.$add(offsetDelayed[index]).rotate2D(rotateDelayed[index] * (Const.pi / 180), center)
 				const colorStart = transparentize(
 					lighten(color, (clamp(brightness, 1.5, 2) - 1.5) * 2),
 					easeIn(clamp(1 - brightness, 0, 1)),
@@ -237,7 +247,8 @@ const LightCanvas: Component<LightCanvasProps> = (p) => {
 					Circle.fromCenter(center, circleSize * easeOut(clamp(brightness - 1, 0, 1)) / 2),
 					Circle.fromCenter(center, circleSize + 0.01),
 				)
-				form.fill(gradientShape).stroke(false).circle(Circle.fromCenter(center, circleSize))
+				const lightShape = Circle.fromCenter(center, circleSize)
+				form.fill(gradientShape).stroke(false).circle(lightShape)
 			}
 			fps.end()
 		})

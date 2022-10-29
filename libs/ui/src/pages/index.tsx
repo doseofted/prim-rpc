@@ -17,17 +17,18 @@ const Index: Component = () => {
 	const [offsetX] = addSignalInput(createSignal(0), "offsetX", offsetLimits, folder)
 	// eslint-disable-next-line solid/reactivity -- just a wrapper around signal
 	const [offsetY] = addSignalInput(createSignal(0), "offsetY", offsetLimits, folder)
+	// eslint-disable-next-line solid/reactivity -- just a wrapper around signal
+	const [rotate] = addSignalInput(createSignal(0), "rotate", { min: 0, max: 360 }, folder)
 	const offsetFormat = createMemo((): [number, number] => [offsetX(), offsetY()])
 	const lights = createMemo(() => new Array(count()))
 	// addSignalMonitor(numSignal, "number", { view: "graph", min: 0, max: 100 }, folder)
 	const sizeStyle = () => `${count()}px`
 	return (
-		<Lights options={{ size: size(), brightness: brightness() }}>
+		<Lights options={{ size: size(), brightness: brightness(), offset: offsetFormat(), rotate: rotate() }}>
 			<div class="lights-and-stuff flex relative flex-wrap justify-center">
 				<For each={lights()}>{() => (
 					<Light
 						style={{ width: sizeStyle(), height: sizeStyle() }}
-						options={{ offset: offsetFormat() }}
 						class="bg-transparent border-white m-6 border-2 rounded-full text-white flex justify-center items-center"
 					/>
 				)}</For>
