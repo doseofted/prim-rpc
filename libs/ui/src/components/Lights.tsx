@@ -68,8 +68,7 @@ export function Lights(props: LightsProps) {
 			}))
 			return this.retrieveLight(id)
 		},
-		/** NOTE: Returned value is from Solid Store and may need to be wrapped in effect */
-		// eslint-disable-next-line solid/reactivity
+		// eslint-disable-next-line solid/reactivity -- note: return value is from Store, may need to be wrapped in effect
 		retrieveLight(id: string) {
 			return lights[locations[id]]
 		},
@@ -145,7 +144,10 @@ export const Light: Component<LightProps> = (p) => {
 	const [props, attrs] = splitProps(p, ["children", "options"])
 	const defaultColors = ["#f0A3FF", "#6D53FF", "#1D0049", "#0069BA", "#5BB8FF"]
 	const color = defaultColors[random(0, defaultColors.length - 1)]
-	const [, env, operations] = useLights() ?? []
+	const ctx = useLights()
+	// eslint-disable-next-line solid/components-return-once -- Light was not used in Lights provider
+	if (!ctx) { return <></> }
+	const [, env, operations] = ctx
 	const options = createMemo<LightOptions>(() => ({
 		color, size: 50, offset: [0, 0], delay: 50, brightness: 1,
 		...env?.optionsShared(),
@@ -199,7 +201,10 @@ interface LightCanvasProps extends JSX.HTMLAttributes<HTMLDivElement> {
 const LightCanvas: Component<LightCanvasProps> = (p) => {
 	const pDefaults = mergeProps<LightCanvasProps[]>({ background: "#2D0D60" }, p)
 	const [props, attrs] = splitProps(pDefaults, ["background"])
-	const [lights = []] = useLights() ?? []
+	const ctx = useLights()
+	// eslint-disable-next-line solid/components-return-once -- component was misused if context is missing
+	if (!ctx) { return <></> }
+	const [lights] = ctx
 	let canvas: HTMLCanvasElement | undefined
 	let space: CanvasSpace | undefined
 	createEffect(() => {
