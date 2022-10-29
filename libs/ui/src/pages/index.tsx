@@ -24,7 +24,7 @@ const Index: Component = () => {
 	// addSignalMonitor(numSignal, "number", { view: "graph", min: 0, max: 100 }, folder)
 	const sizeStyle = () => `${count()}px`
 	return (
-		<Lights options={{ size: size(), brightness: brightness(), offset: offsetFormat(), rotate: rotate() }}>
+		<Lights options={{ size: size(), brightness: brightness(), offset: offsetFormat(), rotate: rotate() }} colors={["#ff0", "#0ff", "#f0f", "#f00", "#0f0", "#00f"]}>
 			<div class="lights-and-stuff flex relative flex-wrap justify-center">
 				<For each={lights()}>{() => (
 					<Light

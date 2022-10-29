@@ -33,6 +33,7 @@ interface LightInstance extends LightOptions {
 }
 
 type LightEnv = {
+	colors: string[]
 	windowSize: Accessor<{ width: number, height: number }>
 	scrollPosition: Accessor<{ x: number, y: number }>
 	optionsShared: Accessor<Partial<LightOptions> | undefined>
@@ -48,6 +49,7 @@ const LightsContext = createContext<LightsContextType>()
 function useLights() {
 	return useContext(LightsContext)
 }
+const defaultColors = ["#f0A3FF", "#6D53FF", "#1D0049", "#0069BA", "#5BB8FF"]
 
 // SECTION Lights provider
 interface LightsProps {
@@ -56,13 +58,24 @@ interface LightsProps {
 	fps?: FpsControls
 	/** Options used if none are provided to a light, overrides defaults */
 	options?: Partial<LightOptions>
+	/** Default colors to use for given lights if a color option is not provided (chosen at random) */
+	colors?: string[]
 }
 /** Provider for `Light` components */
-export function Lights(props: LightsProps) {
+export function Lights(p: LightsProps) {
+	const props = mergeProps({ colors: defaultColors }, p)
 	const [lights, setLights] = createStore<LightInstance[]>([])
 	const optionsShared = createMemo(() => props.options)
 	const locations: Record<string, number> = {}
+	// eslint-disable-next-line solid/reactivity -- updated in effect below
+	const [colors, setColors] = createStore<string[]>(props.colors)
+	createEffect(() => {
+		if (Array.isArray(props.colors) && props.colors.length > 0) {
+			setColors(props.colors)
+		}
+	})
 	const operations = {
+		// eslint-disable-next-line solid/reactivity
 		createLight(options: LightOptions, position: [x: number, y: number]) {
 			const id = nanoid()
 			setLights(produce(state => {
@@ -83,6 +96,7 @@ export function Lights(props: LightsProps) {
 				state[index] = { ...state[index], position: [x, y] }
 			}))
 		},
+		// eslint-disable-next-line solid/reactivity
 		updateLightOptions(id: string, options: Partial<LightOptions>) {
 			const index = locations[id]
 			setLights(produce(state => {
@@ -112,7 +126,11 @@ export function Lights(props: LightsProps) {
 	onMount(() => document.addEventListener("scroll", scrollListener))
 	onCleanup(() => document.removeEventListener("scroll", scrollListener))
 	return (
-		<LightsContext.Provider value={[lights, { windowSize, scrollPosition, optionsShared }, operations]}>
+		<LightsContext.Provider value={[
+			lights,
+			{ windowSize, scrollPosition, optionsShared, colors },
+			operations,
+		]}>
 			<LightsCanvas style={{ position: "fixed", width: "100%", height: "100%", top: 0, left: 0 }} />
 			{props.children}
 		</LightsContext.Provider>
@@ -145,12 +163,11 @@ interface LightProps extends JSX.HTMLAttributes<HTMLDivElement> {
  */
 export const Light: Component<LightProps> = (p) => {
 	const [props, attrs] = splitProps(p, ["children", "options"])
-	const defaultColors = ["#f0A3FF", "#6D53FF", "#1D0049", "#0069BA", "#5BB8FF"]
-	const color = defaultColors[random(0, defaultColors.length - 1)]
 	const ctx = useLights()
 	// eslint-disable-next-line solid/components-return-once -- Light was not used in Lights provider
 	if (!ctx) { return <></> }
 	const [, env, operations] = ctx
+	const color = env.colors[random(0, env.colors.length - 1)]
 	const options = createMemo<LightOptions>(() => ({
 		color, size: 50, offset: [0, 0], delay: 50, brightness: 1,
 		...env.optionsShared(),
@@ -190,7 +207,7 @@ export const Light: Component<LightProps> = (p) => {
 	return (
 		<div
 			{...attrs}
-			ref={e => div = e}
+			ref={ref => div = ref}
 		>
 			{props.children}
 		</div>
@@ -210,7 +227,8 @@ interface LightBehaviorProps extends JSX.HTMLAttributes<HTMLDivElement> {
  */
 export const LightBehavior: Component<LightBehaviorProps> = (p) => {
 	const pDefaults = mergeProps<LightBehaviorProps[]>({ focus: 1, jitter: 0 }, p)
-	const [props, lightRelated] = splitProps(pDefaults, ["focus", "jitter"])
+	// eslint-disable-next-line @typescript-eslint/no-unused-vars
+	const [_props, lightRelated] = splitProps(pDefaults, ["focus", "jitter"])
 	const options = createMemo<Partial<LightOptions>>(() => ({}))
 	return <Light {...lightRelated} options={options()} />
 }
@@ -256,11 +274,11 @@ const LightsCanvas: Component<LightCanvasProps> = (p) => {
 				let center = new Pt(position)
 				const offset = new Pt(offsetCoords)
 				// NOTE: useful example of delayed movement at https://ptsjs.org/demo/edit/?name=create.gridcells
-				offsetDelayed[index] = offsetDelayed[index]
+				offsetDelayed[index] = typeof offsetDelayed[index] !== "undefined"
 					? offsetDelayed[index].$add(offset.$subtract(offsetDelayed[index]).$divide(delay))
 					: offset
 				const rotate = rotateAmount
-				rotateDelayed[index] = rotateDelayed[index]
+				rotateDelayed[index] = typeof rotateDelayed[index] !== "undefined"
 					? rotateDelayed[index] + ((rotate - rotateDelayed[index]) / delay)
 					: rotate
 				center = center.$add(offsetDelayed[index]).rotate2D(rotateDelayed[index] * (Const.pi / 180), center)
