@@ -40,9 +40,11 @@ const Index: Component = () => {
 				)}</For>
 			</div>
 			<div class="more-lights flex relative flex-wrap justify-center mt-80">
-				<LightAuto>
-					Hello
-				</LightAuto>
+				<For each={lights()}>{() => (
+					<LightAuto>
+						Hello
+					</LightAuto>
+				)}</For>
 			</div>
 			<Docs class="relative" docs={docs} />
 		</Lights>

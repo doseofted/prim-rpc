@@ -37,6 +37,7 @@ type LightEnv = {
 	windowSize: Accessor<{ width: number, height: number }>
 	scrollPosition: Accessor<{ x: number, y: number }>
 	optionsShared: Accessor<Partial<LightOptions> | undefined>
+	playing: Accessor<boolean>
 }
 type LightsContextType = [LightInstance[], LightEnv, {
 	createLight(opts: LightOptions, position: [x: number, y: number]): LightInstance
@@ -46,7 +47,8 @@ type LightsContextType = [LightInstance[], LightEnv, {
 	removeLight(id: string): void
 }]
 const LightsContext = createContext<LightsContextType>()
-function useLights() {
+/** Context as used by `Light` component. Don't use unless extending the `Light` component. */
+export function useLights() {
 	return useContext(LightsContext)
 }
 const defaultColors = ["#f0A3FF", "#6D53FF", "#1D0049", "#0069BA", "#5BB8FF"]
@@ -77,6 +79,7 @@ export function Lights(p: LightsProps) {
 			setColors(props.colors)
 		}
 	})
+	const [playing, setPlaying] = createSignal(false)
 	const operations = {
 		// eslint-disable-next-line solid/reactivity
 		createLight(options: LightOptions, position: [x: number, y: number]) {
@@ -131,13 +134,14 @@ export function Lights(p: LightsProps) {
 	return (
 		<LightsContext.Provider value={[
 			lights,
-			{ windowSize, scrollPosition, optionsShared, colors },
+			{ windowSize, scrollPosition, optionsShared, playing, colors },
 			operations,
 		]}>
 			<LightsCanvas
 				background={props.background}
 				style={{ position: "fixed", width: "100%", height: "100%", top: 0, left: 0 }}
 				fps={props.fps}
+				onFirstFrame={() => setPlaying(true)}
 			/>
 			{props.children}
 		</LightsContext.Provider>
@@ -190,7 +194,6 @@ export const Light: Component<LightProps> = (p) => {
 		return { x: (x + width - left) / 2 + x, y: (y + height - top) / 2 + y }
 	}
 	onMount(() => {
-		if (!operations) { return }
 		const { x, y } = getCenter(div.getBoundingClientRect())
 		const light = operations.createLight(options(), [x, y])
 		const updatePosition = throttle(() => {
@@ -229,11 +232,12 @@ export const Light: Component<LightProps> = (p) => {
 interface LightCanvasProps extends JSX.HTMLAttributes<HTMLDivElement> {
 	background?: string
 	fps?: FpsControls
+	onFirstFrame?: () => void
 }
 /** Canvas where lights are drawn */
 const LightsCanvas: Component<LightCanvasProps> = (p) => {
 	const pDefaults = mergeProps<LightCanvasProps[]>({ background: defaultBackground }, p)
-	const [props, attrs] = splitProps(pDefaults, ["background", "fps"])
+	const [props, attrs] = splitProps(pDefaults, ["background", "fps", "onFirstFrame"])
 	const ctx = useLights()
 	// eslint-disable-next-line solid/components-return-once -- component was misused if context is missing
 	if (!ctx) { return <></> }
@@ -302,6 +306,7 @@ const LightsCanvas: Component<LightCanvasProps> = (p) => {
 			props.fps?.end()
 		})
 		space.play()
+		props.onFirstFrame?.()
 	})
 	onCleanup(() => {
 		space?.dispose()
