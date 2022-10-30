@@ -65,6 +65,7 @@ interface LightsProps {
 	colors?: string[]
 	/** Background of canvas (set to "transparent" if background is not needed) */
 	background?: string
+	onFirstFrame?: () => void
 }
 /** Provider for `Light` components */
 export function Lights(p: LightsProps) {
@@ -141,7 +142,7 @@ export function Lights(p: LightsProps) {
 				background={props.background}
 				style={{ position: "fixed", width: "100%", height: "100%", top: 0, left: 0 }}
 				fps={props.fps}
-				onFirstFrame={() => setPlaying(true)}
+				onFirstFrame={() => { setPlaying(true); props.onFirstFrame?.() }}
 			/>
 			{props.children}
 		</LightsContext.Provider>
@@ -275,6 +276,7 @@ const LightsCanvas: Component<LightCanvasProps> = (p) => {
 			props.fps?.begin()
 			if (!space) { return }
 			form.composite("screen")
+			// form.ctx.filter = "blur(100px)"
 			for (const [index, light] of lights.entries()) {
 				const {
 					position = [0, 0], color, size, brightness,

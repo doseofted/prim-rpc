@@ -26,7 +26,7 @@ const Index: Component = () => {
 	const sizeStyle = () => `${count()}px`
 	return (
 		<Lights
-			options={{ size: size(), brightness: brightness(), offset: offsetFormat(), rotate: rotate() }}
+			options={{ size: size(), brightness: brightness(), offset: offsetFormat(), rotate: rotate(), delay: 50 }}
 			// colors={["#ff0", "#0ff", "#f0f", "#f00", "#0f0", "#00f"]}
 			fps={fps}
 		// background="transparent"
@@ -41,9 +41,7 @@ const Index: Component = () => {
 			</div>
 			<div class="more-lights flex relative flex-wrap justify-center mt-80">
 				<For each={lights()}>{() => (
-					<LightAuto>
-						Hello
-					</LightAuto>
+					<LightAuto class="w-5" />
 				)}</For>
 			</div>
 			<Docs class="relative" docs={docs} />

@@ -1,8 +1,8 @@
 import { random } from "lodash-es"
 import {
-	Component, JSX, splitProps, createMemo, createEffect, mergeProps, onMount, createSignal,
+	Component, JSX, splitProps, createMemo, createEffect, mergeProps, createSignal, onCleanup,
 } from "solid-js"
-import { Light, LightOptions } from "./Lights"
+import { Light, LightOptions, useLights } from "./Lights"
 
 // SECTION Light with behaviors
 interface LightBehaviorProps extends JSX.HTMLAttributes<HTMLDivElement> {
@@ -13,8 +13,6 @@ interface LightBehaviorProps extends JSX.HTMLAttributes<HTMLDivElement> {
 	// NOTE: jitter will be multiplied by strength and focus
 	/** Jitter adjusts `offset` and `brightness` over time from 0 (weak/none) to 1 (strong) */
 	jitter?: number
-	/** A limited selection of options passed directly to the Light component */
-	options?: Pick<LightOptions, "color">
 	/** Define limits for behaviors (leave empty for defaults) */
 	limits?: {
 		/** Maximum focus as a pixel amount (unit not needed) */
@@ -24,6 +22,8 @@ interface LightBehaviorProps extends JSX.HTMLAttributes<HTMLDivElement> {
 		/** Define a jitter amount in pixels */
 		jitter: number
 	}
+	/** A limited selection of options passed directly to the Light component */
+	options?: Pick<LightOptions, "color">
 }
 /**
  * This is a variant of the `Light` component but its props describe behavior
@@ -31,59 +31,61 @@ interface LightBehaviorProps extends JSX.HTMLAttributes<HTMLDivElement> {
  * size, position, and rotation individually, change `focus` to control all of them. 
  */
 export const LightAuto: Component<LightBehaviorProps> = (p) => {
-	const pDefaults = mergeProps<LightBehaviorProps[]>({
+	const pDefaults = mergeProps({
 		// factors:
-		focus: 1, strength: 0.5, jitter: 0.3,
+		focus: 1, strength: 0.5, jitter: 1,
 		limits: {
 			focus: 250, strength: 500, jitter: 50,
 		},
 	}, p)
 	const [props, lightRelated] = splitProps(pDefaults, ["focus", "strength", "jitter", "limits", "options"])
-	const focusValues = createMemo<Pick<LightOptions, "offset" | "rotate"> | undefined>(() => {
-		const limit = props.limits?.focus
-		if (typeof limit === "undefined" || typeof props.focus === "undefined") { return }
-		const focus = props.focus * limit
-		return {
-			offset: [random(0, focus), random(0, focus)],
-			rotate: random(0, 360),
-		}
+	const limit = (prop: keyof typeof props["limits"], val: number) => val * props.limits[prop]
+	const timeline = createMemo(() => {
+		const rotate = random(0, 360)
+		const time: [ts: number, opts: Partial<LightOptions>][] = [
+			[0, {
+				brightness: 0,
+				offset: [0, 0],
+				rotate: 0,
+			}],
+			[500, {
+				brightness: 1.5,
+				offset: [random(limit("focus", props.focus) * -1), random(limit("focus", props.focus))],
+				rotate,
+			}],
+			[1000, { rotate, offset: [0, 0] }],
+		]
+		return time
 	})
-	const strengthValues = createMemo<Pick<LightOptions, "brightness" | "size"> | undefined>(() => {
-		const limit = props.limits?.strength
-		if (typeof limit === "undefined" || typeof props.strength === "undefined") { return }
-		return {
-			brightness: props.strength * 2,
-			size: props.strength * limit,
-		}
-	})
-	const options = createMemo<Partial<LightOptions>>(() => {
-		const opts: Partial<LightOptions> = {
-			...focusValues(),
-			...strengthValues(),
-		}
-		for (const [key] of Object.keys(opts)) {
-			if (typeof opts[key as keyof LightOptions] === "undefined") { delete opts[key as keyof LightOptions] }
-		}
-		return opts
-	})
+	const ctx = useLights()
+	// eslint-disable-next-line solid/components-return-once
+	if (!ctx) { return <></> }
+	const [, env] = ctx
+	const [current, setCurrent] = createSignal<Partial<LightOptions>>({})
 	createEffect(() => {
-		console.log(options(), focusValues())
-	})
-	const timeline: [ts: number, opts: () => Partial<LightOptions>][] = [
-		// eslint-disable-next-line solid/reactivity
-		[0, () => ({ brightness: 0, offset: [0, 0], rotate: 0, size: strengthValues()?.size })],
-		// eslint-disable-next-line solid/reactivity
-		[1000, () => options()],
-	]
-	// eslint-disable-next-line solid/reactivity
-	const [currentOptions, setCurrentOptions] = createSignal(options())
-	onMount(() => {
-		for (const [ts, opts] of timeline) {
-			setTimeout(() => {
-				setCurrentOptions(opts())
-			}, ts)
+		if (!env.playing) { return }
+		const duration = timeline().map(([ts]) => ts).reduce((a, b) => a > b ? a : b)
+		// play timeline
+		for (const [ts, opts] of timeline()) {
+			setTimeout(() => { setCurrent(opts) }, ts)
 		}
+		// start jitter effect
+		let interval: number | undefined
+		setTimeout(() => {
+			interval = window.setInterval(() => {
+				setTimeout(() => {
+					setCurrent({
+						offset: [random(0, limit("jitter", props.jitter)), random(0, limit("jitter", props.jitter))],
+						rotate: random(0, 360),
+						delay: 100,
+					})
+				}, random(0, 500))
+			}, 500)
+		}, duration + 500)
+		onCleanup(() => {
+			window.clearInterval(interval)
+		})
 	})
-	return <Light {...lightRelated} options={currentOptions()} />
+	return <Light {...lightRelated} options={{ ...props.options, ...current() }} />
 }
 // !SECTION
