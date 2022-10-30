@@ -10,7 +10,7 @@ import { throttle, clamp, random } from "lodash-es"
 import { nanoid } from "nanoid"
 import type { FpsControls } from "../utils/tweakpane"
 
-interface LightOptions {
+export interface LightOptions {
 	/** Brightness from 0-2 */
 	brightness: number
 	/** Size of light itself, unrelated to brightness */
@@ -21,7 +21,7 @@ interface LightOptions {
 	offset?: [x: number, y: number],
 	/** Rotation around light's center, excluding offset, from 0-360 */
 	rotate?: number
-	/** Delay offset and/or rotation, useful for animations */
+	/** Delay setting of given options, useful for animations */
 	delay?: number
 }
 
@@ -225,25 +225,6 @@ export const Light: Component<LightProps> = (p) => {
 }
 // !SECTION
 
-// SECTION Light with behaviors
-interface LightBehaviorProps extends JSX.HTMLAttributes<HTMLDivElement> {
-	focus?: number
-	jitter?: number
-}
-/**
- * This is a variant of the `Light` component but its props describe behavior
- * rather than its attributes. For instance, instead of controlling brightness,
- * size, position, and rotation individually, change `focus` to control all of them. 
- */
-export const LightBehavior: Component<LightBehaviorProps> = (p) => {
-	const pDefaults = mergeProps<LightBehaviorProps[]>({ focus: 1, jitter: 0 }, p)
-	// eslint-disable-next-line @typescript-eslint/no-unused-vars
-	const [_props, lightRelated] = splitProps(pDefaults, ["focus", "jitter"])
-	const options = createMemo<Partial<LightOptions>>(() => ({}))
-	return <Light {...lightRelated} options={options()} />
-}
-// !SECTION
-
 // SECTION Lights canvas
 interface LightCanvasProps extends JSX.HTMLAttributes<HTMLDivElement> {
 	background?: string
@@ -281,7 +262,7 @@ const LightsCanvas: Component<LightCanvasProps> = (p) => {
 				: given
 			return delays[accessor]
 		}
-		/** Same as`delayPt()` but for numbers) */
+		/** Same as`delayPt()` but for numbers */
 		function delayNumber(given: number, delay: number, prop: string | (string | number)[]) {
 			return delayPt(new Pt([given]), delay, prop)[0]
 		}
