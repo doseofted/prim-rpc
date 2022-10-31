@@ -48,7 +48,7 @@ export const LightAuto: Component<LightBehaviorProps> = (p) => {
 				offset: [0, 0],
 				rotate: 0,
 			}],
-			[500, {
+			[750, {
 				brightness: 1.5,
 				offset: [random(limit("focus", props.focus) * -1), random(limit("focus", props.focus))],
 				rotate,
@@ -78,6 +78,7 @@ export const LightAuto: Component<LightBehaviorProps> = (p) => {
 						offset: [random(0, limit("jitter", props.jitter)), random(0, limit("jitter", props.jitter))],
 						rotate: random(0, 360),
 						delay: 100,
+						// size: limit("strength", random(props.strength / 2, props.strength)),
 					})
 				}, random(0, 500))
 			}, 500)

@@ -6,7 +6,7 @@ import { createStore, produce } from "solid-js/store"
 import { CanvasSpace, Circle, Pt, GroupLike, PtsCanvasRenderingContext2D, Const } from "pts"
 import { lighten, transparentize } from "color2k"
 import { easeIn, easeOut } from "popmotion"
-import { throttle, clamp, random } from "lodash-es"
+import { throttle, clamp, random, shuffle } from "lodash-es"
 import { nanoid } from "nanoid"
 import type { FpsControls } from "../utils/tweakpane"
 
@@ -65,11 +65,14 @@ interface LightsProps {
 	colors?: string[]
 	/** Background of canvas (set to "transparent" if background is not needed) */
 	background?: string
+	/** Lights blend better when canvas is blurred (amount can be adjusted as needed) */
+	blur?: number
+	/** Event handler on the first frame of animation */
 	onFirstFrame?: () => void
 }
 /** Provider for `Light` components */
 export function Lights(p: LightsProps) {
-	const props = mergeProps({ colors: defaultColors }, p)
+	const props = mergeProps({ colors: defaultColors, blur: 15 }, p)
 	const [lights, setLights] = createStore<LightInstance[]>([])
 	const optionsShared = createMemo(() => props.options)
 	const locations: Record<string, number> = {}
@@ -132,6 +135,11 @@ export function Lights(p: LightsProps) {
 	const [scrollPosition, setScroll] = createSignal(scrollPos())
 	onMount(() => document.addEventListener("scroll", scrollListener))
 	onCleanup(() => document.removeEventListener("scroll", scrollListener))
+	const fixedCss: JSX.CSSProperties = { position: "fixed", width: "100%", height: "100%", top: 0, left: 0 }
+	const blurCss = createMemo<JSX.CSSProperties>(() => ({
+		"background-color": "transparent",
+		"backdrop-filter": `blur(${props.blur}px)`,
+	}))
 	return (
 		<LightsContext.Provider value={[
 			lights,
@@ -140,10 +148,11 @@ export function Lights(p: LightsProps) {
 		]}>
 			<LightsCanvas
 				background={props.background}
-				style={{ position: "fixed", width: "100%", height: "100%", top: 0, left: 0 }}
+				style={fixedCss}
 				fps={props.fps}
 				onFirstFrame={() => { setPlaying(true); props.onFirstFrame?.() }}
 			/>
+			<div style={{ ...fixedCss, ...blurCss() }} />
 			{props.children}
 		</LightsContext.Provider>
 	)
@@ -182,7 +191,7 @@ export const Light: Component<LightProps> = (p) => {
 	// eslint-disable-next-line solid/components-return-once -- Light was not used in Lights provider
 	if (!ctx) { return <></> }
 	const [, env, operations] = ctx
-	const color = env.colors[random(0, env.colors.length - 1)]
+	const color = shuffle(env.colors)[random(0, env.colors.length - 1)]
 	const options = createMemo<LightOptions>(() => ({
 		color, size: 50, offset: [0, 0], delay: 50, brightness: 1,
 		...env.optionsShared(),
