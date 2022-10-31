@@ -35,7 +35,7 @@ export const LightAuto: Component<LightBehaviorProps> = (p) => {
 		// factors:
 		focus: 1, strength: 0.5, jitter: 1,
 		limits: {
-			focus: 250, strength: 500, jitter: 50,
+			focus: 500, strength: 500, jitter: 50,
 		},
 	}, p)
 	const [props, lightRelated] = splitProps(pDefaults, ["focus", "strength", "jitter", "limits", "options"])

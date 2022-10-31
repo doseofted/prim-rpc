@@ -4,11 +4,14 @@ import { Light, Lights } from "../components/Lights"
 
 const Index: Component = () => {
 	const offsetXTimeline = [-300, 300]
+	const brightnessTimeline = [0.5, 1.5, 1, 2]
 	const [offsetX, setOffsetX] = createSignal(offsetXTimeline[0])
+	const [brightness, setBrightness] = createSignal(brightnessTimeline[0])
 	let index = 0
 	function run() {
 		index += 1
 		setOffsetX(offsetXTimeline[index % offsetXTimeline.length])
+		setBrightness(brightnessTimeline[index % brightnessTimeline.length])
 	}
 	// eslint-disable-next-line solid/reactivity
 	addSignalMonitor([offsetX, setOffsetX], "offset")
@@ -16,14 +19,14 @@ const Index: Component = () => {
 		setTimeout(() => {
 			run()
 		}, 300)
-		const interval = setInterval(run, 5000)
+		const interval = setInterval(run, 3000)
 		onCleanup(() => {
 			clearInterval(interval)
 		})
 	})
 	return (
 		<Lights
-			options={{ size: 250, brightness: 1.5, offset: [offsetX(), 0], delay: 10 }}
+			options={{ size: 250, brightness: brightness(), offset: [offsetX(), 0], delay: 50 }}
 			colors={["#ff0", "#0ff", "#f0f"]}
 			fps={fps}
 			background="transparent"

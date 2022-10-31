@@ -255,6 +255,27 @@ const LightsCanvas: Component<LightCanvasProps> = (p) => {
 		space = new CanvasSpace(canvas)
 		space.setup({ bgcolor: props.background, resize: true })
 		const form = space.getForm()
+		/* const velocities: { [prop: string]: Pt } = {}
+		function handleVelocity(given: Pt, accessor: string, delay: number) {
+			if (typeof velocities[accessor] === "undefined") { velocities[accessor] = new Pt(Array(given.length).fill(0)) }
+			const inc = 0.05
+			const vals = velocities[accessor].map((val, index) => {
+				const givenVal = given[index]
+				// FIXME: `inc` glitches out when `givenVal === val` because it is consistently incremented/decremented (I think)
+				// if (accessor.endsWith("offset") && index === 0) { console.log(inc1, inc2, delay) }
+				const possiblyReturn = val < givenVal
+					? (val + inc) : val > givenVal
+						? (val - inc) : val
+				if (givenVal < val && givenVal < 0 && possiblyReturn > 0) { return 0 }
+				if (givenVal > val && givenVal > 0 && possiblyReturn < 0) { return 0 }
+				// if (val < givenVal && val < 0 && possiblyReturn > 0) { return 0 }
+				// if (val > givenVal && val > 0 && possiblyReturn < 0) { return 0 }
+				return possiblyReturn
+			})
+			velocities[accessor] = new Pt(...vals)
+			// if (accessor.endsWith("brightness")) { console.log(velocities[accessor].length) }
+			return velocities[accessor]
+		} */
 		const delays: { [prop: string]: Pt } = {}
 		/**
 		 * Given a `Pt`, delay its movement over time.
@@ -262,9 +283,17 @@ const LightsCanvas: Component<LightCanvasProps> = (p) => {
 		 */
 		function delayPt(given: Pt, delay: number, prop: string | (string | number)[]) {
 			const accessor = Array.isArray(prop) ? prop.join("-") : prop
-			delays[accessor] = typeof delays[accessor] !== "undefined" && delays[accessor] !== given
-				? delays[accessor].$add(given.$subtract(delays[accessor]).$divide(delay))
-				: given
+			const givenDelayed = delays[accessor]
+			const delaySet = typeof givenDelayed !== "undefined" && givenDelayed !== given
+			if (delaySet) {
+				const velocity = given.$subtract(givenDelayed).$divide(delay)
+				// const velocityAcc = handleVelocity(velocity, accessor, delay)
+				// if (accessor.endsWith("brightness")) { console.log(velocity, velocityAcc) }
+				const newFromGiven = givenDelayed.$add(velocity/* velocityAcc */)
+				delays[accessor] = newFromGiven
+			} else {
+				delays[accessor] = given
+			}
 			return delays[accessor]
 		}
 		/** Same as`delayPt()` but for numbers */
