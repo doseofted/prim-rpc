@@ -256,7 +256,7 @@ const LightsCanvas: Component<LightCanvasProps> = (p) => {
 		space.setup({ bgcolor: props.background, resize: true })
 		const form = space.getForm()
 		const velocities: { [prop: string]: Pt } = {}
-		const useAcceleration = false
+		const useAcceleration = true
 		function handleVelocity(given: Pt, accessor: string, delay: number) {
 			if (typeof velocities[accessor] === "undefined") { velocities[accessor] = new Pt(Array(given.length).fill(0)) }
 			const inc = 0.05 // 1 / delay
@@ -267,7 +267,7 @@ const LightsCanvas: Component<LightCanvasProps> = (p) => {
 				const nextAcceleration = (withAcceleration < velocity)
 					? (withAcceleration + inc) : (withAcceleration > velocity)
 						? (withAcceleration - inc) : withAcceleration
-				if (accessor.endsWith("offset") && index === 0) { console.log(velocity, withAcceleration, nextAcceleration) }
+				// if (accessor.endsWith("offset") && index === 0) { console.log(velocity, withAcceleration, nextAcceleration) }
 				return nextAcceleration
 			})
 			velocities[accessor] = new Pt(vals)
@@ -286,13 +286,14 @@ const LightsCanvas: Component<LightCanvasProps> = (p) => {
 			if (delaySet) {
 				const velocity = given.$subtract(givenDelayed).$divide(delay)
 				const withAcceleration = useAcceleration ? handleVelocity(velocity, accessor, delay) : velocity
-				// if (accessor.endsWith("brightness")) { console.table([withAcceleration].map(a => a.toArray())) }
+				if (accessor.endsWith("offset")) { console.table([withAcceleration].map(a => a.toArray())) }
 				const newFromGiven = givenDelayed.$add(withAcceleration)
-				delays[accessor] = newFromGiven
+				delays[accessor] = givenDelayed.$add(velocity)
+				return newFromGiven
 			} else {
 				delays[accessor] = given
+				return delays[accessor]
 			}
-			return delays[accessor]
 		}
 		/** Same as`delayPt()` but for numbers */
 		function delayNumber(given: number, delay: number, prop: string | (string | number)[]) {
