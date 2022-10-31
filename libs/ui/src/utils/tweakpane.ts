@@ -26,6 +26,7 @@ function createProxyFromSignal<T>(signal: Signal<T>, key: string) {
 	const compatible = new Proxy({ [key]: given() }, {
 		get: (_target, p, _receiver) => p === key ? given() : undefined,
 		set: (_target, p, value, _receiver) => {
+			// NOTE: setter can't work with object values yet (I may need to use proxy-deep for objects or rely on Solid's Store?)
 			const setIt = p === key
 			if (setIt) { setGiven(value) }
 			return setIt
@@ -36,7 +37,7 @@ function createProxyFromSignal<T>(signal: Signal<T>, key: string) {
 
 function addSignalInput<T>(signal: Signal<T>, key: string, params?: InputParams, pane: Promisable<TabPageApi|FolderApi|Pane|undefined> = pagePane) {
 	let input: InputBindingApi<unknown, unknown>|undefined
-	// eslint-disable-next-line @typescript-eslint/no-misused-promises
+	// eslint-disable-next-line @typescript-eslint/no-misused-promises -- Promised void return value is not used
 	onCleanup(async () => {
 		if (!input) { return }
 		(await pane)?.remove(input)
@@ -47,7 +48,7 @@ function addSignalInput<T>(signal: Signal<T>, key: string, params?: InputParams,
 		given()
 		input?.refresh()
 	})
-	// eslint-disable-next-line @typescript-eslint/no-misused-promises
+	// eslint-disable-next-line @typescript-eslint/no-misused-promises -- Promised void return value is not used
 	onMount(async () => {
 		const compatible = createProxyFromSignal(signal, key)
 		input = (await pane)?.addInput(compatible, key, params)
@@ -57,13 +58,13 @@ function addSignalInput<T>(signal: Signal<T>, key: string, params?: InputParams,
 
 function addSignalMonitor<T>(signal: Signal<T>, key: string, params?: MonitorParams, pane: Promisable<TabPageApi|FolderApi|Pane|undefined> = pagePane) {
 	let input: MonitorBindingApi<unknown>|undefined
-	// eslint-disable-next-line @typescript-eslint/no-misused-promises
+	// eslint-disable-next-line @typescript-eslint/no-misused-promises -- Promised void return value is not used
 	onCleanup(async () => {
 		if (!input) { return }
 		(await pane)?.remove(input)
 		input = undefined
 	})
-	// eslint-disable-next-line @typescript-eslint/no-misused-promises
+	// eslint-disable-next-line @typescript-eslint/no-misused-promises -- Promised void return value is not used
 	onMount(async () => {
 		const compatible = createProxyFromSignal(signal, key)
 		input = (await pane)?.addMonitor(compatible, key, params)

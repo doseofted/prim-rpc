@@ -57,6 +57,7 @@
     }
   },
   "dependencies": {
+    "@motionone/solid": "^10.14.2",
     "color2k": "^2.0.0",
     "nanoid": "^4.0.0",
     "popmotion": "^11.0.5",
