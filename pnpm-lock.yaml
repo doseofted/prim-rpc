@@ -4,12 +4,6 @@ importers:
 
   .:
     specifiers:
-      '@parcel/config-default': ^2.7.0
-      '@parcel/core': ^2.7.0
-      '@parcel/packager-ts': ^2.7.0
-      '@parcel/reporter-cli': ^2.7.0
-      '@parcel/transformer-typescript-types': ^2.7.0
-      '@parcel/validator-typescript': ^2.7.0
       '@typescript-eslint/eslint-plugin': ^5.36.2
       '@typescript-eslint/parser': ^5.36.2
       '@vitest/ui': ^0.23.2
@@ -36,12 +30,6 @@ importers:
     dependencies:
       zx: 7.0.8
     devDependencies:
-      '@parcel/config-default': 2.7.0_shdqhynvzslzlpwcunisasy46q
-      '@parcel/core': 2.7.0
-      '@parcel/packager-ts': 2.7.0_@parcel+core@2.7.0
-      '@parcel/reporter-cli': 2.7.0_@parcel+core@2.7.0
-      '@parcel/transformer-typescript-types': 2.7.0_7uecuwfxmxckiccza3belyuzhe
-      '@parcel/validator-typescript': 2.7.0_7uecuwfxmxckiccza3belyuzhe
       '@typescript-eslint/eslint-plugin': 5.36.2_kou65mzxaniwtkb2mhvaghdcyi
       '@typescript-eslint/parser': 5.36.2_sorwav4hsh5vncerguqybud76i
       '@vitest/ui': 0.23.2
@@ -1618,15 +1606,6 @@ packages:
       - '@parcel/core'
     dev: true
 
-  /@parcel/packager-ts/2.7.0_@parcel+core@2.7.0:
-    resolution: {integrity: sha512-XT46njOHQCYmubQRbtjQOLT9RbXgxQ8aTxCOeO9jEay6snDnY6k+HdMXHAD6qZNyVgm85HJzjmDFDUeJQt9LKw==}
-    engines: {node: '>= 12.0.0', parcel: ^2.7.0}
-    dependencies:
-      '@parcel/plugin': 2.7.0_@parcel+core@2.7.0
-    transitivePeerDependencies:
-      - '@parcel/core'
-    dev: true
-
   /@parcel/plugin/2.7.0_@parcel+core@2.7.0:
     resolution: {integrity: sha512-qqgx+nnMn6/0lRc4lKbLGmhNtBiT93S2gFNB4Eb4Pfz/SxVYoW+fmml+KdfOSiZffWOAH5L6NwhyD7N8aSikzw==}
     engines: {node: '>= 12.0.0'}
@@ -1877,33 +1856,6 @@ packages:
       - '@parcel/core'
     dev: true
 
-  /@parcel/transformer-typescript-types/2.7.0_7uecuwfxmxckiccza3belyuzhe:
-    resolution: {integrity: sha512-7eZFJH+0ZOZoh+4ZUKVnP79LI8h45hGAAqCI1UG8l7ZEf6q9yy8lwF9cREu4dUih70TDUHnHkxoNHfZWOjkDSg==}
-    engines: {node: '>= 12.0.0', parcel: ^2.7.0}
-    peerDependencies:
-      typescript: '>=3.0.0'
-    dependencies:
-      '@parcel/diagnostic': 2.7.0
-      '@parcel/plugin': 2.7.0_@parcel+core@2.7.0
-      '@parcel/source-map': 2.1.0
-      '@parcel/ts-utils': 2.7.0_typescript@4.7.4
-      '@parcel/utils': 2.7.0
-      nullthrows: 1.1.1
-      typescript: 4.7.4
-    transitivePeerDependencies:
-      - '@parcel/core'
-    dev: true
-
-  /@parcel/ts-utils/2.7.0_typescript@4.7.4:
-    resolution: {integrity: sha512-hxgWu9p9+zo9OvllYy12DRrAEyAGGLQysI6PyNvYvsZSmb7sQg9YQ7spD1QmWIQUC1H6BkyzQsowpK0hvPK1xg==}
-    engines: {node: '>= 12.0.0'}
-    peerDependencies:
-      typescript: '>=3.0.0'
-    dependencies:
-      nullthrows: 1.1.1
-      typescript: 4.7.4
-    dev: true
-
   /@parcel/types/2.7.0:
     resolution: {integrity: sha512-+dhXVUnseTCpJvBTGMp0V6X13z6O/A/+CUtwEpMGZ8XSmZ4Gk44GvaTiBOp0bJpWG4fvCKp+UmC8PYbrDiiziw==}
     dependencies:
@@ -1941,22 +1893,6 @@ packages:
       '@parcel/markdown-ansi': 2.7.0
       '@parcel/source-map': 2.1.0
       chalk: 4.1.2
-    dev: true
-
-  /@parcel/validator-typescript/2.7.0_7uecuwfxmxckiccza3belyuzhe:
-    resolution: {integrity: sha512-VZfFRbsCw0jaZVsVjbIFxa1ROVn7Yqq1zGDp30x/pPKC+vyWv0OkVybeCis7lO96Z/ojVB7hILzVi8nj+86JLA==}
-    engines: {node: '>= 12.0.0', parcel: ^2.7.0}
-    peerDependencies:
-      typescript: '>=3.0.0'
-    dependencies:
-      '@parcel/diagnostic': 2.7.0
-      '@parcel/plugin': 2.7.0_@parcel+core@2.7.0
-      '@parcel/ts-utils': 2.7.0_typescript@4.7.4
-      '@parcel/types': 2.7.0_@parcel+core@2.7.0
-      '@parcel/utils': 2.7.0
-      typescript: 4.7.4
-    transitivePeerDependencies:
-      - '@parcel/core'
     dev: true
 
   /@parcel/watcher/2.0.5:

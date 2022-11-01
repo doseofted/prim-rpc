@@ -25,12 +25,6 @@
     "zx": "^7.0.8"
   },
   "devDependencies": {
-    "@parcel/config-default": "^2.7.0",
-    "@parcel/core": "^2.7.0",
-    "@parcel/packager-ts": "^2.7.0",
-    "@parcel/reporter-cli": "^2.7.0",
-    "@parcel/transformer-typescript-types": "^2.7.0",
-    "@parcel/validator-typescript": "^2.7.0",
     "@typescript-eslint/eslint-plugin": "^5.36.2",
     "@typescript-eslint/parser": "^5.36.2",
     "@vitest/ui": "^0.23.2",

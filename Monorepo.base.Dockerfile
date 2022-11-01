@@ -18,11 +18,11 @@ RUN mkdir -p /home/node/project && chown node /home/node/project
 WORKDIR /home/node/project
 # Lockfiles should be copied first when `pnpm fetch` command is used
 # LINK https://pnpm.io/cli/fetch#usage-scenario
-# NOTE: temporarily copying package.json in same step because Parcel fails to fetch otherwise on Debian/ARM64
+# TODO: remove package.json from line below (it was originally added because Parcel wouldn't work without it but I'm no longer using it)
 COPY --chown=node pnpm-*.yaml package.json ./
 RUN pnpm fetch
 # Copy miscellaneous configuration related to project that could be used in container
-COPY --chown=node .eslint* .nvmrc .parcelrc Taskfile.yml tsconfig.json turbo.json build-deps.mjs uno.config.mjs  ./
+COPY --chown=node .eslint* .nvmrc Taskfile.yml tsconfig.json turbo.json build-deps.mjs uno.config.mjs  ./
 COPY --chown=node misc misc
 
 FROM monorepo-install as monorepo-build
