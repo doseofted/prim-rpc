@@ -6,15 +6,19 @@ interface Props extends JSX.HTMLAttributes<HTMLDivElement> {
 }
 
 const Docs: Component<Props> = (props) => {
-	const docs = createMemo(() => createDocsForModule(props.docs))
-	const moduleName = createMemo(() => helpers.findDocsReference(docs(), docs()).name)
+	const docs = createMemo(() => props.docs ? createDocsForModule(props.docs) : undefined)
+	const moduleName = createMemo(() => {
+		const givenDoc = docs()
+		if (!givenDoc) { return null }
+		helpers.findDocsReference(givenDoc, givenDoc).name
+	})
 	createEffect(() => {
 		console.log("docs:", docs())
 	})
 	return (
 		<div>
 			<p>{moduleName()}</p>
-			<For each={Object.entries(docs().props ?? {})}>{([key, _val]) =>
+			<For each={Object.entries(docs()?.props ?? {})}>{([key, _val]) =>
 				<p>{key}</p>
 			}</For>
 		</div>
