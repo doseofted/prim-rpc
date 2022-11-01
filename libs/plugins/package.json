@@ -9,8 +9,8 @@
     "url": "https://doseofted.com/"
   },
   "scripts": {
-    "watch": "unbuild --stub",
-    "build": "unbuild",
+    "watch": "tsup --watch --config build.config.mjs",
+    "build": "tsup --config build.config.mjs",
     "check": "tsc --noEmit",
     "test": "vitest run",
     "testing": "vitest watch",
@@ -34,13 +34,5 @@
     "superwstest": "^2.0.3",
     "ws": "^8.8.1"
   },
-  "exports": {
-    ".": {
-      "types": "./dist/index.d.ts",
-      "import": "./dist/index.mjs",
-      "require": "./dist/index.cjs"
-    }
-  },
-  "types": "./dist/index.d.ts",
   "files": ["dist"]
 }

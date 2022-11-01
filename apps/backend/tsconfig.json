@@ -11,7 +11,7 @@
 		// A config suggestion from Parcel:
 		// LINK https://parceljs.org/languages/typescript/#isolatedmodules
 		"isolatedModules": true,
-		"module": "ESNext"
+		"module": "Node16"
 	},
 	"include": [
 		// include all source code
