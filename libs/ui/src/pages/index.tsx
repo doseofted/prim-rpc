@@ -44,7 +44,7 @@ const Index: Component = () => {
 					<LightAuto class="w-5" />
 				)}</For>
 			</div>
-			<Docs class="relative" docs={docs} />
+			<Docs class="relative text-white z-50" docs={docs} />
 		</Lights>
 	)
 }
