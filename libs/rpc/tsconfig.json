@@ -1,23 +1,15 @@
 {
 	"compilerOptions": {
-		// ES2020 is generally well supported in modern servers/browsers
-		// LINK https://kangax.github.io/compat-table/es2016plus/
 		"target": "ES2020",
-		// LINK https://www.typescriptlang.org/tsconfig#moduleResolution
 		"moduleResolution": "Node",
-		// suggested by TS-Jest CLI when not set to `true` in tsconfig.json
 		"esModuleInterop": true,
-		// A config suggestion from Parcel:
-		// LINK https://parceljs.org/languages/typescript/#isolatedmodules
 		"isolatedModules": true,
 		"lib": ["DOM", "ES2020"]
 	},
 	"include": [
-		// include all source code
 		"src/**/*",
 	],
 	"exclude": [
-		// but not Jest tests
 		"src/**/*.test.ts"
 	]
 }

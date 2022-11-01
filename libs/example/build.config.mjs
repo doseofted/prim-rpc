@@ -8,7 +8,7 @@ export default defineConfig(options => ({
 	target: "ES2020",
 	dts: true,
 	sourcemap: true,
-	format: ["esm", "cjs"],
+	format: ["esm"],
 	clean: true,
 	async onSuccess () {
 		await $`pnpm document`

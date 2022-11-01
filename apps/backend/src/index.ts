@@ -8,8 +8,8 @@ import { WebSocketServer } from "ws"
 import jsonHandler from "superjson"
 import * as module from "@doseofted/prim-example"
 import { createPrimServer } from "@doseofted/prim-rpc"
-import { primMethodFastify } from "@doseofted/prim-plugins/dist/server/fastify.js"
-import { primCallbackWs } from "@doseofted/prim-plugins/dist/server/ws.js"
+import { primMethodFastify } from "@doseofted/prim-plugins/dist/server/fastify.mjs"
+import { primCallbackWs } from "@doseofted/prim-plugins/dist/server/ws.mjs"
 
 async function start() {
 	const contained = JSON.parse(process.env.CONTAINED ?? "false") === true

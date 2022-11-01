@@ -1,6 +1,6 @@
 import { createPrimClient } from "@doseofted/prim-rpc"
 import type * as exampleClient from "@doseofted/prim-example"
-import { createFetchClient, createWebSocketClient } from "@doseofted/prim-plugins/dist/client/browser-api"
+import { createFetchClient, createWebSocketClient } from "@doseofted/prim-plugins/dist/client/browser-api.mjs"
 import jsonHandler from "superjson"
 
 // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access

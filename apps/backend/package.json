@@ -25,11 +25,10 @@
     "test": "vitest run",
     "testing": "vitest watch",
     "lint": "eslint .",
-    "start": "node dist/index.js",
-    "dev": "nodemon --inspect dist/index.js",
+    "start": "node dist/index.mjs",
+    "dev": "nodemon --inspect dist/index.mjs",
     "entrypoint": "zx entrypoint.mjs"
   },
-  "type": "module",
   "engines": {
     "node": ">= 18.7.0"
   },
@@ -37,5 +36,5 @@
     "@types/ws": "^8.5.3",
     "nodemon": "^2.0.16"
   },
-  "module": "dist/index.js"
+  "module": "dist/index.mjs"
 }
