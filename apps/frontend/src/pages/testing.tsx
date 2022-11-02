@@ -1,6 +1,6 @@
 import { Component, createEffect, createResource, createSignal, onMount } from "solid-js"
 import backend from "../client"
-import { TestOnly } from "@doseofted/prim-ui"
+import { Docs } from "@doseofted/prim-ui"
 import { ParentEvent } from "./what"
 
 const Testing: Component = () => {
@@ -24,11 +24,10 @@ const Testing: Component = () => {
 	onMount(() => console.log())
 	return <>
 		<div>
-			<TestOnly
+			<Docs
 				// eslint-disable-next-line @typescript-eslint/no-unsafe-return
 				// ref={e => setElem(e)}
 				class="what"
-				name="Ted"
 				onMouseEnter={() => setHover(true)}
 				onMouseLeave={() => setHover(false)}
 			/>

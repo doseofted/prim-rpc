@@ -17,7 +17,7 @@ services:
 
   # database available for use in project
   postgres:
-    image: postgres:14.5
+    image: postgres:15.0
     environment:
       &database-creds
       POSTGRES_DB: "prim"

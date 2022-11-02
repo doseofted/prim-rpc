@@ -1,4 +1,4 @@
-FROM caddy:2.5.2 as base
+FROM caddy:2.6.2 as base
 WORKDIR /etc/caddy
 COPY base.Caddyfile .
 
