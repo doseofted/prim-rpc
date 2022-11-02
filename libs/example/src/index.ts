@@ -184,6 +184,13 @@ export function createImaginaryProfile(input: ServerImaginaryProfile|ClientImagi
 }
 createImaginaryProfile.rpc = true
 
+/** What's this? What's this? */
+export function whatIsThis(this: unknown) {
+	console.log("What is this?", "This is", this)
+	return { this: !!this }
+}
+whatIsThis.rpc = true
+
 /**
  * 
  * @param params - Any kind of parameter really

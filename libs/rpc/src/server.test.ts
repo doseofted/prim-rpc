@@ -63,6 +63,18 @@ test("Prim Server can call remote methods (without module directly)", async () =
 	expect(result).toEqual({ result: "Hellooo Ted!", id: 1 })
 })
 
+describe("Prim Server can understand its given context", () => {
+	const prim = createPrimServer({ module, prefix: "/prim" })
+	test("using a JSON body", async () => {
+		const server = prim.server()
+		const call: RpcCall = { method: "whatIsThis", id: 1 }
+		const body = JSON.stringify(call)
+		const response = await server.call({ method: "POST", body }, undefined, { context: "ted" })
+		const result = JSON.parse(response.body) as RpcAnswer
+		expect(result).toEqual({ result: { this: true }, id: 1 })
+	})
+})
+
 // describe("Prim Server can answer batch calls", () => {
 // 	// NOTE: this could possibly be moved to the client since the client tests also test the Prim Server
 // })

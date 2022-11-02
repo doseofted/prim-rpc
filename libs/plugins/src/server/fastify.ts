@@ -1,6 +1,9 @@
 import type { PrimServerMethodHandler, PrimServerEvents } from "@doseofted/prim-rpc"
 import type { FastifyPluginAsync, FastifyInstance, FastifyError, FastifyPluginCallback, RawServerDefault, FastifyTypeProviderDefault } from "fastify"
 import type { FastifyMultipartAttachFieldsToBodyOptions, FastifyMultipartOptions, MultipartFile, MultipartValue } from "@fastify/multipart"
+import { IncomingHttpHeaders } from "http"
+
+export type PrimFastifyContext = IncomingHttpHeaders
 
 interface SharedFastifyOptions {
 	multipartPlugin?: FastifyPluginCallback< // NOTE: interface for @fastify/multipart plugin
@@ -82,7 +85,8 @@ export const fastifyPrimPlugin: FastifyPluginAsync<PrimFastifyPluginOptions> = a
 			}
 			const { body: bodyReq, method, raw: { url } } = request
 			const body = bodyForm ?? bodyReq
-			const response = await prim.server().call({ method, url, body }, blobs)
+			const context = { ...request.headers }
+			const response = await prim.server().call({ method, url, body }, blobs, context)
 			void reply.status(response.status).headers(response.headers).send(response.body)
 		},
 	})
@@ -91,7 +95,8 @@ export const fastifyPrimPlugin: FastifyPluginAsync<PrimFastifyPluginOptions> = a
 		url: prim.options.prefix + "/*",
 		handler: async (request, reply) => {
 			const { body, method, raw: { url } } = request
-			const response = await prim.server().call({ method, url, body })
+			const context = { ...request.headers }
+			const response = await prim.server().call({ method, url, body }, null, context)
 			void reply.status(response.status).headers(response.headers).send(response.body)
 		},
 	})

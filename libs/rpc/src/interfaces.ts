@@ -264,7 +264,7 @@ export interface PrimServerOptions<C = unknown> extends PrimOptions {
 
 export type PrimServerSocketAnswer = (result: string) => void
 export type PrimServerSocketAnswerRpc = (result: RpcAnswer|RpcAnswer[]) => void
-interface PrimServerConnectedActions {
+interface PrimServerConnectedActions<Context = unknown> {
 	/**
 	 * Call when the connection to the server terminates
 	 */
@@ -277,19 +277,19 @@ interface PrimServerConnectedActions {
 	 * a response as an object (to be stringified manually, as needed).
 	 * Do not run both `.call()` and `.rpc()`. Instead, choose one or the other.
 	 */
-	call: (data: string, send: PrimServerSocketAnswer) => void
+	call: (data: string, send: PrimServerSocketAnswer, context?: Context) => void
 	/**
 	 * Given an RPC call, get an answer back, to be sent in callback. This is an
 	 * alternative to `.call()` (useful for debugging or non-server contexts)
 	 */
-	rpc: (data: RpcCall|RpcCall[], send: PrimServerSocketAnswerRpc) => void
+	rpc: (data: RpcCall|RpcCall[], send: PrimServerSocketAnswerRpc, context?: Context) => void
 }
 export interface PrimServerSocketEvents {
 	connected: () => PrimServerConnectedActions
 	options: PrimServerOptions
 }
 
-export interface PrimServerActionsBase {
+export interface PrimServerActionsBase<Context = unknown> {
 	/**
 	 * Step 1: Passing common parameters used by server frameworks to Prim, gather the
 	 * prepared RPC call from the request. See `.prepareRpc()` for next step.
@@ -299,7 +299,7 @@ export interface PrimServerActionsBase {
 	 * Step 2: Using the result of `.prepareCall()`, use the RPC to get a result from Prim.
 	 * See `.prepareSend()` for next step.
 	 */
-	prepareRpc: (given: RpcCall|RpcCall[], blobs?: Record<string, unknown>) => Promise<RpcAnswer|RpcAnswer[]>
+	prepareRpc: (given: RpcCall|RpcCall[], blobs?: Record<string, unknown>|null, context?: Context) => Promise<RpcAnswer|RpcAnswer[]>
 	/**
 	 * Step 3: Using the result of `.rpc()`, prepare the result to be sent with the server framework.
 	 */
@@ -308,7 +308,7 @@ export interface PrimServerActionsBase {
 	// instead of using a `methodHandler` or `callbackHandler` (likely to only be used for testing directly)
 }
 
-export interface PrimServerActionsExtended extends PrimServerActionsBase {
+export interface PrimServerActionsExtended<Context = unknown> extends PrimServerActionsBase<Context> {
 	/**
 	 * This function prepares a useable result for common server frameworks
 	 * using common options that most servers provide. It is a shortcut for
@@ -316,7 +316,7 @@ export interface PrimServerActionsExtended extends PrimServerActionsBase {
 	 * 
 	 * This calls, in order, `.prepareCall()`, `.rpc()`, and `.prepareSend()`
 	 */
-	call: (given: CommonServerSimpleGivenOptions, blobs?: Record<string, unknown>) => Promise<CommonServerResponseOptions>
+	call: (given: CommonServerSimpleGivenOptions, blobs?: Record<string, unknown>|null, context?: Context) => Promise<CommonServerResponseOptions>
 }
 
 export interface PrimServerEvents {

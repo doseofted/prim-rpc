@@ -67,6 +67,7 @@ function createServerActions (serverOptions: PrimServerOptions, instance?: Retur
 	const prepareRpc = async (
 		calls: RpcCall|RpcCall[],
 		blobs: Record<string, unknown> = {},
+		context?: unknown,
 		cbResults?: (a: RpcAnswer) => void,
 	): Promise<RpcAnswer|RpcAnswer[]> => {
 		// NOTE: new Prim client should be created on each request so callback results are not shared
@@ -107,13 +108,13 @@ function createServerActions (serverOptions: PrimServerOptions, instance?: Retur
 					}
 				}
 				const argsArray = Array.isArray(params) ? params : [params]
-				const args = Object.entries(blobs).length > 0
+				const args = Object.entries(blobs || {}).length > 0
 					? argsArray.map(arg => mergeBlobLikeWithGiven(arg, blobs))
 					: argsArray
 				if (cbResults) { event.on("response", cbResults) }
 				// NOTE: use `remoteTarget` (even if target is local) to ensure callbacks are handled properly by Prim client
 				// eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
-				const result: RpcAnswer = await Reflect.apply(targetRemote, undefined, args)
+				const result: RpcAnswer = await Reflect.apply(targetRemote, context, args)
 				// TODO: today, result must be supported by JSON handler but consider supporting returned functions
 				// in the same way that callback are supported today (by passing reference to client)
 				return { result, id }
@@ -152,9 +153,10 @@ function createServerEvents (serverOptions: PrimServerOptions): PrimServerEvents
 		const call = async (
 			given: CommonServerSimpleGivenOptions,
 			blobs: Record<string, unknown> = {},
+			context?: unknown,
 		): Promise<CommonServerResponseOptions> => {
 			const preparedParams = prepareCall(given)
-			const result = await prepareRpc(preparedParams, blobs)
+			const result = await prepareRpc(preparedParams, blobs, context)
 			const preparedResult = prepareSend(result)
 			return preparedResult
 		}
@@ -173,26 +175,28 @@ function createSocketEvents (serverOptions: PrimServerOptions): PrimServerSocket
 			event.emit("ended")
 			event.all.clear()
 		}
-		const call = async (body: string, send: PrimServerSocketAnswer) => {
-			// clear previous responses (FIXME: don't stop listening to other responses when new call is made)
+		const call = async (body: string, send: PrimServerSocketAnswer, context?: unknown) => {
+			// clear previous responses
+			// FIXME: don't stop listening to other responses when new call is made)
 			event.off("response")
 			event.on("response", (data) => {
 				const { body } = prepareSend(data)
 				send(body)
 			})
 			const preparedParams = prepareCall({ body })
-			const result = await prepareRpcBase(preparedParams)
+			const result = await prepareRpcBase(preparedParams, null, context)
 			const preparedResult = prepareSend(result)
 			send(preparedResult.body)			
 		}
-		const rpc = async (body: RpcCall|RpcCall[], send: PrimServerSocketAnswerRpc) => {
-			// clear previous responses (FIXME: don't stop listening to other responses when new call is made)
+		const rpc = async (body: RpcCall|RpcCall[], send: PrimServerSocketAnswerRpc, context?: unknown) => {
+			// clear previous responses 
+			// FIXME: don't stop listening to other responses when new call is made)
 			event.off("response")
 			event.on("response", (data) => {
 				send(data)
 			})
-			const result = await prepareRpcBase(body)
-			send(result)			
+			const result = await prepareRpcBase(body, null, context)
+			send(result)
 		}
 		// TODO: return `prepare...()` functions below, in event that something more than `call()` is needed
 		// for example, in the Prim Server plugin for Web Workers (where `body` is not given).
