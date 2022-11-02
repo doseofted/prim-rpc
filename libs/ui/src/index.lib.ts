@@ -1,4 +1,3 @@
-import TestOnly from "./components/Docs"
-import { Light, Lights, useLights } from "./components/Lights"
+import Docs from "./components/Docs"
 
-export { TestOnly, Light, Lights, useLights }
+export { Docs }
