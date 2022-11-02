@@ -23,8 +23,8 @@
       "import": "./dist/index.mjs"
     },
     "./docs.json": "./dist/docs.json",
-    "./dist/docs.json": "./dist/docs.json"
-
+    "./dist/docs.json": "./dist/docs.json",
+    "./package.json": "./package.json"
   },
   "module": "./dist/index.mjs",
   "types": "./dist/index.d.ts",

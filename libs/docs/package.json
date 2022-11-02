@@ -17,26 +17,29 @@
     "lint": "eslint ."
   },
   "dependencies": {
-    "@sinclair/typebox": "^0.24.40",
+    "@sinclair/typebox": "^0.25.2",
     "@types/json-schema": "^7.0.11",
     "lodash-es": "^4.17.21",
-    "typedoc": "^0.23.14",
-    "typescript": "^4.7.4"
+    "typedoc": "^0.23.19",
+    "typescript": "^4.8.4"
   },
   "devDependencies": {
     "@doseofted/prim-example": "workspace:*",
-    "@types/lodash": "^4.14.185",
+    "@types/lodash": "^4.14.187",
     "@types/lodash-es": "^4.17.6",
     "lodash": "^4.17.21",
-    "type-fest": "^2.19.0"
+    "type-fest": "^3.1.0"
   },
   "exports": {
     ".": {
       "types": "./dist/index.d.ts",
       "import": "./dist/index.mjs"
-    }
+    },
+    "./package.json": "./package.json"
   },
   "module": "./dist/index.mjs",
   "types": "./dist/index.d.ts",
-  "files": ["dist"]
+  "files": [
+    "dist"
+  ]
 }

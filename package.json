@@ -22,29 +22,29 @@
     "lint-style": "turbo run lint-style"
   },
   "dependencies": {
-    "zx": "^7.0.8"
+    "zx": "^7.1.1"
   },
   "devDependencies": {
-    "@typescript-eslint/eslint-plugin": "^5.36.2",
-    "@typescript-eslint/parser": "^5.36.2",
-    "@vitest/ui": "^0.23.2",
+    "@typescript-eslint/eslint-plugin": "^5.42.0",
+    "@typescript-eslint/parser": "^5.42.0",
+    "@vitest/ui": "^0.24.5",
     "chokidar": "^3.5.3",
-    "eslint": "^8.23.0",
-    "eslint-plugin-solid": "^0.7.1",
-    "jsdom": "^20.0.0",
-    "postcss": "^8.4.16",
+    "eslint": "^8.26.0",
+    "eslint-plugin-solid": "^0.8.0",
+    "jsdom": "^20.0.2",
+    "postcss": "^8.4.18",
     "postcss-html": "^1.5.0",
-    "sass": "^1.54.9",
-    "stylelint": "^14.11.0",
+    "sass": "^1.55.0",
+    "stylelint": "^14.14.0",
     "stylelint-config-recommended": "^9.0.0",
-    "stylelint-config-recommended-scss": "^7.0.0",
+    "stylelint-config-recommended-scss": "^8.0.0",
     "tsup": "^6.3.0",
-    "turbo": "^1.4.6",
-    "typedoc": "^0.23.14",
-    "typescript": "^4.7.4",
+    "turbo": "^1.6.3",
+    "typedoc": "^0.23.19",
+    "typescript": "^4.8.4",
     "unbuild": "^0.9.4",
-    "unocss": "^0.45.18",
-    "vite": "^3.1.0",
-    "vitest": "^0.23.2"
+    "unocss": "^0.46.2",
+    "vite": "^3.2.2",
+    "vitest": "^0.24.5"
   }
 }

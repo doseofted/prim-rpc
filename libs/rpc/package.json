@@ -23,24 +23,27 @@
     "proxy-deep": "^3.1.1",
     "query-string": "^7.1.1",
     "serialize-error": "^11.0.0",
-    "ufo": "^0.8.5"
+    "ufo": "^0.8.6"
   },
   "devDependencies": {
     "@doseofted/prim-example": "workspace:*",
-    "@types/lodash": "^4.14.185",
+    "@types/lodash": "^4.14.187",
     "@types/lodash-es": "^4.17.6",
     "lodash": "^4.17.21",
     "lodash-es": "^4.17.21",
-    "superjson": "^1.9.1",
-    "type-fest": "^2.19.0"
+    "superjson": "^1.11.0",
+    "type-fest": "^3.1.0"
   },
   "exports": {
     ".": {
       "types": "./dist/index.d.ts",
       "import": "./dist/index.mjs"
-    }
+    },
+    "./package.json": "./package.json"
   },
   "module": "./dist/index.mjs",
   "types": "./dist/index.d.ts",
-  "files": ["dist"]
+  "files": [
+    "dist"
+  ]
 }

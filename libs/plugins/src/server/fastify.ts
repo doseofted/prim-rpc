@@ -1,10 +1,10 @@
 import type { PrimServerMethodHandler, PrimServerEvents } from "@doseofted/prim-rpc"
 import type { FastifyPluginAsync, FastifyInstance, FastifyError, FastifyPluginCallback, RawServerDefault, FastifyTypeProviderDefault } from "fastify"
-import type { FastifyMultipartAttactFieldsToBodyOptions, FastifyMultipartOptions, MultipartFile, MultipartValue } from "@fastify/multipart"
+import type { FastifyMultipartAttachFieldsToBodyOptions, FastifyMultipartOptions, MultipartFile, MultipartValue } from "@fastify/multipart"
 
 interface SharedFastifyOptions {
 	multipartPlugin?: FastifyPluginCallback< // NOTE: interface for @fastify/multipart plugin
-	FastifyMultipartOptions|FastifyMultipartAttactFieldsToBodyOptions,
+	FastifyMultipartOptions|FastifyMultipartAttachFieldsToBodyOptions,
 	RawServerDefault,
 	FastifyTypeProviderDefault
 	>

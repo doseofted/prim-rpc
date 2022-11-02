@@ -21,24 +21,24 @@
   "devDependencies": {
     "@doseofted/prim-docs": "workspace:*",
     "@doseofted/prim-example": "workspace:*",
-    "@solidjs/router": "^0.4.3",
+    "@solidjs/router": "^0.5.0",
     "@tweakpane/core": "^1.1.0",
     "@tweakpane/plugin-essentials": "^0.1.5",
     "@types/lodash-es": "^4.17.6",
-    "@types/node": "^18.7.16",
-    "@unocss/reset": "^0.45.18",
+    "@types/node": "^18.11.9",
+    "@unocss/reset": "^0.46.2",
     "lodash-es": "^4.17.21",
-    "solid-js": "^1.5.4",
-    "solid-styled-components": "^0.28.4",
+    "solid-js": "^1.6.1",
+    "solid-styled-components": "^0.28.5",
     "solid-testing-library": "^0.3.0",
     "tweakpane": "^3.1.0",
-    "type-fest": "^2.19.0",
-    "typescript": "^4.7.4",
-    "unocss": "^0.45.18",
-    "vite": "^3.1.0",
-    "vite-plugin-dts": "^1.5.0",
-    "vite-plugin-pages": "^0.26.0",
-    "vite-plugin-solid": "^2.3.0"
+    "type-fest": "^3.1.0",
+    "typescript": "^4.8.4",
+    "unocss": "^0.46.2",
+    "vite": "^3.2.2",
+    "vite-plugin-dts": "^1.6.6",
+    "vite-plugin-pages": "^0.27.1",
+    "vite-plugin-solid": "^2.3.10"
   },
   "files": [
     "dist"
@@ -55,13 +55,14 @@
     "./style.css": {
       "import": "./dist/style.css",
       "require": "./dist/style.css"
-    }
+    },
+    "./package.json": "./package.json"
   },
   "dependencies": {
-    "@motionone/solid": "^10.14.2",
+    "@motionone/solid": "^10.14.3",
     "color2k": "^2.0.0",
     "nanoid": "^4.0.0",
     "popmotion": "^11.0.5",
-    "pts": "^0.11.1"
+    "pts": "^0.11.2"
   }
 }
