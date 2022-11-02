@@ -26,15 +26,14 @@
     "testing": "vitest watch",
     "lint": "eslint .",
     "start": "node dist/index.mjs",
-    "dev": "nodemon --inspect dist/index.mjs",
+    "dev": "node --watch dist/index.mjs",
     "entrypoint": "zx entrypoint.mjs"
   },
   "engines": {
     "node": ">= 18.7.0"
   },
   "devDependencies": {
-    "@types/ws": "^8.5.3",
-    "nodemon": "^2.0.20"
+    "@types/ws": "^8.5.3"
   },
   "module": "dist/index.mjs"
 }
