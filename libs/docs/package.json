@@ -9,23 +9,12 @@
     "url": "https://doseofted.com/"
   },
   "scripts": {
-    "watch": "parcel watch --no-hmr",
-    "build": "parcel build",
+    "watch": "tsup --watch --config build.config.mjs",
+    "build": "tsup --config build.config.mjs",
     "check": "tsc --noEmit",
     "test": "vitest run",
     "testing": "vitest watch",
     "lint": "eslint ."
-  },
-  "source": "src/index.ts",
-  "types": "dist/index.d.ts",
-  "main": "dist/main.cjs",
-  "module": "dist/module.mjs",
-  "exports": {
-    ".": {
-      "import": "./dist/module.mjs",
-      "require": "./dist/main.cjs"
-    },
-    "./dist/docs.json": "./dist/docs.json"
   },
   "dependencies": {
     "@sinclair/typebox": "^0.24.40",
@@ -40,5 +29,14 @@
     "@types/lodash-es": "^4.17.6",
     "lodash": "^4.17.21",
     "type-fest": "^2.19.0"
-  }
+  },
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "import": "./dist/index.mjs"
+    }
+  },
+  "module": "./dist/index.mjs",
+  "types": "./dist/index.d.ts",
+  "files": ["dist"]
 }

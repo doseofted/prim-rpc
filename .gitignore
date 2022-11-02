@@ -15,8 +15,6 @@ Thumbs.db
 [Dd]esktop.ini
 # Node modules are reinstalled on each client (and huge, don't commit)
 node_modules
-# Parcel cache is specific to built artifact, don't commit
-.parcel-cache
 # TurboRepo cache doesn't need to be committed
 .turbo
 # Don't commit Checksums used by Taskfile when fingerprinting files

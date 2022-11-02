@@ -1,24 +1,14 @@
 {
 	"compilerOptions": {
-		// Target can be higher for server since I can control the version of Node used
-		// LINK https://node.green/
-		"target": "ES2021",
-		// CommonJS resolution
-		// LINK https://www.typescriptlang.org/tsconfig#moduleResolution
+		"target": "ES2022",
 		"moduleResolution": "Node",
-		// suggested by TS-Jest CLI when not set to `true` in tsconfig.json
 		"esModuleInterop": true,
-		// A config suggestion from Parcel:
-		// LINK https://parceljs.org/languages/typescript/#isolatedmodules
-		"isolatedModules": true,
-		"module": "ESNext"
+		"isolatedModules": true
 	},
 	"include": [
-		// include all source code
 		"src/**/*",
 	],
 	"exclude": [
-		// but not Jest tests
 		"src/**/*.test.ts"
 	]
 }

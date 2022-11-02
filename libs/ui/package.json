@@ -45,9 +45,10 @@
   ],
   "main": "./dist/lib.umd.cjs",
   "module": "./dist/lib.es.mjs",
-  "types": "./dist/lib.d.ts",
+  "types": "./dist/index.lib.d.ts",
   "exports": {
     ".": {
+      "types": "./dist/index.lib.d.ts",
       "import": "./dist/lib.es.mjs",
       "require": "./dist/lib.umd.cjs"
     },

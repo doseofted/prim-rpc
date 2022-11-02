@@ -9,23 +9,24 @@
     "url": "https://doseofted.com/"
   },
   "scripts": {
-    "watch": "parcel watch --no-hmr",
-    "build": "parcel build",
+    "watch": "tsup --watch --config build.config.mjs",
+    "build": "tsup --config build.config.mjs",
     "check": "tsc --noEmit",
     "document": "typedoc src/index.ts --json dist/docs.json",
     "test": "vitest run",
     "testing": "vitest watch",
     "lint": "eslint ."
   },
-  "source": "src/index.ts",
-  "types": "dist/index.d.ts",
-  "main": "dist/main.cjs",
-  "module": "dist/module.mjs",
   "exports": {
     ".": {
-      "import": "./dist/module.mjs",
-      "require": "./dist/main.cjs"
+      "types": "./dist/index.d.ts",
+      "import": "./dist/index.mjs"
     },
+    "./docs.json": "./dist/docs.json",
     "./dist/docs.json": "./dist/docs.json"
-  }
+
+  },
+  "module": "./dist/index.mjs",
+  "types": "./dist/index.d.ts",
+  "files": ["dist"]
 }

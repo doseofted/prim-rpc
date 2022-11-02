@@ -3,8 +3,6 @@
 
 # Node modules are installed in each container
 node_modules
-# Parcel cache is specific platform it is built on, leave out of container
-.parcel-cache
 # TurboRepo cache doesn't need to be sent to a container
 .turbo
 # Cached status of Task runs doesn't need to be in container

@@ -19,24 +19,22 @@
     "ws": "^8.8.1"
   },
   "scripts": {
-    "watch": "parcel watch",
-    "build": "parcel build",
+    "watch": "tsup --watch --config build.config.mjs",
+    "build": "tsup --config build.config.mjs",
     "check": "tsc --noEmit",
     "test": "vitest run",
     "testing": "vitest watch",
     "lint": "eslint .",
-    "start": "node dist/module.js",
-    "dev": "nodemon --inspect dist/module.js",
+    "start": "node dist/index.mjs",
+    "dev": "nodemon --inspect dist/index.mjs",
     "entrypoint": "zx entrypoint.mjs"
   },
-  "type": "module",
   "engines": {
     "node": ">= 18.7.0"
   },
-  "source": "src/index.ts",
-  "module": "dist/module.js",
   "devDependencies": {
     "@types/ws": "^8.5.3",
     "nodemon": "^2.0.16"
-  }
+  },
+  "module": "dist/index.mjs"
 }

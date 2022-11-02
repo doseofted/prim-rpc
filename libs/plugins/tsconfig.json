@@ -1,24 +1,15 @@
 {
 	"compilerOptions": {
-		// NOTE: standard introduced ".finally()" used in Prim (target may need to be set lower)
-		"target": "ES2018",
-		// CommonJS resolution (Parcel will still create require/module bundles)
-		// LINK https://www.typescriptlang.org/tsconfig#moduleResolution
+		"target": "ES2020",
 		"moduleResolution": "Node",
-		"module": "Node16",
-		// suggested by TS-Jest CLI when not set to `true` in tsconfig.json
 		"esModuleInterop": true,
-		// A config suggestion from Parcel:
-		// LINK https://parceljs.org/languages/typescript/#isolatedmodules
 		"isolatedModules": true,
-		"resolveJsonModule": true
+		"lib": ["DOM", "ES2020"]
 	},
 	"include": [
-		// include all source code
 		"src/**/*",
 	],
 	"exclude": [
-		// but not Jest tests
 		"src/**/*.test.ts"
 	]
 }
