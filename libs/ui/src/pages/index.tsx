@@ -44,6 +44,7 @@ const Index: Component = () => {
 					<LightAuto class="w-5" />
 				)}</For>
 			</div>
+			{/* eslint-disable-next-line @typescript-eslint/no-unsafe-assignment */}
 			<Docs class="relative text-white z-50" docs={docs} />
 		</Lights>
 	)

@@ -32,7 +32,6 @@
     "eslint": "^8.23.0",
     "eslint-plugin-solid": "^0.7.1",
     "jsdom": "^20.0.0",
-    "parcel": "^2.7.0",
     "postcss": "^8.4.16",
     "postcss-html": "^1.5.0",
     "sass": "^1.54.9",
