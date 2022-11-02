@@ -3,7 +3,7 @@ import { defineConfig } from "tsup"
 import { copyFile, readdir } from "node:fs/promises"
 import { existsSync as exists } from "node:fs"
 import { join as joinPath } from "node:path"
-
+import { $ } from "zx"
 
 export default defineConfig(options => ({
 	...options,
@@ -31,6 +31,9 @@ export default defineConfig(options => ({
 			await copyFile(declaration, newFileName)
 			console.log("Renamed", declaration, "->", newFileName)
 		}
+		// NOTE: when `onSuccess` fires, .d.ts files haven't been created yet so wait for check to complete,
+		// which is a reasonable amount of time to generate .d.ts, then make a copy of generated file.
+		await $`pnpm check`
 		for (const path of paths) {
 			const given = await readdir(path)
 			for (const filename of given) {
