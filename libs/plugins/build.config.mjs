@@ -22,14 +22,14 @@ export default defineConfig(options => ({
 	clean: true,
 	async onSuccess() {
 		const dirname = new URL(".", import.meta.url).pathname
-		const paths = [joinPath(dirname, "dist/client"), joinPath(dirname, "dist/server")]
+		const paths = [joinPath(dirname, "dist/client/"), joinPath(dirname, "dist/server/")]
 		// NOTE: ensure that .mjs import in typescript >=4.7 can be used from plugin package with types
-		/** @type {(declaration: string) => Promise<void>} */
+		/** @type {(declaration: string) => Promise<string>} */
 		const renameDeclaration = async declaration => {
-			if (!exists(declaration)) { return }
+			if (!exists(declaration)) { return "" }
 			const newFileName = declaration.replace(/\.d\.ts$/, ".d.mts")
 			await copyFile(declaration, newFileName)
-			console.log("Renamed", declaration, "->", newFileName)
+			return newFileName
 		}
 		// NOTE: when `onSuccess` fires, .d.ts files haven't been created yet so wait for check to complete,
 		// which is a reasonable amount of time to generate .d.ts, then make a copy of generated file.
@@ -39,7 +39,10 @@ export default defineConfig(options => ({
 			for (const filename of given) {
 				if (filename.endsWith(".d.ts")) {
 					const declaration = joinPath(path, filename)
-					await renameDeclaration(declaration)
+					const newDeclaration = await renameDeclaration(declaration)
+					if (newDeclaration) {
+						console.log("Copied", declaration.replace(path, ""), "->", newDeclaration.replace(path, ""))
+					}
 				}
 			}
 		}
