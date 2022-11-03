@@ -1,4 +1,4 @@
-import { random } from "lodash-es"
+import { clamp, random } from "lodash-es"
 import {
 	Component, JSX, splitProps, createMemo, createEffect, mergeProps, createSignal, onCleanup,
 } from "solid-js"
@@ -39,7 +39,7 @@ export const LightAuto: Component<LightBehaviorProps> = (p) => {
 		},
 	}, p)
 	const [props, lightRelated] = splitProps(pDefaults, ["focus", "strength", "jitter", "limits", "options"])
-	const limit = (prop: keyof typeof props["limits"], val: number) => val * props.limits[prop]
+	const limit = (prop: keyof typeof props["limits"], factor: number) => factor * props.limits[prop]
 	const timeline = createMemo(() => {
 		const rotate = random(0, 360)
 		const time: [ts: number, opts: Partial<LightOptions>][] = [
@@ -67,7 +67,9 @@ export const LightAuto: Component<LightBehaviorProps> = (p) => {
 		const duration = timeline().map(([ts]) => ts).reduce((a, b) => a > b ? a : b)
 		// play timeline
 		for (const [ts, opts] of timeline()) {
-			setTimeout(() => { setCurrent(opts) }, ts)
+			setTimeout(() => {
+				setCurrent(opts)
+			}, ts === 0 ? ts : clamp(random(ts - 100, ts + 150), 0, Infinity))
 		}
 		// start jitter effect
 		let interval: number | undefined
@@ -77,7 +79,7 @@ export const LightAuto: Component<LightBehaviorProps> = (p) => {
 					setCurrent({
 						offset: [random(0, limit("jitter", props.jitter)), random(0, limit("jitter", props.jitter))],
 						rotate: random(0, 360),
-						delay: 100,
+						delay: 200,
 						// size: limit("strength", random(props.strength / 2, props.strength)),
 					})
 				}, random(0, 500))

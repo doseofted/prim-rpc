@@ -8,7 +8,7 @@ import { LightAuto } from "../components/LightsExtended"
 const Index: Component = () => {
 	const folder = addFolderToPane({ title: "A Folder" })
 	// eslint-disable-next-line solid/reactivity -- just a wrapper around signal
-	const [count] = addSignalInput(createSignal(20), "count", { min: 0, max: 100, step: 1 }, folder)
+	const [count] = addSignalInput(createSignal(16), "count", { min: 0, max: 100, step: 1 }, folder)
 	// eslint-disable-next-line solid/reactivity -- just a wrapper around signal
 	const [brightness] = addSignalInput(createSignal(1), "brightness", { min: 0, max: 2, step: 0.01 }, folder)
 	// eslint-disable-next-line solid/reactivity -- just a wrapper around signal
@@ -42,7 +42,7 @@ const Index: Component = () => {
 			</div>
 			<div class="more-lights flex relative flex-wrap justify-center mt-80">
 				<For each={lights()}>{() => (
-					<LightAuto class="w-5" />
+					<LightAuto class="w-12" />
 				)}</For>
 			</div>
 			{/* eslint-disable-next-line @typescript-eslint/no-unsafe-assignment */}
