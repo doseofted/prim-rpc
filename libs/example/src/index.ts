@@ -168,9 +168,9 @@ export function addThings (...things: AddableThing[]): AddableThing {
 }
 addThings.rpc = true
 
-/** Server-provided details */
+/** Server-provided details about an imaginary profile. */
 export interface ServerImaginaryProfile { name: string, password: string, email: string, picture: Promise<string> }
-/** Client-provided details */
+/** Client-provided details about an imaginary profile. */
 export interface ClientImaginaryProfile { name: string, password: string, email: string, picture: Blob }
 export function createImaginaryProfile(input: ServerImaginaryProfile): boolean
 export function createImaginaryProfile(input: ClientImaginaryProfile): boolean
@@ -184,6 +184,31 @@ export function createImaginaryProfile(input: ServerImaginaryProfile|ClientImagi
 	return true
 }
 createImaginaryProfile.rpc = true
+
+export type GenericFormExample = Record<string, Promise<string>|string|string[]>
+export async function handleForm(entries: GenericFormExample): Promise<string[]>
+/**
+ * Upload a form to the server but without all of the hassle. Even with file uploads. What?!
+ *
+ * @param form - An HTML Form element or Form Data used with the HTML Form
+ * @returns The field names as received from the server. Field values are logged server-side.
+ */
+export async function handleForm(form: HTMLFormElement|FormData): Promise<string[]>
+export async function handleForm (given: GenericFormExample|HTMLFormElement|FormData): Promise<string[]> {
+	const serverSide = (given: unknown): given is GenericFormExample => typeof window === "undefined"
+	if (!serverSide(given)) { return [] }
+	const resolved: GenericFormExample = {}
+	for (const [key, input] of Object.entries(given)) {
+		if (input instanceof Promise) {
+			resolved[key] = await input
+		} else {
+			resolved[key] = input
+		}
+	}
+	console.log("Received form data on server:", resolved)
+	return Object.keys(resolved)
+}
+handleForm.rpc = true
 
 /** What's this? What's this? */
 export function whatIsThis(this: unknown) {

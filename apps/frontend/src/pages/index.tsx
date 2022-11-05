@@ -1,68 +1,21 @@
-import type { ClientImaginaryProfile } from "@doseofted/prim-example"
-import { Component, splitProps } from "solid-js"
+import { Component } from "solid-js"
 import backend from "../client"
 
-/** Helper to get entries from given the form as a record */
-function formEntries<Expected>(maybeForm: unknown): Expected | false {
-	const givenForm = (form: unknown): form is HTMLFormElement =>
-		typeof HTMLFormElement === "function" && maybeForm instanceof HTMLFormElement
-	if (!givenForm(maybeForm)) { return false }
-	const formData = new FormData(maybeForm)
-	const data: Record<string, FormDataEntryValue | FormDataEntryValue[]> = {}
-	formData.forEach((val, key) => {
-		if (data[key]) {
-			const previous = data[key]
-			if (Array.isArray(previous)) {
-				previous.push(val)
-			} else {
-				data[key] = [previous, val]
-			}
-		} else {
-			data[key] = val
-		}
-	})
-	return data as unknown as Expected
-}
-
-/** A simple form item */
-const FormItem: Component<{ id: string, type: string, label: string, autocomplete?: string, name: string, multiple?: boolean }> = (props) => {
-	// const [model] = createSignal("")
-	const [given, misc] = splitProps(props, ["id", "label", "type"])
-	return (
-		<div class="flex items-center space-x-6">
-			<label for={given.id} class="block w-32">{given.label}:</label>
-			<input
-				id={given.id}
-				type={given.type}
-				// value={model()}
-				// onInput={(event) => setModel((event.target as HTMLInputElement).value)}
-				class="border border-black rounded-full px-6 py-1 block w-full"
-				{...misc}
-			/>
-		</div>
-	)
-}
-
-// eslint-disable-next-line @typescript-eslint/require-await
-async function formSubmit(event: Event & { currentTarget: HTMLFormElement }) {
-	event.preventDefault()
-	const entries = formEntries<ClientImaginaryProfile>(event.currentTarget)
-	if (entries) {
-		const profile = await backend.createImaginaryProfile(entries)
+const App: Component = () => {
+	async function submitForm(event: Event & { currentTarget: HTMLFormElement }) {
+		event.preventDefault()
+		const profile = await backend.handleForm(event.currentTarget)
 		console.log("Server response:", profile)
 	}
-}
-
-const App: Component = () => {
 	return (
 		<div class="w-full h-100vh flex items-center justify-center bg-black bg-gradient-to-b from-#00080d to-#082d41">
-			<form class="w-full max-w-xl p-8 bg-white rounded-lg space-y-6 flex flex-col m-2" onSubmit={e => void formSubmit(e)}>
+			<form class="w-full max-w-xl p-8 bg-white rounded-lg space-y-6 flex flex-col m-2" onSubmit={e => void submitForm(e)}>
 				<h1 class="text-xl font-bold">A Form</h1>
 				<p>This is a form.</p>
-				<FormItem id="name" name="name" label="Name" type="text" />
-				<FormItem id="password" name="password" label="Password" type="password" autocomplete="new-password" />
-				<FormItem id="email" name="email" label="Email" type="email" autocomplete="username" />
-				<FormItem id="picture" name="picture" label="Picture" type="file" />
+				<div class="grid grid-cols-2 auto-cols-auto gap-4">
+					<label for="name" class="max-w-12">Name</label>
+					<input class="border border-black rounded-full px-2 py-1" type="text" id="name" name="name" />
+				</div>
 				<input type="submit" class="border border-black rounded-full px-6 py-2 self-end">Submit</input>
 			</form>
 		</div>
