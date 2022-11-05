@@ -1,8 +1,11 @@
 import type { PrimServerMethodHandler, PrimServerEvents } from "@doseofted/prim-rpc"
 import type { FastifyPluginAsync, FastifyInstance, FastifyError, FastifyPluginCallback, RawServerDefault, FastifyTypeProviderDefault } from "fastify"
 import type { FastifyMultipartAttachFieldsToBodyOptions, FastifyMultipartOptions, MultipartFile, MultipartValue } from "@fastify/multipart"
-import { IncomingHttpHeaders } from "http"
-
+import type { IncomingHttpHeaders } from "node:http"
+import { pipeline } from "node:stream/promises"
+import { createWriteStream } from "node:fs"
+import { tmpdir } from "node:os"
+import path from "node:path"
 export type PrimFastifyContext = IncomingHttpHeaders
 
 interface SharedFastifyOptions {
@@ -70,18 +73,12 @@ export const fastifyPrimPlugin: FastifyPluginAsync<PrimFastifyPluginOptions> = a
 					if (!part.file && part.fieldname === "rpc") {
 						bodyForm = part.value
 					} else if (part.file && part.fieldname.startsWith("_bin_")) {
-						// TODO: this needs to be streamed rather than placing the entire file in memory
-						blobs[part.fieldname] = await part.toBuffer()
-						// const stream = new Writable()
-						// pipeline(part.file, stream)
-						// blobs[part.fieldname] = stream
+						// TODO: ensure filename has random/generated portion, consider placing all files in temp "prim" folder
+						const tmpFile = path.join(tmpdir(), part.filename)
+						const filenamePromise = pipeline(part.file, createWriteStream(tmpFile)).then(() => tmpFile)
+						blobs[part.fieldname] = filenamePromise
 					}
 				}
-				// const files = await request.saveRequestFiles({ limits: { fileSize }})
-				// for (const file of files) {
-				// 	console.log(file.fields)
-				// 	blobs[file.fieldname] = file.filepath
-				// }
 			}
 			const { body: bodyReq, method, raw: { url } } = request
 			const body = bodyForm ?? bodyReq

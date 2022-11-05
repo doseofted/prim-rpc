@@ -169,15 +169,17 @@ export function addThings (...things: AddableThing[]): AddableThing {
 addThings.rpc = true
 
 /** Server-provided details */
-export interface ServerImaginaryProfile { name: string, password: string, email: string, picture: string }
+export interface ServerImaginaryProfile { name: string, password: string, email: string, picture: Promise<string> }
 /** Client-provided details */
 export interface ClientImaginaryProfile { name: string, password: string, email: string, picture: Blob }
-export function createImaginaryProfile(input: ServerImaginaryProfile): boolean
-export function createImaginaryProfile(input: ClientImaginaryProfile): boolean
-export function createImaginaryProfile(input: ServerImaginaryProfile|ClientImaginaryProfile) {
+export async function createImaginaryProfile(input: ServerImaginaryProfile): Promise<boolean>
+export async function createImaginaryProfile(input: ClientImaginaryProfile): Promise<boolean>
+export async function createImaginaryProfile(input: ServerImaginaryProfile|ClientImaginaryProfile) {
 	const isServerSide = (given: typeof input): given is ServerImaginaryProfile => !(input.picture instanceof Blob)
 	if (isServerSide(input)) {
-		console.log("Look, a profile:", input)
+		console.log(new Date(), "Look, a profile:", input)
+		const picture = await input.picture
+		console.log(new Date(), "Profile picture is here too!", picture)
 		return true
 	}
 	return false
