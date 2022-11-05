@@ -1,7 +1,6 @@
 import { Component, createEffect, createResource, createSignal, onMount } from "solid-js"
-import backend from "../client"
+import backend from "../../client"
 import { Docs } from "@doseofted/prim-ui"
-import { ParentEvent } from "./what"
 
 const Testing: Component = () => {
 	const [typed, setTyped] = createSignal("")
@@ -43,9 +42,6 @@ const Testing: Component = () => {
 			<p>{typed()}</p>
 			<p>You are {hover() ? "" : "not"} hovering.</p>
 			<p>Hello</p>
-			<ParentEvent>
-				<p>Outer</p>
-			</ParentEvent>
 		</div>
 	</>
 }

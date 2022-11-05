@@ -1,6 +1,6 @@
 import { Component, createSignal, onCleanup, onMount } from "solid-js"
-import { addSignalMonitor, fps } from "../utils/tweakpane"
-import { Light, Lights } from "../components/Lights"
+import { addSignalMonitor, fps } from "../../utils/tweakpane"
+import { Light, Lights } from "../../components/Lights"
 
 const Index: Component = () => {
 	const offsetXTimeline = [-300, 300]

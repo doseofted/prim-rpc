@@ -199,10 +199,10 @@ export async function handleForm (given: GenericFormExample|HTMLFormElement|Form
 	if (!serverSide(given)) { return [] }
 	const resolved: GenericFormExample = {}
 	for (const [key, input] of Object.entries(given)) {
-		if (input instanceof Promise) {
-			resolved[key] = await input
+		if (Array.isArray(input)) {
+			resolved[key] = await Promise.all(input)
 		} else {
-			resolved[key] = input
+			resolved[key] = await input
 		}
 	}
 	console.log("Received form data on server:", resolved)

@@ -1,9 +1,9 @@
 import { Component, createMemo, createSignal, For } from "solid-js"
 import { Docs } from "@doseofted/prim-ui"
 import docs from "@doseofted/prim-example/dist/docs.json"
-import { addFolderToPane, addSignalInput, fps } from "../utils/tweakpane"
-import { Light, Lights } from "../components/Lights"
-import { LightAuto } from "../components/LightsExtended"
+import { addFolderToPane, addSignalInput, fps } from "../../utils/tweakpane"
+import { Light, Lights } from "../../components/Lights"
+import { LightAuto } from "../../components/LightsExtended"
 
 const Index: Component = () => {
 	const folder = addFolderToPane({ title: "A Folder" })
