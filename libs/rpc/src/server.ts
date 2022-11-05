@@ -45,7 +45,8 @@ function createServerActions (serverOptions: PrimServerOptions, instance?: Retur
 				parseBooleans: true,
 				parseNumbers: true,
 			})
-			const id = "-" in query ? String(query["-"]) : undefined
+			let id: string|number = "-" in query ? String(query["-"]) : undefined
+			id = Number.isNaN(Number(id)) ? id : Number(id) 
 			delete query["-"]
 			const entries = Object.entries(query)
 			// determine if positional arguments were given (must start at 0, none can be missing)

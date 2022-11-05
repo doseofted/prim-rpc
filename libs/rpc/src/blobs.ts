@@ -7,9 +7,10 @@ import { BLOB_PREFIX } from "./client"
  * 
  * NOTE: this hasn't been tested in Prim RPC yet
  */
-function handlePossibleForm(form: HTMLFormElement) {
-	const formData = new FormData(form)
+function handlePossibleForm(form: HTMLFormElement|FormData) {
+	const formData = form instanceof HTMLFormElement ? new FormData(form) : form
 	const data: Record<string, FormDataEntryValue|FormDataEntryValue[]> = {}
+	// NOTE: not using `Object.fromEntries(formData.entries())` because inputs with multiple values aren't utilized
 	formData.forEach((val, key) => {
 		if (data[key]) {
 			const previous = data[key]
