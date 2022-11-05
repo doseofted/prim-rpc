@@ -172,17 +172,16 @@ addThings.rpc = true
 export interface ServerImaginaryProfile { name: string, password: string, email: string, picture: Promise<string> }
 /** Client-provided details */
 export interface ClientImaginaryProfile { name: string, password: string, email: string, picture: Blob }
-export async function createImaginaryProfile(input: ServerImaginaryProfile): Promise<boolean>
-export async function createImaginaryProfile(input: ClientImaginaryProfile): Promise<boolean>
-export async function createImaginaryProfile(input: ServerImaginaryProfile|ClientImaginaryProfile) {
-	const isServerSide = (given: typeof input): given is ServerImaginaryProfile => !(input.picture instanceof Blob)
-	if (isServerSide(input)) {
-		console.log(new Date(), "Look, a profile:", input)
-		const picture = await input.picture
-		console.log(new Date(), "Profile picture is here too!", picture)
-		return true
-	}
-	return false
+export function createImaginaryProfile(input: ServerImaginaryProfile): boolean
+export function createImaginaryProfile(input: ClientImaginaryProfile): boolean
+export function createImaginaryProfile(input: ServerImaginaryProfile|ClientImaginaryProfile) {
+	const isServerSide = (given: typeof input): given is ServerImaginaryProfile => !(given.picture instanceof Blob)
+	if (!isServerSide(input)) { return false }
+	const { name, email, picture  } = input
+	console.log(new Date(), "Look, a profile:", { name, email })
+	const logUpload = async (picture: Promise<string>) => console.log(new Date(), "Profile picture is here too!", await picture)
+	void logUpload(picture) // we can return before upload is processed
+	return true
 }
 createImaginaryProfile.rpc = true
 

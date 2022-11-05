@@ -1,21 +1,19 @@
 import type { PrimServerMethodHandler, PrimServerEvents } from "@doseofted/prim-rpc"
-import type { FastifyPluginAsync, FastifyInstance, FastifyError, FastifyPluginCallback, RawServerDefault, FastifyTypeProviderDefault } from "fastify"
-import type { FastifyMultipartAttachFieldsToBodyOptions, FastifyMultipartOptions, MultipartFile, MultipartValue } from "@fastify/multipart"
+import type { FastifyPluginAsync, FastifyInstance, FastifyError } from "fastify"
+import type { MultipartFile, MultipartValue } from "@fastify/multipart"
 import type { IncomingHttpHeaders } from "node:http"
+import type FastifyMultipartPlugin from "@fastify/multipart"
 import { pipeline } from "node:stream/promises"
 import { createWriteStream } from "node:fs"
+import { mkdtemp } from "node:fs/promises"
 import { tmpdir } from "node:os"
 import path from "node:path"
+
 export type PrimFastifyContext = IncomingHttpHeaders
 
 interface SharedFastifyOptions {
-	multipartPlugin?: FastifyPluginCallback< // NOTE: interface for @fastify/multipart plugin
-	FastifyMultipartOptions|FastifyMultipartAttachFieldsToBodyOptions,
-	RawServerDefault,
-	FastifyTypeProviderDefault
-	>
+	multipartPlugin?: typeof FastifyMultipartPlugin
 	fileSizeLimitBytes?: number,
-	// handleFile: (part: MultipartFile) => void|Promise<void>
 }
 
 interface PrimFastifyPluginOptions extends SharedFastifyOptions {
@@ -40,10 +38,7 @@ interface PrimFastifyPluginOptions extends SharedFastifyOptions {
 export const fastifyPrimPlugin: FastifyPluginAsync<PrimFastifyPluginOptions> = async (fastify, options) => {
 	const { prim, multipartPlugin, fileSizeLimitBytes: fileSize } = options
 	if (multipartPlugin) {
-		await fastify.register(multipartPlugin, /* {
-			attachFieldsToBody: true,
-			onFile,
-		} */)
+		await fastify.register(multipartPlugin)
 	}
 	// LINK https://github.com/fastify/help/issues/158#issuecomment-1086190754
 	fastify.addContentTypeParser("application/json", { parseAs: "string" }, (_req, body, done) => {
@@ -73,8 +68,8 @@ export const fastifyPrimPlugin: FastifyPluginAsync<PrimFastifyPluginOptions> = a
 					if (!part.file && part.fieldname === "rpc") {
 						bodyForm = part.value
 					} else if (part.file && part.fieldname.startsWith("_bin_")) {
-						// TODO: ensure filename has random/generated portion, consider placing all files in temp "prim" folder
-						const tmpFile = path.join(tmpdir(), part.filename)
+						const tmpFolder = await mkdtemp(path.join(tmpdir(), "prim-rpc-"))
+						const tmpFile = path.join(tmpFolder, part.filename)
 						const filenamePromise = pipeline(part.file, createWriteStream(tmpFile)).then(() => tmpFile)
 						blobs[part.fieldname] = filenamePromise
 					}
