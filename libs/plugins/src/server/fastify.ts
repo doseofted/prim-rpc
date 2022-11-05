@@ -7,7 +7,7 @@ import { pipeline } from "node:stream/promises"
 import { createWriteStream } from "node:fs"
 import { mkdtemp } from "node:fs/promises"
 import { tmpdir } from "node:os"
-import path from "node:path"
+import { join as joinPath } from "node:path"
 
 export type PrimFastifyContext = IncomingHttpHeaders
 
@@ -23,16 +23,22 @@ interface PrimFastifyPluginOptions extends SharedFastifyOptions {
  * A Fastify plugin used to register Prim with the server. Use like so:
  * 
  * ```ts
+ * // imports
  * import Fastify from "fastify"
+ * import multipartPlugin from "@fastify/multipart"
  * import { createPrimServer } from "@doseofted/prim-rpc"
- * import { fastifyPrimPlugin } from "@doseofted/prim-plugins"
- *
+ * import { fastifyPrimPlugin } from "@doseofted/prim-plugins/dist/server/fastify.mjs"
+ * // usage
  * const fastify = Fastify()
  * const prim = createPrimServer()
- * fastify.register(fastifyPrimPlugin, { prim })
+ * fastify.register(fastifyPrimPlugin, { prim, multipartPlugin })
+ * await fastify.listen({ port: 3000 })
  * ```
  * 
- * To let Prim handle registration with Fastify, try importing `primFastifyMethod`
+ * **Note:** usage of the multipart plugin is optional and can be excluded if support
+ * for file uploads is not needed.
+ * 
+ * To let Prim handle registration with Fastify, try importing `primMethodFastify`
  */
 // eslint-disable-next-line @typescript-eslint/require-await
 export const fastifyPrimPlugin: FastifyPluginAsync<PrimFastifyPluginOptions> = async (fastify, options) => {
@@ -68,9 +74,9 @@ export const fastifyPrimPlugin: FastifyPluginAsync<PrimFastifyPluginOptions> = a
 					if (!part.file && part.fieldname === "rpc") {
 						bodyForm = part.value
 					} else if (part.file && part.fieldname.startsWith("_bin_")) {
-						const tmpFolder = await mkdtemp(path.join(tmpdir(), "prim-rpc-"))
-						const tmpFile = path.join(tmpFolder, part.filename)
-						const filenamePromise = pipeline(part.file, createWriteStream(tmpFile)).then(() => tmpFile)
+						const tmpFolder = await mkdtemp(joinPath(tmpdir(), "prim-rpc-"))
+						const tmpFile = joinPath(tmpFolder, part.filename)
+						const filenamePromise = pipeline(part.file, createWriteStream(tmpFile)).then(() => tmpFile).catch(() => "")
 						blobs[part.fieldname] = filenamePromise
 					}
 				}
@@ -101,15 +107,21 @@ interface MethodFastifyOptions extends SharedFastifyOptions {
  * A Prim plugin used to register itself with Fastify. Use like so:
  * 
  * ```ts
+ * // imports
  * import Fastify from "fastify"
+ * import multipartPlugin from "@fastify/multipart"
  * import { createPrimServer } from "@doseofted/prim-rpc"
- * import { primMethodFastify } from "@doseofted/prim-plugins"
- *
+ * import { primMethodFastify } from "@doseofted/prim-plugins/dist/server/fastify.mjs"
+ * // usage
  * const fastify = Fastify()
  * const prim = createPrimServer({
- *   methodHandler: primMethodFastify({ fastify })
+ *   methodHandler: primMethodFastify({ fastify, multipartPlugin })
  * })
+ * await fastify.listen({ port: 3000 })
  * ```
+ * 
+ * **Note:** usage of the multipart plugin is optional and can be excluded if support
+ * for file uploads is not needed.
  * 
  * If you would like to register Prim with Fastify yourself, try importing `fastifyPrimPlugin` instead.
  */
