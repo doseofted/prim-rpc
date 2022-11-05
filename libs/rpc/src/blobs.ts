@@ -36,21 +36,26 @@ function handlePossibleForm(form: HTMLFormElement|FormData) {
  * 
  * Additionally, the separated Blobs will be given as a second return value where each key is the
  * identifier used and the value is the Blob itself.
+ * 
+ * @param given - The given object containing a blob. It could be a form element/data that contains blobs
+ *   or it could be a regular object that contains blobs.
+ * @param fromForm - It is important for Prim Client to use data from a given form element even if blobs
+ *   are not given. This is used in recursive calls to determine if given element is a form element/data
  */
-export function handlePossibleBlobs(given: unknown): [given: unknown, blobs: Record<string, Blob>] {
+export function handlePossibleBlobs(given: unknown, fromForm = false): [given: unknown, blobs: Record<string, Blob>, fromForm: boolean] {
 	const blobs: Record<string, Blob> = {}
 	const binaryGiven = given instanceof Blob ? given : false
-	// FIXME: consider either removing direct HTMLFormElement support or further testing to ensure this works
-	const givenForm = (maybeForm: unknown): maybeForm is HTMLFormElement =>
-		typeof HTMLFormElement === "function" && maybeForm instanceof HTMLFormElement
+	const givenForm = (maybeForm: unknown): maybeForm is HTMLFormElement|FormData =>
+		(typeof HTMLFormElement === "function" && maybeForm instanceof HTMLFormElement)
+		|| (typeof FormData === "function" && maybeForm instanceof FormData)
 	if (givenForm(given)) { // form was given that possibly contains blobs
 		const newGiven = handlePossibleForm(given)
-		return handlePossibleBlobs(newGiven)
+		return handlePossibleBlobs(newGiven, true)
 	}
 	if (binaryGiven) { // blob was given directly
 		const binaryIdentifier = [BLOB_PREFIX, nanoid()].join("")
 		blobs[binaryIdentifier] = binaryGiven
-		return [binaryIdentifier, blobs]
+		return [binaryIdentifier, blobs, fromForm]
 	}
 	if (typeof given === "object") {
 		for (const [key, val] of Object.entries(given)) { // possibly given from form data
@@ -67,7 +72,7 @@ export function handlePossibleBlobs(given: unknown): [given: unknown, blobs: Rec
 			}
 		}
 		if (Object.keys(blobs).length > 0) {
-			return [given, blobs]
+			return [given, blobs, fromForm]
 		}
 	}
 	if (Array.isArray(given) && given.filter(a => a instanceof Blob).length > 0) { // list of blobs given
@@ -79,9 +84,9 @@ export function handlePossibleBlobs(given: unknown): [given: unknown, blobs: Rec
 			}
 			return val as unknown
 		})
-		return [replaced, blobs]
+		return [replaced, blobs, fromForm]
 	}
-	return [given, blobs]
+	return [given, blobs, fromForm]
 }
 
 /**

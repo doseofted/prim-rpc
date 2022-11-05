@@ -77,12 +77,12 @@ export function createPrimClient<
 			const blobs: BlobRecords = {}
 			const params = args.map((arg) => {
 				if (configured.handleBlobs) {
-					const [replacedArg, newBlobs] = handlePossibleBlobs(arg)
+					const [replacedArg, newBlobs, givenFromFormElement] = handlePossibleBlobs(arg)
 					const blobEntries = Object.entries(newBlobs)
 					for (const [key, val] of blobEntries) {
 						blobs[key] = val
 					}
-					if (blobEntries.length > 0) {
+					if (givenFromFormElement || blobEntries.length > 0) {
 						return replacedArg
 					}
 				}

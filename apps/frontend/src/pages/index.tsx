@@ -16,6 +16,14 @@ const App: Component = () => {
 					<label for="name" class="max-w-12">Name</label>
 					<input class="border border-black rounded-full px-2 py-1" type="text" id="name" name="name" />
 				</div>
+				<div class="grid grid-cols-2 auto-cols-auto gap-4">
+					<label for="range" class="max-w-12">Name</label>
+					<input class="border border-black rounded-full px-2 py-1" type="range" min="0" max="100" id="range" name="range" />
+				</div>
+				{/* <div class="grid grid-cols-2 auto-cols-auto gap-4">
+					<label for="picture" class="max-w-12">Picture</label>
+					<input class="border border-black rounded-full px-2 py-1" type="file" id="picture" name="picture" />
+				</div> */}
 				<input type="submit" class="border border-black rounded-full px-6 py-2 self-end">Submit</input>
 			</form>
 		</div>
