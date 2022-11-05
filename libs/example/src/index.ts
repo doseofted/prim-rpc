@@ -199,6 +199,9 @@ whatIsThis.rpc = true
  * 
  * @public
  */
-export default function (...params: unknown[]) {
+function defaultFunction (...params: unknown[]) {
 	return { params: params.length === 1 ? params[0] : params }
 }
+defaultFunction.rpc = true
+
+export default defaultFunction
