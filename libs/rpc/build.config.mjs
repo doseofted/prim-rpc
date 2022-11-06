@@ -10,6 +10,8 @@ export default defineConfig(options => ({
 	// NOTE: CJS format won't work until "nanoid" and "serialize-error" are replaced
 	format: ["esm"],
 	clean: true,
-	// NOTE: enabling line below may allow Prim-RPC to be used from ESM-only modules
-	// noExternal: ["proxy-deep", "query-string"],
+	// NOTE: the following modules are CJS and can't be imported from pure-ESM module.
+	// Since they're imported but listed in package.json as devDependencies, they are already included in bundle with an
+	// ESM wrapper but they're also added below to be explicit
+	noExternal: ["proxy-deep", "query-string"],
 }))
