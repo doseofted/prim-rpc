@@ -10,17 +10,18 @@
  * client by providing the library as an option to `createPrimClient`.
  */
 import ProxyDeep from "proxy-deep"
-import { nanoid } from "nanoid"
 import mitt from "mitt"
+import { nanoid } from "nanoid"
 import { get as getProperty, remove as removeFromArray } from "lodash-es"
 import type { Asyncify } from "type-fest"
-import {
-	RpcCall, PrimOptions, RpcAnswer, PrimWebSocketEvents, PrimHttpEvents,
-	PromiseResolveStatus, PrimHttpQueueItem, BlobRecords,
-} from "./interfaces"
-import { createPrimOptions } from "./options"
 import { deserializeError } from "serialize-error"
+import { createPrimOptions } from "./options"
 import { handlePossibleBlobs } from "./blobs"
+import { PromiseResolveStatus }from "./interfaces"
+import type {
+	RpcCall, PrimOptions, RpcAnswer, PrimWebSocketEvents, PrimHttpEvents,
+	PrimHttpQueueItem, BlobRecords,
+} from "./interfaces"
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 export type AnyFunction = (...args: any[]) => any

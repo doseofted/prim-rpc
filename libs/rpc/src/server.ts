@@ -1,17 +1,16 @@
 import { get as getProperty } from "lodash-es"
 import mitt from "mitt"
 import queryString from "query-string"
-import { createPrimClient, AnyFunction } from "./client"
+import { serializeError } from "serialize-error"
 import { createPrimOptions } from "./options"
-import {
+import { createPrimClient } from "./client"
+import { mergeBlobLikeWithGiven } from "./blobs"
+import type { AnyFunction } from "./client"
+import type {
 	CommonServerSimpleGivenOptions, CommonServerResponseOptions, PrimServerOptions, PrimWebSocketEvents,
 	RpcAnswer, RpcCall, PrimServerSocketAnswer, PrimServerSocketEvents, PrimServerActionsBase, PrimHttpEvents,
-	PrimServerEvents,
-	PrimServer,
-	PrimServerSocketAnswerRpc,
+	PrimServerEvents, PrimServer, PrimServerSocketAnswerRpc,
 } from "./interfaces"
-import { serializeError } from "serialize-error"
-import { mergeBlobLikeWithGiven } from "./blobs"
 
 /**
  * 
@@ -45,8 +44,7 @@ function createServerActions (serverOptions: PrimServerOptions, instance?: Retur
 				parseBooleans: true,
 				parseNumbers: true,
 			})
-			let id: string|number = "-" in query ? String(query["-"]) : undefined
-			id = Number.isNaN(Number(id)) ? id : Number(id) 
+			const id: string|number = ("-" in query && !Array.isArray(query["-"])) ? query["-"] : undefined
 			delete query["-"]
 			const entries = Object.entries(query)
 			// determine if positional arguments were given (must start at 0, none can be missing)

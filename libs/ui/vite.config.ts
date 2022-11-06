@@ -26,14 +26,14 @@ const config: UserConfig & { test?: VitestConfig } = {
 	},
 	build: {
 		lib: {
-			formats: ["es", "umd"],
+			formats: ["es"],
 			entry: resolvePath(__dirname, "src/index.lib.ts"),
 			name: "lib",
-			fileName: (format) => `lib.${format}.${format === "es" ? "m" : "c"}js`,
+			fileName: (format) => `index.${format === "es" ? "m" : "c"}js`,
 		},
 		rollupOptions: {
 			// externalize deps that shouldn't be bundled
-			// external: [],
+			external: ["solid-js", "@doseofted/prim-docs"],
 			// provide global variables to use in the UMD build
 			// output: {
 			// 	globals: {},

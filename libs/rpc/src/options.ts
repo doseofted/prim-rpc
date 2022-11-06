@@ -1,5 +1,5 @@
-import { PrimOptions, PrimServerOptions, RpcCall } from "./interfaces"
 import { defu } from "defu"
+import { PrimOptions, PrimServerOptions, RpcCall } from "./interfaces"
 
 // TODO: consider separating server-specific options from client options so I can reduce the number
 // of options given on the client

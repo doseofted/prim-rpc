@@ -18,19 +18,16 @@
   },
   "dependencies": {
     "defu": "^6.1.0",
+    "lodash-es": "^4.17.21",
     "mitt": "^3.0.0",
     "nanoid": "^4.0.0",
     "proxy-deep": "^3.1.1",
     "query-string": "^7.1.1",
-    "serialize-error": "^11.0.0",
-    "ufo": "^0.8.6"
+    "serialize-error": "^11.0.0"
   },
   "devDependencies": {
     "@doseofted/prim-example": "workspace:*",
-    "@types/lodash": "^4.14.188",
     "@types/lodash-es": "^4.17.6",
-    "lodash": "^4.17.21",
-    "lodash-es": "^4.17.21",
     "superjson": "^1.11.0",
     "type-fest": "^3.1.0"
   },
