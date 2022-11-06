@@ -7,6 +7,9 @@ export default defineConfig(options => ({
 	target: "ES2020",
 	dts: true,
 	sourcemap: true,
-	format: ["esm"], // NOTE: CJS export won't work until "nanoid" and "serialize-error" are replaced
+	// NOTE: CJS format won't work until "nanoid" and "serialize-error" are replaced
+	format: ["esm"],
 	clean: true,
+	// NOTE: enabling line below may allow Prim-RPC to be used from ESM-only modules
+	// noExternal: ["proxy-deep", "query-string"],
 }))
