@@ -3,10 +3,8 @@ import dts from "vite-plugin-dts"
 import solid from "vite-plugin-solid"
 import unocss from "unocss/vite"
 import pages from "vite-plugin-pages"
-import type { UserConfig } from "vite"
 
-// https://vitejs.dev/config/
-const config: UserConfig = {
+export default defineConfig({
 	plugins: [
 		solid(),
 		dts(),
@@ -25,8 +23,8 @@ const config: UserConfig = {
 	build: {
 		lib: {
 			formats: ["es"],
+			// LINK https://github.com/vitejs/vite/blob/v3.2.1/packages/vite/CHANGELOG.md#multiple-entries-for-library-mode
 			entry: {
-				// LINK https://github.com/vitejs/vite/blob/v3.2.1/packages/vite/CHANGELOG.md#multiple-entries-for-library-mode
 				index: new URL("./src/index.lib.ts", import.meta.url).pathname,
 			},
 		},
@@ -35,6 +33,4 @@ const config: UserConfig = {
 		},
 		// emptyOutDir: false,
 	},
-}
-
-export default defineConfig(config)
+})

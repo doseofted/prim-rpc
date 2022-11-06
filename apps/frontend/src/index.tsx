@@ -14,7 +14,7 @@ render(
 		const Routes = useRoutes(pages)
 		return (
 			<MetaProvider>
-				<Title>Example Broken Test</Title>
+				<Title>Prim+RPC</Title>
 				<Router>
 					<Routes />
 				</Router>

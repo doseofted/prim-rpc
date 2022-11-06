@@ -88,6 +88,7 @@ importers:
       '@types/node': ^18.11.9
       '@unocss/reset': ^0.46.3
       color2k: ^2.0.0
+      defu: ^6.1.0
       fastify: ^4.9.2
       lodash-es: ^4.17.21
       nanoid: ^4.0.0
@@ -100,6 +101,7 @@ importers:
       tweakpane: ^3.1.0
       type-fest: ^3.1.0
       typescript: ^4.8.4
+      unocss: ^0.46.3
       vite: ^3.2.2
       vite-plugin-pages: ^0.27.1
       vite-plugin-solid: ^2.4.0
@@ -118,6 +120,7 @@ importers:
       '@types/node': 18.11.9
       '@unocss/reset': 0.46.3
       color2k: 2.0.0
+      defu: 6.1.0
       lodash-es: 4.17.21
       nanoid: 4.0.0
       popmotion: 11.0.5
@@ -129,6 +132,7 @@ importers:
       tweakpane: 3.1.0
       type-fest: 3.1.0
       typescript: 4.8.4
+      unocss: 0.46.3_vite@3.2.2
       vite: 3.2.2
       vite-plugin-pages: 0.27.1_vite@3.2.2
       vite-plugin-solid: 2.4.0_solid-js@1.6.1+vite@3.2.2
@@ -4402,6 +4406,7 @@ packages:
 
   /jiti/1.16.0:
     resolution: {integrity: sha512-L3BJStEf5NAqNuzrpfbN71dp43mYIcBUlCRea/vdyv5dW/AYa1d4bpelko4SHdY3I6eN9Wzyasxirj1/vv5kmg==}
+    hasBin: true
     dev: true
 
   /jju/1.4.0:
@@ -7086,6 +7091,7 @@ packages:
   /which/2.0.2:
     resolution: {integrity: sha512-BLI3Tl1TW3Pvl70l3yq3Y64i+awpwXqsGBYWkkqMtnbXgrMD+yj7rhW0kuEDxzJaYXGjEW5ogapKNMEKNMjibA==}
     engines: {node: '>= 8'}
+    hasBin: true
     dependencies:
       isexe: 2.0.0
 

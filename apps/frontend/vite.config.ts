@@ -2,13 +2,10 @@ import { defineConfig } from "vite"
 import solid from "vite-plugin-solid"
 import unocss from "unocss/vite"
 import pages from "vite-plugin-pages"
-import type { UserConfig as VitestConfig } from "vitest"
-import type { UserConfig } from "vite"
 
 const contained = JSON.parse(process.env.VITE_CONTAINED ?? "false") === true
 
-// https://vitejs.dev/config/
-const config: UserConfig & { test?: VitestConfig } = {
+export default defineConfig({
 	plugins: [
 		solid(),
 		unocss(),
@@ -32,6 +29,4 @@ const config: UserConfig & { test?: VitestConfig } = {
 			clientPort: 443, // port used by browser (reverse proxy will forward to actual port)
 		},
 	} : {},
-}
-
-export default defineConfig(config)
+})
