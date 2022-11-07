@@ -26,12 +26,13 @@ export default defineConfig({
 	resolve: {
 		alias: {
 			"@": new URL("./src", import.meta.url).pathname,
-			"@react": new URL("./generated/react/src", import.meta.url).pathname,
+			"@react": new URL("./src/generated/react/src", import.meta.url).pathname,
 		},
 	},
 	build: {
 		lib: {
 			formats: ["es"],
+			fileName: (module, entry) => `index.${entry}.${module === "es" ? "m" : ""}js`,
 			// LINK https://github.com/vitejs/vite/blob/v3.2.1/packages/vite/CHANGELOG.md#multiple-entries-for-library-mode
 			entry: {
 				react: new URL("./src/index.react.ts", import.meta.url).pathname,

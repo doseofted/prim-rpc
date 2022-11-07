@@ -46,8 +46,8 @@
   },
   "exports": {
     "./dist/react.mjs": {
-      "types": "./dist/src/index.react.d.ts",
-      "import": "./dist/react.mjs"
+      "types": "./dist/index.react.d.ts",
+      "import": "./dist/index.react.mjs"
     },
     "./style.css": {
       "import": "./dist/style.css",

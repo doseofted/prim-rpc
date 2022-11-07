@@ -20,7 +20,7 @@
     "baseUrl": ".",
     "paths": {
       "@/*": ["./src/*"],
-      "@react/*": ["./generated/react/src/*"]
+      "@react/*": ["./src/generated/react/src/*"]
     }
   },
   "include": [
@@ -29,7 +29,7 @@
     "src/**/*.tsx",
     "vite.config.ts",
     "generated/**/*"
-  ],
+, "src/index.react.ts"  ],
   "exclude": ["src/**/*.lite.tsx"],
   "references": [{ "path": "./tsconfig.mitosis.json" }]
 }
