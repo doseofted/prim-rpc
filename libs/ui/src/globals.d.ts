@@ -1,1 +1,1 @@
-/// <reference types="vite-plugin-pages/client-solid" />
+/// <reference types="vite-plugin-pages/client-react" />

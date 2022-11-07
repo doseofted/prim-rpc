@@ -1,6 +1,6 @@
 import { Link } from "@solidjs/router"
 import { Component, For } from "solid-js"
-import { Light, Lights } from "../components/Lights"
+import { Lights } from "../components/Lights"
 import { LightAuto } from "../components/LightsExtended"
 
 const Index: Component = () => {

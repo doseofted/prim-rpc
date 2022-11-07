@@ -1,3 +1,3 @@
-import Docs from "./components/Docs"
+import Docs from "../generated/react/src/components/Counter"
 
 export { Docs }

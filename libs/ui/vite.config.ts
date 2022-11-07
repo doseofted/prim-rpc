@@ -1,15 +1,17 @@
 import { defineConfig } from "vite"
 import dts from "vite-plugin-dts"
-import solid from "vite-plugin-solid"
-import unocss from "unocss/vite"
+// import solid from "vite-plugin-solid"
+// import unocss from "unocss/vite"
 import pages from "vite-plugin-pages"
+import react from "@vitejs/plugin-react"
 
 export default defineConfig({
 	plugins: [
-		solid(),
+		// solid(),
 		dts(),
-		unocss(),
+		// unocss(),
 		pages(),
+		react(),
 	],
 	test: {
 		environment: "jsdom",
@@ -29,7 +31,7 @@ export default defineConfig({
 			},
 		},
 		rollupOptions: {
-			external: ["solid-js", "@doseofted/prim-docs"],
+			external: ["solid-js", "@doseofted/prim-docs", "react"],
 		},
 		// emptyOutDir: false,
 	},

@@ -1,4 +1,3 @@
-/** @jsxImportSource @builder.io/mitosis */
 import { useStore } from "@builder.io/mitosis"
 
 type Props = {
@@ -12,7 +11,7 @@ export default function MyBasicComponent(props: Props) {
 
 	return (
 		<div>
-			{props.message || "Hello"} {state.name}!
+			{props.message || "Hello "} {state.name}!
 		</div>
 	)
 }

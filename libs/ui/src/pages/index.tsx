@@ -1,10 +1,10 @@
-import { Component } from "solid-js"
-import Docs from "../components/Docs"
-import docs from "@doseofted/prim-example/dist/docs.json"
+// import { Component } from "solid-js"
+import Test from "../../generated/react/src/components/Counter"
+// import docs from "@doseofted/prim-example/dist/docs.json"
 
-const Index: Component = () => {
+const Index = () => {
 	return (
-		<Docs docs={docs} />
+		<Test message="Hi" />
 	)
 }
 
