@@ -1,18 +1,25 @@
+/* eslint-disable @typescript-eslint/no-unsafe-assignment */
+/* eslint-disable @typescript-eslint/no-unsafe-call */
+/* eslint-disable @typescript-eslint/no-unsafe-member-access */
 import { Signal, onCleanup, onMount, createEffect } from "solid-js"
-import { Pane as PaneType, InputParams, InputBindingApi, FolderApi, Pane, TabPageApi, MonitorBindingApi, MonitorParams, FolderParams } from "tweakpane"
+import {
+	Pane, InputParams, FolderApi, TabPageApi, InputBindingApi, MonitorBindingApi, FolderParams, MonitorParams,
+} from "tweakpane"
 import type { Promisable } from "type-fest"
-import * as EssentialsPlugin from "@tweakpane/plugin-essentials"
+// import * as EssentialsPlugin from "@tweakpane/plugin-essentials"
 
-let pagePane: PaneType|undefined
+let pagePane: Pane|undefined
 if (import.meta.env.DEV) {
 	const { Pane } = await import("tweakpane")
 	pagePane = new Pane()
+	const EssentialsPlugin = await import("@tweakpane/plugin-essentials")
+	pagePane?.registerPlugin(EssentialsPlugin)
 }
 
-pagePane?.registerPlugin(EssentialsPlugin)
 export interface FpsControls { begin(): void, end(): void }
 export const fps = (import.meta.env.DEV
-	? pagePane?.addBlade({
+	// eslint-disable-next-line @typescript-eslint/no-explicit-any
+	? (pagePane as any)?.addBlade({
 		view: "fpsgraph",
 		label: "fps",
 		lineCount: 1,
