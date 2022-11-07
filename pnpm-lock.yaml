@@ -248,7 +248,6 @@ importers:
       '@builder.io/mitosis-cli': ^0.0.34
       '@doseofted/prim-docs': workspace:*
       '@doseofted/prim-example': workspace:*
-      '@solidjs/router': ^0.5.0
       '@testing-library/jest-dom': ^5.16.5
       '@types/lodash-es': ^4.17.6
       '@types/node': ^18.11.9
@@ -262,19 +261,15 @@ importers:
       react-dom: ^18.2.0
       react-router: ^6.4.3
       react-router-dom: ^6.4.3
-      solid-js: ^1.6.1
-      solid-testing-library: ^0.3.0
       typescript: ^4.8.4
       vite: ^3.2.2
       vite-plugin-dts: ^1.6.6
       vite-plugin-pages: ^0.27.1
-      vite-plugin-solid: ^2.4.0
     devDependencies:
       '@builder.io/mitosis': 0.0.76_prettier@2.7.1
       '@builder.io/mitosis-cli': 0.0.34_prettier@2.7.1
       '@doseofted/prim-docs': link:../docs
       '@doseofted/prim-example': link:../example
-      '@solidjs/router': 0.5.0
       '@testing-library/jest-dom': 5.16.5
       '@types/lodash-es': 4.17.6
       '@types/node': 18.11.9
@@ -288,13 +283,10 @@ importers:
       react-dom: 18.2.0_react@18.2.0
       react-router: 6.4.3_react@18.2.0
       react-router-dom: 6.4.3_biqbaboplfbrettd7655fr4n2y
-      solid-js: 1.6.1
-      solid-testing-library: 0.3.0_solid-js@1.6.1
       typescript: 4.8.4
       vite: 3.2.2
       vite-plugin-dts: 1.6.6_vite@3.2.2
       vite-plugin-pages: 0.27.1_vite@3.2.2
-      vite-plugin-solid: 2.4.0_solid-js@1.6.1+vite@3.2.2
 
 packages:
 

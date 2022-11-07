@@ -1,4 +1,4 @@
-import { describe, it, expect } from "vitest"
+import { describe, it } from "vitest"
 import { render, screen } from "@testing-library/react"
 // import matchers from "@testing-library/jest-dom"
 import docs from "@doseofted/prim-example/dist/docs.json"
