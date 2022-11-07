@@ -14,13 +14,14 @@ export default defineConfig({
 		react(),
 	],
 	test: {
+		include: ["src/**/*.test*"],
 		environment: "jsdom",
-		transformMode: {
-			web: [/.[jt]sx?/],
-		},
-		deps: {
-			registerNodeLoader: true,
-		},
+		// transformMode: {
+		// 	web: [/.[jt]sx?/],
+		// },
+		// deps: {
+		// 	registerNodeLoader: true,
+		// },
 	},
 	resolve: {
 		alias: {
