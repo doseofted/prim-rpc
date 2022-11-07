@@ -1,5 +1,5 @@
 import { Component, createMemo, createSignal, For } from "solid-js"
-import { Docs } from "@doseofted/prim-ui"
+import { Docs } from "@doseofted/prim-ui/dist/index.react.mjs"
 import docs from "@doseofted/prim-example/dist/docs.json"
 import { addFolderToPane, addSignalInput, fps } from "../../utils/tweakpane"
 import { Light, Lights } from "../../components/Lights"
@@ -46,7 +46,7 @@ const Index: Component = () => {
 				)}</For>
 			</div>
 			{/* eslint-disable-next-line @typescript-eslint/no-unsafe-assignment */}
-			<Docs class="relative text-white z-50" docs={docs} />
+			<Docs docs={docs} />
 		</Lights>
 	)
 }
