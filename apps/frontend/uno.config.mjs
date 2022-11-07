@@ -8,6 +8,11 @@ const config = defineConfig({
 			sans: ["\"Plus Jakarta Sans\"", "sans-serif"],
 			title: ["Montserrat", "sans-serif"],
 		},
+		colors: {
+			prim: {
+				space: "#2D0D60",
+			},
+		},
 	},
 })
 
