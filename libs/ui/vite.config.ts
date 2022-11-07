@@ -22,12 +22,18 @@ export default defineConfig({
 			registerNodeLoader: true,
 		},
 	},
+	resolve: {
+		alias: {
+			"@": new URL("./src", import.meta.url).pathname,
+			"@react": new URL("./generated/react/src", import.meta.url).pathname,
+		},
+	},
 	build: {
 		lib: {
 			formats: ["es"],
 			// LINK https://github.com/vitejs/vite/blob/v3.2.1/packages/vite/CHANGELOG.md#multiple-entries-for-library-mode
 			entry: {
-				index: new URL("./src/index.lib.ts", import.meta.url).pathname,
+				react: new URL("./src/index.react.ts", import.meta.url).pathname,
 			},
 		},
 		rollupOptions: {

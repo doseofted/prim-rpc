@@ -25,11 +25,14 @@
     "zx": "^7.1.1"
   },
   "devDependencies": {
+    "@builder.io/eslint-plugin-mitosis": "^0.0.11",
     "@typescript-eslint/eslint-plugin": "^5.42.0",
     "@typescript-eslint/parser": "^5.42.0",
     "@vitest/ui": "^0.24.5",
     "chokidar": "^3.5.3",
     "eslint": "^8.26.0",
+    "eslint-plugin-react": "^7.31.10",
+    "eslint-plugin-react-hooks": "^4.6.0",
     "eslint-plugin-solid": "^0.8.0",
     "jsdom": "^20.0.2",
     "postcss": "^8.4.18",

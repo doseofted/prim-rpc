@@ -15,6 +15,7 @@ const App = () => {
 	)
 }
 
+// eslint-disable-next-line @typescript-eslint/no-unnecessary-type-assertion
 ReactDOM.createRoot(document.getElementById("root") as HTMLElement).render((
 	<StrictMode>
 		<Router>

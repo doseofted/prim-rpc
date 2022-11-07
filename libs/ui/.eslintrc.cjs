@@ -4,6 +4,7 @@ module.exports = {
 	overrides: [
 		{
 			files: ["*.ts", "*.tsx"],
+			excludedFiles: ["*.lite.tsx"],
 			parser: "@typescript-eslint/parser",
 			parserOptions: {
 				sourceType: "module",
@@ -19,18 +20,24 @@ module.exports = {
 			extends: [
 				"eslint:recommended",
 				"plugin:@typescript-eslint/recommended",
-				"plugin:solid/typescript",
+				// "plugin:solid/typescript",
+				"plugin:react/recommended",
+				"plugin:react-hooks/recommended",
 			],
 			env: {
 				"browser": true,
 			},
+			rules: {
+				"react/react-in-jsx-scope": ["off"],
+			},
 		},
 		{
-			files: ["*.tsx"],
-			rules: {
-			// NOTE: this is a workaround until I find out how to let ESLint know JSX element's return types
-				"@typescript-eslint/no-unsafe-return": "off",
-			},
+			files: ["*.lite.tsx"],
+			plugins: ["@builder.io/mitosis"],
+			extends: [
+				// Use this approach for our recommended rules configuration
+				"plugin:@builder.io/mitosis/recommended",
+			],
 		},
 	],
 }
