@@ -1,3 +1,4 @@
+/** @jsxImportSource solid-js */
 import { Component, createEffect, createMemo, For, JSX, splitProps } from "solid-js"
 import { createDocsForModule, helpers } from "@doseofted/prim-docs"
 
