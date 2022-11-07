@@ -24,6 +24,8 @@
     "src/**/*.d.ts",
     "src/**/*.tsx",
     "vite.config.ts",
-    "generated/**"
-  ]
+    "generated/**/*"
+  ],
+  "exclude": ["src/components/*.lite.tsx"],
+  "references": [{ "path": "./tsconfig.mitosis.json" }]
 }
