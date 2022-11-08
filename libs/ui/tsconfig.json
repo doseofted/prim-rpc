@@ -1,37 +1,18 @@
 {
+  "extends": "./tsconfig.base.json",
   "compilerOptions": {
-    "strict": true,
-    "target": "ESNext",
-    "module": "ESNext",
-    "moduleResolution": "Node",
     "jsx": "react-jsx",
-    "allowSyntheticDefaultImports": true,
-    "esModuleInterop": true,
-    "sourceMap": true,
-    "resolveJsonModule": true,
-    "isolatedModules": true,
-    "lib": ["ESNext", "DOM"],
-    "skipLibCheck": true,
-    "useDefineForClassFields": true,
-    "types": [
-      "vite/client",
-      "vitest/globals"
-    ],
-    "baseUrl": ".",
-    "paths": {
-      "@/*": ["./src/*"],
-      "@react/*": ["./src/generated/react/src/*"],
-      "@vue/*": ["./src/generated/vue/vue3/src/*"],
-      "@svelte/*": ["./src/generated/svelte/src/*"],
-    }
   },
   "include": [
     "src/**/*.ts",
     "src/**/*.d.ts",
     "src/**/*.tsx",
     "vite.config.ts",
-    "generated/**/*"
+    "src/generated/**/*"
   ],
   "exclude": ["src/**/*.lite.tsx"],
-  "references": [{ "path": "./tsconfig.mitosis.json" }]
+  "references": [
+    { "path": "./tsconfig.mitosis.json" },
+    { "path": "./tsconfig.vue.json" }
+  ]
 }
