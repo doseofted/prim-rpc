@@ -22,7 +22,9 @@
     "baseUrl": ".",
     "paths": {
       "@/*": ["./src/*"],
-      "@react/*": ["./src/generated/react/src/*"]
+      "@react/*": ["./src/generated/react/src/*"],
+      "@vue/*": ["./src/generated/vue/vue3/src/*"],
+      "@svelte/*": ["./src/generated/svelte/src/*"],
     }
 	},
 	"include": ["src/components/*.lite.tsx"]

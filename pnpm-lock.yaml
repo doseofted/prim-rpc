@@ -255,6 +255,7 @@ importers:
       '@types/react-dom': ^18.0.8
       '@types/testing-library__jest-dom': ^5.14.5
       '@vitejs/plugin-react': ^2.2.0
+      '@vitejs/plugin-vue': ^3.2.0
       lodash-es: ^4.17.21
       prettier: ^2.7.1
       react: ^18.2.0
@@ -265,6 +266,7 @@ importers:
       vite: ^3.2.2
       vite-plugin-dts: ^1.6.6
       vite-plugin-pages: ^0.27.1
+      vue: ^3.2.41
     devDependencies:
       '@builder.io/mitosis': 0.0.76_prettier@2.7.1
       '@builder.io/mitosis-cli': 0.0.34_prettier@2.7.1
@@ -277,6 +279,7 @@ importers:
       '@types/react-dom': 18.0.8
       '@types/testing-library__jest-dom': 5.14.5
       '@vitejs/plugin-react': 2.2.0_vite@3.2.2
+      '@vitejs/plugin-vue': 3.2.0_vite@3.2.2+vue@3.2.41
       lodash-es: 4.17.21
       prettier: 2.7.1
       react: 18.2.0
@@ -287,6 +290,7 @@ importers:
       vite: 3.2.2
       vite-plugin-dts: 1.6.6_vite@3.2.2
       vite-plugin-pages: 0.27.1_vite@3.2.2
+      vue: 3.2.41
 
 packages:
 
@@ -2335,6 +2339,17 @@ packages:
       - supports-color
     dev: true
 
+  /@vitejs/plugin-vue/3.2.0_vite@3.2.2+vue@3.2.41:
+    resolution: {integrity: sha512-E0tnaL4fr+qkdCNxJ+Xd0yM31UwMkQje76fsDVBBUCoGOUPexu2VDUYHL8P4CwV+zMvWw6nlRw19OnRKmYAJpw==}
+    engines: {node: ^14.18.0 || >=16.0.0}
+    peerDependencies:
+      vite: ^3.0.0
+      vue: ^3.2.25
+    dependencies:
+      vite: 3.2.2
+      vue: 3.2.41
+    dev: true
+
   /@vitest/ui/0.24.5:
     resolution: {integrity: sha512-hdj6cmlrVPt3Mpgn0ITytTqnxQLGB4hRgueFuzlKSrqAG30wUrrxQjrW55krE1NR15r1c2jzUBwjzvIJsyoUwg==}
     dependencies:
@@ -2387,6 +2402,37 @@ packages:
       '@vue/shared': 3.2.41
       estree-walker: 2.0.2
       magic-string: 0.25.9
+    dev: true
+
+  /@vue/reactivity/3.2.41:
+    resolution: {integrity: sha512-9JvCnlj8uc5xRiQGZ28MKGjuCoPhhTwcoAdv3o31+cfGgonwdPNuvqAXLhlzu4zwqavFEG5tvaoINQEfxz+l6g==}
+    dependencies:
+      '@vue/shared': 3.2.41
+    dev: true
+
+  /@vue/runtime-core/3.2.41:
+    resolution: {integrity: sha512-0LBBRwqnI0p4FgIkO9q2aJBBTKDSjzhnxrxHYengkAF6dMOjeAIZFDADAlcf2h3GDALWnblbeprYYpItiulSVQ==}
+    dependencies:
+      '@vue/reactivity': 3.2.41
+      '@vue/shared': 3.2.41
+    dev: true
+
+  /@vue/runtime-dom/3.2.41:
+    resolution: {integrity: sha512-U7zYuR1NVIP8BL6jmOqmapRAHovEFp7CSw4pR2FacqewXNGqZaRfHoNLQsqQvVQ8yuZNZtxSZy0FFyC70YXPpA==}
+    dependencies:
+      '@vue/runtime-core': 3.2.41
+      '@vue/shared': 3.2.41
+      csstype: 2.6.21
+    dev: true
+
+  /@vue/server-renderer/3.2.41_vue@3.2.41:
+    resolution: {integrity: sha512-7YHLkfJdTlsZTV0ae5sPwl9Gn/EGr2hrlbcS/8naXm2CDpnKUwC68i1wGlrYAfIgYWL7vUZwk2GkYLQH5CvFig==}
+    peerDependencies:
+      vue: 3.2.41
+    dependencies:
+      '@vue/compiler-ssr': 3.2.41
+      '@vue/shared': 3.2.41
+      vue: 3.2.41
     dev: true
 
   /@vue/shared/3.2.41:
@@ -8798,6 +8844,16 @@ packages:
 
   /vue/2.6.14:
     resolution: {integrity: sha512-x2284lgYvjOMj3Za7kqzRcUSxBboHqtgRE2zlos1qWaOye5yUmHn42LB1250NJBLRwEcdrB0JRwyPTEPhfQjiQ==}
+    dev: true
+
+  /vue/3.2.41:
+    resolution: {integrity: sha512-uuuvnrDXEeZ9VUPljgHkqB5IaVO8SxhPpqF2eWOukVrBnRBx2THPSGQBnVRt0GrIG1gvCmFXMGbd7FqcT1ixNQ==}
+    dependencies:
+      '@vue/compiler-dom': 3.2.41
+      '@vue/compiler-sfc': 3.2.41
+      '@vue/runtime-dom': 3.2.41
+      '@vue/server-renderer': 3.2.41_vue@3.2.41
+      '@vue/shared': 3.2.41
     dev: true
 
   /w3c-xmlserializer/3.0.0:

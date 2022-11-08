@@ -20,7 +20,9 @@
     "baseUrl": ".",
     "paths": {
       "@/*": ["./src/*"],
-      "@react/*": ["./src/generated/react/src/*"]
+      "@react/*": ["./src/generated/react/src/*"],
+      "@vue/*": ["./src/generated/vue/vue3/src/*"],
+      "@svelte/*": ["./src/generated/svelte/src/*"],
     }
   },
   "include": [
@@ -29,7 +31,7 @@
     "src/**/*.tsx",
     "vite.config.ts",
     "generated/**/*"
-, "src/react.ts"  ],
+  ],
   "exclude": ["src/**/*.lite.tsx"],
   "references": [{ "path": "./tsconfig.mitosis.json" }]
 }
