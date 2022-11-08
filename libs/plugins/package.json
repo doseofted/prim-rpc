@@ -39,47 +39,21 @@
   },
   "type": "module",
   "exports": {
-    "./axios": {
-      "types": "./dist/client/axios.d.ts",
-      "import": "./dist/client/axios.js"
-    },
-    "./dist/client/axios.js": {
-      "types": "./dist/client/axios.d.ts",
-      "import": "./dist/client/axios.js"
-    },
-    "./browser-api": {
-      "types": "./dist/client/browser-api.d.ts",
-      "import": "./dist/client/browser-api.js"
-    },
-    "./dist/client/browser-api.js": {
-      "types": "./dist/client/browser-api.d.ts",
-      "import": "./dist/client/browser-api.js"
-    },
-    "./fastify": {
-      "types": "./dist/server/fastify.d.ts",
-      "import": "./dist/server/fastify.js"
-    },
-    "./dist/server/fastify.js": {
-      "types": "./dist/server/fastify.d.ts",
-      "import": "./dist/server/fastify.js"
-    },
-    "./express": {
-      "types": "./dist/server/express.d.ts",
-      "import": "./dist/server/express.js"
-    },
-    "./dist/server/express.js": {
-      "types": "./dist/server/express.d.ts",
-      "import": "./dist/server/express.js"
-    },
-    "./ws": {
-      "types": "./dist/server/ws.d.ts",
-      "import": "./dist/server/ws.js"
-    },
-    "./dist/server/ws.js": {
-      "types": "./dist/server/ws.d.ts",
-      "import": "./dist/server/ws.js"
-    },
+    "./axios": "./dist/client/axios.js",
+    "./browser-api": "./dist/client/browser-api.js",
+    "./fastify": "./dist/server/fastify.js",
+    "./express": "./dist/server/express.js",
+    "./ws": "./dist/server/ws.js",
     "./package.json": "./package.json"
+  },
+  "typesVersions": {
+    "*": {
+      "axios": ["dist/client/axios.d.ts"],
+      "browser-api": ["dist/client/browser-api.d.ts"],
+      "fastify": ["dist/server/fastify.d.ts"],
+      "express": ["dist/server/express.d.ts"],
+      "ws": ["dist/server/ws.d.ts"]
+    }
   },
   "files": [
     "dist"

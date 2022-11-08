@@ -49,15 +49,16 @@
   },
   "type": "module",
   "exports": {
-    "./dist/react.js": {
-      "types": "./dist/react.d.ts",
-      "import": "./dist/react.js"
-    },
-    "./style.css": {
-      "import": "./dist/style.css",
-      "require": "./dist/style.css"
-    },
+    "./react": "./dist/react.js",
+    "./vue": "./dist/vue.js",
+    "./style.css": "./dist/style.css",
     "./package.json": "./package.json"
+  },
+  "typesVersions": {
+    "*": {
+      "react": ["dist/react.d.ts"],
+      "vue": ["dist/vue.d.ts"]
+    }
   },
   "files": [
     "dist"
