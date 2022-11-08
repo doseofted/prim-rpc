@@ -29,7 +29,7 @@
     "src/**/*.tsx",
     "vite.config.ts",
     "generated/**/*"
-, "src/index.react.ts"  ],
+, "src/react.ts"  ],
   "exclude": ["src/**/*.lite.tsx"],
   "references": [{ "path": "./tsconfig.mitosis.json" }]
 }

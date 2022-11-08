@@ -6,7 +6,6 @@ export default defineConfig(options => ({
 	entry: ["src/index.ts"],
 	target: "ES2022",
 	dts: true,
-	sourcemap: true,
 	format: ["esm"],
 	clean: true,
 }))

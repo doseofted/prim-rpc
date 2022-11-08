@@ -1,6 +1,5 @@
 import { Component, createEffect, createResource, createSignal, onMount } from "solid-js"
 import backend from "../../client"
-import { Docs } from "@doseofted/prim-ui"
 
 const Testing: Component = () => {
 	const [typed, setTyped] = createSignal("")
@@ -14,7 +13,7 @@ const Testing: Component = () => {
 			setTyped(typed().concat(letter))
 		}, 100)
 	})
-	const [hover, setHover] = createSignal(false)
+	const [hover] = createSignal(false)
 	// const [elem, setElem] = createSignal<HTMLDivElement>()
 	// createEffect(() => {
 	// 	elem()?.addEventListener("mouseenter", () => setHover(true))
@@ -23,13 +22,6 @@ const Testing: Component = () => {
 	onMount(() => console.log())
 	return <>
 		<div>
-			<Docs
-				// eslint-disable-next-line @typescript-eslint/no-unsafe-return
-				// ref={e => setElem(e)}
-				class="what"
-				onMouseEnter={() => setHover(true)}
-				onMouseLeave={() => setHover(false)}
-			/>
 			<div class="flex gap-4">
 				<input
 					type="text" class="border-gray border rounded-full px-6 py-1"

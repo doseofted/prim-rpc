@@ -9,7 +9,7 @@
     "url": "https://doseofted.com/"
   },
   "scripts": {
-    "build": "node build.mjs",
+    "build": "node build.js",
     "watch": "pnpm build --watch",
     "vite:build": "vite build",
     "vite:watch": "vite build --watch",
@@ -44,10 +44,11 @@
     "vite-plugin-dts": "^1.6.6",
     "vite-plugin-pages": "^0.27.1"
   },
+  "type": "module",
   "exports": {
-    "./dist/react.mjs": {
-      "types": "./dist/index.react.d.ts",
-      "import": "./dist/index.react.mjs"
+    "./dist/react.js": {
+      "types": "./dist/react.d.ts",
+      "import": "./dist/react.js"
     },
     "./style.css": {
       "import": "./dist/style.css",

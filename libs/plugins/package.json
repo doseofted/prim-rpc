@@ -9,8 +9,8 @@
     "url": "https://doseofted.com/"
   },
   "scripts": {
-    "watch": "tsup --watch --config build.config.mjs",
-    "build": "tsup --config build.config.mjs",
+    "watch": "tsup --watch --config build.config.js",
+    "build": "tsup --config build.config.js",
     "check": "tsc --noEmit",
     "test": "vitest run",
     "testing": "vitest watch",
@@ -37,26 +37,47 @@
     "superwstest": "^2.0.3",
     "ws": "^8.10.0"
   },
+  "type": "module",
   "exports": {
-    "./dist/client/axios.mjs": {
-      "types": "./dist/client/axios.d.mts",
-      "import": "./dist/client/axios.mjs"
+    "./axios": {
+      "types": "./dist/client/axios.d.ts",
+      "import": "./dist/client/axios.js"
     },
-    "./dist/client/browser-api.mjs": {
-      "types": "./dist/client/browser-api.d.mts",
-      "import": "./dist/client/browser-api.mjs"
+    "./dist/client/axios.js": {
+      "types": "./dist/client/axios.d.ts",
+      "import": "./dist/client/axios.js"
     },
-    "./dist/server/fastify.mjs": {
-      "types": "./dist/server/fastify.d.mts",
-      "import": "./dist/server/fastify.mjs"
+    "./browser-api": {
+      "types": "./dist/client/browser-api.d.ts",
+      "import": "./dist/client/browser-api.js"
     },
-    "./dist/server/express.mjs": {
-      "types": "./dist/server/express.d.mts",
-      "import": "./dist/server/express.mjs"
+    "./dist/client/browser-api.js": {
+      "types": "./dist/client/browser-api.d.ts",
+      "import": "./dist/client/browser-api.js"
     },
-    "./dist/server/ws.mjs": {
-      "types": "./dist/server/ws.d.mts",
-      "import": "./dist/server/ws.mjs"
+    "./fastify": {
+      "types": "./dist/server/fastify.d.ts",
+      "import": "./dist/server/fastify.js"
+    },
+    "./dist/server/fastify.js": {
+      "types": "./dist/server/fastify.d.ts",
+      "import": "./dist/server/fastify.js"
+    },
+    "./express": {
+      "types": "./dist/server/express.d.ts",
+      "import": "./dist/server/express.js"
+    },
+    "./dist/server/express.js": {
+      "types": "./dist/server/express.d.ts",
+      "import": "./dist/server/express.js"
+    },
+    "./ws": {
+      "types": "./dist/server/ws.d.ts",
+      "import": "./dist/server/ws.js"
+    },
+    "./dist/server/ws.js": {
+      "types": "./dist/server/ws.d.ts",
+      "import": "./dist/server/ws.js"
     },
     "./package.json": "./package.json"
   },

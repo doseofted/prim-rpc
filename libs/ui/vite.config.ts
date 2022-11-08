@@ -32,10 +32,10 @@ export default defineConfig({
 	build: {
 		lib: {
 			formats: ["es"],
-			fileName: (module, entry) => `index.${entry}.${module === "es" ? "m" : ""}js`,
+			fileName: (_module, entry) => `${entry}.js`,
 			// LINK https://github.com/vitejs/vite/blob/v3.2.1/packages/vite/CHANGELOG.md#multiple-entries-for-library-mode
 			entry: {
-				react: new URL("./src/index.react.ts", import.meta.url).pathname,
+				react: new URL("./src/react.ts", import.meta.url).pathname,
 			},
 		},
 		rollupOptions: {

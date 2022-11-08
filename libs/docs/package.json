@@ -9,8 +9,8 @@
     "url": "https://doseofted.com/"
   },
   "scripts": {
-    "watch": "tsup --watch --config build.config.mjs",
-    "build": "tsup --config build.config.mjs",
+    "watch": "tsup --watch --config build.config.js",
+    "build": "tsup --config build.config.js",
     "check": "tsc --noEmit",
     "test": "vitest run",
     "testing": "vitest watch",
@@ -30,14 +30,15 @@
     "typedoc": "^0.23.20",
     "typescript": "^4.8.4"
   },
+  "type": "module",
   "exports": {
     ".": {
       "types": "./dist/index.d.ts",
-      "import": "./dist/index.mjs"
+      "import": "./dist/index.js"
     },
     "./package.json": "./package.json"
   },
-  "module": "./dist/index.mjs",
+  "module": "./dist/index.js",
   "types": "./dist/index.d.ts",
   "files": [
     "dist"

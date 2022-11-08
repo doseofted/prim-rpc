@@ -1,9 +1,11 @@
 import { createPrimClient } from "@doseofted/prim-rpc"
 import type * as exampleClient from "@doseofted/prim-example"
-import { createFetchClient, createWebSocketClient } from "@doseofted/prim-plugins/dist/client/browser-api.mjs"
+import { createFetchClient, createWebSocketClient } from "@doseofted/prim-plugins/dist/client/browser-api.js"
 import jsonHandler from "superjson"
 
+// eslint-disable-next-line @typescript-eslint/no-unsafe-member-access
 const host = import.meta.env.VITE_WEBSITE_HOST as string
+// eslint-disable-next-line @typescript-eslint/no-unsafe-member-access
 const contained = import.meta.env.VITE_CONTAINED as string
 const backend = createPrimClient<typeof exampleClient>({
 	endpoint: contained

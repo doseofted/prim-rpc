@@ -4,8 +4,8 @@ import Cors from "@fastify/cors"
 import { WebSocketServer } from "ws"
 import jsonHandler from "superjson"
 import { createPrimServer } from "@doseofted/prim-rpc"
-import { primMethodFastify } from "@doseofted/prim-plugins/dist/server/fastify.mjs"
-import { primCallbackWs } from "@doseofted/prim-plugins/dist/server/ws.mjs"
+import { primMethodFastify } from "@doseofted/prim-plugins/dist/server/fastify.js"
+import { primCallbackWs } from "@doseofted/prim-plugins/dist/server/ws.js"
 import * as module from "@doseofted/prim-example"
 
 /** Flag to determine if project is running locally or in a container */
