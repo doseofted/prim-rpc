@@ -1,10 +1,16 @@
 {
 	"compilerOptions": {
+		/* below is for Deno */
+		// "strict": true,
+		// "noUnusedLocals": true,
+		// "noUnusedParameters": true,
+		/* below is for denoify */
+		// "outDir": "dist/",
 		"target": "ES2020",
 		"moduleResolution": "Node",
 		"esModuleInterop": true,
 		"isolatedModules": true,
-		"lib": ["DOM", "ES2020"]
+		"lib": ["DOM", "ES2020"],
 	},
 	"include": [
 		"src/**/*",
