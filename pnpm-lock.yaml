@@ -5,7 +5,6 @@ importers:
   .:
     specifiers:
       '@builder.io/eslint-plugin-mitosis': ^0.0.11
-      '@testing-library/react': ^13.4.0
       '@typescript-eslint/eslint-plugin': ^5.42.0
       '@typescript-eslint/parser': ^5.42.0
       '@vitest/ui': ^0.24.5
@@ -34,14 +33,13 @@ importers:
       zx: 7.1.1
     devDependencies:
       '@builder.io/eslint-plugin-mitosis': 0.0.11_eslint@8.26.0
-      '@testing-library/react': 13.4.0
       '@typescript-eslint/eslint-plugin': 5.42.0_6xw5wg2354iw4zujk2f3vyfrzu
       '@typescript-eslint/parser': 5.42.0_wyqvi574yv7oiwfeinomdzmc3m
       '@vitest/ui': 0.24.5
       chokidar: 3.5.3
       eslint: 8.26.0
       eslint-plugin-react: 7.31.10_eslint@8.26.0
-      eslint-plugin-react-hooks: 4.6.0_eslint@8.26.0
+      eslint-plugin-react-hooks: 4.6.0
       eslint-plugin-solid: 0.8.0_wyqvi574yv7oiwfeinomdzmc3m
       jsdom: 20.0.2
       postcss: 8.4.18
@@ -249,6 +247,7 @@ importers:
       '@doseofted/prim-docs': workspace:*
       '@doseofted/prim-example': workspace:*
       '@testing-library/jest-dom': ^5.16.5
+      '@testing-library/react': ^13.4.0
       '@types/lodash-es': ^4.17.6
       '@types/node': ^18.11.9
       '@types/react': ^18.0.25
@@ -268,18 +267,19 @@ importers:
       vite-plugin-pages: ^0.27.1
       vue: ^3.2.41
     devDependencies:
-      '@builder.io/mitosis': 0.0.76_prettier@2.7.1
-      '@builder.io/mitosis-cli': 0.0.34_prettier@2.7.1
+      '@builder.io/mitosis': 0.0.76
+      '@builder.io/mitosis-cli': 0.0.34
       '@doseofted/prim-docs': link:../docs
       '@doseofted/prim-example': link:../example
       '@testing-library/jest-dom': 5.16.5
+      '@testing-library/react': 13.4.0_biqbaboplfbrettd7655fr4n2y
       '@types/lodash-es': 4.17.6
       '@types/node': 18.11.9
       '@types/react': 18.0.25
       '@types/react-dom': 18.0.8
       '@types/testing-library__jest-dom': 5.14.5
       '@vitejs/plugin-react': 2.2.0_vite@3.2.2
-      '@vitejs/plugin-vue': 3.2.0_vite@3.2.2+vue@3.2.41
+      '@vitejs/plugin-vue': 3.2.0
       lodash-es: 4.17.21
       prettier: 2.7.1
       react: 18.2.0
@@ -951,14 +951,13 @@ packages:
       ts-pattern: 3.3.5
     dev: true
 
-  /@builder.io/mitosis-cli/0.0.34_prettier@2.7.1:
+  /@builder.io/mitosis-cli/0.0.34:
     resolution: {integrity: sha512-J+IjAJYEscfEqhf4SnB1Wjy9ixiCWvdIGXmlG/vLOc9cTInCs0RaPMhZKqAS5Ec2bDrCDVukrGXx6NRCXcb/QQ==}
     engines: {npm: 99999999.9.9}
-    hasBin: true
     dependencies:
       '@babel/core': 7.20.2
       '@babel/preset-typescript': 7.18.6_@babel+core@7.20.2
-      '@builder.io/mitosis': 0.0.75_debug@4.3.4+prettier@2.7.1
+      '@builder.io/mitosis': 0.0.75_debug@4.3.4
       '@vue/compiler-sfc': 3.2.41
       babel-preset-solid: 1.6.1_@babel+core@7.20.2
       chalk: 4.1.2
@@ -979,11 +978,10 @@ packages:
       vue-template-validator: 1.1.5_parse5@3.0.3
     transitivePeerDependencies:
       - encoding
-      - prettier
       - supports-color
     dev: true
 
-  /@builder.io/mitosis/0.0.75_debug@4.3.4+prettier@2.7.1:
+  /@builder.io/mitosis/0.0.75_debug@4.3.4:
     resolution: {integrity: sha512-T1kkMVnOjgVOl7wQx9NobBecKiXJbUu4fJY0doIjYpWrSDhpAkrDhGc2BSFGMYyz1wTJweLk0kTRL5H1XqnvsQ==}
     engines: {npm: 99999999.9.9}
     dependencies:
@@ -1010,8 +1008,8 @@ packages:
       lodash: 4.17.21
       marko: 5.22.0
       object-hash: 2.2.0
-      prettier-plugin-marko: 1.2.2_xf46sysjufwndh5dek7ihfm4g4
-      prettier-plugin-svelte: 2.8.0_lrllcp5xtrkmmdzifit4hd52ze
+      prettier-plugin-marko: 1.2.2
+      prettier-plugin-svelte: 2.8.0
       svelte: 3.52.0
       traverse: 0.6.7
       typescript: 4.8.4
@@ -1019,11 +1017,10 @@ packages:
     transitivePeerDependencies:
       - debug
       - encoding
-      - prettier
       - supports-color
     dev: true
 
-  /@builder.io/mitosis/0.0.76_prettier@2.7.1:
+  /@builder.io/mitosis/0.0.76:
     resolution: {integrity: sha512-alG1trB9Bv/G5rFDAAkWNscbYYRB9PSdUJy8csbghE3hT4ZWJ2KwCkBD+KvXbx01hUoi/lNdmuhO3mQenqYsnw==}
     engines: {npm: 99999999.9.9}
     dependencies:
@@ -1050,8 +1047,8 @@ packages:
       lodash: 4.17.21
       marko: 5.22.0
       object-hash: 2.2.0
-      prettier-plugin-marko: 1.2.2_xf46sysjufwndh5dek7ihfm4g4
-      prettier-plugin-svelte: 2.8.0_lrllcp5xtrkmmdzifit4hd52ze
+      prettier-plugin-marko: 1.2.2
+      prettier-plugin-svelte: 2.8.0
       svelte: 3.52.0
       traverse: 0.6.7
       typescript: 4.8.4
@@ -1059,7 +1056,6 @@ packages:
     transitivePeerDependencies:
       - debug
       - encoding
-      - prettier
       - supports-color
     dev: true
 
@@ -1755,7 +1751,7 @@ packages:
       redent: 3.0.0
     dev: true
 
-  /@testing-library/react/13.4.0:
+  /@testing-library/react/13.4.0_biqbaboplfbrettd7655fr4n2y:
     resolution: {integrity: sha512-sXOGON+WNTh3MLE9rve97ftaZukN3oNf2KjDy7YTx6hcTO2uuLHuCGynMDhFwGw/jYf4OJ2Qk0i4i79qMNNkyw==}
     engines: {node: '>=12'}
     peerDependencies:
@@ -1765,6 +1761,8 @@ packages:
       '@babel/runtime': 7.18.9
       '@testing-library/dom': 8.19.0
       '@types/react-dom': 18.0.8
+      react: 18.2.0
+      react-dom: 18.2.0_react@18.2.0
     dev: true
 
   /@tootallnate/once/2.0.0:
@@ -2339,15 +2337,18 @@ packages:
       - supports-color
     dev: true
 
-  /@vitejs/plugin-vue/3.2.0_vite@3.2.2+vue@3.2.41:
+  /@vitejs/plugin-vue/3.2.0:
     resolution: {integrity: sha512-E0tnaL4fr+qkdCNxJ+Xd0yM31UwMkQje76fsDVBBUCoGOUPexu2VDUYHL8P4CwV+zMvWw6nlRw19OnRKmYAJpw==}
     engines: {node: ^14.18.0 || >=16.0.0}
-    peerDependencies:
-      vite: ^3.0.0
-      vue: ^3.2.25
     dependencies:
       vite: 3.2.2
       vue: 3.2.41
+    transitivePeerDependencies:
+      - less
+      - sass
+      - stylus
+      - sugarss
+      - terser
     dev: true
 
   /@vitest/ui/0.24.5:
@@ -2481,7 +2482,6 @@ packages:
   /acorn/8.8.1:
     resolution: {integrity: sha512-7zFpHzhnqYKrkYdUjF1HI1bzd0VygEGX8lFk4k5zVMqHEoES+P+7TKI+EvLO9WVMJ8eekdO0aDEK044xTXwPPA==}
     engines: {node: '>=0.4.0'}
-    hasBin: true
     dev: true
 
   /agent-base/6.0.2:
@@ -3127,7 +3127,6 @@ packages:
 
   /commander/2.20.3:
     resolution: {integrity: sha512-GpVkmM8vF2vQUkj2LvZmD35JxeJOLCwJ9cUkugyk2nuhbv3+mJvpLYYt+0+USMxE+oj+ey/lJEnhZw75x/OMcQ==}
-    requiresBuild: true
     dev: true
 
   /commander/4.1.1:
@@ -3212,7 +3211,6 @@ packages:
 
   /core-js/1.2.7:
     resolution: {integrity: sha512-ZiPp9pZlgxpWRu0M+YWbm6+aQ84XEfH1JRXvfOc/fILWI0VKhLC2LX13X1NYq4fULzLMq7Hfh43CSo2/aIaUPA==}
-    deprecated: core-js@<3.23.3 is no longer maintained and not recommended for usage due to the number of issues. Because of the V8 engine whims, feature detection in old core-js versions could cause a slowdown up to 100x even if nothing is polyfilled. Some versions have web compatibility issues. Please, upgrade your dependencies to the actual version of core-js.
     dev: true
     optional: true
 
@@ -4234,7 +4232,6 @@ packages:
 
   /esbuild/0.12.29:
     resolution: {integrity: sha512-w/XuoBCSwepyiZtIRsKsetiLDUVGPVw1E/R3VTFSecIy8UR7Cq3SOtwKHJMFoVqqVG36aGkzh4e8BvpO1Fdc7g==}
-    hasBin: true
     requiresBuild: true
     dev: true
 
@@ -4359,13 +4356,13 @@ packages:
       source-map: 0.6.1
     dev: true
 
-  /eslint-plugin-react-hooks/4.6.0_eslint@8.26.0:
+  /eslint-plugin-react-hooks/4.6.0:
     resolution: {integrity: sha512-oFc7Itz9Qxh2x4gNHStv3BqJq54ExXmfC+a1NjAta66IAN87Wu0R/QArgIS9qKzX3dXKPI9H5crl9QchNMY9+g==}
     engines: {node: '>=10'}
-    peerDependencies:
-      eslint: ^3.0.0 || ^4.0.0 || ^5.0.0 || ^6.0.0 || ^7.0.0 || ^8.0.0-0
     dependencies:
       eslint: 8.26.0
+    transitivePeerDependencies:
+      - supports-color
     dev: true
 
   /eslint-plugin-react/7.31.10_eslint@8.26.0:
@@ -5234,7 +5231,6 @@ packages:
 
   /he/1.2.0:
     resolution: {integrity: sha512-F/1DnUGPopORZi0ni+CvrCgHQ5FyEAHRLSApuYWMmrbSwoN2Mn/7k+Gl38gJnR7yyDZk6WLXwiGod1JOWNDKGw==}
-    hasBin: true
     dev: true
 
   /hexoid/1.0.0:
@@ -5274,7 +5270,6 @@ packages:
   /html-minifier/4.0.0:
     resolution: {integrity: sha512-aoGxanpFPLg7MkIl/DDFYtb0iWz7jMFGqFhvEDZga6/4QTjneiD8I/NXL1x5aaoCp7FSIT6h/OhykDdPsbtMig==}
     engines: {node: '>=6'}
-    hasBin: true
     dependencies:
       camel-case: 3.0.0
       clean-css: 4.2.4
@@ -5792,7 +5787,6 @@ packages:
   /jsesc/3.0.2:
     resolution: {integrity: sha512-xKqzzWXDttJuOcawBt4KnKHHIf5oQ/Cxax+0PWFG+DFDgHNAdi+TXECADI+RYiFUMmx8792xsMbbgXj4CwnP4g==}
     engines: {node: '>=6'}
-    hasBin: true
     dev: true
 
   /json-parse-even-better-errors/2.3.1:
@@ -5917,7 +5911,6 @@ packages:
   /liquidjs/9.6.0:
     resolution: {integrity: sha512-MTSyzkl9iFZ1xNK496FaTQETS0i/ySy25e2xmw/bPS2G2bVyafy55n/2WmyecKeL86YxC2b+IZ62TN1nhlifEw==}
     engines: {node: '>=4.8.7'}
-    hasBin: true
     dev: true
 
   /listener-tracker/2.0.0:
@@ -6044,7 +6037,6 @@ packages:
 
   /loose-envify/1.4.0:
     resolution: {integrity: sha512-lyuxPGr/Wfhrlem2CL/UcnUc1zcqKAImBDzukY7Y5F/yQiNdko6+fRLevlw1HgMySw7f611UIY408EtxRSoK3Q==}
-    hasBin: true
     dependencies:
       js-tokens: 4.0.0
     dev: true
@@ -6108,7 +6100,6 @@ packages:
 
   /marko/5.22.0:
     resolution: {integrity: sha512-8hkiyrz2BSWVsnP0ZPy7VSDQPDHXStbFJ/tecwaLlMlt5unb0F0/M8nAc7bu2Fxx1xEr+FY4q/g4Y+vDrUO5Kw==}
-    hasBin: true
     dependencies:
       '@marko/compiler': 5.23.0
       '@marko/translator-default': 5.22.0_phz6zytzpv7fonnuvhtcdcgk7y
@@ -6869,21 +6860,17 @@ packages:
     engines: {node: '>= 0.8.0'}
     dev: true
 
-  /prettier-plugin-marko/1.2.2_xf46sysjufwndh5dek7ihfm4g4:
+  /prettier-plugin-marko/1.2.2:
     resolution: {integrity: sha512-1X+IKjhFCa5TZiNPWvEJhQkNgGvwxi748RF9Qg8oiDU9ogXjB5m6fHiZhQ6kDpDbasa8rMynOUgkasf+pGVhxA==}
-    peerDependencies:
-      '@marko/compiler': ^5.20.5
-      prettier: ^2
     dependencies:
       '@marko/compiler': 5.23.0
       prettier: 2.7.1
+    transitivePeerDependencies:
+      - supports-color
     dev: true
 
-  /prettier-plugin-svelte/2.8.0_lrllcp5xtrkmmdzifit4hd52ze:
+  /prettier-plugin-svelte/2.8.0:
     resolution: {integrity: sha512-QlXv/U3bUszks3XYDPsk1fsaQC+fo2lshwKbcbO+lrSVdJ+40mB1BfL8OCAk1W9y4pJxpqO/4gqm6NtF3zNGCw==}
-    peerDependencies:
-      prettier: ^1.16.4 || ^2.0.0
-      svelte: ^3.2.0
     dependencies:
       prettier: 2.7.1
       svelte: 3.52.0
@@ -6892,7 +6879,6 @@ packages:
   /prettier/2.7.1:
     resolution: {integrity: sha512-ujppO+MkdPqoVINuDFDRLClm7D78qbDt0/NR+wp5FqEZOoTNAjPHWj17QRhu7geIHJfcNhRk1XVQmF8Bp3ye+g==}
     engines: {node: '>=10.13.0'}
-    hasBin: true
     dev: true
 
   /pretty-bytes/6.0.0:
@@ -6948,7 +6934,6 @@ packages:
 
   /prop-types/15.8.1:
     resolution: {integrity: sha512-oj87CgZICdulUohogVAR7AjlC0327U4el4L6eAvOqCeudMDVU0NThNaV+b9Df4dXgSP1gXMTnPdhfe/2qDH5cg==}
-    requiresBuild: true
     dependencies:
       loose-envify: 1.4.0
       object-assign: 4.1.1
@@ -7248,7 +7233,6 @@ packages:
 
   /resolve/2.0.0-next.4:
     resolution: {integrity: sha512-iMDbmAWtfU+MHpxt/I5iWI7cY6YVEZUQ3MBgPQ++XD1PELuJHIl82xBmObyP2KyQmkNB2dsqF7seoQQiAn5yDQ==}
-    hasBin: true
     dependencies:
       is-core-module: 2.11.0
       path-parse: 1.0.7
@@ -7406,7 +7390,6 @@ packages:
 
   /semver/5.7.1:
     resolution: {integrity: sha512-sauaDf/PZdVgrLTNYHRtpXa1iRiKcaebiKQ1BJdpQlWH2lCvexQdX55snPFyK7QzpudqbCI0qXFfOasHdyNDGQ==}
-    hasBin: true
     dev: true
 
   /semver/6.3.0:
@@ -7643,7 +7626,6 @@ packages:
   /source-map/0.6.1:
     resolution: {integrity: sha512-UjgapumWlbMhkBgzT7Ykc5YXUT46F0iKu8SGXq0bcwP5dz/h0Plj6enJqjz1Zbq2l5WaqYnrVbwWOWMyF3F47g==}
     engines: {node: '>=0.10.0'}
-    requiresBuild: true
     dev: true
 
   /source-map/0.8.0-beta.0:
@@ -8448,7 +8430,6 @@ packages:
   /uglify-js/3.17.4:
     resolution: {integrity: sha512-T9q82TJI9e/C1TAxYvfb16xO120tMVFZrGA3f9/P4424DNu6ypK103y0GPFVa17yotwSyZW5iYXgjYHkGrJW/g==}
     engines: {node: '>=0.8.0'}
-    hasBin: true
     dev: true
 
   /unbox-primitive/1.0.2:
@@ -8815,7 +8796,6 @@ packages:
   /vm2/3.9.11:
     resolution: {integrity: sha512-PFG8iJRSjvvBdisowQ7iVF580DXb1uCIiGaXgm7tynMR1uTBlv7UJlB1zdv5KJ+Tmq1f0Upnj3fayoEOPpCBKg==}
     engines: {node: '>=6.0'}
-    hasBin: true
     dependencies:
       acorn: 8.8.1
       acorn-walk: 8.2.0

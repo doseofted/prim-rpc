@@ -27,6 +27,7 @@
     "@doseofted/prim-docs": "workspace:*",
     "@doseofted/prim-example": "workspace:*",
     "@testing-library/jest-dom": "^5.16.5",
+    "@testing-library/react": "^13.4.0",
     "@types/lodash-es": "^4.17.6",
     "@types/node": "^18.11.9",
     "@types/react": "^18.0.25",
