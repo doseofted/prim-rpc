@@ -1,61 +1,71 @@
 {
-  "name": "@doseofted/prim-plugins",
-  "version": "0.0.1",
-  "description": "Plugins for using Prim with server/client frameworks",
-  "license": "UNLICENSED",
-  "author": {
-    "name": "Ted Klingenberg",
-    "email": "ted@doseofted.com",
-    "url": "https://doseofted.com/"
-  },
-  "scripts": {
-    "watch": "tsup --watch --config build.config.js",
-    "build": "tsup --config build.config.js",
-    "check": "tsc --noEmit",
-    "test": "vitest run",
-    "testing": "vitest watch",
-    "lint": "eslint ."
-  },
-  "devDependencies": {
-    "@doseofted/prim-example": "workspace:*",
-    "@doseofted/prim-rpc": "workspace:*",
-    "@fastify/multipart": "^7.3.0",
-    "@types/express": "^4.17.14",
-    "@types/multer": "^1.4.7",
-    "@types/node": "^18.11.9",
-    "@types/supertest": "^2.0.12",
-    "@types/ws": "^8.5.3",
-    "axios": "^1.1.3",
-    "express": "^4.18.2",
-    "fastify": "^4.9.2",
-    "multer": "1.4.5-lts.1",
-    "query-string": "^7.1.1",
-    "socket.io": "^4.5.3",
-    "socket.io-client": "^4.5.3",
-    "superjson": "^1.11.0",
-    "supertest": "^6.3.1",
-    "superwstest": "^2.0.3",
-    "ws": "^8.10.0"
-  },
-  "type": "module",
-  "exports": {
-    "./axios": "./dist/client/axios.js",
-    "./browser-api": "./dist/client/browser-api.js",
-    "./fastify": "./dist/server/fastify.js",
-    "./express": "./dist/server/express.js",
-    "./ws": "./dist/server/ws.js",
-    "./package.json": "./package.json"
-  },
-  "typesVersions": {
-    "*": {
-      "axios": ["dist/client/axios.d.ts"],
-      "browser-api": ["dist/client/browser-api.d.ts"],
-      "fastify": ["dist/server/fastify.d.ts"],
-      "express": ["dist/server/express.d.ts"],
-      "ws": ["dist/server/ws.d.ts"]
-    }
-  },
-  "files": [
-    "dist"
-  ]
+	"name": "@doseofted/prim-plugins",
+	"version": "0.0.1",
+	"description": "Plugins for using Prim with server/client frameworks",
+	"license": "UNLICENSED",
+	"author": {
+		"name": "Ted Klingenberg",
+		"email": "ted@doseofted.com",
+		"url": "https://doseofted.com/"
+	},
+	"scripts": {
+		"watch": "tsup --watch --config build.config.js",
+		"build": "tsup --config build.config.js",
+		"check": "tsc --noEmit",
+		"test": "vitest run",
+		"testing": "vitest watch",
+		"lint": "eslint ."
+	},
+	"devDependencies": {
+		"@doseofted/prim-example": "workspace:*",
+		"@doseofted/prim-rpc": "workspace:*",
+		"@fastify/multipart": "^7.3.0",
+		"@types/express": "^4.17.14",
+		"@types/multer": "^1.4.7",
+		"@types/node": "^18.11.9",
+		"@types/supertest": "^2.0.12",
+		"@types/ws": "^8.5.3",
+		"axios": "^1.1.3",
+		"express": "^4.18.2",
+		"fastify": "^4.9.2",
+		"multer": "1.4.5-lts.1",
+		"query-string": "^7.1.1",
+		"socket.io": "^4.5.3",
+		"socket.io-client": "^4.5.3",
+		"superjson": "^1.11.0",
+		"supertest": "^6.3.1",
+		"superwstest": "^2.0.3",
+		"ws": "^8.10.0"
+	},
+	"type": "module",
+	"exports": {
+		"./axios": "./dist/client/axios.js",
+		"./browser-api": "./dist/client/browser-api.js",
+		"./fastify": "./dist/server/fastify.js",
+		"./express": "./dist/server/express.js",
+		"./ws": "./dist/server/ws.js",
+		"./package.json": "./package.json"
+	},
+	"typesVersions": {
+		"*": {
+			"axios": [
+				"dist/client/axios.d.ts"
+			],
+			"browser-api": [
+				"dist/client/browser-api.d.ts"
+			],
+			"fastify": [
+				"dist/server/fastify.d.ts"
+			],
+			"express": [
+				"dist/server/express.d.ts"
+			],
+			"ws": [
+				"dist/server/ws.d.ts"
+			]
+		}
+	},
+	"files": [
+		"dist"
+	]
 }

@@ -1,7 +1,6 @@
 version: 3
 
 tasks:
-
   prod:up:
     desc: "[production] Start all services in project"
     cmds:

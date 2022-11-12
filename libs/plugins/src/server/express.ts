@@ -10,7 +10,9 @@ interface SharedExpressOptions {
 	fileSizeLimitBytes?: number
 }
 
-interface PrimExpressPluginOptions extends SharedExpressOptions { prim: PrimServerEvents }
+interface PrimExpressPluginOptions extends SharedExpressOptions {
+	prim: PrimServerEvents
+}
 /**
  * An Express plugin used to register Prim with the server. Use like so:
  *
@@ -37,7 +39,10 @@ export const expressPrimPlugin = (options: PrimExpressPluginOptions) => {
 	const { prim, multipartPlugin, fileSizeLimitBytes } = options
 	const handler = (req: Express.Request, res: Express.Response, next: Express.NextFunction) => {
 		const processRpc = async () => {
-			if (!req.path.startsWith(prim.options.prefix)) { next(); return }
+			if (!req.path.startsWith(prim.options.prefix)) {
+				next()
+				return
+			}
 			const { method, originalUrl: url } = req
 			let bodyForm: string, bodyChunked: string
 			const blobs: { [identifier: string]: unknown } = {}
@@ -57,7 +62,9 @@ export const expressPrimPlugin = (options: PrimExpressPluginOptions) => {
 				bodyChunked = await new Promise<string>(resolve => {
 					let body = ""
 					req.setEncoding("utf-8")
-					req.on("data", (chunk) => { body += chunk })
+					req.on("data", chunk => {
+						body += chunk
+					})
 					req.on("end", () => resolve(body))
 					// TODO: consider other methods of handling error
 					req.on("error", () => resolve(""))
@@ -83,7 +90,9 @@ export const expressPrimPlugin = (options: PrimExpressPluginOptions) => {
 	return handler
 }
 
-interface MethodExpressOptions extends SharedExpressOptions { app: Express.Application }
+interface MethodExpressOptions extends SharedExpressOptions {
+	app: Express.Application
+}
 /**
  * A Prim plugin used to register itself with Express. Use like so:
  *

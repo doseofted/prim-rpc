@@ -1,7 +1,5 @@
 import { clamp, random } from "lodash-es"
-import {
-	Component, JSX, splitProps, createMemo, createEffect, mergeProps, createSignal, onCleanup,
-} from "solid-js"
+import { Component, JSX, splitProps, createMemo, createEffect, mergeProps, createSignal, onCleanup } from "solid-js"
 import { Light, LightOptions, useLights } from "./Lights"
 
 // SECTION Light with behaviors
@@ -28,48 +26,70 @@ interface LightBehaviorProps extends JSX.HTMLAttributes<HTMLDivElement> {
 /**
  * This is a variant of the `Light` component but its props describe behavior
  * rather than its attributes. For instance, instead of controlling brightness,
- * size, position, and rotation individually, change `focus` to control all of them. 
+ * size, position, and rotation individually, change `focus` to control all of them.
  */
-export const LightAuto: Component<LightBehaviorProps> = (p) => {
-	const pDefaults = mergeProps({
-		// factors:
-		focus: 1, strength: 0.5, jitter: 1,
-		limits: {
-			focus: 500, strength: 500, jitter: 50,
+export const LightAuto: Component<LightBehaviorProps> = p => {
+	const pDefaults = mergeProps(
+		{
+			// factors:
+			focus: 1,
+			strength: 0.5,
+			jitter: 1,
+			limits: {
+				focus: 500,
+				strength: 500,
+				jitter: 50,
+			},
 		},
-	}, p)
+		p
+	)
 	const [props, lightRelated] = splitProps(pDefaults, ["focus", "strength", "jitter", "limits", "options"])
 	const limit = (prop: keyof typeof props["limits"], factor: number) => factor * props.limits[prop]
 	const timeline = createMemo(() => {
 		const rotate = random(0, 360)
 		const time: [ts: number, opts: Partial<LightOptions>][] = [
-			[0, {
-				brightness: 0,
-				offset: [0, 0],
-				rotate: 0,
-			}],
-			[750, {
-				brightness: 1.5,
-				offset: [random(limit("focus", props.focus) * -1), random(limit("focus", props.focus))],
-				rotate,
-			}],
+			[
+				0,
+				{
+					brightness: 0,
+					offset: [0, 0],
+					rotate: 0,
+				},
+			],
+			[
+				750,
+				{
+					brightness: 1.5,
+					offset: [random(limit("focus", props.focus) * -1), random(limit("focus", props.focus))],
+					rotate,
+				},
+			],
 			[1000, { rotate, offset: [0, 0] }],
 		]
 		return time
 	})
 	const ctx = useLights()
 	// eslint-disable-next-line solid/components-return-once
-	if (!ctx) { return <></> }
+	if (!ctx) {
+		return <></>
+	}
 	const [, env] = ctx
 	const [current, setCurrent] = createSignal<Partial<LightOptions>>({})
 	createEffect(() => {
-		if (!env.playing) { return }
-		const duration = timeline().map(([ts]) => ts).reduce((a, b) => a > b ? a : b)
+		if (!env.playing) {
+			return
+		}
+		const duration = timeline()
+			.map(([ts]) => ts)
+			.reduce((a, b) => (a > b ? a : b))
 		// play timeline
 		for (const [ts, opts] of timeline()) {
-			setTimeout(() => {
-				setCurrent(opts)
-			}, ts === 0 ? ts : clamp(random(ts - 100, ts + 150), 0, Infinity))
+			setTimeout(
+				() => {
+					setCurrent(opts)
+				},
+				ts === 0 ? ts : clamp(random(ts - 100, ts + 150), 0, Infinity)
+			)
 		}
 		// start jitter effect
 		let interval: number | undefined

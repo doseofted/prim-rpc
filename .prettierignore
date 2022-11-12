@@ -8,3 +8,5 @@
 **/.task
 **/.turbo
 /data
+pnpm-*.yaml
+pnpm-*.yml

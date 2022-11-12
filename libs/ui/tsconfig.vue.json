@@ -1,10 +1,8 @@
 {
-  "extends": "./tsconfig.base.json",
-  "compilerOptions": {
+	"extends": "./tsconfig.base.json",
+	"compilerOptions": {
 		"composite": true,
-    "jsx": "preserve",
-  },
-  "include": [
-    "src/generated/vue/vue3/**/*"
-  ],
+		"jsx": "preserve"
+	},
+	"include": ["src/generated/vue/vue3/**/*"]
 }

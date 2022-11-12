@@ -30,20 +30,20 @@ const Index: Component = () => {
 			options={{ size: size(), brightness: brightness(), offset: offsetFormat(), rotate: rotate(), delay: 50 }}
 			// colors={["#ff0", "#0ff", "#f0f", "#f00", "#0f0", "#00f"]}
 			fps={fps}
-		// background="transparent"
+			// background="transparent"
 		>
 			<div class="lights-and-stuff flex relative flex-wrap justify-center">
-				<For each={lights()}>{() => (
-					<Light
-						style={{ width: sizeStyle(), height: sizeStyle() }}
-						class="bg-transparent border-white m-6 border-2 rounded-full text-white flex justify-center items-center"
-					/>
-				)}</For>
+				<For each={lights()}>
+					{() => (
+						<Light
+							style={{ width: sizeStyle(), height: sizeStyle() }}
+							class="bg-transparent border-white m-6 border-2 rounded-full text-white flex justify-center items-center"
+						/>
+					)}
+				</For>
 			</div>
 			<div class="more-lights flex relative flex-wrap justify-center mt-80">
-				<For each={lights()}>{() => (
-					<LightAuto class="w-12" />
-				)}</For>
+				<For each={lights()}>{() => <LightAuto class="w-12" />}</For>
 			</div>
 			{/* eslint-disable-next-line @typescript-eslint/no-unsafe-assignment */}
 			<Docs docs={docs} />

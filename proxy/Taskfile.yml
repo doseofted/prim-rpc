@@ -5,7 +5,6 @@ env:
   ADMIN_EMAIL: "ted@doseofted.com"
 
 tasks:
-
   build:
     desc: "Build Caddy image for production use"
     vars:

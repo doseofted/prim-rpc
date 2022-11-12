@@ -2,7 +2,9 @@ import type { Emitter } from "mitt"
 import type { Schema } from "type-fest"
 
 // SECTION RPC call and result structure
-interface RpcBase { id?: string|number }
+interface RpcBase {
+	id?: string | number
+}
 
 export interface RpcCall<Method = string, Params = unknown> extends RpcBase {
 	method: Method
@@ -24,7 +26,7 @@ export enum PromiseResolveStatus {
 
 export interface PrimHttpQueueItem {
 	rpc: RpcCall
-	result: Promise<RpcAnswer>,
+	result: Promise<RpcAnswer>
 	resolved: PromiseResolveStatus
 	blobs: BlobRecords
 }
@@ -59,18 +61,27 @@ export interface JsonHandler {
 // type JsonHandlerOptional  = Partial<JsonHandler>
 /** The record key is a string prefixed with `_bin_` and the value is the Blob */
 export type BlobRecords = Record<string, Blob>
-export type PrimClientFunction<J = JsonHandler> = (endpoint: string, jsonBody: RpcCall|RpcCall[], jsonHandler: J, blobs?: BlobRecords) => Promise<RpcAnswer|RpcAnswer[]>
-export type PrimSocketFunction<J = JsonHandler> = (endpoint: string, events: PrimWebSocketFunctionEvents, jsonHandler: J) => ({
+export type PrimClientFunction<J = JsonHandler> = (
+	endpoint: string,
+	jsonBody: RpcCall | RpcCall[],
+	jsonHandler: J,
+	blobs?: BlobRecords
+) => Promise<RpcAnswer | RpcAnswer[]>
+export type PrimSocketFunction<J = JsonHandler> = (
+	endpoint: string,
+	events: PrimWebSocketFunctionEvents,
+	jsonHandler: J
+) => {
 	/**
 	 * Send given RPC call over the WebSocket
-	 * 
+	 *
 	 * @param message The RPC call to send (use JSON handler provided to stringify before sending over WebSocket)
 	 * @param blobs If given RPC has binary data it will be referenced here by its string identifier in the RPC
 	 */
 	send: (message: RpcCall, blobs?: BlobRecords) => void
-})
+}
 
-type OptionsPresetFallback = "development"|"production"
+type OptionsPresetFallback = "development" | "production"
 
 export interface PrimOptions<M extends object = object, J extends JsonHandler = JsonHandler> {
 	/**
@@ -97,14 +108,14 @@ export interface PrimOptions<M extends object = object, J extends JsonHandler = 
 	/**
 	 * If zero, don't batch RPC calls. If non-zero then wait a short time, in milliseconds, before sending HTTP requests.
 	 * This comes in handy when sending multiple RPC calls at once that do not depend on one another.
-	 * 
+	 *
 	 * As a recommendation, keep this time very low (under `15`ms). Default is `0` (don't batch).
 	 */
 	clientBatchTime?: number
 	/**
 	 * Usually the default of `JSON` is sufficient but parsing/conversion of more complex types may benefit from other
 	 * JSON handling libraries. The same handler must be used on both the server and client.
-	 * 
+	 *
 	 * For example, `superjson` is great for parsing additional JavaScript types, `@msgpack/msgpack` may be useful for
 	 * binary data, `devalue` is useful for cyclical references, or `destr` for someone security-minded.
 	 * These are only examples and you can use any JSON handler.
@@ -117,12 +128,12 @@ export interface PrimOptions<M extends object = object, J extends JsonHandler = 
 	/**
 	 * You may override the HTTP framework used for RPC requests (the default is the Fetch API).
 	 * A custom client should:
-	 * 
+	 *
 	 *    1. Stringify given RPC with chosen JSON handler
 	 *    2. Send off request to the server
 	 *    3. Parse given response with chosen JSON handler
 	 *    4. Resolve on success and reject on error
-	 * 
+	 *
 	 * You may also choose to use another protocol altogether as long as it can become compatible with the interface
 	 * that Prim-RPC expects (for instance: inter-process communication).
 	 *
@@ -140,7 +151,7 @@ export interface PrimOptions<M extends object = object, J extends JsonHandler = 
 	 *    2. Call `events.connected()` and `events.ended()` when websocket is opened and closed
 	 *    3. Parse messages received using given JSON handler and call `events.response()` with the result
 	 *    4. Create a function that sends messages over WebSocket. Return this as a method on an object named `.send()`
-	 * 
+	 *
 	 * You may also choose to use another protocol altogether as long as it can become compatible with the interface
 	 * that Prim-RPC expects (for instance: HTTP long-polling).
 	 *
@@ -156,14 +167,14 @@ export interface PrimOptions<M extends object = object, J extends JsonHandler = 
 	 * Specify an object that follows the structure of the provided module where values are flags specifying whether
 	 * to allow RPC to that method. For instance, if a module exports a single function `sayHello()`, the allow-list
 	 * would look like `{ sayHello: true }`.
-	 * 
+	 *
 	 * If given function specifies a `.rpc` boolean property with a value of `true` then those functions do not need
 	 * to be added to the allow-list.
 	 */
 	allowList?: Schema<M, boolean>
 	/**
 	 * In JavaScript, functions are objects. Those objects can have methods. This means that functions can have methods.
-	 * 
+	 *
 	 * By default, methods on functions are not allowed as RPC. You may optionally allow some methods by specifying
 	 * a list of those names in this option. For instance, if this option is set to `["docs"]` then that means you
 	 * could call `sayHello.docs()` where `sayHello` is another function.
@@ -174,7 +185,7 @@ export interface PrimOptions<M extends object = object, J extends JsonHandler = 
 	 * The default is `true` unless a custom JSON handler is set. You may set this option explicitly to always use your
 	 * preference. When set to `false`, thrown errors are returned to client as an empty object unless your JSON handler
 	 * can stringify `Error` objects.
-	 * 
+	 *
 	 * This option must be set to the same value on the server and client.
 	 */
 	handleError?: boolean
@@ -184,7 +195,7 @@ export interface PrimOptions<M extends object = object, J extends JsonHandler = 
 	 * Prim RPC creates RPC calls formatted as JSON. JSON, by itself, doesn't support binary data. When a function is
 	 * called that has `Blob`-like parameters and this option is `true` (the default), this library will extract that
 	 * data into a separate object and replace the binary data in the JSON with a string identifier (prefixed `_bin_`).
-	 * 
+	 *
 	 * It is up to the provided client/server plugins as to how it will handle this data when this option is `true`.
 	 * When this option is set to `false`, it is up to your configured JSON handler to handle that binary data.
 	 *
@@ -208,7 +219,7 @@ export interface PrimOptions<M extends object = object, J extends JsonHandler = 
 // SECTION Server calls
 /**
  * Common options for servers that are just lightweight extensions of "node:http".
- * 
+ *
  * For GET requests, `.url` and `.method` will be used.
  * For POST requests, `.body` will be used.
  */
@@ -232,8 +243,14 @@ export interface CommonServerResponseOptions {
 // !SECTION
 
 // SECTION Server options
-export type PrimServerMethodHandler<T extends object = object> = (actions: PrimServerEvents, options?: T) => void|Promise<void>
-export type PrimServerCallbackHandler<T = unknown> = (events: PrimServerSocketEvents, options?: T) => void|Promise<void>
+export type PrimServerMethodHandler<T extends object = object> = (
+	actions: PrimServerEvents,
+	options?: T
+) => void | Promise<void>
+export type PrimServerCallbackHandler<T = unknown> = (
+	events: PrimServerSocketEvents,
+	options?: T
+) => void | Promise<void>
 
 export interface PrimServerOptions<C = unknown> extends PrimOptions {
 	/**
@@ -263,7 +280,7 @@ export interface PrimServerOptions<C = unknown> extends PrimOptions {
 }
 
 export type PrimServerSocketAnswer = (result: string) => void
-export type PrimServerSocketAnswerRpc = (result: RpcAnswer|RpcAnswer[]) => void
+export type PrimServerSocketAnswerRpc = (result: RpcAnswer | RpcAnswer[]) => void
 interface PrimServerConnectedActions<Context = unknown> {
 	/**
 	 * Call when the connection to the server terminates
@@ -282,7 +299,7 @@ interface PrimServerConnectedActions<Context = unknown> {
 	 * Given an RPC call, get an answer back, to be sent in callback. This is an
 	 * alternative to `.call()` (useful for debugging or non-server contexts)
 	 */
-	rpc: (data: RpcCall|RpcCall[], send: PrimServerSocketAnswerRpc, context?: Context) => void
+	rpc: (data: RpcCall | RpcCall[], send: PrimServerSocketAnswerRpc, context?: Context) => void
 }
 export interface PrimServerSocketEvents {
 	connected: () => PrimServerConnectedActions
@@ -294,16 +311,20 @@ export interface PrimServerActionsBase<Context = unknown> {
 	 * Step 1: Passing common parameters used by server frameworks to Prim, gather the
 	 * prepared RPC call from the request. See `.prepareRpc()` for next step.
 	 */
-	prepareCall: (given: CommonServerSimpleGivenOptions) => RpcCall|RpcCall[]
+	prepareCall: (given: CommonServerSimpleGivenOptions) => RpcCall | RpcCall[]
 	/**
 	 * Step 2: Using the result of `.prepareCall()`, use the RPC to get a result from Prim.
 	 * See `.prepareSend()` for next step.
 	 */
-	prepareRpc: (given: RpcCall|RpcCall[], blobs?: Record<string, unknown>|null, context?: Context) => Promise<RpcAnswer|RpcAnswer[]>
+	prepareRpc: (
+		given: RpcCall | RpcCall[],
+		blobs?: Record<string, unknown> | null,
+		context?: Context
+	) => Promise<RpcAnswer | RpcAnswer[]>
 	/**
 	 * Step 3: Using the result of `.rpc()`, prepare the result to be sent with the server framework.
 	 */
-	prepareSend: (given: RpcAnswer|RpcAnswer[]) => CommonServerResponseOptions
+	prepareSend: (given: RpcAnswer | RpcAnswer[]) => CommonServerResponseOptions
 	// TODO: consider adding `.handleCallback()` as optional next step, if server actions are called directly
 	// instead of using a `methodHandler` or `callbackHandler` (likely to only be used for testing directly)
 }
@@ -313,10 +334,14 @@ export interface PrimServerActionsExtended<Context = unknown> extends PrimServer
 	 * This function prepares a useable result for common server frameworks
 	 * using common options that most servers provide. It is a shortcut for
 	 * other processing steps of Prim-RPC.
-	 * 
+	 *
 	 * This calls, in order, `.prepareCall()`, `.rpc()`, and `.prepareSend()`
 	 */
-	call: (given: CommonServerSimpleGivenOptions, blobs?: Record<string, unknown>|null, context?: Context) => Promise<CommonServerResponseOptions>
+	call: (
+		given: CommonServerSimpleGivenOptions,
+		blobs?: Record<string, unknown> | null,
+		context?: Context
+	) => Promise<CommonServerResponseOptions>
 }
 
 export interface PrimServerEvents {

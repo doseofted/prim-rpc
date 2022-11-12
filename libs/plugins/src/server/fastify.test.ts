@@ -6,7 +6,6 @@ import { createPrimServer } from "@doseofted/prim-rpc"
 import { fastifyPrimPlugin, primMethodFastify } from "./fastify"
 import queryString from "query-string"
 
-
 describe("Fastify plugin is functional as Prim Plugin", () => {
 	const fastify = Fastify()
 	createPrimServer({
@@ -16,10 +15,14 @@ describe("Fastify plugin is functional as Prim Plugin", () => {
 	beforeEach(async () => {
 		await fastify.ready()
 		await new Promise(resolve => {
-			fastify.server.listen(0, "localhost", () => { resolve(true) })
+			fastify.server.listen(0, "localhost", () => {
+				resolve(true)
+			})
 		})
 	})
-	afterEach(() => { fastify.server.close() })
+	afterEach(() => {
+		fastify.server.close()
+	})
 	const params = { greeting: "What's up", name: "Ted" }
 	const expected = { id: 1, result: module.sayHello(params) }
 	test("registered as Prim Plugin", async () => {
@@ -47,10 +50,14 @@ describe("Fastify plugin is functional as Fastify plugin", async () => {
 	beforeEach(async () => {
 		await fastify.ready()
 		await new Promise(resolve => {
-			fastify.server.listen(0, "localhost", () => { resolve(true) })
+			fastify.server.listen(0, "localhost", () => {
+				resolve(true)
+			})
 		})
 	})
-	afterEach(() => { fastify.server.close() })
+	afterEach(() => {
+		fastify.server.close()
+	})
 	const params = { greeting: "What's up", name: "Ted" }
 	const expected = { id: 1, result: module.sayHello(params) }
 	test("registered as Fastify Plugin", async () => {
@@ -78,10 +85,14 @@ describe("Fastify plugin works with over GET/POST", () => {
 	beforeEach(async () => {
 		await fastify.ready()
 		await new Promise(resolve => {
-			fastify.server.listen(0, "localhost", () => { resolve(true) })
+			fastify.server.listen(0, "localhost", () => {
+				resolve(true)
+			})
 		})
 	})
-	afterEach(() => { fastify.server.close() })
+	afterEach(() => {
+		fastify.server.close()
+	})
 	const params = { greeting: "What's up", name: "Ted" }
 	const expected = { id: 1, result: module.sayHello(params) }
 	test("POST requests", async () => {
@@ -103,10 +114,7 @@ describe("Fastify plugin works with over GET/POST", () => {
 			url: "/prim/sayHello",
 			query: { ...params, "-": 1 },
 		})
-		const response = await request(fastify.server)
-			.get(url)
-			.send()
-			.set("accept", "application/json")
+		const response = await request(fastify.server).get(url).send().set("accept", "application/json")
 		// eslint-disable-next-line @typescript-eslint/no-unsafe-member-access
 		expect(response.headers["content-type"]).toContain("application/json")
 		expect(response.status).toEqual(200)

@@ -1,35 +1,35 @@
 body {
-  margin: 0;
+	margin: 0;
 }
 
 @font-face {
-  font-family: "Montserrat";
-  font-style: normal;
-  font-weight: 100 900;
-  font-display: swap;
-  src: url("/fonts/Montserrat-VariableFont_wght.ttf") format("truetype");
+	font-family: "Montserrat";
+	font-style: normal;
+	font-weight: 100 900;
+	font-display: swap;
+	src: url("/fonts/Montserrat-VariableFont_wght.ttf") format("truetype");
 }
 
 @font-face {
-  font-family: "Montserrat";
-  font-style: oblique;
-  font-weight: 100 900;
-  font-display: swap;
-  src: url("/fonts/Montserrat-Italic-VariableFont_wght.ttf") format("truetype");
+	font-family: "Montserrat";
+	font-style: oblique;
+	font-weight: 100 900;
+	font-display: swap;
+	src: url("/fonts/Montserrat-Italic-VariableFont_wght.ttf") format("truetype");
 }
 
 @font-face {
-  font-family: "Plus Jakarta Sans";
-  font-style: normal;
-  font-weight: 100 900;
-  font-display: swap;
-  src: url("/fonts/PlusJakartaSans-Variable.ttf") format("truetype");
+	font-family: "Plus Jakarta Sans";
+	font-style: normal;
+	font-weight: 100 900;
+	font-display: swap;
+	src: url("/fonts/PlusJakartaSans-Variable.ttf") format("truetype");
 }
 
 @font-face {
-  font-family: "Plus Jakarta Sans";
-  font-style: oblique;
-  font-weight: 100 900;
-  font-display: swap;
-  src: url("/fonts/PlusJakartaSans-VariableItalic.ttf") format("truetype");
+	font-family: "Plus Jakarta Sans";
+	font-style: oblique;
+	font-weight: 100 900;
+	font-display: swap;
+	src: url("/fonts/PlusJakartaSans-VariableItalic.ttf") format("truetype");
 }

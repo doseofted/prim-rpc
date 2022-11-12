@@ -29,13 +29,11 @@ const Index: Component = () => {
 			options={{ size: 250, brightness: brightness(), offset: [offsetX(), 0], delay: 50 }}
 			colors={["#ff0", "#0ff", "#f0f"]}
 			fps={fps}
-			background="transparent"
-		>
+			background="transparent">
 			<div class="bg-black w-full h-100vh flex justify-center items-center">
 				<Light />
 			</div>
 		</Lights>
-
 	)
 }
 

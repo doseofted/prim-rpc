@@ -10,12 +10,8 @@
 		"moduleResolution": "Node",
 		"esModuleInterop": true,
 		"isolatedModules": true,
-		"lib": ["DOM", "ES2020"],
+		"lib": ["DOM", "ES2020"]
 	},
-	"include": [
-		"src/**/*",
-	],
-	"exclude": [
-		"src/**/*.test.ts"
-	]
+	"include": ["src/**/*"],
+	"exclude": ["src/**/*.test.ts"]
 }

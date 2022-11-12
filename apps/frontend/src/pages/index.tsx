@@ -9,9 +9,7 @@ const Index: Component = () => {
 			<Lights options={{ size: 800 }}>
 				<div class="relative min-h-screen w-full">
 					<div class="fixed container w-full h-full inset-0 mx-auto grid grid-cols-12 border-x border-white/40 px-4 gap-4">
-						<For each={new Array(12)}>{() => (
-							<div class="border-x border-white/40" />
-						)}</For>
+						<For each={new Array(12)}>{() => <div class="border-x border-white/40" />}</For>
 					</div>
 					<div class="relative min-h-100vh container mx-auto grid grid-cols-12 grid-rows-[auto_1fr_auto] px-4 gap-4">
 						<div class="col-span-12">
@@ -34,7 +32,10 @@ const Index: Component = () => {
 							(placeholder)
 						</div>
 						<div class="col-span-12">
-							<p class="font-title text-[6rem] font-600 color-white uppercase text-right">Backend,<br /> Meet Frontend.</p>
+							<p class="font-title text-[6rem] font-600 color-white uppercase text-right">
+								Backend,
+								<br /> Meet Frontend.
+							</p>
 						</div>
 					</div>
 				</div>

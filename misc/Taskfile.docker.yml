@@ -1,7 +1,6 @@
 version: 3
 
 tasks:
-
   base:build:
     desc: "Build base image with installed node modules and built dependencies."
     cmds:

@@ -12,23 +12,16 @@ module.exports = {
 				},
 				project: "./apps/frontend/tsconfig.json",
 			},
-			plugins: [
-				"@typescript-eslint",
-				"solid",
-			],
-			extends: [
-				"eslint:recommended",
-				"plugin:@typescript-eslint/recommended",
-				"plugin:solid/typescript",
-			],
+			plugins: ["@typescript-eslint", "solid"],
+			extends: ["eslint:recommended", "plugin:@typescript-eslint/recommended", "plugin:solid/typescript"],
 			env: {
-				"browser": true,
+				browser: true,
 			},
 		},
 		{
 			files: ["*.tsx"],
 			rules: {
-			// NOTE: this is a workaround until I find out how to let ESLint know JSX element's return types
+				// NOTE: this is a workaround until I find out how to let ESLint know JSX element's return types
 				"@typescript-eslint/no-unsafe-return": "off",
 			},
 		},

@@ -18,9 +18,7 @@ export default function Docs(props: Props) {
 	return (
 		<div>
 			<p>{state.moduleName}</p>
-			<For each={Object.entries(state.docs?.props ?? {})}>{(given) =>
-				<p key={given[0]}>{given[0]}</p>
-			}</For>
+			<For each={Object.entries(state.docs?.props ?? {})}>{given => <p key={given[0]}>{given[0]}</p>}</For>
 		</div>
 	)
 }

@@ -6,7 +6,7 @@ import Static from "@fastify/static"
 
 const app = Fastify()
 const projectPath = dirname(fileURLToPath(import.meta.url))
-await app.register(Static,{
+await app.register(Static, {
 	root: joinPath(projectPath, "dist"),
 })
 

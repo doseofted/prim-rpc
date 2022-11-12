@@ -5,11 +5,9 @@ test("should say hello", () => {
 	expect(sayHello({ greeting: "Hey", name: "Ted" })).toBe("Hey Ted!")
 })
 
-
 test("should say hello, using alternate syntax", () => {
 	expect(sayHelloAlternative("Hey", "Ted")).toBe("Hey Ted!")
 })
-
 
 test("oops should throw", () => {
 	expect(() => oops()).toThrowError(new Error("My bad."))
@@ -18,9 +16,11 @@ test("oops should throw", () => {
 test("should use callbacks", async () => {
 	await new Promise<void>(resolve => {
 		const messages: string[] = []
-		function cb (message: string) {
+		function cb(message: string) {
 			messages.push(message)
-			if (messages.length < 2) { return }
+			if (messages.length < 2) {
+				return
+			}
 			expect(messages).toEqual(["You're using Prim.", "Still using Prim!"])
 			resolve()
 		}
@@ -32,9 +32,11 @@ test("should type hello", async () => {
 	await new Promise<void>(resolve => {
 		const message = "Hello"
 		const letters: string[] = []
-		function cb (letter: string) {
+		function cb(letter: string) {
 			letters.push(letter)
-			if (letters.length < message.length) { return }
+			if (letters.length < message.length) {
+				return
+			}
 			expect(letters.join("")).toEqual(message)
 			resolve()
 		}

@@ -5,7 +5,7 @@ import { defineConfig } from "unocss"
 const config = defineConfig({
 	theme: {
 		fontFamily: {
-			sans: ["\"Plus Jakarta Sans\"", "sans-serif"],
+			sans: ['"Plus Jakarta Sans"', "sans-serif"],
 			title: ["Montserrat", "sans-serif"],
 		},
 		colors: {

@@ -3,7 +3,8 @@ import { $ } from "zx"
 
 /** @type {{ [processName: string]: import("zx").ProcessPromise }} */
 const processes = {}
-process.on("SIGTERM", () => { // sigterm received from docker-compose
+process.on("SIGTERM", () => {
+	// sigterm received from docker-compose
 	Object.values(processes).forEach(proc => {
 		proc.kill("SIGINT") // send interrupt, as if used interactively
 	})

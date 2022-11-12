@@ -1,44 +1,44 @@
 {
-  "name": "@doseofted/prim-rpc",
-  "version": "0.0.1",
-  "description": "It's just function calls. It's RPC designed for JS. Plays well with others.",
-  "license": "UNLICENSED",
-  "author": {
-    "name": "Ted Klingenberg",
-    "email": "ted@doseofted.com",
-    "url": "https://doseofted.com/"
-  },
-  "scripts": {
-    "watch": "tsup --watch --config build.config.js",
-    "build": "tsup --config build.config.js",
-    "check": "tsc --noEmit",
-    "test": "vitest run",
-    "testing": "vitest watch",
-    "lint": "eslint ."
-  },
-  "dependencies": {
-    "defu": "^6.1.0",
-    "lodash-es": "^4.17.21",
-    "mitt": "^3.0.0",
-    "nanoid": "^4.0.0",
-    "proxy-deep": "^3.1.1",
-    "query-string": "^7.1.1",
-    "serialize-error": "^11.0.0"
-  },
-  "devDependencies": {
-    "@doseofted/prim-example": "workspace:*",
-    "@types/lodash-es": "^4.17.6",
-    "superjson": "^1.11.0",
-    "type-fest": "^3.1.0"
-  },
-  "type": "module",
-  "exports": {
-    ".": "./dist/index.js",
-    "./package.json": "./package.json"
-  },
-  "module": "./dist/index.js",
-  "types": "./dist/index.d.ts",
-  "files": [
-    "dist"
-  ]
+	"name": "@doseofted/prim-rpc",
+	"version": "0.0.1",
+	"description": "It's just function calls. It's RPC designed for JS. Plays well with others.",
+	"license": "UNLICENSED",
+	"author": {
+		"name": "Ted Klingenberg",
+		"email": "ted@doseofted.com",
+		"url": "https://doseofted.com/"
+	},
+	"scripts": {
+		"watch": "tsup --watch --config build.config.js",
+		"build": "tsup --config build.config.js",
+		"check": "tsc --noEmit",
+		"test": "vitest run",
+		"testing": "vitest watch",
+		"lint": "eslint ."
+	},
+	"dependencies": {
+		"defu": "^6.1.0",
+		"lodash-es": "^4.17.21",
+		"mitt": "^3.0.0",
+		"nanoid": "^4.0.0",
+		"proxy-deep": "^3.1.1",
+		"query-string": "^7.1.1",
+		"serialize-error": "^11.0.0"
+	},
+	"devDependencies": {
+		"@doseofted/prim-example": "workspace:*",
+		"@types/lodash-es": "^4.17.6",
+		"superjson": "^1.11.0",
+		"type-fest": "^3.1.0"
+	},
+	"type": "module",
+	"exports": {
+		".": "./dist/index.js",
+		"./package.json": "./package.json"
+	},
+	"module": "./dist/index.js",
+	"types": "./dist/index.d.ts",
+	"files": [
+		"dist"
+	]
 }

@@ -10,7 +10,7 @@ export default defineConfig(options => ({
 	sourcemap: true,
 	format: ["esm"],
 	clean: true,
-	async onSuccess () {
+	async onSuccess() {
 		await $`pnpm document`
 	},
 }))

@@ -6,7 +6,6 @@
 // it's possible that roles could be reversed (server in Worker, client on main thread)
 // and that may require a separate plugin (to figure out later)
 
-
 // NOTE: below code isn't even kinda working yet (work on later)
 
 // export const createPrimWebWorkerClient = (options: MethodWebWorkerOptions) => {

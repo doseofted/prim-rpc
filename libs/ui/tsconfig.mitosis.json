@@ -1,9 +1,9 @@
 {
-  "extends": "./tsconfig.base.json",
+	"extends": "./tsconfig.base.json",
 	"compilerOptions": {
 		"composite": true,
 		"jsx": "preserve",
-		"jsxImportSource": "@builder.io/mitosis",
+		"jsxImportSource": "@builder.io/mitosis"
 	},
 	"include": ["src/components/*.lite.tsx"]
 }

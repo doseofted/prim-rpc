@@ -9,17 +9,14 @@ import { MetaProvider } from "@solidjs/meta"
 import pages from "~solid-pages"
 
 // eslint-disable-next-line @typescript-eslint/no-unnecessary-type-assertion
-render(
-	() => {
-		const Routes = useRoutes(pages)
-		return (
-			<MetaProvider>
-				<Title>Prim+RPC</Title>
-				<Router>
-					<Routes />
-				</Router>
-			</MetaProvider>
-		)
-	},
-	document.getElementById("root"),
-)
+render(() => {
+	const Routes = useRoutes(pages)
+	return (
+		<MetaProvider>
+			<Title>Prim+RPC</Title>
+			<Router>
+				<Routes />
+			</Router>
+		</MetaProvider>
+	)
+}, document.getElementById("root"))

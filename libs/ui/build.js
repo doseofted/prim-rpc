@@ -4,7 +4,9 @@ import { debounce } from "lodash-es"
 import path from "node:path"
 
 const runMitosis = async (_event = "none", path) => {
-	if (!(typeof path === "undefined" || path.endsWith(".lite.tsx"))) { return }
+	if (!(typeof path === "undefined" || path.endsWith(".lite.tsx"))) {
+		return
+	}
 	await $`pnpm mitosis build --config mitosis.config.cjs`
 }
 await runMitosis()

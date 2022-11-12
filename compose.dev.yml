@@ -14,7 +14,7 @@ services:
       - "2019:2019"
 
   postgres:
-    ports: 
+    ports:
       - "5432:5432"
 
   # libraries is a development-only image used to easily rebuild dependencies

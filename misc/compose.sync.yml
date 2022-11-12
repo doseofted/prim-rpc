@@ -1,7 +1,6 @@
 version: "3"
 
 services:
-
   libraries:
     volumes:
       # dist folder of each dependency to sync to other containers

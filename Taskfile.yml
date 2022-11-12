@@ -5,7 +5,6 @@ dotenv:
   - ".env"
 
 includes:
-
   # Project-wide includes
   dev: ./misc/Taskfile.dev.yml
   docker: ./misc/Taskfile.docker.yml
@@ -47,7 +46,6 @@ includes:
     optional: true
 
 tasks:
-
   default:
     cmds:
       - "task --list"
