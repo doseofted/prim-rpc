@@ -26,6 +26,7 @@
   },
   "devDependencies": {
     "@builder.io/eslint-plugin-mitosis": "^0.0.11",
+    "@types/eslint": "^8.4.10",
     "@typescript-eslint/eslint-plugin": "^5.42.0",
     "@typescript-eslint/parser": "^5.42.0",
     "@vitest/ui": "^0.24.5",

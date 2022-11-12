@@ -1,10 +1,22 @@
+// @ts-check
 // SECTION utilities
-/** Disable ESLint rule and enable TypeScript-ESLint version instead as long as `js` argument is `false`. */
+/**
+ * Disable ESLint rule and enable TypeScript-ESLint version instead as long as `js` argument is `false`.
+ *
+ * @param {string} name
+ * @param {import("eslint").Linter.RuleEntry} opts
+ * @param {boolean} js
+ */
 const withBaseRule = (name, opts, js = false) => (js ? { [name]: opts } : {
 	[name]: "off",
 	[`@typescript-eslint/${name}`]: opts,
 })
-/** Given rule, return tuple with ESLint rule first, then TypeScript-ESLint version */
+/**
+ * Given rule, return tuple with ESLint rule first, then TypeScript-ESLint version
+ * 
+ * @param {string} name
+ * @param {import("eslint").Linter.RuleEntry} opts
+ */
 const rule = (name, opts) => [withBaseRule(name, opts, true), withBaseRule(name, opts)]
 // !SECTION utilities
 
@@ -46,10 +58,10 @@ const config = {
 		},
 	},
 	env: {
-		"node": true,
-		"es6": true,
+		browser: true,
+		es2021: true,
+		node: true,
 	},
-	rules: {},
 	overrides: [
 		{
 			files: ["*.js", "*.jsx", "*.mjs", "*.cjs"],
@@ -61,7 +73,7 @@ const config = {
 			},
 		},
 		{
-			files: ["*.ts", "*.tsx"],
+			files: ["*.ts", "*.tsx", "*.cts", "*.mts"],
 			parser: "@typescript-eslint/parser",
 			plugins: [
 				"@typescript-eslint",

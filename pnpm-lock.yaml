@@ -5,6 +5,7 @@ importers:
   .:
     specifiers:
       '@builder.io/eslint-plugin-mitosis': ^0.0.11
+      '@types/eslint': ^8.4.10
       '@typescript-eslint/eslint-plugin': ^5.42.0
       '@typescript-eslint/parser': ^5.42.0
       '@vitest/ui': ^0.24.5
@@ -33,6 +34,7 @@ importers:
       zx: 7.1.1
     devDependencies:
       '@builder.io/eslint-plugin-mitosis': 0.0.11_eslint@8.26.0
+      '@types/eslint': 8.4.10
       '@typescript-eslint/eslint-plugin': 5.42.0_6xw5wg2354iw4zujk2f3vyfrzu
       '@typescript-eslint/parser': 5.42.0_wyqvi574yv7oiwfeinomdzmc3m
       '@vitest/ui': 0.24.5
@@ -1832,6 +1834,13 @@ packages:
     resolution: {integrity: sha512-9AonUzyTjXXhEOa0DnqpzZi6VHlqKMswga9EXjpXnnqxwLtdvPPtlO8evrI5D9S6asFRCQ6v+wpiUKbw+vKqyg==}
     dependencies:
       '@types/ms': 0.7.31
+    dev: true
+
+  /@types/eslint/8.4.10:
+    resolution: {integrity: sha512-Sl/HOqN8NKPmhWo2VBEPm0nvHnu2LL3v9vKo8MEq0EtbJ4eVzGPl41VNPvn5E1i5poMk4/XD8UriLHpJvEP/Nw==}
+    dependencies:
+      '@types/estree': 1.0.0
+      '@types/json-schema': 7.0.11
     dev: true
 
   /@types/estree/1.0.0:
