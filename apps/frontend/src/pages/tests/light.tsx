@@ -1,6 +1,6 @@
 import { Component, createMemo, createSignal, For } from "solid-js"
-import { Docs } from "@doseofted/prim-ui/dist/react.js"
-import docs from "@doseofted/prim-example/docs.json"
+import { Docs } from "@doseofted/prim-ui/react"
+import docs from "@doseofted/prim-example/dist/docs.json"
 import { addFolderToPane, addSignalInput, fps } from "../../utils/tweakpane"
 import { Light, Lights } from "../../components/Lights"
 import { LightAuto } from "../../components/LightsExtended"

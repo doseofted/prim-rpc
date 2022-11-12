@@ -17,10 +17,15 @@ import type { Asyncify } from "type-fest"
 import { deserializeError } from "serialize-error"
 import { createPrimOptions } from "./options"
 import { handlePossibleBlobs } from "./blobs"
-import { PromiseResolveStatus }from "./interfaces"
+import { PromiseResolveStatus } from "./interfaces"
 import type {
-	RpcCall, PrimOptions, RpcAnswer, PrimWebSocketEvents, PrimHttpEvents,
-	PrimHttpQueueItem, BlobRecords,
+	RpcCall,
+	PrimOptions,
+	RpcAnswer,
+	PrimWebSocketEvents,
+	PrimHttpEvents,
+	PrimHttpQueueItem,
+	BlobRecords,
 } from "./interfaces"
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -29,8 +34,8 @@ type PromisifiedModule<ModuleGiven extends object> = {
 	[Key in keyof ModuleGiven]: ModuleGiven[Key] extends AnyFunction
 		? Asyncify<ModuleGiven[Key]>
 		: ModuleGiven[Key] extends object
-			? PromisifiedModule<ModuleGiven[Key]>
-			: ModuleGiven[Key]
+		? PromisifiedModule<ModuleGiven[Key]>
+		: ModuleGiven[Key]
 }
 /** Callback prefix */ export const CB_PREFIX = "_cb_"
 /** Binary prefix (Blob/File) */ export const BLOB_PREFIX = "_bin_"
@@ -39,14 +44,14 @@ type PromisifiedModule<ModuleGiven extends object> = {
  * Prim-RPC can be used to write plain functions on the server and then call them easily from the client.
  * On the server, Prim-RPC is given parameters from a server framework to find the designated function on each request.
  * On the client, Prim-RPC translates each function call into an RPC that Prim-RPC can understand from the server.
- * 
+ *
  * @param options Options for utilizing functions provided with Prim
  * @param givenModule If `options.server` is true, provide the module where functions should be resolved
  * @returns A wrapper function around the given module or type definitions used for calling functions from server
  */
 export function createPrimClient<
 	ModuleType extends OptionsType["module"] = object,
-	OptionsType extends PrimOptions = PrimOptions,
+	OptionsType extends PrimOptions = PrimOptions
 >(options?: OptionsType): PromisifiedModule<ModuleType> {
 	const configured = createPrimOptions(options)
 	const givenModule = configured.module as ModuleType
@@ -60,7 +65,9 @@ export function createPrimClient<
 				// if an argument is a callback reference, the created callback below will send the result back to client
 				const argsWithListeners = args.map(arg => {
 					const argIsReferenceToCallback = typeof arg === "string" && arg.startsWith(CB_PREFIX)
-					if (!argIsReferenceToCallback) { return arg }
+					if (!argIsReferenceToCallback) {
+						return arg
+					}
 					return (...cbArgs: unknown[]) => {
 						wsEvent.emit("response", { result: cbArgs, id: arg })
 						// NOTE: today, callbacks can be called but server cannot see return value given by client
@@ -76,7 +83,7 @@ export function createPrimClient<
 			// SECTION Client-side module handling
 			let callbacksWereGiven = false
 			const blobs: BlobRecords = {}
-			const params = args.map((arg) => {
+			const params = args.map(arg => {
 				if (configured.handleBlobs) {
 					const [replacedArg, newBlobs, givenFromFormElement] = handlePossibleBlobs(arg)
 					const blobEntries = Object.entries(newBlobs)
@@ -94,7 +101,9 @@ export function createPrimClient<
 				callbacksWereGiven = true
 				const callbackReferenceIdentifier = [CB_PREFIX, nanoid()].join("")
 				const handleRpcCallbackResult = (msg: RpcAnswer) => {
-					if (msg.id !== callbackReferenceIdentifier) { return }
+					if (msg.id !== callbackReferenceIdentifier) {
+						return
+					}
 					const targetArgs = Array.isArray(msg.result) ? msg.result : [msg.result]
 					Reflect.apply(callbackArg, undefined, targetArgs)
 					// NOTE: it's hard to unbind until I know that callback won't fire anymore
@@ -109,8 +118,10 @@ export function createPrimClient<
 			if (callbacksWereGiven) {
 				// TODO: add fallback in case client cannot support websocket
 				const result = new Promise<RpcAnswer>((resolve, reject) => {
-					wsEvent.on("response", (answer) => {
-						if (rpc.id !== answer.id) { return }
+					wsEvent.on("response", answer => {
+						if (rpc.id !== answer.id) {
+							return
+						}
 						if (answer.error) {
 							// TODO: if callback result, handle potential Errors (as given in options)
 							reject(answer.error)
@@ -126,8 +137,10 @@ export function createPrimClient<
 			// NOTE: if promises are extended, this also needs to be done on results returned with callbacks (above)
 			// NOTE: If I ever decide to chain methods, those methods would also have to extend the Promise
 			const result = new Promise<RpcAnswer>((resolve, reject) => {
-				httpEvent.on("response", (answer) => {
-					if (rpc.id !== answer.id) { return }
+				httpEvent.on("response", answer => {
+					if (rpc.id !== answer.id) {
+						return
+					}
 					if (answer.error) {
 						if (configured.handleError) {
 							answer.error = deserializeError(answer.error)
@@ -174,47 +187,62 @@ export function createPrimClient<
 	const httpEvent = configured.internal.clientEvent ?? mitt<PrimHttpEvents>()
 	let timer: ReturnType<typeof setTimeout>
 	// when an RPC is added to the list, prepare request to be sent to server (either immediately or in a batch)
-	httpEvent.on("queue", (given) => {
+	httpEvent.on("queue", given => {
 		queuedCalls.push(given)
 		batchedRequests()
 	})
 	const batchedRequests = () => {
-		if (timer) { return }
+		if (timer) {
+			return
+		}
 		timer = setTimeout(() => {
 			const rpcList = queuedCalls.filter(c => c.resolved === PromiseResolveStatus.Unhandled)
-			rpcList.forEach(r => { r.resolved = PromiseResolveStatus.Pending })
-			clearTimeout(timer); timer = undefined
+			rpcList.forEach(r => {
+				r.resolved = PromiseResolveStatus.Pending
+			})
+			clearTimeout(timer)
+			timer = undefined
 			const rpcCallList = rpcList.map(r => r.rpc)
 			const blobs: BlobRecords = {}
 			Object.assign(blobs, ...rpcList.map(r => r.blobs))
 			const { endpoint, jsonHandler } = configured
 			const rpcCallOrCalls = rpcCallList.length === 1 ? rpcCallList[0] : rpcCallList
-			configured.client(endpoint, rpcCallOrCalls, jsonHandler, blobs).then(answers => {
-				// return either the single result or the batched results to caller
-				if (Array.isArray(answers)) {
-					answers.forEach(answer => { httpEvent.emit("response", answer) })
-				} else {
-					const answer = answers
-					httpEvent.emit("response", answer)
-				}
-			}).catch((errors: RpcAnswer[]) => {
-				if (Array.isArray(errors)) {
-					// multiple errors given, return each error result to caller
-					errors.forEach(error => { httpEvent.emit("response", error) })
-				} else {
-					// one error was given but there may be multiple results, return that error to caller
-					// TODO: ensure only errored results are thrown and others resolve (when calls are batched)
+			configured
+				.client(endpoint, rpcCallOrCalls, jsonHandler, blobs)
+				.then(answers => {
+					// return either the single result or the batched results to caller
+					if (Array.isArray(answers)) {
+						answers.forEach(answer => {
+							httpEvent.emit("response", answer)
+						})
+					} else {
+						const answer = answers
+						httpEvent.emit("response", answer)
+					}
+				})
+				.catch((errors: RpcAnswer[]) => {
+					if (Array.isArray(errors)) {
+						// multiple errors given, return each error result to caller
+						errors.forEach(error => {
+							httpEvent.emit("response", error)
+						})
+					} else {
+						// one error was given but there may be multiple results, return that error to caller
+						// TODO: ensure only errored results are thrown and others resolve (when calls are batched)
+						rpcList.forEach(r => {
+							const error = errors
+							const id = r.rpc.id
+							httpEvent.emit("response", { id, error })
+						})
+					}
+				})
+				.finally(() => {
+					// mark all RPC in this list as resolved so they can be removed, without removing other pending requests
 					rpcList.forEach(r => {
-						const error = errors
-						const id = r.rpc.id
-						httpEvent.emit("response", { id, error })
+						r.resolved = PromiseResolveStatus.Resolved
 					})
-				}
-			}).finally(() => {
-				// mark all RPC in this list as resolved so they can be removed, without removing other pending requests
-				rpcList.forEach(r => { r.resolved = PromiseResolveStatus.Resolved })
-				removeFromArray(queuedCalls, given => given.resolved === PromiseResolveStatus.Resolved)
-			})
+					removeFromArray(queuedCalls, given => given.resolved === PromiseResolveStatus.Resolved)
+				})
 		}, configured.clientBatchTime)
 	}
 	// !SECTION

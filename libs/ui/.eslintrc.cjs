@@ -13,10 +13,7 @@ module.exports = {
 				},
 				project: "./libs/ui/tsconfig.json",
 			},
-			plugins: [
-				"@typescript-eslint",
-				"solid",
-			],
+			plugins: ["@typescript-eslint", "react"],
 			extends: [
 				"eslint:recommended",
 				"plugin:@typescript-eslint/recommended",
@@ -25,7 +22,7 @@ module.exports = {
 				"plugin:react-hooks/recommended",
 			],
 			env: {
-				"browser": true,
+				browser: true,
 			},
 			rules: {
 				"react/react-in-jsx-scope": ["off"],

@@ -1,52 +1,4 @@
 // @ts-check
-// SECTION utilities
-/**
- * Disable ESLint rule and enable TypeScript-ESLint version instead as long as `js` argument is `false`.
- *
- * @param {string} name
- * @param {import("eslint").Linter.RuleEntry} opts
- * @param {boolean} js
- */
-const withBaseRule = (name, opts, js = false) => (js ? { [name]: opts } : {
-	[name]: "off",
-	[`@typescript-eslint/${name}`]: opts,
-})
-/**
- * Given rule, return tuple with ESLint rule first, then TypeScript-ESLint version
- * 
- * @param {string} name
- * @param {import("eslint").Linter.RuleEntry} opts
- */
-const rule = (name, opts) => [withBaseRule(name, opts, true), withBaseRule(name, opts)]
-// !SECTION utilities
-
-/**
- * @type {{
- * 	typescript: Partial<import("eslint").Linter.RulesRecord>,
- * 	javascript: Partial<import("eslint").Linter.RulesRecord>
- * }}
- */
-const sharedRules = (() => {
-	let typescript = {}, javascript = {}
-	void [
-		// LINK https://typescript-eslint.io/rules/brace-style/
-		rule("brace-style", ["error", "1tbs", { "allowSingleLine": true }]),
-		// LINK https://typescript-eslint.io/rules/indent
-		rule("indent", ["error", "tab"]),
-		// LINK https://typescript-eslint.io/rules/quotes
-		rule("quotes", ["error", "double"]),
-		// LINK https://typescript-eslint.io/rules/comma-dangle
-		rule("comma-dangle", ["error", "always-multiline"]),
-		// LINK https://typescript-eslint.io/rules/semi
-		rule("semi", ["error", "never"]),
-		// LINK https://typescript-eslint.io/rules/no-unused-vars
-		rule("no-unused-vars", ["error", { argsIgnorePattern: "^_" }]),
-	].forEach(([js, ts]) => {
-		javascript = { ...javascript, ...js }; typescript = { ...typescript, ...ts }
-	})
-	return { typescript, javascript }
-})()
-
 /** @type {import("eslint").ESLint.ConfigData} */
 const config = {
 	root: true,
@@ -67,10 +19,8 @@ const config = {
 			files: ["*.js", "*.jsx", "*.mjs", "*.cjs"],
 			extends: [
 				"eslint:recommended",
+				"prettier",
 			],
-			rules: {
-				...sharedRules.javascript,
-			},
 		},
 		{
 			files: ["*.ts", "*.tsx", "*.cts", "*.mts"],
@@ -94,12 +44,12 @@ const config = {
 				"eslint:recommended",
 				"plugin:@typescript-eslint/recommended",
 				"plugin:@typescript-eslint/recommended-requiring-type-checking",
+				"prettier",
 			],
-			rules: {
-				...sharedRules.typescript,
-			},
 		},
 	],
 }
-// console.log(JSON.stringify(config, null, "  "))
+// Run command below to see final config
+// DEBUG_CONFIG=true node .eslintrc.cjs | jq
+if (process.env.DEBUG_CONFIG) { console.log(JSON.stringify(config, null, "  ")) }
 module.exports = config
