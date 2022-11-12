@@ -48,7 +48,6 @@
 			"source.fixAll": true
 		},
 		"editor.linkedEditing": true,
-		"editor.formatOnPaste": true,
 		"editor.formatOnSave": true,
 		"editor.defaultFormatter": "esbenp.prettier-vscode",
 		"workbench.editor.pinnedTabSizing": "compact",
@@ -62,6 +61,7 @@
 		"files.associations": {
 			"*.Corefile": "caddyfile"
 		},
+		"prettier.configPath": "🌳 Project Root/.prettierrc.json",
 		"peacock.color": "#57b0ca",
 		"peacock.affectStatusAndTitleBorders": true,
 		"peacock.affectTitleBar": false,

@@ -18,6 +18,9 @@ const config = {
 		{
 			files: ["*.js", "*.jsx", "*.mjs", "*.cjs"],
 			extends: ["eslint:recommended", "prettier"],
+			rules: {
+				"no-unused-vars": ["error", { argsIgnorePattern: "^_" }],
+			},
 		},
 		{
 			files: ["*.ts", "*.tsx", "*.cts", "*.mts"],
@@ -37,6 +40,10 @@ const config = {
 				"plugin:@typescript-eslint/recommended-requiring-type-checking",
 				"prettier",
 			],
+			rules: {
+				"no-unused-vars": ["off"],
+				"@typescript-eslint/no-unused-vars": ["error", { argsIgnorePattern: "^_" }],
+			},
 		},
 	],
 }
