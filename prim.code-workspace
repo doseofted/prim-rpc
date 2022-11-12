@@ -61,7 +61,6 @@
 		"files.associations": {
 			"*.Corefile": "caddyfile"
 		},
-		"prettier.configPath": "🌳 Project Root/.prettierrc.json",
 		"peacock.color": "#57b0ca",
 		"peacock.affectStatusAndTitleBorders": true,
 		"peacock.affectTitleBar": false,
