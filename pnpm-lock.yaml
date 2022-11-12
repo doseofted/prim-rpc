@@ -42,7 +42,7 @@ importers:
       '@vitest/ui': 0.24.5
       chokidar: 3.5.3
       eslint: 8.26.0
-      eslint-config-prettier: 8.5.0_eslint@8.26.0
+      eslint-config-prettier: 8.5.0
       eslint-plugin-react: 7.31.10_eslint@8.26.0
       eslint-plugin-react-hooks: 4.6.0
       eslint-plugin-solid: 0.8.0_wyqvi574yv7oiwfeinomdzmc3m
@@ -256,7 +256,7 @@ importers:
       '@testing-library/react': ^13.4.0
       '@types/lodash-es': ^4.17.6
       '@types/node': ^18.11.9
-      '@types/react': ^18.0.25
+      '@types/react': ^18.0.24
       '@types/react-dom': ^18.0.8
       '@types/testing-library__jest-dom': ^5.14.5
       '@vitejs/plugin-react': ^2.2.0
@@ -2327,7 +2327,7 @@ packages:
       '@unocss/scope': 0.46.3
       '@unocss/transformer-directives': 0.46.3
       magic-string: 0.26.7
-      vite: 3.2.2_sass@1.56.0
+      vite: 3.2.2
     transitivePeerDependencies:
       - rollup
     dev: true
@@ -4369,13 +4369,12 @@ packages:
       source-map: 0.6.1
     dev: true
 
-  /eslint-config-prettier/8.5.0_eslint@8.26.0:
+  /eslint-config-prettier/8.5.0:
     resolution: {integrity: sha512-obmWKLUNCnhtQRKc+tmnYuQl0pFU1ibYJQ5BGhTVB08bHe9wC8qUeG7c08dj9XX+AuPj1YSGSQIHl1pnDHZR0Q==}
-    hasBin: true
-    peerDependencies:
-      eslint: '>=7.0.0'
     dependencies:
       eslint: 8.26.0
+    transitivePeerDependencies:
+      - supports-color
     dev: true
 
   /eslint-plugin-react-hooks/4.6.0:
@@ -6085,7 +6084,6 @@ packages:
 
   /lz-string/1.4.4:
     resolution: {integrity: sha512-0ckx7ZHRPqb0oUm8zNr+90mtf9DQB60H1wMCjBtfi62Kl3a7JbHob6gA2bC+xRvZoOL+1hzUK8jeuEIQE8svEQ==}
-    hasBin: true
     dev: true
 
   /magic-string/0.25.9:
@@ -6901,7 +6899,6 @@ packages:
   /prettier/2.7.1:
     resolution: {integrity: sha512-ujppO+MkdPqoVINuDFDRLClm7D78qbDt0/NR+wp5FqEZOoTNAjPHWj17QRhu7geIHJfcNhRk1XVQmF8Bp3ye+g==}
     engines: {node: '>=10.13.0'}
-    hasBin: true
     dev: true
 
   /pretty-bytes/6.0.0:
@@ -7413,6 +7410,7 @@ packages:
 
   /semver/5.7.1:
     resolution: {integrity: sha512-sauaDf/PZdVgrLTNYHRtpXa1iRiKcaebiKQ1BJdpQlWH2lCvexQdX55snPFyK7QzpudqbCI0qXFfOasHdyNDGQ==}
+    hasBin: true
     dev: true
 
   /semver/6.3.0:
@@ -8974,7 +8972,6 @@ packages:
   /which/2.0.2:
     resolution: {integrity: sha512-BLI3Tl1TW3Pvl70l3yq3Y64i+awpwXqsGBYWkkqMtnbXgrMD+yj7rhW0kuEDxzJaYXGjEW5ogapKNMEKNMjibA==}
     engines: {node: '>= 8'}
-    hasBin: true
     dependencies:
       isexe: 2.0.0
 

@@ -1,18 +1,18 @@
 /* @refresh reload */
-import { StrictMode, Suspense } from "react"
+import React from "react"
 import ReactDOM from "react-dom/client"
 import { BrowserRouter as Router, useRoutes } from "react-router-dom"
 import routes from "~react-pages"
 
 const App = () => {
-	return <Suspense fallback={<p>Loading...</p>}>{useRoutes(routes)}</Suspense>
+	return <React.Suspense fallback={<p>Loading...</p>}>{useRoutes(routes)}</React.Suspense>
 }
 
 // eslint-disable-next-line @typescript-eslint/no-unnecessary-type-assertion
 ReactDOM.createRoot(document.getElementById("root") as HTMLElement).render(
-	<StrictMode>
+	<React.StrictMode>
 		<Router>
 			<App />
 		</Router>
-	</StrictMode>
+	</React.StrictMode>
 )

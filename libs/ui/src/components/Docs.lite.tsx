@@ -12,7 +12,8 @@ export default function Docs(props: Props) {
 			return props.docs ? createDocsForModule(props.docs) : undefined
 		},
 		get moduleName() {
-			return state.docs ? helpers.findDocsReference(state.docs, state.docs).name : ""
+			const foundDocs = state.docs
+			return foundDocs ? helpers.findDocsReference(foundDocs, foundDocs).name : ""
 		},
 	})
 	return (
