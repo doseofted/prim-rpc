@@ -1,9 +1,14 @@
 {
 	"extends": "./tsconfig.base.json",
 	"compilerOptions": {
-    "jsx": "react-jsx"
-  },
-	"include": ["src/**/*.ts", "src/**/*.d.ts", "src/**/*.tsx", "vite.config.ts", "src/generated/**/*"],
-	"exclude": ["src/**/*.lite.tsx"],
-	"references": [{ "path": "./tsconfig.mitosis.json" }]
+		"noEmit": true,
+		"jsx": "react-jsx"
+	},
+	"include": ["src"],
+	"exclude": ["src/vue-globals.d.ts"],
+	"references": [
+		{ "path": "./tsconfig.node.json" },
+		{ "path": "./tsconfig.mitosis.json" },
+		{ "path": "./tsconfig.vue.json" }
+	]
 }

@@ -1,4 +1,3 @@
-// import { Component } from "solid-js"
 import Docs from "@react/components/Docs"
 import docs from "@doseofted/prim-example/dist/docs.json"
 
