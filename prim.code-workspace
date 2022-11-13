@@ -88,6 +88,7 @@
 		],
 		"cSpell.enableFiletypes": ["dockerfile"],
 		"unocss.root": "./apps/frontend",
+		"css.lint.unknownAtRules": "ignore",
 		"typescript.tsdk": "🌳 Project Root/node_modules/typescript/lib"
 	},
 	"extensions": {

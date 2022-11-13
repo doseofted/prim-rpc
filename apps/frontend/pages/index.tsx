@@ -8,7 +8,7 @@ export default function Home() {
       <Head>
         <title>Hi</title>
       </Head>
-      <div className='bg-yellow font-sans'>
+      <div className='bg-gray-100'>
         <Docs docs={docs} />
       </div>
     </div>
