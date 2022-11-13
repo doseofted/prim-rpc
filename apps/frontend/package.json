@@ -20,18 +20,25 @@
 	},
 	"type": "module",
 	"dependencies": {
-		"@types/node": "18.11.9",
-		"@types/react": "18.0.25",
-		"@types/react-dom": "18.0.8",
-		"eslint": "8.27.0",
-		"eslint-config-next": "13.0.3",
+		"@doseofted/prim-example": "workspace:*",
+		"@doseofted/prim-plugins": "workspace:*",
+		"@doseofted/prim-rpc": "workspace:*",
+		"@doseofted/prim-ui": "workspace:*",
 		"next": "13.0.3",
 		"react": "18.2.0",
-		"react-dom": "18.2.0",
-		"typescript": "4.8.4"
+		"react-dom": "18.2.0"
 	},
 	"devDependencies": {
 		"@next/eslint-plugin-next": "^13.0.3",
-		"sass": "^1.56.0"
+		"@types/node": "18.11.9",
+		"@types/react": "18.0.25",
+		"@types/react-dom": "18.0.8",
+		"@unocss/reset": "^0.46.3",
+		"@unocss/webpack": "^0.46.5",
+		"eslint": "8.27.0",
+		"eslint-config-next": "13.0.3",
+		"sass": "^1.56.0",
+		"typescript": "4.8.4",
+		"unocss": "^0.46.3"
 	}
 }

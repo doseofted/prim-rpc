@@ -87,7 +87,7 @@
 			"websockets"
 		],
 		"cSpell.enableFiletypes": ["dockerfile"],
-		"unocss.root": "./",
+		"unocss.root": "./apps/frontend",
 		"typescript.tsdk": "🌳 Project Root/node_modules/typescript/lib"
 	},
 	"extensions": {

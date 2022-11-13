@@ -11,7 +11,7 @@ const config = {
 			plugins: ["@typescript-eslint"],
 			parserOptions: {
 				sourceType: "module",
-				project: ["./apps/frontend2/tsconfig.json"],
+				project: ["./apps/frontend/tsconfig.json"],
 				ecmaFeatures: {
 					jsx: true,
 				},
@@ -30,7 +30,7 @@ const config = {
 	],
 	settings: {
 		next: {
-			rootDir: "apps/frontend2",
+			rootDir: "apps/frontend",
 		},
 	},
 }
