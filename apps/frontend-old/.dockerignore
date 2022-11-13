@@ -11,5 +11,3 @@ node_modules
 dist
 # Ignore data in the root of the project
 /data
-# Ignore the .next folder
-.next

@@ -1,29 +1,38 @@
+// @ts-check
 /** @type {import("eslint").ESLint.ConfigData} */
-module.exports = {
+const config = {
 	root: false,
+	// "extends": ["plugin:@next/next/recommended", "prettier"],
 	overrides: [
 		{
-			files: ["*.ts", "*.tsx"],
+			files: ["*.tsx"],
+			excludedFiles: ["*.lite.tsx"],
 			parser: "@typescript-eslint/parser",
+			plugins: ["@typescript-eslint"],
 			parserOptions: {
 				sourceType: "module",
+				project: ["./apps/frontend2/tsconfig.json"],
 				ecmaFeatures: {
 					jsx: true,
 				},
-				project: "./apps/frontend/tsconfig.json",
 			},
-			plugins: ["@typescript-eslint", "solid"],
-			extends: ["eslint:recommended", "plugin:@typescript-eslint/recommended", "plugin:solid/typescript"],
-			env: {
-				browser: true,
-			},
-		},
-		{
-			files: ["*.tsx"],
+			extends: [
+				"eslint:recommended",
+				"plugin:@typescript-eslint/recommended",
+				"plugin:@typescript-eslint/recommended-requiring-type-checking",
+				"plugin:@next/next/recommended",
+				"prettier",
+			],
 			rules: {
-				// NOTE: this is a workaround until I find out how to let ESLint know JSX element's return types
-				"@typescript-eslint/no-unsafe-return": "off",
+				"@next/next/no-html-link-for-pages": ["error", "pages/"],
 			},
 		},
 	],
+	settings: {
+		next: {
+			rootDir: "apps/frontend2",
+		},
+	},
 }
+
+module.exports = config
