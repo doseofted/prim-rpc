@@ -6,10 +6,12 @@ type Props = {
 	docs: unknown
 }
 
+/** Documentation example */
 export default function Docs(props: Props) {
 	const state = useStore({
 		get docs() {
-			return props.docs ? createDocsForModule(props.docs) : undefined
+			const foundDocs = props.docs
+			return foundDocs ? createDocsForModule(foundDocs) : undefined
 		},
 		get moduleName() {
 			const foundDocs = state.docs
