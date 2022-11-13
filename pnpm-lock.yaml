@@ -273,8 +273,8 @@ importers:
       vite-plugin-pages: ^0.27.1
       vue: ^3.2.41
     devDependencies:
-      '@builder.io/mitosis': 0.0.76
-      '@builder.io/mitosis-cli': 0.0.34
+      '@builder.io/mitosis': 0.0.76_prettier@2.7.1
+      '@builder.io/mitosis-cli': 0.0.34_prettier@2.7.1
       '@doseofted/prim-docs': link:../docs
       '@doseofted/prim-example': link:../example
       '@testing-library/jest-dom': 5.16.5
@@ -300,25 +300,43 @@ importers:
 
   libs/ui2:
     specifiers:
+      '@builder.io/mitosis': ^0.0.76
+      '@builder.io/mitosis-cli': ^0.0.34
+      '@doseofted/prim-docs': workspace:*
+      '@doseofted/prim-example': workspace:*
+      '@testing-library/react': ^13.4.0
+      '@types/lodash-es': ^4.17.6
       '@types/react': ^18.0.24
       '@types/react-dom': ^18.0.8
       '@vitejs/plugin-react': ^2.2.0
+      lodash-es: ^4.17.21
+      prettier: ^2.7.1
       react: ^18.2.0
       react-dom: ^18.2.0
       react-router-dom: ^6.4.3
       typescript: ^4.6.4
       vite: ^3.2.3
+      vite-plugin-dts: ^1.6.6
       vite-plugin-pages: ^0.27.1
     dependencies:
       react: 18.2.0
       react-dom: 18.2.0_react@18.2.0
     devDependencies:
+      '@builder.io/mitosis': 0.0.76_prettier@2.7.1
+      '@builder.io/mitosis-cli': 0.0.34_prettier@2.7.1
+      '@doseofted/prim-docs': link:../docs
+      '@doseofted/prim-example': link:../example
+      '@testing-library/react': 13.4.0_biqbaboplfbrettd7655fr4n2y
+      '@types/lodash-es': 4.17.6
       '@types/react': 18.0.25
       '@types/react-dom': 18.0.8
       '@vitejs/plugin-react': 2.2.0_vite@3.2.3
+      lodash-es: 4.17.21
+      prettier: 2.7.1
       react-router-dom: 6.4.3_biqbaboplfbrettd7655fr4n2y
       typescript: 4.8.4
       vite: 3.2.3
+      vite-plugin-dts: 1.6.6_vite@3.2.3
       vite-plugin-pages: 0.27.1_vite@3.2.3
 
 packages:
@@ -980,13 +998,14 @@ packages:
       ts-pattern: 3.3.5
     dev: true
 
-  /@builder.io/mitosis-cli/0.0.34:
+  /@builder.io/mitosis-cli/0.0.34_prettier@2.7.1:
     resolution: {integrity: sha512-J+IjAJYEscfEqhf4SnB1Wjy9ixiCWvdIGXmlG/vLOc9cTInCs0RaPMhZKqAS5Ec2bDrCDVukrGXx6NRCXcb/QQ==}
     engines: {npm: 99999999.9.9}
+    hasBin: true
     dependencies:
       '@babel/core': 7.20.2
       '@babel/preset-typescript': 7.18.6_@babel+core@7.20.2
-      '@builder.io/mitosis': 0.0.75_debug@4.3.4
+      '@builder.io/mitosis': 0.0.75_debug@4.3.4+prettier@2.7.1
       '@vue/compiler-sfc': 3.2.41
       babel-preset-solid: 1.6.1_@babel+core@7.20.2
       chalk: 4.1.2
@@ -1007,10 +1026,11 @@ packages:
       vue-template-validator: 1.1.5_parse5@3.0.3
     transitivePeerDependencies:
       - encoding
+      - prettier
       - supports-color
     dev: true
 
-  /@builder.io/mitosis/0.0.75_debug@4.3.4:
+  /@builder.io/mitosis/0.0.75_debug@4.3.4+prettier@2.7.1:
     resolution: {integrity: sha512-T1kkMVnOjgVOl7wQx9NobBecKiXJbUu4fJY0doIjYpWrSDhpAkrDhGc2BSFGMYyz1wTJweLk0kTRL5H1XqnvsQ==}
     engines: {npm: 99999999.9.9}
     dependencies:
@@ -1037,8 +1057,8 @@ packages:
       lodash: 4.17.21
       marko: 5.22.0
       object-hash: 2.2.0
-      prettier-plugin-marko: 1.2.2
-      prettier-plugin-svelte: 2.8.0
+      prettier-plugin-marko: 1.2.2_xf46sysjufwndh5dek7ihfm4g4
+      prettier-plugin-svelte: 2.8.0_lrllcp5xtrkmmdzifit4hd52ze
       svelte: 3.52.0
       traverse: 0.6.7
       typescript: 4.8.4
@@ -1046,10 +1066,11 @@ packages:
     transitivePeerDependencies:
       - debug
       - encoding
+      - prettier
       - supports-color
     dev: true
 
-  /@builder.io/mitosis/0.0.76:
+  /@builder.io/mitosis/0.0.76_prettier@2.7.1:
     resolution: {integrity: sha512-alG1trB9Bv/G5rFDAAkWNscbYYRB9PSdUJy8csbghE3hT4ZWJ2KwCkBD+KvXbx01hUoi/lNdmuhO3mQenqYsnw==}
     engines: {npm: 99999999.9.9}
     dependencies:
@@ -1076,8 +1097,8 @@ packages:
       lodash: 4.17.21
       marko: 5.22.0
       object-hash: 2.2.0
-      prettier-plugin-marko: 1.2.2
-      prettier-plugin-svelte: 2.8.0
+      prettier-plugin-marko: 1.2.2_xf46sysjufwndh5dek7ihfm4g4
+      prettier-plugin-svelte: 2.8.0_lrllcp5xtrkmmdzifit4hd52ze
       svelte: 3.52.0
       traverse: 0.6.7
       typescript: 4.8.4
@@ -1085,6 +1106,7 @@ packages:
     transitivePeerDependencies:
       - debug
       - encoding
+      - prettier
       - supports-color
     dev: true
 
@@ -1494,6 +1516,7 @@ packages:
 
   /@microsoft/api-extractor/7.33.5:
     resolution: {integrity: sha512-ENoWpTWarKNuodpRFDQr3jyBigHuv98KuJ8H5qXc1LZ1aP5Mk77lCo88HbPisTmSnGevJJHTScfd/DPznOb4CQ==}
+    hasBin: true
     dependencies:
       '@microsoft/api-extractor-model': 7.25.2
       '@microsoft/tsdoc': 0.14.2
@@ -1927,11 +1950,7 @@ packages:
   /@types/lodash-es/4.17.6:
     resolution: {integrity: sha512-R+zTeVUKDdfoRxpAryaQNRKk3105Rrgx2CFRClIgRGaqDTdjsm8h6IYA8ir584W3ePzkZfst5xIgDwYrlh9HLg==}
     dependencies:
-      '@types/lodash': 4.14.187
-    dev: true
-
-  /@types/lodash/4.14.187:
-    resolution: {integrity: sha512-MrO/xLXCaUgZy3y96C/iOsaIqZSeupyTImKClHunL5GrmaiII2VwvWmLBu2hwa0Kp0sV19CsyjtrTc/Fx8rg/A==}
+      '@types/lodash': 4.14.188
     dev: true
 
   /@types/lodash/4.14.188:
@@ -2536,6 +2555,7 @@ packages:
   /acorn/8.8.1:
     resolution: {integrity: sha512-7zFpHzhnqYKrkYdUjF1HI1bzd0VygEGX8lFk4k5zVMqHEoES+P+7TKI+EvLO9WVMJ8eekdO0aDEK044xTXwPPA==}
     engines: {node: '>=0.4.0'}
+    hasBin: true
     dev: true
 
   /agent-base/6.0.2:
@@ -3265,6 +3285,7 @@ packages:
 
   /core-js/1.2.7:
     resolution: {integrity: sha512-ZiPp9pZlgxpWRu0M+YWbm6+aQ84XEfH1JRXvfOc/fILWI0VKhLC2LX13X1NYq4fULzLMq7Hfh43CSo2/aIaUPA==}
+    deprecated: core-js@<3.23.3 is no longer maintained and not recommended for usage due to the number of issues. Because of the V8 engine whims, feature detection in old core-js versions could cause a slowdown up to 100x even if nothing is polyfilled. Some versions have web compatibility issues. Please, upgrade your dependencies to the actual version of core-js.
     dev: true
     optional: true
 
@@ -4286,6 +4307,7 @@ packages:
 
   /esbuild/0.12.29:
     resolution: {integrity: sha512-w/XuoBCSwepyiZtIRsKsetiLDUVGPVw1E/R3VTFSecIy8UR7Cq3SOtwKHJMFoVqqVG36aGkzh4e8BvpO1Fdc7g==}
+    hasBin: true
     requiresBuild: true
     dev: true
 
@@ -5294,6 +5316,7 @@ packages:
 
   /he/1.2.0:
     resolution: {integrity: sha512-F/1DnUGPopORZi0ni+CvrCgHQ5FyEAHRLSApuYWMmrbSwoN2Mn/7k+Gl38gJnR7yyDZk6WLXwiGod1JOWNDKGw==}
+    hasBin: true
     dev: true
 
   /hexoid/1.0.0:
@@ -5333,6 +5356,7 @@ packages:
   /html-minifier/4.0.0:
     resolution: {integrity: sha512-aoGxanpFPLg7MkIl/DDFYtb0iWz7jMFGqFhvEDZga6/4QTjneiD8I/NXL1x5aaoCp7FSIT6h/OhykDdPsbtMig==}
     engines: {node: '>=6'}
+    hasBin: true
     dependencies:
       camel-case: 3.0.0
       clean-css: 4.2.4
@@ -5849,6 +5873,7 @@ packages:
   /jsesc/3.0.2:
     resolution: {integrity: sha512-xKqzzWXDttJuOcawBt4KnKHHIf5oQ/Cxax+0PWFG+DFDgHNAdi+TXECADI+RYiFUMmx8792xsMbbgXj4CwnP4g==}
     engines: {node: '>=6'}
+    hasBin: true
     dev: true
 
   /json-parse-even-better-errors/2.3.1:
@@ -5973,6 +5998,7 @@ packages:
   /liquidjs/9.6.0:
     resolution: {integrity: sha512-MTSyzkl9iFZ1xNK496FaTQETS0i/ySy25e2xmw/bPS2G2bVyafy55n/2WmyecKeL86YxC2b+IZ62TN1nhlifEw==}
     engines: {node: '>=4.8.7'}
+    hasBin: true
     dev: true
 
   /listener-tracker/2.0.0:
@@ -6124,6 +6150,7 @@ packages:
 
   /lz-string/1.4.4:
     resolution: {integrity: sha512-0ckx7ZHRPqb0oUm8zNr+90mtf9DQB60H1wMCjBtfi62Kl3a7JbHob6gA2bC+xRvZoOL+1hzUK8jeuEIQE8svEQ==}
+    hasBin: true
     dev: true
 
   /magic-string/0.25.9:
@@ -6160,6 +6187,7 @@ packages:
 
   /marko/5.22.0:
     resolution: {integrity: sha512-8hkiyrz2BSWVsnP0ZPy7VSDQPDHXStbFJ/tecwaLlMlt5unb0F0/M8nAc7bu2Fxx1xEr+FY4q/g4Y+vDrUO5Kw==}
+    hasBin: true
     dependencies:
       '@marko/compiler': 5.23.0
       '@marko/translator-default': 5.22.0_phz6zytzpv7fonnuvhtcdcgk7y
@@ -6317,6 +6345,7 @@ packages:
   /mkdirp/1.0.4:
     resolution: {integrity: sha512-vVqVZQyf3WLx2Shd0qJ9xuvqgAyKPLAiqITEtqW0oIUjzo3PePDd6fW9iFz30ef7Ysp/oiWqbhszeGWW2T6Gzw==}
     engines: {node: '>=10'}
+    hasBin: true
     dev: true
 
   /mkdist/0.3.13_typescript@4.8.4:
@@ -6920,17 +6949,21 @@ packages:
     engines: {node: '>= 0.8.0'}
     dev: true
 
-  /prettier-plugin-marko/1.2.2:
+  /prettier-plugin-marko/1.2.2_xf46sysjufwndh5dek7ihfm4g4:
     resolution: {integrity: sha512-1X+IKjhFCa5TZiNPWvEJhQkNgGvwxi748RF9Qg8oiDU9ogXjB5m6fHiZhQ6kDpDbasa8rMynOUgkasf+pGVhxA==}
+    peerDependencies:
+      '@marko/compiler': ^5.20.5
+      prettier: ^2
     dependencies:
       '@marko/compiler': 5.23.0
       prettier: 2.7.1
-    transitivePeerDependencies:
-      - supports-color
     dev: true
 
-  /prettier-plugin-svelte/2.8.0:
+  /prettier-plugin-svelte/2.8.0_lrllcp5xtrkmmdzifit4hd52ze:
     resolution: {integrity: sha512-QlXv/U3bUszks3XYDPsk1fsaQC+fo2lshwKbcbO+lrSVdJ+40mB1BfL8OCAk1W9y4pJxpqO/4gqm6NtF3zNGCw==}
+    peerDependencies:
+      prettier: ^1.16.4 || ^2.0.0
+      svelte: ^3.2.0
     dependencies:
       prettier: 2.7.1
       svelte: 3.52.0
@@ -6939,6 +6972,7 @@ packages:
   /prettier/2.7.1:
     resolution: {integrity: sha512-ujppO+MkdPqoVINuDFDRLClm7D78qbDt0/NR+wp5FqEZOoTNAjPHWj17QRhu7geIHJfcNhRk1XVQmF8Bp3ye+g==}
     engines: {node: '>=10.13.0'}
+    hasBin: true
     dev: true
 
   /pretty-bytes/6.0.0:
@@ -7473,6 +7507,7 @@ packages:
   /semver/7.3.8:
     resolution: {integrity: sha512-NB1ctGL5rlHrPJtFDVIVzTyQylMLu9N9VICA6HSFJo8MCGVTMW6gfpicwKmmK/dAjTOrqu5l63JJOpDSrAis3A==}
     engines: {node: '>=10'}
+    hasBin: true
     dependencies:
       lru-cache: 6.0.0
 
@@ -8488,6 +8523,7 @@ packages:
   /uglify-js/3.17.4:
     resolution: {integrity: sha512-T9q82TJI9e/C1TAxYvfb16xO120tMVFZrGA3f9/P4424DNu6ypK103y0GPFVa17yotwSyZW5iYXgjYHkGrJW/g==}
     engines: {node: '>=0.8.0'}
+    hasBin: true
     dev: true
 
   /unbox-primitive/1.0.2:
@@ -8681,6 +8717,24 @@ packages:
       kolorist: 1.6.0
       ts-morph: 16.0.0
       vite: 3.2.2
+    transitivePeerDependencies:
+      - supports-color
+    dev: true
+
+  /vite-plugin-dts/1.6.6_vite@3.2.3:
+    resolution: {integrity: sha512-XEZQlcAN5Bi1PWL0l/E08cI3VpjTCWY5x7C4/bVyC7lpS+/q9CDBCV8gGsqV97/g34N7gNNRNhqs8r0m6JAmIQ==}
+    engines: {node: ^14.18.0 || >=16.0.0}
+    peerDependencies:
+      vite: '>=2.9.0'
+    dependencies:
+      '@microsoft/api-extractor': 7.33.5
+      '@rushstack/node-core-library': 3.53.2
+      debug: 4.3.4
+      fast-glob: 3.2.12
+      fs-extra: 10.1.0
+      kolorist: 1.6.0
+      ts-morph: 16.0.0
+      vite: 3.2.3
     transitivePeerDependencies:
       - supports-color
     dev: true
@@ -8910,6 +8964,7 @@ packages:
   /vm2/3.9.11:
     resolution: {integrity: sha512-PFG8iJRSjvvBdisowQ7iVF580DXb1uCIiGaXgm7tynMR1uTBlv7UJlB1zdv5KJ+Tmq1f0Upnj3fayoEOPpCBKg==}
     engines: {node: '>=6.0'}
+    hasBin: true
     dependencies:
       acorn: 8.8.1
       acorn-walk: 8.2.0
@@ -9065,6 +9120,7 @@ packages:
   /which/2.0.2:
     resolution: {integrity: sha512-BLI3Tl1TW3Pvl70l3yq3Y64i+awpwXqsGBYWkkqMtnbXgrMD+yj7rhW0kuEDxzJaYXGjEW5ogapKNMEKNMjibA==}
     engines: {node: '>= 8'}
+    hasBin: true
     dependencies:
       isexe: 2.0.0
 
@@ -9163,6 +9219,7 @@ packages:
   /z-schema/5.0.4:
     resolution: {integrity: sha512-gm/lx3hDzJNcLwseIeQVm1UcwhWIKpSB4NqH89pTBtFns4k/HDHudsICtvG05Bvw/Mv3jMyk700y5dadueLHdA==}
     engines: {node: '>=8.0.0'}
+    hasBin: true
     dependencies:
       lodash.get: 4.4.2
       lodash.isequal: 4.5.0

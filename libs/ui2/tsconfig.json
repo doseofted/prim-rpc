@@ -15,7 +15,13 @@
 		"isolatedModules": true,
 		"noEmit": true,
 		"jsx": "react-jsx",
-		"types": ["vite-plugin-pages/client-react"]
+		"types": ["vite/client", "vite-plugin-pages/client-react"],
+		"paths": {
+			"@/*": ["./src/*"],
+			"@react/*": ["./src/generated/react/src/*"],
+			"@vue/*": ["./src/generated/vue/vue3/src/*"],
+			"@svelte/*": ["./src/generated/svelte/src/*"]
+		}
 	},
 	"include": ["src"],
 	"references": [{ "path": "./tsconfig.node.json" }]
