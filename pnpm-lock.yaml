@@ -309,6 +309,7 @@ importers:
       '@types/react': ^18.0.24
       '@types/react-dom': ^18.0.8
       '@vitejs/plugin-react': ^2.2.0
+      '@vitejs/plugin-vue': ^3.2.0
       lodash-es: ^4.17.21
       prettier: ^2.7.1
       react: ^18.2.0
@@ -318,6 +319,7 @@ importers:
       vite: ^3.2.3
       vite-plugin-dts: ^1.6.6
       vite-plugin-pages: ^0.27.1
+      vue: ^3.2.41
     dependencies:
       react: 18.2.0
       react-dom: 18.2.0_react@18.2.0
@@ -331,6 +333,7 @@ importers:
       '@types/react': 18.0.25
       '@types/react-dom': 18.0.8
       '@vitejs/plugin-react': 2.2.0_vite@3.2.3
+      '@vitejs/plugin-vue': 3.2.0_vite@3.2.3+vue@3.2.41
       lodash-es: 4.17.21
       prettier: 2.7.1
       react-router-dom: 6.4.3_biqbaboplfbrettd7655fr4n2y
@@ -338,6 +341,7 @@ importers:
       vite: 3.2.3
       vite-plugin-dts: 1.6.6_vite@3.2.3
       vite-plugin-pages: 0.27.1_vite@3.2.3
+      vue: 3.2.41
 
 packages:
 
@@ -2422,6 +2426,17 @@ packages:
       - stylus
       - sugarss
       - terser
+    dev: true
+
+  /@vitejs/plugin-vue/3.2.0_vite@3.2.3+vue@3.2.41:
+    resolution: {integrity: sha512-E0tnaL4fr+qkdCNxJ+Xd0yM31UwMkQje76fsDVBBUCoGOUPexu2VDUYHL8P4CwV+zMvWw6nlRw19OnRKmYAJpw==}
+    engines: {node: ^14.18.0 || >=16.0.0}
+    peerDependencies:
+      vite: ^3.0.0
+      vue: ^3.2.25
+    dependencies:
+      vite: 3.2.3
+      vue: 3.2.41
     dev: true
 
   /@vitest/ui/0.24.5:

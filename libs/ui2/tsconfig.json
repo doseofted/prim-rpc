@@ -5,5 +5,10 @@
 		"jsx": "react-jsx"
 	},
 	"include": ["src"],
-	"references": [{ "path": "./tsconfig.node.json" }, { "path": "./tsconfig.mitosis.json" }]
+	"exclude": ["src/vue-globals.d.ts"],
+	"references": [
+		{ "path": "./tsconfig.node.json" },
+		{ "path": "./tsconfig.mitosis.json" },
+		{ "path": "./tsconfig.vue.json" }
+	]
 }

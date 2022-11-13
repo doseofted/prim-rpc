@@ -2,10 +2,11 @@ import { defineConfig } from "vite"
 import react from "@vitejs/plugin-react"
 import pages from "vite-plugin-pages"
 import dts from "vite-plugin-dts"
+import vue from "@vitejs/plugin-vue"
 
 // https://vitejs.dev/config/
 export default defineConfig({
-	plugins: [react(), pages(), dts()],
+	plugins: [dts(), react(), pages(), vue()],
 	resolve: {
 		alias: {
 			"@": new URL("./src", import.meta.url).pathname,
@@ -21,7 +22,7 @@ export default defineConfig({
 			// LINK https://github.com/vitejs/vite/blob/v3.2.1/packages/vite/CHANGELOG.md#multiple-entries-for-library-mode
 			entry: {
 				react: new URL("./src/react.ts", import.meta.url).pathname,
-				// vue: new URL("./src/vue.ts", import.meta.url).pathname,
+				vue: new URL("./src/vue.ts", import.meta.url).pathname,
 			},
 		},
 		rollupOptions: {
