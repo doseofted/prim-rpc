@@ -1,0 +1,9 @@
+{
+	"root": false,
+	"extends": ["plugin:@next/next/recommended", "prettier"],
+	"settings": {
+		"next": {
+			"rootDir": "apps/frontend2"
+		}
+	}
+}
