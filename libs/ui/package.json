@@ -22,13 +22,11 @@
 		"testing": "vitest watch"
 	},
 	"dependencies": {
-		"react": "^18.2.0",
-		"react-dom": "^18.2.0"
+		"@doseofted/prim-docs": "workspace:*"
 	},
 	"devDependencies": {
 		"@builder.io/mitosis": "^0.0.76",
 		"@builder.io/mitosis-cli": "^0.0.34",
-		"@doseofted/prim-docs": "workspace:*",
 		"@doseofted/prim-example": "workspace:*",
 		"@testing-library/react": "^13.4.0",
 		"@types/lodash-es": "^4.17.6",
@@ -38,6 +36,8 @@
 		"@vitejs/plugin-vue": "^3.2.0",
 		"lodash-es": "^4.17.21",
 		"prettier": "^2.7.1",
+		"react": "^18.2.0",
+		"react-dom": "^18.2.0",
 		"react-router-dom": "^6.4.3",
 		"typescript": "^4.6.4",
 		"vite": "^3.2.3",

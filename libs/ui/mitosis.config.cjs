@@ -1,10 +1,10 @@
 /** @type {import("@builder.io/mitosis").MitosisConfig} */
 module.exports = {
 	files: "src/components/**",
-	targets: ["vue3", "svelte", "react"],
+	targets: ["vue", "svelte", "react"],
 	dest: "src/generated",
 	options: {
-		vue3: { typescript: true },
+		vue: { typescript: true, api: "options" },
 		svelte: { typescript: true },
 		react: { typescript: true },
 	},
