@@ -50,14 +50,16 @@ type LightsContextType = [
 const LightsContext = createContext<LightsContextType | null>(null)
 /** Context as used by `Light` component. Don't use unless extending the `Light` component. */
 export function useLights() {
-	return useContext(LightsContext)
+	const ctx = useContext(LightsContext)
+	if (!ctx) { throw new Error("Light was not used within Lights component") }
+	return ctx
 }
 const defaultColors = ["#f0A3FF", "#6D53FF", "#1D0049", "#0069BA", "#5BB8FF"]
 const defaultBackground = "#2D0D60"
 
 // SECTION Lights provider
 interface LightsProps {
-	children: JSX.Element | JSX.Element[]
+	children?: React.ReactNode
 	/** Use Tweakpane FPS monitor in development */
 	// fps?: FpsControls
 	/** Options used if none are provided to a light, overrides defaults */
@@ -72,20 +74,23 @@ interface LightsProps {
 	onFirstFrame?: () => void
 }
 export function Lights(props: LightsProps) {
-	const { colors = defaultColors, blur = 15, options: optionsShared } = props
+	const { background, onFirstFrame, colors = defaultColors, blur = 15, options: optionsShared } = props
+	const [locations, setLocation] = useState<Record<string, number>>({})
 	const [lights, setLights] = useState<LightInstance[]>([])
-	const locations: Record<string, number> = {}
 	const [playing, setPlaying] = useState(false)
 	const operations = {
 		createLight(options: LightOptions, position: [x: number, y: number]) {
 			const id = nanoid()
+			let index: number
 			setLights(
 				produce(state => {
 					const [x, y] = position ?? [0, 0]
-					const index = state.push({ ...options, ...props.options, position: [x, y], id }) - 1
-					locations[id] = index
+					index = state.push({ ...options, ...optionsShared, position: [x, y], id }) - 1
 				})
 			)
+			setLocation(produce(state => {
+				state[id] = index
+			}))
 			return this.retrieveLight(id)
 		},
 		retrieveLight(id: string) {
@@ -104,20 +109,29 @@ export function Lights(props: LightsProps) {
 			const index = locations[id]
 			setLights(
 				produce(state => {
-					state[index] = { ...state[index], ...props.options, ...options }
+					state[index] = { ...state[index], ...optionsShared, ...options }
 				})
 			)
 		},
 		removeLight(id: string) {
 			const index = locations[id]
+			let deletedId: string
+			const newLocations: Record<string, number> = {}
 			setLights(
 				produce(state => {
+					deletedId = state[index].id
 					state.splice(index, 1)
 					state.slice(index).map((given, partialIndex) => {
-						locations[given.id] = index + partialIndex
+						newLocations[given.id] = index + partialIndex
 					})
 				})
 			)
+			setLocation(produce(given => {
+				delete given[deletedId]
+				for (const [id, newIndex] of Object.entries(newLocations)) {
+					given[id] = newIndex
+				}
+			}))
 		},
 	}
 	const windowSize = useWindowSize()
@@ -131,12 +145,12 @@ export function Lights(props: LightsProps) {
 		<LightsContext.Provider
 			value={[lights, { windowSize, scrollPosition, optionsShared, playing, colors }, operations]}>
 			<LightsCanvas
-				background={props.background}
+				background={background}
 				style={fixedCss}
 				// fps={props.fps}
 				onFirstFrame={() => {
 					setPlaying(true)
-					props.onFirstFrame?.()
+					onFirstFrame?.()
 				}}
 			/>
 			<div style={{ ...fixedCss, ...blurCss }} />
@@ -175,10 +189,8 @@ interface LightProps extends React.HtmlHTMLAttributes<HTMLDivElement> {
  */
 export function Light(props: LightProps) {
 	const { children, options: givenOptions, ...attrs } = props
-	const ctx = useLights()
-	if (!ctx) { return <></> }
-	const [, env, operations] = ctx
-	const color = shuffle(env.colors)[random(0, env.colors.length - 1)]
+	const [, env, operations] = useLights()
+	const [color] = useState(shuffle(env.colors)[random(0, env.colors.length - 1)])
 	const options = useMemo<LightOptions>(() => ({
 		color,
 		size: 50,
@@ -187,7 +199,7 @@ export function Light(props: LightProps) {
 		brightness: 1,
 		...env.optionsShared,
 		...givenOptions,
-	}), [])
+	}), [env.optionsShared, givenOptions])
 	const div = useRef<HTMLDivElement>(null)
 	/** Utility to get center of div relative to the page */
 	function getCenter(rect: DOMRect) {
