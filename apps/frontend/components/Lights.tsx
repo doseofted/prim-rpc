@@ -211,6 +211,7 @@ export function Light(props: LightProps) {
 		operations.updateLightOptions(light.id, options)
 	}, [options])
 	useEffect(() => {
+		console.log(env.scrollPosition, env.windowSize)
 		updatePosition()
 	}, [env.scrollPosition, env.windowSize])
 	useEffect(() => {

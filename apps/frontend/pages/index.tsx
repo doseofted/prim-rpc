@@ -1,19 +1,28 @@
 import Head from 'next/head'
-import { Docs } from "@doseofted/prim-ui/react"
-import docs from "@doseofted/prim-example/dist/docs.json"
-import { Light, Lights } from '../components/Lights'
-
+// import { Docs } from "@doseofted/prim-ui/react"
+// import docs from "@doseofted/prim-example/dist/docs.json"
+// import { Light, Lights } from '../components/Lights'
+import { CtxChild, CtxTest } from "../components/CtxTest"
 export default function Home() {
   return (
     <>
       <Head>
         <title>Hi</title>
       </Head>
-      <div className='bg-gray-100 font-sans'>
-        <Lights>
-          <Light><p>Hello</p></Light>
-        </Lights>
-        <Docs docs={docs} />
+      <div className='font-sans'>
+        {/* <Lights options={{ brightness: 1, size: 500 }}>
+          <Light>
+            <div className='font-sans relative'>
+              <Docs docs={docs} />
+            </div>
+          </Light>
+        </Lights> */}
+        <CtxTest>
+          <div className='h-[200vh]'>
+            <CtxChild className='fixed top-0' />
+          </div>
+          <CtxChild />
+        </CtxTest>
       </div>
     </>
   )
