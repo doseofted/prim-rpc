@@ -1,13 +1,11 @@
 import { CanvasSpace, Circle, Pt, GroupLike, PtsCanvasRenderingContext2D, Const } from "pts"
-import { createContext, useContext, useEffect, useRef } from "react"
-import { useMount, useUnmount } from "react-use"
+import React, { createContext, useContext, useEffect, useMemo, useRef, useState } from "react"
+import { useMount, useUnmount, useWindowScroll, useWindowSize } from "react-use"
 import { lighten, transparentize } from "color2k"
 import { easeIn, easeOut } from "popmotion"
 import { throttle, clamp, random, shuffle } from "lodash-es"
-
-export function Lights() {
-	return <div>Hi</div>
-}
+import { nanoid } from "nanoid"
+import produce from "immer"
 
 export interface LightOptions {
 	/** Brightness from 0-2 */
@@ -56,6 +54,187 @@ export function useLights() {
 }
 const defaultColors = ["#f0A3FF", "#6D53FF", "#1D0049", "#0069BA", "#5BB8FF"]
 const defaultBackground = "#2D0D60"
+
+// SECTION Lights provider
+interface LightsProps {
+	children: JSX.Element | JSX.Element[]
+	/** Use Tweakpane FPS monitor in development */
+	// fps?: FpsControls
+	/** Options used if none are provided to a light, overrides defaults */
+	options?: Partial<LightOptions>
+	/** Default colors to use for given lights if a color option is not provided (chosen at random) */
+	colors?: string[]
+	/** Background of canvas (set to "transparent" if background is not needed) */
+	background?: string
+	/** Lights blend better when canvas is blurred (amount can be adjusted as needed) */
+	blur?: number
+	/** Event handler on the first frame of animation */
+	onFirstFrame?: () => void
+}
+export function Lights(props: LightsProps) {
+	const { colors = defaultColors, blur = 15, options: optionsShared } = props
+	const [lights, setLights] = useState<LightInstance[]>([])
+	const locations: Record<string, number> = {}
+	const [playing, setPlaying] = useState(false)
+	const operations = {
+		createLight(options: LightOptions, position: [x: number, y: number]) {
+			const id = nanoid()
+			setLights(
+				produce(state => {
+					const [x, y] = position ?? [0, 0]
+					const index = state.push({ ...options, ...props.options, position: [x, y], id }) - 1
+					locations[id] = index
+				})
+			)
+			return this.retrieveLight(id)
+		},
+		retrieveLight(id: string) {
+			return lights[locations[id]]
+		},
+		updateLightPosition(id: string, position: [x: number, y: number]) {
+			const index = locations[id]
+			setLights(
+				produce(state => {
+					const [x, y] = position
+					state[index] = { ...state[index], position: [x, y] }
+				})
+			)
+		},
+		updateLightOptions(id: string, options: Partial<LightOptions>) {
+			const index = locations[id]
+			setLights(
+				produce(state => {
+					state[index] = { ...state[index], ...props.options, ...options }
+				})
+			)
+		},
+		removeLight(id: string) {
+			const index = locations[id]
+			setLights(
+				produce(state => {
+					state.splice(index, 1)
+					state.slice(index).map((given, partialIndex) => {
+						locations[given.id] = index + partialIndex
+					})
+				})
+			)
+		},
+	}
+	const windowSize = useWindowSize()
+	const scrollPosition = useWindowScroll()
+	const fixedCss: React.CSSProperties = { position: "fixed", width: "100%", height: "100%", top: 0, left: 0 }
+	const blurCss = useMemo<React.CSSProperties>(() => ({
+		backgroundColor: "transparent",
+		backdropFilter: `blur(${blur}px)`,
+	}), [blur])
+	return (
+		<LightsContext.Provider
+			value={[lights, { windowSize, scrollPosition, optionsShared, playing, colors }, operations]}>
+			<LightsCanvas
+				background={props.background}
+				style={fixedCss}
+				// fps={props.fps}
+				onFirstFrame={() => {
+					setPlaying(true)
+					props.onFirstFrame?.()
+				}}
+			/>
+			<div style={{ ...fixedCss, ...blurCss }} />
+			{props.children}
+		</LightsContext.Provider>
+	)
+}
+
+// !SECTION
+
+// SECTION Light with attributes
+interface LightProps extends React.HtmlHTMLAttributes<HTMLDivElement> {
+	children?: JSX.Element | JSX.Element[]
+	options?: Partial<LightOptions>
+}
+/**
+ * Place a `Light` component anywhere inside of a `Lights` component and a light
+ * will glow behind the given element. `Light` components are just a "div"
+ * element which can be used to either encapsulate some other element or be
+ * used inside of some other container.
+ *
+ * @example
+ *
+ * ```tsx
+ * <Lights>
+ *   <div class="flex">
+ *     <Light>
+ *       <p>It glows!</p>
+ *     </Light>
+ *     <Light>
+ *       <p>This glows too!</p>
+ *     </Light>
+ *   </div>
+ * </Lights>
+ * ```
+ */
+export function Light(props: LightProps) {
+	const { children, options: givenOptions, ...attrs } = props
+	const ctx = useLights()
+	if (!ctx) { return <></> }
+	const [, env, operations] = ctx
+	const color = shuffle(env.colors)[random(0, env.colors.length - 1)]
+	const options = useMemo<LightOptions>(() => ({
+		color,
+		size: 50,
+		offset: [0, 0],
+		delay: 50,
+		brightness: 1,
+		...env.optionsShared,
+		...givenOptions,
+	}), [])
+	const div = useRef<HTMLDivElement>(null)
+	/** Utility to get center of div relative to the page */
+	function getCenter(rect: DOMRect) {
+		const { x, y, width, height, left, top } = rect
+		return { x: (x + width - left) / 2 + x, y: (y + height - top) / 2 + y }
+	}
+	let light: LightInstance | undefined
+	const updatePosition = throttle(() => {
+		if (!div.current) { return }
+		if (!light) { return }
+		const { x, y } = getCenter(div.current.getBoundingClientRect())
+		operations.updateLightPosition(light?.id, [x, y])
+	}, 10)
+	useMount(() => {
+		if (!div.current) { return }
+		const { x, y } = getCenter(div.current.getBoundingClientRect())
+		light = operations.createLight(options, [x, y])
+	})
+	useEffect(() => {
+		if (!light) { return }
+		operations.updateLightOptions(light.id, options)
+	}, [options])
+	useEffect(() => {
+		updatePosition()
+	}, [env.scrollPosition, env.windowSize])
+	useEffect(() => {
+		if (!div.current) { return }
+		const resizeObserver = new ResizeObserver(entries => {
+			if (entries.length < 1) {
+				return
+			}
+			updatePosition()
+		})
+		resizeObserver.observe(div.current)
+		return () => { resizeObserver.disconnect() }
+	}, [div])
+	useUnmount(() => {
+		if (!light) { return }
+		operations.removeLight(light.id)
+	})
+	return (
+		<div {...attrs} ref={div}>
+			{children}
+		</div>
+	)
+}
+// !SECTION
 
 // SECTION Lights canvas
 interface LightCanvasProps extends React.HTMLAttributes<HTMLDivElement> {

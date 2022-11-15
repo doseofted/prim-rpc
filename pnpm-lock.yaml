@@ -105,7 +105,9 @@ importers:
       daisyui: ^2.39.1
       eslint: 8.27.0
       eslint-config-next: 13.0.3
+      immer: ^9.0.16
       lodash-es: ^4.17.21
+      nanoid: ^4.0.0
       next: 13.0.3
       popmotion: ^11.0.5
       postcss: ^8.4.18
@@ -122,7 +124,9 @@ importers:
       '@doseofted/prim-rpc': link:../../libs/rpc
       '@doseofted/prim-ui': link:../../libs/ui
       color2k: 2.0.0
+      immer: 9.0.16
       lodash-es: 4.17.21
+      nanoid: 4.0.0
       next: 13.0.3_orpxj3vgaelozwpc7iiuainqz4
       popmotion: 11.0.5
       pts: 0.11.2
@@ -6105,6 +6109,10 @@ packages:
     resolution: {integrity: sha512-CmxgYGiEPCLhfLnpPp1MoRmifwEIOgjcHXxOBjv7mY96c+eWScsOP9c112ZyLdWHi0FxHjI+4uVhKYp/gcdRmQ==}
     engines: {node: '>= 4'}
 
+  /immer/9.0.16:
+    resolution: {integrity: sha512-qenGE7CstVm1NrHQbMh8YaSzTZTFNP3zPqr3YU0S0UY441j4bJTg4A2Hh5KAhwgaiU6ZZ1Ar6y/2f4TblnMReQ==}
+    dev: false
+
   /immutable/4.1.0:
     resolution: {integrity: sha512-oNkuqVTA8jqG1Q6c+UglTOD1xhC1BtjKI7XkCXRkZHrN5m18/XsnUp8Q89GkQO/z+0WjonSvl0FLhDYftp46nQ==}
 
@@ -7109,6 +7117,7 @@ packages:
   /nanoid/4.0.0:
     resolution: {integrity: sha512-IgBP8piMxe/gf73RTQx7hmnhwz0aaEXYakvqZyE302IXW3HyVNhdNGC+O2MwMAVhLEnvXlvKtGbtJf6wvHihCg==}
     engines: {node: ^14 || ^16 || >=18}
+    hasBin: true
 
   /natural-compare-lite/1.4.0:
     resolution: {integrity: sha512-Tj+HTDSJJKaZnfiuw+iaF9skdPpTo2GtEly5JHnWV/hfv2Qj/9RKsGISQtLh2ox3l5EAGw487hnBee0sIJ6v2g==}
