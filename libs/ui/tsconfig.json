@@ -1,14 +1,13 @@
 {
 	"extends": "./tsconfig.base.json",
+	"include": ["src/**/*"],
+	"exclude": ["src/**/*.test.ts"],
 	"compilerOptions": {
-		"noEmit": true,
 		"jsx": "react-jsx"
 	},
-	"include": ["src"],
-	"exclude": ["src/vue-globals.d.ts"],
 	"references": [
-		{ "path": "./tsconfig.node.json" },
-		{ "path": "./tsconfig.mitosis.json" },
+		{ "path": "./tsconfig.vite.json" },
+		{ "path": "./tsconfig.react.json" },
 		{ "path": "./tsconfig.vue.json" }
 	]
 }

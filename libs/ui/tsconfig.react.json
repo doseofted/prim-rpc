@@ -1,10 +1,10 @@
 {
   "extends": "./tsconfig.base.json",
-  "include": ["src/**/*.vue", "src/**/*vue.ts"],
+  "include": ["src/**/*react.tsx", "src/**/*react.ts"],
   "compilerOptions": {
     "noEmit": false,
     "composite": true,
-    "jsx": "preserve",
+    "jsx": "react-jsx",
     "outDir": "dist",
     "rootDir": "src"
   }
