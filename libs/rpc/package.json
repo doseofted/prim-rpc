@@ -17,7 +17,7 @@
 		"lint": "eslint ."
 	},
 	"dependencies": {
-		"defu": "^6.1.0",
+		"defu": "^6.1.1",
 		"lodash-es": "^4.17.21",
 		"mitt": "^3.0.0",
 		"nanoid": "^4.0.0",
@@ -29,7 +29,7 @@
 		"@doseofted/prim-example": "workspace:*",
 		"@types/lodash-es": "^4.17.6",
 		"superjson": "^1.11.0",
-		"type-fest": "^3.1.0"
+		"type-fest": "^3.2.0"
 	},
 	"type": "module",
 	"exports": {

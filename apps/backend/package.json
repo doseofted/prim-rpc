@@ -13,11 +13,11 @@
 		"@doseofted/prim-example": "workspace:*",
 		"@doseofted/prim-plugins": "workspace:*",
 		"@doseofted/prim-rpc": "workspace:*",
-		"@fastify/cors": "^8.1.1",
+		"@fastify/cors": "^8.2.0",
 		"@fastify/multipart": "^7.3.0",
-		"fastify": "^4.9.2",
+		"fastify": "^4.10.0",
 		"superjson": "^1.11.0",
-		"ws": "^8.10.0"
+		"ws": "^8.11.0"
 	},
 	"scripts": {
 		"watch": "tsup --watch --config build.config.js",

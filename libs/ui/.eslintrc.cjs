@@ -9,7 +9,7 @@ const config = {
 			plugins: ["@typescript-eslint"],
 			parserOptions: {
 				sourceType: "module",
-				project: ["./libs/ui/tsconfig.json"],
+				project: ["./libs/ui/tsconfig.base.json"],
 				ecmaFeatures: {
 					jsx: true,
 				},
