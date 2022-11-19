@@ -1,11 +1,26 @@
 import produce from "immer"
 import { createContext, useContext, useEffect, useState } from "react"
 import { useWindowScroll, useWindowSize } from "react-use"
+import { createStore, useStore } from "zustand"
+
+interface TestStore {
+	hello: string
+	sayHi(given: string): void
+}
+const store = createStore<TestStore>(set => ({
+	hello: "",
+	sayHi: (given: string) => set(_ => ({ hello: 'Hi ' + given }))
+}))
+
+
+// test.sayHi
 
 type CtxType = { winSize: { width: number, height: number }, scrollPos: { x: number, y: number } }
 const testCtx = createContext<CtxType | null>(null)
 function useTestCtx() {
 	const ctx = useContext(testCtx)
+	const test = useStore(store)
+	console.log(test);
 	if (!ctx) { throw new Error("Nope") }
 	return ctx
 }

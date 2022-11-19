@@ -3,3 +3,5 @@ import { findDocsReference, getFunctionForDocumentation, iterateDocs } from "./h
 
 const helpers = { findDocsReference, getFunctionForDocumentation, iterateDocs }
 export { createDocsForModule, helpers }
+
+export type { PrimRpcDocs } from "./interfaces"
