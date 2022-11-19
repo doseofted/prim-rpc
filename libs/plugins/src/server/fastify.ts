@@ -13,7 +13,7 @@ export type PrimFastifyContext = IncomingHttpHeaders
 
 interface SharedFastifyOptions {
 	multipartPlugin?: typeof FastifyMultipartPlugin
-	fileSizeLimitBytes?: number,
+	fileSizeLimitBytes?: number
 }
 
 interface PrimFastifyPluginOptions extends SharedFastifyOptions {
@@ -21,7 +21,7 @@ interface PrimFastifyPluginOptions extends SharedFastifyOptions {
 }
 /**
  * A Fastify plugin used to register Prim with the server. Use like so:
- * 
+ *
  * ```ts
  * // imports
  * import Fastify from "fastify"
@@ -34,10 +34,10 @@ interface PrimFastifyPluginOptions extends SharedFastifyOptions {
  * fastify.register(fastifyPrimPlugin, { prim, multipartPlugin })
  * await fastify.listen({ port: 3000 })
  * ```
- * 
+ *
  * **Note:** usage of the multipart plugin is optional and can be excluded if support
  * for file uploads is not needed.
- * 
+ *
  * To let Prim handle registration with Fastify, try importing `primMethodFastify`
  */
 // eslint-disable-next-line @typescript-eslint/require-await
@@ -52,7 +52,8 @@ export const fastifyPrimPlugin: FastifyPluginAsync<PrimFastifyPluginOptions> = a
 			done(null, body)
 		} catch (e) {
 			// eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
-			const error: FastifyError = e; error.statusCode = 500
+			const error: FastifyError = e
+			error.statusCode = 500
 			done(error, undefined)
 		}
 	})
@@ -68,7 +69,7 @@ export const fastifyPrimPlugin: FastifyPluginAsync<PrimFastifyPluginOptions> = a
 				// eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
 				const parts: AsyncIterableIterator<MultipartFile & MultipartValue<string>> = request.parts({
 					limits: { fileSize },
-				// eslint-disable-next-line @typescript-eslint/no-explicit-any
+					// eslint-disable-next-line @typescript-eslint/no-explicit-any
 				}) as AsyncIterableIterator<any>
 				for await (const part of parts) {
 					if (!part.file && part.fieldname === "rpc") {
@@ -76,12 +77,18 @@ export const fastifyPrimPlugin: FastifyPluginAsync<PrimFastifyPluginOptions> = a
 					} else if (part.file && part.fieldname.startsWith("_bin_")) {
 						const tmpFolder = await mkdtemp(joinPath(tmpdir(), "prim-rpc-"))
 						const tmpFile = joinPath(tmpFolder, part.filename)
-						const filenamePromise = pipeline(part.file, createWriteStream(tmpFile)).then(() => tmpFile).catch(() => "")
+						const filenamePromise = pipeline(part.file, createWriteStream(tmpFile))
+							.then(() => tmpFile)
+							.catch(() => "")
 						blobs[part.fieldname] = filenamePromise
 					}
 				}
 			}
-			const { body: bodyReq, method, raw: { url } } = request
+			const {
+				body: bodyReq,
+				method,
+				raw: { url },
+			} = request
 			const body = bodyForm ?? bodyReq
 			const context = { ...request.headers }
 			const response = await prim.server().call({ method, url, body }, blobs, context)
@@ -92,7 +99,11 @@ export const fastifyPrimPlugin: FastifyPluginAsync<PrimFastifyPluginOptions> = a
 		method: "GET",
 		url: prim.options.prefix + "/*",
 		handler: async (request, reply) => {
-			const { body, method, raw: { url } } = request
+			const {
+				body,
+				method,
+				raw: { url },
+			} = request
 			const context = { ...request.headers }
 			const response = await prim.server().call({ method, url, body }, null, context)
 			void reply.status(response.status).headers(response.headers).send(response.body)
@@ -105,7 +116,7 @@ interface MethodFastifyOptions extends SharedFastifyOptions {
 }
 /**
  * A Prim plugin used to register itself with Fastify. Use like so:
- * 
+ *
  * ```ts
  * // imports
  * import Fastify from "fastify"
@@ -119,15 +130,15 @@ interface MethodFastifyOptions extends SharedFastifyOptions {
  * })
  * await fastify.listen({ port: 3000 })
  * ```
- * 
+ *
  * **Note:** usage of the multipart plugin is optional and can be excluded if support
  * for file uploads is not needed.
- * 
+ *
  * If you would like to register Prim with Fastify yourself, try importing `fastifyPrimPlugin` instead.
  */
 export const primMethodFastify = (options: MethodFastifyOptions): PrimServerMethodHandler => {
 	const { fastify } = options
 	return prim => {
-		void fastify.register(fastifyPrimPlugin, {...options, prim })
+		void fastify.register(fastifyPrimPlugin, { ...options, prim })
 	}
 }

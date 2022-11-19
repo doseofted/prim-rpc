@@ -1,7 +1,6 @@
 version: 3
 
 tasks:
-
   # NOTE: `mkcert` must be installed on the host, since a containerized version would install CA in its own stores
   cert:
     desc: "Create a certificate to be used in development, trusted by the host system (requires `mkcert`)"
@@ -87,7 +86,7 @@ tasks:
       # Remove Task cache
       - "rm -fr .task"
       # Task doesn't run as root and it could be dangerous to remove project data, so this will be a manual step
-      - "echo \"You'll need to remove data/* as root. The .env file in this project was kept.\""
+      - 'echo "You''ll need to remove data/* as root. The .env file in this project was kept."'
 
   build-libs:
     cmds:

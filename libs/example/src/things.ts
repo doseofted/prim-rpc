@@ -1,4 +1,7 @@
-export interface ThingInstance { id: number, name: string }
+export interface ThingInstance {
+	id: number
+	name: string
+}
 export class Things {
 	things: ThingInstance[]
 	create(thing: ThingInstance) {
@@ -11,14 +14,18 @@ export class Things {
 	update(id: ThingInstance["id"], props: Partial<ThingInstance>) {
 		const index = this.things.findIndex(thing => thing.id === id)
 		const thing = this.things[index]
-		if (!thing) { return }
+		if (!thing) {
+			return
+		}
 		this.things[index] = { ...thing, ...props, id: thing.id }
 		return thing
 	}
 	remove(id: ThingInstance["id"]) {
 		const index = this.things.findIndex(thing => thing.id === id)
 		const thing = this.things[index]
-		if (!thing) { return }
+		if (!thing) {
+			return
+		}
 		this.things.splice(index, 1)
 		return true
 	}

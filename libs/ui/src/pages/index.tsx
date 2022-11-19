@@ -1,10 +1,12 @@
-import { Component } from "solid-js"
-import Docs from "../components/Docs"
+import Docs from "@react/components/Docs"
 import docs from "@doseofted/prim-example/dist/docs.json"
 
-const Index: Component = () => {
+const Index = () => {
 	return (
-		<Docs docs={docs} />
+		<div>
+			{/* eslint-disable-next-line @typescript-eslint/no-unsafe-assignment */}
+			<Docs docs={docs} />
+		</div>
 	)
 }
 

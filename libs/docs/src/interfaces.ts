@@ -2,12 +2,12 @@ import type { JSONSchema7 } from "json-schema"
 
 // NOTE: when adding a new "type", consider if it can be used as input on docs page
 /** Primitive types and the "object" type */
-export type BasicTypes = "string"|"number"|"bigint"|"boolean"|"symbol"|"undefined"|"null"|"Object"
+export type BasicTypes = "string" | "number" | "bigint" | "boolean" | "symbol" | "undefined" | "null" | "Object"
 /** Object types that are commonly thought of as basic language constructs themselves (also, "unknown" where not implemented yet) */
-export type CommonTypes = "Function"|"Array"|"unknown"
+export type CommonTypes = "Function" | "Array" | "unknown"
 export interface PrimType {
 	/** Type as given in JavaScript, including common objects */
-	type: BasicTypes|CommonTypes
+	type: BasicTypes | CommonTypes
 	/** Typed data given from TypeScript formatted as JSON Schema */
 	typed?: JSONSchema7
 }
@@ -50,7 +50,7 @@ export interface PrimModule extends PrimComment {
 	}
 }
 
-export type PrimRootStructureKeys = keyof Omit<PrimRpcDocs, "props"|"docs">
+export type PrimRootStructureKeys = keyof Omit<PrimRpcDocs, "props" | "docs">
 export interface PrimModuleStructure {
 	docs: [key: PrimRootStructureKeys, index: number]
 	props?: {

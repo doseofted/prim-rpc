@@ -16,7 +16,7 @@ tasks:
       - "docker run -it --rm doseofted/prim-backend {{.CLI_ARGS}}"
 
   dev:
-    desc: "Build and run backend image targeting \"dev\" stage with src folder mounted to host"
+    desc: 'Build and run backend image targeting "dev" stage with src folder mounted to host'
     deps:
       - :docker:build-base-images
     cmds:

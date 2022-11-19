@@ -15,10 +15,14 @@ $.silent = true
  */
 export function ipAddressForCoreDns(startsWith = "") {
 	const networks = networkInterfaces()
-	const external = Object.values(networks).flat().filter(n => !n.internal)
+	const external = Object.values(networks)
+		.flat()
+		.filter(n => !n.internal)
 	if (!startsWith) {
 		const firstIpv4 = external.find(n => n.family === "IPv4")
-		if (firstIpv4) { return firstIpv4?.address ?? "" }
+		if (firstIpv4) {
+			return firstIpv4?.address ?? ""
+		}
 		const firstAnyFamily = external[0]?.address ?? ""
 		return firstAnyFamily
 	}

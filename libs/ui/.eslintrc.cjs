@@ -1,36 +1,49 @@
+// @ts-check
 /** @type {import("eslint").ESLint.ConfigData} */
-module.exports = {
+const config = {
 	root: false,
 	overrides: [
 		{
-			files: ["*.ts", "*.tsx"],
+			files: ["*.tsx"],
+			excludedFiles: ["*.lite.tsx"],
 			parser: "@typescript-eslint/parser",
+			plugins: ["@typescript-eslint"],
 			parserOptions: {
 				sourceType: "module",
+				project: ["./libs/ui/tsconfig.json"],
 				ecmaFeatures: {
 					jsx: true,
 				},
-				project: "./libs/ui/tsconfig.json",
 			},
-			plugins: [
-				"@typescript-eslint",
-				"solid",
-			],
 			extends: [
 				"eslint:recommended",
 				"plugin:@typescript-eslint/recommended",
-				"plugin:solid/typescript",
+				"plugin:@typescript-eslint/recommended-requiring-type-checking",
+				"plugin:react/recommended",
+				"plugin:react-hooks/recommended",
+				"prettier",
 			],
-			env: {
-				"browser": true,
-			},
 		},
 		{
-			files: ["*.tsx"],
-			rules: {
-			// NOTE: this is a workaround until I find out how to let ESLint know JSX element's return types
-				"@typescript-eslint/no-unsafe-return": "off",
+			parser: "@typescript-eslint/parser",
+			parserOptions: {
+				sourceType: "module",
+				project: ["./libs/ui/tsconfig.json"],
+				ecmaFeatures: {
+					jsx: true,
+				},
 			},
+			files: ["*.lite.tsx"],
+			plugins: ["@builder.io/mitosis"],
+			extends: [
+				"eslint:recommended",
+				"plugin:@typescript-eslint/recommended",
+				"plugin:@typescript-eslint/recommended-requiring-type-checking",
+				"plugin:@builder.io/mitosis/recommended",
+				"prettier",
+			],
 		},
 	],
 }
+
+module.exports = config

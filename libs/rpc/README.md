@@ -15,7 +15,9 @@ There are a few different ways to do this depending on priorites. Here is a vers
 
 ```typescript
 // example.ts
-export function sayHello (name: string) { return `Hello ${name}!` }
+export function sayHello(name: string) {
+	return `Hello ${name}!`
+}
 
 // app.index.ts
 //
@@ -35,7 +37,7 @@ it would be really easy to import if there are not some sort of tests in place t
 same issue as TRPC because you need access to server code (or the client-side version of it, at least) to get those
 type definitions.
 
-Another version of this would be to make it more similar to TRPC but way less complicated by simply 
+Another version of this would be to make it more similar to TRPC but way less complicated by simply
 removing the ability to use server-side code from the client-side and only importing type definitions. By removing
 the need for code, It is much safer to since only type definitions are needed, reactivity no longer needs to live
 inside of the module (rather some sort of extension could be built to make handling in UIs easier), and you still get
@@ -51,14 +53,16 @@ the client at build-time:
 ```typescript
 // server
 
-export function sayHello (name: string) { return `Hello ${name}!` }
+export function sayHello(name: string) {
+	return `Hello ${name}!`
+}
 // Prim would look at all members of module, gather parameters (still need to figure out how), and create JSON-Schema,
 // again now sure how
 
 // client
 import type definitions from "./generated.ts" // or may just become available as namespaced item given in .d.ts file
 const prim = createPrim<definitions>({
-	sayHello: () => `Loading ...` // client-side version to return until server returns result
+	sayHello: () => `Loading ...`, // client-side version to return until server returns result
 })
 ```
 

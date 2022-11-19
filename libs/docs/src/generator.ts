@@ -3,23 +3,32 @@ import type { SetOptional } from "type-fest"
 import { /* get as getProperty, */ set as setProperty } from "lodash-es"
 import { getDeclarationPropReflected, isTypeDoc, parseComment } from "./helpers/create"
 import {
-	PrimRpcDocs, PrimMethod, PrimModule, PrimMethodSignature, PrimParam, PrimType, PrimReturn, PrimThrow, BasicTypes, CommonTypes,
+	PrimRpcDocs,
+	PrimMethod,
+	PrimModule,
+	PrimMethodSignature,
+	PrimParam,
+	PrimType,
+	PrimReturn,
+	PrimThrow,
+	BasicTypes,
+	CommonTypes,
 } from "./interfaces"
 
-function handleType (given: JSONOutput.SomeType): PrimType["type"] {
+function handleType(given: JSONOutput.SomeType): PrimType["type"] {
 	if (given.type === "array") {
 		return "Array"
 	}
 	if (given.type === "intrinsic") {
 		/** Types that appear to be used with "intrinsic" in TypeDoc */
-		const available: Record<string, BasicTypes|CommonTypes> = {
-			"string": "string",
-			"number": "number",
-			"boolean": "boolean",
-			"null": "null",
-			"bigint": "bigint",
-			"void": "undefined",
-			"symbol": "symbol", // TODO: make sure TypeDoc considers "symbol" intrinsic (probably)
+		const available: Record<string, BasicTypes | CommonTypes> = {
+			string: "string",
+			number: "number",
+			boolean: "boolean",
+			null: "null",
+			bigint: "bigint",
+			void: "undefined",
+			symbol: "symbol", // TODO: make sure TypeDoc considers "symbol" intrinsic (probably)
 		}
 		return available[given.name] ?? "unknown"
 	}
@@ -40,7 +49,7 @@ function handleType (given: JSONOutput.SomeType): PrimType["type"] {
  * @param docs RPC documentation in-progress
  * @param path Path of current method
  */
-function handleMethodLike (given: JSONOutput.DeclarationReflection, docs: PrimRpcDocs, path: string[]) {
+function handleMethodLike(given: JSONOutput.DeclarationReflection, docs: PrimRpcDocs, path: string[]) {
 	const pathParts = path.concat(given.name)
 	const signatures: PrimMethodSignature[] = getDeclarationPropReflected(given, "signatures").value.map(signature => {
 		const comment = parseComment(signature.comment)
@@ -77,9 +86,12 @@ function handleMethodLike (given: JSONOutput.DeclarationReflection, docs: PrimRp
  * @param module Given module in expected format
  * @returns a copy of given documentation, with changes
  */
-function addModuleToDocs(docs: SetOptional<PrimRpcDocs, "docs"|"props">, module: PrimModule) {
+function addModuleToDocs(docs: SetOptional<PrimRpcDocs, "docs" | "props">, module: PrimModule) {
 	// return addThingToDocs(docs, "modules", module)
-	const pathParts = module.path.split("/").filter(path => path).flatMap(path => ["props", path])
+	const pathParts = module.path
+		.split("/")
+		.filter(path => path)
+		.flatMap(path => ["props", path])
 	pathParts.push("docs")
 	const index = docs.modules.push(module) - 1
 	const reference: PrimRpcDocs["docs"] = ["modules", index]
@@ -93,9 +105,12 @@ function addModuleToDocs(docs: SetOptional<PrimRpcDocs, "docs"|"props">, module:
  * @param method Given method in expected format
  * @returns a copy of given documentation, with changes
  */
-function addMethodToDocs(docs: SetOptional<PrimRpcDocs, "docs"|"props">, method: PrimMethod) {
+function addMethodToDocs(docs: SetOptional<PrimRpcDocs, "docs" | "props">, method: PrimMethod) {
 	// return addThingToDocs(docs, "methods", method)
-	const pathParts = method.path.split("/").filter(path => path).flatMap(path => ["props", path])
+	const pathParts = method.path
+		.split("/")
+		.filter(path => path)
+		.flatMap(path => ["props", path])
 	pathParts.push("docs")
 	const index = docs.methods.push(method) - 1
 	const reference: PrimRpcDocs["docs"] = ["methods", index]
@@ -106,13 +121,20 @@ function addMethodToDocs(docs: SetOptional<PrimRpcDocs, "docs"|"props">, method:
  * Given some type that references another type in the TypeDoc documentation,
  * navigate the TypeDoc structure for the actual referenced type.
  */
-function queryGivenReference (given: JSONOutput.DeclarationReflection, id: number): JSONOutput.DeclarationReflection|void {
+function queryGivenReference(
+	given: JSONOutput.DeclarationReflection,
+	id: number
+): JSONOutput.DeclarationReflection | void {
 	const givenChildren = getDeclarationPropReflected(given, "children")
 	const children = givenChildren.reflected?.children ?? givenChildren.given?.children ?? []
 	for (const child of children) {
-		if (child.id === id) { return child }
+		if (child.id === id) {
+			return child
+		}
 		const found = queryGivenReference(child, id)
-		if (found) { return found }
+		if (found) {
+			return found
+		}
 	}
 	return
 }
@@ -121,18 +143,18 @@ function queryGivenReference (given: JSONOutput.DeclarationReflection, id: numbe
  * Navigate TSDoc children and look for things with call signatures. Rather than
  * inspecting the kind, just look for a `.signature` property to treat as a method
  * and look for a `.children` property to look for a module-like object.
- * 
+ *
  * @param root - Given TypeDoc information, in full
  * @param given - Given TypeDoc information for given level (used in recursion)
  * @param docs - In-progress RPC documentation
  * @param path - Path of current module
  * @returns whether the given object contains functions
  */
-function navigateModuleLike (
+function navigateModuleLike(
 	root: JSONOutput.ProjectReflection,
 	given: JSONOutput.DeclarationReflection,
 	docs: PrimRpcDocs,
-	path: string[] = [],
+	path: string[] = []
 ) {
 	let containsFunctions = false
 	const givenChildren = getDeclarationPropReflected(given, "children")
@@ -141,9 +163,8 @@ function navigateModuleLike (
 		// NOTE: if function has properties (like `.rpc`), it will probably have a signature **and** children
 		const referencedIdentifier = (child.type && child.type.type === "query" && child.type.queryType.id) || false
 		// if given type is "query" then use the given ID to find the referenced type
-		const childActual = (typeof referencedIdentifier === "number"
-			? queryGivenReference(root, referencedIdentifier)
-			: child) || child
+		const childActual =
+			(typeof referencedIdentifier === "number" ? queryGivenReference(root, referencedIdentifier) : child) || child
 		const hasSignature = getDeclarationPropReflected(childActual, "signatures")
 		const hasChildren = getDeclarationPropReflected(childActual, "children")
 		if (hasSignature.value) {

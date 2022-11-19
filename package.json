@@ -1,50 +1,57 @@
 {
-  "name": "@doseofted/prim-monorepo",
-  "description": "Not a headless CMS but better.",
-  "author": {
-    "name": "Ted Klingenberg",
-    "email": "ted@doseofted.com",
-    "url": "https://doseofted.com/"
-  },
-  "version": "0.0.1",
-  "packageManager": "pnpm@7.14.2",
-  "license": "UNLICENSED",
-  "private": true,
-  "scripts": {
-    "turbo": "turbo run",
-    "zx": "zx",
-    "build": "turbo run build",
-    "watch": "turbo run watch",
-    "entrypoint": "zx build-deps.mjs",
-    "test": "turbo run test",
-    "testing": "turbo run testing",
-    "lint": "turbo run lint",
-    "lint-style": "turbo run lint-style"
-  },
-  "dependencies": {
-    "zx": "^7.1.1"
-  },
-  "devDependencies": {
-    "@typescript-eslint/eslint-plugin": "^5.42.0",
-    "@typescript-eslint/parser": "^5.42.0",
-    "@vitest/ui": "^0.24.5",
-    "chokidar": "^3.5.3",
-    "eslint": "^8.26.0",
-    "eslint-plugin-solid": "^0.8.0",
-    "jsdom": "^20.0.2",
-    "postcss": "^8.4.18",
-    "postcss-html": "^1.5.0",
-    "sass": "^1.56.0",
-    "stylelint": "^14.14.1",
-    "stylelint-config-recommended": "^9.0.0",
-    "stylelint-config-recommended-scss": "^8.0.0",
-    "tsup": "^6.4.0",
-    "turbo": "^1.6.3",
-    "typedoc": "^0.23.20",
-    "typescript": "^4.8.4",
-    "unbuild": "^0.9.4",
-    "unocss": "^0.46.3",
-    "vite": "^3.2.2",
-    "vitest": "^0.24.5"
-  }
+	"name": "@doseofted/prim-monorepo",
+	"description": "Not a headless CMS but better.",
+	"author": {
+		"name": "Ted Klingenberg",
+		"email": "ted@doseofted.com",
+		"url": "https://doseofted.com/"
+	},
+	"version": "0.0.1",
+	"packageManager": "pnpm@7.14.2",
+	"license": "UNLICENSED",
+	"private": true,
+	"scripts": {
+		"turbo": "turbo run",
+		"zx": "zx",
+		"build": "turbo run build",
+		"watch": "turbo run watch",
+		"entrypoint": "zx build-deps.mjs",
+		"test": "turbo run test",
+		"testing": "turbo run testing",
+		"lint": "turbo run lint",
+		"lint-style": "turbo run lint-style",
+		"format": "prettier --write ."
+	},
+	"dependencies": {
+		"zx": "^7.1.1"
+	},
+	"devDependencies": {
+		"@builder.io/eslint-plugin-mitosis": "^0.0.11",
+		"@types/eslint": "^8.4.10",
+		"@typescript-eslint/eslint-plugin": "^5.42.0",
+		"@typescript-eslint/parser": "^5.42.0",
+		"@vitest/ui": "^0.24.5",
+		"chokidar": "^3.5.3",
+		"eslint": "^8.26.0",
+		"eslint-config-prettier": "^8.5.0",
+		"eslint-plugin-react": "^7.31.10",
+		"eslint-plugin-react-hooks": "^4.6.0",
+		"eslint-plugin-solid": "^0.8.0",
+		"jsdom": "^20.0.2",
+		"postcss": "^8.4.18",
+		"postcss-html": "^1.5.0",
+		"prettier": "^2.7.1",
+		"sass": "^1.56.0",
+		"stylelint": "^14.14.1",
+		"stylelint-config-recommended": "^9.0.0",
+		"stylelint-config-recommended-scss": "^8.0.0",
+		"tsup": "^6.4.0",
+		"turbo": "^1.6.3",
+		"typedoc": "^0.23.20",
+		"typescript": "^4.8.4",
+		"unbuild": "^0.9.4",
+		"unocss": "^0.46.3",
+		"vite": "^3.2.2",
+		"vitest": "^0.24.5"
+	}
 }

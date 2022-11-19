@@ -1,7 +1,5 @@
 import { get as getProperty } from "lodash-es"
-import {
-	PrimRpcDocs, PrimMethod, PrimModule, PrimModuleStructure, PrimRootStructureKeys,
-} from "../interfaces"
+import { PrimRpcDocs, PrimMethod, PrimModule, PrimModuleStructure, PrimRootStructureKeys } from "../interfaces"
 
 /**
  * Simple convenience function to get documentation for reference inside of Prim RPC Docs structure (`.props`)
@@ -10,7 +8,10 @@ import {
  * @param given Property found in documentation structure
  * @returns Documentation for requested module or method
  */
-export function findDocsReference(docs: Partial<PrimRpcDocs>, given?: PrimModuleStructure|PrimModuleStructure["docs"]) {
+export function findDocsReference(
+	docs: Partial<PrimRpcDocs>,
+	given?: PrimModuleStructure | PrimModuleStructure["docs"]
+) {
 	const [type, index] = Array.isArray(given) ? given : given.docs
 	return docs?.[type]?.[index]
 }
@@ -27,7 +28,10 @@ export function findDocsReference(docs: Partial<PrimRpcDocs>, given?: PrimModule
  * @returns A list of modules/methods for given level of documentation
  */
 export function iterateDocs<T extends PrimRootStructureKeys, U extends T extends "modules" ? PrimModule : PrimMethod>(
-	rootDocs: PrimModuleStructure, lookFor: T, submodule: Partial<PrimModuleStructure> = {}, includeNested = false,
+	rootDocs: PrimModuleStructure,
+	lookFor: T,
+	submodule: Partial<PrimModuleStructure> = {},
+	includeNested = false
 ): U[] {
 	const methods: U[] = []
 	for (const [, details] of Object.entries(submodule.props ?? {})) {
@@ -53,11 +57,11 @@ export function iterateDocs<T extends PrimRootStructureKeys, U extends T extends
  * @returns The method requested in your module
  */
 export function getFunctionForDocumentation<
-	Given extends (...args: unknown[]) => unknown = (...args: unknown[]) => unknown,
+	Given extends (...args: unknown[]) => unknown = (...args: unknown[]) => unknown
 >(
 	docs: PrimRpcDocs,
 	module: unknown,
-	methodDocs: PrimMethod|PrimModuleStructure|PrimModuleStructure["docs"],
+	methodDocs: PrimMethod | PrimModuleStructure | PrimModuleStructure["docs"]
 ): Given {
 	if (Array.isArray(methodDocs) && methodDocs[0] === "methods") {
 		const methodFound = findDocsReference(docs, methodDocs)

@@ -6,7 +6,7 @@ import type { JSONOutput } from "typedoc"
 // }
 
 /** Determine if given structure is a TypeDoc */
-export function isTypeDoc (docs: unknown): docs is JSONOutput.ProjectReflection {
+export function isTypeDoc(docs: unknown): docs is JSONOutput.ProjectReflection {
 	const likelyDocs = docs as JSONOutput.ProjectReflection
 	return typeof likelyDocs === "object" && likelyDocs.kind === 1 // ReflectionKind.Project === 1
 }
@@ -14,8 +14,8 @@ export function isTypeDoc (docs: unknown): docs is JSONOutput.ProjectReflection 
 /** Find property on given declaration regardless of whether type is reflected */
 export function getDeclarationPropReflected<
 	Given extends JSONOutput.DeclarationReflection,
-	Key extends keyof JSONOutput.DeclarationReflection,
->(given: Given, prop: Key): { given: Given, reflected: Given, value: Given[Key] } {
+	Key extends keyof JSONOutput.DeclarationReflection
+>(given: Given, prop: Key): { given: Given; reflected: Given; value: Given[Key] } {
 	if (prop in given) {
 		return { given, reflected: null, value: given[prop] }
 	} else if (given.type && given.type.type === "reflection" && prop in given.type.declaration) {
@@ -26,7 +26,7 @@ export function getDeclarationPropReflected<
 }
 
 /** Parse given comment as Markdown. Pass `tagged` to get a comment for a block tag. */
-export function parseComment (comment: JSONOutput.Comment, tagged?: string): string {
+export function parseComment(comment: JSONOutput.Comment, tagged?: string): string {
 	const output = tagged
 		? parseComment({ summary: comment?.blockTags?.find(tag => tag.name === tagged)?.content })
 		: comment?.summary?.map(sum => sum.text).reduce((p, n) => p + n, "")

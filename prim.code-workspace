@@ -1,5 +1,5 @@
 {
-  "folders": [
+	"folders": [
 		{
 			"name": "🌳 Project Root",
 			"path": "."
@@ -48,24 +48,12 @@
 			"source.fixAll": true
 		},
 		"editor.linkedEditing": true,
-		"editor.formatOnPaste": true,
 		"editor.formatOnSave": true,
-		"editor.defaultFormatter": "dbaeumer.vscode-eslint",
+		"editor.defaultFormatter": "esbenp.prettier-vscode",
 		"workbench.editor.pinnedTabSizing": "compact",
 		"npm.packageManager": "auto",
-		"stylelint.validate": [
-			"css",
-			"less",
-			"postcss",
-			"scss"
-		],
-		"eslint.format.enable": true,
-		"eslint.validate": [
-			"javascript",
-			"javascriptreact",
-			"typescript",
-			"typescriptreact"
-		],
+		"stylelint.validate": ["css", "less", "postcss", "scss"],
+		"eslint.validate": ["javascript", "javascriptreact", "typescript", "typescriptreact"],
 		"yaml.schemas": {
 			"https://raw.githubusercontent.com/compose-spec/compose-spec/master/schema/compose-spec.json": "compose.*.yml",
 			"https://json.schemastore.org/taskfile.json": "Taskfile.*.yml"
@@ -98,11 +86,10 @@
 			"Turborepo",
 			"websockets"
 		],
-		"cSpell.enableFiletypes": [
-			"dockerfile"
-		],
-		"unocss.root": "./",
-		"typescript.tsdk": "🌳 Project Root/node_modules/typescript/lib",
+		"cSpell.enableFiletypes": ["dockerfile"],
+		"unocss.root": "./apps/frontend",
+		"css.lint.unknownAtRules": "ignore",
+		"typescript.tsdk": "🌳 Project Root/node_modules/typescript/lib"
 	},
 	"extensions": {
 		"recommendations": [
@@ -110,6 +97,7 @@
 			"zamerick.vscode-caddyfile-syntax",
 			"ms-azuretools.vscode-docker",
 			"dbaeumer.vscode-eslint",
+			"esbenp.prettier-vscode",
 			"stylelint.vscode-stylelint",
 			"irongeek.vscode-env",
 			"streetsidesoftware.code-spell-checker"

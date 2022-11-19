@@ -21,7 +21,7 @@ const createBaseClientOptions = (): PrimOptions => ({
 	client: async (_endpoint, jsonBody) => {
 		const error = "Prim-RPC's client plugin was not provided"
 		if (Array.isArray(jsonBody)) {
-			return jsonBody.map(({ id })=> ({ id, error }))
+			return jsonBody.map(({ id }) => ({ id, error }))
 		}
 		return { error, id: jsonBody.id }
 	},
@@ -63,14 +63,16 @@ const createBaseServerOptions = (): PrimServerOptions => ({
 	},
 })
 
-
 /**
  * Set default options including creation of default clients used by Prim.
  *
  * @param options Given options by developer
  * @returns Options with defaults set
  */
-export function createPrimOptions<OptionsType extends PrimOptions = PrimOptions>(options?: OptionsType, server = false) {
+export function createPrimOptions<OptionsType extends PrimOptions = PrimOptions>(
+	options?: OptionsType,
+	server = false
+) {
 	// first initialize given options and values for which to fallback
 	const overrideBaseOptions = {} as OptionsType
 	if (options?.jsonHandler) {

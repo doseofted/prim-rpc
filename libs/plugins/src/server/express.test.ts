@@ -14,7 +14,7 @@ describe("Express plugin is functional as Prim Plugin", () => {
 	})
 	let server: Server
 	beforeEach(async () => {
-		await new Promise<void>((resolve) => {
+		await new Promise<void>(resolve => {
 			const done = () => resolve()
 			server = app.listen(0, "localhost", done)
 		})
@@ -48,7 +48,7 @@ describe("Express plugin is functional as Express plugin", () => {
 	app.use(expressPrimPlugin({ prim }))
 	let server: Server
 	beforeEach(async () => {
-		await new Promise<void>((resolve) => {
+		await new Promise<void>(resolve => {
 			const done = () => resolve()
 			server = app.listen(0, "localhost", done)
 		})

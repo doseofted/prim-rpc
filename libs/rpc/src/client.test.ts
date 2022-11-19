@@ -93,7 +93,9 @@ describe("Prim Client can throw errors", () => {
 		try {
 			return module.oops()
 		} catch (error) {
-			if (error instanceof Error) { return error.message }
+			if (error instanceof Error) {
+				return error.message
+			}
 			return "?"
 		}
 	})()
@@ -124,7 +126,7 @@ describe("Prim Client can make use of callbacks", () => {
 		const prim = createPrimClient({ module })
 		const results = await new Promise<string[]>(resolve => {
 			const results: string[] = []
-			void prim.withCallback((message) => {
+			void prim.withCallback(message => {
 				results.push(message)
 				if (results.length === 2) {
 					resolve(results)
@@ -138,7 +140,7 @@ describe("Prim Client can make use of callbacks", () => {
 		const prim = createPrimClient<IModule>({ client, socket })
 		const results = await new Promise<string[]>(resolve => {
 			const results: string[] = []
-			void prim.withCallback((message) => {
+			void prim.withCallback(message => {
 				results.push(message)
 				if (results.length === 2) {
 					resolve(results)
@@ -160,8 +162,8 @@ describe("Prim Client can batch RPC calls over HTTP", () => {
 		const prim = createPrimClient<IModule>({ client, socket, clientBatchTime: 15 })
 		// NOTE: can't seem to narrow down chosen type for array (linked possibly related issue)
 		// LINK: https://github.com/microsoft/TypeScript/issues/27808
-		const calls = <M extends typeof prim|typeof module>(m: M) => [
-			m.sayHello({ greeting: "Hi", name: "Ted"}),
+		const calls = <M extends typeof prim | typeof module>(m: M) => [
+			m.sayHello({ greeting: "Hi", name: "Ted" }),
 			m.sayHelloAlternative("Hey", "Ted"),
 		]
 		const expected = calls(module)
@@ -172,10 +174,10 @@ describe("Prim Client can batch RPC calls over HTTP", () => {
 	test("when a result is an error", async () => {
 		const { client, socket } = newTestClients({ module })
 		const prim = createPrimClient<IModule>({ client, socket, clientBatchTime: 15 })
-		const calls = <M extends typeof prim|typeof module>(m: M) => {
+		const calls = <M extends typeof prim | typeof module>(m: M) => {
 			// NOTE: for this test, it's important that functions are not awaited so that they are called within batch time
 			const results: unknown[] = []
-			results.push(m.sayHello({ greeting: "Hi", name: "Ted"}))
+			results.push(m.sayHello({ greeting: "Hi", name: "Ted" }))
 			results.push(m.sayHelloAlternative("Hey", "Ted"))
 			try {
 				results.push(m.oops())
@@ -186,7 +188,7 @@ describe("Prim Client can batch RPC calls over HTTP", () => {
 		}
 		const expected = calls(module)
 		// eslint-disable-next-line @typescript-eslint/no-unsafe-return
-		const result = Promise.allSettled(calls(prim)).then(list => list.map(r => "value" in r ? r.value : r.reason))
+		const result = Promise.allSettled(calls(prim)).then(list => list.map(r => ("value" in r ? r.value : r.reason)))
 		await expect(result).resolves.toEqual(expected)
 	})
 })

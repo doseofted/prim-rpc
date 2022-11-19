@@ -7,18 +7,28 @@ import { createPrimClient } from "./client"
 import { mergeBlobLikeWithGiven } from "./blobs"
 import type { AnyFunction } from "./client"
 import type {
-	CommonServerSimpleGivenOptions, CommonServerResponseOptions, PrimServerOptions, PrimWebSocketEvents,
-	RpcAnswer, RpcCall, PrimServerSocketAnswer, PrimServerSocketEvents, PrimServerActionsBase, PrimHttpEvents,
-	PrimServerEvents, PrimServer, PrimServerSocketAnswerRpc,
+	CommonServerSimpleGivenOptions,
+	CommonServerResponseOptions,
+	PrimServerOptions,
+	PrimWebSocketEvents,
+	RpcAnswer,
+	RpcCall,
+	PrimServerSocketAnswer,
+	PrimServerSocketEvents,
+	PrimServerActionsBase,
+	PrimHttpEvents,
+	PrimServerEvents,
+	PrimServer,
+	PrimServerSocketAnswerRpc,
 } from "./interfaces"
 
 /**
- * 
+ *
  * @param options Options for Prim server, including client options
  * @returns A `client` used for RPC calls, `configured` settings for Prim Server,
  * and event handlers for generic events used when making WS/HTTP calls
  */
-function createPrimInstance (options?: PrimServerOptions) {
+function createPrimInstance(options?: PrimServerOptions) {
 	const configured = createPrimOptions(options)
 	const socketEvent = mitt<PrimWebSocketEvents>()
 	const clientEvent = mitt<PrimHttpEvents>()
@@ -27,13 +37,16 @@ function createPrimInstance (options?: PrimServerOptions) {
 	return { client, socketEvent, clientEvent, configured }
 }
 
-function createServerActions (serverOptions: PrimServerOptions, instance?: ReturnType<typeof createPrimInstance>): PrimServerActionsBase {
+function createServerActions(
+	serverOptions: PrimServerOptions,
+	instance?: ReturnType<typeof createPrimInstance>
+): PrimServerActionsBase {
 	const { jsonHandler, prefix: serverPrefix, handleError } = serverOptions
-	const prepareCall = (given: CommonServerSimpleGivenOptions = {}): RpcCall|RpcCall[] => {
+	const prepareCall = (given: CommonServerSimpleGivenOptions = {}): RpcCall | RpcCall[] => {
 		const { body = "", method = "POST", url: possibleUrl = "" } = given
 		const providedBody = body && method === "POST"
 		if (providedBody) {
-			const prepared = jsonHandler.parse<RpcCall|RpcCall[]>(given.body)
+			const prepared = jsonHandler.parse<RpcCall | RpcCall[]>(given.body)
 			return prepared
 		}
 		const providedUrl = possibleUrl !== "" && method === "GET"
@@ -44,18 +57,22 @@ function createServerActions (serverOptions: PrimServerOptions, instance?: Retur
 				parseBooleans: true,
 				parseNumbers: true,
 			})
-			const id: string|number = ("-" in query && !Array.isArray(query["-"])) ? query["-"] : undefined
+			const id: string | number = "-" in query && !Array.isArray(query["-"]) ? query["-"] : undefined
 			delete query["-"]
 			const entries = Object.entries(query)
 			// determine if positional arguments were given (must start at 0, none can be missing)
 			for (const [possibleIndex, value] of entries) {
 				const index = Number.parseInt(possibleIndex)
-				if (Number.isNaN(index)) { break }
+				if (Number.isNaN(index)) {
+					break
+				}
 				const nextIndex = index === 0 || typeof positional[index - 1] !== "undefined"
-				if (!nextIndex) { break }
+				if (!nextIndex) {
+					break
+				}
 				positional[index] = value
 			}
-			const params = (positional.length > 0 && positional.length === entries.length) ? positional : query
+			const params = positional.length > 0 && positional.length === entries.length ? positional : query
 			let method = url.replace(RegExp("^" + serverPrefix + "\\/?"), "")
 			method = method !== "" ? method : "default"
 			return { id, method, params }
@@ -64,11 +81,11 @@ function createServerActions (serverOptions: PrimServerOptions, instance?: Retur
 		return { method: "default" }
 	}
 	const prepareRpc = async (
-		calls: RpcCall|RpcCall[],
+		calls: RpcCall | RpcCall[],
 		blobs: Record<string, unknown> = {},
 		context?: unknown,
-		cbResults?: (a: RpcAnswer) => void,
-	): Promise<RpcAnswer|RpcAnswer[]> => {
+		cbResults?: (a: RpcAnswer) => void
+	): Promise<RpcAnswer | RpcAnswer[]> => {
 		// NOTE: new Prim client should be created on each request so callback results are not shared
 		const { client, socketEvent: event, configured } = instance ?? createPrimInstance(serverOptions)
 		const callList = Array.isArray(calls) ? calls : [calls]
@@ -82,11 +99,13 @@ function createServerActions (serverOptions: PrimServerOptions, instance?: Retur
 				// using `client` to request remote module if not provided directly to server
 				const targetRemote = getProperty(client, methodExpanded) as AnyFunction & { rpc?: boolean }
 				const target = targetLocal ?? targetRemote
-				if (targetLocal) { // these checks only apply if module is provided directly (TBD on actual server with module)
+				if (targetLocal) {
+					// these checks only apply if module is provided directly (TBD on actual server with module)
 					if (methodExpanded.length > 1) {
 						const previousPath = getProperty(configured.module, methodExpanded.slice(0, -1)) as unknown
-						const disallowedMethodOnMethod = typeof previousPath === "function"
-							&& !serverOptions.methodsOnMethods.includes(methodExpanded.slice(-1)[0])
+						const disallowedMethodOnMethod =
+							typeof previousPath === "function" &&
+							!serverOptions.methodsOnMethods.includes(methodExpanded.slice(-1)[0])
 						if (disallowedMethodOnMethod) {
 							return { error: "Given method on method was not allowed" }
 						}
@@ -99,18 +118,20 @@ function createServerActions (serverOptions: PrimServerOptions, instance?: Retur
 					}
 					const methodAllowedDirectly = "rpc" in target && typeof target.rpc == "boolean" && target.rpc
 					if (!methodAllowedDirectly) {
-						const allowedInSchema = Object.entries(serverOptions.allowList ?? {}).length > 0
-							&& !!getProperty(serverOptions.allowList, methodExpanded)
+						const allowedInSchema =
+							Object.entries(serverOptions.allowList ?? {}).length > 0 &&
+							!!getProperty(serverOptions.allowList, methodExpanded)
 						if (!allowedInSchema) {
 							return { error: "Method not allowed" }
 						}
 					}
 				}
 				const argsArray = Array.isArray(params) ? params : [params]
-				const args = Object.entries(blobs || {}).length > 0
-					? argsArray.map(arg => mergeBlobLikeWithGiven(arg, blobs))
-					: argsArray
-				if (cbResults) { event.on("response", cbResults) }
+				const args =
+					Object.entries(blobs || {}).length > 0 ? argsArray.map(arg => mergeBlobLikeWithGiven(arg, blobs)) : argsArray
+				if (cbResults) {
+					event.on("response", cbResults)
+				}
 				// NOTE: use `remoteTarget` (even if target is local) to ensure callbacks are handled properly by Prim client
 				// eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
 				const result: RpcAnswer = await Reflect.apply(targetRemote, context, args)
@@ -131,12 +152,12 @@ function createServerActions (serverOptions: PrimServerOptions, instance?: Retur
 		const answeredCalls = await Promise.all(answeringCalls)
 		return answeredCalls.length === 1 ? answeredCalls[0] : answeredCalls
 	}
-	const prepareSend = (given: RpcAnswer|RpcAnswer[]): CommonServerResponseOptions => {
+	const prepareSend = (given: RpcAnswer | RpcAnswer[]): CommonServerResponseOptions => {
 		const body = jsonHandler.stringify(given)
 		// NOTE: body length is generally handled by server framework, I think
 		const headers = { "Content-Type": "application/json" }
 		const answers = Array.isArray(given) ? given : [given]
-		const statuses = answers.map(answer => answer.error ? 500 : (answer.result ? 200 : 400))
+		const statuses = answers.map(answer => (answer.error ? 500 : answer.result ? 200 : 400))
 		const notOkay = statuses.filter(stat => stat !== 200)
 		const errored = statuses.filter(stat => stat === 500)
 		// NOTE: return 200:okay, 400:missing, 500:error if any call has that status
@@ -146,13 +167,13 @@ function createServerActions (serverOptions: PrimServerOptions, instance?: Retur
 	return { prepareCall, prepareRpc, prepareSend }
 }
 
-function createServerEvents (serverOptions: PrimServerOptions): PrimServerEvents {
+function createServerEvents(serverOptions: PrimServerOptions): PrimServerEvents {
 	const server = () => {
 		const { prepareCall, prepareRpc, prepareSend } = createServerActions(serverOptions)
 		const call = async (
 			given: CommonServerSimpleGivenOptions,
 			blobs: Record<string, unknown> = {},
-			context?: unknown,
+			context?: unknown
 		): Promise<CommonServerResponseOptions> => {
 			const preparedParams = prepareCall(given)
 			const result = await prepareRpc(preparedParams, blobs, context)
@@ -164,7 +185,7 @@ function createServerEvents (serverOptions: PrimServerOptions): PrimServerEvents
 	return { server, options: serverOptions }
 }
 
-function createSocketEvents (serverOptions: PrimServerOptions): PrimServerSocketEvents {
+function createSocketEvents(serverOptions: PrimServerOptions): PrimServerSocketEvents {
 	const connected = () => {
 		const instance = createPrimInstance(serverOptions)
 		const { socketEvent: event } = instance
@@ -178,20 +199,20 @@ function createSocketEvents (serverOptions: PrimServerOptions): PrimServerSocket
 			// clear previous responses
 			// FIXME: don't stop listening to other responses when new call is made)
 			event.off("response")
-			event.on("response", (data) => {
+			event.on("response", data => {
 				const { body } = prepareSend(data)
 				send(body)
 			})
 			const preparedParams = prepareCall({ body })
 			const result = await prepareRpcBase(preparedParams, null, context)
 			const preparedResult = prepareSend(result)
-			send(preparedResult.body)			
+			send(preparedResult.body)
 		}
-		const rpc = async (body: RpcCall|RpcCall[], send: PrimServerSocketAnswerRpc, context?: unknown) => {
-			// clear previous responses 
+		const rpc = async (body: RpcCall | RpcCall[], send: PrimServerSocketAnswerRpc, context?: unknown) => {
+			// clear previous responses
 			// FIXME: don't stop listening to other responses when new call is made)
 			event.off("response")
-			event.on("response", (data) => {
+			event.on("response", data => {
 				send(data)
 			})
 			const result = await prepareRpcBase(body, null, context)
@@ -226,8 +247,8 @@ export function createPrimServer<
 	// eslint-disable-next-line @typescript-eslint/no-unused-vars
 	ModuleType extends OptionsType["module"] = object,
 	// eslint-disable-next-line @typescript-eslint/no-unused-vars
-	Context extends ReturnType<OptionsType["context"]> = never, 
-	OptionsType extends PrimServerOptions = PrimServerOptions,
+	Context extends ReturnType<OptionsType["context"]> = never,
+	OptionsType extends PrimServerOptions = PrimServerOptions
 >(options?: PrimServerOptions): PrimServer {
 	// NOTE: server options may include client options but only server options should be used
 	// client options should be re-instantiated on every request

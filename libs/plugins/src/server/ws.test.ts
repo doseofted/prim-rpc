@@ -6,7 +6,6 @@ import { primCallbackWs } from "./ws"
 import { WebSocketServer } from "ws"
 import http from "node:http"
 
-
 describe("ws is functional as Prim Plugin", async () => {
 	const server = http.createServer()
 	const wss = new WebSocketServer({ server })
@@ -22,14 +21,22 @@ describe("ws is functional as Prim Plugin", async () => {
 			})
 		})
 	})
-	afterEach(() => { server.close() })
+	afterEach(() => {
+		server.close()
+	})
 	const message = "Hey"
 	const expected = await new Promise<string[]>(resolve => {
 		const typed: string[] = []
-		module.typeMessage(message, (letter) => {
-			typed.push(letter)
-			if (typed.length === message.length) { resolve(typed) }
-		}, 0)
+		module.typeMessage(
+			message,
+			letter => {
+				typed.push(letter)
+				if (typed.length === message.length) {
+					resolve(typed)
+				}
+			},
+			0
+		)
 	})
 	test("registered as Prim Plugin", async () => {
 		const callbackId = "_cb_identifier"

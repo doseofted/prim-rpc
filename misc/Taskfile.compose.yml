@@ -4,7 +4,6 @@ env:
   COMPOSE_FILE: "{{.COMPOSE_FILE}}"
 
 tasks:
-
   ps:
     desc: "[{{.CHOSEN_ENV}}] List all running service names"
     cmds:

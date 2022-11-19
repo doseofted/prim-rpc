@@ -1,9 +1,9 @@
 /**
  * Example library
- * 
+ *
  * @packageDocumentation
  * @public
- * 
+ *
  * @nonsense Hello
  * @fakeFlag
  */
@@ -23,24 +23,29 @@ export * as additional from "./submodule"
 
 /**
  * Not me.
- * 
+ *
  * @public
  */
 export const you = "Ted"
 
-export enum Test { What = 5 }
+export enum Test {
+	What = 5,
+}
 
 /** Options used for greeting */
-export interface Greeting { greeting?: string, name?: string }
+export interface Greeting {
+	greeting?: string
+	name?: string
+}
 /**
  * Say hello. A test with an object parameter.
  *
  * @param options - Options used for greeting
  * @returns A nice greeting
- * 
+ *
  * @public
  */
-export function sayHello (options?: Greeting) {
+export function sayHello(options?: Greeting) {
 	const { greeting, name } = options ?? {}
 	return `${greeting ?? "Hello"} ${name ?? "you"}!`
 }
@@ -52,7 +57,7 @@ sayHello.rpc = true
  * @param greeting - How should `name` be greeted?
  * @param name - What's your name?
  * @returns A nice greeting
- * 
+ *
  * @public
  */
 export function sayHelloAlternative(greeting: string, name: string) {
@@ -62,7 +67,7 @@ sayHelloAlternative.rpc = true
 
 /**
  * This is an example of an entire that module that might be exported.
- * 
+ *
  * @public
  */
 export const testLevel1 = {
@@ -77,7 +82,7 @@ logMessage.rpc = true
 
 /**
  * A module inside of a module. A module turducken.
- * 
+ *
  * @public
  */
 export const testLevel2 = {
@@ -87,24 +92,26 @@ export const testLevel2 = {
 
 /**
  * It throws on purpose.
- * 
+ *
  * @param ok - Is it okay to fail?
  * @returns A message
  * @throws An error: "My bad."
- * 
+ *
  * @public
  */
 export function oops(ok = false) {
-	if (!ok) { throw new Error("My bad.") }
+	if (!ok) {
+		throw new Error("My bad.")
+	}
 	return "I did it again."
 }
 oops.rpc = true
 
 /**
  * This function makes use of a callback. Sometimes I don't need to be clever.
- * 
+ *
  * @param cb - Callback to be called with a message
- * 
+ *
  * @public
  */
 export function withCallback(cb: (message: string) => void) {
@@ -117,10 +124,10 @@ withCallback.rpc = true
 
 /**
  * Type a message. Now with configurable type speed.
- * 
+ *
  * @param message - Message to be typed
  * @param typeLetter - Callback called on each new letter
- * 
+ *
  * @public
  */
 export function typeMessage(message: string, typeLetter: (typed: string) => void, speed = 300) {
@@ -135,23 +142,23 @@ typeMessage.rpc = true
 
 /**
  * Probably tomorrow.
- * 
+ *
  * @param day - Given day
- * 
+ *
  * @public
  */
-export function whatIsDayAfter (day: Date) {
-	return new Date(day.valueOf() + (1000 * 60 * 60 * 24))
+export function whatIsDayAfter(day: Date) {
+	return new Date(day.valueOf() + 1000 * 60 * 60 * 24)
 }
 whatIsDayAfter.rpc = true
 
-type AddableThing = number|string
+type AddableThing = number | string
 /** Add two numbers */
-export function addThings (...things: number[]): number
+export function addThings(...things: number[]): number
 /** Add two strings */
-export function addThings (...things: string[]): string
+export function addThings(...things: string[]): string
 /** Add two things */
-export function addThings (...things: AddableThing[]): AddableThing {
+export function addThings(...things: AddableThing[]): AddableThing {
 	const unique = new Set(things.map(t => typeof t))
 	/** Workaround for function overload... this is just an example */
 	const expected = <X>(given: unknown, type: string): given is X => Array.from(unique)[0] === type
@@ -169,23 +176,36 @@ export function addThings (...things: AddableThing[]): AddableThing {
 addThings.rpc = true
 
 /** Server-provided details about an imaginary profile. */
-export interface ServerImaginaryProfile { name: string, password: string, email: string, picture: Promise<string> }
+export interface ServerImaginaryProfile {
+	name: string
+	password: string
+	email: string
+	picture: Promise<string>
+}
 /** Client-provided details about an imaginary profile. */
-export interface ClientImaginaryProfile { name: string, password: string, email: string, picture: Blob }
+export interface ClientImaginaryProfile {
+	name: string
+	password: string
+	email: string
+	picture: Blob
+}
 export function createImaginaryProfile(input: ServerImaginaryProfile): boolean
 export function createImaginaryProfile(input: ClientImaginaryProfile): boolean
-export function createImaginaryProfile(input: ServerImaginaryProfile|ClientImaginaryProfile) {
+export function createImaginaryProfile(input: ServerImaginaryProfile | ClientImaginaryProfile) {
 	const isServerSide = (given: typeof input): given is ServerImaginaryProfile => !(given.picture instanceof Blob)
-	if (!isServerSide(input)) { return false }
-	const { name, email, picture  } = input
+	if (!isServerSide(input)) {
+		return false
+	}
+	const { name, email, picture } = input
 	console.log(new Date(), "Look, a profile:", { name, email })
-	const logUpload = async (picture: Promise<string>) => console.log(new Date(), "Profile picture is here too!", await picture)
+	const logUpload = async (picture: Promise<string>) =>
+		console.log(new Date(), "Profile picture is here too!", await picture)
 	void logUpload(picture) // we can return before upload is processed
 	return true
 }
 createImaginaryProfile.rpc = true
 
-export type GenericFormExample = Record<string, Promise<string>|string|string[]>
+export type GenericFormExample = Record<string, Promise<string> | string | string[]>
 export async function handleForm(entries: GenericFormExample): Promise<string[]>
 /**
  * Upload a form to the server but without all of the hassle. Even with file uploads. What?!
@@ -193,10 +213,12 @@ export async function handleForm(entries: GenericFormExample): Promise<string[]>
  * @param form - An HTML Form element or Form Data used with the HTML Form
  * @returns The field names as received from the server. Field values are logged server-side.
  */
-export async function handleForm(form: HTMLFormElement|FormData): Promise<string[]>
-export async function handleForm (given: GenericFormExample|HTMLFormElement|FormData): Promise<string[]> {
+export async function handleForm(form: HTMLFormElement | FormData): Promise<string[]>
+export async function handleForm(given: GenericFormExample | HTMLFormElement | FormData): Promise<string[]> {
 	const serverSide = (given: unknown): given is GenericFormExample => typeof window === "undefined"
-	if (!serverSide(given)) { return [] }
+	if (!serverSide(given)) {
+		return []
+	}
 	const resolved: GenericFormExample = {}
 	for (const [key, input] of Object.entries(given)) {
 		if (Array.isArray(input)) {
@@ -218,13 +240,13 @@ export function whatIsThis(this: unknown) {
 whatIsThis.rpc = true
 
 /**
- * 
+ *
  * @param params - Any kind of parameter really
  * @returns The parameters you gave
- * 
+ *
  * @public
  */
-function defaultFunction (...params: unknown[]) {
+function defaultFunction(...params: unknown[]) {
 	return { params: params.length === 1 ? params[0] : params }
 }
 defaultFunction.rpc = true

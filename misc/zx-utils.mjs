@@ -2,7 +2,7 @@
 import { $, echo as baseEcho, chalk } from "zx"
 /**
  * Log output with given prefix and highlight variables. Use like so:
- * 
+ *
  * ```js
  * const echo = createEcho("name")
  * const there = "here"
@@ -14,7 +14,9 @@ function createEcho(prefix = "project") {
 	/** Add color to variables in console logs then echo. */
 	return function echo(strings, ...vals) {
 		let str = strings[0]
-		for (let i = 0; i < vals.length; i++) { str += chalk`{green ${vals[i]}}` + strings[i + 1] }
+		for (let i = 0; i < vals.length; i++) {
+			str += chalk`{green ${vals[i]}}` + strings[i + 1]
+		}
 		baseEcho(chalk.green.bold(`[${prefix}]`), str)
 	}
 }
