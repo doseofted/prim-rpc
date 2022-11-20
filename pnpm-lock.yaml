@@ -116,6 +116,7 @@ importers:
       sass: ^1.56.1
       tailwindcss: ^3.2.4
       typescript: ^4.8.4
+      use-immer: ^0.8.1
       webpack: ^5.75.0
       zustand: ^4.1.4
     dependencies:
@@ -124,9 +125,7 @@ importers:
       '@doseofted/prim-rpc': link:../../libs/rpc
       '@doseofted/prim-ui': link:../../libs/ui
       color2k: 2.0.0
-      immer: 9.0.16
       lodash-es: 4.17.21
-      nanoid: 4.0.0
       next: 13.0.4_m5sxuueb27gk6ddc5gums6vtgq
       popmotion: 11.0.5
       pts: 0.11.2
@@ -147,10 +146,13 @@ importers:
       daisyui: 2.41.0_2lwn2upnx27dqeg6hqdu7sq75m
       eslint: 8.28.0
       eslint-config-next: 13.0.4_hsf322ms6xhhd4b5ne6lb74y4a
+      immer: 9.0.16
+      nanoid: 4.0.0
       postcss: 8.4.19
       sass: 1.56.1
       tailwindcss: 3.2.4_postcss@8.4.19
       typescript: 4.9.3
+      use-immer: 0.8.1_immer@9.0.16+react@18.2.0
       webpack: 5.75.0
 
   libs/docs:
@@ -4720,7 +4722,6 @@ packages:
 
   /immer/9.0.16:
     resolution: {integrity: sha512-qenGE7CstVm1NrHQbMh8YaSzTZTFNP3zPqr3YU0S0UY441j4bJTg4A2Hh5KAhwgaiU6ZZ1Ar6y/2f4TblnMReQ==}
-    dev: false
 
   /immutable/4.1.0:
     resolution: {integrity: sha512-oNkuqVTA8jqG1Q6c+UglTOD1xhC1BtjKI7XkCXRkZHrN5m18/XsnUp8Q89GkQO/z+0WjonSvl0FLhDYftp46nQ==}
@@ -5595,7 +5596,6 @@ packages:
     resolution: {integrity: sha512-IgBP8piMxe/gf73RTQx7hmnhwz0aaEXYakvqZyE302IXW3HyVNhdNGC+O2MwMAVhLEnvXlvKtGbtJf6wvHihCg==}
     engines: {node: ^14 || ^16 || >=18}
     hasBin: true
-    dev: false
 
   /natural-compare-lite/1.4.0:
     resolution: {integrity: sha512-Tj+HTDSJJKaZnfiuw+iaF9skdPpTo2GtEly5JHnWV/hfv2Qj/9RKsGISQtLh2ox3l5EAGw487hnBee0sIJ6v2g==}
@@ -7926,6 +7926,16 @@ packages:
     dependencies:
       querystringify: 2.2.0
       requires-port: 1.0.0
+    dev: true
+
+  /use-immer/0.8.1_immer@9.0.16+react@18.2.0:
+    resolution: {integrity: sha512-OfTFf1pL+ICjjcLPn9+ZnaJO/Yg4MBzYZtACEe2mZ/W2A5col28PNUnwowOAaBuOogACOK/37TU17KgsIhUpOw==}
+    peerDependencies:
+      immer: '>=2.0.0'
+      react: ^16.8.0 || ^17.0.1 || ^18.0.0
+    dependencies:
+      immer: 9.0.16
+      react: 18.2.0
     dev: true
 
   /use-sync-external-store/1.2.0_react@18.2.0:
