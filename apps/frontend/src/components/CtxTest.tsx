@@ -9,19 +9,20 @@ interface TestStore {
 }
 const store = createStore<TestStore>(set => ({
 	hello: "",
-	sayHi: (given: string) => set(_ => ({ hello: 'Hi ' + given }))
+	sayHi: (given: string) => set(_ => ({ hello: "Hi " + given })),
 }))
-
 
 // test.sayHi
 
-type CtxType = { winSize: { width: number, height: number }, scrollPos: { x: number, y: number } }
+type CtxType = { winSize: { width: number; height: number }; scrollPos: { x: number; y: number } }
 const testCtx = createContext<CtxType | null>(null)
 function useTestCtx() {
 	const ctx = useContext(testCtx)
 	const test = useStore(store)
-	console.log(test);
-	if (!ctx) { throw new Error("Nope") }
+	console.log(test)
+	if (!ctx) {
+		throw new Error("Nope")
+	}
 	return ctx
 }
 
@@ -31,25 +32,25 @@ interface CtxTestProps {
 export function CtxTest(props: CtxTestProps) {
 	const [env, setEnv] = useState<CtxType>({
 		winSize: { width: 0, height: 0 },
-		scrollPos: { x: 0, y: 0 }
+		scrollPos: { x: 0, y: 0 },
 	})
 	const winSize = useWindowSize(0, 0)
 	const scrollPos = useWindowScroll()
 	useEffect(() => {
-		setEnv(produce((given) => {
-			given.winSize = winSize
-		}))
+		setEnv(
+			produce(given => {
+				given.winSize = winSize
+			})
+		)
 	}, [winSize])
 	useEffect(() => {
-		setEnv(produce((given) => {
-			given.scrollPos = scrollPos
-		}))
+		setEnv(
+			produce(given => {
+				given.scrollPos = scrollPos
+			})
+		)
 	}, [scrollPos])
-	return (
-		<testCtx.Provider value={env}>
-			{props.children}
-		</testCtx.Provider>
-	)
+	return <testCtx.Provider value={env}>{props.children}</testCtx.Provider>
 }
 
 interface CtxChildProps extends React.HTMLAttributes<HTMLDivElement> {
@@ -57,9 +58,15 @@ interface CtxChildProps extends React.HTMLAttributes<HTMLDivElement> {
 }
 export function CtxChild({ children, ...attrs }: CtxChildProps) {
 	const { scrollPos, winSize } = useTestCtx()
-	return <div {...attrs}>
-		<div>({scrollPos.x}, {scrollPos.y})</div>
-		<div>({winSize.width}, {winSize.height})</div>
-		{children}
-	</div>
+	return (
+		<div {...attrs}>
+			<div>
+				({scrollPos.x}, {scrollPos.y})
+			</div>
+			<div>
+				({winSize.width}, {winSize.height})
+			</div>
+			{children}
+		</div>
+	)
 }
