@@ -11,7 +11,7 @@ const config = {
 			plugins: ["@typescript-eslint"],
 			parserOptions: {
 				sourceType: "module",
-				project: ["./apps/frontend/tsconfig.json"],
+				project: ["./tsconfig.json"],
 				ecmaFeatures: {
 					jsx: true,
 				},

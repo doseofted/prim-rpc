@@ -14,6 +14,7 @@ export default function Home() {
 				<Lights options={{ brightness: 1, size: 500 }}>
 					<Light>
 						<div className="font-sans relative">
+							{/* eslint-disable-next-line @typescript-eslint/no-unsafe-assignment */}
 							<PrimDocs docs={docs} />
 						</div>
 					</Light>

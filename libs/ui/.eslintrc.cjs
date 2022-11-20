@@ -9,7 +9,7 @@ const config = {
 			plugins: ["@typescript-eslint"],
 			parserOptions: {
 				sourceType: "module",
-				project: ["./libs/ui/tsconfig.base.json"],
+				project: ["./tsconfig.json"],
 				ecmaFeatures: {
 					jsx: true,
 				},
@@ -28,9 +28,10 @@ const config = {
 			files: ["*.vue"],
 			parser: "vue-eslint-parser",
 			parserOptions: {
+				extraFileExtensions: [".vue"],
 				parser: "@typescript-eslint/parser",
 				sourceType: "module",
-				project: ["./libs/ui/tsconfig.json"],
+				project: ["./tsconfig.json"],
 				ecmaFeatures: {
 					jsx: true,
 				},
