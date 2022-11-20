@@ -7,6 +7,7 @@ import { CanvasSpace, Circle, Pt, GroupLike, PtsCanvasRenderingContext2D, Const,
 import { lighten, transparentize } from "color2k"
 import { easeIn, easeOut } from "popmotion"
 import { PtsCanvas } from "react-pts-canvas"
+import type { RequireExactlyOne } from "type-fest"
 
 export interface LightOptions {
 	/** Brightness from 0-2 */
@@ -39,7 +40,7 @@ type LightsState = {
 	colors: string[]
 }
 type LightsActions = {
-	createLight(opts: LightOptions, position: [x: number, y: number]): string
+	createLight(opts: RequireExactlyOne<Partial<LightOptions>, "color">, position: [x: number, y: number]): string
 	retrieveLight(id: string): LightInstance
 	updateLightPosition(id: string, position: [x: number, y: number]): void
 	updateLightOptions(id: string, options: Partial<LightOptions>): void
@@ -73,7 +74,7 @@ export interface LightsProps {
 }
 /** Provider for `Light` components */
 export function Lights(props: LightsProps) {
-	const { children, options: optionsShared, onFirstFrame } = props
+	const { children, options: sharedOptions = {}, onFirstFrame } = props
 	const [lights, setLights] = useImmer<{ [id: string]: LightInstance }>({})
 	const windowSize = useWindowSize(0, 0)
 	const windowScroll = useWindowScroll()
@@ -89,9 +90,18 @@ export function Lights(props: LightsProps) {
 					setLights(draft => {
 						const [x, y] = position ?? [0, 0]
 						draft[id] = {
-							...optionsShared,
+							// defaults
+							brightness: 1,
+							size: 50,
+							offset: [0, 0],
+							rotate: 0,
+							delay: 50,
+							// shared
+							...sharedOptions,
+							// given
 							...opts,
 							position: [x, y],
+							// created
 							id,
 						}
 					})
@@ -100,7 +110,7 @@ export function Lights(props: LightsProps) {
 				updateLightOptions(id, options) {
 					setLights(draft => {
 						const light = draft[id]
-						draft[id] = { ...optionsShared, ...light, ...options }
+						draft[id] = { ...sharedOptions, ...light, ...options }
 					})
 				},
 				updateLightPosition(id, position) {
@@ -119,7 +129,7 @@ export function Lights(props: LightsProps) {
 				},
 			},
 		],
-		[lights, windowSize, windowScroll]
+		[sharedOptions, lights, windowSize, windowScroll]
 	)
 	const fixedCss: React.CSSProperties = { position: "fixed", width: "100%", height: "100%", top: 0, left: 0 }
 	const blurCss = useMemo<React.CSSProperties>(
@@ -178,19 +188,15 @@ export function Light(props: LightsProps) {
 	const { options: givenOptions, children, ...attrs } = props
 	const [ctx, actions] = useLights()
 	const color = useMemo(() => shuffle(ctx.colors)[random(0, ctx.colors.length - 1)], [])
-	const options = useMemo<LightOptions>(
+	const options = useMemo<RequireExactlyOne<Partial<LightOptions>, "color">>(
 		() => ({
 			color,
-			size: 50,
-			offset: [0, 0],
-			delay: 50,
-			brightness: 1,
 			...givenOptions,
 		}),
 		[givenOptions]
 	)
 	const [id, setId] = useState("")
-	// const light = useMemo(() => ctx.lights[id], [ctx.lights, id])
+	const light = useMemo(() => ctx.lights[id], [ctx.lights, id])
 	useEffect(() => {
 		if (!options) {
 			return
@@ -201,13 +207,16 @@ export function Light(props: LightsProps) {
 		return () => actions.removeLight(given)
 	}, [])
 	useEffect(() => {
-		if (!id) {
+		if (!light) {
 			return
 		}
 		const { x, y } = getCenter(div.current)
 		actions.updateLightPosition(id, [x, y])
 	}, [ctx.windowSize, ctx.windowScroll])
 	useEffect(() => {
+		if (!light) {
+			return
+		}
 		actions.updateLightOptions(id, options)
 	}, [options])
 	const div = useRef<HTMLDivElement>(null)

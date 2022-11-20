@@ -1,5 +1,6 @@
 import Head from "next/head"
-import { Lights, Light } from "../components/Lights"
+import { Lights } from "../components/Lights"
+import { LightState } from "../components/LightsState"
 
 export default function Home() {
 	return (
@@ -7,11 +8,11 @@ export default function Home() {
 			<Head>
 				<title>Hi</title>
 			</Head>
-			<div className="font-sans flex justify-center items-center min-h-[200vh]">
-				<Lights options={{ size: 500 }}>
-					<div className="flex justify-center items-center gap-12">
-						{Array.from(Array(10), (_, i) => i).map(key => (
-							<Light key={key}></Light>
+			<div className="font-sans flex justify-center items-center min-h-screen">
+				<Lights options={{ size: 600, brightness: 1 }}>
+					<div className="flex justify-center items-center gap-12 relative top-0">
+						{Array.from(Array(1), (_, i) => i).map(key => (
+							<LightState key={key}></LightState>
 						))}
 					</div>
 				</Lights>
