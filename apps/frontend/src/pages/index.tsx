@@ -7,9 +7,9 @@ export default function Home() {
 			<Head>
 				<title>Hi</title>
 			</Head>
-			<div className="font-sans flex justify-center items-center min-h-screen">
+			<div className="font-sans flex justify-center items-center min-h-[200vh]">
 				<Lights>
-					<Light>Hi</Light>
+					<Light options={{ size: 500 }}>Hi</Light>
 				</Lights>
 			</div>
 		</>

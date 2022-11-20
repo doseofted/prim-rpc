@@ -112,6 +112,7 @@ importers:
       pts: ^0.11.2
       react: 18.2.0
       react-dom: 18.2.0
+      react-pts-canvas: ^0.3.4
       react-use: ^17.4.0
       sass: ^1.56.1
       tailwindcss: ^3.2.4
@@ -149,6 +150,7 @@ importers:
       popmotion: 11.0.5
       postcss: 8.4.19
       pts: 0.11.2
+      react-pts-canvas: 0.3.4_igotx7vagjyvdevbv4p2avxh3q
       sass: 1.56.1
       tailwindcss: 3.2.4_postcss@8.4.19
       typescript: 4.9.3
@@ -1372,6 +1374,10 @@ packages:
 
   /@types/node/12.20.24:
     resolution: {integrity: sha512-yxDeaQIAJlMav7fH5AQqPH1u8YIuhYJXYBzxaQ4PifsU0GDO38MSdmEDeRlIxrKbC6NbEaaEHDanWb+y30U8SQ==}
+    dev: true
+
+  /@types/node/17.0.45:
+    resolution: {integrity: sha512-w+tIMs3rq2afQdsPJlODhoUEKzFP1ayaoyl1CcnwtIlsVe7K7bA1NGm4s3PraqTLlXnbIN84zuBlxBWo1u9BLw==}
     dev: true
 
   /@types/node/18.11.9:
@@ -6339,6 +6345,22 @@ packages:
 
   /react-is/17.0.2:
     resolution: {integrity: sha512-w2GsyukL62IJnlaff/nRegPQR94C/XXamvMWmSHRJ4y7Ts/4ocGRmTHvOs8PSE6pB3dWOrD/nueuU5sduBsQ4w==}
+    dev: true
+
+  /react-pts-canvas/0.3.4_igotx7vagjyvdevbv4p2avxh3q:
+    resolution: {integrity: sha512-Cdo3gzHqIDjQyx1VI4G6OlozNAwOK7FB7WkP4sgVNoiBrbuFZY/DcyEhO+NTATyj2/GMmLbA+u4FG4mD3/V7zg==}
+    engines: {node: '>=8', npm: '>=5'}
+    peerDependencies:
+      pts: '>=0.10.2'
+      react: '>=17.0.0'
+      react-dom: '>=17.0.0'
+    dependencies:
+      '@types/node': 17.0.45
+      prop-types: 15.8.1
+      pts: 0.11.2
+      react: 18.2.0
+      react-dom: 18.2.0_react@18.2.0
+      typescript: 4.9.3
     dev: true
 
   /react-refresh/0.14.0:
