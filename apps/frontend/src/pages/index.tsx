@@ -7,7 +7,7 @@ export default function Home() {
 			<Head>
 				<title>Hi</title>
 			</Head>
-			<div className="font-sans">
+			<div className="font-sans flex justify-center items-center min-h-screen">
 				<Lights>
 					<Light>Hi</Light>
 				</Lights>
