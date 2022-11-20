@@ -4,13 +4,12 @@ const config = {
 	root: false,
 	overrides: [
 		{
-			files: ["*.tsx"],
-			excludedFiles: ["*.lite.tsx"],
+			files: ["*react.tsx"],
 			parser: "@typescript-eslint/parser",
 			plugins: ["@typescript-eslint"],
 			parserOptions: {
 				sourceType: "module",
-				project: ["./libs/ui/tsconfig.json"],
+				project: ["./tsconfig.json"],
 				ecmaFeatures: {
 					jsx: true,
 				},
@@ -21,25 +20,27 @@ const config = {
 				"plugin:@typescript-eslint/recommended-requiring-type-checking",
 				"plugin:react/recommended",
 				"plugin:react-hooks/recommended",
+				"plugin:react/jsx-runtime",
 				"prettier",
 			],
 		},
 		{
-			parser: "@typescript-eslint/parser",
+			files: ["*.vue"],
+			parser: "vue-eslint-parser",
 			parserOptions: {
+				extraFileExtensions: [".vue"],
+				parser: "@typescript-eslint/parser",
 				sourceType: "module",
-				project: ["./libs/ui/tsconfig.json"],
+				project: ["./tsconfig.json"],
 				ecmaFeatures: {
 					jsx: true,
 				},
 			},
-			files: ["*.lite.tsx"],
-			plugins: ["@builder.io/mitosis"],
 			extends: [
 				"eslint:recommended",
 				"plugin:@typescript-eslint/recommended",
 				"plugin:@typescript-eslint/recommended-requiring-type-checking",
-				"plugin:@builder.io/mitosis/recommended",
+				"plugin:vue/vue3-recommended",
 				"prettier",
 			],
 		},

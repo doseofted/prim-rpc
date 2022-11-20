@@ -11,7 +11,7 @@ const config = {
 			plugins: ["@typescript-eslint"],
 			parserOptions: {
 				sourceType: "module",
-				project: ["./apps/frontend/tsconfig.json"],
+				project: ["./tsconfig.json"],
 				ecmaFeatures: {
 					jsx: true,
 				},
@@ -24,7 +24,7 @@ const config = {
 				"prettier",
 			],
 			rules: {
-				"@next/next/no-html-link-for-pages": ["error", "pages/"],
+				"@next/next/no-html-link-for-pages": ["error", "src/pages/"],
 			},
 		},
 	],
