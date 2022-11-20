@@ -73,12 +73,13 @@ export interface LightsProps {
 }
 /** Provider for `Light` components */
 export function Lights(props: LightsProps) {
-	const { children, colors: colorsGiven, background: bgGiven, options: optionsShared, onFirstFrame } = props
+	const { children, options: optionsShared, onFirstFrame } = props
 	const [lights, setLights] = useImmer<{ [id: string]: LightInstance }>({})
 	const windowSize = useWindowSize(0, 0)
 	const windowScroll = useWindowScroll()
-	const colors = useMemo(() => colorsGiven ?? defaultColors, [colorsGiven])
-	const background = useMemo(() => bgGiven ?? defaultBackground, [bgGiven])
+	const colors = useMemo(() => props.colors ?? defaultColors, [props.colors])
+	const background = useMemo(() => props.background ?? defaultBackground, [props.background])
+	const blur = useMemo(() => props.blur ?? 15, [props.blur])
 	const ctx = useMemo<LightsContext>(
 		() => [
 			{ lights, windowSize, windowScroll, colors },
@@ -125,19 +126,13 @@ export function Lights(props: LightsProps) {
 		() => ({
 			...fixedCss,
 			backgroundColor: "transparent",
-			backdropFilter: `blur(${props.blur}px)`,
+			backdropFilter: `blur(${blur}px)`,
 		}),
 		[]
 	)
 	return (
 		<LightsContext.Provider value={ctx}>
-			<LightsCanvas
-				background={background}
-				style={fixedCss}
-				onFirstFrame={() => {
-					onFirstFrame?.()
-				}}
-			/>
+			<LightsCanvas background={background} style={fixedCss} onFirstFrame={() => onFirstFrame?.()} />
 			<div style={blurCss} />
 			{children}
 		</LightsContext.Provider>
