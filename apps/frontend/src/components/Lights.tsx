@@ -138,7 +138,7 @@ export function Lights(props: LightsProps) {
 			backgroundColor: "transparent",
 			backdropFilter: `blur(${blur}px)`,
 		}),
-		[]
+		[blur]
 	)
 	return (
 		<LightsContext.Provider value={ctx}>

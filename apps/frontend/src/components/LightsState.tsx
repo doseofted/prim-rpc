@@ -23,8 +23,8 @@ export function LightState(props: LightStateProps) {
 				{
 					...configured,
 					brightness: 0,
-					size: 0,
-					offset: [random(50, 100), random(50, 100)],
+					size: (configured.size ?? 0) * 3,
+					offset: [random(100, 200), random(100, 200)],
 					rotate: random(0, 360),
 					delay: enterDelay,
 				},
@@ -70,7 +70,6 @@ export function LightState(props: LightStateProps) {
 			return
 		}
 		const timeline = timelines[state]
-		console.log("timeline state", state)
 		const cancellations = timeline.map(([timestamp, newOptions], index) => {
 			const lastTimelineItem = index === timeline.length - 1
 			if (lastTimelineItem) {

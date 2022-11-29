@@ -6,10 +6,10 @@ export default function Home() {
 	return (
 		<>
 			<Head>
-				<title>Hi</title>
+				<title>Prim+RPC</title>
 			</Head>
 			<div className="font-sans flex justify-center items-center min-h-screen">
-				<Lights options={{ size: 600, brightness: 1 }}>
+				<Lights options={{ size: 600, brightness: 1 }} blur={40}>
 					<div className="flex justify-center items-center gap-12 relative top-0">
 						{Array.from(Array(20), (_, i) => i).map(key => (
 							<LightState state="enter" key={key}></LightState>
