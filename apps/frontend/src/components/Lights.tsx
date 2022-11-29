@@ -162,6 +162,7 @@ function getCenter(div?: HTMLDivElement | null) {
 export interface LightProps extends React.HTMLAttributes<HTMLDivElement> {
 	children?: React.ReactNode | React.ReactNode[]
 	options?: Partial<LightOptions>
+	onOptionsSet?: (options: Partial<LightOptions>) => void
 }
 /**
  * Place a `Light` component anywhere inside of a `Lights` component and a light
@@ -184,8 +185,8 @@ export interface LightProps extends React.HTMLAttributes<HTMLDivElement> {
  * </Lights>
  * ```
  */
-export function Light(props: LightsProps) {
-	const { options: givenOptions, children, ...attrs } = props
+export function Light(props: LightProps) {
+	const { options: givenOptions, children, onOptionsSet, ...attrs } = props
 	const [ctx, actions] = useLights()
 	const color = useMemo(() => shuffle(ctx.colors)[random(0, ctx.colors.length - 1)], [])
 	const options = useMemo<RequireExactlyOne<Partial<LightOptions>, "color">>(
@@ -206,6 +207,17 @@ export function Light(props: LightsProps) {
 		setId(given)
 		return () => actions.removeLight(given)
 	}, [])
+	const [optionsEventSent, setOptionsEventSent] = useState(false)
+	useEffect(() => {
+		if (!light) {
+			return
+		}
+		if (optionsEventSent) {
+			return
+		}
+		setOptionsEventSent(true)
+		onOptionsSet?.(light)
+	}, [light])
 	useEffect(() => {
 		if (!light) {
 			return

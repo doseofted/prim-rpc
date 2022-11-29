@@ -13,46 +13,48 @@ interface LightStateProps extends React.HTMLAttributes<HTMLDivElement> {
  */
 export function LightState(props: LightStateProps) {
 	const { children, options: optionsGiven = {}, state = "enter", ...attrs } = props
+	const [configured, setConfigured] = useState<Partial<LightOptions>>({})
 	type TimelineItem = [timestamp: number, options: Partial<LightOptions>][]
 	const timelines = useMemo<{ [key in PossibleStates]: TimelineItem }>(() => {
-		const delay = random(0, 50)
+		const enterDelay = random(50, 75)
 		const enter: TimelineItem = [
 			[
 				0,
 				{
-					...optionsGiven,
+					...configured,
 					brightness: 0,
 					size: 0,
-					offset: [random(50, 150), random(50, 150)],
+					offset: [random(50, 100), random(50, 100)],
 					rotate: random(0, 360),
-					delay,
+					delay: enterDelay,
 				},
 			],
 			[
-				random(500, 1500),
+				random(200, 1000),
 				{
-					...optionsGiven,
-					delay,
+					...configured,
+					delay: enterDelay,
 				},
 			],
 		]
+		const exitDelay = random(75, 150)
 		const exit: TimelineItem = [
 			[
 				0,
 				{
-					...optionsGiven,
-					delay,
+					...configured,
+					delay: exitDelay,
 				},
 			],
 			[
-				random(500, 1500),
+				random(200, 1000),
 				{
-					...optionsGiven,
+					...configured,
 					brightness: 0,
 					size: 0,
-					offset: [random(50, 150), random(50, 150)],
+					offset: [random(0, 100), random(0, 100)],
 					rotate: random(0, 360),
-					delay,
+					delay: exitDelay,
 				},
 			],
 		]
@@ -62,10 +64,13 @@ export function LightState(props: LightStateProps) {
 		}
 	}, [optionsGiven])
 	const [options, setOptions] = useState(optionsGiven)
+	const lightReady = useMemo(() => Object.keys(configured).length > 0, [configured])
 	useEffect(() => {
+		if (!lightReady) {
+			return
+		}
 		const timeline = timelines[state]
 		console.log("timeline state", state)
-
 		const cancellations = timeline.map(([timestamp, newOptions], index) => {
 			const lastTimelineItem = index === timeline.length - 1
 			if (lastTimelineItem) {
@@ -80,9 +85,9 @@ export function LightState(props: LightStateProps) {
 		return () => {
 			cancellations.map(cancelId => clearTimeout(cancelId))
 		}
-	}, [state])
+	}, [state, lightReady])
 	return (
-		<Light {...attrs} options={options}>
+		<Light {...attrs} options={options} onOptionsSet={opts => setConfigured(opts)}>
 			{children}
 		</Light>
 	)
