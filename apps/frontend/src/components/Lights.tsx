@@ -56,8 +56,17 @@ function useLights() {
 	return ctx
 }
 
-const defaultColors = ["#f0A3FF", "#6D53FF", "#1D0049", "#0069BA", "#5BB8FF"]
-const defaultBackground = "#2D0D60"
+/** Names come from Coolors app */
+export enum NamedColor {
+	Mauve = 0,
+	MajorelleBlue,
+	RussianViolet,
+	GreenBlue,
+	BlueJeans,
+	ElectricBlue,
+}
+export const defaultColors = ["#f0A3FF", "#6D53FF", "#1D0049", "#0069BA", "#5BB8FF", "#4AEDFF"]
+export const defaultBackground = "#2D0D60"
 
 export interface LightsProps {
 	children?: React.ReactNode | React.ReactNode[]

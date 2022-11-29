@@ -9,7 +9,7 @@ interface LightStateProps extends React.HTMLAttributes<HTMLDivElement> {
 	children?: React.ReactNode | React.ReactNode[]
 }
 /**
- * A wrapper around Light with pre-configured states for page actions.
+ * A wrapper around `Light` with pre-configured states for page actions.
  */
 export function LightState(props: LightStateProps) {
 	const { children, options: optionsGiven = {}, state = "enter", ...attrs } = props

@@ -3,7 +3,7 @@ import { Montserrat, Plus_Jakarta_Sans } from "@next/font/google"
 import type { AppProps } from "next/app"
 
 const montserrat = Montserrat({
-	variable: "--montserrat",
+	variable: "--font-montserrat",
 	subsets: ["latin"],
 	display: "swap",
 })
@@ -15,7 +15,7 @@ const plusJakartaSans = Plus_Jakarta_Sans({
 
 export default function App({ Component, pageProps }: AppProps) {
 	return (
-		<div className={["w-full min-h-screen", montserrat.variable, plusJakartaSans.variable].join(" ")}>
+		<div className={["w-full min-h-screen font-sans", montserrat.variable, plusJakartaSans.variable].join(" ")}>
 			<Component {...pageProps} />
 		</div>
 	)
