@@ -45,6 +45,7 @@
 		"eslint": "8.28.0",
 		"eslint-config-next": "13.0.4",
 		"immer": "^9.0.16",
+		"leva": "^0.9.34",
 		"lodash-es": "^4.17.21",
 		"nanoid": "^4.0.0",
 		"popmotion": "^11.0.5",

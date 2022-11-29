@@ -1,8 +1,12 @@
 import Head from "next/head"
 import { Lights } from "../../components/Lights"
 import { LightState } from "../../components/LightsState"
+import { useControls } from "leva"
+import { useMemo } from "react"
 
 export default function Home() {
+	const { show } = useControls({ show: true })
+	const state = useMemo(() => (show ? "enter" : "exit"), [show])
 	return (
 		<>
 			<Head>
@@ -12,7 +16,7 @@ export default function Home() {
 				<Lights options={{ size: 600, brightness: 1 }} blur={40}>
 					<div className="flex justify-center items-center gap-12 relative top-0">
 						{Array.from(Array(20), (_, i) => i).map(key => (
-							<LightState state="enter" key={key}></LightState>
+							<LightState state={state} key={key}></LightState>
 						))}
 					</div>
 				</Lights>

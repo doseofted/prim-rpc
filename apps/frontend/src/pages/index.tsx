@@ -7,7 +7,7 @@ export default function Home() {
 	return (
 		<>
 			<Head>
-				<title>Lights Test</title>
+				<title>Prim+RPC</title>
 			</Head>
 			<div className="bg-prim-space">
 				<Lights options={{ size: 800 }}>
@@ -32,7 +32,7 @@ export default function Home() {
 								(placeholder)
 							</div>
 							<div className="col-span-12">
-								<p className="font-title text-[6rem] font-semibold text-white uppercase text-right">
+								<p className="font-title text-[6rem] font-semibold text-white uppercase text-right leading-tight">
 									Backend,
 									<br /> Meet Frontend.
 								</p>
