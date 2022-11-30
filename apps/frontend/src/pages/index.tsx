@@ -40,12 +40,20 @@ export default function Home() {
 						<div className="relative min-h-screen py-8 container mx-auto grid grid-cols-12 grid-rows-[auto_1fr_auto] px-4 gap-4">
 							<div className="col-span-12">
 								<div className="inline-block">
-									<Link href="/" className="relative">
-										<p className="font-title text-[3rem] select-none font-normal text-prim-space uppercase">
-											Prim+<span className="font-bold">RPC</span>
+									<Link href="/" className="group relative">
+										<p className="font-title text-[1.5rem] lg:text-[3rem] select-none font-normal transition-[font-weight] duration-500 group-hover:font-medium text-prim-space uppercase">
+											Prim+
+											<span className="font-bold transition-[font-weight] delay-100 duration-500 group-hover:font-extrabold">
+												RPC
+											</span>
 										</p>
 										{logoIlluminated.map((light, index) => (
-											<Light key={index} state="enter" className="absolute inset-0" options={light} />
+											<Light
+												key={index}
+												state="enter"
+												className="absolute inset-0 pointer-events-none"
+												options={light}
+											/>
 										))}
 									</Link>
 								</div>
@@ -54,7 +62,7 @@ export default function Home() {
 								(placeholder)
 							</div>
 							<div className="col-span-12">
-								<p className="font-title text-[6rem] font-semibold text-white uppercase text-right leading-tight">
+								<p className="font-title text-[3rem] lg:text-[6rem] font-semibold text-white uppercase text-right leading-tight">
 									Backend,
 									<br /> Meet Frontend.
 								</p>

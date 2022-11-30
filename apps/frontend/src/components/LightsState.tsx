@@ -1,5 +1,6 @@
 import { random } from "lodash-es"
 import { useEffect, useMemo, useState } from "react"
+import { useInterval, useToggle } from "react-use"
 import { Light, LightOptions } from "./Lights"
 
 type PossibleStates = "enter" | "exit"
@@ -65,16 +66,18 @@ export function LightState(props: LightStateProps) {
 	}, [configured])
 	const [options, setOptions] = useState(optionsGiven)
 	const lightReady = useMemo(() => Object.keys(configured).length > 0, [configured])
+	const [jitter, setJitter] = useToggle(false)
 	useEffect(() => {
 		if (!lightReady) {
 			return
 		}
 		const timeline = timelines[state]
+		setJitter(false)
 		const cancellations = timeline.map(([timestamp, newOptions], index) => {
 			const lastTimelineItem = index === timeline.length - 1
 			if (lastTimelineItem) {
 				setTimeout(() => {
-					console.log("todo: start jitter effect")
+					setJitter(true)
 				}, timestamp)
 			}
 			return setTimeout(() => {
@@ -85,6 +88,12 @@ export function LightState(props: LightStateProps) {
 			cancellations.map(cancelId => clearTimeout(cancelId))
 		}
 	}, [state, lightReady])
+	useInterval(
+		() => {
+			console.log("jitter")
+		},
+		jitter ? 1000 : null
+	)
 	return (
 		<Light {...attrs} options={options} onOptionsSet={opts => setConfigured(opts)}>
 			{children}
