@@ -62,7 +62,7 @@ export function LightState(props: LightStateProps) {
 			enter,
 			exit,
 		}
-	}, [optionsGiven])
+	}, [configured])
 	const [options, setOptions] = useState(optionsGiven)
 	const lightReady = useMemo(() => Object.keys(configured).length > 0, [configured])
 	useEffect(() => {
