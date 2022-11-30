@@ -39,6 +39,6 @@ services:
   frontend:
     image: doseofted/prim-frontend:latest
     environment:
-      VITE_WEBSITE_HOST: $WEBSITE_HOST
-      VITE_CONTAINED: "true"
+      NEXT_PUBLIC_WEBSITE_HOST: $WEBSITE_HOST
+      NEXT_PUBLIC_CONTAINED: "true"
     restart: "no"
