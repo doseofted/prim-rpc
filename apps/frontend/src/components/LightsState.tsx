@@ -37,7 +37,7 @@ export function LightState(props: LightStateProps) {
 				},
 			],
 		]
-		const exitDelay = random(75, 150)
+		const exitDelay = random(25, 75)
 		const exit: TimelineItem = [
 			[
 				0,
@@ -51,7 +51,7 @@ export function LightState(props: LightStateProps) {
 				{
 					...configured,
 					brightness: 0,
-					size: 0,
+					size: (configured.size ?? 0) * 2,
 					offset: [random(0, 100), random(0, 100)],
 					rotate: random(0, 360),
 					delay: exitDelay,
@@ -62,7 +62,7 @@ export function LightState(props: LightStateProps) {
 			enter,
 			exit,
 		}
-	}, [optionsGiven])
+	}, [configured])
 	const [options, setOptions] = useState(optionsGiven)
 	const lightReady = useMemo(() => Object.keys(configured).length > 0, [configured])
 	useEffect(() => {
