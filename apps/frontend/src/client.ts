@@ -1,7 +1,7 @@
 import { createPrimClient } from "@doseofted/prim-rpc"
-import type * as exampleClient from "@doseofted/prim-example"
 import { createFetchClient, createWebSocketClient } from "@doseofted/prim-plugins/browser-api"
 import jsonHandler from "superjson"
+import type * as exampleClient from "@doseofted/prim-example"
 
 const host = process.env.NEXT_PUBLIC_WEBSITE_HOST
 const contained = JSON.parse(process.env.NEXT_PUBLIC_CONTAINED ?? "false") as boolean
