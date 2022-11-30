@@ -1,18 +1,36 @@
+import { random } from "lodash-es"
 import Head from "next/head"
 import Link from "next/link"
-import { Lights, defaultColors, NamedColor, Light as LightBasic, LightOptions } from "../components/Lights"
+import { useMemo } from "react"
+import { Lights, Light as LightBasic, LightOptions } from "../components/Lights"
 import { LightState } from "../components/LightsState"
 
 export default function Home() {
 	const animatedLights = true
 	const Light = animatedLights ? LightState : LightBasic
+	console.log(random(false))
+	const randomNegative = () => (random(false) === 0 ? -1 : 1)
+	const logoIlluminated = useMemo<Partial<LightOptions>[]>(
+		() =>
+			Array.from(Array(12), (_, i) => ({
+				brightness: i % 3 === 0 ? random(1.1, 1.3) : random(0.7, 1.1),
+				offset:
+					i % 3 === 0
+						? [random(75, 150) * randomNegative(), random(75, 150) * randomNegative()]
+						: [random(-50, 50), random(-50, 50)],
+				delay: random(20, 40),
+				rotate: random(0, 360),
+				size: i % 3 === 0 ? random(500, 700) : random(300, 500),
+			})),
+		[]
+	)
 	return (
 		<>
 			<Head>
 				<title>Prim+RPC</title>
 			</Head>
 			<div className="bg-prim-space">
-				<Lights options={{ size: 800 }} blur={30}>
+				<Lights options={{ size: 800 }} blur={30} saturate={1.3}>
 					<div className="relative min-h-screen w-full">
 						<div className="fixed container w-full h-full inset-0 mx-auto grid grid-cols-12 border-x border-white/40 px-4 gap-4">
 							{Array.from(Array(12), (_, i) => i).map((_, index) => (
@@ -26,7 +44,7 @@ export default function Home() {
 										<p className="font-title text-[3rem] select-none font-normal text-prim-space uppercase">
 											Prim+<span className="font-bold">RPC</span>
 										</p>
-										{logoLights.map((light, index) => (
+										{logoIlluminated.map((light, index) => (
 											<Light key={index} state="enter" className="absolute inset-0" options={light} />
 										))}
 									</Link>
@@ -48,42 +66,3 @@ export default function Home() {
 		</>
 	)
 }
-
-const logoLights: LightOptions[] = [
-	{
-		brightness: 2,
-		color: defaultColors[NamedColor.ElectricBlue],
-		size: 300,
-		offset: [0, 0],
-	},
-	{
-		brightness: 1.4,
-		color: defaultColors[NamedColor.BlueJeans],
-		size: 600,
-		offset: [0, 50],
-	},
-	{
-		brightness: 1,
-		color: defaultColors[NamedColor.BlueJeans],
-		size: 400,
-		offset: [0, 250],
-	},
-	{
-		brightness: 1.4,
-		color: defaultColors[NamedColor.ElectricBlue],
-		size: 300,
-		offset: [0, 300],
-	},
-	{
-		brightness: 1.5,
-		color: defaultColors[NamedColor.Mauve],
-		size: 300,
-		offset: [250, 0],
-	},
-	{
-		brightness: 1.3,
-		color: defaultColors[NamedColor.Mauve],
-		size: 400,
-		offset: [300, 100],
-	},
-]

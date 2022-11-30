@@ -58,14 +58,15 @@ function useLights() {
 
 /** Names come from Coolors app */
 export enum NamedColor {
-	Mauve = 0,
+	Mauve1 = 0,
+	Mauve2, // increase chances of using this color
 	MajorelleBlue,
 	RussianViolet,
 	GreenBlue,
 	BlueJeans,
 	ElectricBlue,
 }
-export const defaultColors = ["#f0A3FF", "#6D53FF", "#1D0049", "#0069BA", "#5BB8FF", "#4AEDFF"]
+export const defaultColors = ["#f0A3FF", "#f0A3FF", "#6D53FF", "#1D0049", "#0069BA", "#5BB8FF", "#4AEDFF"]
 export const defaultBackground = "#2D0D60"
 
 export interface LightsProps {
@@ -76,8 +77,10 @@ export interface LightsProps {
 	colors?: string[]
 	/** Background of canvas (set to "transparent" if background is not needed) */
 	background?: string
-	/** Lights blend better when canvas is blurred (amount can be adjusted as needed) */
+	/** Lights blend better when canvas is blurred (amount in pixels can be adjusted as needed) */
 	blur?: number
+	/** Saturate given colors as needed (given as 0-2, representing 0-200%) */
+	saturate?: number
 	/** Event handler on the first frame of animation */
 	onFirstFrame?: () => void
 }
@@ -90,6 +93,7 @@ export function Lights(props: LightsProps) {
 	const colors = useMemo(() => props.colors ?? defaultColors, [props.colors])
 	const background = useMemo(() => props.background ?? defaultBackground, [props.background])
 	const blur = useMemo(() => props.blur ?? 15, [props.blur])
+	const saturate = useMemo(() => clamp(props.saturate ?? 1, 0, 2), [props.saturate])
 	const ctx = useMemo<LightsContext>(
 		() => [
 			{ lights, windowSize, windowScroll, colors },
@@ -145,9 +149,9 @@ export function Lights(props: LightsProps) {
 		() => ({
 			...fixedCss,
 			backgroundColor: "transparent",
-			backdropFilter: `blur(${blur}px)`,
+			backdropFilter: `blur(${blur}px) saturate(${saturate * 100}%)`,
 		}),
-		[blur]
+		[blur, saturate]
 	)
 	return (
 		<LightsContext.Provider value={ctx}>
