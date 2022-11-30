@@ -25,3 +25,4 @@ tasks:
     desc: "Clear dangling build cache, images, networks, etc. (pass `--all` as needed)"
     cmds:
       - docker system prune {{.CLI_ARGS}}
+      - docker builder prune {{.CLI_ARGS}}
