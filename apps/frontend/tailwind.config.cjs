@@ -8,6 +8,7 @@ module.exports = {
 			fontFamily: {
 				sans: ["var(--font-jakarta)", ...fontFamily.sans],
 				title: ["var(--font-montserrat)", ...fontFamily.sans],
+				mono: ["var(--font-fira)", ...fontFamily.mono],
 			},
 			colors: {
 				prim: {

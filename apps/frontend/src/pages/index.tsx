@@ -61,7 +61,7 @@ export default function Home() {
 							<div className="col-span-12 font-sans text-center flex justify-center items-center text-white">
 								<div className="flex h-full w-full justify-center items-center gap-16">
 									<Light className="mt-16" options={{ brightness: 1.3, size: 400 }}>
-										<div className="mockup-code bg-white/60 backdrop-blur-lg">
+										<div className="mockup-code bg-white/80 backdrop-blur-lg">
 											<div className="bg-prim-space mx-3 -mb-2 p-2 rounded-lg">
 												<pre>
 													<code>// server javascript here...</code>
@@ -70,7 +70,7 @@ export default function Home() {
 										</div>
 									</Light>
 									<Light className="mb-16" options={{ brightness: 1.3, size: 400 }}>
-										<div className="mockup-code bg-white/60 backdrop-blur-lg">
+										<div className="mockup-code bg-white/80 backdrop-blur-lg">
 											<div className="bg-prim-space mx-3 -mb-2 p-2 rounded-lg">
 												<pre>
 													<code>// client javascript here...</code>

@@ -1,5 +1,5 @@
 import "../styles/globals.css"
-import { Montserrat, Plus_Jakarta_Sans } from "@next/font/google"
+import { Fira_Code, Montserrat, Plus_Jakarta_Sans } from "@next/font/google"
 import type { AppProps } from "next/app"
 
 const montserrat = Montserrat({
@@ -12,10 +12,21 @@ const plusJakartaSans = Plus_Jakarta_Sans({
 	subsets: ["latin"],
 	display: "swap",
 })
+const firaCodeMono = Fira_Code({
+	variable: "--font-fira",
+	subsets: ["latin"],
+	display: "swap",
+})
 
 export default function App({ Component, pageProps }: AppProps) {
 	return (
-		<div className={["w-full min-h-screen font-sans", montserrat.variable, plusJakartaSans.variable].join(" ")}>
+		<div
+			className={[
+				"w-full min-h-screen font-sans",
+				montserrat.variable,
+				plusJakartaSans.variable,
+				firaCodeMono.variable,
+			].join(" ")}>
 			<Component {...pageProps} />
 		</div>
 	)
