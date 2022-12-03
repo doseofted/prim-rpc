@@ -41,7 +41,11 @@ export function LayoutDocs({ meta, children }: LayoutDocsProps) {
 						</ul>
 					</div>
 					<div className="pointer-events-auto col-span-9 bg-white -mx-4 px-4 rounded-tr-3xl py-8 min-h-[50vh]">
-						<div className="prose prose-headings:font-title">{children}</div>
+						<div className="grid grid-cols-10 gap-4">
+							<div className="col-span-10 lg:col-span-8 col-start-1 lg:col-start-2 prose min-w-full prose-headings:font-title">
+								{children}
+							</div>
+						</div>
 					</div>
 				</div>
 			</div>

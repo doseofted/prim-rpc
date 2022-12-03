@@ -1,3 +1,4 @@
+import "@code-hike/mdx/dist/index.css"
 import "../styles/globals.css"
 import { Fira_Code, Montserrat, Plus_Jakarta_Sans } from "@next/font/google"
 import type { AppProps } from "next/app"

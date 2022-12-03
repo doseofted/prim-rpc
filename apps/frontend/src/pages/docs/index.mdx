@@ -19,6 +19,25 @@ lacus viverra vitae congue eu consequat ac. Dictum fusce ut placerat orci nulla 
 morbi tincidunt ornare massa. At volutpat diam ut venenatis tellus in. Ante in nibh mauris cursus mattis molestie. Neque
 gravida in fermentum et sollicitudin ac. Platea dictumst vestibulum rhoncus est pellentesque elit.
 
+<CH.Code>
+
+```js server.js
+// on server:
+export function sayHello(x, y) {
+	return `${x}, meet ${y}.`
+}
+```
+
+---
+
+```js client.js
+// in browser:
+const greeting = await sayHello("Backend", "Frontend")
+// greeting === "Backend, meet Frontend."
+```
+
+</CH.Code>
+
 Natoque penatibus et magnis dis. Quisque id diam vel quam. Sagittis eu volutpat odio facilisis mauris sit amet massa.
 Sed ullamcorper morbi tincidunt ornare massa eget egestas purus. Elementum facilisis leo vel fringilla est. A
 condimentum vitae sapien pellentesque. Et netus et malesuada fames ac turpis egestas. Diam vel quam elementum pulvinar

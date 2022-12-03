@@ -22,3 +22,16 @@
 .mockup-code::before {
 	opacity: 1;
 }
+
+/**
+ * Provided from Code Hike
+ * https://codehike.org/docs/configuration#copy-button
+ */
+.ch-codeblock .ch-code-button,
+.ch-editor-frame .ch-editor-button {
+	display: none;
+}
+.ch-codeblock:hover .ch-code-button,
+.ch-editor-frame:hover .ch-editor-button {
+	display: block;
+}
