@@ -12,8 +12,8 @@ export function IntroText(props: IntroTextProps) {
 	const {
 		className = "",
 		children = [],
-		stagger: staggerChildren = 0.9,
-		delay: delayChildren = 1.3,
+		stagger: staggerChildren = 0.5,
+		delay: delayChildren = 0.5,
 		duration = 0.6,
 	} = props
 	const animationContainer: Variants = {

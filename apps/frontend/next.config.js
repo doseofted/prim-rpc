@@ -1,6 +1,15 @@
 // @ts-check
-/** @type {import('next').NextConfig} */
-const nextConfig = {
+import mdx from "@next/mdx"
+
+const withMDX = mdx({
+	extension: /\.mdx?$/,
+	options: {
+		remarkPlugins: [],
+		rehypePlugins: [],
+	},
+})
+
+const nextConfig = withMDX({
 	reactStrictMode: true,
 	swcMinify: true,
 	webpack(given) {
@@ -9,6 +18,7 @@ const nextConfig = {
 		// ...
 		return config
 	},
-}
+	pageExtensions: ["ts", "tsx", "js", "jsx", "md", "mdx"],
+})
 
 export default nextConfig

@@ -251,4 +251,15 @@ function defaultFunction(...params: unknown[]) {
 }
 defaultFunction.rpc = true
 
+/**
+ * Make an introduction.
+ *
+ * @param x Introducee 1
+ * @param y Introducee 2
+ * @returns An introduction
+ */
+export function greetings(x: string, y: string) {
+	return `${x}, meet ${y}.`
+}
+
 export default defaultFunction
