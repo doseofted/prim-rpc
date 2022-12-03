@@ -1,8 +1,8 @@
 import Head from "next/head"
 import Link from "next/link"
-import { CodeHighlighted } from "../components/CodeHighlighted"
 import { Lights } from "../components/Lights"
 import { OpinionatedLight } from "../components/LightsState"
+// import { CodeHighlighted } from "../components/CodeHighlighted"
 
 export default function Home() {
 	const state = "enter"
@@ -37,16 +37,16 @@ export default function Home() {
 								<div className="flex h-full w-full justify-center items-center gap-16">
 									<div className="mt-16">
 										<div className="mockup-code w-96 relative text-left text-xs bg-white/70 backdrop-blur-lg">
-											{/* <div className="bg-prim-space mx-3 -mb-2 p-2 rounded-lg">
+											<div className="bg-prim-space mx-3 -mb-2 p-2 rounded-lg">
 												{serverCodeSnippet.split("\n").map((snippet, index) => (
 													<pre className="-ml-4" key={index} data-prefix={index + 1}>
 														<code>{snippet}</code>
 													</pre>
 												))}
-											</div> */}
-											<CodeHighlighted className="bg-prim-space mx-3 -mb-2 p-2 rounded-lg">
+											</div>
+											{/* <CodeHighlighted className="bg-prim-space mx-3 -mb-2 p-2 rounded-lg">
 												{serverCodeSnippet}
-											</CodeHighlighted>
+											</CodeHighlighted> */}
 											<OpinionatedLight count={7} focus={0.9} size={400} offset={[100, 0]} state={state} />
 										</div>
 									</div>
