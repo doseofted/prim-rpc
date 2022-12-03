@@ -21,10 +21,23 @@ export function LayoutDocs({ meta, children }: LayoutDocsProps) {
 						)}
 					</div>
 					<div className="pointer-events-auto col-span-3 bg-white/70 -ml-4 px-4 py-8 rounded-tl-2xl">
-						<ul className="prose">
-							<li>Table</li>
-							<li>of</li>
-							<li>Contents</li>
+						<ul className="space-y-8">
+							<li className="space-y-2">
+								<span className="font-title font-semibold">Header</span>
+								<ul className="space-y-2">
+									<li>Table</li>
+									<li>of</li>
+									<li>Contents</li>
+								</ul>
+							</li>
+							<li className="space-y-2">
+								<span className="font-title font-semibold">Header</span>
+								<ul className="space-y-2">
+									<li>Table</li>
+									<li>of</li>
+									<li>Contents</li>
+								</ul>
+							</li>
 						</ul>
 					</div>
 					<div className="pointer-events-auto col-span-9 bg-white -mx-4 px-4 rounded-tr-3xl py-8 min-h-[50vh]">

@@ -8,5 +8,6 @@
 	"trailingComma": "es5",
 	"bracketSpacing": true,
 	"bracketSameLine": true,
-	"arrowParens": "avoid"
+	"arrowParens": "avoid",
+	"proseWrap": "always"
 }
