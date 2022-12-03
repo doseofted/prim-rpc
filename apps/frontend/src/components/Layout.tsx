@@ -15,8 +15,8 @@ export default function Layout(props: LayoutProps) {
 			<LightsProvider options={{ size: 500 }} blur={25} saturate={1.3}>
 				<div className="relative min-h-screen w-full z-2">
 					{!homepage && (
-						<div className="py-8 absolute container inset-0 mx-auto grid grid-cols-12 border-x border-transparent px-4 gap-4">
-							<Navigation className="relative" />
+						<div className="py-8 absolute container inset-x-0 mx-auto grid grid-cols-12 border-x border-transparent px-4 gap-4">
+							<Navigation className="relative col-span-12" />
 						</div>
 					)}
 					<div className="pointer-events-none fixed container w-full h-full inset-0 mx-auto grid grid-cols-12 border-x border-white/30 px-4 gap-4 mix-blend-overlay">

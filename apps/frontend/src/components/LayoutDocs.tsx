@@ -40,8 +40,9 @@ export function LayoutDocs({ meta, children }: LayoutDocsProps) {
 							</li>
 						</ul>
 					</div>
-					<div className="pointer-events-auto col-span-9 bg-white -mx-4 px-4 rounded-tr-3xl py-8 min-h-[50vh]">
-						<div className="grid grid-cols-10 gap-4">
+					<div className="pointer-events-auto col-span-9 bg-white -mx-4 px-4 py-8 min-h-[50vh] relative">
+						<div className="bg-white w-screen h-full z-1 absolute top-0 right-0 transform translate-x-full" />
+						<div className="grid grid-cols-10 gap-4 relative z-2">
 							<div className="col-span-10 lg:col-span-8 col-start-1 lg:col-start-2 prose min-w-full prose-headings:font-title">
 								{children}
 							</div>
