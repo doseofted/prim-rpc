@@ -23,19 +23,39 @@ export function LayoutDocs({ meta, children }: LayoutDocsProps) {
 					<div className="pointer-events-auto col-span-3 bg-white/70 -ml-4 px-4 py-8 rounded-tl-2xl">
 						<ul className="space-y-8">
 							<li className="space-y-2">
-								<span className="font-title font-semibold">Header</span>
+								<span className="font-title font-semibold">Get Started</span>
 								<ul className="space-y-2">
-									<li>Table</li>
-									<li>of</li>
-									<li>Contents</li>
+									<li>Introduction</li>
+									<li>Setup</li>
+									<li>Create Functions</li>
+									<li>Call Functions</li>
 								</ul>
 							</li>
 							<li className="space-y-2">
-								<span className="font-title font-semibold">Header</span>
+								<span className="font-title font-semibold">Usage</span>
 								<ul className="space-y-2">
-									<li>Table</li>
-									<li>of</li>
-									<li>Contents</li>
+									<li>Simple</li>
+									<li>Advanced</li>
+								</ul>
+							</li>
+							<li className="space-y-2">
+								<span className="font-title font-semibold">Build Docs</span>
+								<ul className="space-y-2">
+									<li>Build Time</li>
+									<li>Run Time</li>
+								</ul>
+							</li>
+							<li className="space-y-2">
+								<span className="font-title font-semibold">Create a Plugin</span>
+								<ul className="space-y-2">
+									<li>Client</li>
+									<li>Server</li>
+								</ul>
+							</li>
+							<li className="space-y-2">
+								<span className="font-title font-semibold">Example</span>
+								<ul className="space-y-2">
+									<li>...</li>
 								</ul>
 							</li>
 						</ul>
