@@ -21,7 +21,7 @@ const firaCodeMono = Fira_Code({
 	display: "swap",
 })
 
-// https://easings.net/#easeOutExpo
+/** https://easings.net/#easeOutExpo */
 function easeOutExpo(x: number): number {
 	return x === 1 ? 1 : 1 - Math.pow(2, -10 * x)
 }

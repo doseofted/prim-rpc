@@ -2,6 +2,7 @@ import Head from "next/head"
 import { OpinionatedLight } from "../components/LightsState"
 import { Navigation } from "../components/Navigation"
 import { CodeHighlighted } from "../components/CodeHighlighted"
+import { motion } from "framer-motion"
 
 export default function Home() {
 	const state = "enter"
@@ -15,20 +16,28 @@ export default function Home() {
 				<div className="col-span-12 font-sans text-center flex justify-center items-center text-white">
 					<div className="flex h-full w-full justify-center items-center gap-16">
 						<div className="mt-16">
-							<div className="mockup-code w-96 relative text-left text-xs bg-white/70 backdrop-blur-lg">
+							<motion.div
+								className="mockup-code w-96 relative text-left text-xs bg-white/70 backdrop-blur-lg"
+								initial={{ y: 25, opacity: 0 }}
+								animate={{ y: 0, opacity: 1 }}
+								transition={{ duration: 0.7, delay: 0.75 }}>
 								<CodeHighlighted transparent className="bg-prim-space mx-3 -mb-2 p-2 rounded-lg">
 									{serverCodeSnippet}
 								</CodeHighlighted>
-								<OpinionatedLight count={7} focus={0.9} size={400} offset={[100, 0]} state={state} />
-							</div>
+								<OpinionatedLight count={7} focus={0.9} size={400} offset={[100, -25]} state={state} />
+							</motion.div>
 						</div>
 						<div className="mb-16">
-							<div className="mockup-code w-96 relative text-left text-xs bg-white/70 backdrop-blur-lg">
+							<motion.div
+								className="mockup-code w-96 relative text-left text-xs bg-white/70 backdrop-blur-lg"
+								initial={{ y: 25, opacity: 0 }}
+								animate={{ y: 0, opacity: 1 }}
+								transition={{ duration: 0.7, delay: 0.6 }}>
 								<CodeHighlighted transparent className="bg-prim-space mx-3 -mb-2 p-2 rounded-lg">
 									{clientCodeSnippet}
 								</CodeHighlighted>
-								<OpinionatedLight count={7} focus={0.9} size={300} offset={[-100, 0]} state={state} />
-							</div>
+								<OpinionatedLight count={7} focus={0.9} size={300} offset={[-100, -25]} state={state} />
+							</motion.div>
 						</div>
 					</div>
 				</div>
