@@ -19,7 +19,7 @@ export default function Layout(props: LayoutProps) {
 							<Navigation className="relative" />
 						</div>
 					)}
-					<div className="fixed container w-full h-full inset-0 mx-auto grid grid-cols-12 border-x border-white/30 px-4 gap-4 mix-blend-overlay">
+					<div className="pointer-events-none fixed container w-full h-full inset-0 mx-auto grid grid-cols-12 border-x border-white/30 px-4 gap-4 mix-blend-overlay">
 						{Array.from(Array(12), (_, i) => i).map((_, index) => (
 							<motion.div
 								key={index}
