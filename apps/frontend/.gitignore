@@ -34,3 +34,6 @@ yarn-error.log*
 # typescript
 *.tsbuildinfo
 next-env.d.ts
+
+# Shiki uses "dist" folder when loading assets locally, don't ignore this
+!/public/shiki/dist

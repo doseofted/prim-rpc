@@ -4,5 +4,16 @@
 @tailwind utilities;
 
 ::selection {
-	background-color: #6D53FF;
+	background-color: #6d53ff70;
+}
+
+/**
+ * DaisyUI-provided "mockup-code" adds space for prefix even when there is no prefix.
+ * This conflicts with the way Shiki formats HTML so this is an adjustment for that integration.
+ */
+.mockup-code pre.shiki:not([data-prefix])::before {
+	margin-right: 0;
+}
+.mockup-code pre.shiki {
+	padding: 0.5rem 0.75rem;
 }
