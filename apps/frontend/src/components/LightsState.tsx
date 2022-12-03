@@ -135,8 +135,9 @@ interface LightsStateProps extends LightStateProps {
 	disableAnimation?: boolean
 }
 /**
- * A wrapper around `LightState` that is a wrapper around `Light`. This is a very opinionated version of LightState.
- * This creates multiple lights at the same point and creates an additional `<div />`
+ * A wrapper around `LightState` that is a wrapper around `Light`.
+ * This is a very opinionated version of `LightState`.
+ * This creates multiple lights at the same point along with an additional `<div />`
  * wrapper around given children to absolutely position lights at center of given element.
  */
 export function OpinionatedLight(props: Omit<LightsStateProps, "options">) {

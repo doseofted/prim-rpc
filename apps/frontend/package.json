@@ -27,8 +27,7 @@
 		"next": "13.0.4",
 		"react": "18.2.0",
 		"react-dom": "18.2.0",
-		"react-use": "^17.4.0",
-		"zustand": "^4.1.4"
+		"react-use": "^17.4.0"
 	},
 	"devDependencies": {
 		"@headlessui/react": "^1.7.4",

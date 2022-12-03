@@ -124,7 +124,6 @@ importers:
       typescript: ^4.8.4
       use-immer: ^0.8.1
       webpack: ^5.75.0
-      zustand: ^4.1.4
     dependencies:
       '@doseofted/prim-example': link:../../libs/example
       '@doseofted/prim-plugins': link:../../libs/plugins
@@ -134,7 +133,6 @@ importers:
       react: 18.2.0
       react-dom: 18.2.0_react@18.2.0
       react-use: 17.4.0_biqbaboplfbrettd7655fr4n2y
-      zustand: 4.1.4_immer@9.0.16+react@18.2.0
     devDependencies:
       '@headlessui/react': 1.7.4_biqbaboplfbrettd7655fr4n2y
       '@next/eslint-plugin-next': 13.0.4
@@ -5082,6 +5080,7 @@ packages:
 
   /immer/9.0.16:
     resolution: {integrity: sha512-qenGE7CstVm1NrHQbMh8YaSzTZTFNP3zPqr3YU0S0UY441j4bJTg4A2Hh5KAhwgaiU6ZZ1Ar6y/2f4TblnMReQ==}
+    dev: true
 
   /immutable/4.1.0:
     resolution: {integrity: sha512-oNkuqVTA8jqG1Q6c+UglTOD1xhC1BtjKI7XkCXRkZHrN5m18/XsnUp8Q89GkQO/z+0WjonSvl0FLhDYftp46nQ==}
@@ -8998,23 +8997,6 @@ packages:
     dependencies:
       react: 18.2.0
     dev: true
-
-  /zustand/4.1.4_immer@9.0.16+react@18.2.0:
-    resolution: {integrity: sha512-k2jVOlWo8p4R83mQ+/uyB8ILPO2PCJOf+QVjcL+1PbMCk1w5OoPYpAIxy9zd93FSfmJqoH6lGdwzzjwqJIRU5A==}
-    engines: {node: '>=12.7.0'}
-    peerDependencies:
-      immer: '>=9.0'
-      react: '>=16.8'
-    peerDependenciesMeta:
-      immer:
-        optional: true
-      react:
-        optional: true
-    dependencies:
-      immer: 9.0.16
-      react: 18.2.0
-      use-sync-external-store: 1.2.0_react@18.2.0
-    dev: false
 
   /zx/7.1.1:
     resolution: {integrity: sha512-5YlTO2AJ+Ku2YuZKSSSqnUKuagcM/f/j4LmHs15O84Ch80Z9gzR09ZK3gR7GV+rc8IFpz2H/XNFtFVmj31yrZA==}

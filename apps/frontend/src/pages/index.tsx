@@ -12,9 +12,9 @@ export default function Home() {
 				<title>Prim+RPC</title>
 			</Head>
 			<div className="bg-prim-space">
-				<Lights options={{ size: 500 }} blur={30} saturate={1.3}>
+				<Lights options={{ size: 500 }} blur={25} saturate={1.3}>
 					<div className="relative min-h-screen w-full">
-						<div className="fixed container w-full h-full inset-0 mx-auto grid grid-cols-12 border-x border-white/30 px-4 gap-4">
+						<div className="fixed container w-full h-full inset-0 mx-auto grid grid-cols-12 border-x border-white/30 px-4 gap-4 mix-blend-overlay">
 							{Array.from(Array(12), (_, i) => i).map((_, index) => (
 								<div key={index} className="border-x border-white/30" />
 							))}
@@ -37,7 +37,7 @@ export default function Home() {
 								<div className="flex h-full w-full justify-center items-center gap-16">
 									<div className="mt-16">
 										<div className="mockup-code w-96 relative text-left text-xs bg-white/70 backdrop-blur-lg">
-											<div className="bg-prim-space mx-3 -mb-2 p-2 rounded-lg">
+											<div className="bg-prim-space/90 mx-3 -mb-2 p-2 rounded-lg">
 												{serverCodeSnippet.split("\n").map((snippet, index) => (
 													<pre className="-ml-4" key={index} data-prefix={index + 1}>
 														<code>{snippet}</code>
@@ -52,7 +52,7 @@ export default function Home() {
 									</div>
 									<div className="mb-16">
 										<div className="mockup-code w-96 relative text-left text-xs bg-white/70 backdrop-blur-lg">
-											<div className="bg-prim-space mx-3 -mb-2 p-2 rounded-lg">
+											<div className="bg-prim-space/90 mx-3 -mb-2 p-2 rounded-lg">
 												{clientCodeSnippet.split("\n").map((snippet, index) => (
 													<pre className="-ml-5" key={index} data-prefix={index + 1}>
 														<code>{snippet}</code>
