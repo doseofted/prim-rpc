@@ -3,6 +3,7 @@ import { OpinionatedLight } from "../components/LightsState"
 import { Navigation } from "../components/Navigation"
 import { CodeHighlighted } from "../components/CodeHighlighted"
 import { motion } from "framer-motion"
+import { IntroText } from "../components/IntroText"
 
 export default function Home() {
 	const state = "enter"
@@ -43,8 +44,10 @@ export default function Home() {
 				</div>
 				<div className="col-span-12">
 					<p className="font-title text-[3rem] lg:text-[5.5rem] font-semibold text-white uppercase text-right leading-tight">
-						Backend,
-						<br /> Meet Frontend.
+						<IntroText className="leading-none">
+							<>Backend,</>
+							<>meet Frontend.</>
+						</IntroText>
 					</p>
 				</div>
 			</div>
