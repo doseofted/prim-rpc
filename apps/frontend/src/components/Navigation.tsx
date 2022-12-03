@@ -2,6 +2,7 @@ import React, { useMemo } from "react"
 import { OpinionatedLight } from "../components/LightsState"
 import { motion } from "framer-motion"
 import { useRouter } from "next/router"
+import { Icon } from "@iconify/react"
 // import Link from "next/link"
 
 type NavigationProps = React.HTMLAttributes<HTMLDivElement>
@@ -44,13 +45,38 @@ export function Navigation(props: NavigationProps) {
 					<React.Fragment key={i}>
 						{/* eslint-disable-next-line @next/next/no-html-link-for-pages */}
 						<a
-							className="group font-semibold uppercase text-sm h-full px-6 p-4 flex justify-center items-center rounded-2xl transition-all duration-300
-								bg-transparent hover:bg-white transform scale-100 hover:scale-105"
+							className="group font-semibold uppercase text-sm h-full px-6 p-4 flex justify-center items-center rounded-b-2xl transition-all duration-300
+								bg-transparent hover:bg-white transform scale-100 hover:scale-110"
 							href={link}>
+							<div className="pointer-events-none w-full h-screen transition-all duration-300 bg-transparent group-hover:bg-white absolute top-0 transform -translate-y-full" />
+
 							<span className="transition-all duration-300 transform">{name}</span>
 						</a>
 					</React.Fragment>
 				))}
+				<a
+					className="group font-semibold uppercase text-sm h-full px-4 p-4 flex justify-center items-center rounded-b-2xl
+						transition-all duration-300
+						bg-transparent hover:bg-white transform scale-100 hover:scale-110"
+					href="https://twitter.com/doseofted"
+					target="_blank">
+					<div className="pointer-events-none w-full h-screen transition-all duration-300 bg-transparent group-hover:bg-white absolute top-0 transform -translate-y-full" />
+					<span className="transition-all duration-300 transform">
+						<Icon className="w-6 h-6" icon="simple-icons:twitter" />
+						<span className="sr-only">Twitter</span>
+					</span>
+				</a>
+				<a
+					className="group font-semibold uppercase text-sm h-full px-4 p-4 flex justify-center items-center rounded-b-2xl transition-all duration-300
+						bg-transparent hover:bg-white transform scale-100 hover:scale-110"
+					href="https://github.com/doseofted"
+					target="_blank">
+					<div className="pointer-events-none w-full h-screen transition-all duration-300 bg-transparent group-hover:bg-white absolute top-0 transform -translate-y-full" />
+					<span className="transition-all duration-300 transform">
+						<Icon className="w-6 h-6" icon="simple-icons:github" />
+						<span className="sr-only">Github</span>
+					</span>
+				</a>
 			</motion.div>
 		</div>
 	)

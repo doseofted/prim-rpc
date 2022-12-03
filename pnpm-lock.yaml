@@ -92,6 +92,8 @@ importers:
       '@doseofted/prim-rpc': workspace:*
       '@doseofted/prim-ui': workspace:*
       '@headlessui/react': ^1.7.4
+      '@iconify-json/simple-icons': ^1.1.37
+      '@iconify/react': ^4.0.1
       '@mdx-js/loader': ^2.1.5
       '@mdx-js/react': ^2.1.5
       '@next/eslint-plugin-next': ^13.0.4
@@ -142,6 +144,8 @@ importers:
     devDependencies:
       '@code-hike/mdx': 0.7.4_react@18.2.0
       '@headlessui/react': 1.7.4_biqbaboplfbrettd7655fr4n2y
+      '@iconify-json/simple-icons': 1.1.37
+      '@iconify/react': 4.0.1_react@18.2.0
       '@mdx-js/loader': 2.1.5_webpack@5.75.0
       '@mdx-js/react': 2.1.5_react@18.2.0
       '@next/eslint-plugin-next': 13.0.4
@@ -790,6 +794,21 @@ packages:
 
   /@humanwhocodes/object-schema/1.2.1:
     resolution: {integrity: sha512-ZnQMnLV4e7hDlUvw8H+U8ASL02SS2Gn6+9Ac3wGGLIe7+je2AeAOxPY+izIPJDfFDb7eDjev0Us8MO1iFRN8hA==}
+    dev: true
+
+  /@iconify-json/simple-icons/1.1.37:
+    resolution: {integrity: sha512-swCfWfY9vspxWmjARHpZjeK5qxKVU19Z/9dt1cYRYX3UzfeW8SYu9ifuov3zPmAgl2D+G/8nlZxNU4eCOb6kVg==}
+    dependencies:
+      '@iconify/types': 2.0.0
+    dev: true
+
+  /@iconify/react/4.0.1_react@18.2.0:
+    resolution: {integrity: sha512-/DBJqh5K7W4f+d4kpvyJa/OTpVa3GfgrE9bZFAKP0vIWDr0cvVU9MVvbbkek216w9nLQhpJY/FeJtc6izB1PHw==}
+    peerDependencies:
+      react: '>=16'
+    dependencies:
+      '@iconify/types': 2.0.0
+      react: 18.2.0
     dev: true
 
   /@iconify/types/2.0.0:
