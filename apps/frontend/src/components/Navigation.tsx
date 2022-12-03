@@ -1,11 +1,15 @@
-import React from "react"
+import React, { useMemo } from "react"
 import { OpinionatedLight } from "../components/LightsState"
+import { motion } from "framer-motion"
+import { useRouter } from "next/router"
 // import Link from "next/link"
 
 type NavigationProps = React.HTMLAttributes<HTMLDivElement>
 export function Navigation(props: NavigationProps) {
 	const { ...attrs } = props
 	const state = "enter"
+	const router = useRouter()
+	const homepage = useMemo(() => router.pathname === "/", [router.pathname])
 	return (
 		<div {...attrs} className={[attrs.className, "flex justify-between items-center gap-8"].join(" ")}>
 			<div className="inline-block">
@@ -21,7 +25,11 @@ export function Navigation(props: NavigationProps) {
 					<OpinionatedLight count={12} state={state} size={700} />
 				</a>
 			</div>
-			<div className="bg-white/70 border-b border-l border-white/70 rounded-bl-2xl h-full flex items-center relative">
+			<motion.div
+				initial={{ y: -20, opacity: 0 }}
+				animate={{ y: 0, opacity: 1 }}
+				transition={{ duration: 1, delay: homepage ? 2.8 : 0.5, ease: "circOut" }}
+				className="bg-white/70 border-b border-l border-white/70 rounded-bl-2xl h-full flex items-center relative">
 				<div className="bg-white/70 border-l border-white/70 w-screen h-screen absolute top-0 -left-[1px] transform -translate-y-full" />
 				<div className="bg-white/70 border-b border-white/70 w-screen absolute top-0 -bottom-[1px] right-0 transform translate-x-full" />
 				{[
@@ -43,7 +51,7 @@ export function Navigation(props: NavigationProps) {
 						</a>
 					</React.Fragment>
 				))}
-			</div>
+			</motion.div>
 		</div>
 	)
 }
