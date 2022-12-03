@@ -17,3 +17,8 @@
 .mockup-code pre.shiki {
 	padding: 0.5rem 0.75rem;
 }
+
+/** Buttons are hard to see on homepage with default DaisyUI opacity. */
+.mockup-code::before {
+	opacity: 1;
+}
