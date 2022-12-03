@@ -1,29 +1,10 @@
-import { random } from "lodash-es"
 import Head from "next/head"
 import Link from "next/link"
-import { useMemo } from "react"
-import { Lights, Light as LightBasic, LightOptions } from "../components/Lights"
-import { LightState } from "../components/LightsState"
+import { Lights } from "../components/Lights"
+import { OpinionatedLight } from "../components/LightsState"
 
 export default function Home() {
-	const animatedLights = true
-	const Light = animatedLights ? LightState : LightBasic
-	console.log(random(false))
-	const randomNegative = () => (random(false) === 0 ? -1 : 1)
-	const logoIlluminated = useMemo<Partial<LightOptions>[]>(
-		() =>
-			Array.from(Array(12), (_, i) => ({
-				brightness: i % 3 === 0 ? random(1.1, 1.3) : random(0.7, 1.1),
-				offset:
-					i % 3 === 0
-						? [random(75, 150) * randomNegative(), random(75, 150) * randomNegative()]
-						: [random(-50, 50), random(-50, 50)],
-				delay: random(40, 60),
-				rotate: random(0, 360),
-				size: i % 3 === 0 ? random(400, 500) : random(200, 400),
-			})),
-		[]
-	)
+	const state = "enter"
 	return (
 		<>
 			<Head>
@@ -47,41 +28,40 @@ export default function Home() {
 												RPC
 											</span>
 										</p>
-										{logoIlluminated.map((light, index) => (
-											<Light
-												key={index}
-												state="enter"
-												className="absolute inset-0 pointer-events-none"
-												options={light}
-											/>
-										))}
+										<OpinionatedLight count={12} state={state} />
 									</Link>
 								</div>
 							</div>
 							<div className="col-span-12 font-sans text-center flex justify-center items-center text-white">
 								<div className="flex h-full w-full justify-center items-center gap-16">
-									<Light className="mt-16" options={{ brightness: 1.3, size: 400 }}>
-										<div className="mockup-code bg-white/80 backdrop-blur-lg">
+									<div className="mt-16">
+										<div className="mockup-code w-96 relative text-left text-xs bg-white/70 backdrop-blur-lg">
 											<div className="bg-prim-space mx-3 -mb-2 p-2 rounded-lg">
-												<pre>
-													<code>// server javascript here...</code>
-												</pre>
+												{serverCodeSnippet.split("\n").map((snippet, index) => (
+													<pre className="-ml-4" key={index} data-prefix={index + 1}>
+														<code>{snippet}</code>
+													</pre>
+												))}
 											</div>
+											<OpinionatedLight count={7} focus={0.9} size={400} offset={[100, 0]} state={state} />
 										</div>
-									</Light>
-									<Light className="mb-16" options={{ brightness: 1.3, size: 400 }}>
-										<div className="mockup-code bg-white/80 backdrop-blur-lg">
+									</div>
+									<div className="mb-16">
+										<div className="mockup-code w-96 relative text-left text-xs bg-white/70 backdrop-blur-lg">
 											<div className="bg-prim-space mx-3 -mb-2 p-2 rounded-lg">
-												<pre>
-													<code>// client javascript here...</code>
-												</pre>
+												{clientCodeSnippet.split("\n").map((snippet, index) => (
+													<pre className="-ml-5" key={index} data-prefix={index + 1}>
+														<code>{snippet}</code>
+													</pre>
+												))}
 											</div>
+											<OpinionatedLight count={7} focus={0.9} size={300} offset={[-100, 0]} state={state} />
 										</div>
-									</Light>
+									</div>
 								</div>
 							</div>
 							<div className="col-span-12">
-								<p className="font-title text-[3rem] lg:text-[6rem] font-semibold text-white uppercase text-right leading-tight">
+								<p className="font-title text-[3rem] lg:text-[5.5rem] font-semibold text-white uppercase text-right leading-tight">
 									Backend,
 									<br /> Meet Frontend.
 								</p>
@@ -93,3 +73,12 @@ export default function Home() {
 		</>
 	)
 }
+
+const serverCodeSnippet = `// on server:
+export function sayHello (name) {
+  return \`Hello \${name}!\`
+}`
+const clientCodeSnippet = `// in browser:
+const greeting = await sayHello("Ted")
+
+// greeting === "Hello Ted!"`

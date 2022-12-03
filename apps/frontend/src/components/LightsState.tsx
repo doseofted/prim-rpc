@@ -100,3 +100,63 @@ export function LightState(props: LightStateProps) {
 		</Light>
 	)
 }
+
+function randomNegative(given = 1) {
+	return given * (random(false) === 0 ? -1 : 1)
+}
+function generateLightOptions(
+	count = 12,
+	sizeBase = 400,
+	focus = 0,
+	offset: [x: number, y: number] = [0, 0]
+): Partial<LightOptions>[] {
+	const focusStrength = 1 - focus
+	return Array.from(Array(count), (_, i) => ({
+		brightness: i % 3 === 0 ? random(1.1, 1.3) : random(0.7, 1.1),
+		offset:
+			i % 3 === 0
+				? [
+						offset[0] + random(75, 150) * randomNegative() * focusStrength,
+						offset[1] + random(75, 150) * randomNegative() * focusStrength,
+				  ]
+				: [offset[0] + random(-50, 50) * focusStrength, offset[1] + random(-50, 50) * focusStrength],
+		delay: random(40, 60),
+		rotate: random(0, 360),
+		size: i % 3 === 0 ? random(sizeBase, sizeBase * 0.25) : random(sizeBase / 2, sizeBase),
+	}))
+}
+
+interface LightsStateProps extends LightStateProps {
+	count?: number
+	size?: number
+	focus?: number
+	offset?: [x: number, y: number]
+	children?: React.ReactNode | React.ReactNode[]
+	disableAnimation?: boolean
+}
+/**
+ * A wrapper around `LightState` that is a wrapper around `Light`. This is a very opinionated version of LightState.
+ * This creates multiple lights at the same point and creates an additional `<div />`
+ * wrapper around given children to absolutely position lights at center of given element.
+ */
+export function OpinionatedLight(props: Omit<LightsStateProps, "options">) {
+	const { count, size, focus, offset, disableAnimation = false, children, className, ...lightStateProps } = props
+	const illuminated = useMemo<Partial<LightOptions>[]>(
+		() => generateLightOptions(count, size, focus, offset),
+		[count, size, focus, offset]
+	)
+	const LightChosen = disableAnimation ? Light : LightState
+	return (
+		<div className={["relative", className].join(" ")}>
+			{illuminated.map((light, index) => (
+				<LightChosen
+					key={index}
+					{...lightStateProps}
+					options={light}
+					className="absolute inset-0 pointer-events-none"
+				/>
+			))}
+			{children}
+		</div>
+	)
+}
