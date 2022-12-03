@@ -4,17 +4,18 @@ import { useAsync } from "react-use"
 interface CodeHighlightedProps extends React.HTMLAttributes<HTMLDivElement> {
 	children?: string
 	code?: string
+	transparent?: boolean
 }
 /** A `<div />` containing code, highlighted with Shiki */
 export function CodeHighlighted(props: CodeHighlightedProps) {
-	const { code, children, ...attrs } = props
+	const { code, children, transparent = false, ...attrs } = props
 	const toBeHighlighted = code ?? children ?? ""
 	const html = useAsync(async () => {
 		setCDN("/shiki/")
 		const highlighter = await getHighlighter({ theme: "bearded-theme-monokai-stone", langs: ["ts"] })
 		const html = highlighter.codeToHtml(toBeHighlighted, { lang: "ts" })
-		return { __html: html }
-	})
+		return { __html: transparent ? html.replace(/style="background-color: ?#\w{1,}"/, "") : html }
+	}, [toBeHighlighted, transparent])
 	return (
 		<>
 			{!html.loading ? (
@@ -25,7 +26,7 @@ export function CodeHighlighted(props: CodeHighlightedProps) {
 				/>
 			) : (
 				<div {...attrs} className={[attrs.className].join(" ")}>
-					<pre className="shiki">
+					<pre className="shiki opacity-50">
 						<code>{toBeHighlighted}</code>
 					</pre>
 				</div>

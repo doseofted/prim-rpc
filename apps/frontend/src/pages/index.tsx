@@ -16,7 +16,7 @@ export default function Home() {
 					<div className="flex h-full w-full justify-center items-center gap-16">
 						<div className="mt-16">
 							<div className="mockup-code w-96 relative text-left text-xs bg-white/70 backdrop-blur-lg">
-								<CodeHighlighted className="bg-prim-space mx-3 -mb-2 p-2 rounded-lg">
+								<CodeHighlighted transparent className="bg-prim-space mx-3 -mb-2 p-2 rounded-lg">
 									{serverCodeSnippet}
 								</CodeHighlighted>
 								<OpinionatedLight count={7} focus={0.9} size={400} offset={[100, 0]} state={state} />
@@ -24,7 +24,7 @@ export default function Home() {
 						</div>
 						<div className="mb-16">
 							<div className="mockup-code w-96 relative text-left text-xs bg-white/70 backdrop-blur-lg">
-								<CodeHighlighted className="bg-prim-space mx-3 -mb-2 p-2 rounded-lg">
+								<CodeHighlighted transparent className="bg-prim-space mx-3 -mb-2 p-2 rounded-lg">
 									{clientCodeSnippet}
 								</CodeHighlighted>
 								<OpinionatedLight count={7} focus={0.9} size={300} offset={[-100, 0]} state={state} />
@@ -45,10 +45,10 @@ export default function Home() {
 }
 
 const serverCodeSnippet = `// on server:
-export function sayHello (name) {
-  return \`Hello \${name}!\`
+export function sayHello (x, y) {
+  return \`\${x}, meet \${y}.\`
 }`
 const clientCodeSnippet = `// in browser:
-const greeting = await sayHello("Ted")
-
-// greeting === "Hello Ted!"`
+const greeting = await sayHello(
+  "Backend", "Frontend")
+// greeting === "Backend, meet Frontend."`
