@@ -132,6 +132,7 @@ importers:
       typescript: ^4.8.4
       use-immer: ^0.8.1
       webpack: ^5.75.0
+      zustand: ^4.1.4
     dependencies:
       '@doseofted/prim-example': link:../../libs/example
       '@doseofted/prim-plugins': link:../../libs/plugins
@@ -180,6 +181,7 @@ importers:
       typescript: 4.9.3
       use-immer: 0.8.1_immer@9.0.16+react@18.2.0
       webpack: 5.75.0
+      zustand: 4.1.4_immer@9.0.16+react@18.2.0
 
   libs/docs:
     specifiers:
@@ -9496,7 +9498,6 @@ packages:
       react: ^16.8.0 || ^17.0.0 || ^18.0.0
     dependencies:
       react: 18.2.0
-    dev: false
 
   /util-deprecate/1.0.2:
     resolution: {integrity: sha512-EPD5q1uXyFxJpCrLnCc1nHnq3gOa6DZBocAIiI2TaSCA7VCJ1UJDMagCzIkXNsUYfD1daK//LTEQ8xiIbrHtcw==}
@@ -10137,6 +10138,23 @@ packages:
         optional: true
     dependencies:
       react: 18.2.0
+    dev: true
+
+  /zustand/4.1.4_immer@9.0.16+react@18.2.0:
+    resolution: {integrity: sha512-k2jVOlWo8p4R83mQ+/uyB8ILPO2PCJOf+QVjcL+1PbMCk1w5OoPYpAIxy9zd93FSfmJqoH6lGdwzzjwqJIRU5A==}
+    engines: {node: '>=12.7.0'}
+    peerDependencies:
+      immer: '>=9.0'
+      react: '>=16.8'
+    peerDependenciesMeta:
+      immer:
+        optional: true
+      react:
+        optional: true
+    dependencies:
+      immer: 9.0.16
+      react: 18.2.0
+      use-sync-external-store: 1.2.0_react@18.2.0
     dev: true
 
   /zwitch/1.0.5:

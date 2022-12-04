@@ -3,7 +3,7 @@ import { OpinionatedLight } from "../components/LightsState"
 import { motion } from "framer-motion"
 import { useRouter } from "next/router"
 import { Icon } from "@iconify/react"
-// import Link from "next/link"
+import Link from "next/link"
 
 type NavigationProps = React.HTMLAttributes<HTMLDivElement>
 export function Navigation(props: NavigationProps) {
@@ -16,7 +16,7 @@ export function Navigation(props: NavigationProps) {
 			<div className="inline-block">
 				{/* FIXME: next/link doesn't seem to work when navigating from docs -> homepage */}
 				{/* eslint-disable-next-line @next/next/no-html-link-for-pages */}
-				<a href="/" className="group relative">
+				<Link href="/" className="group relative">
 					<p className="font-title text-[1.5rem] lg:text-[3rem] select-none font-normal transition-[font-weight] duration-500 group-hover:font-medium text-prim-space uppercase">
 						Prim+
 						<span className="font-bold transition-[font-weight] delay-100 duration-500 group-hover:font-extrabold">
@@ -24,13 +24,13 @@ export function Navigation(props: NavigationProps) {
 						</span>
 					</p>
 					<OpinionatedLight count={12} state={state} size={700} />
-				</a>
+				</Link>
 			</div>
 			<motion.div
 				initial={{ y: -20, opacity: 0 }}
 				animate={{ y: 0, opacity: 1 }}
 				transition={{ duration: 1, delay: homepage ? 2.8 : 0.5, ease: "circOut" }}
-				className="bg-white/70 border-b border-l border-white/70 rounded-bl-2xl h-full flex items-center relative">
+				className="bg-white/70 border-b border-l border-white/70 text-black rounded-bl-2xl h-full flex items-center relative">
 				<div className="bg-white/70 border-l border-white/70 w-screen h-screen absolute top-0 -left-[1px] transform -translate-y-full" />
 				<div className="bg-white/70 border-b border-white/70 w-screen absolute top-0 -bottom-[1px] right-0 transform translate-x-full" />
 				{[
@@ -44,17 +44,16 @@ export function Navigation(props: NavigationProps) {
 				].map(({ name, link }, i) => (
 					<React.Fragment key={i}>
 						{/* eslint-disable-next-line @next/next/no-html-link-for-pages */}
-						<a
+						<Link
 							className="group font-semibold uppercase text-sm h-full px-6 p-4 flex justify-center items-center rounded-b-2xl transition-all duration-300
 								bg-transparent hover:bg-white transform scale-100 hover:scale-110"
 							href={link}>
 							<div className="pointer-events-none w-full h-screen transition-all duration-300 bg-transparent group-hover:bg-white absolute top-0 transform -translate-y-full" />
-
 							<span className="transition-all duration-300 transform">{name}</span>
-						</a>
+						</Link>
 					</React.Fragment>
 				))}
-				<a
+				<Link
 					className="group font-semibold uppercase text-sm h-full px-4 p-4 flex justify-center items-center rounded-b-2xl
 						transition-all duration-300
 						bg-transparent hover:bg-white transform scale-100 hover:scale-110"
@@ -65,8 +64,8 @@ export function Navigation(props: NavigationProps) {
 						<Icon className="w-6 h-6" icon="simple-icons:twitter" />
 						<span className="sr-only">Twitter</span>
 					</span>
-				</a>
-				<a
+				</Link>
+				<Link
 					className="group font-semibold uppercase text-sm h-full px-4 p-4 flex justify-center items-center rounded-b-2xl transition-all duration-300
 						bg-transparent hover:bg-white transform scale-100 hover:scale-110"
 					href="https://github.com/doseofted"
@@ -76,7 +75,7 @@ export function Navigation(props: NavigationProps) {
 						<Icon className="w-6 h-6" icon="simple-icons:github" />
 						<span className="sr-only">Github</span>
 					</span>
-				</a>
+				</Link>
 			</motion.div>
 		</div>
 	)

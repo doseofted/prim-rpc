@@ -38,7 +38,7 @@ export default function Home({ greeting }: Props) {
 						<div className="transform translate-x-32 mt-16">
 							<div className="transform -translate-x-32">
 								<motion.div
-									className="mockup-code w-96 relative text-left text-xs bg-white/70 border border-white/60 backdrop-blur-lg"
+									className="mockup-code w-96 relative text-left text-sm bg-white/70 border border-white/60 backdrop-blur-lg"
 									initial={{ y: 25, opacity: 0 }}
 									animate={{ y: 0, opacity: 1 }}
 									transition={{ duration: 0.7, delay: 0.75 }}>
@@ -52,7 +52,7 @@ export default function Home({ greeting }: Props) {
 						<div className="transform -translate-x-32 mb-16">
 							<div className="transform translate-x-32">
 								<motion.div
-									className="mockup-code w-96 relative text-left text-xs bg-white/70 border border-white/60 backdrop-blur-lg"
+									className="mockup-code w-96 relative text-left text-sm bg-white/70 border border-white/60 backdrop-blur-lg"
 									initial={{ y: 25, opacity: 0 }}
 									animate={{ y: 0, opacity: 1 }}
 									transition={{ duration: 0.7, delay: 0.6 }}>

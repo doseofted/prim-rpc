@@ -150,6 +150,7 @@ export function Lights(props: LightsProps) {
 			...fixedCss,
 			backgroundColor: "transparent",
 			backdropFilter: `blur(${blur}px) saturate(${saturate * 100}%)`,
+			WebkitBackdropFilter: `blur(${blur}px) saturate(${saturate * 100}%)`, // Safari-specific
 		}),
 		[blur, saturate]
 	)
@@ -252,9 +253,30 @@ export function Light(props: LightProps) {
 	)
 }
 
-interface LightCanvasProps extends React.HTMLAttributes<HTMLDivElement> {
-	background?: string
-	onFirstFrame?: () => void
+const delays: { [prop: string]: Pt } = {}
+/**
+ * Given a `Pt`, delay its movement over time.
+ * [This example is a useful reference](https://ptsjs.org/demo/edit/?name=create.gridcells).
+ */
+function delayPt(given: Pt, delay: number, prop: string | (string | number)[]) {
+	const accessor = Array.isArray(prop) ? prop.join("-") : prop
+	const givenDelayed = delays[accessor]
+	const delaySet = typeof givenDelayed !== "undefined" && givenDelayed !== given
+	let newVal: Pt
+	if (delaySet) {
+		const velocity = given.$subtract(givenDelayed).$divide(delay)
+		// delays[accessor] = givenDelayed.$add(velocity)
+		newVal = givenDelayed.$add(velocity)
+	} else {
+		// delays[accessor] = given
+		newVal = given
+	}
+	delays[accessor] = newVal
+	return newVal
+}
+/** Same as`delayPt()` but for numbers */
+function delayNumber(given: number, delay: number, prop: string | (string | number)[]) {
+	return delayPt(new Pt([given]), delay, prop)[0]
 }
 
 interface LightCanvasProps extends React.HTMLAttributes<HTMLDivElement> {
@@ -266,41 +288,12 @@ function LightsCanvas(props: LightCanvasProps) {
 	const { background, onFirstFrame, ...attrs } = props
 	const [ctx] = useLights()
 	const lightEntries = useMemo(() => Object.entries(ctx.lights), [ctx.lights])
-	const [delays, setDelays] = useImmer<{ [prop: string]: Pt }>({})
-	/**
-	 * Given a `Pt`, delay its movement over time.
-	 * [This example is a useful reference](https://ptsjs.org/demo/edit/?name=create.gridcells).
-	 */
-	function delayPt(given: Pt, delay: number, prop: string | (string | number)[]) {
-		const accessor = Array.isArray(prop) ? prop.join("-") : prop
-		const givenDelayed = delays[accessor]
-		const delaySet = typeof givenDelayed !== "undefined" && givenDelayed !== given
-		let newVal: Pt
-		if (delaySet) {
-			const velocity = given.$subtract(givenDelayed).$divide(delay)
-			// delays[accessor] = givenDelayed.$add(velocity)
-			newVal = givenDelayed.$add(velocity)
-		} else {
-			// delays[accessor] = given
-			newVal = given
-		}
-		setDelays(draft => {
-			draft[accessor] = newVal
-		})
-		return newVal
-	}
-	/** Same as`delayPt()` but for numbers */
-	function delayNumber(given: number, delay: number, prop: string | (string | number)[]) {
-		return delayPt(new Pt([given]), delay, prop)[0]
-	}
 	function onAnimate(space: CanvasSpace, form: CanvasForm) {
 		if (!space || !form) {
 			return
 		}
 		form.composite("screen")
-		// form.ctx.filter = "blur(100px)"
 		for (const [index, light] of lightEntries) {
-			// console.log(ctx.lights)
 			const {
 				position = [0, 0],
 				color,

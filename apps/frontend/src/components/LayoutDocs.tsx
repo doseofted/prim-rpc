@@ -14,13 +14,14 @@ export function LayoutDocs({ meta, children }: LayoutDocsProps) {
 					<div className="col-span-12 min-h-[50vh] flex items-end justify-end -mt-4">
 						{meta?.title && (
 							<div className="pointer-events-auto">
-								<h1 className="font-title text-[3rem] lg:text-[5.5rem] font-semibold text-white uppercase text-right leading-none">
-									<IntroText>{meta.title.split("\n")}</IntroText>
-								</h1>
+								{/* Each documentation page has its own header so this should be a paragraph (really, it's just decoration) */}
+								<p className="font-title text-[3rem] lg:text-[5.5rem] font-semibold text-white uppercase text-right leading-none">
+									<IntroText>RPC Docs.</IntroText>
+								</p>
 							</div>
 						)}
 					</div>
-					<div className="pointer-events-auto col-span-3 bg-white/70 -ml-4 px-4 py-8 rounded-tl-2xl">
+					<div className="pointer-events-auto col-span-3 bg-white/70 text-black -ml-4 px-4 py-8 rounded-tl-2xl">
 						<ul className="space-y-8">
 							<li className="space-y-2">
 								<span className="font-title font-semibold">Get Started</span>
@@ -63,7 +64,7 @@ export function LayoutDocs({ meta, children }: LayoutDocsProps) {
 					<div className="pointer-events-auto col-span-9 bg-white -mx-4 px-4 py-8 min-h-[50vh] relative">
 						<div className="bg-white w-screen h-full z-1 absolute top-0 right-0 transform translate-x-full" />
 						<div className="grid grid-cols-10 gap-4 relative z-2">
-							<div className="col-span-10 lg:col-span-8 col-start-1 lg:col-start-2 prose min-w-full prose-headings:font-title">
+							<div className="text-black col-span-10 lg:col-span-8 col-start-1 lg:col-start-2 prose min-w-full prose-headings:font-title prose-headings:font-bold prose-headings:text-black">
 								{children}
 							</div>
 						</div>
