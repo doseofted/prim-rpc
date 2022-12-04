@@ -1,4 +1,3 @@
-import Head from "next/head"
 import { OpinionatedLight } from "../components/LightsState"
 import { Navigation } from "../components/Navigation"
 import { CodeHighlighted } from "../components/CodeHighlighted"
@@ -73,14 +72,6 @@ export default function Home({ greeting }: Props) {
 					{/* <p className="text-white text-right">A bridge between JavaScript environments.</p> */}
 				</div>
 			</div>
-			{/* <div className="px-4 container mx-auto">
-				<div className="grid grid-cols-12 gap-4">
-					<div className="col-span-2 bg-white/70 rounded-l-3xl"></div>
-					<div className="col-span-10 bg-white -ml-4 pl-4 rounded-r-3xl">
-						<div className="prose">Hi</div>
-					</div>
-				</div>
-			</div> */}
 		</>
 	)
 }
