@@ -14,8 +14,6 @@ export function Navigation(props: NavigationProps) {
 	return (
 		<div {...attrs} className={[attrs.className, "flex justify-between items-center gap-8"].join(" ")}>
 			<div className="inline-block">
-				{/* FIXME: next/link doesn't seem to work when navigating from docs -> homepage */}
-				{/* eslint-disable-next-line @next/next/no-html-link-for-pages */}
 				<Link href="/" className="group relative">
 					<p className="font-title text-[1.5rem] lg:text-[3rem] select-none font-normal transition-[font-weight] duration-500 group-hover:font-medium text-prim-space uppercase">
 						Prim+
