@@ -6,6 +6,7 @@ import { motion } from "framer-motion"
 import { IntroText } from "../components/IntroText"
 import { GetServerSideProps } from "next"
 import backend from "../client"
+import { Title } from "../components/Title"
 
 interface Props {
 	greeting: string
@@ -28,9 +29,7 @@ export default function Home({ greeting }: Props) {
 	const state = "enter"
 	return (
 		<>
-			<Head>
-				<title>Prim+RPC</title>
-			</Head>
+			<Title />
 			<div className="relative min-h-screen py-8 container mx-auto grid grid-cols-12 grid-rows-[auto_1fr_auto] px-4 gap-4">
 				<Navigation className="col-span-12" />
 				<div className="col-span-12 font-sans text-center flex justify-center items-center text-white">

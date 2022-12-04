@@ -1,4 +1,5 @@
 import { IntroText } from "./IntroText"
+import { Title } from "./Title"
 
 export interface DocsMeta {
 	title?: string
@@ -9,6 +10,7 @@ type LayoutDocsProps = { meta?: DocsMeta } & React.HTMLAttributes<HTMLDivElement
 export function LayoutDocs({ meta, children }: LayoutDocsProps) {
 	return (
 		<>
+			<Title>{meta?.title}</Title>
 			<div className="pointer-events-none px-4 container mx-auto relative">
 				<div className="grid grid-cols-12 gap-4">
 					<div className="col-span-12 min-h-[50vh] flex items-end justify-end -mt-4">
