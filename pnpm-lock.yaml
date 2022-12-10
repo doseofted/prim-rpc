@@ -92,6 +92,7 @@ importers:
       '@doseofted/prim-rpc': workspace:*
       '@doseofted/prim-ui': workspace:*
       '@headlessui/react': ^1.7.4
+      '@iconify-json/carbon': ^1.1.11
       '@iconify-json/simple-icons': ^1.1.37
       '@iconify/react': ^4.0.1
       '@mdx-js/loader': ^2.1.5
@@ -145,6 +146,7 @@ importers:
     devDependencies:
       '@code-hike/mdx': 0.7.4_react@18.2.0
       '@headlessui/react': 1.7.4_biqbaboplfbrettd7655fr4n2y
+      '@iconify-json/carbon': 1.1.11
       '@iconify-json/simple-icons': 1.1.37
       '@iconify/react': 4.0.1_react@18.2.0
       '@mdx-js/loader': 2.1.5_webpack@5.75.0
@@ -796,6 +798,12 @@ packages:
 
   /@humanwhocodes/object-schema/1.2.1:
     resolution: {integrity: sha512-ZnQMnLV4e7hDlUvw8H+U8ASL02SS2Gn6+9Ac3wGGLIe7+je2AeAOxPY+izIPJDfFDb7eDjev0Us8MO1iFRN8hA==}
+    dev: true
+
+  /@iconify-json/carbon/1.1.11:
+    resolution: {integrity: sha512-IHkHSNmTM6q6b8DuKSzd+AEMYPZywSxcb+37kZU7ywtcwsGen3aVEvWFykopIWjjwj3xdZ/5UdwJRqhZDQMlNg==}
+    dependencies:
+      '@iconify/types': 2.0.0
     dev: true
 
   /@iconify-json/simple-icons/1.1.37:

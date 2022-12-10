@@ -1,14 +1,25 @@
 {/* SECTION: setup */}
 
 import { LayoutDocs } from "../../components/LayoutDocs"
+import { Alert } from "../../components/Alert"
 export const meta = {
-	title: "Getting Started",
+	title: "Introduction",
 }
 export default ({ children }) => <LayoutDocs meta={meta}>{children}</LayoutDocs>
 
 {/* !SECTION setup */}
 
 # {meta.title}
+
+<Alert icon="carbon:information">
+
+**TLDR:** Prim+RPC is a framework for calling ordinary JavaScript functions over any transport, with support for typed
+requests, batching, file uploads, advanced serialization, and more.
+
+Use Prim+RPC to communicate between different JavaScript environments where functions can't be called directly, such as
+client and server. Prim+RPC allows you to focus less on message transport and more on the message being sent.
+
+</Alert>
 
 ## What is it?
 
@@ -17,56 +28,49 @@ library is making plain function calls to a server from some client (RPC), as if
 client itself. The goal is to write plain JavaScript, or TypeScript if you prefer, and immediately invoke typed code
 without verbose wrappers around the communication channel.
 
-Let's say, as a contrived example, that you have the following function defined on a server (remembering that TypeScript
-is optional):
+<CH.Code>
 
-```ts my-form-validation.ts
-// NOTE: this file runs on a server
-interface SomeForm {
-	name?: string
-}
-/** Determine if name of visitor is Ted. It's probably not. */
-export function validateSomeForm(form: SomeForm = {}) {
-	if (form.name === "Ted") {
-		return "Hi Ted!"
-	} else {
-		return "You're not Ted!"
-	}
-}
-validateSomeForm.rpc = true
-```
-
-Notice that we added a property to our function (`validateSomeForm.rpc`). This is a safety feature to explicitly tell
-Prim+RPC that we want to share this function. Since functions are technically objects in JavaScript, this code is
-perfectly valid.
-
-Now we want to expose `validateSomeForm` to the browser where a user may submit some form. This is simple with the
-Prim+RPC server:
-
-```ts index.ts focus=1:3,9:12
-// NOTE: this file runs on a server
-import { validateSomeForm } from "./my-form-validation.ts"
+```ts server.ts mark=4:6
+// import the Prim+RPC server
 import { createPrimServer } from "@doseofted/prim-rpc"
-import Fastify from "fastify"
-import { primMethodFastify } from "@doseofted/prim-plugins/fastify"
-
-const fastify = Fastify()
-
-createPrimServer({
-	module: { validateSomeForm },
-	methodHandler: primMethodFastify({ fastify }),
+// create any ordinary function
+export function sayHello(x, y) {
+	return `${x}, meet ${y}.`
+}
+// signal that this function is intended to be called as RPC
+sayHello.rpc = true
+// pass your function to Prim+RPC server
+const prim = createPrimServer({
+	module: { sayHello },
+	// ... setup transport options (described in documentation)
 })
-
-await fastify.listen({ host, port: 3001 })
+// now make RPC from the client
 ```
+
+---
+
+```ts client.ts mark=11
+// import Prim+RPC client
+import { createPrimClient } from "@doseofted/prim-rpc"
+// import types from server
+import type * as module from "./server.ts"
+// configure client with types and endpoint used on the server
+const prim = createPrimClient<typeof module>({
+	endpoint: "http://localhost:1234/prim",
+	// ... setup transport options (described in documentation)
+})
+// call function as if it exists on the client (which it doesn't)
+const greeting = await prim.sayHello("Backend", "Frontend")
+// greeting === "Backend, meet Frontend."
+```
+
+</CH.Code>
 
 Importantly, Prim+RPC does not dictate or have a preference regarding how you send RPC. This means that Prim+RPC can be
 used to bridge any two kinds of JavaScript environments where communication is otherwise difficult. This could mean
-communication between two physically separated servers, between a server and client, between two separate
+communication between two physically separated servers, between a server and client, or between two separate
 processes/threads. Prim+RPC can connect all of these environments, with type definitions attached, and without the need
 for a separate schema/definition language.
-
-In this example, we
 
 Prim+RPC is written in TypeScript and allows you to take advantage of type definitions in your code from one environment
 to another without manually copying or recreating definitions, whether those are written in TypeScript or JavaScript
@@ -93,7 +97,156 @@ tool, with minimal setup on the developer's side.
 
 In short, Prim+RPC allows you to focus less on message transport and more on the message being sent.
 
-## How Does It Work?
+## A Simple Example
+
+<Alert icon="carbon:warning" type="alert-warning">
+	Work in Progress
+</Alert>
+
+## A Demonstration
+
+Prim+RPC allows you to write a plain JavaScript function in one environment (like a server) and share it directly with
+another environment (like a browser). The best way to introduce Prim+RPC is with an example. Let's take the example from
+the homepage:
+
+```ts server.ts
+// on server:
+export function sayHello(x, y) {
+	return `${x}, meet ${y}.`
+}
+```
+
+This is a regular JavaScript function. If we want to expose this from the server to the outside world, we can create a
+Prim+RPC server to share it:
+
+```ts server.ts mark=2,7,9:12
+// on server:
+import { createPrimServer } from "@doseofted/prim-rpc"
+
+export function sayHello(x, y) {
+	return `${x}, meet ${y}.`
+}
+sayHello.rpc = true
+
+const prim = createPrimServer({
+	module: { sayHello },
+	// ... other options
+})
+```
+
+In this example, we've created a Prim+RPC server instance and gave it our function to use. We also added boolean
+property named `rpc` to our function to specify that this function is allowed to be used as an RPC.
+
+We can now make an RPC directly to the Prim+RPC server:
+
+```ts server.ts focus=14:19
+// on server:
+import { createPrimServer } from "@doseofted/prim-rpc"
+
+export function sayHello(x, y) {
+	return `${x}, meet ${y}.`
+}
+sayHello.rpc = true
+
+const prim = createPrimServer({
+	module: { sayHello },
+	// ... other options
+})
+
+// below is the equivalent of calling `sayHello("Backend", "Frontend")`
+const { result: greeting } = await prim.server().prepareRpc({
+	method: "sayHello",
+	params: ["Backend", "Frontend"],
+})
+// greeting === "Backend, meet Frontend."
+```
+
+Of course, on the server we can just call the function directly. Where Prim+RPC becomes useful is when you combine this
+with the Prim+RPC client which automatically generates this RPC. First, we'll make this RPC available with an HTTP
+server. Prim+RPC doesn't concern itself with the method of delivery and instead allows you to use plugins to send RPC.
+In this example, we'll use a plugin for a server framework called Fastify but there are many other plugins available and
+it is easy to write your own.
+
+```ts server.ts mark=3,4,6,15,19
+// on server:
+import { createPrimServer } from "@doseofted/prim-rpc"
+import { primMethodFastify } from "@doseofted/prim-plugins/fastify"
+import Fastify from "fastify"
+
+const fastify = Fastify()
+
+export function sayHello(x, y) {
+	return `${x}, meet ${y}.`
+}
+sayHello.rpc = true
+
+const prim = createPrimServer({
+	module: { sayHello },
+	methodHandler: primMethodFastify({ fastify }),
+	// ... other options
+})
+
+await fastify.listen({ port: 1234 })
+```
+
+Now our function is available over the network at `http://localhost:1234/prim`.
+
+In a new file, we'll create a Prim+RPC client that will communicate with our newly configured server.
+
+```ts client.ts mark=3,6
+// on client:
+import { createPrimClient } from "@doseofted/prim-rpc"
+import type * as module from "./server.ts"
+
+const prim = createPrimClient<typeof module>({
+	endpoint: "http://localhost:1234/prim",
+})
+```
+
+Note that we imported the types directly from our server using TypeScript and passed it to the Prim+RPC client. In
+JavaScript, we could've also used a JSDoc comment to annotate our client. Also note that we are _only_ importing types:
+code from the server is not imported. Instead, this will be requested over the endpoint that we've configured.
+
+By default, the Prim+RPC does not assume a default client. Similar to the server, we provide this functionality through
+the use of plugins. Let's add support for our Fastify server using the browser's built-in fetch client:
+
+```ts client.ts mark=3,8
+// on client:
+import { createPrimClient } from "@doseofted/prim-rpc"
+import { createFetchClient } from "@doseofted/prim-plugins/browser-api"
+import type * as module from "./server.ts"
+
+const prim = createPrimClient<typeof module>({
+	endpoint: "http://localhost:1234/prim",
+	client: createFetchClient(),
+})
+```
+
+We also have the option of configuring our own client if we'd like (it doesn't even need to be an HTTP client). Now
+we're ready to call our function from the client to our server!
+
+```ts client.ts focus=11:12
+// on client:
+import { createPrimClient } from "@doseofted/prim-rpc"
+import { createFetchClient } from "@doseofted/prim-plugins/browser-api"
+import type * as module from "./server.ts"
+
+const prim = createPrimClient<typeof module>({
+	endpoint: "http://localhost:1234/prim",
+	client: createFetchClient(),
+})
+
+const greeting = await prim.sayHello("Backend", "Frontend")
+// greeting === "Backend, meet Frontend."
+```
+
+We can now create more JavaScript/TypeScript functions and easily share them with the client!
+
+This basic example demonstrates how to make a simple function call but Prim+RPC has much more functionality built in. In
+this documentation you'll learn how to support file uploads, use callbacks, batch requests, generate documentation,
+support automatic serialization of objects like Dates, and much more, all with Prim+RPC.
+
+## So, How Does This Work?
 
 There are two parts of Prim+RPC for communicating between two different environments, typically a server and a
 browser/client.
@@ -112,57 +265,3 @@ language itself.
 There are many other more intricate details concerning how Prim+RPC works: batching requests, handling files,
 interaction with plugins, just to name a few. These are topics that may be covered in-depth as this documentation
 progresses.
-
-## Show Me An Example
-
-<CH.Code>
-
-```js server.js
-// on server:
-export function sayHello(x, y) {
-	return `${x}, meet ${y}.`
-}
-```
-
----
-
-```js client.js
-// in browser:
-const greeting = await sayHello("Backend", "Frontend")
-// greeting === "Backend, meet Frontend."
-```
-
-</CH.Code>
-
-Natoque penatibus et magnis dis. Quisque id diam vel quam. Sagittis eu volutpat odio facilisis mauris sit amet massa.
-Sed ullamcorper morbi tincidunt ornare massa eget egestas purus. Elementum facilisis leo vel fringilla est. A
-condimentum vitae sapien pellentesque. Et netus et malesuada fames ac turpis egestas. Diam vel quam elementum pulvinar
-etiam non quam. Vitae et leo duis ut. Aliquam purus sit amet luctus venenatis lectus magna fringilla. Ut ornare lectus
-sit amet est placerat in egestas. Sed egestas egestas fringilla phasellus faucibus. Erat velit scelerisque in dictum non
-consectetur a erat. Ultricies leo integer malesuada nunc vel. Amet justo donec enim diam. Augue lacus viverra vitae
-congue. Nisi est sit amet facilisis magna etiam tempor. Senectus et netus et malesuada fames ac turpis. In fermentum et
-sollicitudin ac orci. Odio euismod lacinia at quis.
-
-Sem integer vitae justo eget magna. Donec ultrices tincidunt arcu non. Vulputate dignissim suspendisse in est. Imperdiet
-sed euismod nisi porta. Egestas purus viverra accumsan in nisl nisi. Neque convallis a cras semper auctor neque vitae
-tempus. Sagittis aliquam malesuada bibendum arcu vitae elementum curabitur. Rhoncus aenean vel elit scelerisque mauris
-pellentesque pulvinar. Iaculis nunc sed augue lacus viverra vitae congue eu. Consequat interdum varius sit amet mattis
-vulputate enim. Tellus integer feugiat scelerisque varius morbi enim nunc faucibus. Dignissim sodales ut eu sem. Gravida
-in fermentum et sollicitudin ac orci. Risus commodo viverra maecenas accumsan lacus vel facilisis volutpat est.
-
-Ut morbi tincidunt augue interdum velit. Ultrices in iaculis nunc sed augue lacus viverra. Quam id leo in vitae turpis
-massa sed. Rhoncus est pellentesque elit ullamcorper dignissim. Sagittis eu volutpat odio facilisis mauris sit. Molestie
-at elementum eu facilisis sed odio morbi quis commodo. Viverra nibh cras pulvinar mattis nunc sed blandit. Duis at
-tellus at urna condimentum mattis. Facilisis magna etiam tempor orci eu lobortis elementum nibh. Adipiscing elit duis
-tristique sollicitudin nibh sit amet. Proin sed libero enim sed faucibus turpis. Sed cras ornare arcu dui vivamus arcu
-felis bibendum ut.
-
-Consectetur lorem donec massa sapien faucibus et molestie. Quis ipsum suspendisse ultrices gravida dictum fusce ut
-placerat orci. Commodo elit at imperdiet dui accumsan sit amet nulla facilisi. Quis eleifend quam adipiscing vitae proin
-sagittis nisl. Pellentesque id nibh tortor id aliquet lectus proin. Vel eros donec ac odio tempor. Elementum tempus
-egestas sed sed risus pretium quam. Diam volutpat commodo sed egestas egestas fringilla phasellus faucibus scelerisque.
-Libero justo laoreet sit amet cursus sit amet. Neque vitae tempus quam pellentesque nec nam aliquam. Tristique magna sit
-amet purus gravida quis blandit. Arcu bibendum at varius vel pharetra vel turpis nunc eget. Faucibus turpis in eu mi
-bibendum neque egestas congue quisque. Sapien et ligula ullamcorper malesuada proin libero nunc consequat interdum.
-Convallis convallis tellus id interdum velit laoreet id. Magna fringilla urna porttitor rhoncus dolor purus non enim
-praesent.
