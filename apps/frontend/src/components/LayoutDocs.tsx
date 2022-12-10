@@ -18,13 +18,14 @@ export function LayoutDocs({ meta, children }: LayoutDocsProps) {
 				{ name: "Setup", link: "/setup" },
 				{ name: "Configuration", link: "/configuration" },
 				{ name: "Examples", link: "/examples" },
+				{ name: "Limitations", link: "/limitations" },
 			],
 		},
 		{
 			name: "Usage",
 			sections: [
 				{ name: "Call a Function", link: "/usage/function-calls" },
-				{ name: "Use Callbacks", link: "use-callbacks" },
+				{ name: "Use Callbacks", link: "/usage/callbacks" },
 				{ name: "Upload Files", link: "/usage/upload-files" },
 				{ name: "Create a Plugin", link: "/usage/plugin-creation" },
 				{ name: "Custom Serialization", link: "/usage/serialization" },
@@ -77,12 +78,12 @@ export function LayoutDocs({ meta, children }: LayoutDocsProps) {
 					<div className="pointer-events-auto col-span-3 bg-white/70 text-black -ml-4 px-4 py-8 rounded-tl-2xl">
 						<ul className="space-y-8">
 							{tableOfContents.map(({ name, sections }) => (
-								<li className="space-y-2">
+								<li key={name} className="space-y-2">
 									<span className="font-title font-semibold">{name}</span>
 									<ul className="space-y-2">
 										{sections.map(({ name, link }) => (
 											<li key={link}>
-												<Link href={`/docs/${link}`}>{name}</Link>
+												<Link href={`/docs${link}`}>{name}</Link>
 											</li>
 										))}
 									</ul>

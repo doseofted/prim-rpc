@@ -1,5 +1,5 @@
-import { Lights } from "../../components/Lights"
-import { LightState } from "../../components/LightsState"
+import { Lights } from "@/components/Lights"
+import { LightState } from "@/components/LightsState"
 import { useControls } from "leva"
 import { useMemo } from "react"
 

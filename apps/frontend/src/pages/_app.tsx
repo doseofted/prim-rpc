@@ -2,7 +2,7 @@ import "@code-hike/mdx/dist/index.css"
 import "../styles/globals.css"
 import { Fira_Code, Montserrat, Plus_Jakarta_Sans } from "@next/font/google"
 import type { AppProps } from "next/app"
-import Layout from "../components/Layout"
+import Layout from "@/components/Layout"
 import Lenis from "@studio-freight/lenis"
 import { useEffect } from "react"
 
@@ -28,18 +28,21 @@ function easeOutExpo(x: number): number {
 }
 
 export default function App({ Component, pageProps }: AppProps) {
+	const useLenis = true
 	useEffect(() => {
-		const lenis = new Lenis({
-			duration: 1,
-			easing: easeOutExpo,
-			direction: "vertical",
-			gestureDirection: "vertical",
-			smooth: true,
-			mouseMultiplier: 1,
-			smoothTouch: false,
-			touchMultiplier: 2,
-			infinite: false,
-		})
+		const lenis = useLenis
+			? new Lenis({
+					duration: 1,
+					easing: easeOutExpo,
+					direction: "vertical",
+					gestureDirection: "vertical",
+					smooth: true,
+					mouseMultiplier: 1,
+					smoothTouch: false,
+					touchMultiplier: 2,
+					infinite: false,
+			  })
+			: null
 		function raf(time: number) {
 			lenis?.raf(time)
 			requestAnimationFrame(raf)

@@ -3,7 +3,7 @@ import { createFetchClient, createWebSocketClient } from "@doseofted/prim-plugin
 import jsonHandler from "superjson"
 import type * as exampleClient from "@doseofted/prim-example"
 
-const host = process.env.NEXT_PUBLIC_WEBSITE_HOST
+const host = process.env.NEXT_PUBLIC_WEBSITE_HOST ?? ""
 const contained = JSON.parse(process.env.NEXT_PUBLIC_CONTAINED ?? "false") as boolean
 const clientSide = typeof window !== "undefined"
 const backend = createPrimClient<typeof exampleClient>({

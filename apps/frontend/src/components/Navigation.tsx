@@ -1,5 +1,5 @@
 import React, { useMemo } from "react"
-import { OpinionatedLight } from "../components/LightsState"
+import { OpinionatedLight } from "@/components/LightsState"
 import { motion } from "framer-motion"
 import { useRouter } from "next/router"
 import { Icon } from "@iconify/react"

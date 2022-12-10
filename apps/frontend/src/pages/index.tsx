@@ -1,11 +1,11 @@
-import { OpinionatedLight } from "../components/LightsState"
-import { Navigation } from "../components/Navigation"
-import { CodeHighlighted } from "../components/CodeHighlighted"
+import { OpinionatedLight } from "@/components/LightsState"
+import { Navigation } from "@/components/Navigation"
+import { CodeHighlighted } from "@/components/CodeHighlighted"
 import { motion } from "framer-motion"
-import { IntroText } from "../components/IntroText"
+import { IntroText } from "@/components/IntroText"
 import { GetServerSideProps } from "next"
-import backend from "../client"
-import { Title } from "../components/Title"
+import backend from "../prim-client"
+import { Title } from "@/components/Title"
 
 interface Props {
 	greeting: string

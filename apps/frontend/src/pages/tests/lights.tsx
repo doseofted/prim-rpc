@@ -1,4 +1,4 @@
-import { Lights, Light } from "../../components/Lights"
+import { Lights, Light } from "@/components/Lights"
 import { useControls } from "leva"
 
 export default function LightsPage() {

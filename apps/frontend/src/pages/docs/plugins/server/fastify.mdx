@@ -1,0 +1,16 @@
+{/* SECTION: setup */}
+
+import { LayoutDocs } from "@/components/LayoutDocs"
+import { Alert } from "@/components/Alert"
+export const meta = {
+	title: "Fastify",
+}
+export default ({ children }) => <LayoutDocs meta={meta}>{children}</LayoutDocs>
+
+{/* !SECTION setup */}
+
+# {meta.title}
+
+<Alert icon="carbon:warning" type="alert-warning">
+	Work in Progress
+</Alert>

@@ -1,5 +1,5 @@
 import { useRef, useState } from "react"
-import backend from "../../client"
+import backend from "../../prim-client"
 
 function Form() {
 	const form = useRef<HTMLFormElement>(null)
