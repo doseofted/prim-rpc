@@ -82,5 +82,5 @@ export function sayHello (x, y) {
 }`
 const clientCodeSnippet = `// in browser:
 const greeting = await sayHello(
-  "Backend", "Frontend")
-// greeting === "Backend, meet Frontend."`
+  "Backend", "Frontend"
+)`

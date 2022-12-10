@@ -31,18 +31,16 @@ export function IntroText(props: IntroTextProps) {
 	const childrenList = React.Children.toArray(children)
 	return (
 		<motion.span className={className} variants={animationContainer} initial="waiting" animate="ready">
-			{childrenList.map((child, index) => {
-				return (
-					<React.Fragment key={index}>
-						<span className="inline-block overflow-hidden">
-							<motion.span className="inline-block" variants={childrenVariants}>
-								{child}
-							</motion.span>
-						</span>
-						{index !== childrenList.length - 1 ? <br /> : null}
-					</React.Fragment>
-				)
-			})}
+			{childrenList.map((child, index) => (
+				<React.Fragment key={index}>
+					<span className="inline-block overflow-hidden">
+						<motion.span className="inline-block" variants={childrenVariants}>
+							{child}
+						</motion.span>
+					</span>
+					{index !== childrenList.length - 1 ? <br /> : null}
+				</React.Fragment>
+			))}
 		</motion.span>
 	)
 }
