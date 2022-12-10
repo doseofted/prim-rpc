@@ -1,6 +1,5 @@
 import type { PrimServerMethodHandler, PrimServerEvents } from "@doseofted/prim-rpc"
 import type { FastifyPluginAsync, FastifyInstance, FastifyError } from "fastify"
-import type { MultipartFile, MultipartValue } from "@fastify/multipart"
 import type { IncomingHttpHeaders } from "node:http"
 import type FastifyMultipartPlugin from "@fastify/multipart"
 import { pipeline } from "node:stream/promises"
@@ -65,16 +64,13 @@ export const fastifyPrimPlugin: FastifyPluginAsync<PrimFastifyPluginOptions> = a
 			const blobs: { [identifier: string]: unknown } = {}
 			let bodyForm: string
 			if (multipartPlugin && request.isMultipart()) {
-				// NOTE: @fastify/multipart doesn't seem to let me use `MultipartValue` type from `.parts()` so this is a workaround
-				// eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
-				const parts: AsyncIterableIterator<MultipartFile & MultipartValue<string>> = request.parts({
+				const parts = request.parts({
 					limits: { fileSize },
-					// eslint-disable-next-line @typescript-eslint/no-explicit-any
-				}) as AsyncIterableIterator<any>
+				})
 				for await (const part of parts) {
-					if (!part.file && part.fieldname === "rpc") {
-						bodyForm = part.value
-					} else if (part.file && part.fieldname.startsWith("_bin_")) {
+					if (!("file" in part) && part.fieldname === "rpc") {
+						bodyForm = part.value as string
+					} else if ("file" in part && part.fieldname.startsWith("_bin_")) {
 						const tmpFolder = await mkdtemp(joinPath(tmpdir(), "prim-rpc-"))
 						const tmpFile = joinPath(tmpFolder, part.filename)
 						const filenamePromise = pipeline(part.file, createWriteStream(tmpFile))
