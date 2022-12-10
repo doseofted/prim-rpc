@@ -86,8 +86,7 @@
 			"Turborepo",
 			"websockets"
 		],
-		"cSpell.enableFiletypes": ["dockerfile"],
-		"unocss.root": "./apps/frontend",
+		"cSpell.enableFiletypes": ["dockerfile", "mdx"],
 		"css.lint.unknownAtRules": "ignore",
 		"typescript.tsdk": "🌳 Project Root/node_modules/typescript/lib"
 	},

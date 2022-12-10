@@ -17,58 +17,103 @@ library is making plain function calls to a server from some client (RPC), as if
 client itself. The goal is to write plain JavaScript, or TypeScript if you prefer, and immediately invoke typed code
 without verbose wrappers around the communication channel.
 
-Importantly, Prim+RPC does not dictate or have a preference regarding how you send RPC through its modular design. This
-means that Prim+RPC can be used to bridge any two kinds of JavaScript environments where communication is otherwise
-difficult. This could mean communication between two physically separated servers, between a server and client, between
-two separate processes, between two threads, or between a primary and background service. Prim+RPC can connect all of
-these environments, with type definitions attached, and without the need for a separate definition/data language.
+Let's say, as a contrived example, that you have the following function defined on a server (remembering that TypeScript
+is optional):
+
+```ts my-form-validation.ts
+// NOTE: this file runs on a server
+interface SomeForm {
+	name?: string
+}
+/** Determine if name of visitor is Ted. It's probably not. */
+export function validateSomeForm(form: SomeForm = {}) {
+	if (form.name === "Ted") {
+		return "Hi Ted!"
+	} else {
+		return "You're not Ted!"
+	}
+}
+validateSomeForm.rpc = true
+```
+
+Notice that we added a property to our function (`validateSomeForm.rpc`). This is a safety feature to explicitly tell
+Prim+RPC that we want to share this function. Since functions are technically objects in JavaScript, this code is
+perfectly valid.
+
+Now we want to expose `validateSomeForm` to the browser where a user may submit some form. This is simple with the
+Prim+RPC server:
+
+```ts index.ts focus=1:3,9:12
+// NOTE: this file runs on a server
+import { validateSomeForm } from "./my-form-validation.ts"
+import { createPrimServer } from "@doseofted/prim-rpc"
+import Fastify from "fastify"
+import { primMethodFastify } from "@doseofted/prim-plugins/fastify"
+
+const fastify = Fastify()
+
+createPrimServer({
+	module: { validateSomeForm },
+	methodHandler: primMethodFastify({ fastify }),
+})
+
+await fastify.listen({ host, port: 3001 })
+```
+
+Importantly, Prim+RPC does not dictate or have a preference regarding how you send RPC. This means that Prim+RPC can be
+used to bridge any two kinds of JavaScript environments where communication is otherwise difficult. This could mean
+communication between two physically separated servers, between a server and client, between two separate
+processes/threads. Prim+RPC can connect all of these environments, with type definitions attached, and without the need
+for a separate schema/definition language.
+
+In this example, we
 
 Prim+RPC is written in TypeScript and allows you to take advantage of type definitions in your code from one environment
 to another without manually copying or recreating definitions, whether those are written in TypeScript or JavaScript
 with JSDoc comments. There's also no client generation script or other transpilation step needed to access type
-defintions since any types you've already written inside of your code are utilized by Prim+RPC. Through the usage of a
-custom JSON parser like superjson you can even use types like Dates and Regex directly with Prim+RPC without the need
-for manually serializing data before sending it.
+definitions since any types you've already written inside of your code are utilized by Prim+RPC.
 
 In addition to the library itself, Prim+RPC also includes a low-level documentation generator, based on TypeDoc, that
-you can use to generate your own custom documentation website for your RPC. You can even generate code snippets for
-usage of Prim+RPC in other languages using the HTTPsnippet library. On the topic of other environments, the RPC created
-with Prim+RPC is purposefully very simple and easy to structure, in the event that you need to use code outside of
-JavaScript.
+you can use to generate your own custom documentation website for your RPC (both JavaScript and TypeScript). You can
+even generate code snippets for usage of Prim+RPC in other languages using the HTTPsnippet library. On the topic of
+other environments, the RPC created with Prim+RPC is purposefully very simple and easy to structure, in the event that
+you need to use code outside of JavaScript. In the future, this documentation may also be used to generate a JSON schema
+for your RPC so that other languages can have typed requests by making their requests with JSON.
 
 Prim+RPC is created with the goal of allowing you to write the code that you actually want to write with the tools that
 you already enjoy using. While other tools require separate type/schema definitions, Prim+RPC takes advantage of
 existing types in your JavaScript/TypeScript. While other tools require generation of a client-side code to communicate
-with a server, Prim+RPC utilizies JavaScript Proxies to automatically generate the correct RPC code based on your
+with a server, Prim+RPC utilizes JavaScript Proxies to automatically generate the correct RPC code based on your
 function calls. While other tools generally assume usage over HTTP, Prim+RPC utilizes separate plugins to communicate
 over any channel that you'd like (with default plugins, of course).
 
-There are also many additional features of Prim+RPC that stand out from other tools. For instance, there is file upload
-support with Prim+RPC through the usage of plugins. Another example: callbacks on the server can be used from the client
-without the need for manually opening a WebSocket or configuring "subscriptions" as commonly used in other tools.
+While file uploads, serialization of data, batching of requests, and server-sent data are considered separate features
+to be implemented in other tools, Prim+RPC supports these out of the box either directly or by utilizing a third party
+tool, with minimal setup on the developer's side.
 
-Prim+RPC allows you to focus less on how you send something and more on the message itself that needs to be sent.
+In short, Prim+RPC allows you to focus less on message transport and more on the message being sent.
 
 ## How Does It Work?
 
-Prim+RPC is fairly simple in how it works. There are two parts of Prim+RPC for communicating between two different
-environments (typically a server and a browser).
+There are two parts of Prim+RPC for communicating between two different environments, typically a server and a
+browser/client.
 
-The server is responsible for making your code available to the client. You can write any function that you'd like (just
-a plain JavaScript function), flag it as publicy available, pass it to Prim+RPC, and it's now available for the client
-to use. The server reads RPC (a JSON object) and translates this into the proper function call available on the server.
+The server is responsible for making your code available to the client. You can write any plain JavaScript function that
+you'd like, pass it to Prim+RPC, and it becomes available for the client to use once flag as publicly available (nothing
+is shared by default). The server reads given RPC (a simple JSON object typically transported over HTTP or WebSocket)
+and translates this into the proper function call on the server.
 
 The client is responsible for structuring requests into RPC that the server can understand. When you make a function
 call using the client, that function call is translated into RPC using a recursive JavaScript Proxy. The Proxy object is
-JavaScript's answer to metaprogramming and allow tools like Prim+RPC to inspect usage of certain properties and methods
-on an object. This means that Prim+RPC doesn't need to generate a client to communicate with the server. Instead, it
-uses the language itself.
+JavaScript's answer to meta-programming and allows tools like Prim+RPC to inspect usage of properties and methods on an
+object. This means that Prim+RPC doesn't need to generate a client to communicate with the server. Instead, it uses the
+language itself.
 
-There are many other more intricate details concerning how Prim+RPC works such as the process for handling files and for
-handling callbacks and generating documentation however these are topics that may be covered in-depth as this
-documentation progresses.
+There are many other more intricate details concerning how Prim+RPC works: batching requests, handling files,
+interaction with plugins, just to name a few. These are topics that may be covered in-depth as this documentation
+progresses.
 
-## Example
+## Show Me An Example
 
 <CH.Code>
 
