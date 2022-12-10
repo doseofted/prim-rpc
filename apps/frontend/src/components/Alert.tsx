@@ -6,12 +6,13 @@ interface Props {
 	icon?: `carbon:${string}` | `simple-icons:${string}`
 	children?: React.ReactNode | React.ReactNode[]
 	prose?: boolean
+	className?: string
 }
 
 export function Alert(props: Props) {
-	const { type = "alert-info", icon = "carbon:information", children, prose = false } = props
+	const { type = "alert-info", icon = "carbon:information", children, prose = false, className } = props
 	return (
-		<div className={["alert shadow-lg", type].join(" ")}>
+		<div className={["alert shadow-lg", className, type].join(" ")}>
 			<div className={prose ? "prose" : "not-prose"}>
 				<Icon className="w-6 h-6 flex-shrink-0 self-start mt-1" icon={icon} />
 				<div className={prose ? "" : "space-y-4"}>{children}</div>

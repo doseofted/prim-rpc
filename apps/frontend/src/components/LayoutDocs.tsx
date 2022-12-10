@@ -1,3 +1,4 @@
+import { Alert } from "./Alert"
 import { IntroText } from "./IntroText"
 import { Title } from "./Title"
 
@@ -67,6 +68,10 @@ export function LayoutDocs({ meta, children }: LayoutDocsProps) {
 						<div className="bg-white w-screen h-full z-1 absolute top-0 right-0 transform translate-x-full" />
 						<div className="grid grid-cols-10 gap-4 relative z-2">
 							<div className="text-black col-span-10 lg:col-span-8 col-start-1 lg:col-start-2 prose min-w-full prose-headings:font-title prose-headings:font-bold prose-headings:text-black">
+								<Alert icon="carbon:warning" type="alert-warning" className="mb-8">
+									Prim+RPC is prerelease software. It has not reached a stable version yet and the documentation is in
+									progress. Functionality may change and the library potentially be unstable.
+								</Alert>
 								{children}
 							</div>
 						</div>

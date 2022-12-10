@@ -248,12 +248,16 @@ support automatic serialization of objects like Dates, and much more, all with P
 
 ## So, How Does This Work?
 
+<Alert icon="carbon:warning" type="alert-warning">
+	Work in Progress
+</Alert>
+
 There are two parts of Prim+RPC for communicating between two different environments, typically a server and a
 browser/client.
 
 The server is responsible for making your code available to the client. You can write any plain JavaScript function that
 you'd like, pass it to Prim+RPC, and it becomes available for the client to use once flag as publicly available (nothing
-is shared by default). The server reads given RPC (a simple JSON object typically transported over HTTP or WebSocket)
+is shared by default). The server reads given RPC, a simple JSON object typically transported over HTTP or WebSocket,
 and translates this into the proper function call on the server.
 
 The client is responsible for structuring requests into RPC that the server can understand. When you make a function
@@ -280,3 +284,6 @@ make this project open source for several reasons but primarily because many of 
 source. The availability of these tools are a big part of why I am a developer today and that ecosystem is something
 that for which I hope I can contribute back. I hope that you find this library useful and that it helps other developers
 like yourself whether you are experienced or just starting out.
+
+If you find this tool useful, consider giving it a star on Github, contributing back to the project (whether to the core
+project or a plugin for it), sponsoring the project, or by working with Ted through his company, Dose of Ted.
