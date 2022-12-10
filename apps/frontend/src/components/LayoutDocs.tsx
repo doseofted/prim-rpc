@@ -1,3 +1,4 @@
+import Link from "next/link"
 import { Alert } from "./Alert"
 import { IntroText } from "./IntroText"
 import { Title } from "./Title"
@@ -9,6 +10,55 @@ export interface DocsMeta {
 type LayoutDocsProps = { meta?: DocsMeta } & React.HTMLAttributes<HTMLDivElement>
 
 export function LayoutDocs({ meta, children }: LayoutDocsProps) {
+	const tableOfContents = [
+		{
+			name: "Getting Started",
+			sections: [
+				{ name: "Introduction", link: "/" },
+				{ name: "Setup", link: "/setup" },
+				{ name: "Configuration", link: "/configuration" },
+				{ name: "Examples", link: "/examples" },
+			],
+		},
+		{
+			name: "Usage",
+			sections: [
+				{ name: "Call a Function", link: "/usage/function-calls" },
+				{ name: "Use Callbacks", link: "use-callbacks" },
+				{ name: "Upload Files", link: "/usage/upload-files" },
+				{ name: "Create a Plugin", link: "/usage/plugin-creation" },
+				{ name: "Custom Serialization", link: "/usage/serialization" },
+			],
+		},
+		{
+			name: "Reference",
+			sections: [{ name: "Configuration", link: "/reference/configuration" }],
+		},
+		{
+			name: "Server Plugins",
+			sections: [
+				{ name: "Fastify", link: "/plugins/server/fastify" },
+				{ name: "Express", link: "/plugins/server/express" },
+				{ name: "Node/HTTP", link: "/plugins/server/node-http" },
+				{ name: "Socket.io", link: "/plugins/server/socket-io" },
+				{ name: "WS", link: "/plugins/server/ws" },
+				{ name: "Web Worker", link: "/plugins/server/web-worker" },
+				{ name: "Electron IPC", link: "/plugins/server/electron-ipc" },
+				{ name: "Create Your Own", link: "/plugins/server/create" },
+			],
+		},
+		{
+			name: "Client Plugins",
+			sections: [
+				{ name: "Browser", link: "/plugins/client/browser" },
+				{ name: "Axios", link: "/plugins/client/axios" },
+				{ name: "Socket.io", link: "/plugins/client/socket-io" },
+				{ name: "Web Worker", link: "/plugins/client/web-worker" },
+				{ name: "Electron IPC", link: "/plugins/client/electron-ipc" },
+				{ name: "Create Your Own", link: "/plugins/client/create" },
+			],
+		},
+	]
 	return (
 		<>
 			<Title>{meta?.title}</Title>
@@ -26,42 +76,18 @@ export function LayoutDocs({ meta, children }: LayoutDocsProps) {
 					</div>
 					<div className="pointer-events-auto col-span-3 bg-white/70 text-black -ml-4 px-4 py-8 rounded-tl-2xl">
 						<ul className="space-y-8">
-							<li className="space-y-2">
-								<span className="font-title font-semibold">Get Started</span>
-								<ul className="space-y-2">
-									<li>Introduction</li>
-									<li>Setup</li>
-									<li>Create Functions</li>
-									<li>Call Functions</li>
-								</ul>
-							</li>
-							<li className="space-y-2">
-								<span className="font-title font-semibold">Usage</span>
-								<ul className="space-y-2">
-									<li>Simple</li>
-									<li>Advanced</li>
-								</ul>
-							</li>
-							<li className="space-y-2">
-								<span className="font-title font-semibold">Build Docs</span>
-								<ul className="space-y-2">
-									<li>Build Time</li>
-									<li>Run Time</li>
-								</ul>
-							</li>
-							<li className="space-y-2">
-								<span className="font-title font-semibold">Create a Plugin</span>
-								<ul className="space-y-2">
-									<li>Client</li>
-									<li>Server</li>
-								</ul>
-							</li>
-							<li className="space-y-2">
-								<span className="font-title font-semibold">Example</span>
-								<ul className="space-y-2">
-									<li>...</li>
-								</ul>
-							</li>
+							{tableOfContents.map(({ name, sections }) => (
+								<li className="space-y-2">
+									<span className="font-title font-semibold">{name}</span>
+									<ul className="space-y-2">
+										{sections.map(({ name, link }) => (
+											<li key={link}>
+												<Link href={`/docs/${link}`}>{name}</Link>
+											</li>
+										))}
+									</ul>
+								</li>
+							))}
 						</ul>
 					</div>
 					<div className="pointer-events-auto col-span-9 bg-white -mx-4 px-4 py-8 min-h-[50vh] relative">

@@ -69,7 +69,6 @@ export default function Home({ greeting }: Props) {
 							{greeting.split(", ").map((text, i, g) => (i !== g.length - 1 ? text + ", " : text))}
 						</IntroText>
 					</p>
-					{/* <p className="text-white text-right">A bridge between JavaScript environments.</p> */}
 				</div>
 			</div>
 		</>
