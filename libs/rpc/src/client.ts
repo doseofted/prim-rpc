@@ -30,6 +30,7 @@ import type {
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 export type AnyFunction = (...args: any[]) => any
+// NOTE: Asyncify might need to be replaced since TSDoc comments aren't shown in editor when used
 type PromisifiedModule<ModuleGiven extends object> = {
 	[Key in keyof ModuleGiven]: ModuleGiven[Key] extends AnyFunction
 		? Asyncify<ModuleGiven[Key]>
