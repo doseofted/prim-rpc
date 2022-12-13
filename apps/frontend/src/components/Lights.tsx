@@ -66,6 +66,7 @@ export enum NamedColor {
 	BlueJeans,
 	ElectricBlue,
 }
+// LINK https://coolors.co/f0a3ff-6d53ff-1d0049-0069ba-5bb8ff-4aedff
 export const defaultColors = ["#f0A3FF", "#f0A3FF", "#6D53FF", "#1D0049", "#0069BA", "#5BB8FF", "#4AEDFF"]
 export const defaultBackground = "#2D0D60"
 

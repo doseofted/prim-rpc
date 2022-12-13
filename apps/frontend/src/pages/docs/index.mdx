@@ -11,7 +11,7 @@ export default ({ children }) => <LayoutDocs meta={meta}>{children}</LayoutDocs>
 
 # {meta.title}
 
-<Alert icon="carbon:information">
+<Alert prose icon="carbon:information">
 
 **TLDR:** Prim+RPC is a framework for calling ordinary JavaScript functions over any transport, with support for typed
 requests, batching, file uploads, advanced serialization, and more.
@@ -19,7 +19,11 @@ requests, batching, file uploads, advanced serialization, and more.
 Use Prim+RPC to communicate between different JavaScript environments where functions can't be called directly, such as
 client and server. Prim+RPC allows you to focus less on message transport and more on the message being sent.
 
+Ready to get [get started](/docs/setup)?
+
 </Alert>
+
+## Table of Contents
 
 ## What is it?
 
@@ -30,7 +34,7 @@ without verbose wrappers around the communication channel.
 
 <CH.Code>
 
-```ts server.ts mark=4:6
+```ts server.ts focus=3:6
 // import the Prim+RPC server
 import { createPrimServer } from "@doseofted/prim-rpc"
 // create any ordinary function
@@ -49,26 +53,26 @@ const prim = createPrimServer({
 
 ---
 
-```ts client.ts mark=11
+```ts client.ts focus=10:11
 // import Prim+RPC client
 import { createPrimClient } from "@doseofted/prim-rpc"
 // import types from server
 import type * as module from "./server.ts"
 // configure client with types and endpoint used on the server
-const prim = createPrimClient<typeof module>({
+const { sayHello } = createPrimClient<typeof module>({
 	endpoint: "http://localhost:1234/prim",
 	// ... setup transport options (described in documentation)
 })
 // call function as if it exists on the client (which it doesn't)
-const greeting = await prim.sayHello("Backend", "Frontend")
+const greeting = await sayHello("Backend", "Frontend")
 // greeting === "Backend, meet Frontend."
 ```
 
 </CH.Code>
 
-Importantly, Prim+RPC does not dictate or have a preference regarding how you send RPC. This means that Prim+RPC can be
-used to bridge any two kinds of JavaScript environments where communication is otherwise difficult. This could mean
-communication between two physically separated servers, between a server and client, or between two separate
+Importantly, Prim+RPC does not dictate or have a preference regarding how you send or receive RPC. This means that
+Prim+RPC can be used to bridge any two kinds of JavaScript environments where communication is otherwise difficult. This
+could mean communication between two physically separated servers, between a server and client, or between two separate
 processes/threads. Prim+RPC can connect all of these environments, with type definitions attached, and without the need
 for a separate schema/definition language.
 
@@ -97,13 +101,14 @@ tool, with minimal setup on the developer's side.
 
 In short, Prim+RPC allows you to focus less on message transport and more on the message being sent.
 
-## A Simple Example
-
-<Alert icon="carbon:warning" type="alert-warning">
-	Work in Progress
-</Alert>
-
 ## A Demonstration
+
+<Alert prose icon="carbon:information">
+
+The following is a demonstration; not a tutorial. If you'd like to follow along, please follow
+[Setup Instructions](/docs/setup).
+
+</Alert>
 
 Prim+RPC allows you to write a plain JavaScript function in one environment (like a server) and share it directly with
 another environment (like a browser). The best way to introduce Prim+RPC is with an example. Let's take the example from
@@ -189,7 +194,18 @@ const prim = createPrimServer({
 await fastify.listen({ port: 1234 })
 ```
 
-Now our function is available over the network at `http://localhost:1234/prim`.
+Now our function is available over the network at `http://localhost:1234/prim` (default path name can be changed if
+needed). We can even test this out before configuring our client, by making a request over the terminal:
+
+```zsh
+curl --request POST \
+  --url http://localhost:1234/prim \
+  --header 'Content-Type: application/json' \
+  --data '{
+	"method": "sayHello",
+	"params": ["Frontend", "Backend"]
+}'
+```
 
 In a new file, we'll create a Prim+RPC client that will communicate with our newly configured server.
 
@@ -208,7 +224,7 @@ JavaScript, we could've also used a JSDoc comment to annotate our client. Also n
 code from the server is not imported. Instead, this will be requested over the endpoint that we've configured.
 
 By default, the Prim+RPC does not assume a default client. Similar to the server, we provide this functionality through
-the use of plugins. Let's add support for our Fastify server using the browser's built-in fetch client:
+the use of plugins. Let's add support for our server using the browser's built-in fetch client:
 
 ```ts client.ts mark=3,8
 // on client:
@@ -246,7 +262,7 @@ This basic example demonstrates how to make a simple function call but Prim+RPC 
 this documentation you'll learn how to support file uploads, use callbacks, batch requests, generate documentation,
 support automatic serialization of objects like Dates, and much more, all with Prim+RPC.
 
-## So, How Does This Work?
+## How Does This Work?
 
 <Alert icon="carbon:warning" type="alert-warning">
 	Work in Progress
@@ -270,7 +286,7 @@ There are many other more intricate details concerning how Prim+RPC works: batch
 interaction with plugins, just to name a few. These are topics that may be covered in-depth as this documentation
 progresses.
 
-## Is There More?
+## Next Steps
 
 Yes! This introduction has only shown the basic RPC features available with Prim+RPC. There are many additional features
 like callback support and file upload handling, options that you can configure, plugins that you can utilize (or create
@@ -285,5 +301,5 @@ source. The availability of these tools are a big part of why I am a developer t
 that for which I hope I can contribute back. I hope that you find this library useful and that it helps other developers
 like yourself whether you are experienced or just starting out.
 
-If you find this tool useful, consider giving it a star on Github, contributing back to the project (whether to the core
-project or a plugin for it), sponsoring the project, or by working with Ted through his company, Dose of Ted.
+If you do find this tool useful, consider giving it a star on Github, contributing back to the project (whether to the
+core project or a plugin for it), sponsoring the project, or by working with Ted through his company, Dose of Ted.

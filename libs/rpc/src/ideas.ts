@@ -673,4 +673,47 @@ let exposedRpc: Status.Implemented
  */
 let supportReturnValuesOnCallbacksAndReturnedFunctionOnMethod: Status.Idea
 
+/**
+ * Today, Prim+RPC can send back a JSON result from an RPC. That RPC can be JSON or it could be JSON
+ * with binary attachments referenced in a form-data request. Sending binary data along-side RPC
+ * is easy because there is format (form-data) that is well-known and easy to use that is intended
+ * for this kind of purpose. Sending data back however is different. Generally, if you're sending data
+ * back, it is either binary (some file) or data (like JSON). My initial hesitation against sending
+ * back a file over RPC is because you can't send back a file and a response at the same time like you
+ * can with requests because this my be a point of confusion.
+ * 
+ * However, this may be a large limitation if an RPC is supposed to result in the return of a file, for instance,
+ * a request that generates a calendar event or that adds a watermark to a video. In these cases, it may be useful to
+ * send the file as a response (even if it's not possible to send RPC back with it).
+ * 
+ * Ideally I would send both RPC and the intended file back, the same way that you can with a request (using form-data
+ * as a response). This doesn't seem to be well-supported but I think instead Prim RPC could just detect if a response
+ * is a Buffer/Blob/File/otherwise binary and send that back with appropriate headers. The Prim client would then need
+ * to know how to respond to file data (or rather plugins for Prim RPC would need to do this).
+ * 
+ * There are a few problems here. For one, I would need to send all binary data as octet-stream or some generic
+ * mime-type because I can't know what the file type is without relying on another third-party library which would
+ * need to (probably) read the file extension. Functionality should not be tied to one run-time (like Node or Deno)
+ * rather it should be generic and then specific functionality handled by plugins. Because of this, Prim RPC itself
+ * needs to send generic binary type of data back that is generally understood (streams/buffers).
+ * 
+ * When some needs binary data *and* a response one workaround would be to use callback but this would be hacky and
+ * shouldn't be recommended because it does feel hacky. This also isn't possible today (see next idea as of why).
+ */
+let sendBackBinaryData: Status.Idea
+
+/**
+ * Prim RPC can't send binary data and handle callbacks in the same function call because one requires an HTTP client
+ * (binary files) while callbacks require WebSockets (or some similar tech through a plugin). This can be frustrating
+ * because the callback could potentially send details back to the client such as upload or processing progress. For
+ * this to work, I would probably need to use the WebSocket for these connections but I would also have to handle binary
+ * files over WebSocket.
+ * 
+ * It's possible and (seemingly) straight forward to send binary data but Prim+RPC would need to piece together multiple
+ * WebSocket messages since each message is either binary or text (otherwise I would need to build a custom framework
+ * for separating data given in a single message similar to what form-data does and this just isn't realistic and
+ * unrelated to Prim RPC's goals).
+ */
+let allowFileUploadsAndCallbacks: Status.Idea
+
 export {}

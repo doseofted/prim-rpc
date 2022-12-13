@@ -5,6 +5,12 @@ import type { AppProps } from "next/app"
 import Layout from "@/components/Layout"
 import Lenis from "@studio-freight/lenis"
 import { useEffect } from "react"
+import { MDXProvider } from "@mdx-js/react"
+import Link from "next/link"
+
+const mdxComponents = {
+	a: (props: React.HTMLAttributes<HTMLAnchorElement> & { href: string }) => <Link {...props} />,
+}
 
 const montserrat = Montserrat({
 	variable: "--font-montserrat",
@@ -54,13 +60,17 @@ export default function App({ Component, pageProps }: AppProps) {
 	}, [])
 	return (
 		<Layout
+			data-theme="prim"
 			className={[
 				"w-full min-h-screen font-sans",
 				montserrat.variable,
 				plusJakartaSans.variable,
 				firaCodeMono.variable,
 			].join(" ")}>
-			<Component {...pageProps} />
+			{/* eslint-disable-next-line @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-explicit-any */}
+			<MDXProvider components={mdxComponents as any}>
+				<Component {...pageProps} />
+			</MDXProvider>
 		</Layout>
 	)
 }

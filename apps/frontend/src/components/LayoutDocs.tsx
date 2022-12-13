@@ -22,6 +22,15 @@ export function LayoutDocs({ meta, children }: LayoutDocsProps) {
 			],
 		},
 		{
+			name: "Guides",
+			sections: [
+				{ name: "Minimal", link: "/guides/minimal" },
+				{ name: "HTTP / WS Server", link: "/guides/client-server" },
+				{ name: "Web Workers", link: "/guides/web-workers" },
+				{ name: "Electron IPC", link: "/guides/electron" },
+			],
+		},
+		{
 			name: "Usage",
 			sections: [
 				{ name: "Call a Function", link: "/usage/function-calls" },
@@ -96,7 +105,7 @@ export function LayoutDocs({ meta, children }: LayoutDocsProps) {
 						<div className="grid grid-cols-10 gap-4 relative z-2">
 							<div className="text-black col-span-10 lg:col-span-8 col-start-1 lg:col-start-2 prose min-w-full prose-headings:font-title prose-headings:font-bold prose-headings:text-black">
 								<Alert icon="carbon:warning" type="alert-warning" className="mb-8">
-									Prim+RPC is prerelease software. It has not reached a stable version yet and the documentation is in
+									Prim+RPC is prerelease software. It has not reached a stable version and the documentation is in
 									progress. Functionality may change and the library potentially be unstable.
 								</Alert>
 								{children}
