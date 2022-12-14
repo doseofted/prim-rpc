@@ -699,6 +699,23 @@ let supportReturnValuesOnCallbacksAndReturnedFunctionOnMethod: Status.Idea
  * 
  * When some needs binary data *and* a response one workaround would be to use callback but this would be hacky and
  * shouldn't be recommended because it does feel hacky. This also isn't possible today (see next idea as of why).
+ * 
+ * ...
+ * 
+ * Looking into the form-data response option again, I notice that there is an option to convert a response into
+ * form-data with the browser's built-in fetch client. In MDN it is noted that this is primarily for intercepting a
+ * request/response with a worker but if I can find a server tool that can create form-data and send it back to the
+ * client then this may solve my problem. This way both the Prim client and server can understand binary data through
+ * form-data requests/responses and RPC results can include files along-side responses. In Deno, it appears that
+ * the FormData object is actually supported but I don't believe that it is in Node and I'm not sure yet if the
+ * "form-data" package on NPM solves that need yet. I'll need to look into it.
+ * 
+ * It is worth noting that even if the default fetch client can parse form-data as a response, that most HTTP clients
+ * will not likely support this. This is especially an issue when using a Prim RPC server outside of JavaScript. For
+ * this reason, it may make sense to limit responses to either being RPC or being binary. Either this or I would need
+ * to specify in the docs that while it's possible with the default client plugins, that it may not be possible in
+ * other clients plugins or outside of JavaScript with popular HTTP frameworks today. Doing so would almost force some
+ * users to use a certain client those which would go against why Prim RPC is so useful (bring your own frameworks).
  */
 let sendBackBinaryData: Status.Idea
 
