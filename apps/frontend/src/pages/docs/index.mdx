@@ -207,7 +207,8 @@ curl --request POST \
 }'
 ```
 
-In a new file, we'll create a Prim+RPC client that will communicate with our newly configured server.
+The client that we'll create can automatically generate this RPC (the `--data` parameter above). In a new file, we'll
+create a Prim+RPC client that will communicate with our newly configured server.
 
 ```ts client.ts mark=3,6
 // on client:
@@ -220,8 +221,9 @@ const prim = createPrimClient<typeof module>({
 ```
 
 Note that we imported the types directly from our server using TypeScript and passed it to the Prim+RPC client. In
-JavaScript, we could've also used a JSDoc comment to annotate our client. Also note that we are _only_ importing types:
-code from the server is not imported. Instead, this will be requested over the endpoint that we've configured.
+JavaScript, we could've also used a JSDoc comment to annotate our client. These types are totally optional and the
+client has no dependency on them (for those who prefer JavaScript). Also note that we are _only_ importing types: code
+from the server is not imported. Instead, this will be requested over the endpoint that we've configured.
 
 By default, the Prim+RPC does not assume a default client. Similar to the server, we provide this functionality through
 the use of plugins. Let's add support for our server using the browser's built-in fetch client:

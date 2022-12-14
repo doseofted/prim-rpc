@@ -1,31 +1,31 @@
 {
 	"folders": [
 		{
-			"name": "🌳 Project Root",
+			"name": "🌳 Monorepo",
 			"path": "."
 		},
 		{
-			"name": "📙 Prim RPC",
+			"name": "📙 Prim+RPC",
 			"path": "./libs/rpc"
 		},
 		{
-			"name": "📙 Prim RPC Plugins",
+			"name": "📙 Plugins",
 			"path": "./libs/plugins"
 		},
 		{
-			"name": "📙 Prim RPC Docs",
+			"name": "📙 Docs Generator",
 			"path": "./libs/docs"
 		},
 		{
-			"name": "📘 Prim RPC UI",
+			"name": "📘 Docs UI",
 			"path": "./libs/ui"
 		},
 		{
-			"name": "📗 Example Library",
+			"name": "📗 Example Module",
 			"path": "./libs/example"
 		},
 		{
-			"name": "🌐 Example Frontend",
+			"name": "🌐 Documentation",
 			"path": "./apps/frontend"
 		},
 		{
@@ -88,7 +88,7 @@
 		],
 		"cSpell.enableFiletypes": ["dockerfile", "mdx"],
 		"css.lint.unknownAtRules": "ignore",
-		"typescript.tsdk": "🌳 Project Root/node_modules/typescript/lib"
+		"typescript.tsdk": "🌳 Monorepo/node_modules/typescript/lib"
 	},
 	"extensions": {
 		"recommendations": [

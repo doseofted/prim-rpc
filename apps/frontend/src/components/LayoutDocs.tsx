@@ -15,6 +15,7 @@ export function LayoutDocs({ meta, children }: LayoutDocsProps) {
 			name: "Getting Started",
 			sections: [
 				{ name: "Introduction", link: "/" },
+				{ name: "Comparisons", link: "/comparisons" },
 				{ name: "Setup", link: "/setup" },
 				{ name: "Configuration", link: "/configuration" },
 				{ name: "Examples", link: "/examples" },
@@ -24,8 +25,10 @@ export function LayoutDocs({ meta, children }: LayoutDocsProps) {
 		{
 			name: "Guides",
 			sections: [
-				{ name: "Minimal", link: "/guides/minimal" },
-				{ name: "HTTP / WS Server", link: "/guides/client-server" },
+				{ name: "Beginner", link: "/guides/beginner" },
+				{ name: "Intermediate", link: "/guides/intermediate" },
+				{ name: "Experienced", link: "/guides/experienced" },
+				{ name: "Server / Website", link: "/guides/client-server" },
 				{ name: "Web Workers", link: "/guides/web-workers" },
 				{ name: "Electron IPC", link: "/guides/electron" },
 			],

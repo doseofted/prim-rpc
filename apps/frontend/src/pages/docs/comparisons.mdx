@@ -1,0 +1,139 @@
+{/* SECTION: setup */}
+
+import { LayoutDocs } from "@/components/LayoutDocs"
+import { Alert } from "@/components/Alert"
+export const meta = {
+	title: "Comparisons",
+}
+export default ({ children }) => <LayoutDocs meta={meta}>{children}</LayoutDocs>
+
+{/* !SECTION setup */}
+
+# {meta.title}
+
+Why use Prim+RPC over some other framework? What does Prim+RPC offer in comparison to other frameworks? If I've already
+learned another framework then how can I find the equivalent features in Prim+RPC? Let's answer these questions by
+comparing Prim+RPC with other popular methods of transfer and frameworks.
+
+First, it's important to know Prim+RPC only concerns itself with making RPC and offering tools that assists in making
+RPC. It also is not intended to completely replace your existing tooling (like an HTTP server) but rather work alongside
+them. Although in some cases, you may be able to replace some tooling.
+
+Some tools are easy to compare against Prim+RPC. For instance, GraphQL is a form of RPC so it's easy to make a direct
+comparison. Since GraphQL is so popular, it's also the first framework that we'll tackle. Other frameworks however are
+harder to compare, such as Prim+RPC versus a REST API using a framework like Express or Fastify. While some of your HTTP
+routes could be replaced with RPC, it's also not a completely fair comparison because REST isn't RPC. There are
+different motivations and goals for using each. Regardless, we'll discuss the differences and how Prim+RPC can be used
+alongside a REST API or as a replacement for it.
+
+It's very difficult to compare architectural styles such as RPC versus REST because these styles can be implemented in
+many different ways that makes discussion around these topics abstract and difficult to define, especially in a
+practical way that reflects how they're actually used today. So instead we'll focus on specific tooling that implements
+these styles since it is easier to make direct comparisons against concrete features. Naturally, all of these
+comparisons will be biased towards Prim+RPC since it's written by the same author.
+
+Enough disclaimers. Let's discuss.
+
+## GraphQL
+
+[GraphQL](https://graphql.org/) is a form of RPC that comes with its own query language. You define a schema up front
+for your methods, parameters, and returned types in GraphQL's SDL and then you use special types to get this data back
+using the GraphQL querying language. These special types include: queries for reading data, and mutations for changing
+data. Once all of these types are defined, it is then time to implement these queries and mutations in the language of
+your choice which are expected to strictly adhere to the types that you have defined.
+
+Prim+RPC is also a form of RPC however it doesn't have a built-in querying language. Instead it relies on the features
+of JavaScript. A request with Prim+RPC is synonymous with making a function call in JavaScript. Because of this, there's
+no separation between queries and mutations. Instead you are expected to use your own naming scheme to determine what
+will read data and what will write it.
+
+Prim+RPC also doesn't have a separate type system. Instead types are completely optional and can be utilized with the
+language that you're already programming in. JavaScript itself doesn't have a strongly typed system but TypeScript is
+widely adopted today. This means that you can define types to be as strict as you'd like in TypeScript and then enforce
+these rules when some utilizes your RPC library with JavaScript/TypeScript. Unlike GraphQL, these types are only
+understood at compile-time which makes Prim+RPC very flexible. This doesn't mean that Prim+RPC isn't capable of
+following a type system however. There are popular libraries like [Zod](https://github.com/colinhacks/zod) and
+[TypeBox](https://github.com/sinclairzx81/typebox) that provide schema validation that can be used in the place of
+something like GraphQL's type system. Unlike GraphQL, you're not restricted to the types defined by their language but
+rather you can choose to validate your data however you'd like by taking advantage of the JavaScript ecosystem.
+
+Unlike GraphQL, Prim+RPC is a tool designed for usage in JavaScript. While you are welcome to use Prim+RPC outside of
+JavaScript, since the RPC is very easy to structure and understand, it's expected that you are at least running a server
+that uses JavaScript. This is largely because Prim+RPC builds on top of JavaScript language features. By directly
+supporting some other language, Prim+RPC would need to consider additional constraints such as those imposed by a
+programming language's meta-programming abilities or lack thereof, type system, and overall design (for instance,
+Prim+RPC relies on the fact that JavaScript functions are also Objects, that TypeScript types are incredibly flexible,
+and JavaScript language design regarding context).
+
+GraphQL also has additional features that can be compared with Prim+RPC such as subscriptions. Subscriptions in GraphQL
+allow you to query data and receive multiple updates about that data. In other words, you don't receive a single
+response with a subscription but instead multiple responses whenever something changes to that data on the server. This
+feature typically uses WebSockets to send data back intermittently without the client polling the server.
+
+In Prim+RPC, you can also "subscribe" to data but instead of defining a separate subscription query, you simply make a
+call to a function that uses a callback. Whenever the server uses the callback, the client receives that data. This
+functionality is provided over a plugin, typically that uses a WebSocket (but may optionally use some other method of
+transfer).
+
+One last feature of GraphQL, or rather an extension of GraphQL, is the ability to upload files. This isn't supported by
+the query language itself but rather is implemented in several GraphQL tools based on a GraphQL multipart specification
+that's generally accepted by the GraphQL community. While it's generally accepted, it's not widely supported and can be
+difficult to setup.
+
+In Prim+RPC, the type of data that is supported is totally up to plugins which means that file uploads are generally
+supported as long as the plugin being used supports it. In other words, Prim+RPC has already considered file uploads and
+how they should be sent over RPC. Once plugins are configured, sending a file over Prim+RPC is as simple as calling a
+function with your file as an argument.
+
+To sum up the differences between the two:
+
+| GraphQL                                   | Prim+RPC                                        |
+| ----------------------------------------- | ----------------------------------------------- |
+| Uses separate SDL to define types         | Uses already-defined types in application       |
+| Uses queries and mutations for requests   | Requests are just JavaScript function calls     |
+| Uses subscriptions for server-sent events | Server-sent events are received using callbacks |
+| File uploads supported by community       | File uploads directly supported with plugins    |
+| Supports many languages                   | Server is expected to be JavaScript/TypeScript  |
+
+## Fastify / Express
+
+It is difficult to compare Prim+RPC against an HTTP server framework because they are so different but they can both be
+used as some method to send/receive data from a function so the comparison is still relevant. Fastify and Express are
+two examples of popular server frameworks that extend Node's http module. They are used for manually creating API routes
+with explicit HTTP methods, paths, headers, and possibly a body. There are various middleware to add almost any kind of
+functionality that you need to your server. In fact, these frameworks can be difficult to use without a large stack of
+middleware.
+
+Prim+RPC does not aim to replace these frameworks. Similar to how frameworks like GraphQL can integrate with frameworks
+like Express and Fastify, so can Prim+RPC. Prim+RPC does not come with a default transport mechanism and supports both
+Fastify and Express through the use of plugins. This means that you could add Prim+RPC to your project and it alongside
+your existing, defined HTTP routes.
+
+Of course, defining HTTP routes can become tedious. You may need to follow RESTful patterns, define HTTP status codes
+([often arbitrary](https://developer.mozilla.org/en-US/docs/Web/HTTP/Status/418)), manage various resources like
+headers, queries, parameters, cookies, sessions, and more.
+
+A quicker way to define these routes would be with Prim+RPC. Since it integrates directly with both Fastify and Express,
+you could register Prim as middleware for either framework and simply give Prim+RPC your function. Pri+RPC will
+automatically response to routes that match your function. For instance, a request to `/prim/someModule/sayHello` would
+call a function given to Prim+RPC like so: `someModule.sayHello()`. All requests sent to Prim+RPC are sent as POST
+requests (with GET requests available for simple requests) and have simple HTTP status codes already defined based on
+whether your function returns or throws an error. This means you do not have to concern yourself with these various HTTP
+resources.
+
+You can also access the request context from your server framework using context. For instance, the Fastify plugin for
+Prim+RPC will expose the request to your function by binding these variables to your function's `this` object. While
+it's generally encouraged to pass variables as arguments to the function, this functions as an escape haatch when you
+need a resource given through your HTTP server.
+
+## tRPC
+
+WIP.
+
+## gRPC
+
+WIP.
+
+## JSON RPC
+
+WIP.

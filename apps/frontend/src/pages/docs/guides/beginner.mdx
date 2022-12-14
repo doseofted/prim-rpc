@@ -1,0 +1,20 @@
+{/* SECTION: setup */}
+
+import { LayoutDocs } from "@/components/LayoutDocs"
+import { Alert } from "@/components/Alert"
+export const meta = {
+	title: " A Minimal Example",
+}
+export default ({ children }) => <LayoutDocs meta={meta}>{children}</LayoutDocs>
+
+{/* !SECTION setup */}
+
+# {meta.title}
+
+To get going and show off what Prim+RPC can do, we'll set up two JavaScript environments that can't directly communicate
+with each other: a web server and a website. Our web server will use Deno and our website will use basic HTML and
+JavaScript.
+
+This guide will assume that you have a basic knowledge of JavaScript and some HTML but you do not have to be an expert
+to follow this guide. If you are looking for a more in-depth guide, you may consider the Intermediate or Experienced
+guides.
