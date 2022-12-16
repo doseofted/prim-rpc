@@ -121,11 +121,13 @@ which isn't possible over the "method handler" (this is primarily why there are 
 methods). The problem is that there is no "form-data" standard/library over WebSocket without creating one myself.
 Instead, RPC would need to be sent over one message and another message (potentially, multiple messages) would need to
 contain binary data. This would then need to be pieced together on the server. That's a lot of work and falls outside of
-Prim+RPC's responsibilities. I will need to find some other solution or consider making this a permanent limitation.
+Prim+RPC's responsibilities. I will need to find time to address this issue, find some other solution, or consider
+making this a permanent limitation.
 
 ## Serialization Limitations
 
-RPC messages need to be serialized before they are transported.
+RPC messages need to be serialized before they are transported. Simple primitive types are always supported but
+additional types may require a separate serialization library or manual work to deserialize data on the server.
 
 ### Default JSON Serialization
 
@@ -187,7 +189,7 @@ function results back to the client as Promises of the requested data, similar t
 ### Callback Results Must Be Awaited
 
 <Alert icon="carbon:warning" type="alert-warning">
-	This feature does not exist yet but is planned.
+	Callback return values are not supported yet but are planned.
 </Alert>
 
 Similar to the rule above, callback results on the server must also be awaited. This is because the result is from the
