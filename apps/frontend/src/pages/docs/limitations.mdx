@@ -14,3 +14,181 @@ export default ({ children }) => <LayoutDocs meta={meta}>{children}</LayoutDocs>
 <Alert icon="carbon:warning" type="alert-warning">
 	Work in Progress
 </Alert>
+
+Prim+RPC has many features built-in and is intended to be very flexible but there are some limitations as to what you
+can do with the library. Prim+RPC is intended to allow you to make plain function calls to a server as if that code was
+written locally. Since this is not possible with regular JavaScript functions (outside of using RPC, like this library)
+there are naturally some limitations to what you can do with functions when used with Prim+RPC.
+
+It is important to understand these limitations since these function calls look like regular JavaScript function calls,
+rather than an RPC. It is also suggested that you name your Prim+RPC client something that reminds you that it is RPC.
+For instance, you may name your client `backend` so that if you call, for example, `backend.sayHello()` then you know
+that this function is provided from your backend service and is subject to these limitations.
+
+There are a few categories of limitations. The first category are limitations due to the fact that Prim+RPC is still
+early in development. These are limitations that are intended to be resolved. The second category are serialization
+limitations because every RPC must first be serialized before it can be sent. There are ways to extend the types of data
+that can be serialized that we'll discuss but some limitations still exist. The third category are limitations in
+language support. JavaScript has many features and while Prim+RPC tries to support many, there are some features that
+are very difficult to support. I'm hesitant to say impossible to support but some are likely infeasible, at least for
+now.
+
+It's important to note that the highest priorities of Prim+RPC is to be functionally on-par with other popular
+frameworks like GraphQL or just regular HTTP requests. Supporting every part of the JavaScript language is very, very
+difficult and some parts may very well not be possible. The goal is not to support 100% of JavaScript as a language but
+rather to communicate limitations clearly.
+
+## Table of Contents
+
+## Prerelease Limitations
+
+These are issues that I hope to resolve. Many of these depend on me finding creative solutions to these problems which
+makes creating a timeline for these issues difficult.
+
+### Server Cannot Curry to Client Yet
+
+Today, Prim+RPC supports many types of return values and even more by using a custom JSON serialization library with
+Prim+RPC. It even supports calling a client-defined callback based on server events. However today, a function returned
+a function call on the server cannot be called from the client.
+
+```ts
+// NOTE: DOES NOT WORK
+export function add(a: number) {
+	return function (b: number) {
+		a + b
+	}
+}
+```
+
+This may be fixed by storing a function reference on the server while a WebSocket (or other transport) connection is
+open and then once the returned function on the client is called, sending a new WebSocket message with a reference to
+that temporary function.
+
+This becomes complicated when you consider that these functions could be passed a file parameter or a callback
+themselves, when they're not directly accessible except for during the WebSocket session. This may be difficult to
+support and may involve adding a new limitation that returned functions cannot have files/callbacks themselves.
+
+### Callbacks Cannot Return Value to Client Yet
+
+You can pass callbacks to functions defined on a server used with Prim+RPC. These callbacks can be called from the
+server and the client's callback will receive the parameters from the server. However, if the client returns a value
+from this callback, the server cannot receive that information yet.
+
+```ts
+// NOTE: DOES NOT WORK
+export function doSomething(askApproval: (status: string) => boolean) {
+	const acknowledged = await askApproval("ready")
+	if (acknowledged) {
+		// ... do something
+	}
+}
+```
+
+I believe that this can be solved but there may be an additional limitation needed so that a callback cannot return yet
+another function (otherwise this is another problem that needs to be solved).
+
+### Files Cannot Be Sent as Response to RPC Yet
+
+Today, Prim+RPC can handle file uploads to the server but cannot return a file from the server back to the client. To be
+clear, you can return a URL to the client over RPC that points to a file (this is typical with many server-side APIs)
+but you cannot return the binary contents of that file back to the function yet.
+
+```ts
+// NOTE: DOES NOT WORK
+export function createCalendarEvent(date: Date) {
+	const calendarInviteFile: Buffer = createICSFile()
+	return calendarInviteFile
+}
+```
+
+### Callbacks and Files Can't Be Used At Same Time
+
+Today, Prim+RPC can support both callbacks and files as parameters. However, it cannot support both at the same time.
+This is due to the fact that they require different methods of transport today. Callbacks require a "callback handler"
+plugin (typically a WebSocket connection to maintain the callback reference) while files require a "method handler"
+plugin (typically an HTTP client that uses "form-data" to upload the file).
+
+```ts
+// NOTE: DOES NOT WORK
+export function uploadFileWithProgress(file: Promise<Buffer>, receivedCallback: () => void) {
+	const downloaded = await file
+	receivedCallback()
+}
+```
+
+The solution is to allow file uploads over the "callback handler" since callbacks require some session to be established
+which isn't possible over the "method handler" (this is primarily why there are two handlers, for callbacks and
+methods). The problem is that there is no "form-data" standard/library over WebSocket without creating one myself.
+Instead, RPC would need to be sent over one message and another message (potentially, multiple messages) would need to
+contain binary data. This would then need to be pieced together on the server. That's a lot of work and falls outside of
+Prim+RPC's responsibilities. I will need to find some other solution or consider making this a permanent limitation.
+
+## Serialization Limitations
+
+RPC messages need to be serialized before they are transported.
+
+### Default JSON Serialization
+
+Since Prim+RPC messages are JSON, the default JSON handler is used with special handling of callbacks, files, and Error
+objects. However, this is subject to the limitations of the default JSON handler. This means that other types of data
+will need to be serialized to a string and will not automatically convert back to the same type on the server. If the
+data type passed to Prim+RPC is not something that can be serialized then it may not be sent at all.
+
+However, you can change the JSON serialization library used to extend the number of types that can be serialized and add
+more. This way your types from the client that you pass to the server will be preserved on the server without having to
+manually deserialize that data.
+
+### Extending JSON Serialization
+
+You may choose to use a library like [superjson](https://github.com/blitz-js/superjson) to extend the types that can be
+used automatically with Prim+RPC. Prim+RPC supports custom JSON handlers like this and many others as long as they
+provide a `stringify` and `parse` method.
+
+It is important to know that if JSON serialization is extended, you must do so on both the server and client (since
+serialization and deserialzation go hand-in-hand) You can configure it like so:
+
+<CH.Code>
+
+```ts client.ts
+import { createPrimClient } from "@doseofted/prim-rpc"
+import jsonHandler from "superjson"
+
+const client = createPrimClient<typeof exampleClient>({
+	jsonHandler,
+	// ... other client options
+})
+```
+
+---
+
+```ts server.ts
+import { createPrimServer } from "@doseofted/prim-rpc"
+import jsonHandler from "superjson"
+
+const server = createPrimServer({
+	jsonHandler,
+	// ... other server options
+})
+```
+
+</CH.Code>
+
+## Language Limitations
+
+These aren't necessarily limitations but are important to point out so that you understand how Prim+RPC works.
+
+### Function Results Must Be Awaited
+
+When you call a function with the Prim+RPC client, the result of that call will be wrapped in a Promise and must be
+awaited, even if the function you're calling doesn't return a Promise. This is because you are fetching this result over
+some other channel (in most cases, over HTTP) and this result is not immediately available to you. Prim+RPC sends all
+function results back to the client as Promises of the requested data, similar to how you must await a fetch request.
+
+### Callback Results Must Be Awaited
+
+<Alert icon="carbon:warning" type="alert-warning">
+	This feature does not exist yet but is planned.
+</Alert>
+
+Similar to the rule above, callback results on the server must also be awaited. This is because the result is from the
+client and is not immediately available. Prim+RPC automatically wraps this data in a Promise.

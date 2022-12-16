@@ -159,7 +159,7 @@ you give Prim+RPC a module named `someModule` with a function `sayHello` then yo
 No other options are needed for that function call from the client except for those provided from your function.
 
 tRPC also utilizes Zod to a large extent as a way of defining types that can be enforced during run-time. This allows
-tRPC to enforce a schema but it means that you need to use tRPC to do so. Prim+RPC on the other hand only focuses on
+tRPC to enforce a schema but it means that you need to use Zod to do so. Prim+RPC on the other hand only focuses on
 compile-time validation of types and leaves the run-time errors to the developer. This means that you could potentially
 use Zod, jut like you would in tRPC, but you also have the option of choosing your own tool from the JavaScript
 ecosystem if you'd like.
