@@ -19,6 +19,7 @@ export function LayoutDocs({ meta, children }: LayoutDocsProps) {
 				{ name: "Setup", link: "/setup" },
 				{ name: "Configuration", link: "/configuration" },
 				{ name: "Examples", link: "/examples" },
+				{ name: "RPC Structure", link: "/rpc-structure" },
 				{ name: "Limitations", link: "/limitations" },
 			],
 		},

@@ -1,0 +1,34 @@
+{/* SECTION: setup */}
+
+import { LayoutDocs } from "@/components/LayoutDocs"
+import { Alert } from "@/components/Alert"
+export const meta = {
+	title: "RPC Structure",
+}
+export default ({ children }) => <LayoutDocs meta={meta}>{children}</LayoutDocs>
+
+{/* !SECTION setup */}
+
+# {meta.title}
+
+<Alert icon="carbon:information" type="alert-info">
+
+This is a slightly more advanced guide for those using Prim+RPC outside of JavaScript. **You do not need to read this to
+understand how to use Prim+RPC.**
+
+</Alert>
+
+While using Prim+RPC's client to generate RPC is incredibly easy and painless, there may be situations where you would
+like to learn how to structure a request to a Prim+RPC server. Maybe you are developing an application with Swift/Kotlin
+and need to connect to Prim+RPC from an ordinary HTTP client, maybe you're looking to intercept requests with a Web
+Worker for caching, or maybe you are just curious as to how it works.
+
+Before you learn how to format an RPC manually, you should also know that Prim+RPC has a low-level documentation
+generator for which you could generate RPC snippets for popular HTTP clients using
+[HTTPSnippet](https://github.com/Kong/httpsnippet). These can be customized for your own code being used with Prim+RPC.
+This is useful when you have potentially hundreds of different method calls to make. Otherwise, you may just learn how
+to make the request yourself since it is designed to be easy to do.
+
+While Prim+RPC only deals with the RPC portion of the request, plugins used with Prim+RPC generally follow a particular
+format to deliver that RPC (although they're not technically required to do so). We'll discuss this by following the
+lifecycle of an RPC in Prim+RPC.

@@ -15,6 +15,8 @@ Why use Prim+RPC over some other framework? What does Prim+RPC offer in comparis
 learned another framework then how can I find the equivalent features in Prim+RPC? Let's answer these questions by
 comparing Prim+RPC with other popular methods of transfer and frameworks.
 
+## Table of Contents
+
 First, it's important to know Prim+RPC only concerns itself with making RPC and offering tools that assists in making
 RPC. It also is not intended to completely replace your existing tooling (like an HTTP server) but rather work alongside
 them. Although in some cases, you may be able to replace some tooling.
@@ -75,10 +77,10 @@ call to a function that uses a callback. Whenever the server uses the callback, 
 functionality is provided over a plugin, typically that uses a WebSocket (but may optionally use some other method of
 transfer).
 
-One last feature of GraphQL, or rather an extension of GraphQL, is the ability to upload files. This isn't supported by
-the query language itself but rather is implemented in several GraphQL tools based on a GraphQL multipart specification
-that's generally accepted by the GraphQL community. While it's generally accepted, it's not widely supported and can be
-difficult to setup.
+One last feature of GraphQL, or rather an extension of it, is the ability to upload files. This isn't supported by
+GraphQL itself but rather is implemented in several tools based on a GraphQL multipart specification that's generally
+accepted by the GraphQL community. While it's generally accepted, it's not widely supported and can be difficult to
+setup.
 
 In Prim+RPC, the type of data that is supported is totally up to plugins which means that file uploads are generally
 supported as long as the plugin being used supports it. In other words, Prim+RPC has already considered file uploads and
@@ -98,42 +100,122 @@ To sum up the differences between the two:
 ## Fastify / Express
 
 It is difficult to compare Prim+RPC against an HTTP server framework because they are so different but they can both be
-used as some method to send/receive data from a function so the comparison is still relevant. Fastify and Express are
-two examples of popular server frameworks that extend Node's http module. They are used for manually creating API routes
-with explicit HTTP methods, paths, headers, and possibly a body. There are various middleware to add almost any kind of
-functionality that you need to your server. In fact, these frameworks can be difficult to use without a large stack of
-middleware.
+used as some method to send/receive data from a function so the comparison is still relevant.
+[Fastify](https://www.fastify.io/) and [Express](https://expressjs.com/) are two examples of popular server frameworks
+that extend Node's http module. They are used for manually creating API routes with explicit HTTP methods, paths,
+headers, and possibly a body. There are various middleware to add almost any kind of functionality that you need to your
+server. In fact, these frameworks can be difficult to use without a large stack of middleware.
 
 Prim+RPC does not aim to replace these frameworks. Similar to how frameworks like GraphQL can integrate with frameworks
 like Express and Fastify, so can Prim+RPC. Prim+RPC does not come with a default transport mechanism and supports both
-Fastify and Express through the use of plugins. This means that you could add Prim+RPC to your project and it alongside
-your existing, defined HTTP routes.
+Fastify and Express (as well as other HTTP servers) through the use of plugins. This means that you could add Prim+RPC
+to your project and use it alongside your existing, defined HTTP routes.
 
-Of course, defining HTTP routes can become tedious. You may need to follow RESTful patterns, define HTTP status codes
-([often arbitrary](https://developer.mozilla.org/en-US/docs/Web/HTTP/Status/418)), manage various resources like
+Of course, defining HTTP routes can become tedious. You may need to follow strict RESTful patterns, define HTTP status
+codes ([often arbitrary](https://developer.mozilla.org/en-US/docs/Web/HTTP/Status/418)), manage various resources like
 headers, queries, parameters, cookies, sessions, and more.
 
 A quicker way to define these routes would be with Prim+RPC. Since it integrates directly with both Fastify and Express,
 you could register Prim as middleware for either framework and simply give Prim+RPC your function. Pri+RPC will
-automatically response to routes that match your function. For instance, a request to `/prim/someModule/sayHello` would
-call a function given to Prim+RPC like so: `someModule.sayHello()`. All requests sent to Prim+RPC are sent as POST
-requests (with GET requests available for simple requests) and have simple HTTP status codes already defined based on
-whether your function returns or throws an error. This means you do not have to concern yourself with these various HTTP
-resources.
+automatically create a route for your functions. For instance, a request to `/prim/someModule/sayHello?name=Ted` would
+call a function given to Prim+RPC like so: `someModule.sayHello({ name: "Ted" })`. Requests sent to Prim+RPC are
+typically sent as POST requests (with GET requests available for simple requests, as shown in example) and have simple
+HTTP status codes already defined based on whether your function returns (`200`), isn't found (`400`), or throws an
+error (`500`). This means you do not have to concern yourself with these various HTTP resources and can use regular
+JavaScript errors (optionally attaching codes if needed) without worrying about a whole separate class of HTTP error
+codes.
 
-You can also access the request context from your server framework using context. For instance, the Fastify plugin for
-Prim+RPC will expose the request to your function by binding these variables to your function's `this` object. While
-it's generally encouraged to pass variables as arguments to the function, this functions as an escape haatch when you
-need a resource given through your HTTP server.
+You can also access the request context from your server framework using `this` context. For instance, the Fastify
+plugin for Prim+RPC will expose the request to your function by binding these variables to your function's `this` object
+bound by Prim+RPC. While it's generally encouraged to pass variables as arguments to the function, this functions as an
+escape hatch when you need a resource given through your HTTP server (for instance, some existing authentication given
+over a cookie, processed by your HTTP server).
+
+Using Prim+RPC with an HTTP server is powerful combo because you can leverage the middleware available in your existing
+frameworks but have the simplicity of using Prim+RPC to define resources to be made available over the Internet.
 
 ## tRPC
 
-WIP.
+[tRPC](https://github.com/trpc/trpc) is probably most similar to Prim+RPC in terms of the problems that it serves to
+address. tRPC and Prim+RPC diverge in how they aim to address them. tRPC is an RPC framework designed to make it easier
+to communicate between an HTTP server written in TypeScript and some client written in TypeScript (with React hooks
+available). These are some of the first few differentiators between the two RPC frameworks.
+
+While tRPC focuses on server/client communication over HTTP, Prim+RPC focuses on server/client communication regardless
+of transport method (of course, HTTP is well-supported). Prim+RPC aims to be transport-agnostic so that it can support
+various uses of RPC, including IPC (for instance, as used in Electron or between Node.js servers).
+
+tRPC has a lot of features that are comparable to GraphQL. It uses familiar GraphQL terms for defining requests which
+can be super useful for those migrating from GraphQL to a tool like tRPC. If you're familiar with queries, mutations,
+subscriptions, and the like, then tRPC can be an easy tool for which to migrate. However, if you're unfamiliar, these
+terms may be daunting and become a hurdle in picking up the framework.
+
+Prim+RPC in contrast does not compare itself to GraphQL but rather to JavaScript. If you know JavaScript then Prim+RPC
+should be easy to pick up. Queries in tRPC are simply JavaScript function calls in Prim+RPC, as are mutations.
+Subscriptions (messages sent over WebSocket) in tRPC are a somewhat more advanced feature of the framework while in
+Prim+RPC, they are simply callbacks on a JavaScript function. While tRPC utilizes different methods to define procedures
+explicitly on the server, Prim+RPC follows the structure of the JavaScript module that you give it. In other words, if
+you give Prim+RPC a module named `someModule` with a function `sayHello` then you'd simply call `someModule.sayHello()`.
+No other options are needed for that function call from the client except for those provided from your function.
+
+tRPC also utilizes Zod to a large extent as a way of defining types that can be enforced during run-time. This allows
+tRPC to enforce a schema but it means that you need to use tRPC to do so. Prim+RPC on the other hand only focuses on
+compile-time validation of types and leaves the run-time errors to the developer. This means that you could potentially
+use Zod, jut like you would in tRPC, but you also have the option of choosing your own tool from the JavaScript
+ecosystem if you'd like.
+
+Another difference between the two is how they are used on the client and within frontend frameworks. tRPC provides an
+RPC client with its own fetch client with a variety of features and options built-in. It also provides an adapter for
+React that extends the regular tRPC client. This is useful for getting started but becomes a problem if you need to use
+a custom fetch client like Axios.
+
+Prim+RPC's client on the other hand doesn't have a default fetch client. In fact, your method of transport may not be
+HTTP so you may not need a fetch client. This functionality in Prim+RPC is provided over plugins so that you can
+customize how data is received. This is useful when you need to specify specific details about a connection to a server
+or if you need a specific fetch client (for instance, in Ionic Capacitor apps you may need to use the Capacitor HTTP API
+instead of the default browser fetch client, which is something that you can do in Prim+RPC by building a plugin).
+
+While tRPC can be used in any UI framework, it provides a React-specific client. Prim+RPC doesn't provide clients for
+React or other UI frameworks directly because it's generally not needed. The result of a function call in Prim+RPC's
+client is simply a Promise in JavaScript containing your result of the function call. Popular UI frameworks today
+usually provide excellent tools for handling Promises so an additional client isn't needed for Prim+RPC.
+
+To sum up differences:
+
+| tRPC                                  | Prim+RPC                                                     |
+| ------------------------------------- | ------------------------------------------------------------ |
+| Focus on HTTP transport               | Transport-agnostic                                           |
+| Great for those familiar with GraphQL | Great for those familiar with JavaScript                     |
+| Uses Zod for schema validation        | Schema validation is left to developer but Zod could be used |
+| Built-in fetch with client            | Fetching ability provided over plugins                       |
 
 ## gRPC
 
-WIP.
+<Alert icon="carbon:warning" type="alert-warning">
+	Unavailable (Work In Progress)
+</Alert>
 
 ## JSON RPC
 
-WIP.
+Prim+RPC's structure probably most resembles [JSON RPC](https://www.jsonrpc.org/). However, it is not JSON RPC and does
+not adhere to the standard. Prim+RPC is also not a standard (although it may be standardized before reaching version
+1.0) but rather it's a tool for constructing and understanding simple RPCs over JSON. While there are JSON RPC clients
+provided by a community of developers, I'm unaware of an official client for it which makes direct comparisons between
+the two difficult. Prim+RPC however has an official client.
+
+While JSON RPC and Prim+RPC messages may appear similar at first glance, there are some major differences worth
+mentioning. For instance, RPC with Prim+RPC does not require an ID while JSON RPC does (however, it's recommended and
+the Prim+RPC will create an ID for its own internal purpose of managing batched requests). Obviously, the `jsonrpc`
+property is also missing in Prim+RPC since it is not JSON RPC. Errors in Prim+RPC are also handled differently and
+depend entirely on how a thrown Error in JavaScript is serialized (there is no standard). There are no standardized
+error codes in Prim+RPC and none are planned while JSON RPC has a few codes intended for RPC-specific errors.
+
+Prim+RPC also has additional features like the ability to receive data from callbacks which has a similar structure to
+regular Prim+RPC messages but is formatted slightly different. This feature is not part of JSON RPC. Prim+RPC can also
+support file uploads by referencing file IDs in some other object (typically form-data) while file uploads are not a
+topic mentioned in JSON RPC.
+
+One last difference between the two is that Prim+RPC does not feature extensions like JSON RPC. It's possible that
+Prim+RPC may look to create a standard for its messages in which case features for extending the RPC format may be
+considered (like extensions). Today Prim+RPC is still in an early phase and this is something to consider in the future
+as Prim+RPC becomes stable.
