@@ -270,9 +270,9 @@ There are two parts of Prim+RPC for communicating between two different environm
 browser/client.
 
 The server is responsible for making your code available to the client. You can write any plain JavaScript function that
-you'd like, pass it to Prim+RPC, and it becomes available for the client to use once flag as publicly available (nothing
-is shared by default). The server reads given RPC, a simple JSON object typically transported over HTTP or WebSocket,
-and translates this into the proper function call on the server.
+you'd like, pass it to Prim+RPC, and it becomes available for the client to use once flagged as publicly available
+(nothing is shared by default). The server reads given RPC, a simple JSON object typically transported over HTTP or
+WebSocket, and translates this into the proper function call on the server.
 
 The client is responsible for structuring requests into RPC that the server can understand. When you make a function
 call using the client, that function call is translated into RPC using a recursive JavaScript Proxy. The Proxy object is

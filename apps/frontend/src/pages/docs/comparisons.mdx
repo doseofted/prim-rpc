@@ -52,7 +52,7 @@ will read data and what will write it.
 Prim+RPC also doesn't have a separate type system. Instead types are completely optional and can be utilized with the
 language that you're already programming in. JavaScript itself doesn't have a strongly typed system but TypeScript is
 widely adopted today. This means that you can define types to be as strict as you'd like in TypeScript and then enforce
-these rules when some utilizes your RPC library with JavaScript/TypeScript. Unlike GraphQL, these types are only
+these rules when someone utilizes your RPC library with JavaScript/TypeScript. Unlike GraphQL, these types are only
 understood at compile-time which makes Prim+RPC very flexible. This doesn't mean that Prim+RPC isn't capable of
 following a type system however. There are popular libraries like [Zod](https://github.com/colinhacks/zod) and
 [TypeBox](https://github.com/sinclairzx81/typebox) that provide schema validation that can be used in the place of
@@ -64,8 +64,8 @@ JavaScript, since the RPC is very easy to structure and understand, it's expecte
 that uses JavaScript. This is largely because Prim+RPC builds on top of JavaScript language features. By directly
 supporting some other language, Prim+RPC would need to consider additional constraints such as those imposed by a
 programming language's meta-programming abilities or lack thereof, type system, and overall design (for instance,
-Prim+RPC relies on the fact that JavaScript functions are also Objects, that TypeScript types are incredibly flexible,
-and JavaScript language design regarding context).
+Prim+RPC relies on the fact that JavaScript functions are also Objects, that TypeScript types are structural and
+incredibly flexible, and JavaScript language design regarding context).
 
 GraphQL also has additional features that can be compared with Prim+RPC such as subscriptions. Subscriptions in GraphQL
 allow you to query data and receive multiple updates about that data. In other words, you don't receive a single

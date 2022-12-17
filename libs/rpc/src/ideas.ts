@@ -733,4 +733,57 @@ let sendBackBinaryData: Status.Idea
  */
 let allowFileUploadsAndCallbacks: Status.Idea
 
+/**
+ * Prim RPC is very useful in projects where the frontend and backend are contained in the same repository. You could
+ * also have the frontend and backend in different repositories altogether but the downside with that kind of setup is
+ * that types from the backend have to be copied to the frontend and it's easy for those types to become outdated.
+ * 
+ * It's not always possible for the frontend and backend to live in the same repository, especially when a public API is
+ * offered. To address this, Prim RPC should offer the ability to host type files from the server. These type files
+ * would be packaged together with a package.json file and would be packed into a tarball expected by popular package
+ * managers. Popular package managers support downloading packages from URLs in this format so this would be a great way
+ * to share types for public APIs. As an example, Thin Backend provides this as an option to get a typed database
+ * (and likely others).
+ * 
+ * Prim RPC itself should probably not support this itself since it will depend on the framework used. Packaging types
+ * into a tarball would be specific to NPM-like package managers (not sure how this would work with Deno). Instead, this
+ * could be offered as a module to be used with Prim RPC (also a great example to show a module made by possible by
+ * Prim RPC). It would be set up like this:
+ * 
+ * ```ts
+ * import { typeServer } from "@doseofted/prim-type-server"
+ * // ...
+ * createPrimServer({
+ *   module: {
+ *     types: typeServer({ types: "./types" })
+ *   }
+ * })
+ * ```
+ * 
+ * There are some potential problems with this kind of setup. The biggest one is versioning. How should the version be
+ * declared? It needs to be contained in the URL somehow so a version can be pinned. However Prim RPC should not dictate
+ * how versioning is done. There are many different ways to version software and multiple levels in the stack. When
+ * hosting a public API, multiple versions will need to be served as well and some developers may have apprehensions
+ * about creating multiple Prim Servers to host different versions. For this reason, this "type-server" module should
+ * not provide a "version" option since versioning should be handled by the module(s). There should be a method to
+ * signal what version is provided to this "type-server".
+ * 
+ * A module could export an object with a property ".version" that would be a semver-compatible name (a string). It
+ * doesn't technically have to semver since the package would not have the same constraints of the NPM registry but
+ * it's still a good idea to have (whether this should be enforced by Prim is questionable, probably not). The question
+ * is then how does this version property get communicated to a "type-server" module. What if there are multiple
+ * versions?
+ * 
+ * There are other potential problems with this approach. For one, Prim RPC works with many frameworks while this
+ * "type-server" would depend on features specific to platforms. For instance, a node-module solver would be needed to
+ * find where type files are located if given a package name (otherwise a file path for types would be needed which
+ * isn't always known by the developer or in the same place at all times). I would also need a tool to tar the final
+ * contents to be compatible with popular package managers.
+ * 
+ * It's also worth noting that Prim+RPC will first need to support binary data as a response before this feature can be
+ * added (because the package manager will request from the URL and expects a tarball). Binary responses are already
+ * planned but this feature of serving types does depend on that feature being finished first.
+ */
+let useTypesOutsideOfBackendProject: Status.Idea
+
 export {}
