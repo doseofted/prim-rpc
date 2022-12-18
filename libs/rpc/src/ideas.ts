@@ -774,16 +774,70 @@ let allowFileUploadsAndCallbacks: Status.Idea
  * is then how does this version property get communicated to a "type-server" module. What if there are multiple
  * versions?
  * 
+ * Versioning should not be handled by Prim RPC. The only reason that versioning needs to be known by Prim RPC is so
+ * that it can be signaled to package managers that the types need to be updated. Otherwise, updates to types may not
+ * be received or even worse, if some developer removes old type definitions (for some odd reason), then anyone who
+ * downloads types would not have the same development environment as another developer. Using the NPM registry with
+ * semantic versioning would be the fix for this. It would be handled like any other dependency but developers building
+ * a public API do not want to rely on NPM for their API (it's okay for JS API clients, not the API itself). This is why
+ * types should be hosted alongside the API itself.
+ * 
  * There are other potential problems with this approach. For one, Prim RPC works with many frameworks while this
  * "type-server" would depend on features specific to platforms. For instance, a node-module solver would be needed to
  * find where type files are located if given a package name (otherwise a file path for types would be needed which
  * isn't always known by the developer or in the same place at all times). I would also need a tool to tar the final
  * contents to be compatible with popular package managers.
  * 
+ * May this "type-server" should instead be part of some "prim-cli" module. Since this has to do with packaging types
+ * to be made available, it makes sense to make this part of some build process. I'm completely against relying on a
+ * build process in Prim RPC but since types with TypeScript naturally are outside of the run-time processes, it makes
+ * sense to separate the ability to package types into a separate module altogether in the same way that the
+ * documentation generator is separate from Prim RPC.
+ * 
+ * In fact, it may make sense to combine Prim RPC's documentation generator and this "type-server" idea into one package
+ * called "prim-rpc-tools". This way, This "tools" project would include the documentation generator but would also
+ * include a second build for a CLI tool that would read build output (that includes type definitions) and then package
+ * types (and types only) with some package.json, tar it, and then make it available on the hard drive. There would then
+ * be some sort of very small run-time component (for use in Prim RPC as a module) that would serve this tarball without
+ * having to rely solely on some pre-configured HTTP server (instead that generic server would be a plugin for Prim
+ * RPC). This would solve the platform-specific issues since the types would be generated outside of Prim RPC and the
+ * portion of the "type-server" that is used with Prim RPC is generic and just serves the final tarball to the user.
+ * 
  * It's also worth noting that Prim+RPC will first need to support binary data as a response before this feature can be
  * added (because the package manager will request from the URL and expects a tarball). Binary responses are already
  * planned but this feature of serving types does depend on that feature being finished first.
  */
 let useTypesOutsideOfBackendProject: Status.Idea
+
+/**
+ * Building on the `useTypesOutsideOfBackendProject`, it might be a good idea to combine the documentation generator
+ * with the "type-server" described earlier and call this "prim-rpc-tools". The documentation generator today simply
+ * reads some prebuilt TypeDoc output and creates a simpler version of it that specifically is for RPC. By building a
+ * CLI instead, I could use the TypeDoc tool as part of the CLI to generate TypeDoc and then also generate the RPC docs
+ * alongside it. This way, the developer doesn't need to run two commands if they're only interested in the RPC docs.
+ * This would require a specific version of TypeDoc which doesn't appear to be completely stable so it may not be a good
+ * idea to use it directly but instead rely on the output of the tool so developers can freely update their TypeDoc
+ * version (this is how the docs generator works today anyway).
+ * 
+ * Another part of this "prim-rpc-tools" CLI would be the "type-server". This would be a post-build step once TypeScript
+ * types have been generated. This CLI would be run after build and would check for all type definitions and read the
+ * local package.json (or generate a new one) and then tarball the entire thing. The resulting file would then be made
+ * available in some "dist" folder for use in Prim RPC server.
+ * 
+ * Since this "prim-rpc-tools" module could include other tools, I could also house a separate project that would serve
+ * an entire module with a pre-configured HTTP and WS server. This would remove a barrier for someone looking to get
+ * started with Prim RPC because they would not have to configure other tools. So, if someone has already created a
+ * module that they want to serve, they could simply execute it with the following:
+ * 
+ * ```zsh
+ * pnpx @doseofted/prim-rpc-tools serve ./dist/server.js
+ * ```
+ * 
+ * The above example assumes that someone built their server but you could also just use the source directly. By using
+ * a tool like "tsx" (Node.js with TypeScript support), the above command could be simplified by just specifying the
+ * TypeScript file directly (then the question becomes how does one share the Type definitions with the client; would
+ * you import the file in the client using a statement like "import type ... from '...'"?).
+ */
+let primToolsCli: Status.Idea
 
 export {}
