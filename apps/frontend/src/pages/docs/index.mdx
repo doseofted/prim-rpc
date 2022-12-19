@@ -175,7 +175,7 @@ it is easy to write your own.
 ```ts server.ts mark=3,4,6,15,19
 // on server:
 import { createPrimServer } from "@doseofted/prim-rpc"
-import { primMethodFastify } from "@doseofted/prim-plugins/fastify"
+import { primMethodFastify } from "@doseofted/prim-rpc-plugins/fastify"
 import Fastify from "fastify"
 
 const fastify = Fastify()
@@ -231,7 +231,7 @@ the use of plugins. Let's add support for our server using the browser's built-i
 ```ts client.ts mark=3,8
 // on client:
 import { createPrimClient } from "@doseofted/prim-rpc"
-import { createFetchClient } from "@doseofted/prim-plugins/browser-api"
+import { createFetchClient } from "@doseofted/prim-rpc-plugins/browser-api"
 import type * as module from "./server.ts"
 
 const prim = createPrimClient<typeof module>({
@@ -246,7 +246,7 @@ we're ready to call our function from the client to our server!
 ```ts client.ts focus=11:12
 // on client:
 import { createPrimClient } from "@doseofted/prim-rpc"
-import { createFetchClient } from "@doseofted/prim-plugins/browser-api"
+import { createFetchClient } from "@doseofted/prim-rpc-plugins/browser-api"
 import type * as module from "./server.ts"
 
 const prim = createPrimClient<typeof module>({

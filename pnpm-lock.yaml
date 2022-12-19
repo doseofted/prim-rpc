@@ -64,8 +64,8 @@ importers:
   apps/backend:
     specifiers:
       '@doseofted/prim-example': workspace:*
-      '@doseofted/prim-plugins': workspace:*
       '@doseofted/prim-rpc': workspace:*
+      '@doseofted/prim-rpc-plugins': workspace:*
       '@fastify/cors': ^8.2.0
       '@fastify/multipart': ^7.3.0
       '@types/ws': ^8.5.3
@@ -74,8 +74,8 @@ importers:
       ws: ^8.11.0
     dependencies:
       '@doseofted/prim-example': link:../../libs/example
-      '@doseofted/prim-plugins': link:../../libs/plugins
       '@doseofted/prim-rpc': link:../../libs/rpc
+      '@doseofted/prim-rpc-plugins': link:../../libs/plugins
       '@fastify/cors': 8.2.0
       '@fastify/multipart': 7.3.0
       fastify: 4.10.0
@@ -88,9 +88,9 @@ importers:
     specifiers:
       '@code-hike/mdx': ^0.7.4
       '@doseofted/prim-example': workspace:*
-      '@doseofted/prim-plugins': workspace:*
       '@doseofted/prim-rpc': workspace:*
-      '@doseofted/prim-ui': workspace:*
+      '@doseofted/prim-rpc-plugins': workspace:*
+      '@doseofted/prim-rpc-ui': workspace:*
       '@headlessui/react': ^1.7.4
       '@iconify-json/carbon': ^1.1.11
       '@iconify-json/simple-icons': ^1.1.37
@@ -133,16 +133,18 @@ importers:
       remark-toc: ^8.0.1
       sass: ^1.56.1
       shiki: ^0.11.1
+      superjson: ^1.11.0
       tailwindcss: ^3.2.4
+      type-fest: ^3.2.0
       typescript: ^4.8.4
       use-immer: ^0.8.1
       webpack: ^5.75.0
       zustand: ^4.1.4
     dependencies:
       '@doseofted/prim-example': link:../../libs/example
-      '@doseofted/prim-plugins': link:../../libs/plugins
       '@doseofted/prim-rpc': link:../../libs/rpc
-      '@doseofted/prim-ui': link:../../libs/ui
+      '@doseofted/prim-rpc-plugins': link:../../libs/plugins
+      '@doseofted/prim-rpc-ui': link:../../libs/ui
       next: 13.0.4_m5sxuueb27gk6ddc5gums6vtgq
       react: 18.2.0
       react-dom: 18.2.0_react@18.2.0
@@ -187,7 +189,9 @@ importers:
       remark-toc: 8.0.1
       sass: 1.56.1
       shiki: 0.11.1
+      superjson: 1.11.0
       tailwindcss: 3.2.4_postcss@8.4.19
+      type-fest: 3.2.0
       typescript: 4.9.3
       use-immer: 0.8.1_immer@9.0.16+react@18.2.0
       webpack: 5.75.0
@@ -292,8 +296,8 @@ importers:
 
   libs/ui:
     specifiers:
-      '@doseofted/prim-docs': workspace:*
       '@doseofted/prim-example': workspace:*
+      '@doseofted/prim-rpc-docs': workspace:*
       '@testing-library/react': ^13.4.0
       '@types/react': ^18.0.25
       '@types/react-dom': ^18.0.9
@@ -312,7 +316,7 @@ importers:
       vue: ^3.2.45
       vue-tsc: ^1.0.9
     dependencies:
-      '@doseofted/prim-docs': link:../docs
+      '@doseofted/prim-rpc-docs': link:../docs
       react: 18.2.0
       react-dom: 18.2.0_react@18.2.0
       vue: 3.2.45

@@ -12,7 +12,7 @@ interface MethodWsOptions {
  *
  * ```ts
  * import { createPrimServer } from "@doseofted/prim-rpc"
- * import { primMethodWs } from "@doseofted/prim-plugins"
+ * import { primMethodWs } from "@doseofted/prim-rpc-plugins"
  *
  * const wss = new WebSocketServer({ port: 1234 })
  * const prim = createPrimServer({
@@ -29,7 +29,7 @@ interface MethodWsOptions {
  * import Fastify from "fastify"
  * import { WebSocketServer } from "ws"
  * import { createPrimServer } from "@doseofted/prim-rpc"
- * import { primMethodFastify, primMethodWs } from "@doseofted/prim-plugins"
+ * import { primMethodFastify, primMethodWs } from "@doseofted/prim-rpc-plugins"
  *
  * const fastify = Fastify()
  * const wss = new WebSocketServer({ server: fastify.server })

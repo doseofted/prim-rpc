@@ -26,7 +26,7 @@ interface PrimFastifyPluginOptions extends SharedFastifyOptions {
  * import Fastify from "fastify"
  * import multipartPlugin from "@fastify/multipart"
  * import { createPrimServer } from "@doseofted/prim-rpc"
- * import { fastifyPrimPlugin } from "@doseofted/prim-plugins/dist/server/fastify.mjs"
+ * import { fastifyPrimPlugin } from "@doseofted/prim-rpc-plugins/dist/server/fastify.mjs"
  * // usage
  * const fastify = Fastify()
  * const prim = createPrimServer()
@@ -118,7 +118,7 @@ interface MethodFastifyOptions extends SharedFastifyOptions {
  * import Fastify from "fastify"
  * import multipartPlugin from "@fastify/multipart"
  * import { createPrimServer } from "@doseofted/prim-rpc"
- * import { primMethodFastify } from "@doseofted/prim-plugins/dist/server/fastify.mjs"
+ * import { primMethodFastify } from "@doseofted/prim-rpc-plugins/dist/server/fastify.mjs"
  * // usage
  * const fastify = Fastify()
  * const prim = createPrimServer({

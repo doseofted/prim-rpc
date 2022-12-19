@@ -1,5 +1,5 @@
 {
-	"name": "@doseofted/prim-backend",
+	"name": "@doseofted/prim-example-server",
 	"version": "0.0.1",
 	"description": "An example backend making use of Prim.",
 	"license": "UNLICENSED",
@@ -11,7 +11,7 @@
 	},
 	"dependencies": {
 		"@doseofted/prim-example": "workspace:*",
-		"@doseofted/prim-plugins": "workspace:*",
+		"@doseofted/prim-rpc-plugins": "workspace:*",
 		"@doseofted/prim-rpc": "workspace:*",
 		"@fastify/cors": "^8.2.0",
 		"@fastify/multipart": "^7.3.0",

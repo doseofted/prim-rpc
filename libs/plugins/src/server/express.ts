@@ -21,7 +21,7 @@ interface PrimExpressPluginOptions extends SharedExpressOptions {
  * import express from "express"
  * import multipartPlugin from "multer"
  * import { createPrimServer } from "@doseofted/prim-rpc"
- * import { expressPrimPlugin } from "@doseofted/prim-plugins/dist/server/express.mjs"
+ * import { expressPrimPlugin } from "@doseofted/prim-rpc-plugins/dist/server/express.mjs"
  * // usage
  * const app = express()
  * const prim = createPrimServer()
@@ -101,7 +101,7 @@ interface MethodExpressOptions extends SharedExpressOptions {
  * import express from "express"
  * import multipartPlugin from "multer"
  * import { createPrimServer } from "@doseofted/prim-rpc"
- * import { primMethodExpress } from "@doseofted/prim-plugins/dist/server/express.mjs"
+ * import { primMethodExpress } from "@doseofted/prim-rpc-plugins/dist/server/express.mjs"
  * // usage
  * const app = express()
  * const prim = createPrimServer({

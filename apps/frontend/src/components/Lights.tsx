@@ -117,7 +117,7 @@ export function Lights(props: LightsProps) {
 							position: [x, y],
 							// created
 							id,
-						}
+						} as LightInstance
 					})
 					return id
 				},

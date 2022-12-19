@@ -45,7 +45,7 @@ export interface MethodWebWorkerOptions {
  *
  * ```ts
  * import { createPrimServer } from "@doseofted/prim-rpc"
- * import { primMethodWebWorker, primCallbackWebWorker } from "@doseofted/prim-plugins"
+ * import { primMethodWebWorker, primCallbackWebWorker } from "@doseofted/prim-rpc-plugins"
  *
  * const worker = new Worker(new URL('./my-worker.ts', import.meta.url), { type: "module" })
  *

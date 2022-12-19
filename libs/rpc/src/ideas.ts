@@ -371,7 +371,7 @@ let webhooksOrEventEmitter: Status.Idea
  * that returns the result gathered from the Prim Server (regardless of whether function is local to main process
  * or a call to a remote server).
  *
- * NOTE: this will be best implemented as a "plugin" using "@doseofted/prim-plugins"
+ * NOTE: this will be best implemented as a "plugin" using "@doseofted/prim-rpc-plugins"
  */
 let electronSupport: Status.Idea
 

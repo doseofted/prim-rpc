@@ -21,20 +21,20 @@
 			"path": "./libs/ui"
 		},
 		{
-			"name": "📗 Example Module",
-			"path": "./libs/example"
+			"name": "☁️ Reverse Proxy",
+			"path": "./proxy"
 		},
 		{
 			"name": "🌐 Documentation",
 			"path": "./apps/frontend"
 		},
 		{
-			"name": "🌐 Example Backend",
+			"name": "🌐 Example Server",
 			"path": "./apps/backend"
 		},
 		{
-			"name": "☁️ Reverse Proxy",
-			"path": "./proxy"
+			"name": "📗 Example Module",
+			"path": "./libs/example"
 		}
 	],
 	"settings": {

@@ -1,5 +1,5 @@
 {
-	"name": "@doseofted/prim-plugins",
+	"name": "@doseofted/prim-rpc-plugins",
 	"version": "0.0.1",
 	"description": "Plugins for using Prim with server/client frameworks",
 	"license": "UNLICENSED",

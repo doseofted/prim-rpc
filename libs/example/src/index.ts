@@ -261,5 +261,6 @@ defaultFunction.rpc = true
 export function greetings(x: string, y: string) {
 	return `${x}, meet ${y}.`
 }
+greetings.rpc = true
 
 export default defaultFunction
