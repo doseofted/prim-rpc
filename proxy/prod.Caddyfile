@@ -11,7 +11,7 @@ www.{$WEBSITE_HOST} {
 
 {$WEBSITE_HOST} {
   encode zstd gzip
-  reverse_proxy frontend:5173
+  reverse_proxy frontend:3000
   root * /srv
   file_server
 }

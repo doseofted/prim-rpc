@@ -18,8 +18,8 @@ www.{$WEBSITE_HOST} {
     header Connection *Upgrade*
     header Upgrade websocket
   }
-  reverse_proxy @websockets frontend:24678
-  reverse_proxy frontend:5173
+  reverse_proxy @websockets frontend:3000
+  reverse_proxy frontend:3000
 }
 
 api.{$WEBSITE_HOST} {
