@@ -11,12 +11,12 @@
 	},
 	"dependencies": {
 		"@doseofted/prim-example": "workspace:*",
-		"@doseofted/prim-rpc-plugins": "workspace:*",
 		"@doseofted/prim-rpc": "workspace:*",
+		"@doseofted/prim-rpc-plugins": "workspace:*",
 		"@fastify/cors": "^8.2.0",
 		"@fastify/multipart": "^7.3.0",
-		"fastify": "^4.10.0",
-		"superjson": "^1.11.0",
+		"fastify": "^4.10.2",
+		"superjson": "^1.12.0",
 		"ws": "^8.11.0"
 	},
 	"scripts": {
