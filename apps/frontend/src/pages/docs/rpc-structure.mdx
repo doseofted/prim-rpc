@@ -39,7 +39,8 @@ typical RPCs that may be sent in Prim+RPC.
 
 Let's look at a simple function call and compare it directly against the resulting RPC. We'll define the client and
 server in the same file for easier reading. In a real-world scenario, we would use a Prim+RPC plugin but we'll use
-testing plugins for example.
+testing plugins for example. The focus is only on the `add()` function but if you'd like to test this out, you may copy
+the snippet below to see how it actually runs.
 
 ```ts index.ts mark=2:5,16:17
 import { createPrimClient, createPrimServer, testing } from "@doseofted/prim-rpc"
@@ -131,3 +132,7 @@ function add(options: { a: number; b: number }) {
 ## With Custom JSON Handler
 
 ## With File
+
+## Handling an Error
+
+## Batching Requests

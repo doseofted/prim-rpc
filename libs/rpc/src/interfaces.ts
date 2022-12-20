@@ -8,6 +8,7 @@ interface RpcBase {
 
 export interface RpcCall<Method = string, Params = unknown> extends RpcBase {
 	method: Method
+	// FIXME: rename this to "args" since this refers to values given to method
 	params?: Params
 }
 
