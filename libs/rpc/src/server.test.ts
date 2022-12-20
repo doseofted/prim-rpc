@@ -4,7 +4,7 @@ import { RpcAnswer, RpcCall } from "./interfaces"
 import type * as exampleClient from "@doseofted/prim-example"
 import * as exampleServer from "@doseofted/prim-example"
 import queryString from "query-string"
-import { newTestClients } from "./preparation.test"
+import { createPrimTestingPlugins } from "./testing"
 
 const module = exampleServer
 type IModule = typeof exampleClient
@@ -49,8 +49,9 @@ describe("Prim Server can call methods with local module", () => {
 })
 
 test("Prim Server can call remote methods (without module directly)", async () => {
-	const { client, socket } = newTestClients({ module })
-	const prim = createPrimServer<IModule>({ client, socket })
+	const { client, socket, callbackHandler, methodHandler } = createPrimTestingPlugins()
+	createPrimServer({ module, callbackHandler, methodHandler }) // server 1
+	const prim = createPrimServer<IModule>({ client, socket }) // server 2
 	const server = prim.server()
 	const call: RpcCall = {
 		method: "sayHello",

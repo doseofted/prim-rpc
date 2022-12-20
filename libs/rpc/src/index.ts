@@ -1,5 +1,6 @@
 export { createPrimClient } from "./client"
 export { createPrimServer } from "./server"
+export * as testing from "./testing"
 
 export type {
 	// Basic RPC structures

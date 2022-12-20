@@ -37,6 +37,90 @@ typical RPCs that may be sent in Prim+RPC.
 
 ## Simple RPC
 
+Let's look at a simple function call and compare it directly against the resulting RPC. We'll define the client and
+server in the same file for easier reading. Since this is just an example, additional client/server options for
+transport are not given but you may pass these options to make this example work.
+
+```ts index.ts mark=2:5
+import { createPrimServer, createPrimClient } from "@doseofted/prim-rpc"
+// define some function
+function add(a: number, b: number) {
+	return a + b
+}
+// assign property "rpc" (otherwise function isn't allowed to be called remotely)
+add.rpc = true
+// prepare Prim+RPC server and give it function
+const module = { add }
+const prim = createPrimServer({
+	module,
+	// ... other server options
+})
+// create Prim+RPC client to communicate with server
+const backend = createPrimClient<typeof module>({
+	// ... other client options
+})
+// call that function from the client
+backend.add(2, 3)
+```
+
+The function call above, when used with Prim+RPC, would generate the following RPC request and result:
+
+<CH.Code>
+
+```json request.json
+{
+	"method": "add",
+	"params": [1, 2]
+}
+```
+
+---
+
+```json response.json
+{
+	"result": 3
+}
+```
+
+</CH.Code>
+
+Depending on how you send/receive RPC, this result may be wrapped in some other container, like an HTTP request, but the
+RPC itself is contained in this JSON. We simply gave the method name and arguments passed to this function and received
+a result. Our arguments were given as an array because we have more than one but if we had a single argument (maybe an
+object), then we would simply need to pass that argument, no array needed (but you could keep if you like). See the
+following:
+
+<CH.Code>
+
+```ts index.ts
+/** Alternative version of example above. Notice that there's now a single parameter. */
+function add(options: { a: number; b: number }) {
+	return options.a + options.b
+}
+```
+
+---
+
+```json request.json
+{
+	"method": "add",
+	"params": {
+		"a": 1,
+		"b": 2
+	}
+}
+```
+
+---
+
+```json response.json
+{
+	"result": 3
+}
+```
+
+</CH.Code>
+
 ## With Callback
 
 ## With Custom JSON Handler

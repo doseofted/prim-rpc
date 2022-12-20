@@ -88,7 +88,10 @@
 		],
 		"cSpell.enableFiletypes": ["dockerfile", "mdx"],
 		"css.lint.unknownAtRules": "ignore",
-		"typescript.tsdk": "🌳 Monorepo/node_modules/typescript/lib"
+		"typescript.tsdk": "🌳 Monorepo/node_modules/typescript/lib",
+		"[typescript]": {
+			"editor.defaultFormatter": "esbenp.prettier-vscode"
+		}
 	},
 	"extensions": {
 		"recommendations": [
