@@ -38,29 +38,29 @@ typical RPCs that may be sent in Prim+RPC.
 ## Simple RPC
 
 Let's look at a simple function call and compare it directly against the resulting RPC. We'll define the client and
-server in the same file for easier reading. Since this is just an example, additional client/server options for
-transport are not given but you may pass these options to make this example work.
+server in the same file for easier reading. In a real-world scenario, we would use a Prim+RPC plugin but we'll use
+testing plugins for example.
 
-```ts index.ts mark=2:5
-import { createPrimServer, createPrimClient } from "@doseofted/prim-rpc"
-// define some function
+```ts index.ts mark=2:5,16:17
+import { createPrimClient, createPrimServer, testing } from "@doseofted/prim-rpc"
+// define the function
 function add(a: number, b: number) {
 	return a + b
 }
-// assign property "rpc" (otherwise function isn't allowed to be called remotely)
+// assign property "rpc" (otherwise the function isn't allowed to be called remotely)
 add.rpc = true
-// prepare Prim+RPC server and give it function
+// we'll give Prim RPC Server a module (or a variable resembling a module, like below)
 const module = { add }
-const prim = createPrimServer({
-	module,
-	// ... other server options
-})
-// create Prim+RPC client to communicate with server
-const backend = createPrimClient<typeof module>({
-	// ... other client options
-})
-// call that function from the client
-backend.add(2, 3)
+// create plugins for testing Prim RPC locally (real-world usage may use HTTP/WS plugins)
+const { callbackHandler, methodHandler, client, socket } = testing.createPrimTestingPlugins()
+// pass module and plugins to Prim RPC server
+const backend = createPrimServer({ module, methodHandler, callbackHandler })
+// create a Prim RPC client (and give plugins used to communicate with server)
+const frontend = createPrimClient<typeof module>({ client, socket })
+// now make the function call (we can compare this to the expected result, for testing)
+const result = await frontend.add(1, 2)
+const expected = module.add(1, 2)
+console.log(result, result === expected)
 ```
 
 The function call above, when used with Prim+RPC, would generate the following RPC request and result:
@@ -69,6 +69,7 @@ The function call above, when used with Prim+RPC, would generate the following R
 
 ```json request.json
 {
+	"id": "...",
 	"method": "add",
 	"params": [1, 2]
 }
@@ -78,17 +79,21 @@ The function call above, when used with Prim+RPC, would generate the following R
 
 ```json response.json
 {
+	"id": "...",
 	"result": 3
 }
 ```
 
 </CH.Code>
 
-Depending on how you send/receive RPC, this result may be wrapped in some other container, like an HTTP request, but the
-RPC itself is contained in this JSON. We simply gave the method name and arguments passed to this function and received
-a result. Our arguments were given as an array because we have more than one but if we had a single argument (maybe an
-object), then we would simply need to pass that argument, no array needed (but you could keep if you like). See the
-following:
+It's that simple! If you were to make this RPC manually, you wouldn't even need to include the "id" property in the
+request (this is optional and is used by the Prim+RPC client to sort out batched requests). Depending on how you
+send/receive RPC, this result may be wrapped in some other other container, like an HTTP request, but the RPC itself is
+contained in this JSON.
+
+We simply gave the method name and arguments to the method then received a result. Our arguments were given as an array
+because we have more than one but if we had a single argument (maybe an object), then we would simply need to pass that
+argument, no array needed (but you could keep if you like). See the following:
 
 <CH.Code>
 
