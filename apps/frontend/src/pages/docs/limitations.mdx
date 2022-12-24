@@ -11,10 +11,6 @@ export default ({ children }) => <LayoutDocs meta={meta}>{children}</LayoutDocs>
 
 # {meta.title}
 
-<Alert icon="carbon:warning" type="alert-warning">
-	Work in Progress
-</Alert>
-
 Prim+RPC has many features built-in and is intended to be very flexible but there are some limitations as to what you
 can do with the library. Prim+RPC is intended to allow you to make plain function calls to a server as if that code was
 written locally. Since this is not possible with regular JavaScript functions (outside of using RPC, like this library)
@@ -174,6 +170,12 @@ const server = createPrimServer({
 ```
 
 </CH.Code>
+
+It's important to note that if a public API is built with Prim+RPC that not everyone can use a custom JSON handler (for
+instance, if a request is made outside of a JavaScript environment). In these situations, you can create two Prim+RPC
+servers referencing the same module: one that supports a custom JSON handler and one that does not. In these situations,
+you'll need to handle serialization when someone makes a request using the default JSON handler from the client (you
+may, for example, use a framework like [Zod](https://github.com/colinhacks/zod) for preprocessing or type coercion).
 
 ## Language Limitations
 

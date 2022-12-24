@@ -30,10 +30,8 @@ We will be setting up Prim+RPC on both the **server** and the **client**.
 The server is where your JavaScript functions are located; functions that you'd like to share with someone else. The
 client will call these JavaScript functions remotely. Typically the server is some HTTP or WebSocket server and the
 client is a web browser or native application that makes requests to this server. In other cases, the server may be
-running in one process while the client is running in a separate process. This is the case for Web Workers, separate
-Node.js processes, or Electron's main and renderer processes. You may also be have two Node.js servers configured where
-one is acting as the server and the other as the client. However you're using up Prim+RPC, this guide should apply to
-all relationships between client and server.
+running in one process while the client is running in a separate process on the same machine. However you're using up
+Prim+RPC, this guide should apply to all relationships between client and server.
 
 The first step to use Prim+RPC will be to add the library to both the server and client portions of your project. If
 your client and server are located in separate projects, you should install the following packages in both:

@@ -94,9 +94,7 @@ contained in this JSON.
 
 We simply gave the method name and arguments to the method then received a result. Our arguments were given as an array
 because we have more than one but if we had a single argument (maybe an object), then we would simply need to pass that
-argument, no array needed (but you could keep if you like). See the following:
-
-<CH.Code>
+argument without wrapping in an array. Let's say we have function like so:
 
 ```ts index.ts
 /** Alternative version of example above. Notice that there's now a single parameter. */
@@ -105,7 +103,9 @@ function add(options: { a: number; b: number }) {
 }
 ```
 
----
+When used with Prim+RPC, this would result in the following RPC:
+
+<CH.Code>
 
 ```json request.json
 {
@@ -127,12 +127,92 @@ function add(options: { a: number; b: number }) {
 
 </CH.Code>
 
-## With Callback
-
-## With Custom JSON Handler
-
-## With File
+That's about all there is to know about making a simple function call and receiving a result. However, there are
+situations where you may not receive a return value back. We'll cover this situation next.
 
 ## Handling an Error
 
+Most of the time requests with Prim+RPC will return a result in its RPC contained in the `.result` property of the
+response. However, if your function throws an error, then this is no longer the case. When your function errors on the
+server, that error is caught, serialized, and forwarded to the client where the error is recreated and thrown for the
+client to handle.
+
+Let's take our previous `add()` example and make a small modification:
+
+```ts
+function add(a: number, b: number) {
+	if (typeof a !== "number") {
+		throw "a is not number"
+	}
+	if (typeof b !== "number") {
+		throw "b is not number"
+	}
+	return a + b
+}
+```
+
+Given valid input, the RPC result is still the same as it was before. However, if we give an argument of a string, an
+error is thrown and the following result is received.
+
+```ts index.ts
+try {
+	add("not a number", 2)
+} catch (error) {
+	// error === "a is not number"
+}
+```
+
+Running this code would result in the following RPC:
+
+<CH.Code>
+
+```json request.json
+{
+	"method": "add",
+	"params": {
+		"a": "not a number",
+		"b": 2
+	}
+}
+```
+
+---
+
+```json response.json
+{
+	"error": "a is not number"
+}
+```
+
+</CH.Code>
+
+The error thrown on the server was serialized and sent to the client on the property `.error` which was then thrown
+again on the Prim+RPC client.
+
+You also have the option of throwing an `Error` object which are serialized by default using the library
+[serialize-error](https://github.com/sindresorhus/serialize-error). This is the default option in Prim+RPC but can also
+be disabled by setting an option in Prim+RPC `handleError` to `false`.
+
+## With Callback
+
+<Alert icon="carbon:warning" type="alert-warning">
+	Work in Progress
+</Alert>
+
+## With Custom JSON Handler
+
+<Alert icon="carbon:warning" type="alert-warning">
+	Work in Progress
+</Alert>
+
+## With File
+
+<Alert icon="carbon:warning" type="alert-warning">
+	Work in Progress
+</Alert>
+
 ## Batching Requests
+
+<Alert icon="carbon:warning" type="alert-warning">
+	Work in Progress
+</Alert>

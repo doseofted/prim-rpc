@@ -15,12 +15,18 @@ export function LayoutDocs({ meta, children }: LayoutDocsProps) {
 			name: "Getting Started",
 			sections: [
 				{ name: "Introduction", link: "/" },
-				{ name: "Comparisons", link: "/comparisons" },
 				{ name: "Setup", link: "/setup" },
-				{ name: "Configuration", link: "/configuration" },
 				{ name: "Examples", link: "/examples" },
 				{ name: "RPC Structure", link: "/rpc-structure" },
 				{ name: "Limitations", link: "/limitations" },
+				{ name: "Comparisons", link: "/comparisons" },
+			],
+		},
+		{
+			name: "Reference",
+			sections: [
+				{ name: "API", link: "/reference/api" },
+				{ name: "Configuration", link: "/reference/configuration" },
 			],
 		},
 		{
@@ -43,10 +49,6 @@ export function LayoutDocs({ meta, children }: LayoutDocsProps) {
 				{ name: "Create a Plugin", link: "/usage/plugin-creation" },
 				{ name: "Custom Serialization", link: "/usage/serialization" },
 			],
-		},
-		{
-			name: "Reference",
-			sections: [{ name: "Configuration", link: "/reference/configuration" }],
 		},
 		{
 			name: "Server Plugins",
