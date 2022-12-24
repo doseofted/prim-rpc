@@ -1,4 +1,5 @@
-import mitt, { Emitter } from "mitt"
+import mitt, { Emitter, EventType } from "mitt"
+import { nanoid } from "nanoid"
 import { createPrimClient } from "./client"
 import {
 	PrimServerMethodHandler,
@@ -12,58 +13,85 @@ import { createPrimServer } from "./server"
 // SECTION: mock servers
 /** Represents an open WebSocket connection */
 type ConnectedEvent = Emitter<{ messageClient: string; messageServer: string; ended: void }>
+/** Represents a request over HTTP (after connection is made) to upgrade to a WS connection */
+type WsRequest = { connect: void; connected: ConnectedEvent }
+/** Represent an HTTP request (after initial connection is made) */
+type HttpRequest = { request: string; response: string }
 
+// NOTE: Instead of directly sharing event emitters for `wsServer` and `httpServer` between server/client plugins for
+// Prim RPC, a "connection" emitter is used to send a request ID from the client to the server which creates a unique
+// instance of `wsServer` or `httpServer` (depending on what was requested) for use with that client only. This is only
+// useful when creating multiple instances of Prim clients and/or servers sharing the same instance of a server/client
+// plugin. However, if a developer shares plugins between instances (not originally intended but possible by design),
+// it's a good idea to separate these requests, even if it's only purpose is for testing Prim RPC.
 /**
  * Creates event emitters that are intended to represent potential events from both
  * an HTTP and WS server. Neither of these are real servers (used for testing).
  */
 export function createTestServers() {
-	/** Represents potential WebSocket server */
-	const wsServer = mitt<{ connect: void; connected: ConnectedEvent }>()
-	/** Represents potential HTTP server */
-	const httpServer = mitt<{ request: string; response: string }>()
-	return { httpServer, wsServer }
+	/** Represents a connection that will create a request to the intended server (an event emitter, for testing) */
+	const connection = <GivenEmitter extends Record<EventType, unknown>>() =>
+		mitt<{ [request: `req:${string}`]: void; [response: `res:${string}`]: Emitter<GivenEmitter> }>()
+	/** Represents potential connection to a WebSocket server */
+	const wsConnection = connection<WsRequest>()
+	/** Represents potential connection to an HTTP server */
+	const httpConnection = connection<HttpRequest>()
+	return { httpConnection, wsConnection }
 }
 // !SECTION
 
 // SECTION: Prim RPC Server options
 interface MethodTestingOptions {
 	context?: unknown
-	httpServer: ReturnType<typeof createTestServers>["httpServer"]
+	httpConnection: ReturnType<typeof createTestServers>["httpConnection"]
 }
 export const primMethodTesting = (options: MethodTestingOptions): PrimServerMethodHandler => {
-	const { context, httpServer } = options
+	const { context, httpConnection } = options
 	return ({ server }) => {
-		// eslint-disable-next-line @typescript-eslint/no-misused-promises
-		httpServer.on("request", async body => {
-			const { call } = server()
-			const response = await call({ body: String(body) }, undefined, context)
-			httpServer.emit("response", response.body)
+		httpConnection.on("*", reqId => {
+			if (reqId.startsWith("res:")) {
+				return
+			}
+			const httpServer = mitt<HttpRequest>()
+			// eslint-disable-next-line @typescript-eslint/no-misused-promises
+			httpServer.on("request", async body => {
+				const { call } = server()
+				const response = await call({ body: String(body) }, undefined, context)
+				httpServer.emit("response", response.body)
+			})
+			httpConnection.emit(`res:${reqId.replace(/^req:/, "")}`, httpServer)
 		})
 	}
 }
 
 interface CallbackTestingOptions {
 	context?: unknown
-	wsServer: ReturnType<typeof createTestServers>["wsServer"]
+	wsConnection: ReturnType<typeof createTestServers>["wsConnection"]
 }
 export const primCallbackTesting = (options: CallbackTestingOptions): PrimServerCallbackHandler => {
-	const { context, wsServer } = options
+	const { context, wsConnection } = options
 	return ({ connected }) => {
-		wsServer.on("connect", () => {
-			const { call, ended } = connected()
-			const wsConnection: ConnectedEvent = mitt()
-			wsConnection.on("messageClient", m => {
-				call(
-					String(m),
-					data => {
-						wsConnection.emit("messageServer", data)
-					},
-					context
-				)
-				wsConnection.on("ended", ended)
+		wsConnection.on("*", reqId => {
+			if (reqId.startsWith("res:")) {
+				return
+			}
+			const wsServer = mitt<WsRequest>()
+			wsServer.on("connect", () => {
+				const { call, ended } = connected()
+				const wsSession: ConnectedEvent = mitt()
+				wsSession.on("messageClient", m => {
+					call(
+						String(m),
+						data => {
+							wsSession.emit("messageServer", data)
+						},
+						context
+					)
+					wsSession.on("ended", ended)
+				})
+				wsServer.emit("connected", wsSession)
 			})
-			wsServer.emit("connected", wsConnection)
+			wsConnection.emit(`res:${reqId.replace(/^req:/, "")}`, wsServer)
 		})
 	}
 }
@@ -71,41 +99,50 @@ export const primCallbackTesting = (options: CallbackTestingOptions): PrimServer
 
 // SECTION: Prim RPC Client options
 interface PrimClientOptions {
-	httpServer: ReturnType<typeof createTestServers>["httpServer"]
+	httpConnection: ReturnType<typeof createTestServers>["httpConnection"]
 }
-export function primClientPlugin({ httpServer }: PrimClientOptions) {
-	const client: PrimClientFunction = (_endpoint, bodyRpc, jsonHandler) =>
-		new Promise(resolve => {
-			const body = jsonHandler.stringify(bodyRpc)
-			httpServer.on("response", body => {
-				resolve(jsonHandler.parse(body))
+export function primClientPlugin({ httpConnection }: PrimClientOptions) {
+	const client: PrimClientFunction = (_endpoint, bodyRpc, jsonHandler) => {
+		return new Promise(resolve => {
+			const reqId = nanoid()
+			httpConnection.on(`res:${reqId}`, httpServer => {
+				const body = jsonHandler.stringify(bodyRpc)
+				httpServer.on("response", body => {
+					resolve(jsonHandler.parse(body))
+				})
+				httpServer.emit("request", body)
 			})
-			httpServer.emit("request", body)
+			httpConnection.emit(`req:${reqId}`)
 		})
+	}
 	return client
 }
 
 interface PrimSocketOptions {
-	wsServer: ReturnType<typeof createTestServers>["wsServer"]
+	wsConnection: ReturnType<typeof createTestServers>["wsConnection"]
 }
 
-export function primSocketPlugin({ wsServer }: PrimSocketOptions) {
+export function primSocketPlugin({ wsConnection }: PrimSocketOptions) {
 	const socket: PrimSocketFunction = (_endpoint, { connected, ended: _ended, response }, jsonHandler) => {
-		// NOTE: no need to call `ended` in test client unless destroyed
-		let wsConnection: ConnectedEvent
-		wsServer.on("connected", ws => {
-			wsConnection = ws
-			ws.on("messageServer", msg => {
-				response(jsonHandler.parse(msg))
+		let wsSession: ConnectedEvent
+		const reqId = nanoid()
+		wsConnection.on(`res:${reqId}`, wsServer => {
+			// NOTE: no need to call `ended` in test client unless destroyed
+			wsServer.on("connected", ws => {
+				wsSession = ws
+				ws.on("messageServer", msg => {
+					response(jsonHandler.parse(msg))
+				})
+				connected()
 			})
-			connected()
+			setTimeout(() => {
+				wsServer.emit("connect")
+			}, 0)
 		})
-		setTimeout(() => {
-			wsServer.emit("connect")
-		}, 0)
+		wsConnection.emit(`req:${reqId}`)
 		return {
 			send(msg) {
-				wsConnection.emit("messageClient", jsonHandler.stringify(msg))
+				wsSession.emit("messageClient", jsonHandler.stringify(msg))
 			},
 		}
 	}
@@ -115,17 +152,29 @@ export function primSocketPlugin({ wsServer }: PrimSocketOptions) {
 
 // SECTION: pre-configured test client/server for Prim RPC
 
-// FIXME: httpServer and wsServer use a single event emitter for all initial requests (ws emitter use two but one
-// for initial connection) which is usually fine for testing but in a real client/server scenario, a new emitter
-// should be created for each request so events only apply for that single request. Today, results are sent to all
-// clients because they share an event emitter.
-// Until fixed, a "do not use in "production" flag is in place (although there's not a good reason to use in production)
+/**
+ * Create Prim RPC plugins that will communicate with mock servers.
+ * Mock servers are just event emitters used for testing Prim RPC in a single file.
+ *
+ * This is useful for writing tests and understanding how Prim RPC works.
+ *
+ * @param exampleContext Optional context to be used with servers
+ * @returns Configured Prim RPC client and server
+ */
+export function createPrimTestingPlugins<Ctx = unknown>(exampleContext?: Ctx) {
+	const { httpConnection, wsConnection } = createTestServers()
+	const callbackHandler = primCallbackTesting({ wsConnection, context: exampleContext })
+	const methodHandler = primMethodTesting({ httpConnection, context: exampleContext })
+	const client = primClientPlugin({ httpConnection })
+	const socket = primSocketPlugin({ wsConnection })
+	return { callbackHandler, methodHandler, client, socket }
+}
 
 /**
  * Create a Prim RPC client and server that communicates with mock servers.
  * Mock servers are just event emitters used for testing Prim RPC in a single file.
  *
- * **Do not use in production.** This is useful for writing tests and getting started with Prim RPC.
+ * This is useful for writing tests and getting started with Prim RPC.
  *
  * @param serverOptions Options to be given to Prim RPC *server* only
  * @param clientOptions Options to be given to Prim RPC *client* only
@@ -137,34 +186,17 @@ export function createPrimTestingSuite<Module extends object, Ctx = unknown>(
 	clientOptions: PrimOptions<Module>,
 	exampleContext?: Ctx
 ) {
-	const { httpServer, wsServer } = createTestServers()
-	const server = createPrimServer({
+	const { callbackHandler, methodHandler, client, socket } = createPrimTestingPlugins(exampleContext)
+	const primServer = createPrimServer({
 		...serverOptions,
-		callbackHandler: primCallbackTesting({ wsServer, context: exampleContext }),
-		methodHandler: primMethodTesting({ httpServer, context: exampleContext }),
+		callbackHandler,
+		methodHandler,
 	})
-	const client = createPrimClient({
+	const primClient = createPrimClient({
 		...clientOptions,
-		client: primClientPlugin({ httpServer }),
-		socket: primSocketPlugin({ wsServer }),
+		client,
+		socket,
 	})
-	return { client, server }
-}
-/**
- * Create Prim RPC plugins that will communicate with mock servers.
- * Mock servers are just event emitters used for testing Prim RPC in a single file.
- *
- * **Do not use in production.** This is useful for writing tests and understanding how Prim RPC works.
- *
- * @param exampleContext Optional context to be used with servers
- * @returns Configured Prim RPC client and server
- */
-export function createPrimTestingPlugins<Ctx = unknown>(exampleContext?: Ctx) {
-	const { httpServer, wsServer } = createTestServers()
-	const callbackHandler = primCallbackTesting({ wsServer, context: exampleContext })
-	const methodHandler = primMethodTesting({ httpServer, context: exampleContext })
-	const client = primClientPlugin({ httpServer })
-	const socket = primSocketPlugin({ wsServer })
-	return { callbackHandler, methodHandler, client, socket }
+	return { client: primClient, server: primServer }
 }
 // !SECTION
