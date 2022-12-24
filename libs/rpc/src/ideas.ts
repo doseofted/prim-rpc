@@ -869,4 +869,42 @@ let primToolsCli: Status.Idea
  */
 let blobHandler: Status.Idea
 
+/**
+ * Today Prim RPC supports custom JSON handlers like superjson. However, it's important to note that today these
+ * handlers need to support serialization to a string. This isn't really possible in any kind of efficient way when
+ * handling files. However, formats like msgpack and BSON are like JSON but support binary contents. These should
+ * become supported in Prim as a JSON handler. Using a handler like @msgpack/msgpack isn't problematic with Prim RPC
+ * itself as long as `.stringify()` and `.parse()` options are given.
+ *
+ * ```ts
+ * import { encode, decode } from "@msgpack/msgpack"
+ *
+ * createPrimClient({
+ *   jsonHandler: {
+ *     stringify(given) { return msgpack.encode(given) }
+ *     parse(given) { return msgpack.decode(given) }
+ *   }
+ *   // ... more options
+ * })
+ * ```
+ *
+ * Instead, the problem is with client/server plugins. Today it's assumed that the serialized JSON given is a string.
+ * That's a safe assumption for JSON data usually but to support something like msgpack, every client plugin would
+ * need to be able to determine if given JSON is binary and format their requests if given binary "JSON-like" data.
+ * This is the case for some Prim RPC client plugins (ones that use HTTP) since a fetch request would need to format a
+ * request with binary data. It's also the potential case for a method handler if any processing is needed to turn given
+ * data into a format expected by the "JSON" handler (such as turning a Stream into a Blob, maybe?).
+ *
+ * This does appear to be easy to implement in Prim RPC itself (I don't believe any changes are needed). However, every
+ * Prim plugin (client and server side) would need to either:
+ *
+ * - expect given JSON to be either a string or binary-like (Buffer/Stream/File/Blob)
+ * - expect some sort of generic interface given by Prim RPC for JSON (more work to be done on Prim RPC itself) as well
+ *   as plugins
+ *
+ * It's also worth noting that support for Streams would be difficult (but potentially needed for large files). That may
+ * need to also be considered.
+ */
+let supportBinaryJsonHandlers: Status.Idea
+
 export {}
