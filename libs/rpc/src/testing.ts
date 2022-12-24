@@ -7,8 +7,11 @@ import {
 	PrimClientFunction,
 	PrimSocketFunction,
 	PrimOptions,
+	BlobRecords,
 } from "./interfaces"
 import { createPrimServer } from "./server"
+
+// NOTE: these testing plugins are intended to mimic interactions with an HTTP and WS server in a single file
 
 // SECTION: mock servers
 /** Represents an open WebSocket connection */
@@ -16,7 +19,7 @@ type ConnectedEvent = Emitter<{ messageClient: string; messageServer: string; en
 /** Represents a request over HTTP (after connection is made) to upgrade to a WS connection */
 type WsRequest = { connect: void; connected: ConnectedEvent }
 /** Represent an HTTP request (after initial connection is made) */
-type HttpRequest = { request: string; response: string }
+type HttpRequest = { request: { body: string; blobs?: BlobRecords }; response: string }
 
 // NOTE: Instead of directly sharing event emitters for `wsServer` and `httpServer` between server/client plugins for
 // Prim RPC, a "connection" emitter is used to send a request ID from the client to the server which creates a unique
@@ -54,9 +57,9 @@ export const primMethodTesting = (options: MethodTestingOptions): PrimServerMeth
 			}
 			const httpServer = mitt<HttpRequest>()
 			// eslint-disable-next-line @typescript-eslint/no-misused-promises
-			httpServer.on("request", async body => {
+			httpServer.on("request", async ({ body, blobs }) => {
 				const { call } = server()
-				const response = await call({ body: String(body) }, undefined, context)
+				const response = await call({ body: String(body) }, blobs, context)
 				httpServer.emit("response", response.body)
 			})
 			httpConnection.emit(`res:${reqId.replace(/^req:/, "")}`, httpServer)
@@ -102,7 +105,7 @@ interface PrimClientOptions {
 	httpConnection: ReturnType<typeof createTestServers>["httpConnection"]
 }
 export function primClientPlugin({ httpConnection }: PrimClientOptions) {
-	const client: PrimClientFunction = (_endpoint, bodyRpc, jsonHandler) => {
+	const client: PrimClientFunction = (_endpoint, bodyRpc, jsonHandler, blobs) => {
 		return new Promise(resolve => {
 			const reqId = nanoid()
 			httpConnection.on(`res:${reqId}`, httpServer => {
@@ -110,7 +113,7 @@ export function primClientPlugin({ httpConnection }: PrimClientOptions) {
 				httpServer.on("response", body => {
 					resolve(jsonHandler.parse(body))
 				})
-				httpServer.emit("request", body)
+				httpServer.emit("request", { body, blobs })
 			})
 			httpConnection.emit(`req:${reqId}`)
 		})
