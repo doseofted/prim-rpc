@@ -61,7 +61,7 @@ export interface JsonHandler {
 }
 // type JsonHandlerOptional  = Partial<JsonHandler>
 /** The record key is a string prefixed with `_bin_` and the value is the Blob */
-export type BlobRecords = Record<string, Blob>
+export type BlobRecords = Record<string, Blob | Buffer>
 export type PrimClientFunction<J = JsonHandler> = (
 	endpoint: string,
 	jsonBody: RpcCall | RpcCall[],
