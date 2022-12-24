@@ -45,9 +45,12 @@ function handlePossibleForm(form: HTMLFormElement | FormData) {
 export function handlePossibleBlobs(
 	given: unknown,
 	fromForm = false
-): [given: unknown, blobs: Record<string, Blob>, fromForm: boolean] {
-	const blobs: Record<string, Blob> = {}
-	const binaryGiven = given instanceof Blob ? given : false
+): [given: unknown, blobs: Record<string, Blob | Buffer>, fromForm: boolean] {
+	const blobs: Record<string, Blob | Buffer> = {}
+	const binaryGiven =
+		(typeof Blob !== "undefined" && given instanceof Blob) || (typeof Buffer !== "undefined" && given instanceof Buffer)
+			? given
+			: false
 	const givenForm = (maybeForm: unknown): maybeForm is HTMLFormElement | FormData =>
 		(typeof HTMLFormElement === "function" && maybeForm instanceof HTMLFormElement) ||
 		(typeof FormData === "function" && maybeForm instanceof FormData)
