@@ -177,7 +177,7 @@ export function createPrimClient<
 			send(initialMessage, initialBlobs)
 		}
 		const wsEndpoint = configured.wsEndpoint || configured.endpoint.replace(/^http(s?)/g, "ws$1")
-		const { send } = configured.socket(wsEndpoint, { connected, response, ended }, configured.jsonHandler)
+		const { send } = configured.callbackPlugin(wsEndpoint, { connected, response, ended }, configured.jsonHandler)
 		sendMessage = send
 	}
 	/** Sets up WebSocket if needed otherwise sends a message over websocket */
@@ -209,7 +209,7 @@ export function createPrimClient<
 			const { endpoint, jsonHandler } = configured
 			const rpcCallOrCalls = rpcCallList.length === 1 ? rpcCallList[0] : rpcCallList
 			configured
-				.client(endpoint, rpcCallOrCalls, jsonHandler, blobs)
+				.methodPlugin(endpoint, rpcCallOrCalls, jsonHandler, blobs)
 				.then(answers => {
 					// return either the single result or the batched results to caller
 					if (Array.isArray(answers)) {

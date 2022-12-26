@@ -4,8 +4,8 @@ import Cors from "@fastify/cors"
 import { WebSocketServer } from "ws"
 import jsonHandler from "superjson"
 import { createPrimServer } from "@doseofted/prim-rpc"
-import { primMethodFastify } from "@doseofted/prim-rpc-plugins/fastify"
-import { primCallbackWs } from "@doseofted/prim-rpc-plugins/ws"
+import { createMethodHandler } from "@doseofted/prim-rpc-plugins/fastify"
+import { createCallbackHandler } from "@doseofted/prim-rpc-plugins/ws"
 import * as module from "@doseofted/prim-example"
 
 /** Flag to determine if project is running locally or in a container */
@@ -22,9 +22,9 @@ createPrimServer({
 	prefix: "/prim",
 	jsonHandler,
 	module,
-	methodHandler: primMethodFastify({ fastify, multipartPlugin }),
+	methodHandler: createMethodHandler({ fastify, multipartPlugin }),
 	// eslint-disable-next-line @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-unsafe-call
-	callbackHandler: primCallbackWs({ wss }),
+	callbackHandler: createCallbackHandler({ wss }),
 })
 
 // Start listening for requests to server

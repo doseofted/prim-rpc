@@ -31,9 +31,9 @@ describe("Prim Client can call methods with a single parameter", () => {
 		expect(result).toEqual(expected)
 	})
 	test("with remote source", async () => {
-		const { client, socket, callbackHandler, methodHandler } = createPrimTestingPlugins()
+		const { callbackPlugin, methodPlugin, callbackHandler, methodHandler } = createPrimTestingPlugins()
 		createPrimServer({ module, callbackHandler, methodHandler })
-		const prim = createPrimClient<IModule>({ client, socket })
+		const prim = createPrimClient<IModule>({ callbackPlugin, methodPlugin })
 		const params = { greeting: "Hey", name: "Ted" }
 		const expected = module.sayHello(params)
 		const result = await prim.sayHello(params)
@@ -50,9 +50,9 @@ describe("Prim Client can call methods with positional parameters", () => {
 		expect(result).toEqual(expected)
 	})
 	test("with remote source", async () => {
-		const { client, socket, callbackHandler, methodHandler } = createPrimTestingPlugins()
+		const { callbackPlugin, methodPlugin, callbackHandler, methodHandler } = createPrimTestingPlugins()
 		createPrimServer({ module, callbackHandler, methodHandler })
-		const prim = createPrimClient<IModule>({ client, socket })
+		const prim = createPrimClient<IModule>({ callbackPlugin, methodPlugin })
 		const params = ["Hey", "Ted"] as const
 		const expected = module.sayHelloAlternative(...params)
 		const result = await prim.sayHelloAlternative(...params)
@@ -61,11 +61,11 @@ describe("Prim Client can call methods with positional parameters", () => {
 })
 
 test("Prim Client can use alternative JSON handler", async () => {
-	const { client, socket, callbackHandler, methodHandler } = createPrimTestingPlugins()
+	const { callbackPlugin, methodPlugin, callbackHandler, methodHandler } = createPrimTestingPlugins()
 	// JSON handler is only useful with remote source (no local source test needed)
 	const commonOptions: PrimServerOptions = { jsonHandler }
 	createPrimServer({ ...commonOptions, module, callbackHandler, methodHandler })
-	const prim = createPrimClient<IModule>({ ...commonOptions, client, socket })
+	const prim = createPrimClient<IModule>({ ...commonOptions, callbackPlugin, methodPlugin })
 	const date = new Date()
 	const expected = module.whatIsDayAfter(date)
 	const result = await prim.whatIsDayAfter(date)
@@ -82,9 +82,9 @@ describe("Prim Client can call deeply nested methods", () => {
 		expect(result).toEqual(expected)
 	})
 	test("with remote source", async () => {
-		const { client, socket, callbackHandler, methodHandler } = createPrimTestingPlugins()
+		const { callbackPlugin, methodPlugin, callbackHandler, methodHandler } = createPrimTestingPlugins()
 		createPrimServer({ module, callbackHandler, methodHandler })
-		const prim = createPrimClient<IModule>({ client, socket })
+		const prim = createPrimClient<IModule>({ callbackPlugin, methodPlugin })
 		const params = { greeting: "Yo", name: "Ted" }
 		const expected = module.testLevel2.testLevel1.sayHello(params)
 		const result = await prim.testLevel2.testLevel1.sayHello(params)
@@ -109,19 +109,19 @@ describe("Prim Client can throw errors", () => {
 		expect(result).toThrow(expected)
 	})
 	test("with remote source, default JSON handler", async () => {
-		const { client, socket, callbackHandler, methodHandler } = createPrimTestingPlugins()
+		const { callbackPlugin, methodPlugin, callbackHandler, methodHandler } = createPrimTestingPlugins()
 		createPrimServer({ module, callbackHandler, methodHandler })
-		const prim = createPrimClient<IModule>({ client, socket })
+		const prim = createPrimClient<IModule>({ callbackPlugin, methodPlugin })
 		const result = () => prim.oops()
 		await expect(result()).rejects.toThrow(expected)
 		await expect(result()).rejects.toBeInstanceOf(Error)
 	})
 	test("with remote source and custom JSON handler", async () => {
-		const { client, socket, callbackHandler, methodHandler } = createPrimTestingPlugins()
+		const { callbackPlugin, methodPlugin, callbackHandler, methodHandler } = createPrimTestingPlugins()
 		const commonOptions = { jsonHandler }
 		createPrimServer({ ...commonOptions, module, callbackHandler, methodHandler })
 		// const { client, socket } = newTestClients({ ...commonOptions, module })
-		const prim = createPrimClient<IModule>({ ...commonOptions, client, socket })
+		const prim = createPrimClient<IModule>({ ...commonOptions, callbackPlugin, methodPlugin })
 		const result = () => prim.oops()
 		await expect(result()).rejects.toThrow(expected)
 		await expect(result()).rejects.toBeInstanceOf(Error)
@@ -143,9 +143,9 @@ describe("Prim Client can make use of callbacks", () => {
 		expect(results).toEqual(["You're using Prim.", "Still using Prim!"])
 	})
 	test("with remote source", async () => {
-		const { client, socket, callbackHandler, methodHandler } = createPrimTestingPlugins()
+		const { callbackPlugin, methodPlugin, callbackHandler, methodHandler } = createPrimTestingPlugins()
 		createPrimServer({ module, callbackHandler, methodHandler })
-		const prim = createPrimClient<IModule>({ client, socket })
+		const prim = createPrimClient<IModule>({ callbackPlugin, methodPlugin })
 		const results = await new Promise<string[]>(resolve => {
 			const results: string[] = []
 			void prim.withCallback(message => {
@@ -166,9 +166,9 @@ describe("Prim Client can make use of callbacks", () => {
 
 describe("Prim Client can batch RPC calls over HTTP", () => {
 	test("when all results are successful", async () => {
-		const { client, socket, callbackHandler, methodHandler } = createPrimTestingPlugins()
+		const { callbackPlugin, methodPlugin, callbackHandler, methodHandler } = createPrimTestingPlugins()
 		createPrimServer({ module, callbackHandler, methodHandler })
-		const prim = createPrimClient<IModule>({ client, socket, clientBatchTime: 15 })
+		const prim = createPrimClient<IModule>({ callbackPlugin, methodPlugin, clientBatchTime: 15 })
 		// NOTE: can't seem to narrow down chosen type for array (linked possibly related issue)
 		// LINK: https://github.com/microsoft/TypeScript/issues/27808
 		const calls = <M extends typeof prim | typeof module>(m: M) => [
@@ -181,9 +181,9 @@ describe("Prim Client can batch RPC calls over HTTP", () => {
 	})
 
 	test("when a result is an error", async () => {
-		const { client, socket, callbackHandler, methodHandler } = createPrimTestingPlugins()
+		const { callbackPlugin, methodPlugin, callbackHandler, methodHandler } = createPrimTestingPlugins()
 		createPrimServer({ module, callbackHandler, methodHandler })
-		const prim = createPrimClient<IModule>({ client, socket, clientBatchTime: 15 })
+		const prim = createPrimClient<IModule>({ callbackPlugin, methodPlugin, clientBatchTime: 15 })
 		const calls = <M extends typeof prim | typeof module>(m: M) => {
 			// NOTE: for this test, it's important that functions are not awaited so that they are called within batch time
 			const results: unknown[] = []

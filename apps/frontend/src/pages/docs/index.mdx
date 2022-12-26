@@ -175,7 +175,7 @@ it is easy to write your own.
 ```ts server.ts mark=3,4,6,15,19
 // on server:
 import { createPrimServer } from "@doseofted/prim-rpc"
-import { primMethodFastify } from "@doseofted/prim-rpc-plugins/fastify"
+import { createMethodHandler } from "@doseofted/prim-rpc-plugins/fastify"
 import Fastify from "fastify"
 
 const fastify = Fastify()
@@ -187,7 +187,7 @@ sayHello.rpc = true
 
 const prim = createPrimServer({
 	module: { sayHello },
-	methodHandler: primMethodFastify({ fastify }),
+	methodHandler: createMethodHandler({ fastify }),
 	// ... other options
 })
 
@@ -226,32 +226,34 @@ client has no dependency on them (for those who prefer JavaScript). Also note th
 from the server is not imported. Instead, this will be requested over the endpoint that we've configured.
 
 By default, the Prim+RPC does not assume a default client. Similar to the server, we provide this functionality through
-the use of plugins. Let's add support for our server using the browser's built-in fetch client:
+the use of plugins. Let's add support for our server using the browser's built-in fetch client (supported with a
+Prim+RPC plugin):
 
 ```ts client.ts mark=3,8
 // on client:
 import { createPrimClient } from "@doseofted/prim-rpc"
-import { createFetchClient } from "@doseofted/prim-rpc-plugins/browser-api"
+import { createMethodPlugin } from "@doseofted/prim-rpc-plugins/browser-api"
 import type * as module from "./server.ts"
 
 const prim = createPrimClient<typeof module>({
 	endpoint: "http://localhost:1234/prim",
-	client: createFetchClient(),
+	methodPlugin: createMethodPlugin(),
 })
 ```
 
-We also have the option of configuring our own client if we'd like (it doesn't even need to be an HTTP client). Now
-we're ready to call our function from the client to our server!
+This plugin will use the browser's Fetch API so call our function given at the endpoint we've given. We also have the
+option of configuring this plugin or setting up our own client if we'd like (it doesn't even need to be an HTTP client).
+Now we're ready to call our function from the client to our server!
 
 ```ts client.ts focus=11:12
 // on client:
 import { createPrimClient } from "@doseofted/prim-rpc"
-import { createFetchClient } from "@doseofted/prim-rpc-plugins/browser-api"
+import { createMethodPlugin } from "@doseofted/prim-rpc-plugins/browser-api"
 import type * as module from "./server.ts"
 
 const prim = createPrimClient<typeof module>({
 	endpoint: "http://localhost:1234/prim",
-	client: createFetchClient(),
+	methodPlugin: createMethodPlugin(),
 })
 
 const greeting = await prim.sayHello("Backend", "Frontend")

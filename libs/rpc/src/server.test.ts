@@ -49,9 +49,9 @@ describe("Prim Server can call methods with local module", () => {
 })
 
 test("Prim Server can call remote methods (without module directly)", async () => {
-	const { client, socket, callbackHandler, methodHandler } = createPrimTestingPlugins()
+	const { callbackPlugin, methodPlugin, callbackHandler, methodHandler } = createPrimTestingPlugins()
 	createPrimServer({ module, callbackHandler, methodHandler }) // server 1
-	const prim = createPrimServer<IModule>({ client, socket }) // server 2
+	const prim = createPrimServer<IModule>({ callbackPlugin, methodPlugin }) // server 2
 	const server = prim.server()
 	const call: RpcCall = {
 		method: "sayHello",

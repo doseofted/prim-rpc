@@ -2,8 +2,8 @@ import type { BlobRecords, PrimClientFunction, PrimSocketFunction, RpcAnswer, Rp
 
 // TODO: test this plugin
 
-export const createFetchClient = (headersOverride?: Headers | Record<string, string>) => {
-	const primClient: PrimClientFunction = async (endpoint, jsonBody, jsonHandler, blobs = {}) => {
+export const createMethodPlugin = (headersOverride?: Headers | Record<string, string>) => {
+	const methodPlugin: PrimClientFunction = async (endpoint, jsonBody, jsonHandler, blobs = {}) => {
 		let fetchOptions: RequestInit = {}
 		const blobList = Object.entries(blobs)
 		if (blobList.length > 0) {
@@ -11,7 +11,7 @@ export const createFetchClient = (headersOverride?: Headers | Record<string, str
 			const data = new FormData()
 			data.append("rpc", jsonHandler.stringify(jsonBody))
 			for (const [key, blob] of blobList) {
-				data.append(key, blob)
+				data.append(key, blob as Blob)
 			}
 			fetchOptions = {
 				method: "POST",
@@ -29,11 +29,11 @@ export const createFetchClient = (headersOverride?: Headers | Record<string, str
 		const result = await fetch(endpoint, fetchOptions)
 		return jsonHandler.parse<RpcAnswer | RpcAnswer[]>(await result.text())
 	}
-	return primClient
+	return methodPlugin
 }
 
-export const createWebSocketClient = () => {
-	const primSocket: PrimSocketFunction = (endpoint, { connected, response, ended }, jsonHandler) => {
+export const createCallbackPlugin = () => {
+	const callbackPlugin: PrimSocketFunction = (endpoint, { connected, response, ended }, jsonHandler) => {
 		const ws = new WebSocket(endpoint)
 		ws.onopen = connected
 		ws.onclose = ended
@@ -57,5 +57,5 @@ export const createWebSocketClient = () => {
 		}
 		return { send }
 	}
-	return primSocket
+	return callbackPlugin
 }

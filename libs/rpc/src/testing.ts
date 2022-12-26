@@ -48,7 +48,7 @@ interface MethodTestingOptions {
 	context?: unknown
 	httpConnection: ReturnType<typeof createTestServers>["httpConnection"]
 }
-export const primMethodTesting = (options: MethodTestingOptions): PrimServerMethodHandler => {
+export const createMethodHandler = (options: MethodTestingOptions): PrimServerMethodHandler => {
 	const { context, httpConnection } = options
 	return ({ server }) => {
 		httpConnection.on("*", reqId => {
@@ -71,7 +71,7 @@ interface CallbackTestingOptions {
 	context?: unknown
 	wsConnection: ReturnType<typeof createTestServers>["wsConnection"]
 }
-export const primCallbackTesting = (options: CallbackTestingOptions): PrimServerCallbackHandler => {
+export const createCallbackHandler = (options: CallbackTestingOptions): PrimServerCallbackHandler => {
 	const { context, wsConnection } = options
 	return ({ connected }) => {
 		wsConnection.on("*", reqId => {
@@ -104,7 +104,7 @@ export const primCallbackTesting = (options: CallbackTestingOptions): PrimServer
 interface PrimClientOptions {
 	httpConnection: ReturnType<typeof createTestServers>["httpConnection"]
 }
-export function primClientPlugin({ httpConnection }: PrimClientOptions) {
+export function createMethodPlugin({ httpConnection }: PrimClientOptions) {
 	const client: PrimClientFunction = (_endpoint, bodyRpc, jsonHandler, blobs) => {
 		return new Promise(resolve => {
 			const reqId = nanoid()
@@ -125,7 +125,7 @@ interface PrimSocketOptions {
 	wsConnection: ReturnType<typeof createTestServers>["wsConnection"]
 }
 
-export function primSocketPlugin({ wsConnection }: PrimSocketOptions) {
+export function createCallbackPlugin({ wsConnection }: PrimSocketOptions) {
 	const socket: PrimSocketFunction = (_endpoint, { connected, ended: _ended, response }, jsonHandler) => {
 		let wsSession: ConnectedEvent
 		const reqId = nanoid()
@@ -166,11 +166,11 @@ export function primSocketPlugin({ wsConnection }: PrimSocketOptions) {
  */
 export function createPrimTestingPlugins<Ctx = unknown>(exampleContext?: Ctx) {
 	const { httpConnection, wsConnection } = createTestServers()
-	const callbackHandler = primCallbackTesting({ wsConnection, context: exampleContext })
-	const methodHandler = primMethodTesting({ httpConnection, context: exampleContext })
-	const client = primClientPlugin({ httpConnection })
-	const socket = primSocketPlugin({ wsConnection })
-	return { callbackHandler, methodHandler, client, socket }
+	const methodHandler = createMethodHandler({ httpConnection, context: exampleContext })
+	const callbackHandler = createCallbackHandler({ wsConnection, context: exampleContext })
+	const methodPlugin = createMethodPlugin({ httpConnection })
+	const callbackPlugin = createCallbackPlugin({ wsConnection })
+	return { methodHandler, callbackHandler, methodPlugin, callbackPlugin }
 }
 
 /**
@@ -189,17 +189,17 @@ export function createPrimTestingSuite<Module extends object, Ctx = unknown>(
 	clientOptions: PrimOptions<Module>,
 	exampleContext?: Ctx
 ) {
-	const { callbackHandler, methodHandler, client, socket } = createPrimTestingPlugins(exampleContext)
-	const primServer = createPrimServer({
+	const { methodHandler, callbackHandler, methodPlugin, callbackPlugin } = createPrimTestingPlugins(exampleContext)
+	const server = createPrimServer({
 		...serverOptions,
-		callbackHandler,
 		methodHandler,
+		callbackHandler,
 	})
-	const primClient = createPrimClient({
+	const client = createPrimClient({
 		...clientOptions,
-		client,
-		socket,
+		methodPlugin,
+		callbackPlugin,
 	})
-	return { client: primClient, server: primServer }
+	return { client, server }
 }
 // !SECTION

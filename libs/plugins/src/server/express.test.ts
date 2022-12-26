@@ -3,14 +3,14 @@ import request from "superwstest"
 import * as module from "@doseofted/prim-example"
 import express from "express"
 import { createPrimServer } from "@doseofted/prim-rpc"
-import { primMethodExpress, expressPrimPlugin } from "./express"
+import { createMethodHandler, expressPrimRpc } from "./express"
 import type { Server } from "node:http"
 
 describe("Express plugin is functional as Prim Plugin", () => {
 	const app = express()
 	createPrimServer({
 		module,
-		methodHandler: primMethodExpress({ app }),
+		methodHandler: createMethodHandler({ app }),
 	})
 	let server: Server
 	beforeEach(async () => {
@@ -45,7 +45,7 @@ describe("Express plugin is functional as Express plugin", () => {
 		module,
 	})
 	const app = express()
-	app.use(expressPrimPlugin({ prim }))
+	app.use(expressPrimRpc({ prim }))
 	let server: Server
 	beforeEach(async () => {
 		await new Promise<void>(resolve => {

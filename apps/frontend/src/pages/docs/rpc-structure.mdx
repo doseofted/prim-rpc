@@ -53,11 +53,11 @@ add.rpc = true
 // we'll give Prim RPC Server a module (or a variable resembling a module, like below)
 const module = { add }
 // create plugins for testing Prim RPC locally (real-world usage may use HTTP/WS plugins)
-const { callbackHandler, methodHandler, client, socket } = testing.createPrimTestingPlugins()
+const { methodHandler, callbackHandler, methodPlugin, callbackPlugin } = testing.createPrimTestingPlugins()
 // pass module and plugins to Prim RPC server
 const backend = createPrimServer({ module, methodHandler, callbackHandler })
 // create a Prim RPC client (and give plugins used to communicate with server)
-const frontend = createPrimClient<typeof module>({ client, socket })
+const frontend = createPrimClient<typeof module>({ methodPlugin, callbackPlugin })
 // now make the function call (we can compare this to the expected result, for testing)
 const result = await frontend.add(1, 2)
 const expected = module.add(1, 2)

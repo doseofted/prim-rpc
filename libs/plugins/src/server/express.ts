@@ -21,11 +21,11 @@ interface PrimExpressPluginOptions extends SharedExpressOptions {
  * import express from "express"
  * import multipartPlugin from "multer"
  * import { createPrimServer } from "@doseofted/prim-rpc"
- * import { expressPrimPlugin } from "@doseofted/prim-rpc-plugins/dist/server/express.mjs"
+ * import { expressPrimRpc } from "@doseofted/prim-rpc-plugins/dist/server/express.mjs"
  * // usage
  * const app = express()
  * const prim = createPrimServer()
- * express.use(expressPrimPlugin({ prim, multipartPlugin }))
+ * express.use(expressPrimRpc({ prim, multipartPlugin }))
  * app.listen(3000)
  * ```
  *
@@ -35,7 +35,7 @@ interface PrimExpressPluginOptions extends SharedExpressOptions {
  * To let Prim handle registration with Express, try importing `primMethodExpress`
  */
 // eslint-disable-next-line @typescript-eslint/require-await
-export const expressPrimPlugin = (options: PrimExpressPluginOptions) => {
+export const expressPrimRpc = (options: PrimExpressPluginOptions) => {
 	const { prim, multipartPlugin, fileSizeLimitBytes } = options
 	const handler = (req: Express.Request, res: Express.Response, next: Express.NextFunction) => {
 		const processRpc = async () => {
@@ -101,11 +101,11 @@ interface MethodExpressOptions extends SharedExpressOptions {
  * import express from "express"
  * import multipartPlugin from "multer"
  * import { createPrimServer } from "@doseofted/prim-rpc"
- * import { primMethodExpress } from "@doseofted/prim-rpc-plugins/dist/server/express.mjs"
+ * import { createMethodHandler } from "@doseofted/prim-rpc-plugins/express"
  * // usage
  * const app = express()
  * const prim = createPrimServer({
- *   methodHandler: primMethodExpress({ app, multipartPlugin })
+ *   methodHandler: createMethodHandler({ app, multipartPlugin })
  * })
  * app.listen(3000)
  * ```
@@ -113,12 +113,12 @@ interface MethodExpressOptions extends SharedExpressOptions {
  * **Note:** usage of the multipart plugin is optional and can be excluded if support
  * for file uploads is not needed.
  *
- * If you would like to register Prim with Express yourself, try importing `expressPrimPlugin` instead.
+ * If you would like to register Prim with Express yourself, try importing `expressPrimRpc` instead.
  */
-export const primMethodExpress = (options: MethodExpressOptions): PrimServerMethodHandler => {
+export const createMethodHandler = (options: MethodExpressOptions): PrimServerMethodHandler => {
 	const { app } = options
 	return prim => {
 		// eslint-disable-next-line @typescript-eslint/no-misused-promises
-		void app.use(expressPrimPlugin({ ...options, prim }))
+		void app.use(expressPrimRpc({ ...options, prim }))
 	}
 }

@@ -3,8 +3,8 @@ import type { AxiosInstance } from "axios"
 
 // TODO: test this plugin
 
-export const createPrimAxiosClient = (client: AxiosInstance) => {
-	const primClient: PrimClientFunction = async (endpoint, jsonBody, jsonHandler = JSON) => {
+export const createMethodPlugin = (client: AxiosInstance) => {
+	const methodPlugin: PrimClientFunction = async (endpoint, jsonBody, jsonHandler = JSON) => {
 		// eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
 		const { data } = await client.post(endpoint, jsonHandler.stringify(jsonBody), {
 			headers: { "Content-Type": "application/json" },
@@ -16,5 +16,5 @@ export const createPrimAxiosClient = (client: AxiosInstance) => {
 		const result = jsonHandler.parse<RpcAnswer>(responseStr)
 		return result
 	}
-	return primClient
+	return methodPlugin
 }

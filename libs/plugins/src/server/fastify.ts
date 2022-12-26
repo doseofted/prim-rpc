@@ -26,11 +26,11 @@ interface PrimFastifyPluginOptions extends SharedFastifyOptions {
  * import Fastify from "fastify"
  * import multipartPlugin from "@fastify/multipart"
  * import { createPrimServer } from "@doseofted/prim-rpc"
- * import { fastifyPrimPlugin } from "@doseofted/prim-rpc-plugins/dist/server/fastify.mjs"
+ * import { fastifyPrimRpc } from "@doseofted/prim-rpc-plugins/dist/server/fastify.mjs"
  * // usage
  * const fastify = Fastify()
  * const prim = createPrimServer()
- * fastify.register(fastifyPrimPlugin, { prim, multipartPlugin })
+ * fastify.register(fastifyPrimRpc, { prim, multipartPlugin })
  * await fastify.listen({ port: 3000 })
  * ```
  *
@@ -40,7 +40,7 @@ interface PrimFastifyPluginOptions extends SharedFastifyOptions {
  * To let Prim handle registration with Fastify, try importing `primMethodFastify`
  */
 // eslint-disable-next-line @typescript-eslint/require-await
-export const fastifyPrimPlugin: FastifyPluginAsync<PrimFastifyPluginOptions> = async (fastify, options) => {
+export const fastifyPrimRpc: FastifyPluginAsync<PrimFastifyPluginOptions> = async (fastify, options) => {
 	const { prim, multipartPlugin, fileSizeLimitBytes: fileSize } = options
 	if (multipartPlugin) {
 		await fastify.register(multipartPlugin)
@@ -130,11 +130,11 @@ interface MethodFastifyOptions extends SharedFastifyOptions {
  * **Note:** usage of the multipart plugin is optional and can be excluded if support
  * for file uploads is not needed.
  *
- * If you would like to register Prim with Fastify yourself, try importing `fastifyPrimPlugin` instead.
+ * If you would like to register Prim with Fastify yourself, try importing `fastifyPrimRpc` instead.
  */
-export const primMethodFastify = (options: MethodFastifyOptions): PrimServerMethodHandler => {
+export const createMethodHandler = (options: MethodFastifyOptions): PrimServerMethodHandler => {
 	const { fastify } = options
 	return prim => {
-		void fastify.register(fastifyPrimPlugin, { ...options, prim })
+		void fastify.register(fastifyPrimRpc, { ...options, prim })
 	}
 }

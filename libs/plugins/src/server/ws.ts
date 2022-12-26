@@ -39,7 +39,7 @@ interface MethodWsOptions {
  * })
  * ```
  */
-export const primCallbackWs = (options: MethodWsOptions): PrimServerCallbackHandler => {
+export const createCallbackHandler = (options: MethodWsOptions): PrimServerCallbackHandler => {
 	const { wss: webSocketServer } = options
 	return prim => {
 		webSocketServer.on("connection", ws => {

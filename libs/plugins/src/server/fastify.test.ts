@@ -3,14 +3,14 @@ import request from "superwstest"
 import * as module from "@doseofted/prim-example"
 import Fastify from "fastify"
 import { createPrimServer } from "@doseofted/prim-rpc"
-import { fastifyPrimPlugin, primMethodFastify } from "./fastify"
+import { createMethodHandler, fastifyPrimRpc } from "./fastify"
 import queryString from "query-string"
 
 describe("Fastify plugin is functional as Prim Plugin", () => {
 	const fastify = Fastify()
 	createPrimServer({
 		module,
-		methodHandler: primMethodFastify({ fastify }),
+		methodHandler: createMethodHandler({ fastify }),
 	})
 	beforeEach(async () => {
 		await fastify.ready()
@@ -46,7 +46,7 @@ describe("Fastify plugin is functional as Fastify plugin", async () => {
 		module,
 	})
 	const fastify = Fastify()
-	await fastify.register(fastifyPrimPlugin, { prim })
+	await fastify.register(fastifyPrimRpc, { prim })
 	beforeEach(async () => {
 		await fastify.ready()
 		await new Promise(resolve => {
@@ -80,7 +80,7 @@ describe("Fastify plugin works with over GET/POST", () => {
 	const fastify = Fastify()
 	createPrimServer({
 		module,
-		methodHandler: primMethodFastify({ fastify }),
+		methodHandler: createMethodHandler({ fastify }),
 	})
 	beforeEach(async () => {
 		await fastify.ready()

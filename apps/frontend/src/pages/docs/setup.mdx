@@ -62,18 +62,36 @@ You may also use Prim+RPC from a CDN:
 <CH.Code>
 
 ```ts esm.sh
-import { /** choose imports */ } "https://esm.sh/@doseofted/prim-rpc";
-import { /** choose imports */ } "https://esm.sh/@doseofted/prim-rpc-plugins";
+import { createPrimServer, createPrimClient } from "https://esm.sh/@doseofted/prim-rpc"
+// use available export in place of {PLUGIN_NAME} below
+import {
+	createMethodHandler,
+	createMethodPlugin,
+	createCallbackHandler,
+	createCallbackPlugin,
+} from "https://esm.sh/@doseofted/prim-rpc-plugins/{PLUGIN_NAME}"
 ```
 
 ```ts skypack.dev
-import { /** choose imports */ } "https://cdn.skypack.dev/@doseofted/prim-rpc"
-import { /** choose imports */ } "https://cdn.skypack.dev/@doseofted/prim-rpc-plugins"
+import { createPrimServer, createPrimClient } from "https://cdn.skypack.dev/@doseofted/prim-rpc"
+// use available export in place of {PLUGIN_NAME} below
+import {
+	createMethodHandler,
+	createMethodPlugin,
+	createCallbackHandler,
+	createCallbackPlugin,
+} from "https://cdn.skypack.dev/@doseofted/prim-rpc-plugins/{PLUGIN_NAME}"
 ```
 
 ```ts unpkg.com
-import { /** choose imports */ } "https://unpkg.com/@doseofted/prim-rpc"
-import { /** choose imports */ } "https://unpkg.com/@doseofted/prim-rpc-plugins"
+import { createPrimServer, createPrimClient } from "https://unpkg.com/@doseofted/prim-rpc"
+// use available export in place of {PLUGIN_NAME} below
+import {
+	createMethodHandler,
+	createMethodPlugin,
+	createCallbackHandler,
+	createCallbackPlugin,
+} from "https://unpkg.com/@doseofted/prim-rpc-plugins/{PLUGIN_NAME}"
 ```
 
 </CH.Code>

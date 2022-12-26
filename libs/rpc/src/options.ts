@@ -18,7 +18,7 @@ const createBaseClientOptions = (): PrimOptions => ({
 	jsonHandler: { stringify: JSON.stringify, parse: JSON.parse },
 	// `client()` is intended to be overridden so as not to force any one HTTP framework but default is fine for most cases
 	// eslint-disable-next-line @typescript-eslint/require-await
-	client: async (_endpoint, jsonBody) => {
+	methodPlugin: async (_endpoint, jsonBody) => {
 		const error = "Prim-RPC's client plugin was not provided"
 		if (Array.isArray(jsonBody)) {
 			return jsonBody.map(({ id }) => ({ id, error }))
@@ -26,7 +26,7 @@ const createBaseClientOptions = (): PrimOptions => ({
 		return { error, id: jsonBody.id }
 	},
 	// same with socket, usually the default WebSocket client is fine but the choice to change should be given
-	socket: (_endpoint, { response }) => {
+	callbackPlugin: (_endpoint, { response }) => {
 		const error = "Prim-RPC's socket plugin was not provided"
 		const send = (msg: RpcCall) => {
 			response({ id: msg.id, error })
