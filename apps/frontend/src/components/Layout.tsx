@@ -24,7 +24,7 @@ export default function Layout(props: LayoutProps) {
 						{Array.from(Array(12), (_, i) => i).map((_, index) => (
 							<motion.div
 								key={index}
-								className="border-x"
+								className={["border-x col-span-2 lg:col-span-1", index >= 6 ? "hidden lg:block" : ""].join(" ")}
 								initial={{ borderColor: transparentize("#fff", 1) }}
 								animate={{ borderColor: transparentize("#fff", 0.7) }}
 								transition={{ delay: 0.3 }}

@@ -90,7 +90,7 @@ export function LayoutDocs({ meta, children }: LayoutDocsProps) {
 							</div>
 						)}
 					</div>
-					<div className="pointer-events-auto col-span-3 bg-white/70 text-black -ml-4 px-4 py-8 rounded-tl-2xl">
+					<div className="hidden lg:block pointer-events-auto col-span-3 bg-white/70 text-black -ml-4 px-4 py-8 rounded-tl-2xl">
 						<ul className="space-y-8">
 							{tableOfContents.map(({ name, sections }) => (
 								<li key={name} className="space-y-2">
@@ -106,8 +106,9 @@ export function LayoutDocs({ meta, children }: LayoutDocsProps) {
 							))}
 						</ul>
 					</div>
-					<div className="pointer-events-auto col-span-9 bg-white -mx-4 px-4 py-8 min-h-[50vh] relative">
+					<div className="pointer-events-auto col-span-12 lg:col-span-9 bg-white -mx-4 px-4 py-8 min-h-[50vh] relative">
 						<div className="bg-white w-screen h-full z-1 absolute top-0 right-0 transform translate-x-full" />
+						<div className="block lg:hidden bg-white w-screen h-full z-1 absolute top-0 left-0 transform -translate-x-full" />
 						<div className="grid grid-cols-10 gap-4 relative z-2">
 							<div className="text-black col-span-10 lg:col-span-8 col-start-1 lg:col-start-2 prose min-w-full prose-headings:font-title prose-headings:font-bold prose-headings:text-black">
 								<Alert icon="carbon:warning" type="alert-warning" className="mb-8">

@@ -32,9 +32,9 @@ export default function Home({ greeting }: Props) {
 			<div className="relative min-h-screen py-8 container mx-auto grid grid-cols-12 grid-rows-[auto_1fr_auto] px-4 gap-4">
 				<Navigation className="col-span-12" />
 				<div className="col-span-12 font-sans text-center flex justify-center items-center text-white">
-					<div className="flex h-full w-full justify-center items-center gap-16">
-						<div className="transform translate-x-32 mt-16">
-							<div className="transform -translate-x-32">
+					<div className="flex flex-col lg:flex-row h-full w-full justify-center items-center gap-16">
+						<div className="transform translate-y-32 lg:translate-y-0 lg:translate-x-32 ml-16 lg:ml-0 lg:mt-16">
+							<div className="transform -translate-y-32 lg:translate-y-0 lg:-translate-x-32">
 								<motion.div
 									className="mockup-code w-96 relative text-left text-sm bg-white/70 border border-white/60 backdrop-blur-lg"
 									initial={{ y: 25, opacity: 0 }}
@@ -47,8 +47,8 @@ export default function Home({ greeting }: Props) {
 							</div>
 							<OpinionatedLight count={7} focus={0.9} size={500} state={state} />
 						</div>
-						<div className="transform -translate-x-32 mb-16">
-							<div className="transform translate-x-32">
+						<div className="transform -translate-y-32 lg:translate-y-0 lg:-translate-x-32 mr-16 lg:mr-0 lg:mb-16">
+							<div className="transform translate-y-32 lg:translate-y-0 lg:translate-x-32">
 								<motion.div
 									className="mockup-code w-96 relative text-left text-sm bg-white/70 border border-white/60 backdrop-blur-lg"
 									initial={{ y: 25, opacity: 0 }}

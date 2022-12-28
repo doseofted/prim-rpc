@@ -15,7 +15,7 @@ export function Navigation(props: NavigationProps) {
 		<div {...attrs} className={[attrs.className, "flex justify-between items-center gap-8"].join(" ")}>
 			<div className="inline-block">
 				<Link href="/" className="group relative">
-					<p className="font-title text-[1.5rem] lg:text-[3rem] select-none font-normal transition-[font-weight] duration-500 group-hover:font-medium text-prim-space uppercase">
+					<p className="font-title text-[2.5rem] lg:text-[3rem] select-none font-normal transition-[font-weight] duration-500 group-hover:font-medium text-prim-space uppercase">
 						Prim+
 						<span className="font-bold transition-[font-weight] delay-100 duration-500 group-hover:font-extrabold">
 							RPC
@@ -28,7 +28,7 @@ export function Navigation(props: NavigationProps) {
 				initial={{ y: -20, opacity: 0 }}
 				animate={{ y: 0, opacity: 1 }}
 				transition={{ duration: 1, delay: homepage ? 2.8 : 0.5, ease: "circOut" }}
-				className="bg-white/70 border-b border-l border-white/70 text-black rounded-bl-2xl h-full flex items-center relative">
+				className="hidden lg:flex bg-white/70 border-b border-l border-white/70 text-black rounded-bl-2xl h-full items-center relative">
 				<div className="bg-white/70 border-l border-white/70 w-screen h-screen absolute top-0 -left-[1px] transform -translate-y-full" />
 				<div className="bg-white/70 border-b border-white/70 w-screen absolute top-0 -bottom-[1px] right-0 transform translate-x-full" />
 				{[
