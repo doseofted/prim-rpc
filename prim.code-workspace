@@ -1,11 +1,11 @@
 {
 	"folders": [
 		{
-			"name": "🌳 Monorepo",
+			"name": "🌳 Prim+RPC",
 			"path": "."
 		},
 		{
-			"name": "📙 Prim+RPC",
+			"name": "📙 Library",
 			"path": "./libs/rpc"
 		},
 		{
@@ -13,7 +13,7 @@
 			"path": "./libs/plugins"
 		},
 		{
-			"name": "📙 Docs Generator",
+			"name": "📙 Tooling",
 			"path": "./libs/docs"
 		},
 		{
