@@ -13,12 +13,12 @@ import ProxyDeep from "proxy-deep"
 import mitt from "mitt"
 import { nanoid } from "nanoid"
 import { get as getProperty, remove as removeFromArray } from "lodash-es"
-import type { Asyncify } from "type-fest"
 import { deserializeError } from "serialize-error"
 import { createPrimOptions } from "./options"
 import { handlePossibleBlobs } from "./blobs"
 import { PromiseResolveStatus } from "./interfaces"
 import type {
+	PromisifiedModule,
 	RpcCall,
 	PrimOptions,
 	RpcAnswer,
@@ -28,16 +28,8 @@ import type {
 	BlobRecords,
 } from "./interfaces"
 
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
-export type AnyFunction = (...args: any[]) => any
-// NOTE: Asyncify might need to be replaced since TSDoc comments aren't shown in editor when used
-type PromisifiedModule<ModuleGiven extends object> = {
-	[Key in keyof ModuleGiven]: ModuleGiven[Key] extends AnyFunction
-		? Asyncify<ModuleGiven[Key]>
-		: ModuleGiven[Key] extends object
-		? PromisifiedModule<ModuleGiven[Key]>
-		: ModuleGiven[Key]
-}
+export type { AnyFunction } from "./interfaces"
+
 /** Callback prefix */ export const CB_PREFIX = "_cb_"
 /** Binary prefix (Blob/File) */ export const BLOB_PREFIX = "_bin_"
 

@@ -21,4 +21,7 @@ export type {
 	// needed by plugins or otherwise
 	PrimServerEvents,
 	BlobRecords,
+	// other potentially useful utilities
+	AnyFunction,
+	PromisifiedModule,
 } from "./interfaces"

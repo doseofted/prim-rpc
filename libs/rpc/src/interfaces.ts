@@ -1,5 +1,6 @@
 import type { Emitter } from "mitt"
 import type { Schema } from "type-fest"
+import type { Asyncify } from "type-fest"
 
 // SECTION RPC call and result structure
 interface RpcBase {
@@ -54,6 +55,18 @@ interface PrimWebSocketFunctionEvents {
 // !SECTION
 
 // SECTION Client options
+
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+export type AnyFunction = (...args: any[]) => any
+// NOTE: Asyncify might need to be replaced since TSDoc comments aren't shown in editor when used
+export type PromisifiedModule<ModuleGiven extends object> = {
+	[Key in keyof ModuleGiven]: ModuleGiven[Key] extends AnyFunction
+		? Asyncify<ModuleGiven[Key]>
+		: ModuleGiven[Key] extends object
+		? PromisifiedModule<ModuleGiven[Key]>
+		: ModuleGiven[Key]
+}
+
 export interface JsonHandler {
 	stringify: (json: unknown) => string
 	// eslint-disable-next-line @typescript-eslint/no-explicit-any
