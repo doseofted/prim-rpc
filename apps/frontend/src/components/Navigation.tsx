@@ -28,7 +28,7 @@ export function Navigation(props: NavigationProps) {
 				initial={{ y: -20, opacity: 0 }}
 				animate={{ y: 0, opacity: 1 }}
 				transition={{ duration: 1, delay: homepage ? 2.8 : 0.5, ease: "circOut" }}
-				className="hidden lg:flex bg-white/70 border-b border-l border-white/70 text-black rounded-bl-2xl h-full items-center relative">
+				className="flex bg-white/70 border-b border-l border-white/70 text-black rounded-bl-2xl h-full items-center relative">
 				<div className="bg-white/70 border-l border-white/70 w-screen h-screen absolute top-0 -left-[1px] transform -translate-y-full" />
 				<div className="bg-white/70 border-b border-white/70 w-screen absolute top-0 -bottom-[1px] right-0 transform translate-x-full" />
 				{[
@@ -43,7 +43,7 @@ export function Navigation(props: NavigationProps) {
 					<React.Fragment key={i}>
 						{/* eslint-disable-next-line @next/next/no-html-link-for-pages */}
 						<Link
-							className="group font-semibold uppercase text-sm h-full px-6 p-4 flex justify-center items-center rounded-b-2xl transition-all duration-300
+							className="hidden lg:flex group font-semibold uppercase text-sm h-full px-6 p-4 justify-center items-center rounded-b-2xl transition-all duration-300
 								bg-transparent hover:bg-white transform scale-100 hover:scale-110"
 							href={link}>
 							<div className="pointer-events-none w-full h-screen transition-all duration-300 bg-transparent group-hover:bg-white absolute top-0 transform -translate-y-full" />
@@ -52,7 +52,7 @@ export function Navigation(props: NavigationProps) {
 					</React.Fragment>
 				))}
 				<Link
-					className="group font-semibold uppercase text-sm h-full px-4 p-4 flex justify-center items-center rounded-b-2xl
+					className="hidden lg:flex group font-semibold uppercase text-sm h-full px-4 p-4 justify-center items-center rounded-b-2xl
 						transition-all duration-300
 						bg-transparent hover:bg-white transform scale-100 hover:scale-110"
 					href="https://twitter.com/doseofted"
@@ -64,7 +64,7 @@ export function Navigation(props: NavigationProps) {
 					</span>
 				</Link>
 				<Link
-					className="group font-semibold uppercase text-sm h-full px-4 p-4 flex justify-center items-center rounded-b-2xl transition-all duration-300
+					className="hidden lg:flex group font-semibold uppercase text-sm h-full px-4 p-4 justify-center items-center rounded-b-2xl transition-all duration-300
 						bg-transparent hover:bg-white transform scale-100 hover:scale-110"
 					href="https://github.com/doseofted"
 					target="_blank">
@@ -74,6 +74,15 @@ export function Navigation(props: NavigationProps) {
 						<span className="sr-only">Github</span>
 					</span>
 				</Link>
+				<button
+					className="flex lg:hidden group font-semibold uppercase text-sm h-full px-4 p-4 justify-center items-center rounded-b-2xl transition-all duration-300
+						bg-transparent hover:bg-white transform scale-100 hover:scale-110">
+					<div className="pointer-events-none w-full h-screen transition-all duration-300 bg-transparent group-hover:bg-white absolute top-0 transform -translate-y-full" />
+					<span className="transition-all duration-300 transform">
+						<Icon className="w-6 h-6" icon="carbon:menu" />
+						<span className="sr-only">Menu</span>
+					</span>
+				</button>
 			</motion.div>
 		</div>
 	)
