@@ -93,7 +93,7 @@ export const fastifyPrimRpc: FastifyPluginAsync<PrimFastifyPluginOptions> = asyn
 	})
 	fastify.route<{ Body: string }>({
 		method: "GET",
-		url: prim.options.prefix + "/*",
+		url: prim.options.prefix + "*",
 		handler: async (request, reply) => {
 			const {
 				body,

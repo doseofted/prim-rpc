@@ -72,7 +72,8 @@ function createServerActions(
 				}
 				positional[index] = value
 			}
-			const params = positional.length > 0 && positional.length === entries.length ? positional : query
+			const params =
+				positional.length > 0 && positional.length === entries.length ? positional : entries.length === 0 ? [] : query
 			let method = url.replace(RegExp("^" + serverPrefix + "\\/?"), "")
 			method = method !== "" ? method : "default"
 			return { id, method, params }
