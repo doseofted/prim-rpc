@@ -195,11 +195,89 @@ be disabled by setting an option in Prim+RPC `handleError` to `false`.
 
 ## With Callback
 
-<Alert icon="carbon:warning" type="alert-warning">
-	Work in Progress
-</Alert>
+Prim+RPC can also support callbacks given as an argument to a function that you define. Since callbacks are called at a
+later point in time, the initial RPC is followed not just by a single return value but with multiple responses for each
+time the callback given is called from the server.
+
+It's easiest to explain with an example. Let's take a look at the function below.
+
+```ts
+function typeMessage(message: string, typeLetter: (letter: string) => void) {
+	let timeout = 0
+	message.split("").forEach(letter => {
+		setTimeout(() => {
+			typeLetter(letter)
+		}, ++timeout * 150)
+	})
+}
+// example usage
+typeMessage("Hi!", letter => console.log(letter))
+```
+
+This function takes a string message and, for each letter in the message, calls `typeLetter()` with a short delay
+between each letter. Similar to other function calls, there is an initial RPC and a response:
+
+<CH.Code>
+
+```json request.json
+{
+	"method": "typeMessage",
+	"params": ["Hi!", "_cb_1234"]
+}
+```
+
+---
+
+```json response-1.json
+{
+	"result": null
+}
+```
+
+</CH.Code>
+
+We can't serialize the callback function, so instead it is replaced with a string identifier that we will keep track of
+when we receive a result from the server. When the server calls the callback, we can expect the server to return this
+identifier back to use with the arguments used on the server when it was called. Prim+RPC's client will automatically
+generate the callback identifier and match it with a response from the server. When using outside of JavaScript, the
+request and responses (typically over a WebSocket connection) need to be matched.
+
+Note that the return value of the function is `null` because the function had no return value (and `undefined` can't be
+sent back with the default JSON handler, because it's not a valid JSON value).
+
+However, we're not done yet. The Prim+RPC server will send back additional messages as the callback is called from the
+server (tap each tab to see responses):
+
+<CH.Code>
+
+```json response-2.json
+{
+	"result": ["H"],
+	"id": "_cb_1234"
+}
+```
+
+```json response-3.json
+{
+	"result": ["i"],
+	"id": "_cb_1234"
+}
+```
+
+```json response-4.json
+{
+	"result": ["!"],
+	"id": "_cb_1234"
+}
+```
+
+</CH.Code>
+
+Each callback result includes the identifier that we sent in the request for us to match back to the request.
 
 ## With Custom JSON Handler
+
+Up until this point, we've worked with primitive values on the function. With Prim+RPC ...
 
 <Alert icon="carbon:warning" type="alert-warning">
 	Work in Progress
