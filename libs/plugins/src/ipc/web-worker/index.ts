@@ -7,7 +7,17 @@ import {
 	RpcCall,
 } from "@doseofted/prim-rpc"
 
-// FIXME: the following only works (for now) by bypassing the JSON handler on Prim client/server using the following:
+// SECTION Shared options
+
+/**
+ * NOTE: Web Workers, by default, post messages using a
+ * [structured cloning algorithm](https://developer.mozilla.org/en-US/docs/Web/API/Web_Workers_API/Structured_clone_algorithm)
+ * which is typically more powerful than typical JSON serialization. This situation needs to be considered because currently
+ * the Prim client sets JSON handler options (not plugins). While this plugin can support using a JSON handler, it's not
+ * nearly as powerful so this may need to be noted in the plugin's documentation that the JSON handler should just pass
+ * information transparently through instead of serializing/deserializing it.
+ */
+// FIXME: this plugin only works (for now) by bypassing the JSON handler on the Prim client/server using the following:
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
 const jsonHandler = {
 	// eslint-disable-next-line @typescript-eslint/no-unsafe-return, @typescript-eslint/no-explicit-any
@@ -19,6 +29,10 @@ const jsonHandler = {
 interface CallbackSharedWebWorkerOptions {
 	worker: Worker | Window
 }
+
+// !SECTION
+
+// SECTION Callback handler / plugin
 
 // eslint-disable-next-line @typescript-eslint/no-empty-interface
 interface CallbackPluginWebWorkerOptions extends CallbackSharedWebWorkerOptions {
@@ -68,6 +82,9 @@ export const createCallbackHandler = (options: CallbackHandlerWebWorkerOptions):
 		const { call, ended } = prim.connected()
 	}
 }
+// !SECTION
+
+// SECTION Method handler / plugin
 
 // FIXME: I may be able to remove the method handler/plugins altogether for Worker-related plugins. As long as Prim client can
 // fallback to the the callback plugin/handlers if method-plugin is not given, then this may not be needed. Especially since
@@ -100,3 +117,42 @@ export const createMethodHandler = (options: CallbackHandlerWebWorkerOptions): P
 		})
 	}
 }
+// !SECTION
+
+// SECTION: Custom events for web workers
+
+// NOTE: this section is not used yet but could be useful for other types of workers (this may be deleted later)
+
+enum PrimEvent {
+	Connect = "prim-connect",
+}
+
+interface PrimEventDetail {
+	[PrimEvent.Connect]: CustomEvent<{
+		id: string
+	}>
+}
+
+type PossibleContext = Window | Worker | SharedWorker | ServiceWorker
+
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
+function customDispatchEvent<T extends PrimEvent>(
+	parent: PossibleContext,
+	event: T,
+	data: Partial<PrimEventDetail[T]> & Pick<PrimEventDetail[T], "detail">
+) {
+	return parent.dispatchEvent(new CustomEvent(event, data))
+}
+
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
+function customAddEventListener<T extends PrimEvent>(
+	parent: PossibleContext,
+	event: T,
+	callback: (event: PrimEventDetail[T]) => void
+) {
+	return parent.addEventListener(event, e => {
+		const event = e as PrimEventDetail[T]
+		callback(event)
+	})
+}
+// !SECTION
