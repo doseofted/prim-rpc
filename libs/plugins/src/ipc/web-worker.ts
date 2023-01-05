@@ -70,6 +70,16 @@ interface CallbackHandlerWebWorkerOptions extends CallbackSharedWebWorkerOptions
 export const createCallbackHandler = (options: CallbackHandlerWebWorkerOptions): PrimServerCallbackHandler => {
 	const { worker } = options
 	return prim => {
+		// customAddEventListener(worker, PrimEvent.Request, ({ detail: connection }) => {
+		// 	const id = connection.id
+		// 	customDispatchEvent(worker, id, { /** some connection details? */})
+		// 	// ...
+		// 	customAddEventListener(worker, PrimEvent.Call, ({ detail: request }) => {
+		// 		if (connection.id !== request.id) { return }
+		// 		const rpc = request.rpc
+		// 	})
+		// 	customDispatchEvent(worker, PrimEvent.Response, { detail: { id } })
+		// })
 		worker.addEventListener("message", (event: MessageEvent<RpcCall>) => {
 			// FIXME: typescript definitions need to be adjusted since JSON handler is (likely) not needed
 			call(event.data as unknown as string, data => {
@@ -124,11 +134,25 @@ export const createMethodHandler = (options: CallbackHandlerWebWorkerOptions): P
 // NOTE: this section is not used yet but could be useful for other types of workers (this may be deleted later)
 
 enum PrimEvent {
-	Connect = "prim-connect",
+	Request = "prim-request",
+	Response = "prim-response",
+	Call = "prim-call",
+	Answer = "prim-answer",
 }
 
 interface PrimEventDetail {
-	[PrimEvent.Connect]: CustomEvent<{
+	[PrimEvent.Request]: CustomEvent<{
+		id: string
+	}>
+	[PrimEvent.Response]: CustomEvent<{
+		id: string
+	}>
+	[PrimEvent.Call]: CustomEvent<{
+		rpc: RpcCall | RpcCall[]
+		id: string
+	}>
+	[PrimEvent.Answer]: CustomEvent<{
+		rpc: RpcAnswer | RpcAnswer[]
 		id: string
 	}>
 }
@@ -154,5 +178,14 @@ function customAddEventListener<T extends PrimEvent>(
 		const event = e as PrimEventDetail[T]
 		callback(event)
 	})
+}
+
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
+function customRemoveEventListener<T extends PrimEvent>(
+	parent: PossibleContext,
+	event: T,
+	callback: (event: PrimEventDetail[T]) => void
+) {
+	return parent.removeEventListener(event, callback)
 }
 // !SECTION
