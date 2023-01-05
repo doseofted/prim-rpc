@@ -44,6 +44,7 @@
 		"./fastify": "./dist/server/fastify.js",
 		"./express": "./dist/server/express.js",
 		"./ws": "./dist/server/ws.js",
+		"./web-worker": "./dist/ipc/web-worker/index.js",
 		"./package.json": "./package.json"
 	},
 	"typesVersions": {
@@ -62,6 +63,9 @@
 			],
 			"ws": [
 				"dist/server/ws.d.ts"
+			],
+			"web-worker": [
+				"dist/ipc/web-worker/index.d.ts"
 			]
 		}
 	},

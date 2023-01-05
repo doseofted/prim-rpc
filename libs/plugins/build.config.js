@@ -10,6 +10,7 @@ export default defineConfig(options => ({
 		"src/server/ws.ts",
 		"src/client/axios.ts",
 		"src/client/browser-api.ts",
+		"src/ipc/web-worker/index.ts",
 	],
 	target: "ES2020",
 	dts: true,
