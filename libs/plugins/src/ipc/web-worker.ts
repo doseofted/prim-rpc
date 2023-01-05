@@ -1,8 +1,8 @@
 import {
-	PrimClientFunction,
+	PrimClientMethodPlugin,
 	PrimServerCallbackHandler,
 	PrimServerMethodHandler,
-	PrimSocketFunction,
+	PrimClientCallbackPlugin,
 	RpcAnswer,
 	RpcCall,
 } from "@doseofted/prim-rpc"
@@ -42,7 +42,7 @@ interface CallbackPluginWebWorkerOptions extends CallbackSharedWebWorkerOptions 
 // TODO: consider making two versions: worker-server (main is client) and worker-client (main is server)
 // and try to make them share as much code as possible (this means 2 plugins and 2 handlers for web workers)
 
-export const createCallbackPlugin = (options: CallbackPluginWebWorkerOptions): PrimSocketFunction => {
+export const createCallbackPlugin = (options: CallbackPluginWebWorkerOptions): PrimClientCallbackPlugin => {
 	const { worker = self } = options
 	return (_endpoint, { connected, response, ended }) => {
 		worker.addEventListener("message", (event: MessageEvent<RpcAnswer>) => {
@@ -91,7 +91,7 @@ export const createCallbackHandler = (options: CallbackHandlerWebWorkerOptions):
 // the callback plugin has more functionality than the method plugin (method plugin is simpler for HTTP requests since
 // I can only pass a request and a response).
 
-export const createMethodPlugin = (options: CallbackPluginWebWorkerOptions): PrimClientFunction => {
+export const createMethodPlugin = (options: CallbackPluginWebWorkerOptions): PrimClientMethodPlugin => {
 	const { worker = self } = options
 	return (_endpoint, message) =>
 		new Promise((resolve, reject) => {

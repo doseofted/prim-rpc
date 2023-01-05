@@ -1,9 +1,15 @@
-import type { BlobRecords, PrimClientFunction, PrimSocketFunction, RpcAnswer, RpcCall } from "@doseofted/prim-rpc"
+import type {
+	BlobRecords,
+	PrimClientMethodPlugin,
+	PrimClientCallbackPlugin,
+	RpcAnswer,
+	RpcCall,
+} from "@doseofted/prim-rpc"
 
 // TODO: test this plugin
 
 export const createMethodPlugin = (headersOverride?: Headers | Record<string, string>) => {
-	const methodPlugin: PrimClientFunction = async (endpoint, jsonBody, jsonHandler, blobs = {}) => {
+	const methodPlugin: PrimClientMethodPlugin = async (endpoint, jsonBody, jsonHandler, blobs = {}) => {
 		let fetchOptions: RequestInit = {}
 		const blobList = Object.entries(blobs)
 		if (blobList.length > 0) {
@@ -33,7 +39,7 @@ export const createMethodPlugin = (headersOverride?: Headers | Record<string, st
 }
 
 export const createCallbackPlugin = () => {
-	const callbackPlugin: PrimSocketFunction = (endpoint, { connected, response, ended }, jsonHandler) => {
+	const callbackPlugin: PrimClientCallbackPlugin = (endpoint, { connected, response, ended }, jsonHandler) => {
 		const ws = new WebSocket(endpoint)
 		ws.onopen = connected
 		ws.onclose = ended

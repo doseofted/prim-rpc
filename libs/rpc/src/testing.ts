@@ -4,8 +4,8 @@ import { createPrimClient } from "./client"
 import {
 	PrimServerMethodHandler,
 	PrimServerCallbackHandler,
-	PrimClientFunction,
-	PrimSocketFunction,
+	PrimClientMethodPlugin,
+	PrimClientCallbackPlugin,
 	PrimOptions,
 	BlobRecords,
 } from "./interfaces"
@@ -105,7 +105,7 @@ interface PrimClientOptions {
 	httpConnection: ReturnType<typeof createTestServers>["httpConnection"]
 }
 export function createMethodPlugin({ httpConnection }: PrimClientOptions) {
-	const client: PrimClientFunction = (_endpoint, bodyRpc, jsonHandler, blobs) => {
+	const client: PrimClientMethodPlugin = (_endpoint, bodyRpc, jsonHandler, blobs) => {
 		return new Promise(resolve => {
 			const reqId = nanoid()
 			httpConnection.on(`res:${reqId}`, httpServer => {
@@ -126,7 +126,7 @@ interface PrimSocketOptions {
 }
 
 export function createCallbackPlugin({ wsConnection }: PrimSocketOptions) {
-	const socket: PrimSocketFunction = (_endpoint, { connected, ended: _ended, response }, jsonHandler) => {
+	const socket: PrimClientCallbackPlugin = (_endpoint, { connected, ended: _ended, response }, jsonHandler) => {
 		let wsSession: ConnectedEvent
 		const reqId = nanoid()
 		wsConnection.on(`res:${reqId}`, wsServer => {
