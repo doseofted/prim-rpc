@@ -22,7 +22,7 @@ const jsonHandlerPassthrough: JsonHandler = {
 	stringify: given => given as string,
 }
 
-interface CallbackSharedWebWorkerOptions {
+interface SharedWebWorkerOptions {
 	worker: Worker | Window
 }
 
@@ -31,7 +31,7 @@ interface CallbackSharedWebWorkerOptions {
 // SECTION Callback handler / plugin
 
 // eslint-disable-next-line @typescript-eslint/no-empty-interface
-interface CallbackPluginWebWorkerOptions extends CallbackSharedWebWorkerOptions {}
+interface CallbackPluginWebWorkerOptions extends SharedWebWorkerOptions {}
 export const createCallbackPlugin = (options: CallbackPluginWebWorkerOptions) => {
 	const { worker = self } = options
 	const transport = setupMessageTransport(worker)
@@ -57,7 +57,7 @@ export const createCallbackPlugin = (options: CallbackPluginWebWorkerOptions) =>
 }
 
 // eslint-disable-next-line @typescript-eslint/no-empty-interface
-interface CallbackHandlerWebWorkerOptions extends CallbackSharedWebWorkerOptions {}
+interface CallbackHandlerWebWorkerOptions extends SharedWebWorkerOptions {}
 // TODO: consider what to do when JSON handler is used (and either string or binary contents are given instead of actual RPC)
 export const createCallbackHandler = (options: CallbackHandlerWebWorkerOptions) => {
 	const { worker = self } = options
@@ -80,7 +80,9 @@ export const createCallbackHandler = (options: CallbackHandlerWebWorkerOptions) 
 
 // SECTION Method handler / plugin
 
-export const createMethodPlugin = (options: CallbackPluginWebWorkerOptions) => {
+// eslint-disable-next-line @typescript-eslint/no-empty-interface
+interface MethodPluginWebWorkerOptions extends SharedWebWorkerOptions {}
+export const createMethodPlugin = (options: MethodPluginWebWorkerOptions) => {
 	const { worker = self } = options
 	const transport = setupMessageTransport(worker)
 	const methodPlugin: PrimClientMethodPlugin = (_endpoint, message, jsonHandler, blobs) =>
@@ -97,7 +99,9 @@ export const createMethodPlugin = (options: CallbackPluginWebWorkerOptions) => {
 	return { methodPlugin, jsonHandler: jsonHandlerPassthrough }
 }
 
-export const createMethodHandler = (options: CallbackHandlerWebWorkerOptions) => {
+// eslint-disable-next-line @typescript-eslint/no-empty-interface
+interface MethodHandlerWebWorkerOptions extends SharedWebWorkerOptions {}
+export const createMethodHandler = (options: MethodHandlerWebWorkerOptions) => {
 	const { worker } = options
 	const transport = setupMessageTransport(worker)
 	const methodHandler: PrimServerMethodHandler = prim => {
