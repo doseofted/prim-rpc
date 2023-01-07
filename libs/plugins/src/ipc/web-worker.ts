@@ -6,8 +6,12 @@ import {
 	RpcAnswer,
 	RpcCall,
 } from "@doseofted/prim-rpc"
+import { nanoid } from "nanoid"
 
 // SECTION Shared options
+
+// FIXME: determine if structured cloning is specific to "message" event only
+// if it is, then RPC should be sent as message event and all other messages over custom events
 
 /**
  * NOTE: Web Workers, by default, post messages using a
@@ -44,21 +48,41 @@ interface CallbackPluginWebWorkerOptions extends CallbackSharedWebWorkerOptions 
 
 export const createCallbackPlugin = (options: CallbackPluginWebWorkerOptions): PrimClientCallbackPlugin => {
 	const { worker = self } = options
-	return (_endpoint, { connected, response, ended }) => {
-		worker.addEventListener("message", (event: MessageEvent<RpcAnswer>) => {
-			response(event.data)
-		})
-		worker.addEventListener("error", () => {
-			ended()
+	return (_endpoint, { connected, response }, jsonHandler) => {
+		const id = nanoid()
+		customAddEventListener(worker, `connected:${id}`, () => {
+			console.log("connected?")
+			customAddEventListener(worker, `callback:connected:${id}`, () => {
+				customAddEventListener(worker, `server:message:${id}`, ({ detail: result }) => {
+					// NOTE: result is expected to be string (over network but is likely not over web workers)
+					response(jsonHandler.parse(result as unknown as string))
+				})
+				connected()
+			})
+			customDispatchEvent(worker, `callback:connect:${id}`, { detail: null })
 		})
 		setTimeout(() => {
-			connected()
+			customDispatchEvent(worker, `connect`, { detail: id })
 		}, 0)
 		return {
 			send(message, _blobs) {
-				worker.postMessage(message)
+				customDispatchEvent(worker, `client:message:${id}`, { detail: jsonHandler.stringify(message) })
 			},
 		}
+		// worker.addEventListener("message", (event: MessageEvent<RpcAnswer>) => {
+		// 	response(event.data)
+		// })
+		// worker.addEventListener("error", () => {
+		// 	ended()
+		// })
+		// setTimeout(() => {
+		// 	connected()
+		// }, 0)
+		// return {
+		// 	send(message, _blobs) {
+		// 		worker.postMessage(message)
+		// 	},
+		// }
 	}
 }
 
@@ -68,28 +92,40 @@ interface CallbackHandlerWebWorkerOptions extends CallbackSharedWebWorkerOptions
 }
 // TODO: consider what to do when JSON handler is used (and either string or binary contents are given instead of actual RPC)
 export const createCallbackHandler = (options: CallbackHandlerWebWorkerOptions): PrimServerCallbackHandler => {
-	const { worker } = options
+	const { worker = self } = options
 	return prim => {
-		// customAddEventListener(worker, PrimEvent.Request, ({ detail: connection }) => {
-		// 	const id = connection.id
-		// 	customDispatchEvent(worker, id, { /** some connection details? */})
-		// 	// ...
-		// 	customAddEventListener(worker, PrimEvent.Call, ({ detail: request }) => {
-		// 		if (connection.id !== request.id) { return }
-		// 		const rpc = request.rpc
-		// 	})
-		// 	customDispatchEvent(worker, PrimEvent.Response, { detail: { id } })
-		// })
-		worker.addEventListener("message", (event: MessageEvent<RpcCall>) => {
-			// FIXME: typescript definitions need to be adjusted since JSON handler is (likely) not needed
-			call(event.data as unknown as string, data => {
-				worker.postMessage(data)
+		// NOTE: duplicate connect/callback:connect events may be extraneous for web workers
+		// (this doesn't necessarily need to mirror network calls)
+		customAddEventListener(worker, "connect", ({ detail: id }) => {
+			console.log("connect?", id)
+			customAddEventListener(worker, `callback:connect:${id}`, () => {
+				const { call, rpc: makeRpc } = prim.connected()
+				customAddEventListener(worker, `client:message:${id}`, ({ detail: rpc }) => {
+					if (typeof rpc === "string") {
+						call(rpc, detail => {
+							customDispatchEvent(worker, `server:message:${id}`, { detail })
+						})
+					} else {
+						makeRpc(rpc, detail => {
+							customDispatchEvent(worker, `server:message:${id}`, { detail })
+						})
+					}
+				})
+				// customAddEventListener(worker, `ended:${id}`, () => {})
+				customDispatchEvent(worker, `callback:connected:${id}`, { detail: null })
 			})
+			customDispatchEvent(worker, `connected:${id}`, { detail: null })
 		})
-		worker.addEventListener("error", () => {
-			ended()
-		})
-		const { call, ended } = prim.connected()
+		// worker.addEventListener("message", (event: MessageEvent<RpcCall>) => {
+		// 	// FIXME: typescript definitions need to be adjusted since JSON handler is (likely) not needed
+		// 	call(event.data as unknown as string, data => {
+		// 		worker.postMessage(data)
+		// 	})
+		// })
+		// worker.addEventListener("error", () => {
+		// 	ended()
+		// })
+		// const { call, ended } = prim.connected()
 	}
 }
 // !SECTION
@@ -133,31 +169,31 @@ export const createMethodHandler = (options: CallbackHandlerWebWorkerOptions): P
 
 // NOTE: this section is not used yet but could be useful for other types of workers (this may be deleted later)
 
-enum PrimEvent {
-	Request = "prim-request",
-	Response = "prim-response",
-	Call = "prim-call",
-	Answer = "prim-answer",
+type ConnectionEvents = {
+	connect: CustomEvent<string>
+	[connected: `connected:${string}`]: CustomEvent<null>
 }
 
-interface PrimEventDetail {
-	[PrimEvent.Request]: CustomEvent<{
-		id: string
-	}>
-	[PrimEvent.Response]: CustomEvent<{
-		id: string
-	}>
-	[PrimEvent.Call]: CustomEvent<{
-		rpc: RpcCall | RpcCall[]
-		id: string
-	}>
-	[PrimEvent.Answer]: CustomEvent<{
-		rpc: RpcAnswer | RpcAnswer[]
-		id: string
-	}>
+type CallbackEvents = {
+	[connect: `callback:connect:${string}`]: CustomEvent<null>
+	[connected: `callback:connected:${string}`]: CustomEvent<null>
+	[clientMessage: `client:message:${string}`]: CustomEvent<RpcCall | RpcCall[] | string>
+	[serverMessage: `server:message:${string}`]: CustomEvent<RpcAnswer | RpcAnswer[] | string>
+	[ended: `ended:${string}`]: CustomEvent<null>
 }
 
-type PossibleContext = Window | Worker | SharedWorker | ServiceWorker
+type MethodEvents = {
+	[request: `request:${string}`]: CustomEvent<RpcCall | RpcCall[] | string>
+	[response: `response:${string}`]: CustomEvent<RpcAnswer | RpcAnswer[] | string>
+}
+
+type PrimEventDetail = ConnectionEvents & CallbackEvents & MethodEvents
+type PrimEvent = keyof PrimEventDetail
+
+type PossibleContext = Window | Worker // | SharedWorker | ServiceWorker
+
+/** Should CustomEvent be used or "message" events? */
+// const POST_MESSAGE = true
 
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
 function customDispatchEvent<T extends PrimEvent>(
@@ -165,6 +201,10 @@ function customDispatchEvent<T extends PrimEvent>(
 	event: T,
 	data: Partial<PrimEventDetail[T]> & Pick<PrimEventDetail[T], "detail">
 ) {
+	console.debug(event, "event", data?.detail)
+	// if (POST_MESSAGE) {
+	// 	return parent.postMessage({ data, event })
+	// }
 	return parent.dispatchEvent(new CustomEvent(event, data))
 }
 
@@ -174,6 +214,17 @@ function customAddEventListener<T extends PrimEvent>(
 	event: T,
 	callback: (event: PrimEventDetail[T]) => void
 ) {
+	console.debug("listening", event)
+	// if (POST_MESSAGE) {
+	// 	parent.addEventListener("message", e => {
+	// 		const event = e as PrimEventDetail[T]
+	// 		const d = e as unknown as { data: unknown, event: T }
+	// 		if (d.event === event) {
+	// 			const a = { detail: d.data } as PrimEventDetail[T]
+	// 			callback(a)
+	// 		}
+	// 	})
+	// }
 	return parent.addEventListener(event, e => {
 		const event = e as PrimEventDetail[T]
 		callback(event)

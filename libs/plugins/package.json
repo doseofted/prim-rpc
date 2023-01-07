@@ -35,6 +35,7 @@
 		"superjson": "^1.12.0",
 		"supertest": "^6.3.3",
 		"superwstest": "^2.0.3",
+		"type-fest": "^3.4.0",
 		"ws": "^8.11.0"
 	},
 	"type": "module",
@@ -71,5 +72,8 @@
 	},
 	"files": [
 		"dist"
-	]
+	],
+	"dependencies": {
+		"nanoid": "^4.0.0"
+	}
 }
