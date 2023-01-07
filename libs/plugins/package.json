@@ -74,6 +74,7 @@
 		"dist"
 	],
 	"dependencies": {
+		"mitt": "^3.0.0",
 		"nanoid": "^4.0.0"
 	}
 }

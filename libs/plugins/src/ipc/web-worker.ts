@@ -7,7 +7,7 @@ import {
 	RpcCall,
 } from "@doseofted/prim-rpc"
 import { nanoid } from "nanoid"
-
+import mitt from "mitt"
 // SECTION Shared options
 
 // FIXME: determine if structured cloning is specific to "message" event only
@@ -48,41 +48,27 @@ interface CallbackPluginWebWorkerOptions extends CallbackSharedWebWorkerOptions 
 
 export const createCallbackPlugin = (options: CallbackPluginWebWorkerOptions): PrimClientCallbackPlugin => {
 	const { worker = self } = options
+	const transport = setupMessageTransport(worker)
 	return (_endpoint, { connected, response }, jsonHandler) => {
 		const id = nanoid()
-		customAddEventListener(worker, `connected:${id}`, () => {
-			console.log("connected?")
-			customAddEventListener(worker, `callback:connected:${id}`, () => {
-				customAddEventListener(worker, `server:message:${id}`, ({ detail: result }) => {
+		transport.on(`connected:${id}`, () => {
+			transport.on(`callback:connected:${id}`, () => {
+				transport.on(`server:message:${id}`, result => {
 					// NOTE: result is expected to be string (over network but is likely not over web workers)
 					response(jsonHandler.parse(result as unknown as string))
 				})
 				connected()
 			})
-			customDispatchEvent(worker, `callback:connect:${id}`, { detail: null })
+			transport.send(`callback:connect:${id}`, null)
 		})
 		setTimeout(() => {
-			customDispatchEvent(worker, `connect`, { detail: id })
+			transport.send("connect", id)
 		}, 0)
 		return {
 			send(message, _blobs) {
-				customDispatchEvent(worker, `client:message:${id}`, { detail: jsonHandler.stringify(message) })
+				transport.send(`client:message:${id}`, jsonHandler.stringify(message))
 			},
 		}
-		// worker.addEventListener("message", (event: MessageEvent<RpcAnswer>) => {
-		// 	response(event.data)
-		// })
-		// worker.addEventListener("error", () => {
-		// 	ended()
-		// })
-		// setTimeout(() => {
-		// 	connected()
-		// }, 0)
-		// return {
-		// 	send(message, _blobs) {
-		// 		worker.postMessage(message)
-		// 	},
-		// }
 	}
 }
 
@@ -93,39 +79,29 @@ interface CallbackHandlerWebWorkerOptions extends CallbackSharedWebWorkerOptions
 // TODO: consider what to do when JSON handler is used (and either string or binary contents are given instead of actual RPC)
 export const createCallbackHandler = (options: CallbackHandlerWebWorkerOptions): PrimServerCallbackHandler => {
 	const { worker = self } = options
+	const transport = setupMessageTransport(worker)
 	return prim => {
 		// NOTE: duplicate connect/callback:connect events may be extraneous for web workers
 		// (this doesn't necessarily need to mirror network calls)
-		customAddEventListener(worker, "connect", ({ detail: id }) => {
-			console.log("connect?", id)
-			customAddEventListener(worker, `callback:connect:${id}`, () => {
+		transport.on("connect", id => {
+			transport.on(`callback:connect:${id}`, () => {
 				const { call, rpc: makeRpc } = prim.connected()
-				customAddEventListener(worker, `client:message:${id}`, ({ detail: rpc }) => {
+				transport.on(`client:message:${id}`, rpc => {
 					if (typeof rpc === "string") {
 						call(rpc, detail => {
-							customDispatchEvent(worker, `server:message:${id}`, { detail })
+							transport.send(`server:message:${id}`, detail)
 						})
 					} else {
 						makeRpc(rpc, detail => {
-							customDispatchEvent(worker, `server:message:${id}`, { detail })
+							transport.send(`server:message:${id}`, detail)
 						})
 					}
 				})
 				// customAddEventListener(worker, `ended:${id}`, () => {})
-				customDispatchEvent(worker, `callback:connected:${id}`, { detail: null })
+				transport.send(`callback:connected:${id}`, null)
 			})
-			customDispatchEvent(worker, `connected:${id}`, { detail: null })
+			transport.send(`connected:${id}`, null)
 		})
-		// worker.addEventListener("message", (event: MessageEvent<RpcCall>) => {
-		// 	// FIXME: typescript definitions need to be adjusted since JSON handler is (likely) not needed
-		// 	call(event.data as unknown as string, data => {
-		// 		worker.postMessage(data)
-		// 	})
-		// })
-		// worker.addEventListener("error", () => {
-		// 	ended()
-		// })
-		// const { call, ended } = prim.connected()
 	}
 }
 // !SECTION
@@ -165,78 +141,51 @@ export const createMethodHandler = (options: CallbackHandlerWebWorkerOptions): P
 }
 // !SECTION
 
-// SECTION: Custom events for web workers
-
-// NOTE: this section is not used yet but could be useful for other types of workers (this may be deleted later)
+// SECTION: Message event wrapper
 
 type ConnectionEvents = {
-	connect: CustomEvent<string>
-	[connected: `connected:${string}`]: CustomEvent<null>
+	connect: string
+	[connected: `connected:${string}`]: void
 }
 
 type CallbackEvents = {
-	[connect: `callback:connect:${string}`]: CustomEvent<null>
-	[connected: `callback:connected:${string}`]: CustomEvent<null>
-	[clientMessage: `client:message:${string}`]: CustomEvent<RpcCall | RpcCall[] | string>
-	[serverMessage: `server:message:${string}`]: CustomEvent<RpcAnswer | RpcAnswer[] | string>
-	[ended: `ended:${string}`]: CustomEvent<null>
+	[connect: `callback:connect:${string}`]: void
+	[connected: `callback:connected:${string}`]: void
+	[clientMessage: `client:message:${string}`]: RpcCall | RpcCall[] | string
+	[serverMessage: `server:message:${string}`]: RpcAnswer | RpcAnswer[] | string
+	[ended: `ended:${string}`]: void
 }
 
 type MethodEvents = {
-	[request: `request:${string}`]: CustomEvent<RpcCall | RpcCall[] | string>
-	[response: `response:${string}`]: CustomEvent<RpcAnswer | RpcAnswer[] | string>
+	[request: `request:${string}`]: RpcCall | RpcCall[] | string
+	[response: `response:${string}`]: RpcAnswer | RpcAnswer[] | string
 }
 
 type PrimEventDetail = ConnectionEvents & CallbackEvents & MethodEvents
-type PrimEvent = keyof PrimEventDetail
+type PrimEventName = keyof PrimEventDetail
+type PrimEventStructure<T extends PrimEventName> = { event: T; data: PrimEventDetail[T] }
 
 type PossibleContext = Window | Worker // | SharedWorker | ServiceWorker
 
-/** Should CustomEvent be used or "message" events? */
-// const POST_MESSAGE = true
-
-// eslint-disable-next-line @typescript-eslint/no-unused-vars
-function customDispatchEvent<T extends PrimEvent>(
-	parent: PossibleContext,
-	event: T,
-	data: Partial<PrimEventDetail[T]> & Pick<PrimEventDetail[T], "detail">
-) {
-	console.debug(event, "event", data?.detail)
-	// if (POST_MESSAGE) {
-	// 	return parent.postMessage({ data, event })
-	// }
-	return parent.dispatchEvent(new CustomEvent(event, data))
+function setupMessageTransport(parent: PossibleContext) {
+	const eventsReceived = mitt<PrimEventDetail>()
+	const callback = ({ data: given }: MessageEvent<PrimEventStructure<PrimEventName>>) => {
+		eventsReceived.emit(given.event, given.data)
+	}
+	parent.addEventListener("message", callback)
+	return {
+		on<T extends PrimEventName>(event: T, cb: (data: PrimEventDetail[T]) => void) {
+			eventsReceived.on(event, cb)
+			return () => eventsReceived.off(event, cb)
+		},
+		send<T extends PrimEventName>(event: T, data: PrimEventDetail[T]) {
+			parent.postMessage({ event, data })
+		},
+		destroy() {
+			eventsReceived.all.clear()
+			parent.removeEventListener("message", callback)
+		},
+	}
 }
 
-// eslint-disable-next-line @typescript-eslint/no-unused-vars
-function customAddEventListener<T extends PrimEvent>(
-	parent: PossibleContext,
-	event: T,
-	callback: (event: PrimEventDetail[T]) => void
-) {
-	console.debug("listening", event)
-	// if (POST_MESSAGE) {
-	// 	parent.addEventListener("message", e => {
-	// 		const event = e as PrimEventDetail[T]
-	// 		const d = e as unknown as { data: unknown, event: T }
-	// 		if (d.event === event) {
-	// 			const a = { detail: d.data } as PrimEventDetail[T]
-	// 			callback(a)
-	// 		}
-	// 	})
-	// }
-	return parent.addEventListener(event, e => {
-		const event = e as PrimEventDetail[T]
-		callback(event)
-	})
-}
-
-// eslint-disable-next-line @typescript-eslint/no-unused-vars
-function customRemoveEventListener<T extends PrimEvent>(
-	parent: PossibleContext,
-	event: T,
-	callback: (event: PrimEventDetail[T]) => void
-) {
-	return parent.removeEventListener(event, callback)
-}
 // !SECTION
