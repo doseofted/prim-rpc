@@ -46,6 +46,8 @@ export function createPrimClient<
 	ModuleType extends OptionsType["module"] = object,
 	OptionsType extends PrimOptions = PrimOptions
 >(options?: OptionsType): PromisifiedModule<ModuleType> {
+	const methodPluginGiven = typeof options?.methodPlugin !== "undefined"
+	const callbackPluginGiven = typeof options?.callbackPlugin !== "undefined"
 	const configured = createPrimOptions(options)
 	const givenModule = configured.module as ModuleType
 	// SECTION Proxy to handle function calls
@@ -108,7 +110,7 @@ export function createPrimClient<
 				return callbackReferenceIdentifier
 			})
 			const rpc: RpcCall = { method: this.path.join("/"), params, id: nanoid() }
-			if (callbacksWereGiven) {
+			if ((callbackPluginGiven && callbacksWereGiven) || !methodPluginGiven) {
 				// TODO: add fallback in case client cannot support websocket
 				const result = new Promise<RpcAnswer>((resolve, reject) => {
 					wsEvent.on("response", answer => {
@@ -240,5 +242,7 @@ export function createPrimClient<
 	}
 	// !SECTION
 	const client = proxy as PromisifiedModule<ModuleType>
+	// TODO: consider returning client as property so other client-specific methods like `destroy()`
+	// can be added (for closing websocket connections)
 	return client
 }

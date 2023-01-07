@@ -1,10 +1,10 @@
-import type { PrimClientFunction, RpcAnswer } from "@doseofted/prim-rpc"
+import type { PrimClientMethodPlugin, RpcAnswer } from "@doseofted/prim-rpc"
 import type { AxiosInstance } from "axios"
 
 // TODO: test this plugin
 
 export const createMethodPlugin = (client: AxiosInstance) => {
-	const methodPlugin: PrimClientFunction = async (endpoint, jsonBody, jsonHandler = JSON) => {
+	const methodPlugin: PrimClientMethodPlugin = async (endpoint, jsonBody, jsonHandler = JSON) => {
 		// eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
 		const { data } = await client.post(endpoint, jsonHandler.stringify(jsonBody), {
 			headers: { "Content-Type": "application/json" },

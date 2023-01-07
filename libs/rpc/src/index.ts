@@ -10,8 +10,8 @@ export type {
 	PrimOptions,
 	PrimServerOptions,
 	// client-side functions for sending RPCs
-	PrimClientFunction,
-	PrimSocketFunction,
+	PrimClientMethodPlugin,
+	PrimClientCallbackPlugin,
 	// server-side functions for handling RPCs
 	PrimServerMethodHandler,
 	PrimServerCallbackHandler,

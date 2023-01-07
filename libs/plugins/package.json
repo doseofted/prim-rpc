@@ -35,6 +35,7 @@
 		"superjson": "^1.12.0",
 		"supertest": "^6.3.3",
 		"superwstest": "^2.0.3",
+		"type-fest": "^3.4.0",
 		"ws": "^8.11.0"
 	},
 	"type": "module",
@@ -44,6 +45,7 @@
 		"./fastify": "./dist/server/fastify.js",
 		"./express": "./dist/server/express.js",
 		"./ws": "./dist/server/ws.js",
+		"./web-worker": "./dist/ipc/web-worker.js",
 		"./package.json": "./package.json"
 	},
 	"typesVersions": {
@@ -62,10 +64,17 @@
 			],
 			"ws": [
 				"dist/server/ws.d.ts"
+			],
+			"web-worker": [
+				"dist/ipc/web-worker.d.ts"
 			]
 		}
 	},
 	"files": [
 		"dist"
-	]
+	],
+	"dependencies": {
+		"mitt": "^3.0.0",
+		"nanoid": "^4.0.0"
+	}
 }

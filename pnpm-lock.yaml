@@ -236,14 +236,20 @@ importers:
       axios: ^1.2.1
       express: ^4.18.2
       fastify: ^4.10.2
+      mitt: ^3.0.0
       multer: 1.4.5-lts.1
+      nanoid: ^4.0.0
       query-string: ^8.0.3
       socket.io: ^4.5.4
       socket.io-client: ^4.5.4
       superjson: ^1.12.0
       supertest: ^6.3.3
       superwstest: ^2.0.3
+      type-fest: ^3.4.0
       ws: ^8.11.0
+    dependencies:
+      mitt: 3.0.0
+      nanoid: 4.0.0
     devDependencies:
       '@doseofted/prim-example': link:../example
       '@doseofted/prim-rpc': link:../rpc
@@ -263,6 +269,7 @@ importers:
       superjson: 1.12.0
       supertest: 6.3.3
       superwstest: 2.0.3_supertest@6.3.3
+      type-fest: 3.4.0
       ws: 8.11.0
 
   libs/rpc:
@@ -287,12 +294,12 @@ importers:
       proxy-deep: 3.1.1
       query-string: 8.0.3
       serialize-error: 11.0.0
+      type-fest: 3.4.0
     devDependencies:
       '@doseofted/prim-example': link:../example
       '@types/lodash-es': 4.17.6
       '@types/node': 18.11.17
       superjson: 1.12.0
-      type-fest: 3.4.0
 
   libs/ui:
     specifiers:
@@ -9799,7 +9806,6 @@ packages:
   /type-fest/3.4.0:
     resolution: {integrity: sha512-PEPg6RHlB9cFwoTMNENNrQFL0cXX04voWr2UPwQBJ3pVs7Mt8Y1oLWdUeMdGEwZE8HFFlujq8gS9enmyiQ8pLg==}
     engines: {node: '>=14.16'}
-    dev: true
 
   /type-is/1.6.18:
     resolution: {integrity: sha512-TkRKr9sUTxEH8MdfuCSP7VizJyzRNMjj2J2do2Jr3Kym598JVdEksuzPQCnlFPW4ky9Q+iA+ma9BGm06XQBy8g==}

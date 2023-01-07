@@ -75,13 +75,13 @@ export interface JsonHandler {
 // type JsonHandlerOptional  = Partial<JsonHandler>
 /** The record key is a string prefixed with `_bin_` and the value is the Blob */
 export type BlobRecords = Record<string, Blob | Buffer>
-export type PrimClientFunction<J = JsonHandler> = (
+export type PrimClientMethodPlugin<J = JsonHandler> = (
 	endpoint: string,
 	jsonBody: RpcCall | RpcCall[],
 	jsonHandler: J,
 	blobs?: BlobRecords
 ) => Promise<RpcAnswer | RpcAnswer[]>
-export type PrimSocketFunction<J = JsonHandler> = (
+export type PrimClientCallbackPlugin<J = JsonHandler> = (
 	endpoint: string,
 	events: PrimWebSocketFunctionEvents,
 	jsonHandler: J
@@ -156,7 +156,7 @@ export interface PrimOptions<M extends object = object, J extends JsonHandler = 
 	 * @param jsonHandler Provided handler for JSON, with `.stringify()` and `.parse()` methods
 	 * @param blobs If given RPC has binary data it will be referenced here by its string identifier in the RPC
 	 */
-	methodPlugin?: PrimClientFunction<J>
+	methodPlugin?: PrimClientMethodPlugin<J>
 	/**
 	 * You may override the WS framework used for handling callbacks on RPC requests (the default is the WebSocket API).
 	 * A custom client should:
@@ -173,7 +173,7 @@ export interface PrimOptions<M extends object = object, J extends JsonHandler = 
 	 * @param events: An object containing several callbacks that should be called when event happens on websocket
 	 * @param jsonHandler Provided handler for JSON, with `.stringify()` and `.parse()` methods
 	 */
-	callbackPlugin?: PrimSocketFunction<J>
+	callbackPlugin?: PrimClientCallbackPlugin<J>
 	/**
 	 * By default, methods in a module used with Prim+RPC cannot be called via RPC. Instead, methods must be explicitly be
 	 * allowed by either specifying a flag on the function or adding that function to an "allow-list" (this option).

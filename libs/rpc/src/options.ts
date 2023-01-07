@@ -5,8 +5,12 @@ import { PrimOptions, PrimServerOptions, RpcCall } from "./interfaces"
 // of options given on the client
 // TODO: add presets option for dev and production to configure which fallback settings to use when not provided
 
-const createBaseClientOptions = (): PrimOptions => ({
+// NOTE: The Prim client could be instantiated from the Prim server (since Prim server will use Prim client if module is not provided directly)
+// This may not be clear to someone utilizing Prim RPC for IPC (where error may appear to come from client but is actually from server)
+// The `server` parameter below is used to give more specific error messages to developer utilizing Prim RPC
+const createBaseClientOptions = (server = false): PrimOptions => ({
 	// SECTION: client
+	// TODO: consider moving `endpoint` and `wsEndpoint` to plugins since this is generally HTTP-specific (server uses this as well though)
 	// if endpoint is not given then assume endpoint is relative to current url, following suggested `/prim` for Prim-RPC calls
 	endpoint: "/prim",
 	// if not provided, Prim will try to use endpoint as websocket (useful when http/ws are on same path)
@@ -19,7 +23,7 @@ const createBaseClientOptions = (): PrimOptions => ({
 	// `client()` is intended to be overridden so as not to force any one HTTP framework but default is fine for most cases
 	// eslint-disable-next-line @typescript-eslint/require-await
 	methodPlugin: async (_endpoint, jsonBody) => {
-		const error = "Prim-RPC's method plugin was not provided"
+		const error = `Prim-RPC's method plugin was not provided (${server ? "server" : "client"})`
 		if (Array.isArray(jsonBody)) {
 			return jsonBody.map(({ id }) => ({ id, error }))
 		}
@@ -27,7 +31,7 @@ const createBaseClientOptions = (): PrimOptions => ({
 	},
 	// same with socket, usually the default WebSocket client is fine but the choice to change should be given
 	callbackPlugin: (_endpoint, { response }) => {
-		const error = "Prim-RPC's callback plugin was not provided"
+		const error = `Prim-RPC's callback plugin was not provided (${server ? "server" : "client"})`
 		const send = (msg: RpcCall) => {
 			response({ id: msg.id, error })
 		}
@@ -52,7 +56,7 @@ const createBaseClientOptions = (): PrimOptions => ({
 })
 
 const createBaseServerOptions = (): PrimServerOptions => ({
-	...createBaseClientOptions(),
+	...createBaseClientOptions(true),
 	// the default prefix will likely be overridden
 	prefix: "/prim",
 	callbackHandler() {
