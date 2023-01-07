@@ -6,6 +6,7 @@ import {
 	RpcAnswer,
 	RpcCall,
 	JsonHandler,
+	BlobRecords,
 } from "@doseofted/prim-rpc"
 import { nanoid } from "nanoid"
 import mitt from "mitt"
@@ -79,22 +80,17 @@ export const createCallbackHandler = (options: CallbackHandlerWebWorkerOptions) 
 
 // SECTION Method handler / plugin
 
-// FIXME: I may be able to remove the method handler/plugins altogether for Worker-related plugins. As long as Prim client can
-// fallback to the the callback plugin/handlers if method-plugin is not given, then this may not be needed. Especially since
-// the callback plugin has more functionality than the method plugin (method plugin is simpler for HTTP requests since
-// I can only pass a request and a response).
-
 export const createMethodPlugin = (options: CallbackPluginWebWorkerOptions) => {
 	const { worker = self } = options
 	const transport = setupMessageTransport(worker)
-	const methodPlugin: PrimClientMethodPlugin = (_endpoint, message, jsonHandler) =>
+	const methodPlugin: PrimClientMethodPlugin = (_endpoint, message, jsonHandler, blobs) =>
 		new Promise(resolve => {
 			const id = nanoid()
 			transport.on(`method:connected:${id}`, () => {
 				transport.on(`response:${id}`, result => {
 					resolve(jsonHandler.parse(result as string))
 				})
-				transport.send(`request:${id}`, jsonHandler.stringify(message))
+				transport.send(`request:${id}`, { rpc: jsonHandler.stringify(message), blobs })
 			})
 			transport.send("method:connect", id)
 		})
@@ -109,8 +105,8 @@ export const createMethodHandler = (options: CallbackHandlerWebWorkerOptions) =>
 		transport.on("method:connect", id => {
 			// TODO: handle blobs if JSON handler is used
 			// eslint-disable-next-line @typescript-eslint/no-misused-promises
-			transport.on(`request:${id}`, async req => {
-				const result = await prim.server().prepareRpc(jsonHandler.parse(req as string))
+			transport.on(`request:${id}`, async ({ rpc, blobs }) => {
+				const result = await prim.server().prepareRpc(jsonHandler.parse(rpc as string), blobs)
 				transport.send(`response:${id}`, jsonHandler.stringify(result))
 			})
 			transport.send(`method:connected:${id}`, null)
@@ -133,7 +129,9 @@ type CallbackEvents = {
 type MethodEvents = {
 	"method:connect": string
 	[connected: `method:connected:${string}`]: void
-	[request: `request:${string}`]: RpcCall | RpcCall[] | string
+	[request: `request:${string}`]: { rpc: RpcCall | RpcCall[] | string; blobs?: BlobRecords }
+	// NOTE: once binary results can be sent back using blob handlers, blobs should be added to interface below
+	// (also note that blob handler isn't needed with structured cloning)
 	[response: `response:${string}`]: RpcAnswer | RpcAnswer[] | string
 }
 
