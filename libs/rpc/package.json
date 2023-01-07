@@ -23,14 +23,14 @@
 		"nanoid": "^4.0.0",
 		"proxy-deep": "^3.1.1",
 		"query-string": "^8.0.3",
-		"serialize-error": "^11.0.0"
+		"serialize-error": "^11.0.0",
+		"type-fest": "^3.4.0"
 	},
 	"devDependencies": {
 		"@doseofted/prim-example": "workspace:*",
 		"@types/lodash-es": "^4.17.6",
 		"@types/node": "^18.11.17",
-		"superjson": "^1.12.0",
-		"type-fest": "^3.4.0"
+		"superjson": "^1.12.0"
 	},
 	"type": "module",
 	"exports": {

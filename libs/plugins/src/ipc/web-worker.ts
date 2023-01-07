@@ -11,18 +11,6 @@ import { nanoid } from "nanoid"
 import mitt from "mitt"
 // SECTION Shared options
 
-// FIXME: determine if structured cloning is specific to "message" event only
-// if it is, then RPC should be sent as message event and all other messages over custom events
-
-/**
- * NOTE: Web Workers, by default, post messages using a
- * [structured cloning algorithm](https://developer.mozilla.org/en-US/docs/Web/API/Web_Workers_API/Structured_clone_algorithm)
- * which is typically more powerful than typical JSON serialization. This situation needs to be considered because currently
- * the Prim client sets JSON handler options (not plugins). While this plugin can support using a JSON handler, it's not
- * nearly as powerful so this may need to be noted in the plugin's documentation that the JSON handler should just pass
- * information transparently through instead of serializing/deserializing it.
- */
-
 /**
  * A passthrough JSON handler that doesn't serialize data.
  * Useful when structured cloning is used with Web Workers.
@@ -68,9 +56,7 @@ export const createCallbackPlugin = (options: CallbackPluginWebWorkerOptions) =>
 }
 
 // eslint-disable-next-line @typescript-eslint/no-empty-interface
-interface CallbackHandlerWebWorkerOptions extends CallbackSharedWebWorkerOptions {
-	// ...
-}
+interface CallbackHandlerWebWorkerOptions extends CallbackSharedWebWorkerOptions {}
 // TODO: consider what to do when JSON handler is used (and either string or binary contents are given instead of actual RPC)
 export const createCallbackHandler = (options: CallbackHandlerWebWorkerOptions) => {
 	const { worker = self } = options
@@ -98,35 +84,43 @@ export const createCallbackHandler = (options: CallbackHandlerWebWorkerOptions) 
 // the callback plugin has more functionality than the method plugin (method plugin is simpler for HTTP requests since
 // I can only pass a request and a response).
 
-export const createMethodPlugin = (options: CallbackPluginWebWorkerOptions): PrimClientMethodPlugin => {
+export const createMethodPlugin = (options: CallbackPluginWebWorkerOptions) => {
 	const { worker = self } = options
-	return (_endpoint, message) =>
-		new Promise((resolve, reject) => {
-			const listener = (event: MessageEvent<RpcAnswer>) => {
-				worker.removeEventListener("message", listener)
-				resolve(event.data)
-			}
-			worker.addEventListener("message", listener)
-			worker.addEventListener("error", err => {
-				reject(err)
+	const transport = setupMessageTransport(worker)
+	const methodPlugin: PrimClientMethodPlugin = (_endpoint, message, jsonHandler) =>
+		new Promise(resolve => {
+			const id = nanoid()
+			transport.on(`connected:${id}`, () => {
+				transport.on(`response:${id}`, result => {
+					resolve(jsonHandler.parse(result as string))
+				})
+				transport.send(`request:${id}`, jsonHandler.stringify(message))
 			})
-			worker.postMessage(message)
+			transport.send("connect", id)
 		})
+	return { methodPlugin, jsonHandler: jsonHandlerPassthrough }
 }
 
-export const createMethodHandler = (options: CallbackHandlerWebWorkerOptions): PrimServerMethodHandler => {
+export const createMethodHandler = (options: CallbackHandlerWebWorkerOptions) => {
 	const { worker } = options
-	return prim => {
-		// eslint-disable-next-line @typescript-eslint/no-misused-promises
-		worker.addEventListener("message", async (event: MessageEvent<RpcCall>) => {
-			const result = await prim.server().prepareRpc(event.data)
-			worker.postMessage(result)
+	const transport = setupMessageTransport(worker)
+	const methodHandler: PrimServerMethodHandler = prim => {
+		const jsonHandler = prim.options.jsonHandler
+		transport.on("connect", id => {
+			// TODO: handle blobs if JSON handler is used
+			// eslint-disable-next-line @typescript-eslint/no-misused-promises
+			transport.on(`request:${id}`, async req => {
+				const result = await prim.server().prepareRpc(jsonHandler.parse(req as string))
+				transport.send(`response:${id}`, jsonHandler.stringify(result))
+			})
+			transport.send(`connected:${id}`, null)
 		})
 	}
+	return { methodHandler, jsonHandler: jsonHandlerPassthrough }
 }
 // !SECTION
 
-// SECTION: Message event wrapper
+// SECTION Message event wrapper
 
 type ConnectionEvents = {
 	connect: string
