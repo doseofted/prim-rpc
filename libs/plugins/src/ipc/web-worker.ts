@@ -36,7 +36,7 @@ export const createCallbackPlugin = (options: CallbackPluginWebWorkerOptions) =>
 	const transport = setupMessageTransport(worker)
 	const callbackPlugin: PrimClientCallbackPlugin = (_endpoint, { connected, response }, jsonHandler) => {
 		const id = nanoid()
-		transport.on(`connected:${id}`, () => {
+		transport.on(`callback:connected:${id}`, () => {
 			transport.on(`server:message:${id}`, result => {
 				// NOTE: result is expected to be string (over network but is likely not over web workers)
 				response(jsonHandler.parse(result as unknown as string))
@@ -44,7 +44,7 @@ export const createCallbackPlugin = (options: CallbackPluginWebWorkerOptions) =>
 			connected()
 		})
 		setTimeout(() => {
-			transport.send("connect", id)
+			transport.send("callback:connect", id)
 		}, 0)
 		return {
 			send(message, _blobs) {
@@ -63,14 +63,14 @@ export const createCallbackHandler = (options: CallbackHandlerWebWorkerOptions) 
 	const transport = setupMessageTransport(worker)
 	const callbackHandler: PrimServerCallbackHandler = prim => {
 		const jsonHandler = prim.options.jsonHandler
-		transport.on("connect", id => {
+		transport.on("callback:connect", id => {
 			const { rpc: makeRpc } = prim.connected()
 			transport.on(`client:message:${id}`, rpc => {
 				makeRpc(jsonHandler.parse(rpc as string), detail => {
 					transport.send(`server:message:${id}`, jsonHandler.stringify(detail))
 				})
 			})
-			transport.send(`connected:${id}`, null)
+			transport.send(`callback:connected:${id}`, null)
 		})
 	}
 	return { callbackHandler, jsonHandler: jsonHandlerPassthrough }
@@ -90,13 +90,13 @@ export const createMethodPlugin = (options: CallbackPluginWebWorkerOptions) => {
 	const methodPlugin: PrimClientMethodPlugin = (_endpoint, message, jsonHandler) =>
 		new Promise(resolve => {
 			const id = nanoid()
-			transport.on(`connected:${id}`, () => {
+			transport.on(`method:connected:${id}`, () => {
 				transport.on(`response:${id}`, result => {
 					resolve(jsonHandler.parse(result as string))
 				})
 				transport.send(`request:${id}`, jsonHandler.stringify(message))
 			})
-			transport.send("connect", id)
+			transport.send("method:connect", id)
 		})
 	return { methodPlugin, jsonHandler: jsonHandlerPassthrough }
 }
@@ -106,14 +106,14 @@ export const createMethodHandler = (options: CallbackHandlerWebWorkerOptions) =>
 	const transport = setupMessageTransport(worker)
 	const methodHandler: PrimServerMethodHandler = prim => {
 		const jsonHandler = prim.options.jsonHandler
-		transport.on("connect", id => {
+		transport.on("method:connect", id => {
 			// TODO: handle blobs if JSON handler is used
 			// eslint-disable-next-line @typescript-eslint/no-misused-promises
 			transport.on(`request:${id}`, async req => {
 				const result = await prim.server().prepareRpc(jsonHandler.parse(req as string))
 				transport.send(`response:${id}`, jsonHandler.stringify(result))
 			})
-			transport.send(`connected:${id}`, null)
+			transport.send(`method:connected:${id}`, null)
 		})
 	}
 	return { methodHandler, jsonHandler: jsonHandlerPassthrough }
@@ -122,23 +122,22 @@ export const createMethodHandler = (options: CallbackHandlerWebWorkerOptions) =>
 
 // SECTION Message event wrapper
 
-type ConnectionEvents = {
-	connect: string
-	[connected: `connected:${string}`]: void
-}
-
 type CallbackEvents = {
+	"callback:connect": string
+	[connected: `callback:connected:${string}`]: void
 	[clientMessage: `client:message:${string}`]: RpcCall | RpcCall[] | string
 	[serverMessage: `server:message:${string}`]: RpcAnswer | RpcAnswer[] | string
 	[ended: `ended:${string}`]: void
 }
 
 type MethodEvents = {
+	"method:connect": string
+	[connected: `method:connected:${string}`]: void
 	[request: `request:${string}`]: RpcCall | RpcCall[] | string
 	[response: `response:${string}`]: RpcAnswer | RpcAnswer[] | string
 }
 
-type PrimEventDetail = ConnectionEvents & CallbackEvents & MethodEvents
+type PrimEventDetail = CallbackEvents & MethodEvents
 type PrimEventName = keyof PrimEventDetail
 type PrimEventStructure<T extends PrimEventName> = { event: T; data: PrimEventDetail[T] }
 
