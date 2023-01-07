@@ -52,14 +52,11 @@ export const createCallbackPlugin = (options: CallbackPluginWebWorkerOptions): P
 	return (_endpoint, { connected, response }, jsonHandler) => {
 		const id = nanoid()
 		transport.on(`connected:${id}`, () => {
-			transport.on(`callback:connected:${id}`, () => {
-				transport.on(`server:message:${id}`, result => {
-					// NOTE: result is expected to be string (over network but is likely not over web workers)
-					response(jsonHandler.parse(result as unknown as string))
-				})
-				connected()
+			transport.on(`server:message:${id}`, result => {
+				// NOTE: result is expected to be string (over network but is likely not over web workers)
+				response(jsonHandler.parse(result as unknown as string))
 			})
-			transport.send(`callback:connect:${id}`, null)
+			connected()
 		})
 		setTimeout(() => {
 			transport.send("connect", id)
@@ -81,24 +78,18 @@ export const createCallbackHandler = (options: CallbackHandlerWebWorkerOptions):
 	const { worker = self } = options
 	const transport = setupMessageTransport(worker)
 	return prim => {
-		// NOTE: duplicate connect/callback:connect events may be extraneous for web workers
-		// (this doesn't necessarily need to mirror network calls)
 		transport.on("connect", id => {
-			transport.on(`callback:connect:${id}`, () => {
-				const { call, rpc: makeRpc } = prim.connected()
-				transport.on(`client:message:${id}`, rpc => {
-					if (typeof rpc === "string") {
-						call(rpc, detail => {
-							transport.send(`server:message:${id}`, detail)
-						})
-					} else {
-						makeRpc(rpc, detail => {
-							transport.send(`server:message:${id}`, detail)
-						})
-					}
-				})
-				// customAddEventListener(worker, `ended:${id}`, () => {})
-				transport.send(`callback:connected:${id}`, null)
+			const { call, rpc: makeRpc } = prim.connected()
+			transport.on(`client:message:${id}`, rpc => {
+				if (typeof rpc === "string") {
+					call(rpc, detail => {
+						transport.send(`server:message:${id}`, detail)
+					})
+				} else {
+					makeRpc(rpc, detail => {
+						transport.send(`server:message:${id}`, detail)
+					})
+				}
 			})
 			transport.send(`connected:${id}`, null)
 		})
@@ -149,8 +140,6 @@ type ConnectionEvents = {
 }
 
 type CallbackEvents = {
-	[connect: `callback:connect:${string}`]: void
-	[connected: `callback:connected:${string}`]: void
 	[clientMessage: `client:message:${string}`]: RpcCall | RpcCall[] | string
 	[serverMessage: `server:message:${string}`]: RpcAnswer | RpcAnswer[] | string
 	[ended: `ended:${string}`]: void
