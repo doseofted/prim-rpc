@@ -5,6 +5,7 @@ import {
 	PrimClientCallbackPlugin,
 	RpcAnswer,
 	RpcCall,
+	JsonHandler,
 } from "@doseofted/prim-rpc"
 import { nanoid } from "nanoid"
 import mitt from "mitt"
@@ -21,13 +22,15 @@ import mitt from "mitt"
  * nearly as powerful so this may need to be noted in the plugin's documentation that the JSON handler should just pass
  * information transparently through instead of serializing/deserializing it.
  */
-// FIXME: this plugin only works (for now) by bypassing the JSON handler on the Prim client/server using the following:
-// eslint-disable-next-line @typescript-eslint/no-unused-vars
-const jsonHandler = {
+
+/**
+ * A passthrough JSON handler that doesn't serialize data.
+ * Useful when structured cloning is used with Web Workers.
+ */
+const jsonHandlerPassthrough: JsonHandler = {
 	// eslint-disable-next-line @typescript-eslint/no-unsafe-return, @typescript-eslint/no-explicit-any
-	parse: (given: string) => given as any,
-	// eslint-disable-next-line @typescript-eslint/no-explicit-any
-	stringify: (given: any) => given as string,
+	parse: given => given as any,
+	stringify: given => given as string,
 }
 
 interface CallbackSharedWebWorkerOptions {
@@ -39,17 +42,11 @@ interface CallbackSharedWebWorkerOptions {
 // SECTION Callback handler / plugin
 
 // eslint-disable-next-line @typescript-eslint/no-empty-interface
-interface CallbackPluginWebWorkerOptions extends CallbackSharedWebWorkerOptions {
-	// ...
-}
-
-// TODO: consider making two versions: worker-server (main is client) and worker-client (main is server)
-// and try to make them share as much code as possible (this means 2 plugins and 2 handlers for web workers)
-
-export const createCallbackPlugin = (options: CallbackPluginWebWorkerOptions): PrimClientCallbackPlugin => {
+interface CallbackPluginWebWorkerOptions extends CallbackSharedWebWorkerOptions {}
+export const createCallbackPlugin = (options: CallbackPluginWebWorkerOptions) => {
 	const { worker = self } = options
 	const transport = setupMessageTransport(worker)
-	return (_endpoint, { connected, response }, jsonHandler) => {
+	const callbackPlugin: PrimClientCallbackPlugin = (_endpoint, { connected, response }, jsonHandler) => {
 		const id = nanoid()
 		transport.on(`connected:${id}`, () => {
 			transport.on(`server:message:${id}`, result => {
@@ -67,6 +64,7 @@ export const createCallbackPlugin = (options: CallbackPluginWebWorkerOptions): P
 			},
 		}
 	}
+	return { callbackPlugin, jsonHandler: jsonHandlerPassthrough }
 }
 
 // eslint-disable-next-line @typescript-eslint/no-empty-interface
@@ -74,26 +72,22 @@ interface CallbackHandlerWebWorkerOptions extends CallbackSharedWebWorkerOptions
 	// ...
 }
 // TODO: consider what to do when JSON handler is used (and either string or binary contents are given instead of actual RPC)
-export const createCallbackHandler = (options: CallbackHandlerWebWorkerOptions): PrimServerCallbackHandler => {
+export const createCallbackHandler = (options: CallbackHandlerWebWorkerOptions) => {
 	const { worker = self } = options
 	const transport = setupMessageTransport(worker)
-	return prim => {
+	const callbackHandler: PrimServerCallbackHandler = prim => {
+		const jsonHandler = prim.options.jsonHandler
 		transport.on("connect", id => {
-			const { call, rpc: makeRpc } = prim.connected()
+			const { rpc: makeRpc } = prim.connected()
 			transport.on(`client:message:${id}`, rpc => {
-				if (typeof rpc === "string") {
-					call(rpc, detail => {
-						transport.send(`server:message:${id}`, detail)
-					})
-				} else {
-					makeRpc(rpc, detail => {
-						transport.send(`server:message:${id}`, detail)
-					})
-				}
+				makeRpc(jsonHandler.parse(rpc as string), detail => {
+					transport.send(`server:message:${id}`, jsonHandler.stringify(detail))
+				})
 			})
 			transport.send(`connected:${id}`, null)
 		})
 	}
+	return { callbackHandler, jsonHandler: jsonHandlerPassthrough }
 }
 // !SECTION
 
