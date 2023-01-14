@@ -18,7 +18,8 @@
 	},
 	"dependencies": {
 		"lodash-es": "^4.17.21",
-		"unplugin": "^1.0.1"
+		"unplugin": "^1.0.1",
+		"zx": "^7.1.1"
 	},
 	"devDependencies": {
 		"@doseofted/prim-example": "workspace:*",
@@ -31,6 +32,7 @@
 		"typedoc": "^0.23.23",
 		"typescript": "^4.9.4"
 	},
+	"bin": "./dist/cli/index.js",
 	"type": "module",
 	"exports": {
 		"./build": "./dist/build/index.js",
