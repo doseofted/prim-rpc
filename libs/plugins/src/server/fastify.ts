@@ -1,6 +1,5 @@
 import type { PrimServerMethodHandler, PrimServerEvents } from "@doseofted/prim-rpc"
-import type { FastifyPluginAsync, FastifyInstance, FastifyError } from "fastify"
-import type { IncomingHttpHeaders } from "node:http"
+import type { FastifyPluginAsync, FastifyInstance, FastifyError, FastifyRequest, FastifyReply } from "fastify"
 import type FastifyMultipartPlugin from "@fastify/multipart"
 import { pipeline } from "node:stream/promises"
 import { createWriteStream } from "node:fs"
@@ -8,11 +7,13 @@ import { mkdtemp } from "node:fs/promises"
 import { tmpdir } from "node:os"
 import { join as joinPath } from "node:path"
 
-export type PrimFastifyContext = IncomingHttpHeaders
+/** The default Prim context when used with Fastify. Overridden with `contextTransform` option. */
+export type PrimFastifyContext = { context: "fastify"; request: FastifyRequest; reply: FastifyReply }
 
 interface SharedFastifyOptions {
 	multipartPlugin?: typeof FastifyMultipartPlugin
 	fileSizeLimitBytes?: number
+	contextTransform?: (req: FastifyRequest, res: FastifyReply) => unknown
 }
 
 interface PrimFastifyPluginOptions extends SharedFastifyOptions {
@@ -41,7 +42,12 @@ interface PrimFastifyPluginOptions extends SharedFastifyOptions {
  */
 // eslint-disable-next-line @typescript-eslint/require-await
 export const fastifyPrimRpc: FastifyPluginAsync<PrimFastifyPluginOptions> = async (fastify, options) => {
-	const { prim, multipartPlugin, fileSizeLimitBytes: fileSize } = options
+	const {
+		prim,
+		multipartPlugin,
+		fileSizeLimitBytes: fileSize,
+		contextTransform = (request, reply) => ({ context: "fastify", request, reply }),
+	} = options
 	if (multipartPlugin) {
 		await fastify.register(multipartPlugin)
 	}
@@ -86,7 +92,7 @@ export const fastifyPrimRpc: FastifyPluginAsync<PrimFastifyPluginOptions> = asyn
 				raw: { url },
 			} = request
 			const body = bodyForm ?? bodyReq
-			const context = { ...request.headers }
+			const context = contextTransform(request, reply)
 			const response = await prim.server().call({ method, url, body }, blobs, context)
 			void reply.status(response.status).headers(response.headers).send(response.body)
 		},
@@ -100,7 +106,7 @@ export const fastifyPrimRpc: FastifyPluginAsync<PrimFastifyPluginOptions> = asyn
 				method,
 				raw: { url },
 			} = request
-			const context = { ...request.headers }
+			const context = contextTransform(request, reply)
 			const response = await prim.server().call({ method, url, body }, null, context)
 			void reply.status(response.status).headers(response.headers).send(response.body)
 		},

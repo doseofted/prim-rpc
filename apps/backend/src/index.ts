@@ -17,14 +17,20 @@ await fastify.register(Cors, { origin: contained ? `https://${process.env.WEBSIT
 // Setup WS-Server (WebSocket server)
 const wss = new WebSocketServer({ server: fastify.server })
 
+const methodHandler = createMethodHandler({
+	fastify,
+	multipartPlugin,
+	contextTransform: req => req.headers,
+})
+const callbackHandler = createCallbackHandler({ wss })
 // Setup Prim Server, configured with chosen HTTP/WS server
 createPrimServer({
 	prefix: "/prim",
 	jsonHandler,
 	module,
-	methodHandler: createMethodHandler({ fastify, multipartPlugin }),
+	methodHandler,
 	// eslint-disable-next-line @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-unsafe-call
-	callbackHandler: createCallbackHandler({ wss }),
+	callbackHandler,
 })
 
 // Start listening for requests to server

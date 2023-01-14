@@ -2,7 +2,7 @@ import { describe, test, beforeEach, afterEach } from "vitest"
 import request from "superwstest"
 import * as module from "@doseofted/prim-example"
 import { createPrimServer } from "@doseofted/prim-rpc"
-import { primCallbackWs } from "./ws"
+import { createCallbackHandler } from "./ws"
 import { WebSocketServer } from "ws"
 import http from "node:http"
 
@@ -12,7 +12,7 @@ describe("ws is functional as Prim Plugin", async () => {
 	createPrimServer({
 		prefix: "/prim",
 		module,
-		callbackHandler: primCallbackWs({ wss }),
+		callbackHandler: createCallbackHandler({ wss }),
 	})
 	beforeEach(async () => {
 		await new Promise(resolve => {

@@ -1,8 +1,13 @@
 import type { PrimServerCallbackHandler } from "@doseofted/prim-rpc"
+import type { IncomingMessage } from "node:http"
 import type { WebSocketServer } from "ws"
+
+/** The default Prim context when used with WS. Overridden with `contextTransform` option. */
+export type PrimWsContext = { context: "ws"; req: IncomingMessage }
 
 interface MethodWsOptions {
 	wss: WebSocketServer
+	contextTransform?: (req: IncomingMessage) => unknown
 }
 /**
  * A Prim plugin used to register itself with the "ws" module. The callback handler plugin is often used in conjunction
@@ -40,9 +45,10 @@ interface MethodWsOptions {
  * ```
  */
 export const createCallbackHandler = (options: MethodWsOptions): PrimServerCallbackHandler => {
-	const { wss: webSocketServer } = options
+	const { wss: webSocketServer, contextTransform = req => ({ context: "ws", req }) } = options
 	return prim => {
-		webSocketServer.on("connection", ws => {
+		webSocketServer.on("connection", (ws, req) => {
+			const context = contextTransform(req)
 			const { ended, call } = prim.connected()
 			ws.on("close", () => {
 				ended()
@@ -51,9 +57,13 @@ export const createCallbackHandler = (options: MethodWsOptions): PrimServerCallb
 				ended()
 			})
 			ws.on("message", m => {
-				call(String(m), data => {
-					ws.send(data)
-				})
+				call(
+					String(m),
+					data => {
+						ws.send(data)
+					},
+					context
+				)
 			})
 		})
 	}

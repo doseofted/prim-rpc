@@ -5,9 +5,13 @@ import { tmpdir } from "node:os"
 // import { mkdtemp } from "node:fs/promises"
 // import { join as joinPath } from "node:path"
 
+/** The default Prim context when used with Express. Overridden with `contextTransform` option. */
+export type PrimExpressContext = { context: "express"; req: Express.Request; res: Express.Response }
+
 interface SharedExpressOptions {
 	multipartPlugin?: typeof Multer
 	fileSizeLimitBytes?: number
+	contextTransform?: (req: Express.Request, res: Express.Response) => unknown
 }
 
 interface PrimExpressPluginOptions extends SharedExpressOptions {
@@ -36,7 +40,12 @@ interface PrimExpressPluginOptions extends SharedExpressOptions {
  */
 // eslint-disable-next-line @typescript-eslint/require-await
 export const expressPrimRpc = (options: PrimExpressPluginOptions) => {
-	const { prim, multipartPlugin, fileSizeLimitBytes } = options
+	const {
+		prim,
+		multipartPlugin,
+		fileSizeLimitBytes,
+		contextTransform = (req, res) => ({ context: "express", req, res }),
+	} = options
 	const handler = (req: Express.Request, res: Express.Response, next: Express.NextFunction) => {
 		const processRpc = async () => {
 			if (!req.path.startsWith(prim.options.prefix)) {
@@ -71,7 +80,8 @@ export const expressPrimRpc = (options: PrimExpressPluginOptions) => {
 				})
 			}
 			const body = bodyForm ?? bodyChunked
-			const response = await prim.server().call({ method, url, body }, blobs)
+			const context = contextTransform(req, res)
+			const response = await prim.server().call({ method, url, body }, blobs, context)
 			res.status(response.status)
 			for (const [headerName, headerValue] of Object.entries(response.headers)) {
 				res.header(headerName, headerValue)
