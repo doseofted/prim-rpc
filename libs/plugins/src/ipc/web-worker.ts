@@ -48,6 +48,9 @@ export const createCallbackPlugin = (options: CallbackPluginWebWorkerOptions) =>
 			transport.send("callback:connect", id)
 		}, 0)
 		return {
+			close() {
+				transport.destroy()
+			},
 			send(message, _blobs) {
 				transport.send(`client:message:${id}`, jsonHandler.stringify(message))
 			},

@@ -61,7 +61,8 @@ export const createCallbackPlugin = () => {
 				ws.send(blob)
 			}
 		}
-		return { send }
+		const close = () => ws.close()
+		return { send, close }
 	}
 	return callbackPlugin
 }

@@ -88,7 +88,12 @@ function createServerActions(
 		cbResults?: (a: RpcAnswer) => void
 	): Promise<RpcAnswer | RpcAnswer[]> => {
 		// NOTE: new Prim client should be created on each request so callback results are not shared
-		const { client, socketEvent: event, configured } = instance ?? createPrimInstance(serverOptions)
+		const {
+			// eslint-disable-next-line @typescript-eslint/no-unused-vars
+			client: { client, destroy: _destroy },
+			socketEvent: event,
+			configured,
+		} = instance ?? createPrimInstance(serverOptions)
 		const callList = Array.isArray(calls) ? calls : [calls]
 		const answeringCalls = callList.map(async (given): Promise<RpcAnswer> => {
 			// eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
@@ -269,40 +274,3 @@ export function createPrimServer<
 		handlersRegistered,
 	}
 }
-
-// IDEA: Prim should accept HTTP handler to automatically register server framework plugins
-// as an option of Prim, but also, server framework plugins should be provided directly
-// so that if someone wishes to register themselves (like with connect middleware) then they can.
-// Since the HTTP handler is just registering plugins, it makes sense to also provide that
-// server framework's plugin directly.
-// This however can't be done with WebSockets since they're not usually pluggable like
-// server frameworks are in Node.js (like Connect middleware or Fastify plugins)
-
-// const server = createPrimServer({
-// 	methodHandler({ client }) {
-// 		// this is an example of express middleware
-// 		app.use("/prim", async (req, res) => {
-// 			const { call } = client()
-// 			const { body, headers, status } = await call({
-// 				body: req.body,
-// 				method: req.method,
-// 				url: req.url
-// 			})
-// 			res.set(headers)
-// 			res.status(status)
-// 			res.send(body)
-// 		})
-// 	},
-// 	callbackHandler({ connected }) {
-// 		wss.on("connected", () => {
-// 			const { ended, call } = connected()
-// 			ws.on("ended", () => ended())
-// 			ws.on("message", (m) => {
-// 				call(m, (data) => {
-// 					ws.send(data)
-// 				})
-// 			})
-// 		})
-// 	},
-// 	context: () => "",
-// })
