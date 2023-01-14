@@ -11,7 +11,7 @@ export default createUnplugin((options: BuildOptions = { name: "" }) => ({
 	name: "unplugin-prim-prevent-import",
 	transformInclude: id => {
 		const matches = id.startsWith(options.name)
-		if (options.debug) console.log((matches ? "matc:" : "no match:").padEnd(10), id)
+		if (options.debug) console.log((matches ? "match:" : "no match:").padEnd(10), id)
 		return matches
 	},
 	transform: () => "export {};",
