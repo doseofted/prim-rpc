@@ -9,7 +9,7 @@ services:
       - dist-plugins:/home/node/project/libs/plugins/dist
       - dist-rpc:/home/node/project/libs/rpc/dist
       - dist-ui:/home/node/project/libs/ui/dist
-      - dist-docs:/home/node/project/libs/docs/dist
+      - dist-tooling:/home/node/project/libs/tooling/dist
 
   backend:
     volumes: *dist-shared
@@ -22,4 +22,4 @@ volumes:
   dist-plugins:
   dist-rpc:
   dist-ui:
-  dist-docs:
+  dist-tooling:

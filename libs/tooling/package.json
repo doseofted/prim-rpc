@@ -1,7 +1,7 @@
 {
-	"name": "@doseofted/prim-rpc-docs",
+	"name": "@doseofted/prim-rpc-tooling",
 	"version": "0.0.1",
-	"description": "Documentation logic for Prim RPC",
+	"description": "Completely optional build tools for Prim RPC",
 	"license": "UNLICENSED",
 	"author": {
 		"name": "Ted Klingenberg",
@@ -17,7 +17,8 @@
 		"lint": "eslint ."
 	},
 	"dependencies": {
-		"lodash-es": "^4.17.21"
+		"lodash-es": "^4.17.21",
+		"unplugin": "^1.0.1"
 	},
 	"devDependencies": {
 		"@doseofted/prim-example": "workspace:*",
@@ -32,11 +33,20 @@
 	},
 	"type": "module",
 	"exports": {
-		".": "./dist/index.js",
+		"./build": "./dist/build/index.js",
+		"./docs": "./dist/docs/index.js",
 		"./package.json": "./package.json"
 	},
-	"module": "./dist/index.js",
-	"types": "./dist/index.d.ts",
+	"typesVersions": {
+		"*": {
+			"build": [
+				"dist/build/index.d.ts"
+			],
+			"docs": [
+				"dist/docs/index.d.ts"
+			]
+		}
+	},
 	"files": [
 		"dist"
 	]

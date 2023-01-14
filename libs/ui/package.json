@@ -36,7 +36,7 @@
 		"vue-tsc": "^1.0.14"
 	},
 	"dependencies": {
-		"@doseofted/prim-rpc-docs": "workspace:*",
+		"@doseofted/prim-rpc-tooling": "workspace:*",
 		"react": "^18.2.0",
 		"react-dom": "^18.2.0",
 		"vue": "^3.2.45"

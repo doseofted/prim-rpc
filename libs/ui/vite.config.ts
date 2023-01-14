@@ -17,7 +17,7 @@ export default defineConfig({
 			},
 		},
 		rollupOptions: {
-			external: ["@doseofted/prim-rpc-docs", "react", "vue"],
+			external: ["@doseofted/prim-rpc-tooling", "react", "vue"],
 		},
 		// emptyOutDir: false,
 	},

@@ -14,7 +14,7 @@
 		},
 		{
 			"name": "📙 Tooling",
-			"path": "./libs/docs"
+			"path": "./libs/tooling"
 		},
 		{
 			"name": "📘 Interface",

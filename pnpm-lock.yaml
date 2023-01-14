@@ -195,31 +195,6 @@ importers:
       webpack: 5.75.0
       zustand: 4.1.5_immer@9.0.16+react@18.2.0
 
-  libs/docs:
-    specifiers:
-      '@doseofted/prim-example': workspace:*
-      '@sinclair/typebox': ^0.25.13
-      '@types/json-schema': ^7.0.11
-      '@types/lodash': ^4.14.191
-      '@types/lodash-es': ^4.17.6
-      lodash: ^4.17.21
-      lodash-es: ^4.17.21
-      type-fest: ^3.4.0
-      typedoc: ^0.23.23
-      typescript: ^4.9.4
-    dependencies:
-      lodash-es: 4.17.21
-    devDependencies:
-      '@doseofted/prim-example': link:../example
-      '@sinclair/typebox': 0.25.13
-      '@types/json-schema': 7.0.11
-      '@types/lodash': 4.14.191
-      '@types/lodash-es': 4.17.6
-      lodash: 4.17.21
-      type-fest: 3.4.0
-      typedoc: 0.23.23_typescript@4.9.4
-      typescript: 4.9.4
-
   libs/example:
     specifiers: {}
 
@@ -301,10 +276,37 @@ importers:
       '@types/node': 18.11.17
       superjson: 1.12.0
 
+  libs/tooling:
+    specifiers:
+      '@doseofted/prim-example': workspace:*
+      '@sinclair/typebox': ^0.25.13
+      '@types/json-schema': ^7.0.11
+      '@types/lodash': ^4.14.191
+      '@types/lodash-es': ^4.17.6
+      lodash: ^4.17.21
+      lodash-es: ^4.17.21
+      type-fest: ^3.4.0
+      typedoc: ^0.23.23
+      typescript: ^4.9.4
+      unplugin: ^1.0.1
+    dependencies:
+      lodash-es: 4.17.21
+      unplugin: 1.0.1
+    devDependencies:
+      '@doseofted/prim-example': link:../example
+      '@sinclair/typebox': 0.25.13
+      '@types/json-schema': 7.0.11
+      '@types/lodash': 4.14.191
+      '@types/lodash-es': 4.17.6
+      lodash: 4.17.21
+      type-fest: 3.4.0
+      typedoc: 0.23.23_typescript@4.9.4
+      typescript: 4.9.4
+
   libs/ui:
     specifiers:
       '@doseofted/prim-example': workspace:*
-      '@doseofted/prim-rpc-docs': workspace:*
+      '@doseofted/prim-rpc-tooling': workspace:*
       '@testing-library/react': ^13.4.0
       '@types/react': ^18.0.26
       '@types/react-dom': ^18.0.9
@@ -323,7 +325,7 @@ importers:
       vue: ^3.2.45
       vue-tsc: ^1.0.14
     dependencies:
-      '@doseofted/prim-rpc-docs': link:../docs
+      '@doseofted/prim-rpc-tooling': link:../tooling
       react: 18.2.0
       react-dom: 18.2.0_react@18.2.0
       vue: 3.2.45
@@ -2049,11 +2051,7 @@ packages:
   /@types/lodash-es/4.17.6:
     resolution: {integrity: sha512-R+zTeVUKDdfoRxpAryaQNRKk3105Rrgx2CFRClIgRGaqDTdjsm8h6IYA8ir584W3ePzkZfst5xIgDwYrlh9HLg==}
     dependencies:
-      '@types/lodash': 4.14.188
-    dev: true
-
-  /@types/lodash/4.14.188:
-    resolution: {integrity: sha512-zmEmF5OIM3rb7SbLCFYoQhO4dGt2FRM9AMkxvA3LaADOF1n8in/zGJlWji9fmafLoNyz+FoL6FE0SLtGIArD7w==}
+      '@types/lodash': 4.14.191
     dev: true
 
   /@types/lodash/4.14.191:
@@ -2824,7 +2822,6 @@ packages:
     resolution: {integrity: sha512-7zFpHzhnqYKrkYdUjF1HI1bzd0VygEGX8lFk4k5zVMqHEoES+P+7TKI+EvLO9WVMJ8eekdO0aDEK044xTXwPPA==}
     engines: {node: '>=0.4.0'}
     hasBin: true
-    dev: true
 
   /agent-base/6.0.2:
     resolution: {integrity: sha512-RZNwNclF7+MS/8bDg70amg32dyeZGZxiDuQmZxKLAlQjr3jGyLx+4Kkk58UO7D2QdgFIQCovuSuZESne6RG6XQ==}
@@ -10094,6 +10091,15 @@ packages:
     engines: {node: '>= 0.8'}
     dev: true
 
+  /unplugin/1.0.1:
+    resolution: {integrity: sha512-aqrHaVBWW1JVKBHmGo33T5TxeL0qWzfvjWokObHA9bYmN7eNDkwOxmLjhioHl9878qDFMAaT51XNroRyuz7WxA==}
+    dependencies:
+      acorn: 8.8.1
+      chokidar: 3.5.3
+      webpack-sources: 3.2.3
+      webpack-virtual-modules: 0.5.0
+    dev: false
+
   /untyped/1.2.0:
     resolution: {integrity: sha512-nG0A55YEhUU5UCEM+nhIhCVkA8a4L1spIVtzO0937WDjEA6jrKpu184O2K9iv5UuJNHnwhu+Q3TXiSJh/JrjlQ==}
     dependencies:
@@ -10498,7 +10504,10 @@ packages:
   /webpack-sources/3.2.3:
     resolution: {integrity: sha512-/DyMEOrDgLKKIG0fmvtz+4dUX/3Ghozwgm6iPp8KRhvn+eQf9+Q7GWxVNMk3+uCPWfdXYC4ExGBckIXdFEfH1w==}
     engines: {node: '>=10.13.0'}
-    dev: true
+
+  /webpack-virtual-modules/0.5.0:
+    resolution: {integrity: sha512-kyDivFZ7ZM0BVOUteVbDFhlRt7Ah/CSPwJdi8hBpkK7QLumUqdLtVfm/PX/hkcnrvr0i77fO5+TjZ94Pe+C9iw==}
+    dev: false
 
   /webpack/5.75.0:
     resolution: {integrity: sha512-piaIaoVJlqMsPtX/+3KTTO6jfvrSYgauFVdt8cr9LTHKmcq/AMd4mhzsiP7ZF/PGRNPGA8336jldh9l2Kt2ogQ==}
