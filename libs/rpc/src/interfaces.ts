@@ -93,7 +93,9 @@ export type PrimClientCallbackPlugin<J = JsonHandler> = (
 	 * @param blobs If given RPC has binary data it will be referenced here by its string identifier in the RPC
 	 */
 	send: (message: RpcCall, blobs?: BlobRecords) => void
-	/** Close an active connection to a WebSocket (called upon calling Prim client's `destroy()` option) */
+	/**
+	 * Close an active connection to a WebSocket. This is not utilized by Prim RPC today but may be used in the future.
+	 */
 	close?: () => void
 }
 

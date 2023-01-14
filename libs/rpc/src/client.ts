@@ -33,10 +33,11 @@ export type { AnyFunction } from "./interfaces"
 /** Callback prefix */ export const CB_PREFIX = "_cb_"
 /** Binary prefix (Blob/File) */ export const BLOB_PREFIX = "_bin_"
 
-export interface PrimClient<ModuleType extends PrimOptions["module"]> {
-	client: PromisifiedModule<ModuleType>
-	destroy: () => void
-}
+export type PrimClient<ModuleType extends PrimOptions["module"]> = PromisifiedModule<ModuleType>
+// export interface PrimClient<ModuleType extends PrimOptions["module"]> {
+// 	client: PromisifiedModule<ModuleType>
+// 	destroy: () => void
+// }
 
 /**
  * Prim-RPC can be used to write plain functions on the server and then call them easily from the client.
@@ -254,10 +255,11 @@ export function createPrimClient<
 	}
 	// !SECTION
 	const client = proxy as PromisifiedModule<ModuleType>
-	function destroy() {
-		wsDestroyedEvents.forEach(shutDown => shutDown())
-		wsEvent.all.clear()
-		httpEvent.all.clear()
-	}
-	return { client, destroy }
+	// function destroy() {
+	// 	wsDestroyedEvents.forEach(shutDown => shutDown())
+	// 	wsEvent.all.clear()
+	// 	httpEvent.all.clear()
+	// }
+	// return { client, destroy }
+	return client
 }

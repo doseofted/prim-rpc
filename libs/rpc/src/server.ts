@@ -88,12 +88,7 @@ function createServerActions(
 		cbResults?: (a: RpcAnswer) => void
 	): Promise<RpcAnswer | RpcAnswer[]> => {
 		// NOTE: new Prim client should be created on each request so callback results are not shared
-		const {
-			// eslint-disable-next-line @typescript-eslint/no-unused-vars
-			client: { client, destroy: _destroy },
-			socketEvent: event,
-			configured,
-		} = instance ?? createPrimInstance(serverOptions)
+		const { client, socketEvent: event, configured } = instance ?? createPrimInstance(serverOptions)
 		const callList = Array.isArray(calls) ? calls : [calls]
 		const answeringCalls = callList.map(async (given): Promise<RpcAnswer> => {
 			// eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
