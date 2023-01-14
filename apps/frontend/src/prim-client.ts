@@ -9,7 +9,7 @@ const clientSide = typeof window !== "undefined"
 
 console.log(contained && clientSide ? `https://api.${host}/prim` : "http://localhost:3001/prim")
 
-const backend = createPrimClient<typeof exampleClient>({
+const client = createPrimClient<typeof exampleClient>({
 	endpoint: contained && clientSide ? `https://api.${host}/prim` : "http://localhost:3001/prim",
 	clientBatchTime: 0,
 	jsonHandler: superjson as JsonHandler,
@@ -17,4 +17,4 @@ const backend = createPrimClient<typeof exampleClient>({
 	callbackPlugin: createCallbackPlugin(),
 })
 
-export default backend
+export default client

@@ -33,6 +33,12 @@ export type { AnyFunction } from "./interfaces"
 /** Callback prefix */ export const CB_PREFIX = "_cb_"
 /** Binary prefix (Blob/File) */ export const BLOB_PREFIX = "_bin_"
 
+export type PrimClient<ModuleType extends PrimOptions["module"]> = PromisifiedModule<ModuleType>
+// export interface PrimClient<ModuleType extends PrimOptions["module"]> {
+// 	client: PromisifiedModule<ModuleType>
+// 	destroy: () => void
+// }
+
 /**
  * Prim-RPC can be used to write plain functions on the server and then call them easily from the client.
  * On the server, Prim-RPC is given parameters from a server framework to find the designated function on each request.
@@ -45,7 +51,7 @@ export type { AnyFunction } from "./interfaces"
 export function createPrimClient<
 	ModuleType extends OptionsType["module"] = object,
 	OptionsType extends PrimOptions = PrimOptions
->(options?: OptionsType): PromisifiedModule<ModuleType> {
+>(options?: OptionsType): PrimClient<ModuleType> {
 	const methodPluginGiven = typeof options?.methodPlugin !== "undefined"
 	const callbackPluginGiven = typeof options?.callbackPlugin !== "undefined"
 	const configured = createPrimOptions(options)
@@ -157,6 +163,7 @@ export function createPrimClient<
 	// !SECTION
 	// SECTION: WebSocket event handling
 	const wsEvent = configured.internal.socketEvent ?? mitt<PrimWebSocketEvents>()
+	const wsDestroyedEvents: (() => void)[] = []
 	function createWebsocket(initialMessage: RpcCall, initialBlobs: BlobRecords) {
 		const response = (given: RpcAnswer) => {
 			wsEvent.emit("response", given)
@@ -164,6 +171,7 @@ export function createPrimClient<
 		const ended = () => {
 			sendMessage = createWebsocket
 			wsEvent.emit("ended")
+			wsDestroyedEvents.length = 0
 		}
 		const connected = () => {
 			// NOTE connect event should only happen once so initial message will be sent then
@@ -171,7 +179,12 @@ export function createPrimClient<
 			send(initialMessage, initialBlobs)
 		}
 		const wsEndpoint = configured.wsEndpoint || configured.endpoint.replace(/^http(s?)/g, "ws$1")
-		const { send } = configured.callbackPlugin(wsEndpoint, { connected, response, ended }, configured.jsonHandler)
+		const { send, close } = configured.callbackPlugin(
+			wsEndpoint,
+			{ connected, response, ended },
+			configured.jsonHandler
+		)
+		wsDestroyedEvents.push(close)
 		sendMessage = send
 	}
 	/** Sets up WebSocket if needed otherwise sends a message over websocket */
@@ -242,7 +255,11 @@ export function createPrimClient<
 	}
 	// !SECTION
 	const client = proxy as PromisifiedModule<ModuleType>
-	// TODO: consider returning client as property so other client-specific methods like `destroy()`
-	// can be added (for closing websocket connections)
+	// function destroy() {
+	// 	wsDestroyedEvents.forEach(shutDown => shutDown())
+	// 	wsEvent.all.clear()
+	// 	httpEvent.all.clear()
+	// }
+	// return { client, destroy }
 	return client
 }
