@@ -12,8 +12,11 @@ without verbose wrappers around the communication channel.
 See the [Documentation](./README.md) for usage instructions. These instructions refer to development of the project
 itself.
 
-Install [Task](https://taskfile.dev/) to easily run project commands defined in the [Taskfile](./Taskfile.yml). Run
-`task dev:local` to configure local development environment.
+[Node](https://nodejs.org/) is required for development. Install dependencies with `pnpm install`. If
+[pnpm](https://pnpm.io/) is not installed, run `corepack enable` first to automatically install it. Scripts this project
+are defined with [Task](https://taskfile.dev/) in the [Taskfile](./Taskfile.yml).
 
-If you prefer to work in Docker, configure the [`.env` file](./.env.example) and run `task compose:dev:up` (depends on
-[Docker/Compose](https://docs.docker.com/get-docker/), [mkcert](https://github.com/FiloSottile/mkcert)).
+Run `pnpm task dev:local` to configure, build, and run the local development environment.
+
+If you prefer to work in Docker, configure the [`.env` file](./.env.example) and run `pnpm task compose:dev:up` (depends
+on [Docker/Compose](https://docs.docker.com/get-docker/) and [mkcert](https://github.com/FiloSottile/mkcert)).

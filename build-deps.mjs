@@ -24,7 +24,7 @@ if (inDevelopment) {
 		const projectPath = relativePath.split(path.sep)[0]
 		const filter = "." + path.sep + path.join("libs", projectPath)
 		const createProc = () => {
-			const proc = $`pnpm build --filter=${filter}`.nothrow()
+			const proc = $`pnpm task dev:build -- --filter=${filter}`.nothrow()
 			void (async () => {
 				await proc
 				delete processes[projectPath]

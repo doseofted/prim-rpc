@@ -33,6 +33,7 @@ tasks:
           -conf /root/Corefile
 
   install:
+    # NOTE: this is only useful if Task is installed globally already (not through PNPM)
     desc: "Set Node version and install node modules with PNPM"
     cmds:
       - "corepack enable"
@@ -45,7 +46,7 @@ tasks:
       - cert
       - install
     cmds:
-      - pnpm build
+      - task: build
 
   upgrade:
     desc: "Upgrade node modules to latest versions across project"
@@ -57,7 +58,8 @@ tasks:
       - "pnpm outdated -r"
       # Upgrade all dependencies to latest
       - "pnpm upgrade -r --interactive --latest"
-      - "echo 'In event of issues after upgrading, try `task dev:clean` then reinstall. If all else fails, delete lockfile.'"
+      - "echo 'In event of issues after upgrading, try `task dev:clean` then reinstall. If all else fails, delete
+        lockfile.'"
 
   # NOTE: errors are ignored for "clean-*" commands below since data/* contents owned by root user cannot be deleted
   # (otherwise commands work fine)
@@ -73,7 +75,6 @@ tasks:
   clean-turbo:
     cmds: ["find . -name .turbo -type d -prune -exec rm -fr {} +"]
     ignore_error: true
-
   clean:
     desc: "Remove locally built files from the project, useful for a clean run"
     cmds:
@@ -91,17 +92,45 @@ tasks:
       - 'echo "You''ll need to remove data/* as root. The .env file in this project was kept."'
 
   build-libs:
+    ignore_error: true
     cmds:
-      - pnpm entrypoint
+      - zx build-deps.mjs
     env:
       NODE_ENV: "development"
+
   local-parallel:
     deps:
       - build-libs
       - :frontend:entrypoint
-  local:
+
+  watch:
     desc: "Run a local development environment watching and running all parts of project without the use of containers"
     cmds:
-      - task: install
-      - pnpm build
+      - task: build
       - task: local-parallel
+
+  # NOTE: the following are Turborepo scripts (moved from package.json to Taskfile so scripts are documented)
+  build:
+    desc: "Build all parts of project once"
+    cmds:
+      - turbo run build {{.CLI_ARGS}}
+  test:
+    desc: "Test all parts of project once with Vitest"
+    cmds:
+      - turbo run test {{.CLI_ARGS}}
+  testing:
+    desc: "Test all parts of project with Vitest and wait to rerun tests on changes"
+    cmds:
+      - turbo run testing {{.CLI_ARGS}}
+  lint:
+    desc: "Lint entire project with ESLint"
+    cmds:
+      - turbo run lint {{.CLI_ARGS}}
+  lint:style:
+    desc: "Lint entire project with Stylelint"
+    cmds:
+      - turbo run lint-style {{.CLI_ARGS}}
+  format:
+    desc: "Format and write changes to disk with Prettier"
+    cmds:
+      - prettier --write . {{.CLI_ARGS}}
