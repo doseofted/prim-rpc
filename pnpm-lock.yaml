@@ -4,6 +4,7 @@ importers:
 
   .:
     specifiers:
+      '@go-task/cli': ^3.20.0
       '@types/eslint': ^8.4.10
       '@typescript-eslint/eslint-plugin': ^5.46.1
       '@typescript-eslint/parser': ^5.46.1
@@ -31,6 +32,7 @@ importers:
       vitest: ^0.25.8
       zx: ^7.1.1
     dependencies:
+      '@go-task/cli': 3.20.0
       zx: 7.1.1
     devDependencies:
       '@types/eslint': 8.4.10
@@ -972,6 +974,17 @@ packages:
       hexoid: 1.0.0
       secure-json-parse: 2.5.0
       stream-wormhole: 1.1.0
+
+  /@go-task/cli/3.20.0:
+    resolution: {integrity: sha512-EfwTUeXj/vqzihrLFdgV810B33uF9gIHpXGgO5cpEkiW0cmaRzvBF2hz8D9Xq7C4yQ1QJp+VgHyQhzRJ04Uqjg==}
+    requiresBuild: true
+    dependencies:
+      '@go-task/go-npm': 0.1.17
+    dev: false
+
+  /@go-task/go-npm/0.1.17:
+    resolution: {integrity: sha512-j+xydQWrAxsqLYjweok1fWzDmBAA1g/gmFbPyG8kRI/d/+rzXGGLlro8zdS6mJ3Is+8BrIy2ZBmQkoONhowh7A==}
+    hasBin: true
 
   /@headlessui/react/1.7.7_biqbaboplfbrettd7655fr4n2y:
     resolution: {integrity: sha512-BqDOd/tB9u2tA0T3Z0fn18ktw+KbVwMnkxxsGPIH2hzssrQhKB5n/6StZOyvLYP/FsYtvuXfi9I0YowKPv2c1w==}

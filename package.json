@@ -11,19 +11,11 @@
 	"license": "UNLICENSED",
 	"private": true,
 	"scripts": {
-		"turbo": "turbo run",
-		"zx": "zx",
-		"build": "turbo run build",
-		"watch": "turbo run watch",
-		"entrypoint": "zx build-deps.mjs",
-		"test": "turbo run test",
-		"testing": "turbo run testing",
-		"lint": "turbo run lint",
-		"lint-style": "turbo run lint-style",
 		"format": "prettier --write ."
 	},
 	"dependencies": {
-		"zx": "^7.1.1"
+		"zx": "^7.1.1",
+		"@go-task/cli": "^3.20.0"
 	},
 	"devDependencies": {
 		"@types/eslint": "^8.4.10",

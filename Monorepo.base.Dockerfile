@@ -5,9 +5,6 @@ USER root
 # NOTE: it seems corepack `enable` and `prepare` need to be separate steps (otherwise correct version is not used)
 RUN corepack enable
 RUN corepack prepare pnpm@7.14.2 --activate
-# Use Task to make management of project easier
-# LINK https://taskfile.dev/installation/#install-script
-RUN sh -c "$(curl --location https://taskfile.dev/install.sh)" -- -d -b /usr/local/bin
 USER node
 # Set the store-dir explicitly so that I know it's location (to copy later)
 # `pnpm config` is alias for `npm config` and `store-dir` is specific to pnpm
@@ -29,7 +26,7 @@ FROM monorepo-install as monorepo-build
 # First, start with libraries used in the project
 COPY --chown=node libs libs
 RUN pnpm install --offline --frozen-lockfile
-RUN pnpm build --filter=./libs
+RUN pnpm task build -- --filter=./libs
 ENV NODE_ENV=development
-# Entrypoint will watch libs and rebuild with Turborepo commands in development
-CMD [ "pnpm", "entrypoint" ]
+# "build-libs" task will watch libs and rebuild in development
+CMD [ "pnpm", "task", "build-libs" ]
