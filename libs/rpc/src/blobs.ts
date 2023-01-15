@@ -4,8 +4,6 @@ import { BLOB_PREFIX } from "./client"
 /**
  * Helper to get entries from given the form as a record
  * (which can then be used to get Blobs)
- *
- * NOTE: this hasn't been tested in Prim RPC yet
  */
 function handlePossibleForm(form: HTMLFormElement | FormData) {
 	const formData = form instanceof HTMLFormElement ? new FormData(form) : form

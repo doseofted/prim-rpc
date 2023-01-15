@@ -14,3 +14,95 @@ export default ({ children }) => <LayoutDocs meta={meta}>{children}</LayoutDocs>
 <Alert icon="carbon:warning" type="alert-warning">
 	Work in Progress
 </Alert>
+
+Prim+RPC includes two functions for configuring Prim+RPC: one for the client (`createPrimClient()`) and another for the
+server (`createPrimServer()`). Both of these functions accept options and are given in this reference guide.
+
+This guide is split up into two sections: client options and server options. The Prim+RPC client expects client options
+only while the Prim+RPC server accepts both client and server options.
+
+The Prim+RPC server shares options with the client for two reasons. The first: some options should be shared with both
+the server and client. For instance, if the JSON handler is changed on the client then it should also be changed on the
+server for proper serialization. The second: if a function doesn't exist on module provided to Prim+RPC server then the
+Prim+RPC server will create a new Prim+RPC client to contact another server (this is totally optional and allows
+communication between multiple servers with dedicated responsibilities).
+
+## Table of Contents
+
+## Client
+
+The following options are available to the `createPrimClient`:
+
+```typescript
+// Tap option name below to see documentation
+// You do not need to provide all of these options. This is just a demonstration.
+createPrimClient({
+	// link[2:9] #endpoint-endpoint
+	endpoint: "/prim",
+	clientBatchTime: 15,
+	jsonHandler: JSON,
+	methodPlugin: createMethodPlugin(),
+	callbackPlugin: createCallbackPlugin(),
+})
+```
+
+### Endpoint (`.endpoint`)
+
+| Required  | Default     |
+| --------- | ----------- |
+| _`false`_ | _`"/prim"`_ |
+
+It is very common to use Prim+RPC with a web server so the `endpoint` option is a URL provided directly on the Prim+RPC
+client. This option is passed to both the [`methodHandler`](#method-handler) and the
+[`callbackHandler`](#callback-handler) functions as an argument so that they can make connections.
+
+<CH.Spotlight>
+
+```typescript
+createPrimClient({
+	// Provide the path if the Prim+RPC client/server are on the same domain
+	endpoint: "/prim",
+})
+```
+
+---
+
+Path
+
+---
+
+```typescript
+createPrimClient({
+	// You don't have to provide endpoint if not utilized (for instance when using IPC)
+	endpoint: null,
+})
+```
+
+None
+
+---
+
+```typescript
+createPrimClient({
+	// Provide a full URL if Prim+RPC server is on separate domain
+	// (tip: make sure proper CORS rules are enabled on server)
+	endpoint: "https://api.example.com/prim",
+})
+```
+
+Full URL
+
+---
+
+```typescript
+createPrimClient({
+	// Pass a different URL depending if rendered on client/server (SSR)
+	endpoint: typeof window === "undefined" ? "http://localhost:1234" : "https://api.example.com/prim",
+})
+```
+
+Conditional URL
+
+</CH.Spotlight>
+
+## Server

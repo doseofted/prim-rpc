@@ -35,3 +35,27 @@
 .ch-editor-frame:hover .ch-editor-button {
 	display: block;
 }
+
+/** Fix mobile styling on Code Hike Spotlight component */
+.ch-spotlight {
+	flex-direction: column;
+}
+.ch-spotlight-sticker {
+	width: 100%;
+}
+.ch-spotlight-tab {
+	margin: 0;
+}
+/* Reset Code Hike Spotlight to defaults on large screens */
+@media (min-width: theme("screens.xl")) {
+	.ch-spotlight-tab {
+		margin: 0 -0.5rem;
+	}
+	.ch-spotlight {
+		flex-direction: row;
+	}
+	.ch-spotlight-sticker {
+		/* Override default 420px width since it feels small */
+		width: 520px;
+	}
+}

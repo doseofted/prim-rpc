@@ -23,7 +23,7 @@ const jsonHandlerPassthrough: JsonHandler = {
 }
 
 interface SharedWebWorkerOptions {
-	worker: Worker | Window
+	worker: Worker | Window // | SharedWorker | ServiceWorker
 }
 
 // !SECTION
@@ -61,7 +61,6 @@ export const createCallbackPlugin = (options: CallbackPluginWebWorkerOptions) =>
 
 // eslint-disable-next-line @typescript-eslint/no-empty-interface
 interface CallbackHandlerWebWorkerOptions extends SharedWebWorkerOptions {}
-// TODO: consider what to do when JSON handler is used (and either string or binary contents are given instead of actual RPC)
 export const createCallbackHandler = (options: CallbackHandlerWebWorkerOptions) => {
 	const { worker = self } = options
 	const transport = setupMessageTransport(worker)
@@ -110,7 +109,6 @@ export const createMethodHandler = (options: MethodHandlerWebWorkerOptions) => {
 	const methodHandler: PrimServerMethodHandler = prim => {
 		const jsonHandler = prim.options.jsonHandler
 		transport.on("method:connect", id => {
-			// TODO: handle blobs if JSON handler is used
 			// eslint-disable-next-line @typescript-eslint/no-misused-promises
 			transport.on(`request:${id}`, async ({ rpc, blobs }) => {
 				const result = await prim.server().prepareRpc(jsonHandler.parse(rpc as string), blobs)
