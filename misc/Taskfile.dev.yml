@@ -3,6 +3,7 @@ version: 3
 tasks:
   # NOTE: `mkcert` must be installed on the host, since a containerized version would install CA in its own stores
   cert:
+    ignore_error: true
     desc: "Create a certificate to be used in development, trusted by the host system (requires `mkcert`)"
     status:
       - "test -f data/server/dev-cert.pem"
@@ -37,7 +38,7 @@ tasks:
     desc: "Set Node version and install node modules with PNPM"
     cmds:
       - "corepack enable"
-      - "pnpm env use --global 19.0.0"
+      - "pnpm env use --global 19.4.0"
       - "pnpm install"
 
   setup:

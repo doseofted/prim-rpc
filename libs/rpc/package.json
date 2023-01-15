@@ -12,6 +12,7 @@
 		"watch": "tsup --watch --config build.config.js",
 		"build": "tsup --config build.config.js",
 		"check": "tsc --noEmit",
+		"document": "typedoc src/index.ts --json dist/docs.json",
 		"test": "vitest run",
 		"testing": "vitest watch",
 		"lint": "eslint ."
