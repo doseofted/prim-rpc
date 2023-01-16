@@ -27,6 +27,14 @@ server for proper serialization. The second: if a function doesn't exist on modu
 Prim+RPC server will create a new Prim+RPC client to contact another server (this is totally optional and allows
 communication between multiple servers with dedicated responsibilities).
 
+<Alert icon="carbon:information" type="alert-info" prose>
+
+Some options must be set to the same value on both the server and the client. To make clear which properties must be
+synced between client/server, you'll find a **Sync Requirement** for each option below that will be either: **🟢 No**
+meaning that the option can differ, or **🔴 Yes** meaning that option must be the same.
+
+</Alert>
+
 ## Table of Contents
 
 ## Client
@@ -48,9 +56,9 @@ createPrimClient({
 
 ### `.jsonHandler`
 
-| Required  | Default  |
-| --------- | -------- |
-| _`false`_ | _`JSON`_ |
+| Required  | Default  | Sync Requirement |
+| --------- | -------- | ---------------- |
+| _`false`_ | _`JSON`_ | 🔴 Yes           |
 
 Functions used with Prim+RPC have to be serialized before sending a function call (RPC) to the server. By default, any
 RPC made with Prim+RPC will use the environment's default JSON handler.
@@ -82,11 +90,47 @@ Prim+RPC because, by default, files are extracted from the RPC and sent separate
 
 </Alert>
 
+It is important to note that this option must be set to the same option on both the server and client since
+serialization on the client and deserialization on the server go hand-in-hand.
+
+<Alert icon="carbon:information" type="alert-info" prose>
+
+Some clients may not be able to support a custom JSON handler (for instance, native apps that don't use JavaScript). In
+these instances, you may consider creating two Prim+RPC servers that use the same module: one that uses the default JSON
+handler, and the second that uses your custom JSON handler (for clients that _can_ support it).
+
+</Alert>
+
+### `.handleError`
+
+| Required  | Default  | Sync Requirement |
+| --------- | -------- | ---------------- |
+| _`false`_ | _`true`_ | 🔴 Yes           |
+
+By default in JavaScript, the `Error` instance used in JavaScript does not make useful properties like `.message`
+enumerable which means that when you try to stringify an `Error` with `JSON` you do not get back these properties.
+Instead, you get an empty object.
+
+To make for an easier development experience, Prim+RPC will serialize thrown errors to be sent back to the client using
+[serialize-error](https://www.npmjs.com/package/serialize-error), when using the default JSON handler. This means that
+if you throw an error from a function on a Prim+RPC server, the Prim+RPC client will receive that same error message. By
+default, this option is set to `true`.
+
+If the default JSON handler is changed, for instance if you use [superjson](https://github.com/blitz-js/superjson) which
+already serializes errors, then this option is set to `false` so as not to conflict with possible error handling done in
+the custom JSON handler.
+
+Importantly, if you explicitly specify the `.handleError` property then your choice will be respected regardless of what
+JSON handler you are using. The default conditions of setting `handleError` only apply when the option is not provided
+by the developer.
+
+This option must be set to the same value on the server and client.
+
 ### `.endpoint`
 
-| Required  | Default     |
-| --------- | ----------- |
-| _`false`_ | _`"/prim"`_ |
+| Required  | Default     | Sync Requirement |
+| --------- | ----------- | ---------------- |
+| _`false`_ | _`"/prim"`_ | 🟢 No            |
 
 It is very common to use Prim+RPC with a web server so the `endpoint` option is a URL provided directly on the Prim+RPC
 client. This option is passed to both the [`methodHandler`](#method-handler) and the
@@ -146,9 +190,9 @@ Conditional URL
 
 ### `.wsEndpoint`
 
-| Required  | Default |
-| --------- | ------- |
-| _`false`_ | _`""`_  |
+| Required  | Default | Sync Requirement |
+| --------- | ------- | ---------------- |
+| _`false`_ | _`""`_  | 🟢 No            |
 
 The [`callbackHandler`](#callback-handler) may use a different URL from the [`methodHandler`](#method-handler). In these
 events, `wsEndpoint` can be provided. This is common when the method handler uses the HTTPS protocol while the callback
@@ -156,9 +200,9 @@ handler uses the WebSocket protocol.
 
 ### `.clientBatchTime`
 
-| Required  | Default |
-| --------- | ------- |
-| _`false`_ | _`0`_   |
+| Required  | Default | Sync Requirement |
+| --------- | ------- | ---------------- |
+| _`false`_ | _`0`_   | 🟢 No            |
 
 The Prim+RPC client can batch RPCs made with its method handler. This is useful when using Prim+RPC with an HTTP server
 and you want to avoid sending hundreds of HTTP requests.
@@ -182,9 +226,9 @@ overhead in sending requests, usually over WebSocket, where batching requests is
 
 ### `.module`
 
-| Required  | Default       |
-| --------- | ------------- |
-| _`false`_ | _`undefined`_ |
+| Required  | Default       | Sync Requirement |
+| --------- | ------------- | ---------------- |
+| _`false`_ | _`undefined`_ | 🟢 No            |
 
 When an RPC is received by the Prim+RPC server, it will be translated into a function call to be made on the provided
 JavaScript module. If a module is not provided then Prim+RPC will return an error.
@@ -242,5 +286,82 @@ All functions need to be explicitly allowed before being used with Prim+RPC. Thi
 property to each function. When using an external module you may not be able to add a property to an existing function.
 In these cases you can use the [`allowList`](#allowlist) option of Prim+RPC to specify that a module is allowed to be
 used.
+
+</Alert>
+
+### `.allowList`
+
+| Required  | Default | Sync Requirement |
+| --------- | ------- | ---------------- |
+| _`false`_ | _`{}`_  | 🟢 No            |
+
+All functions provided to Prim+RPC must explicitly be marked usable as RPC. This is typically done by adding a `.rpc`
+property to the function in question. Sometimes this is not possible, such as when using a separate package directly
+with Prim+RPC that does not have an RPC property. In these events, you may specify an allowed list of functions that can
+be used.
+
+When Prim+RPC receives an RPC it will check the `.rpc` property and, if not found, follow the allow-list. The allow list
+is expected to follow the same structure as the module you provide. The allow list below is a simple example and follows
+the same structure of the module provided:
+
+```typescript
+// it's easier to specify the `.rpc` property on functions but below is also completely valid
+createPrimServer({
+	module: {
+		hi() {
+			return "Hi!"
+		},
+		good: {
+			bye() {
+				return "Goodbye!"
+			},
+		},
+	},
+	allowList: {
+		hi: true,
+		good: {
+			bye: true,
+		},
+	},
+})
+```
+
+### `.methodsOnMethods`
+
+| Required  | Default | Sync Requirement |
+| --------- | ------- | ---------------- |
+| _`false`_ | _`[]`_  | 🟢 No            |
+
+By default, Prim+RPC will not answer methods calls made on a function. For instance, if you have a function named
+`hello()`, you cannot call `hello.toString()`. However, there may be circumstances where you'd like to allow certain
+methods on a defined function. For instance, the following could be useful:
+
+```typescript
+function sayHello() {
+	return "Hello!"
+}
+sayHello.rpc = true
+sayHello.docs = function () {
+	return "I say hello!"
+}
+```
+
+By default, `sayHello.docs()` is not allowed to be called. This can be fixed by specifying the following:
+
+```typescript
+import { sayHello } from "./previous-example"
+
+createPrimServer({
+	module: { sayHello },
+	methodsOnMethods: ["docs"],
+})
+```
+
+Now, any function that has a `.docs()` method can be called.
+
+<Alert icon="carbon:warning" type="alert-warning" prose>
+
+It is recommended, but not required, that you choose unique method names and avoid exposing or using the same names as
+built-in methods, when using this option.
 
 </Alert>
