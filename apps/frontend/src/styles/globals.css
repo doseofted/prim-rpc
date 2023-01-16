@@ -23,6 +23,26 @@
 	opacity: 1;
 }
 
+/* Make code headings appear nicer in documentation across entire website */
+.prose h1:has(code),
+.prose h2:has(code),
+.prose h3:has(code) {
+	background-color: #2D0D6011;
+	padding: 0.5rem 0;
+	border-radius: 0.35rem;
+	border-bottom-left-radius: 0;
+	border-bottom-right-radius: 0;
+}
+
+.prose :where(h1, h2, h3) + table {
+	margin-top: -0.7rem;
+	top: -1px;
+}
+.prose :where(h1, h2, h3) + table th {
+	background-color: #2D0D6011;
+	border-radius: 0;
+}
+
 /**
  * Provided from Code Hike
  * https://codehike.org/docs/configuration#copy-button

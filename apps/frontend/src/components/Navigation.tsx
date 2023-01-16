@@ -66,7 +66,7 @@ export function Navigation(props: NavigationProps) {
 				<Link
 					className="hidden lg:flex group font-semibold uppercase text-sm h-full px-4 p-4 justify-center items-center rounded-b-2xl transition-all duration-300
 						bg-transparent hover:bg-white transform scale-100 hover:scale-110"
-					href="https://github.com/doseofted"
+					href="https://github.com/doseofted/prim-rpc"
 					target="_blank">
 					<div className="pointer-events-none w-full h-screen transition-all duration-300 bg-transparent group-hover:bg-white absolute top-0 transform -translate-y-full" />
 					<span className="transition-all duration-300 transform">
