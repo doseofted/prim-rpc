@@ -168,9 +168,9 @@ const { result: greeting } = await prim.server().prepareRpc({
 
 Of course, on the server we can just call the function directly. Where Prim+RPC becomes useful is when you combine this
 with the Prim+RPC client which automatically generates this RPC. First, we'll make this RPC available with an HTTP
-server. Prim+RPC doesn't concern itself with the method of delivery and instead allows you to use plugins to send RPC.
-In this example, we'll use a plugin for a server framework called Fastify but there are many other plugins available and
-it is easy to write your own.
+server. Prim+RPC doesn't concern itself with the method of delivery and instead allows you to specify a handler plugin
+to send RPC. In this example, we'll use a handler for a server framework called Fastify but there are many other
+handlers available and it is easy to write your own.
 
 ```ts server.ts mark=3,4,6,15,19
 // on server:
@@ -227,7 +227,7 @@ from the server is not imported. Instead, this will be requested over the endpoi
 
 By default, the Prim+RPC does not assume a default client. Similar to the server, we provide this functionality through
 the use of plugins. Let's add support for our server using the browser's built-in fetch client (supported with a
-Prim+RPC plugin):
+Prim+RPC plugin for the browser's APIs):
 
 ```ts client.ts mark=3,8
 // on client:
@@ -268,8 +268,9 @@ support automatic serialization of objects like Dates, and much more, all with P
 
 ## How Does This Work?
 
-There are two parts of Prim+RPC for communicating between two different environments, typically a server and a
-browser/client.
+There are two parts of Prim+RPC for communicating between two different environments, referred to as server and client.
+The server/client could be two distinct processes communicating with each other (IPC) or it could be a web server
+communicating with a web browser (RPC, a form of IPC).
 
 The server is responsible for making your code available to the client. You can write any plain JavaScript function that
 you'd like, pass it to Prim+RPC, and it becomes available for the client to use once flagged as publicly available
@@ -297,8 +298,8 @@ I personally work with many different frameworks and created Prim+RPC to make wo
 backends easier by making an RPC framework that is highly modular and can work with any frontend or backend. It is also
 a necessary stepping block for me to build Prim+CMS, for which I'll be announcing more details in the future. I chose to
 make this project open source for several reasons but primarily because many of the tools that I use today are also open
-source. The availability of these tools are a big part of why I am a developer today and that ecosystem is something
-that for which I hope I can contribute back. I hope that you find this library useful and that it helps other developers
+source. The availability of these tools are a big part of why I am a developer today and that ecosystem is something for
+which I hope that I can contribute back. I hope that you find this library useful and that it helps other developers
 like yourself whether you are experienced or just starting out.
 
 If you do find this tool useful, consider giving it a star on Github, contributing back to the project (whether to the
