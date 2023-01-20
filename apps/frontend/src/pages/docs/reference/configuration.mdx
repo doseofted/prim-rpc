@@ -38,32 +38,29 @@ that the option can differ, or **🔴 Yes** meaning that option must be the same
 The following options are available to the `createPrimClient`:
 
 ```typescript
-import { createPrimClient, createPrimServer } from "@doseofted/prim-rpc"
+import { createPrimClient } from "@doseofted/prim-rpc"
 import { createMethodPlugin, createCallbackPlugin } from "@doseofted/prim-rpc-plugins/{CHOOSE_YOUR_PLUGIN}"
 
 // Tap option name below to see documentation
 // You do not need to provide all of these options. This is just a demonstration.
 
 const client = createPrimClient({
-	// link[2:9] #endpoint
-	endpoint: "/prim",
-	// link[2:16] #clientbatchtime
-	clientBatchTime: 15,
-	// link[2:12] #jsonhandler
-	jsonHandler: JSON,
 	// link[2:13] #methodplugin
 	methodPlugin: createMethodPlugin(),
 	// link[2:15] #callbackplugin
 	callbackPlugin: createCallbackPlugin(),
-})
-
-const server = createPrimServer({
-	// link[2:7] #module
-	module: { sayHello: () => "Hello!" },
-	// link[2:10] #allowlist
-	allowList: { sayHello: true },
-	// link[2:17] #methodsonmethods
-	methodsOnMethods: [],
+	// link[2:12] #jsonhandler
+	jsonHandler: JSON,
+	// link[2:12] #handleerror
+	handleError: true,
+	// link[2:12] #handleblobs
+	handleBlobs: true,
+	// link[2:9] #endpoint
+	endpoint: "http://example.localhost/prim",
+	// link[2:11] #wsendpoint
+	wsEndpoint: "ws://example.localhost/prim",
+	// link[2:16] #clientbatchtime
+	clientBatchTime: 15,
 })
 ```
 
@@ -225,7 +222,29 @@ This option must be set to the same value on the server and client.
 | --------- | -------- | ------------- |
 | _`false`_ | _`true`_ | 🔴 Yes        |
 
-...
+The Prim+RPC client can call many server-provided functions including those that expect binary arguments. By default,
+Prim+RPC sends RPC using JSON: a format that doesn't support binary data. In order to support binary data there are two
+options: The first is overriding the default JSON handler with some JSON-like handler that does support binary data.
+Support for these handlers is planned for Prim+RPC but is not available yet. The second however is supported and
+involves separating binary data from the RPC.
+
+The `.handleBlobs` option tells Prim+RPC to read the given function arguments for anything Blob-like, including Files
+(which are Blobs). The binary arguments are a replaced with an identifier in the RPC. The configured
+[`.methodPlugin`](#methodplugin) is then responsible for sending both the RPC and binary data to the Prim+RPC server.
+The Prim+RPC server will have a [`.methodHandler`](#methodhandler) that will piece back together the RPC and binary data
+into a function call. This is useful because, while JSON cannot support binary data, your method of transport (like
+using FormData over HTTP) may be able to transport the binary file(s) and JSON separately.
+
+Since splitting up blobs from RPC is done on the client, this option must also be specified on the server so it knows to
+piece these two pieces back together.
+
+<Alert icon="carbon:information" type="alert-info" prose>
+
+Today, blob handling is done with the method plugin/handler but in the future there are plans to support binary data in
+the callback handler as well. There's also planned support for JSON-like handlers that support binary data. Prim+RPC is
+still in early stages.
+
+</Alert>
 
 ### `.endpoint`
 
@@ -332,6 +351,31 @@ overhead in sending requests, usually over WebSocket, where batching requests is
 </Alert>
 
 ## Server
+
+The following options are available to the `createPrimServer`:
+
+```typescript
+import { createPrimServer } from "@doseofted/prim-rpc"
+import { createMethodHandler, createCallbackHandler } from "@doseofted/prim-rpc-plugins/{CHOOSE_YOUR_HANDLER}"
+
+// Tap option name below to see documentation
+// You do not need to provide all of these options. This is just a demonstration.
+
+const server = createPrimServer({
+	// link[11:33] #client
+	// NOTE: all options from client are available here
+	// link[2:7] #module
+	module: { sayHello: () => "Hello!" },
+	// link[2:14] #methodhandler
+	methodHandler: createMethodHandler(),
+	// link[2:16] #callbackhandler
+	callbackHandler: createCallbackHandler(),
+	// link[2:10] #allowlist
+	allowList: { sayHello: true },
+	// link[2:17] #methodsonmethods
+	methodsOnMethods: [],
+})
+```
 
 ### `.module`
 
@@ -450,15 +494,63 @@ connection). Prim+RPC has a dedicated handler for callbacks through the use of a
 | --------- | -------------- | ------------- |
 | _`false`_ | _`() => void`_ | 🟢 No         |
 
-...
+The callback handler serves a similar role to the [`.methodHandler`](#methodhandler) and the goal of this handler is
+very similar. The primary difference is that the callback handler is used to maintain a connection to the client from
+the server so that callbacks can be called, potentially multiple times.
 
 ### `.prefix`
 
-| Required  | Default        | Sync Required |
-| --------- | -------------- | ------------- |
-| _`false`_ | _`() => void`_ | 🟢 No         |
+| Required  | Default   | Sync Required |
+| --------- | --------- | ------------- |
+| _`false`_ | _`/prim`_ | 🟢 No         |
 
-...
+This option is used to configure HTTP routers used inside of a method/callback handler. The prefix will become the path
+for which the Prim+RPC client's plugins will communicate.
+
+In general, if you are using an HTTP/WS server with Prim+RPC then the `.prefix` option given on the Prim+RPC server is
+the pathname that you should give as the [`.endpoint](#endpoint) in the Prim+RPC client. If you are not using a
+transport that makes use of a URL (i.e. Web Workers, other forms of IPC) then this option isn't needed.
+
+As an example, using some HTTP server:
+
+<CH.Code>
+
+```ts server.ts
+import { createPrimServer } from "@doseofted/prim-rpc"
+
+createPrimServer({
+	prefix: "/my-rpc-endpoint",
+	// ... other options
+})
+
+// ... start HTTP server
+```
+
+---
+
+```ts client.ts
+import { createPrimClient } from "@doseofted/prim-rpc"
+
+// We'll pretend that the server is running on http://localhost:1234
+createPrimClient({
+	endpoint: "http://some-server.localhost:1234/my-rpc-endpoint",
+	// ... other options
+})
+```
+
+</CH.Code>
+
+This option also tells Prim+RPC what parts of a path to exclude if a request is given over a URL. While most requests
+are given using the Prim+RPC client, you could also make a simple request like so:
+
+```zsh
+curl --request GET \
+  --url http://some-server.localhost:1234/my-rpc-endpoint/sayHello?name=Ted&greeting=Hello
+```
+
+This example is the equivalent of calling `sayHello({ name: "Ted", greeting: "Hello" })`. Prim+RPC will know to remove
+the `/my-rpc-endpoint` part of the path because we configured it as the `.prefix`. Making requests over a URL isn't the
+primary use of Prim+RPC but it is possible as long as the method handler supports it.
 
 ### `.allowList`
 
