@@ -1,9 +1,5 @@
 version: 3
 
-env:
-  WEBSITE_HOST: "prim.localhost"
-  ADMIN_EMAIL: "ted@doseofted.com"
-
 tasks:
   build:
     desc: "Build Caddy image for production use"

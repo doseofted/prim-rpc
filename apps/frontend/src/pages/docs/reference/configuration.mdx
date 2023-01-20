@@ -425,11 +425,11 @@ Inline Module
 
 ```typescript
 import { createPrimServer } from "@doseofted/prim-rpc"
-import { upperFirst } from "lodash"
+import { startCase } from "lodash"
 
 createPrimServer({
-	module: { upperFirst },
-	allowList: { upperFirst: true },
+	module: { startCase },
+	allowList: { startCase: true },
 })
 ```
 

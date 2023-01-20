@@ -17,6 +17,8 @@
  * a testing framework is setup.
  */
 export * as additional from "./submodule"
+// external module directly imported (no RPC property added)
+export { startCase } from "lodash-es"
 
 // import things, { ThingInstance, Things } from "./things"
 // export type { ThingInstance }

@@ -31,6 +31,7 @@ createPrimServer({
 	methodHandler,
 	// eslint-disable-next-line @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-unsafe-call
 	callbackHandler,
+	allowList: { startCase: true },
 })
 
 // Start listening for requests to server

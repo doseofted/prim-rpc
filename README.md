@@ -5,7 +5,7 @@ library is making plain function calls to a server from some client (RPC), as if
 client itself. The goal is to write plain JavaScript, or TypeScript if you prefer, and immediately invoke typed code
 without verbose wrappers around the communication channel.
 
-[Read the Documentation](./README.md)
+[Read the Documentation](https://prim.doseofted.com/)
 
 ## Security
 
@@ -38,8 +38,8 @@ made available. If a license is not made available then it is unlicensed meaning
 
 ## Development
 
-See the [Documentation](./README.md) for usage instructions. These instructions refer to development of the project
-itself.
+See the [Documentation](https://prim.doseofted.com/) for usage instructions. These instructions refer to development of
+the project itself.
 
 [Node](https://nodejs.org/) is required for development. Install dependencies with `pnpm install`. If
 [pnpm](https://pnpm.io/) is not installed, run `corepack enable` first to automatically install it. Scripts for this
