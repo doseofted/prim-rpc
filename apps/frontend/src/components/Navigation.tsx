@@ -32,13 +32,9 @@ export function Navigation(props: NavigationProps) {
 				<div className="bg-white/70 border-l border-white/70 w-screen h-screen absolute top-0 -left-[1px] transform -translate-y-full" />
 				<div className="bg-white/70 border-b border-white/70 w-screen absolute top-0 -bottom-[1px] right-0 transform translate-x-full" />
 				{[
+					// { name: "About", link: "/" },
 					{ name: "Documentation", link: "/docs" },
-					{ name: "About", link: "/" },
-					// { name: "Callbacks", link: "/tests/callbacks" },
-					// { name: "Form", link: "/tests/form" },
-					// { name: "Greeting", link: "/tests/greeting" },
-					// { name: "Lighting", link: "/tests/lighting" },
-					// { name: "Lights", link: "/tests/lights" },
+					{ name: "CMS", link: "/cms" },
 				].map(({ name, link }, i) => (
 					<React.Fragment key={i}>
 						{/* eslint-disable-next-line @next/next/no-html-link-for-pages */}
