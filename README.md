@@ -7,6 +7,35 @@ without verbose wrappers around the communication channel.
 
 [Read the Documentation](./README.md)
 
+## Security
+
+> **Warning** Prim+RPC is prerelease software. It has not reached a stable version.
+
+If a security issue is found then please privately [report the issue to Ted](mailto:ted@doseofted.com). Prim+RPC is in
+early stages and, as it progresses, a more robust policy should be created.
+
+## Contributions
+
+To be written.
+
+## License
+
+This is a monolithic repository consisting of several projects. The repository itself is proprietary while individual
+projects are separately licensed:
+
+| Project                | Folder                       | License          |
+| ---------------------- | ---------------------------- | ---------------- |
+| Prim+RPC               | `./libs/rpc`                 | To be determined |
+| Prim+RPC Plugins       | `./libs/plugins`             | To be determined |
+| Prim+RPC Tooling       | `./libs/tooling`             | To be determined |
+| Prim+RPC UI            | `./libs/ui`                  | To be determined |
+| Example Library        | `./libs/example`             | To be determined |
+| Prim+RPC Website       | `./apps/frontend`            | To be determined |
+| Prim+RPC Documentation | `./apps/frontend/pages/docs` | To be determined |
+
+You will find a license file (`LICENSE.md`) in each project's folder that describes the detailed license for which it is
+made available. If a license is not made available then it is unlicensed meaning that usage is unauthorized.
+
 ## Development
 
 See the [Documentation](./README.md) for usage instructions. These instructions refer to development of the project

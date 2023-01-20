@@ -101,11 +101,11 @@ Once your method plugin is registered with the Prim+RPC client then you will als
 RPC on a client while a "handler" (sometimes called a "handler plugin") is used by the Prim+RPC server to handle RPC and
 send the RPC result back to the client.
 
-One limitation of the "method" plugin is that it is intended to work with a single request and a single response. This
-means that the method plugin is not designed to work with callbacks because they require an open connection where
-multiple responses can be sent back (one response being the function result, the others as a result of a callback). If
-your functions use callbacks or you expect multiple responses, you should also set up the
-[`.callbackPlugin`](#callbackplugin).
+One limitation of the "method" plugin is that it is intended to work with a single request (consisting of one or
+multiple RPCs) and a single response (also consisting of one/multiple RPCs). This means that the method plugin is not
+designed to work with callbacks because they require an open connection where multiple responses can be sent back (one
+response being the function result, the others as a result of a callback). If your functions use callbacks or you expect
+multiple responses, you should also set up the [`.callbackPlugin`](#callbackplugin).
 
 ### `.callbackPlugin`
 
@@ -219,6 +219,14 @@ by the developer.
 
 This option must be set to the same value on the server and client.
 
+### `.handleBlobs`
+
+| Required  | Default  | Sync Required |
+| --------- | -------- | ------------- |
+| _`false`_ | _`true`_ | 🔴 Yes        |
+
+...
+
 ### `.endpoint`
 
 | Required  | Default     | Sync Required |
@@ -226,11 +234,11 @@ This option must be set to the same value on the server and client.
 | _`false`_ | _`"/prim"`_ | 🟢 No         |
 
 It is very common to use Prim+RPC with a web server so the `endpoint` option is a URL provided directly on the Prim+RPC
-client. This option is passed to both the [`methodHandler`](#method-handler) and the
-[`callbackHandler`](#callback-handler) functions as an argument so that they can make connections.
+client. This option is passed to both the [`methodHandler`](#methodhandler) and the
+[`callbackHandler`](#callbackhandler) functions as an argument so that they can make connections.
 
-This option can be overridden for the [`callbackHandler`](#callback-handler) by providing the
-[`wsEndpoint`](#wsendpoint) option.
+This option can be overridden for the [`callbackHandler`](#callbackhandler) by providing the [`wsEndpoint`](#wsendpoint)
+option.
 
 <CH.Spotlight>
 
@@ -295,7 +303,7 @@ Conditional URL
 | --------- | ------- | ------------- |
 | _`false`_ | _`""`_  | 🟢 No         |
 
-The [`callbackHandler`](#callback-handler) may use a different URL from the [`methodHandler`](#method-handler). In these
+The [`callbackHandler`](#callbackhandler) may use a different URL from the [`methodHandler`](#methodhandler). In these
 events, `wsEndpoint` can be provided. This is common when the method handler uses the HTTPS protocol while the callback
 handler uses the WebSocket protocol.
 
@@ -393,6 +401,64 @@ In these cases you can use the [`allowList`](#allowlist) option of Prim+RPC to s
 used.
 
 </Alert>
+
+### `.methodHandler`
+
+| Required  | Default        | Sync Required |
+| --------- | -------------- | ------------- |
+| _`false`_ | _`() => void`_ | 🟢 No         |
+
+When a function call is made with the Prim+RPC client, that call is serialized into an RPC and is sent using the
+configured [`.methodPlugin`](#methodplugin) to the server of your choice. The Prim+RPC server receives these requests
+from your chosen server with its `.methodHandler`. In Prim+RPC, each client _plugin_ needs a corresponding server
+_handler_.
+
+The method handler in Prim+RPC is a plugin that integrates with your server (for example, an HTTP server) to receive a
+request containing RPC. The responsibility of the method handler is to transform given server properties into RPC, make
+the function call, and send back the result to your server in a format that it can understand. Your server then sends a
+result back to the client.
+
+There are many method handlers available that you integrate with the server framework of your choice. You can also
+[write your own](/docs/plugins/server/create) if a server handler doesn't meet your needs or you need support for an
+additional server. An example of how to use an existing method handler is demonstrated below:
+
+```typescript
+import { createPrimServer } from "@doseofted/prim-rpc"
+import { createMethodHandler } from "@doseofted/prim-rpc-plugins/fastify"
+
+// initialize your server (this example uses Fastify)
+import Fastify from "fastify"
+const fastify = Fastify()
+
+// and pass this instance to the method handler so the server can be configured to accept RPC
+createPrimServer({
+	methodHandler: createMethodHandler({ fastify }),
+})
+
+const address = await fastify.listen({ port: 1234 })
+console.log("Listening:", address)
+```
+
+Similar to the [`.methodPlugin`](#methodplugin), the limitation of method handlers is that they receive a single request
+(containing one or multiple RPCs) and send a single response (containing one or multiple RPCs). This means that the
+method handler cannot support callbacks because multiple responses must be sent back (typically by keeping an open
+connection). Prim+RPC has a dedicated handler for callbacks through the use of a [`.callbackHandler`](#callbackhandler).
+
+### `.callbackHandler`
+
+| Required  | Default        | Sync Required |
+| --------- | -------------- | ------------- |
+| _`false`_ | _`() => void`_ | 🟢 No         |
+
+...
+
+### `.prefix`
+
+| Required  | Default        | Sync Required |
+| --------- | -------------- | ------------- |
+| _`false`_ | _`() => void`_ | 🟢 No         |
+
+...
 
 ### `.allowList`
 
