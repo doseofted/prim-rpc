@@ -88,6 +88,7 @@ importers:
       '@doseofted/prim-example': workspace:*
       '@doseofted/prim-rpc': workspace:*
       '@doseofted/prim-rpc-plugins': workspace:*
+      '@doseofted/prim-rpc-tooling': workspace:*
       '@doseofted/prim-rpc-ui': workspace:*
       '@headlessui/react': ^1.7.7
       '@iconify-json/carbon': ^1.1.13
@@ -142,6 +143,7 @@ importers:
       '@doseofted/prim-example': link:../../libs/example
       '@doseofted/prim-rpc': link:../../libs/rpc
       '@doseofted/prim-rpc-plugins': link:../../libs/plugins
+      '@doseofted/prim-rpc-tooling': link:../../libs/tooling
       '@doseofted/prim-rpc-ui': link:../../libs/ui
       next: 13.1.2_3duxcpitbtplz62feflag7fwby
       react: 18.2.0

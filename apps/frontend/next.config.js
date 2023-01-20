@@ -1,4 +1,5 @@
 // @ts-check
+import path from "node:path"
 import mdx from "@next/mdx"
 import { remarkCodeHike } from "@code-hike/mdx"
 import { readFileSync } from "fs"
@@ -6,6 +7,7 @@ import remarkToc from "remark-toc"
 import remarkGfm from "remark-gfm"
 import rehypeSlug from "rehype-slug"
 import rehypeAutolinkHeadings from "rehype-autolink-headings"
+import preventImport from "@doseofted/prim-rpc-tooling/build"
 
 // NOTE: eslint doesn't appear to support assert syntax yet on imports
 // LINK: https://github.com/eslint/eslint/discussions/15305#discussioncomment-1634740
@@ -28,7 +30,9 @@ const nextConfig = withMDX({
 	webpack(given) {
 		/** @type {import("webpack").Configuration} */
 		const config = given
-		// ...
+		const dirname = new URL("", import.meta.url).pathname
+		const modulePath = path.join(dirname, "../../..", "libs/example")
+		config.plugins?.push(preventImport.webpack({ name: modulePath }))
 		return config
 	},
 	pageExtensions: ["ts", "tsx", "js", "jsx", "md", "mdx"],
