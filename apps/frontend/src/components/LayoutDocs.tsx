@@ -16,6 +16,7 @@ export function LayoutDocs({ meta, children }: LayoutDocsProps) {
 			sections: [
 				{ name: "Introduction", link: "/" },
 				{ name: "Setup", link: "/setup" },
+				{ name: "Usage", link: "/usage" },
 				{ name: "Examples", link: "/examples" },
 				{ name: "RPC Structure", link: "/rpc-structure" },
 				{ name: "Limitations", link: "/limitations" },
@@ -29,37 +30,25 @@ export function LayoutDocs({ meta, children }: LayoutDocsProps) {
 				{ name: "Configuration", link: "/reference/configuration" },
 			],
 		},
-		{
-			name: "Guides",
-			sections: [
-				{ name: "Beginner", link: "/guides/beginner" },
-				{ name: "Intermediate", link: "/guides/intermediate" },
-				{ name: "Experienced", link: "/guides/experienced" },
-				{ name: "Server / Website", link: "/guides/client-server" },
-				{ name: "Web Workers", link: "/guides/web-workers" },
-				{ name: "Electron IPC", link: "/guides/electron" },
-			],
-		},
-		{
-			name: "Usage",
-			sections: [
-				{ name: "Call a Function", link: "/usage/function-calls" },
-				{ name: "Use Callbacks", link: "/usage/callbacks" },
-				{ name: "Upload Files", link: "/usage/upload-files" },
-				{ name: "Create a Plugin", link: "/usage/plugin-creation" },
-				{ name: "Custom Serialization", link: "/usage/serialization" },
-			],
-		},
+		// NOTE: Entire usage section might be a bit ambitious, consider moving to one page
+		// {
+		// 	name: "Usage",
+		// 	sections: [
+		// 		{ name: "Call a Function", link: "/usage/function-calls" },
+		// 		{ name: "Use Callbacks", link: "/usage/callbacks" },
+		// 		{ name: "Upload Files", link: "/usage/upload-files" },
+		// 		{ name: "Create a Plugin", link: "/usage/plugin-creation" },
+		// 		{ name: "Custom Serialization", link: "/usage/serialization" },
+		// 	],
+		// },
 		{
 			name: "Server Plugins",
 			sections: [
 				{ name: "Fastify", link: "/plugins/server/fastify" },
 				{ name: "Express", link: "/plugins/server/express" },
-				{ name: "Node/HTTP", link: "/plugins/server/node-http" },
-				{ name: "Socket.io", link: "/plugins/server/socket-io" },
+				// { name: "Node/HTTP", link: "/plugins/server/node-http" },
+				// { name: "Socket.io", link: "/plugins/server/socket-io" },
 				{ name: "WS", link: "/plugins/server/ws" },
-				{ name: "Web Worker", link: "/plugins/server/web-worker" },
-				{ name: "Electron IPC", link: "/plugins/server/electron-ipc" },
 				{ name: "Create Your Own", link: "/plugins/server/create" },
 			],
 		},
@@ -69,9 +58,14 @@ export function LayoutDocs({ meta, children }: LayoutDocsProps) {
 				{ name: "Browser", link: "/plugins/client/browser" },
 				{ name: "Axios", link: "/plugins/client/axios" },
 				{ name: "Socket.io", link: "/plugins/client/socket-io" },
-				{ name: "Web Worker", link: "/plugins/client/web-worker" },
-				{ name: "Electron IPC", link: "/plugins/client/electron-ipc" },
 				{ name: "Create Your Own", link: "/plugins/client/create" },
+			],
+		},
+		{
+			name: "IPC Plugins",
+			sections: [
+				{ name: "Web Worker", link: "/plugins/ipc/web-worker" },
+				{ name: "Electron", link: "/plugins/ipc/electron" },
 			],
 		},
 	]
