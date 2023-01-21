@@ -12,14 +12,8 @@ export default ({ children }) => <LayoutDocs meta={meta}>{children}</LayoutDocs>
 
 # {meta.title}
 
-In this guide, we'll learn how to set up an existing project to use Prim+RPC. If you'd like to set up a new project, you
-may follow the guides or explore one of the example projects on this website.
-
-<Alert icon="carbon:warning" type="alert-warning">
-
-Setup guides for new project are coming soon.
-
-</Alert>
+In this guide, we'll learn how to set up an existing project to use Prim+RPC. If you're starting a new project, we'll
+include some examples to get started. You may also reference [the available examples](/docs/examples) on this website.
 
 ## Table of Contents
 
@@ -39,20 +33,25 @@ your client and server are located in separate projects, you should install the 
 - **Prim+RPC**: contains both client and server tools for making RPC; framework-agnostic
 - **Prim+RPC Plugins**: framework-specific plugins for Prim+RPC, both client and server side
 
+You may optionally install **Prim+RPC Tooling** for helpful Prim+RPC-related tools. The Tooling package is completely
+optional and includes utilities like a documentation generator as well as a build plugin that prevents the import of a
+function from the server directly (it's always safe to import types but the import of code from the server is usually
+not intended so this plugin stops that from happening). The Tooling package is included in the install commands below.
+
 Provided are installation commands for common package managers.
 
 <CH.Code>
 
 ```zsh npm
-npm install @doseofted/prim-rpc @doseofted/prim-rpc-plugins
+npm add @doseofted/prim-rpc @doseofted/prim-rpc-plugins @doseofted/prim-rpc-tooling
 ```
 
 ```zsh yarn
-yarn add @doseofted/prim-rpc @doseofted/prim-rpc-plugins
+yarn add @doseofted/prim-rpc @doseofted/prim-rpc-plugins @doseofted/prim-rpc-tooling
 ```
 
 ```zsh pnpm
-pnpm install @doseofted/prim-rpc @doseofted/prim-rpc-plugins
+pnpm add @doseofted/prim-rpc @doseofted/prim-rpc-plugins @doseofted/prim-rpc-tooling
 ```
 
 </CH.Code>
@@ -66,10 +65,12 @@ import { createPrimServer, createPrimClient } from "https://esm.sh/@doseofted/pr
 // use available export in place of {PLUGIN_NAME} below
 import {
 	createMethodHandler,
-	createMethodPlugin,
 	createCallbackHandler,
+	createMethodPlugin,
 	createCallbackPlugin,
 } from "https://esm.sh/@doseofted/prim-rpc-plugins/{PLUGIN_NAME}"
+// the following import is only if you're using Prim+RPC tooling
+import "https://esm.sh/@doseofted/prim-rpc-tooling/{TOOL_NAME}"
 ```
 
 ```ts skypack.dev
@@ -77,10 +78,12 @@ import { createPrimServer, createPrimClient } from "https://cdn.skypack.dev/@dos
 // use available export in place of {PLUGIN_NAME} below
 import {
 	createMethodHandler,
-	createMethodPlugin,
 	createCallbackHandler,
+	createMethodPlugin,
 	createCallbackPlugin,
 } from "https://cdn.skypack.dev/@doseofted/prim-rpc-plugins/{PLUGIN_NAME}"
+// the following import is only if you're using Prim+RPC tooling
+import "https://cdn.skypack.dev/@doseofted/prim-rpc-tooling/{TOOL_NAME}"
 ```
 
 ```ts unpkg.com
@@ -88,20 +91,18 @@ import { createPrimServer, createPrimClient } from "https://unpkg.com/@doseofted
 // use available export in place of {PLUGIN_NAME} below
 import {
 	createMethodHandler,
-	createMethodPlugin,
 	createCallbackHandler,
+	createMethodPlugin,
 	createCallbackPlugin,
 } from "https://unpkg.com/@doseofted/prim-rpc-plugins/{PLUGIN_NAME}"
+// the following import is only if you're using Prim+RPC tooling
+import "https://unpkg.com/@doseofted/prim-rpc-tooling/{TOOL_NAME}"
 ```
 
 </CH.Code>
 
-Now you're ready to start setting up the client and the server! I've created some guides to help you set up both client
-and server and to show what is possible with Prim+RPC. These are available in the website's navigation.
-
-If you're already familiar with Prim+RPC or don't have time to follow a guide, I'll describe below the steps that you
-should follow to set up your existing client and server projects with Prim+RPC. If you don't already have a client and
-serer configured, I recommend that you follow one of the guides on this website.
+Now you're ready to start setting up the client and the server! You may either follow setup instructions below or you
+can look at [one of the available examples](/docs/examples) for reference.
 
 We'll separate client/server steps and start with the server first.
 
@@ -110,7 +111,7 @@ We'll separate client/server steps and start with the server first.
 The Prim+RPC server hosts your JavaScript functions and makes them available to the Prim+RPC client. You can write
 regular JavaScript functions and then pass them to Prim+RPC to make them available to the server.
 
-WIP.
+Prim+RPC works with the server of your choice. You may browse the available plugins on this documentation website.
 
 ## Client Setup
 

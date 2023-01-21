@@ -31,32 +31,12 @@ export function LayoutDocs({ meta, children }: LayoutDocsProps) {
 			],
 		},
 		{
-			name: "Server Plugins",
+			name: "Integrations",
 			sections: [
-				{ name: "Fastify", link: "/plugins/server/fastify" },
-				{ name: "Express", link: "/plugins/server/express" },
-				// { name: "Node/HTTP", link: "/plugins/server/node-http" },
-				// { name: "Socket.io", link: "/plugins/server/socket-io" },
-				// { name: "Next.js", link: "/plugins/server/next-js" },
-				// { name: "Nuxt/H3", link: "/plugins/server/h3" },
-				{ name: "WS", link: "/plugins/server/ws" },
-				{ name: "Create Your Own", link: "/plugins/server/create" },
-			],
-		},
-		{
-			name: "Client Plugins",
-			sections: [
-				{ name: "Browser", link: "/plugins/client/browser" },
-				{ name: "Axios", link: "/plugins/client/axios" },
-				{ name: "Socket.io", link: "/plugins/client/socket-io" },
-				{ name: "Create Your Own", link: "/plugins/client/create" },
-			],
-		},
-		{
-			name: "IPC Plugins",
-			sections: [
-				{ name: "Web Worker", link: "/plugins/ipc/web-worker" },
-				{ name: "Electron", link: "/plugins/ipc/electron" },
+				{ name: "Client Plugins", link: "/plugins/client" },
+				{ name: "Server Plugins", link: "/plugins/server" },
+				{ name: "IPC Plugins", link: "/plugins/ipc" },
+				{ name: "Create Your Own", link: "/plugins/create" },
 			],
 		},
 	]
