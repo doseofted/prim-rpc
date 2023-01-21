@@ -62,6 +62,9 @@ const client = createPrimClient({
 	// link[2:16] #clientbatchtime
 	clientBatchTime: 15,
 })
+
+// link[32:59] #server
+// NOTE: all options above are also available on the server
 ```
 
 ### `.methodPlugin`
@@ -370,6 +373,8 @@ const server = createPrimServer({
 	methodHandler: createMethodHandler(),
 	// link[2:16] #callbackhandler
 	callbackHandler: createCallbackHandler(),
+	// link[2:7] #prefix
+	prefix: "/prim",
 	// link[2:10] #allowlist
 	allowList: { sayHello: true },
 	// link[2:17] #methodsonmethods
@@ -498,6 +503,32 @@ The callback handler serves a similar role to the [`.methodHandler`](#methodhand
 very similar. The primary difference is that the callback handler is used to maintain a connection to the client from
 the server so that callbacks can be called, potentially multiple times.
 
+When a function call is made to Prim+RPC that contains a callback, that function call is turned into an RPC and any
+callbacks on that function are transformed into a string identifier with the client's `.callbackPlugin`. This RPC is
+sent to the server of your choice which then forwards that RPC to the Prim+RPC server's corresponding
+`.callbackHandler`.
+
+The callback handler usually is usually a plugin for some kind of event handler where a persistent connection is kept
+open, like a WebSocket connection. The callback handler's responsibility is to transform RPC from the server into a
+return value, just like the method handler. However it has an additional responsibility of creating functions in place
+of the callbacks that you give and then listening for events on them. When a callback is called, those arguments are
+captured and forwarded to the Prim+RPC client.
+
+There are callback handlers available for the server of your choice and it is
+[also easy to create your own](/docs/plugins/server/create). An example of how to utilize an existing callback handler
+is given below:
+
+```typescript
+import { createPrimServer } from "@doseofted/prim-rpc"
+import { createCallbackHandler } from "@doseofted/prim-rpc-plugins/ws"
+
+const wss = new WebSocketServer({ port: 1234 })
+
+createPrimServer({
+	callbackHandler: createCallbackHandler({ wss }),
+})
+```
+
 ### `.prefix`
 
 | Required  | Default   | Sync Required |
@@ -520,7 +551,6 @@ import { createPrimServer } from "@doseofted/prim-rpc"
 
 createPrimServer({
 	prefix: "/my-rpc-endpoint",
-	// ... other options
 })
 
 // ... start HTTP server
@@ -533,8 +563,7 @@ import { createPrimClient } from "@doseofted/prim-rpc"
 
 // We'll pretend that the server is running on http://localhost:1234
 createPrimClient({
-	endpoint: "http://some-server.localhost:1234/my-rpc-endpoint",
-	// ... other options
+	endpoint: "http://localhost:1234/my-rpc-endpoint",
 })
 ```
 
@@ -545,7 +574,7 @@ are given using the Prim+RPC client, you could also make a simple request like s
 
 ```zsh
 curl --request GET \
-  --url http://some-server.localhost:1234/my-rpc-endpoint/sayHello?name=Ted&greeting=Hello
+  --url http://localhost:1234/my-rpc-endpoint/sayHello?name=Ted&greeting=Hello
 ```
 
 This example is the equivalent of calling `sayHello({ name: "Ted", greeting: "Hello" })`. Prim+RPC will know to remove
