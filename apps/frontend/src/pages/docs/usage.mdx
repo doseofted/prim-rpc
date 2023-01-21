@@ -1,0 +1,136 @@
+{/* SECTION: setup */}
+
+import { LayoutDocs } from "@/components/LayoutDocs"
+import { Alert } from "@/components/Alert"
+export const meta = {
+	title: "Usage",
+}
+export default ({ children }) => <LayoutDocs meta={meta}>{children}</LayoutDocs>
+
+{/* !SECTION setup */}
+
+# {meta.title}
+
+If you know a little JavaScript then you know how to use Prim+RPC. In this guide, we'll outline the features of Prim+RPC
+and give examples of how to use them.
+
+It is assumed that you have already set up the Prim+RPC client and server. If you have not yet then you may
+[follow the setup guide](/docs/setup) before continuing. The following are partial examples that demonstrate each
+selected feature. We'll be working out of an imaginary file called `example.ts` (a TypeScript file but feel free to use
+regular JavaScript). For example's sake, we'll assume that this file is imported and used with Prim+RPC like so:
+
+<CH.Code>
+
+```typescript index.ts
+import { createPrimClient, createPrimServer, testing } from "@doseofted/prim-rpc"
+import * as module from "./example"
+
+const plugins = testing.createPrimTestingPlugins()
+
+const { callbackHandler, methodHandler } = plugins
+const server = createPrimServer({ module, callbackHandler, methodHandler })
+
+const { methodPlugin, callbackPlugin } = plugins
+const client = createPrimClient({ callbackPlugin, methodPlugin })
+```
+
+```typescript example.ts
+// We've not created any functions yet!
+export {}
+```
+
+</CH.Code>
+
+Of course, if you'd like to follow along then you can use any plugins that you'd like. The following examples will
+modify the module given in `example.ts`.
+
+It's also worth noting that this guide is only meant to demonstrate usage of functions with Prim+RPC. You can find more
+features available with the Prim+RPC server and client by checking the
+[configuration reference](/docs/reference/configuration).
+
+## Table of Contents
+
+## Call a Function
+
+You can create a regular JavaScript function and use that directly with Prim+RPC. Remember to add the `.rpc` property to
+the function to tell Prim+RPC that it is allowed to be called.
+
+<CH.Code>
+
+```typescript example.ts
+/** Say hello! */
+export function sayHello(name: string) {
+	return `Hello ${name ?? "you"}!`
+}
+
+sayHello.rpc = true
+```
+
+---
+
+```typescript index.ts
+// ...client defined earlier
+const greeting = client.sayHello("Ted")
+console.log(greeting) // "Hello Ted!"
+```
+
+</CH.Code>
+
+By default, Prim+PRC can accept all types supported by JSON. These can be extended by using a custom JSON handler as
+seen [in the next example](#pass-advanced-arguments).
+
+## Pass Advanced Arguments
+
+If you've [set up a custom JSON handler](/docs/reference/configuration#jsonhandler) then you can even use other
+non-primitive types like Dates directly with Prim+RPC!
+
+<CH.Code>
+
+```typescript example.ts
+/** Probably tomorrow. */
+export function whatIsDayAfter(day: Date) {
+	return new Date(day.valueOf() + 1000 * 60 * 60 * 24)
+}
+
+whatIsDayAfter.rpc = true
+```
+
+---
+
+```typescript index.ts
+// ...client defined earlier
+const result = client.whatIsDayAfter(new Date())
+console.log(result) // (a Date object)
+```
+
+</CH.Code>
+
+You can also [pass callbacks](#use-a-callback) and [files](#upload-files) to functions!
+
+## Throw an Error
+
+...
+
+## Use a Callback
+
+...
+
+## Upload Files
+
+...
+
+## Pass a Form directly
+
+...
+
+## Use Multiple Signatures
+
+...
+
+## Use Nested Modules
+
+...
+
+## Use Server Context
+
+...

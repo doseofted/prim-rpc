@@ -13,7 +13,7 @@ export function HeaderLink(props: HTMLAttributes<HTMLHeadingElement> & { as: `h$
 					href={["#", attrs.id ?? ""].join("")}
 					aria-hidden="true"
 					tabIndex={-1}
-					className="inline-block opacity-0 group-hover:opacity-100 transition-opacity duration-300 align-middle transform -translate-x-6">
+					className="inline-block absolute opacity-0 group-hover:opacity-100 transition-opacity duration-300 align-middle transform -translate-x-6">
 					<Icon className="w-4 h-4" icon="carbon:link" />
 				</Link>
 			)}
