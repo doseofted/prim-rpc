@@ -9,6 +9,13 @@ import { easeIn, easeOut } from "popmotion"
 import { PtsCanvas } from "react-pts-canvas"
 import type { RequireExactlyOne } from "type-fest"
 
+/**
+ * The Light/Lights component can become intense on system resources in development.
+ * Toggle them on in development when they're actively being worked on.
+ */
+const USE_LIGHTS_DEVELOPMENT = false
+const SHOW_LIGHTS = process.env.NODE_ENV === "production" || USE_LIGHTS_DEVELOPMENT
+
 export interface LightOptions {
 	/** Brightness from 0-2 */
 	brightness: number
@@ -157,7 +164,7 @@ export function Lights(props: LightsProps) {
 	)
 	return (
 		<LightsContext.Provider value={ctx}>
-			<LightsCanvas background={background} style={fixedCss} onFirstFrame={() => onFirstFrame?.()} />
+			{SHOW_LIGHTS && <LightsCanvas background={background} style={fixedCss} onFirstFrame={() => onFirstFrame?.()} />}
 			<div style={blurCss} />
 			{children}
 		</LightsContext.Provider>
@@ -202,6 +209,9 @@ export interface LightProps extends React.HTMLAttributes<HTMLDivElement> {
  */
 export function Light(props: LightProps) {
 	const { options: givenOptions, children, onOptionsSet, ...attrs } = props
+	if (!SHOW_LIGHTS) {
+		return <div {...attrs}>{children}</div>
+	}
 	const [ctx, actions] = useLights()
 	const color = useMemo(() => shuffle(ctx.colors)[random(0, ctx.colors.length - 1)], [])
 	const options = useMemo<RequireExactlyOne<Partial<LightOptions>, "color">>(
