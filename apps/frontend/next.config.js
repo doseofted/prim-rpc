@@ -6,7 +6,7 @@ import { readFileSync } from "fs"
 import remarkToc from "remark-toc"
 import remarkGfm from "remark-gfm"
 import rehypeSlug from "rehype-slug"
-import rehypeAutolinkHeadings from "rehype-autolink-headings"
+// import rehypeAutolinkHeadings from "rehype-autolink-headings"
 import preventImport from "@doseofted/prim-rpc-tooling/build"
 
 // NOTE: eslint doesn't appear to support assert syntax yet on imports
@@ -19,7 +19,7 @@ const withMDX = mdx({
 	extension: /\.mdx?$/,
 	options: {
 		remarkPlugins: [[remarkCodeHike, { theme, showCopyButton: true }], remarkToc, remarkGfm],
-		rehypePlugins: [rehypeSlug, rehypeAutolinkHeadings],
+		rehypePlugins: [rehypeSlug /* rehypeAutolinkHeadings */],
 		providerImportSource: "@mdx-js/react",
 	},
 })

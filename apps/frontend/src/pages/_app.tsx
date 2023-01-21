@@ -4,12 +4,15 @@ import { Fira_Code, Montserrat, Plus_Jakarta_Sans } from "@next/font/google"
 import type { AppProps } from "next/app"
 import Layout from "@/components/Layout"
 import Lenis from "@studio-freight/lenis"
-import { useEffect } from "react"
+import React, { useEffect } from "react"
 import { MDXProvider } from "@mdx-js/react"
 import Link from "next/link"
+import { HeaderLink } from "@/components/Headers"
 
 const mdxComponents = {
 	a: (props: React.HTMLAttributes<HTMLAnchorElement> & { href: string }) => <Link {...props} />,
+	h2: (props: React.HTMLAttributes<HTMLHeadingElement>) => <HeaderLink as="h2" {...props} />,
+	h3: (props: React.HTMLAttributes<HTMLHeadingElement>) => <HeaderLink as="h3" {...props} />,
 }
 
 const montserrat = Montserrat({
