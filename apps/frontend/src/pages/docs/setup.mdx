@@ -56,11 +56,28 @@ yarn add @doseofted/prim-rpc @doseofted/prim-rpc-plugins @doseofted/prim-rpc-too
 pnpm add @doseofted/prim-rpc @doseofted/prim-rpc-plugins @doseofted/prim-rpc-tooling
 ```
 
+```zsh bun
+bun add @doseofted/prim-rpc @doseofted/prim-rpc-plugins @doseofted/prim-rpc-tooling
+```
+
 </CH.Code>
 
-You may also use Prim+RPC from a CDN:
+You may also use Prim+RPC with Deno or from a CDN:
 
 <CH.Code>
+
+```ts Deno
+import { createPrimServer, createPrimClient } from "npm:@doseofted/prim-rpc"
+// use available export in place of {PLUGIN_NAME} below
+import {
+	createMethodHandler,
+	createCallbackHandler,
+	createMethodPlugin,
+	createCallbackPlugin,
+} from "npm:@doseofted/prim-rpc-plugins/{PLUGIN_NAME}"
+// the following import is only if you're using Prim+RPC tooling
+import "npm:@doseofted/prim-rpc-tooling/{TOOL_NAME}"
+```
 
 ```ts esm.sh
 import { createPrimServer, createPrimClient } from "https://esm.sh/@doseofted/prim-rpc"
