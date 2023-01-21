@@ -261,5 +261,9 @@ export function createPrimClient<
 	// 	httpEvent.all.clear()
 	// }
 	// return { client, destroy }
+
+	// NOTE: if additional methods are added to the return value, consider adding method that to the proxy itself
+	// so that function calls can always be located on the root of the return value (prefix with underscore so that it's
+	// easy to differentiate between Prim method and function call)
 	return client
 }

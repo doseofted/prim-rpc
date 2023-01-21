@@ -15,6 +15,8 @@ export default ({ children }) => <LayoutDocs meta={meta}>{children}</LayoutDocs>
 In this guide, we'll learn how to set up an existing project to use Prim+RPC. If you're starting a new project, we'll
 include some examples to get started. You may also reference [the available examples](/docs/examples) on this website.
 
+Once you've set up your project, you can [learn how to write a function](/docs/usage) to be shared as Prim+RPC.
+
 ## Table of Contents
 
 ## Installation
@@ -111,8 +113,48 @@ We'll separate client/server steps and start with the server first.
 The Prim+RPC server hosts your JavaScript functions and makes them available to the Prim+RPC client. You can write
 regular JavaScript functions and then pass them to Prim+RPC to make them available to the server.
 
-Prim+RPC works with the server of your choice. You may browse the available plugins on this documentation website.
+Prim+RPC works with the server of your choice through the use of handler plugins. There are two types of handlers that
+you can configure with the Prim+RPC server. The **method handler** is used to resolve method calls in Prim+RPC. The
+**callback handler** is optional and can be used both to resolve methods but also to resolve callbacks given on a
+method. You can use both a method and callback handler with Prim+RPC at the same time or use one of them at a time (your
+choice).
+
+The reason that there are two types of handlers and why the callback plugin is optional is because, while the callback
+handler is incredibly useful, not everyone needs it. Method handlers are easier to write and understand how they work
+because they handle a request from the client and send back a response (a simple transaction). A callback handler on the
+other hand keeps an open connection to the client so that multiple responses can be sent back (like when a callback is
+called multiple times). Callback handlers are incredibly useful for real-time information (like a chat app) but can
+become expensive for large applications because your server must maintain active connections to the client.
+
+...
 
 ## Client Setup
 
-WIP.
+The Prim+RPC client communicates with the Prim+RPC server. You simply call your JavaScript function on the client, as if
+it exists on your local machine (which it doesn't), and get a result back. The client intercepts the function call and
+sends that to the Prim+RPC server. Once a response is received from the server, the client receives this result and
+hands it back to the function that you called.
+
+This is done using a
+[JavaScript Proxy object](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Proxy). The
+function that you call on the client doesn't actually exist but rather the function name and arguments are given to the
+Prim+RPC client so that it can send those to the server where your function is actually located.
+
+The Prim+RPC client communicates with your server through the use of plugins. The Prim+RPC client itself turns your
+function call into RPC and sends that RPC to plugins. There are two types of plugins that you can provide to the
+Prim+RPC client.
+
+The **method plugin** receives RPC from the client, sends it to the server, receives a result from the server, and gives
+the result back to the Prim+RPC client. The method **plugin** communicates with the method **handler** defined on the
+Prim+RPC server.
+
+The **callback plugin** is optional and keeps an open connection to the server. It receives RPC from the client when a
+callback is given, sends it to the server, and awaits multiple results from the server. As these results are received,
+they are given back to the Prim+RPC client. The callback **plugin** communicates with the callback **handler** defined
+on the Prim+RPC server.
+
+It is important to use a compatible plugin and handler (for both methods and callbacks). For instance, if you use a
+plugin that sends HTTP requests then you need a handler that can receive HTTP requests. As another example, if you use a
+plugin for Web Workers then you need a handler for Web Workers.
+
+...
