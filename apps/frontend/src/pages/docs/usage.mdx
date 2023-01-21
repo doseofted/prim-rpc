@@ -53,7 +53,8 @@ features available with the Prim+RPC server and client by checking the
 ## Call a Function
 
 You can create a regular JavaScript function and use that directly with Prim+RPC. Remember to add the `.rpc` property to
-the function to tell Prim+RPC that it is allowed to be called.
+the function to tell Prim+RPC that it is allowed to be called. Also remember that the function result is wrapped in a
+Promise and must be awaited (because we must await a response from the server).
 
 <CH.Code>
 
@@ -62,7 +63,6 @@ the function to tell Prim+RPC that it is allowed to be called.
 export function sayHello(name: string) {
 	return `Hello ${name ?? "you"}!`
 }
-
 sayHello.rpc = true
 ```
 
@@ -70,7 +70,7 @@ sayHello.rpc = true
 
 ```typescript index.ts
 // ...client defined earlier
-const greeting = client.sayHello("Ted")
+const greeting = await client.sayHello("Ted")
 console.log(greeting) // "Hello Ted!"
 ```
 
@@ -91,7 +91,6 @@ non-primitive types like Dates directly with Prim+RPC!
 export function whatIsDayAfter(day: Date) {
 	return new Date(day.valueOf() + 1000 * 60 * 60 * 24)
 }
-
 whatIsDayAfter.rpc = true
 ```
 
@@ -99,7 +98,7 @@ whatIsDayAfter.rpc = true
 
 ```typescript index.ts
 // ...client defined earlier
-const result = client.whatIsDayAfter(new Date())
+const result = await client.whatIsDayAfter(new Date())
 console.log(result) // (a Date object)
 ```
 
@@ -109,28 +108,101 @@ You can also [pass callbacks](#use-a-callback) and [files](#upload-files) to fun
 
 ## Throw an Error
 
-...
+If a function that you define on the server throws an error, that same error can be thrown on the client (as long as
+[`.handleError`](/docs/reference/configuration#handleerror) option is `true`).
+
+<CH.Code>
+
+```typescript example.ts
+/** Whoopsie */
+export function oops(ok = false) {
+	if (!ok) {
+		throw new Error("My bad.")
+	}
+	return "I did it again."
+}
+oops.rpc = true
+```
+
+---
+
+```typescript index.ts
+// ...client defined earlier
+try {
+	const result = await client.oops()
+} catch (error) {
+	if (error instanceof Error) {
+		console.log(error.message) // "My bad."
+	}
+}
+```
+
+</CH.Code>
 
 ## Use a Callback
 
-...
+Functions used with Prim+RPC can accept callbacks. This is useful for listening to events on the server as they happen
+without having to poll the server at a set interval.
+
+<CH.Code>
+
+```typescript example.ts
+/** Type a message. Now with configurable type speed. */
+export function typeMessage(message: string, typeLetter: (typed: string) => void, speed = 300) {
+	let timeout = 0
+	message.split("").forEach(letter => {
+		setTimeout(() => {
+			typeLetter(letter)
+		}, ++timeout * speed)
+	})
+}
+typeMessage.rpc = true
+```
+
+---
+
+```typescript index.ts
+// ...client defined earlier
+client.typeMessage("Hello!", letter => {
+	console.log(letter) // each letter of "Hello!"
+})
+```
+
+</CH.Code>
 
 ## Upload Files
+
+You can upload files to Prim+RPC as long as your configured
+[`.methodHandler`](/docs/reference/configuration#methodhandler) supports it. Files (and Blobs, in general) can be sent
+like so:
 
 ...
 
 ## Pass a Form directly
 
+If you have an HTML form on the page, you can pass that Form element directly to Prim+RPC. The Prim+RPC client will read
+the FormData given on the form and turn it into an object (preserving any files given on the Form) that will be sent to
+the server.
+
 ...
 
 ## Use Multiple Signatures
+
+If you're using TypeScript, you can define multiple signatures on your function and those types will be available on the
+client.
 
 ...
 
 ## Use Nested Modules
 
+You can use nested modules with Prim+RPC.
+
 ...
 
 ## Use Server Context
+
+You can set the context of the function based on the utilized method and callback handlers. Each handler used with
+Prim+RPC will have its own context (for instance, a Request object in some server framework). This context can be
+accessed from the function's `this` object (Prim+RPC will bind that context to the function).
 
 ...

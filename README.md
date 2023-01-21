@@ -5,7 +5,7 @@ library is making plain function calls to a server from some client (RPC), as if
 client itself. The goal is to write plain JavaScript, or TypeScript if you prefer, and immediately invoke typed code
 without verbose wrappers around the communication channel.
 
-[Read the Documentation](https://prim.doseofted.com/)
+[Read the Documentation](https://prim.doseofted.com/) ∙ [Work with Ted](https://doseofted.com/)
 
 ## Security
 

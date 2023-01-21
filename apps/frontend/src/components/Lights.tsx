@@ -3,7 +3,7 @@ import { useImmer } from "use-immer"
 import { nanoid } from "nanoid"
 import { useWindowScroll, useWindowSize } from "react-use"
 import { clamp, random, shuffle } from "lodash-es"
-import { CanvasSpace, Circle, Pt, GroupLike, PtsCanvasRenderingContext2D, Const, CanvasForm } from "pts"
+import { CanvasSpace, Circle, Pt, Const as PtsConst, CanvasForm } from "pts"
 import { lighten, transparentize } from "color2k"
 import { easeIn, easeOut } from "popmotion"
 import { PtsCanvas } from "react-pts-canvas"
@@ -321,7 +321,7 @@ function LightsCanvas(props: LightCanvasProps) {
 			const offsetDelayed = delayPt(offset, delay, [index, "offset"])
 			const rotate = rotateAmount % 360
 			const rotateDelayed = delayNumber(rotate, delay, [index, "rotate"])
-			center = center.$add(offsetDelayed).rotate2D(rotateDelayed * (Const.pi / 180), center)
+			center = center.$add(offsetDelayed).rotate2D(rotateDelayed * (PtsConst.pi / 180), center)
 			const colorStart = transparentize(
 				lighten(color, (clamp(brightnessDelayed, 1.5, 2) - 1.5) * 2),
 				easeIn(clamp(1 - brightnessDelayed, 0, 1))
@@ -329,7 +329,7 @@ function LightsCanvas(props: LightCanvasProps) {
 			const colorEnd = transparentize(colorStart, 1)
 			const sizeDelayed = delayNumber(size, delay, [index, "size"])
 			const circleSize = sizeDelayed * easeOut(brightnessDelayed / 2)
-			const gradientColor = temporaryGradient(form.ctx, [colorStart, colorEnd])
+			const gradientColor = form.gradient([colorStart, colorEnd])
 			const gradientShape = gradientColor(
 				Circle.fromCenter(center, (circleSize * easeOut(clamp(brightnessDelayed - 1, 0, 1))) / 2),
 				Circle.fromCenter(center, circleSize + 0.01)
@@ -350,40 +350,4 @@ function LightsCanvas(props: LightCanvasProps) {
 			/>
 		</div>
 	)
-}
-
-/**
- * This is a temporary replacement for PTS gradient method while my PR is being reviewed in the official library.
- * Replace `temporaryGradient(form.ctx, ...)` with `form.gradient(...)` once approved.
- *
- * - [My PR](https://github.com/williamngan/pts/pull/196)
- * - [Original gradient function](https://github.com/williamngan/pts/blob/5aacde2939e339892fd001885f964d5c52b057c5/src/Canvas.ts#L617-L641)
- */
-function temporaryGradient(
-	ctx: PtsCanvasRenderingContext2D,
-	stops: [number, string][] | string[]
-): (area1: GroupLike, area2?: GroupLike) => CanvasGradient {
-	const vals: [number, string][] = []
-	if (stops.length < 2) (stops as [number, string][]).push([0.99, "#000"], [1, "#000"])
-	for (let i = 0, len = stops.length; i < len; i++) {
-		const t: number = typeof stops[i] === "string" ? i * (1 / (stops.length - 1)) : (stops[i][0] as number)
-		const v: string = typeof stops[i] === "string" ? (stops[i] as string) : stops[i][1]
-		vals.push([t, v])
-	}
-	return (area1: GroupLike, area2?: GroupLike) => {
-		const grad = area2
-			? ctx.createRadialGradient(
-					area1[0][0],
-					area1[0][1],
-					Math.abs(area1[1][0]),
-					area2[0][0],
-					area2[0][1],
-					Math.abs(area2[1][0])
-			  )
-			: ctx.createLinearGradient(area1[0][0], area1[0][1], area1[1][0], area1[1][1])
-		for (let i = 0, len = vals.length; i < len; i++) {
-			grad.addColorStop(vals[i][0], vals[i][1])
-		}
-		return grad
-	}
 }
