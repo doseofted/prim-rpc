@@ -18,9 +18,8 @@ export function LayoutDocs({ meta, children }: LayoutDocsProps) {
 				{ name: "Setup", link: "/setup" },
 				{ name: "Usage", link: "/usage" },
 				{ name: "Examples", link: "/examples" },
-				{ name: "RPC Structure", link: "/rpc-structure" },
-				{ name: "Limitations", link: "/limitations" },
 				{ name: "Comparisons", link: "/comparisons" },
+				{ name: "Limitations", link: "/limitations" },
 			],
 		},
 		{
@@ -28,19 +27,9 @@ export function LayoutDocs({ meta, children }: LayoutDocsProps) {
 			sections: [
 				{ name: "API", link: "/reference/api" },
 				{ name: "Configuration", link: "/reference/configuration" },
+				{ name: "RPC Structure", link: "/reference/structure" },
 			],
 		},
-		// NOTE: Entire usage section might be a bit ambitious, consider moving to one page
-		// {
-		// 	name: "Usage",
-		// 	sections: [
-		// 		{ name: "Call a Function", link: "/usage/function-calls" },
-		// 		{ name: "Use Callbacks", link: "/usage/callbacks" },
-		// 		{ name: "Upload Files", link: "/usage/upload-files" },
-		// 		{ name: "Create a Plugin", link: "/usage/plugin-creation" },
-		// 		{ name: "Custom Serialization", link: "/usage/serialization" },
-		// 	],
-		// },
 		{
 			name: "Server Plugins",
 			sections: [
@@ -48,6 +37,8 @@ export function LayoutDocs({ meta, children }: LayoutDocsProps) {
 				{ name: "Express", link: "/plugins/server/express" },
 				// { name: "Node/HTTP", link: "/plugins/server/node-http" },
 				// { name: "Socket.io", link: "/plugins/server/socket-io" },
+				// { name: "Next.js", link: "/plugins/server/next-js" },
+				// { name: "Nuxt/H3", link: "/plugins/server/h3" },
 				{ name: "WS", link: "/plugins/server/ws" },
 				{ name: "Create Your Own", link: "/plugins/server/create" },
 			],
