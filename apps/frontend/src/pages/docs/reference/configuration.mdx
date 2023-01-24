@@ -86,7 +86,7 @@ Below is an example of how to register an existing method plugin with the Prim+R
 
 ```typescript
 import { createPrimClient } from "@doseofted/prim-rpc"
-import { createMethodPlugin } from "@doseofted/prim-rpc-plugins/browser-api"
+import { createMethodPlugin } from "@doseofted/prim-rpc-plugins/browser-fetch"
 
 const methodPlugin = createMethodPlugin()
 createPrimClient({ methodPlugin })
@@ -133,7 +133,7 @@ You can configure the callback plugin like so:
 
 ```typescript
 import { createPrimClient } from "@doseofted/prim-rpc"
-import { createCallbackPlugin } from "@doseofted/prim-rpc-plugins/browser-api"
+import { createCallbackPlugin } from "@doseofted/prim-rpc-plugins/browser-websocket"
 
 const callbackPlugin = createCallbackPlugin()
 createPrimClient({ callbackPlugin })

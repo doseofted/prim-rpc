@@ -232,7 +232,7 @@ Prim+RPC plugin for the browser's APIs):
 ```ts client.ts mark=3,8
 // on client:
 import { createPrimClient } from "@doseofted/prim-rpc"
-import { createMethodPlugin } from "@doseofted/prim-rpc-plugins/browser-api"
+import { createMethodPlugin } from "@doseofted/prim-rpc-plugins/browser-fetch"
 import type * as module from "./server.ts"
 
 const prim = createPrimClient<typeof module>({
@@ -248,7 +248,7 @@ Now we're ready to call our function from the client to our server!
 ```ts client.ts focus=11:12
 // on client:
 import { createPrimClient } from "@doseofted/prim-rpc"
-import { createMethodPlugin } from "@doseofted/prim-rpc-plugins/browser-api"
+import { createMethodPlugin } from "@doseofted/prim-rpc-plugins/browser-fetch"
 import type * as module from "./server.ts"
 
 const prim = createPrimClient<typeof module>({

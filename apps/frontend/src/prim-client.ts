@@ -1,5 +1,5 @@
 import { createPrimClient, JsonHandler } from "@doseofted/prim-rpc"
-import { createCallbackPlugin, createMethodPlugin } from "@doseofted/prim-rpc-plugins/browser-api"
+import { createMethodPlugin, createCallbackPlugin } from "@doseofted/prim-rpc-plugins/browser"
 import superjson from "superjson"
 import type * as exampleClient from "@doseofted/prim-example"
 

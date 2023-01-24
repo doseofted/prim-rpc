@@ -13,12 +13,46 @@ export default ({ children }) => <LayoutDocs meta={meta}>{children}</LayoutDocs>
 
 ## Table of Contents
 
-## Web Worker
+## Overview
+
+Prim+RPC works over the transport of your choice through the usage of plugins. There are four types of plugins, split
+into two categories: a **client plugin** that sends RPC and expect a result, and a **server handler** that receives
+given RPC and returns a result.
+
+On both the client and the server, there are two types of plugins/handlers. There are **method handlers** used to send
+RPC and receive an immediate RPC result and **callback handlers** which are used to send RPC and await multiple results
+over time. Each method _handler_ on the server-side works with the client through a method _plugin_. The same applies to
+callbacks: each server-side handler must have a client-side plugin.
+
+For example: if you're already using Express as an HTTP server then you may want to use Prim+RPC with the
+[Express method handler](/docs/plugins/server#express) on the server. Since you're using an HTTP server, you'll also
+need a client-side plugin that can send and receive HTTP requests. For this purpose, you may use the
+[Fetch method plugin](/docs/plugins/client#fetch-api-browser) which uses the web browser's Fetch API to communicate with
+your server.
+
+As another example, you may want to support callbacks on your function calls used with Prim+RPC. For this, you'll need a
+callback handler. If you are using "ws" (a WebSocket library for Node) then you may use the
+[ws callback handler](/docs/plugins/server#ws). You'll also need a corresponding callback plugin on the client. Since
+we're using a WebSocket on the server, we'll use the
+[WebSocket callback plugin](/docs/plugins/client#websocket-api-browser) which uses the web browser's WebSocket API to
+communicate with your server. You may use the method and callback plugins at the same time with Prim+RPC because it will
+know when to use one versus the other.
+
+Now that we understand the responsibilities of each plugin/handler, we can determine what type of plugin that we'd like
+to create and learn how to create it next.
+
+## Create a Method Plugin
 
 ...
 
-## Electron
+## Create a Method Handler
 
-<Alert icon="carbon:warning" type="alert-warning">
-	Work in Progress
-</Alert>
+...
+
+## Create a Callback Plugin
+
+...
+
+## Create a Callback Handler
+
+...

@@ -44,7 +44,9 @@
 	"type": "module",
 	"exports": {
 		"./axios": "./dist/client/axios.js",
-		"./browser-api": "./dist/client/browser-api.js",
+		"./browser": "./dist/client/browser.js",
+		"./browser-fetch": "./dist/client/browser-fetch.js",
+		"./browser-websocket": "./dist/client/browser-websocket.js",
 		"./fastify": "./dist/server/fastify.js",
 		"./express": "./dist/server/express.js",
 		"./ws": "./dist/server/ws.js",
@@ -56,8 +58,14 @@
 			"axios": [
 				"dist/client/axios.d.ts"
 			],
-			"browser-api": [
-				"dist/client/browser-api.d.ts"
+			"browser": [
+				"dist/client/browser.d.ts"
+			],
+			"browser-fetch": [
+				"dist/client/browser-fetch.d.ts"
+			],
+			"browser-websocket": [
+				"dist/client/browser-websocket.d.ts"
 			],
 			"fastify": [
 				"dist/server/fastify.d.ts"
