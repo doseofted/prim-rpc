@@ -14,6 +14,12 @@ without verbose wrappers around the communication channel.
 If a security issue is found then please privately [report the issue to Ted](mailto:ted@doseofted.com). Prim+RPC is in
 early stages and, as it progresses, a more robust policy should be created.
 
+## Issues
+
+If you discover an issue with Prim+RPC unrelated to security, search open issues and discussions in this repository to
+determine if someone else has faced the same issue. Otherwise, feel free to report an issue with a minimal reproduction
+(consider [using an example](https://github.com/doseofted/prim-rpc-examples) as a starting point).
+
 ## Contributions
 
 To be written.
