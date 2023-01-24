@@ -25,7 +25,6 @@ export function LayoutDocs({ meta, children }: LayoutDocsProps) {
 		{
 			name: "Reference",
 			sections: [
-				{ name: "API", link: "/reference/api" },
 				{ name: "Configuration", link: "/reference/configuration" },
 				{ name: "RPC Structure", link: "/reference/structure" },
 			],
