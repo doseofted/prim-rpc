@@ -45,10 +45,12 @@ export function handlePossibleBlobs(
 	fromForm = false
 ): [given: unknown, blobs: Record<string, Blob | Buffer>, fromForm: boolean] {
 	const blobs: Record<string, Blob | Buffer> = {}
-	const binaryGiven =
-		(typeof Blob !== "undefined" && given instanceof Blob) || (typeof Buffer !== "undefined" && given instanceof Buffer)
-			? given
+	const isBinaryLike = (possiblyBin: unknown) =>
+		(typeof Blob !== "undefined" && possiblyBin instanceof Blob) ||
+		(typeof Buffer !== "undefined" && possiblyBin instanceof Buffer)
+			? possiblyBin
 			: false
+	const binaryGiven = isBinaryLike(given)
 	const givenForm = (maybeForm: unknown): maybeForm is HTMLFormElement | FormData =>
 		(typeof HTMLFormElement === "function" && maybeForm instanceof HTMLFormElement) ||
 		(typeof FormData === "function" && maybeForm instanceof FormData)
@@ -66,10 +68,11 @@ export function handlePossibleBlobs(
 	if (typeof given === "object") {
 		for (const [key, val] of Object.entries(given)) {
 			// possibly given from form data
-			if (val instanceof Blob) {
+			const valBinary = isBinaryLike(val)
+			if (valBinary) {
 				const binaryIdentifier = [BLOB_PREFIX, nanoid()].join("")
 				given[key] = binaryIdentifier
-				blobs[binaryIdentifier] = val
+				blobs[binaryIdentifier] = valBinary
 			} else if (Array.isArray(val)) {
 				// maybe multiple files were given in form data
 				const [replacedVal, moreBlobs] = handlePossibleBlobs(val)
@@ -86,9 +89,10 @@ export function handlePossibleBlobs(
 	if (Array.isArray(given) && given.filter(a => a instanceof Blob).length > 0) {
 		// list of blobs given
 		const replaced = given.map(val => {
-			if (val instanceof Blob) {
+			const valBinary = isBinaryLike(val)
+			if (valBinary) {
 				const binaryIdentifier = [BLOB_PREFIX, nanoid()].join("")
-				blobs[binaryIdentifier] = val
+				blobs[binaryIdentifier] = valBinary
 				return binaryIdentifier
 			}
 			return val as unknown

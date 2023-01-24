@@ -46,7 +46,7 @@ function createServerActions(
 		const { body = "", method = "POST", url: possibleUrl = "" } = given
 		const providedBody = body && method === "POST"
 		if (providedBody) {
-			const prepared = jsonHandler.parse<RpcCall | RpcCall[]>(given.body)
+			const prepared = jsonHandler.parse(given.body) as RpcCall | RpcCall[]
 			return prepared
 		}
 		const providedUrl = possibleUrl !== "" && method === "GET"
@@ -154,9 +154,9 @@ function createServerActions(
 		return answeredCalls.length === 1 ? answeredCalls[0] : answeredCalls
 	}
 	const prepareSend = (given: RpcAnswer | RpcAnswer[]): CommonServerResponseOptions => {
-		const body = jsonHandler.stringify(given)
+		const body = jsonHandler.stringify(given) as string
 		// NOTE: body length is generally handled by server framework, I think
-		const headers = { "Content-Type": "application/json" }
+		const headers = { "content-type": jsonHandler.mediaType ?? "application/json" }
 		const answers = Array.isArray(given) ? given : [given]
 		const statuses = answers.map(answer => (answer.error ? 500 : answer.result ? 200 : 400))
 		const notOkay = statuses.filter(stat => stat !== 200)

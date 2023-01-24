@@ -58,7 +58,7 @@ export const createCallbackHandler = (options: MethodWsOptions): PrimServerCallb
 			})
 			ws.on("message", m => {
 				call(
-					String(m),
+					m as unknown as string,
 					data => {
 						ws.send(data)
 					},

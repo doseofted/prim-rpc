@@ -51,6 +51,19 @@ export const fastifyPrimRpc: FastifyPluginAsync<PrimFastifyPluginOptions> = asyn
 	if (multipartPlugin) {
 		await fastify.register(multipartPlugin)
 	}
+	// LINK https://github.com/fastify/fastify/issues/534
+	/* fastify.addContentTypeParser("application/octet-stream", (req, payload, done) => {
+		let data: Buffer
+		payload.on("data", chunk => {
+			data = Buffer.concat([data, chunk].filter(given => given))
+		})
+		payload.on("error", () => {
+			done(new Error("Buffer could not be read"))
+		})
+		payload.on("end", () => {
+			done(null, data)
+		})
+	}) */
 	// LINK https://github.com/fastify/help/issues/158#issuecomment-1086190754
 	fastify.addContentTypeParser("application/json", { parseAs: "string" }, (_req, body, done) => {
 		try {
@@ -94,6 +107,9 @@ export const fastifyPrimRpc: FastifyPluginAsync<PrimFastifyPluginOptions> = asyn
 			const body = bodyForm ?? bodyReq
 			const context = contextTransform(request, reply)
 			const response = await prim.server().call({ method, url, body }, blobs, context)
+			// if (response.headers["content-type"] === "application/octet-stream") {
+			// 	void reply.status(response.status).headers(response.headers).send(Buffer.from(response.body))
+			// }
 			void reply.status(response.status).headers(response.headers).send(response.body)
 		},
 	})
@@ -108,6 +124,9 @@ export const fastifyPrimRpc: FastifyPluginAsync<PrimFastifyPluginOptions> = asyn
 			} = request
 			const context = contextTransform(request, reply)
 			const response = await prim.server().call({ method, url, body }, null, context)
+			// if (response.headers["content-type"] === "application/octet-stream") {
+			// 	void reply.status(response.status).headers(response.headers).send(Buffer.from(response.body))
+			// }
 			void reply.status(response.status).headers(response.headers).send(response.body)
 		},
 	})

@@ -68,9 +68,11 @@ export type PromisifiedModule<ModuleGiven extends object> = {
 }
 
 export interface JsonHandler {
-	stringify: (json: unknown) => string
 	// eslint-disable-next-line @typescript-eslint/no-explicit-any
-	parse: <T = any>(string: string) => T
+	stringify: (value: any) => any
+	// eslint-disable-next-line @typescript-eslint/no-explicit-any
+	parse: (text: any) => any
+	mediaType?: string
 }
 // type JsonHandlerOptional  = Partial<JsonHandler>
 /** The record key is a string prefixed with `_bin_` and the value is the Blob */
