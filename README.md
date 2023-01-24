@@ -17,12 +17,19 @@ early stages and, as it progresses, a more robust policy should be created.
 ## Issues
 
 If you discover an issue with Prim+RPC unrelated to security, search open issues and discussions in this repository to
-determine if someone else has faced the same issue. Otherwise, feel free to report an issue with a minimal reproduction
-(consider [using an example](https://github.com/doseofted/prim-rpc-examples) as a starting point).
+determine if someone else has faced the same issue. Otherwise, feel free to report an issue _with_ a minimal
+reproduction (consider [using an example](https://github.com/doseofted/prim-rpc-examples) as a starting point).
 
 ## Contributions
 
-To be written.
+Prim+RPC depends on handlers/plugins to work with a wide variety of frameworks. These frameworks can sometimes be
+difficult to integrate with when one is not familiar with the framework. Contributions for handlers/plugins or to rest
+of the project are welcome!
+
+It is possible that a feature is already being or has been developed or that a feature may have been rejected. If you'd
+like to contribute to the project, open a pull request and describe what change that you would like to make.
+
+Contributions made to the project will be made available under the [license of that project](#license).
 
 ## License
 
