@@ -191,9 +191,24 @@ To sum up differences:
 
 ## gRPC
 
-<Alert icon="carbon:warning" type="alert-warning">
-	Unavailable (Work In Progress)
-</Alert>
+Prim+RPC and gRPC are very different which makes it difficult to accurately compare both without leaving something out
+or oversimplifying. However, we'll try to make some general comparisons.
+
+Prim+RPC focuses on JavaScript and takes advantage of JavaScript-specific features. It supports other languages through
+the use of simple and easy-to-understand RPCs that can be made over any HTTP client but does not provide clients for
+other, specific languages. gRPC on the other hand is intended to be more language-neutral though the usage of protocol
+buffers ("protobufs"). While this flexibility can be useful, it does mean that service definitions need to be written in
+another language and then implemented in the language of your choice (this is similar to GraphQL in the fact that an
+intermediary language is used; in GraphQL it's their SDL, gRPC it's protocol buffers, however they are very different
+languages). In Prim+RPC, you only need to use TypeScript to define types without some other intermediary language (or
+you could call TypeScript that "intermediary language"). The difference being that TypeScript is written alongside your
+code while protocol buffers live outside of it.
+
+[streaming section]
+
+[client generation]
+
+[authentication info]
 
 ## JSON RPC
 

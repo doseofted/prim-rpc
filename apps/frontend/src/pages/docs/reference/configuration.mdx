@@ -94,7 +94,7 @@ createPrimClient({ methodPlugin })
 
 Each method plugin may (or may not) include its own options specific to that plugin. You can find a list of available
 method plugins on this documentation website or you can
-[follow this guide to create your own](/docs/plugins/client/create).
+[follow this guide to create your own](/docs/plugins/create#method-plugin).
 
 Once your method plugin is registered with the Prim+RPC client then you will also need to specify a compatible
 [method "handler"](#methodhandler) on the Prim+RPC server. In general, a "plugin" in Prim+RPC is used to send/receive
@@ -141,7 +141,7 @@ createPrimClient({ callbackPlugin })
 
 Each callback plugin may (or may not) include its own options specific to that plugin. You can find a list of available
 callback plugins on this documentation website or you can
-[follow this guide to create your own](/docs/plugins/client/create).
+[follow this guide to create your own](/docs/plugins/create#callback-plugin).
 
 If a callback plugin is given, it's important to note that each plugin used on the Prim+RPC client must have a
 [compatible "handler" plugin](#callbackhandler) on the Prim+RPC server (just like method plugins/handlers).
@@ -468,8 +468,8 @@ the function call, and send back the result to your server in a format that it c
 result back to the client.
 
 There are many method handlers available that you integrate with the server framework of your choice. You can also
-[write your own](/docs/plugins/server/create) if a server handler doesn't meet your needs or you need support for an
-additional server. An example of how to use an existing method handler is demonstrated below:
+[create your own](/docs/plugins/create#method-handler) if a server handler doesn't meet your needs or you need support
+for an additional server. An example of how to use an existing method handler is demonstrated below:
 
 ```typescript
 import { createPrimServer } from "@doseofted/prim-rpc"
@@ -515,8 +515,8 @@ of the callbacks that you give and then listening for events on them. When a cal
 captured and forwarded to the Prim+RPC client.
 
 There are callback handlers available for the server of your choice and it is
-[also easy to create your own](/docs/plugins/server/create). An example of how to utilize an existing callback handler
-is given below:
+[also easy to create your own](/docs/plugins/create#callback-handler). An example of how to utilize an existing callback
+handler is given below:
 
 ```typescript
 import { createPrimServer } from "@doseofted/prim-rpc"
