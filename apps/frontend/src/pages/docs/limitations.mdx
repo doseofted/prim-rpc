@@ -120,6 +120,27 @@ contain binary data. This would then need to be pieced together on the server. T
 Prim+RPC's responsibilities. I will need to find time to address this issue, find some other solution, or consider
 making this a permanent limitation.
 
+### Generator Functions are Not Supported Yet
+
+[Generator functions](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Statements/function*) can be
+incredibly useful but do not appear to be a very popular feature in JavaScript yet. Generator functions are not
+supported yet in Prim+RPC today. It is possible that they may be supported in the future in a similar way that callbacks
+are supported but today this feature is unavailable. As Prim+RPC progresses, this feature is something that I'd like to
+look into further to determine if this is possible or needs to become a permanent limitation (Prim+RPC is in early
+stages).
+
+### Function Context is set by Prim+RPC
+
+Prim+RPC today sets the context of your function (the `this` variable ) based on the server-side handler used. This
+behavior is used to allow transport-specific mechanisms to be used where necessary (for instance, this could be useful
+for using existing authentication over an HTTP framework). Since the `this` object is set from the handler plugin, this
+means that functions used with Prim+RPC cannot set the `this` without it being overridden by the calling function. This
+should generally be expected in JavaScript since the value of the `this` variable is determined by the calling function
+(Prim+RPC in this case) but may be confusing if a method is given from an instantiated class.
+
+This is the default behavior today but this may be changed before a 1.0 release if found that this functionality is more
+of a hurdle than a helpful utility.
+
 ## Serialization Limitations
 
 RPC messages need to be serialized before they are transported. Simple primitive types are always supported but
