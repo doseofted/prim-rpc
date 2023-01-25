@@ -158,11 +158,11 @@ explicitly on the server, Prim+RPC follows the structure of the JavaScript modul
 you give Prim+RPC a module named `someModule` with a function `sayHello` then you'd simply call `someModule.sayHello()`.
 No other options are needed for that function call from the client except for those provided from your function.
 
-tRPC also utilizes Zod to a large extent as a way of defining types that can be enforced during run-time. This allows
-tRPC to enforce a schema but it means that you need to use Zod to do so. Prim+RPC on the other hand only focuses on
-compile-time validation of types and leaves the run-time errors to the developer. This means that you could potentially
-use Zod, jut like you would in tRPC, but you also have the option of choosing your own tool from the JavaScript
-ecosystem if you'd like.
+tRPC also utilizes Zod to a large extent as a way of defining types that can be enforced during run-time. It also has
+tested a few other popular schema libraries and allows them to be used with tRPC. Prim+RPC on the other hand only
+focuses on compile-time validation of types and leaves the run-time errors to the developer. This means that you could
+potentially use Zod, jut like you would in tRPC, but you also have the option of choosing any other tool from the
+JavaScript ecosystem if you'd like.
 
 Another difference between the two is how they are used on the client and within frontend frameworks. tRPC provides an
 RPC client with its own fetch client with a variety of features and options built-in. It also provides an adapter for
@@ -186,7 +186,7 @@ To sum up differences:
 | ------------------------------------- | ------------------------------------------------------------ |
 | Focus on HTTP transport               | Transport-agnostic                                           |
 | Great for those familiar with GraphQL | Great for those familiar with JavaScript                     |
-| Uses Zod for schema validation        | Schema validation is left to developer but Zod could be used |
+| Mostly sses Zod for schema validation | Schema validation is left to developer but Zod could be used |
 | Built-in fetch with client            | Fetching ability provided over plugins                       |
 
 ## gRPC
