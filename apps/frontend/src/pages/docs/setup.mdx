@@ -12,8 +12,9 @@ export default ({ children }) => <LayoutDocs meta={meta}>{children}</LayoutDocs>
 
 # {meta.title}
 
-In this guide, we'll learn how to set up an existing project to use Prim+RPC. If you're starting a new project, we'll
-include some examples to get started. You may also reference [the available examples](/docs/examples) on this website.
+In this guide, we'll learn how to set up an existing project to use Prim+RPC. If you're starting a new project, you can
+also follow this guide. You may reference [the available examples](/docs/examples) on this website to act as a starting
+point.
 
 Once you've set up your project, you can [learn how to write a function](/docs/usage) to be shared as Prim+RPC.
 
@@ -130,6 +131,27 @@ We'll separate client/server steps and start with the server first.
 The Prim+RPC server hosts your JavaScript functions and makes them available to the Prim+RPC client. You can write
 regular JavaScript functions and then pass them to Prim+RPC to make them available to the server.
 
+For this example, we'll pretend that we have an existing JavaScript file that we'd like to work with Prim+RPC. Note that
+TypeScript here is optional and we use it here only as an example.
+
+```typescript hello.ts
+/**
+ * This function just says hello.
+ */
+export function sayHello(x: string, y: string) {
+	return `${x}, meet ${y}.`
+}
+// JavaScript functions are objects so we can add additional properties to them
+// We add the `.rpc` property to explicitly say that this function can be used as RPC
+sayHello.rpc = true
+```
+
+Note that we added a `.rpc` property to the function. Prim+RPC will look for this property before it is allowed to
+execute the function remotely. If you can't add the the `.rpc` property (maybe the
+[function is frozen](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Object/freeze))
+then you can also specify that it's allowed to be called by using the
+[`.allowList`](/docs/reference/configuration#allowlist) option on the Prim+RPC server.
+
 Prim+RPC works with the server of your choice through the use of handler plugins. There are two types of handlers that
 you can configure with the Prim+RPC server. The **method handler** is used to resolve method calls in Prim+RPC. The
 **callback handler** is optional and can be used both to resolve methods but also to resolve callbacks given on a
@@ -143,7 +165,11 @@ other hand keeps an open connection to the client so that multiple responses can
 called multiple times). Callback handlers are incredibly useful for real-time information (like a chat app) but can
 become expensive for large applications because your server must maintain active connections to the client.
 
-...
+If interested, you may learn more about [how plugins/handlers work](/docs/plugins/create) in the plugin creation guide.
+
+```typescript
+// ...
+```
 
 ## Client Setup
 
