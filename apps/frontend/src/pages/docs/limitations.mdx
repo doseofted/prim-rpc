@@ -123,11 +123,22 @@ making this a permanent limitation.
 ### Generator Functions are Not Supported Yet
 
 [Generator functions](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Statements/function*) can be
-incredibly useful but do not appear to be a very popular feature in JavaScript yet. Generator functions are not
+incredibly useful but do not appear to be a very popular feature in JavaScript yet. Generator functions are not yet
 supported yet in Prim+RPC today. It is possible that they may be supported in the future in a similar way that callbacks
 are supported but today this feature is unavailable. As Prim+RPC progresses, this feature is something that I'd like to
-look into further to determine if this is possible or needs to become a permanent limitation (Prim+RPC is in early
-stages).
+look into further to ensure that it's possible (Prim+RPC is in early stages).
+
+```ts
+// NOTE: DOES NOT WORK
+export function* aloha() {
+	yield "Hello!"
+	yield "Goodbye!"
+}
+
+for (const greeting of aloha()) {
+	console.log(greeting)
+}
+```
 
 ### Function Context is set by Prim+RPC
 
@@ -137,6 +148,28 @@ for using existing authentication over an HTTP framework). Since the `this` obje
 means that functions used with Prim+RPC cannot set the `this` without it being overridden by the calling function. This
 should generally be expected in JavaScript since the value of the `this` variable is determined by the calling function
 (Prim+RPC in this case) but may be confusing if a method is given from an instantiated class.
+
+```typescript
+// NOTE: this DOES work (just remember to set the correct context used with your chosen server)
+export function getCustomHeader(this: PrimFastifyContext) {
+	console.log(`Header provided over ${this.context}`, this.headers["x-my-custom-header"])
+}
+
+// NOTE: DOES NOT WORK
+class Test {
+	someProperty = "hello!"
+
+	hello() {
+		console.log(this.someProperty)
+	}
+}
+const test = new Test()
+export { test }
+```
+
+In the above example, `getCustomHeader()` would work if used with a server framework that provides headers (using
+Fastify as an example). The second example however will log `undefined` instead of the expected `"hello!"` because
+Prim+RPC set the `this` value to another value, where `.someProperty` doesn't exist.
 
 This is the default behavior today but this may be changed before a 1.0 release if found that this functionality is more
 of a hurdle than a helpful utility.
