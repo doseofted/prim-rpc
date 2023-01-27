@@ -3,14 +3,24 @@ import "../styles/globals.css"
 import { Fira_Code, Montserrat, Plus_Jakarta_Sans } from "@next/font/google"
 import type { AppProps } from "next/app"
 import Layout from "@/components/Layout"
-import Lenis from "@studio-freight/lenis"
-import React, { useEffect } from "react"
+import React from "react"
 import { MDXProvider } from "@mdx-js/react"
 import Link from "next/link"
 import { HeaderLink } from "@/components/Headers"
+import { LenisProvider, useLenis } from "@/components/LenisProvider"
 
 const mdxComponents = {
-	a: (props: React.HTMLAttributes<HTMLAnchorElement> & { href: string }) => <Link {...props} />,
+	a: (props: React.HTMLAttributes<HTMLAnchorElement> & { href: string }) => {
+		// eslint-disable-next-line @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-unsafe-call
+		const lenis = useLenis()
+		return (
+			<Link
+				{...props}
+				// eslint-disable-next-line @typescript-eslint/no-unsafe-return, @typescript-eslint/no-unsafe-member-access, @typescript-eslint/no-unsafe-call
+				onClick={() => (props.href.startsWith("#") ? lenis?.scrollTo(document.querySelector(props.href)) : null)}
+			/>
+		)
+	},
 	h2: (props: React.HTMLAttributes<HTMLHeadingElement>) => <HeaderLink as="h2" {...props} />,
 	h3: (props: React.HTMLAttributes<HTMLHeadingElement>) => <HeaderLink as="h3" {...props} />,
 }
@@ -31,36 +41,7 @@ const firaCodeMono = Fira_Code({
 	display: "swap",
 })
 
-/** https://easings.net/#easeOutExpo */
-function easeOutExpo(x: number): number {
-	return x === 1 ? 1 : 1 - Math.pow(2, -10 * x)
-}
-
 export default function App({ Component, pageProps }: AppProps) {
-	const useLenis = true
-	useEffect(() => {
-		const lenis = useLenis
-			? new Lenis({
-					duration: 1,
-					easing: easeOutExpo,
-					direction: "vertical",
-					gestureDirection: "vertical",
-					smooth: true,
-					mouseMultiplier: 1,
-					smoothTouch: false,
-					touchMultiplier: 2,
-					infinite: false,
-			  })
-			: null
-		function raf(time: number) {
-			lenis?.raf(time)
-			requestAnimationFrame(raf)
-		}
-		requestAnimationFrame(raf)
-		return () => {
-			lenis?.destroy()
-		}
-	}, [])
 	return (
 		<Layout
 			data-theme="prim"
@@ -70,10 +51,12 @@ export default function App({ Component, pageProps }: AppProps) {
 				plusJakartaSans.variable,
 				firaCodeMono.variable,
 			].join(" ")}>
-			{/* eslint-disable-next-line @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-explicit-any */}
-			<MDXProvider components={mdxComponents as any}>
-				<Component {...pageProps} />
-			</MDXProvider>
+			<LenisProvider>
+				{/* eslint-disable-next-line @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-explicit-any */}
+				<MDXProvider components={mdxComponents as any}>
+					<Component {...pageProps} />
+				</MDXProvider>
+			</LenisProvider>
 		</Layout>
 	)
 }
