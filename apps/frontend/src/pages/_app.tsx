@@ -16,8 +16,10 @@ const mdxComponents = {
 		return (
 			<Link
 				{...props}
-				// eslint-disable-next-line @typescript-eslint/no-unsafe-return, @typescript-eslint/no-unsafe-member-access, @typescript-eslint/no-unsafe-call
-				onClick={() => (props.href.startsWith("#") ? lenis?.scrollTo(document.querySelector(props.href)) : null)}
+				onClick={() =>
+					// eslint-disable-next-line @typescript-eslint/no-unsafe-return, @typescript-eslint/no-unsafe-member-access, @typescript-eslint/no-unsafe-call
+					props.href.startsWith("#") ? lenis?.scrollTo(document.querySelector(props.href), { offset: -20 }) : null
+				}
 			/>
 		)
 	},
