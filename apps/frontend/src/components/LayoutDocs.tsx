@@ -27,6 +27,7 @@ export function LayoutDocs({ meta, children }: LayoutDocsProps) {
 			sections: [
 				{ name: "Configuration", link: "/reference/configuration" },
 				{ name: "RPC Structure", link: "/reference/structure" },
+				{ name: "Additional Tools", link: "/reference/tooling" },
 			],
 		},
 		{
