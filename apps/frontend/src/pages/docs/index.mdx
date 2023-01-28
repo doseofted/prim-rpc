@@ -81,12 +81,13 @@ to another without manually copying or recreating definitions, whether those are
 with JSDoc comments. There's also no client generation script or other transpilation step needed to access type
 definitions since any types you've already written inside of your code are utilized by Prim+RPC.
 
-In addition to the library itself, Prim+RPC also includes a low-level documentation generator, based on TypeDoc, that
-you can use to generate your own custom documentation website for your RPC (both JavaScript and TypeScript). You can
-even generate code snippets for usage of Prim+RPC in other languages using the HTTPsnippet library. On the topic of
-other environments, the RPC created with Prim+RPC is purposefully very simple and easy to structure, in the event that
-you need to use code outside of JavaScript. In the future, this documentation may also be used to generate a JSON schema
-for your RPC so that other languages can have typed requests by making their requests with JSON.
+In addition to the library itself, Prim+RPC also includes a
+[low-level documentation generator](/docs/reference/tooling#documentation-generator) that you can use to generate your
+own custom documentation website for your RPC (both JavaScript and TypeScript). This output could even be used to
+generate requests for non-JavaScript environments. On the topic of other environments, the RPC created with Prim+RPC is
+purposefully very simple and easy to structure, in the event that you need to use code outside of JavaScript. In the
+future, this documentation may also be used to generate a JSON schema for your RPC so that other languages can have
+typed requests by making their requests with JSON.
 
 Prim+RPC is created with the goal of allowing you to write the code that you actually want to write with the tools that
 you already enjoy using. While other tools require separate type/schema definitions, Prim+RPC takes advantage of
