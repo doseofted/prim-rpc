@@ -16,6 +16,7 @@ const mdxComponents = {
 		return (
 			<Link
 				{...props}
+				target={props.href.startsWith("http") ? "_blank" : "_self"}
 				onClick={() =>
 					// eslint-disable-next-line @typescript-eslint/no-unsafe-return, @typescript-eslint/no-unsafe-member-access, @typescript-eslint/no-unsafe-call
 					props.href.startsWith("#") ? lenis?.scrollTo(document.querySelector(props.href), { offset: -20 }) : null
