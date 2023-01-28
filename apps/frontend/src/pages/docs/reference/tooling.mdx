@@ -24,16 +24,19 @@ tools that work on both server and client this may be harder to catch.
 
 The Prevent Import Utility is very simple plugin for the build tool of your choice (using
 [unplugin](https://github.com/unjs/unplugin)) that just prevents imports of a specified directory or file, like those
-from the server. You can use it like so (we'll use Vite as an example):
+from the server. You can use it like so (we'll use Vite as an example but you could use Webpack or others):
 
 ```typescript
 import path from "node:path"
 import { defineConfig } from "vite"
 import preventImport from "@doseofted/prim-rpc-tooling/build"
 
+const preventServerImport = preventImport.vite({
+	name: path.join(__dirname, "server"),
+})
+
 export default defineConfig({
-	server: { port: 3000 },
-	plugins: [preventImport.vite({ name: path.join(__dirname, "server") })],
+	plugins: [preventServerImport],
 })
 ```
 

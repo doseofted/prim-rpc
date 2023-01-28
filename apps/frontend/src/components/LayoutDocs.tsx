@@ -1,5 +1,5 @@
-import Link from "next/link"
 import { Alert } from "./Alert"
+import { DocsTableOfContents } from "./DocsToc"
 import { IntroText } from "./IntroText"
 import { Title } from "./Title"
 
@@ -10,36 +10,6 @@ export interface DocsMeta {
 type LayoutDocsProps = { meta?: DocsMeta } & React.HTMLAttributes<HTMLDivElement>
 
 export function LayoutDocs({ meta, children }: LayoutDocsProps) {
-	const tableOfContents = [
-		{
-			name: "Getting Started",
-			sections: [
-				{ name: "Introduction", link: "/" },
-				{ name: "Setup", link: "/setup" },
-				{ name: "Usage", link: "/usage" },
-				{ name: "Examples", link: "/examples" },
-				{ name: "Comparisons", link: "/comparisons" },
-				{ name: "Limitations", link: "/limitations" },
-			],
-		},
-		{
-			name: "Reference",
-			sections: [
-				{ name: "Configuration", link: "/reference/configuration" },
-				{ name: "RPC Structure", link: "/reference/structure" },
-				{ name: "Additional Tools", link: "/reference/tooling" },
-			],
-		},
-		{
-			name: "Integrations",
-			sections: [
-				{ name: "Server Plugins", link: "/plugins/server" },
-				{ name: "Client Plugins", link: "/plugins/client" },
-				{ name: "IPC Plugins", link: "/plugins/ipc" },
-				{ name: "Create Your Own", link: "/plugins/create" },
-			],
-		},
-	]
 	return (
 		<>
 			<Title>{meta?.title}</Title>
@@ -56,20 +26,7 @@ export function LayoutDocs({ meta, children }: LayoutDocsProps) {
 						)}
 					</div>
 					<div className="hidden lg:block pointer-events-auto col-span-3 bg-white/70 text-black -ml-4 px-4 py-8 rounded-tl-2xl">
-						<ul className="space-y-8">
-							{tableOfContents.map(({ name, sections }) => (
-								<li key={name} className="space-y-2">
-									<span className="font-title font-semibold">{name}</span>
-									<ul className="space-y-2">
-										{sections.map(({ name, link }) => (
-											<li key={link}>
-												<Link href={`/docs${link}`}>{name}</Link>
-											</li>
-										))}
-									</ul>
-								</li>
-							))}
-						</ul>
+						<DocsTableOfContents />
 					</div>
 					<div className="pointer-events-auto col-span-12 lg:col-span-9 bg-white -mx-4 px-4 py-8 min-h-[50vh] relative">
 						<div className="bg-white w-screen h-full z-1 absolute top-0 right-0 transform translate-x-full" />

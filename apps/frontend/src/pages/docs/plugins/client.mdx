@@ -34,6 +34,9 @@ const methodPlugin = createMethodPlugin()
 const client = createPrimClient({ methodPlugin })
 ```
 
+Remember to set the [`.endpoint`](/docs/reference/configuration#endpoint) so the plugin knows where the server is
+located.
+
 ## WebSocket API (Browser)
 
 | For                                                                              | Plugin Type     | Transport Type |
@@ -49,6 +52,9 @@ import { createCallbackPlugin } from "@doseofted/prim-rpc-plugins/browser-websoc
 const callbackPlugin = createCallbackPlugin()
 const client = createPrimClient({ callbackPlugin })
 ```
+
+Remember to set the [`.wsEndpoint`](/docs/reference/configuration#wsendpoint) so the plugin knows where the server is
+located.
 
 ## Axios
 
