@@ -18,25 +18,12 @@ interface PrimExpressPluginOptions extends SharedExpressOptions {
 	prim: PrimServerEvents
 }
 /**
- * An Express plugin used to register Prim with the server. Use like so:
- *
- * ```ts
- * // imports
- * import express from "express"
- * import multipartPlugin from "multer"
- * import { createPrimServer } from "@doseofted/prim-rpc"
- * import { expressPrimRpc } from "@doseofted/prim-rpc-plugins/dist/server/express.mjs"
- * // usage
- * const app = express()
- * const prim = createPrimServer()
- * express.use(expressPrimRpc({ prim, multipartPlugin }))
- * app.listen(3000)
- * ```
+ * An Express plugin used to register Prim with the server.
  *
  * **Note:** usage of the multipart plugin is optional and can be excluded if support
  * for file uploads is not needed.
  *
- * To let Prim handle registration with Express, try importing `primMethodExpress`
+ * To let Prim handle registration with Express, try importing `methodHandler` instead.
  */
 // eslint-disable-next-line @typescript-eslint/require-await
 export const expressPrimRpc = (options: PrimExpressPluginOptions) => {
@@ -104,21 +91,7 @@ interface MethodExpressOptions extends SharedExpressOptions {
 	app: Express.Application
 }
 /**
- * A Prim plugin used to register itself with Express. Use like so:
- *
- * ```ts
- * // imports
- * import express from "express"
- * import multipartPlugin from "multer"
- * import { createPrimServer } from "@doseofted/prim-rpc"
- * import { createMethodHandler } from "@doseofted/prim-rpc-plugins/express"
- * // usage
- * const app = express()
- * const prim = createPrimServer({
- *   methodHandler: createMethodHandler({ app, multipartPlugin })
- * })
- * app.listen(3000)
- * ```
+ * A Prim plugin used to register itself with Express.
  *
  * **Note:** usage of the multipart plugin is optional and can be excluded if support
  * for file uploads is not needed.

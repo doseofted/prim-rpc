@@ -25,8 +25,12 @@
 			"path": "./proxy"
 		},
 		{
-			"name": "🌐 Documentation",
+			"name": "🌐 Website",
 			"path": "./apps/frontend"
+		},
+		{
+			"name": "🌐 Documentation",
+			"path": "./apps/frontend/src/pages/docs"
 		},
 		{
 			"name": "📗 Example Server",

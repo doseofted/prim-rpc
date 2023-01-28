@@ -20,7 +20,6 @@ const wss = new WebSocketServer({ server: fastify.server })
 const methodHandler = createMethodHandler({
 	fastify,
 	multipartPlugin,
-	contextTransform: req => req.headers,
 })
 const callbackHandler = createCallbackHandler({ wss })
 // Setup Prim Server, configured with chosen HTTP/WS server

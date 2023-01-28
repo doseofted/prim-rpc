@@ -20,25 +20,12 @@ interface PrimFastifyPluginOptions extends SharedFastifyOptions {
 	prim: PrimServerEvents
 }
 /**
- * A Fastify plugin used to register Prim with the server. Use like so:
- *
- * ```ts
- * // imports
- * import Fastify from "fastify"
- * import multipartPlugin from "@fastify/multipart"
- * import { createPrimServer } from "@doseofted/prim-rpc"
- * import { fastifyPrimRpc } from "@doseofted/prim-rpc-plugins/dist/server/fastify.mjs"
- * // usage
- * const fastify = Fastify()
- * const prim = createPrimServer()
- * fastify.register(fastifyPrimRpc, { prim, multipartPlugin })
- * await fastify.listen({ port: 3000 })
- * ```
+ * A Fastify plugin used to register Prim with the server.
  *
  * **Note:** usage of the multipart plugin is optional and can be excluded if support
  * for file uploads is not needed.
  *
- * To let Prim handle registration with Fastify, try importing `primMethodFastify`
+ * To let Prim handle registration with Fastify, try importing `createMethodHandler` instead.
  */
 // eslint-disable-next-line @typescript-eslint/require-await
 export const fastifyPrimRpc: FastifyPluginAsync<PrimFastifyPluginOptions> = async (fastify, options) => {
@@ -136,21 +123,7 @@ interface MethodFastifyOptions extends SharedFastifyOptions {
 	fastify: FastifyInstance
 }
 /**
- * A Prim plugin used to register itself with Fastify. Use like so:
- *
- * ```ts
- * // imports
- * import Fastify from "fastify"
- * import multipartPlugin from "@fastify/multipart"
- * import { createPrimServer } from "@doseofted/prim-rpc"
- * import { primMethodFastify } from "@doseofted/prim-rpc-plugins/dist/server/fastify.mjs"
- * // usage
- * const fastify = Fastify()
- * const prim = createPrimServer({
- *   methodHandler: primMethodFastify({ fastify, multipartPlugin })
- * })
- * await fastify.listen({ port: 3000 })
- * ```
+ * A Prim plugin used to register itself with Fastify.
  *
  * **Note:** usage of the multipart plugin is optional and can be excluded if support
  * for file uploads is not needed.

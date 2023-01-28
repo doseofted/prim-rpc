@@ -11,21 +11,96 @@ export default ({ children }) => <LayoutDocs meta={meta}>{children}</LayoutDocs>
 
 # {meta.title}
 
+These are the currently supported handler plugins for Prim+RPC. For each Prim+RPC server instance you may choose one
+method handler and one callback handler (see **Plugin Type** in tables below). Remember that for each _handler_ on the
+server you must also specify a compatible _plugin_ on the client. For plugins/handlers to be compatible they must use
+the same type of transport (given in **Transport Type** in tables below).
+
 ## Table of Contents
 
 ## Fastify
 
-...
+| For                                           | Plugin Type    | Transport Type |
+| --------------------------------------------- | -------------- | -------------- |
+| [Fastify](https://github.com/fastify/fastify) | Method handler | HTTP           |
+
+You can configure Fastify with Prim+RPC like so (note that the multipart plugin is optional and used for uploading
+files):
+
+```typescript
+import { createPrimServer } from "@doseofted/prim-rpc"
+import { createMethodHandler } from "@doseofted/prim-rpc-plugins/fastify"
+import Fastify from "fastify"
+import multipartPlugin from "@fastify/multipart"
+
+const fastify = Fastify()
+const methodHandler = createMethodHandler({
+	fastify,
+	multipartPlugin,
+})
+
+createPrimServer({ methodHandler })
+fastify.listen({ port: 1234 })
+```
+
+You may use the `.contextTransform` option of `createMethodHandler()` to determine what values from Fastify are bound to
+the function's `this` context.
 
 ## Express
 
-...
+| For                                             | Plugin Type    | Transport Type |
+| ----------------------------------------------- | -------------- | -------------- |
+| [Express](https://github.com/expressjs/express) | Method handler | HTTP           |
+
+You can configure Express with Prim+RPC like so (note that the multipart plugin is optional and used for uploading
+files):
+
+```typescript
+import { createPrimServer } from "@doseofted/prim-rpc"
+import { createMethodHandler } from "@doseofted/prim-rpc-plugins/express"
+import express from "express"
+import multipartPlugin from "multer"
+
+const app = express()
+const methodHandler = createMethodHandler({
+	app,
+	multipartPlugin,
+})
+
+createPrimServer({ methodHandler })
+app.listen(1234)
+```
+
+You may use the `.contextTransform` option of `createMethodHandler()` to determine what values from Express are bound to
+the function's `this` context.
 
 ## WS
 
-...
+| For                                    | Plugin Type      | Transport Type |
+| -------------------------------------- | ---------------- | -------------- |
+| [ws](https://github.com/websockets/ws) | Callback handler | WebSocket      |
+
+You can configure `ws` with Prim+RPC like so:
+
+```typescript
+import { createPrimServer } from "@doseofted/prim-rpc"
+import { createCallbackHandler } from "@doseofted/prim-rpc-plugins/ws"
+import { WebSocketServer } from "ws"
+
+const wss = new WebSocketServer({ port: 1234 })
+const callbackHandler = createCallbackHandler({ wss })
+
+createPrimServer({ callbackHandler })
+```
+
+You may use the `.contextTransform` option of `createCallbackHandler()` to determine what values from `ws` are bound to
+the function's `this` context.
 
 ## Node / HTTP
+
+| For                                           | Plugin Type    | Transport Type |
+| --------------------------------------------- | -------------- | -------------- |
+| [Node](https://nodejs.org/api/http.html#http) | Method handler | HTTP           |
 
 <Alert icon="carbon:warning" type="alert-warning">
 	Unavailable (planned)
@@ -33,17 +108,29 @@ export default ({ children }) => <LayoutDocs meta={meta}>{children}</LayoutDocs>
 
 ## Socket.io
 
+| For                                                | Plugin Type      | Transport Type |
+| -------------------------------------------------- | ---------------- | -------------- |
+| [Socket.io](https://github.com/socketio/socket.io) | Callback handler | Socket.io      |
+
 <Alert icon="carbon:warning" type="alert-warning">
 	Unavailable (planned)
 </Alert>
 
 ## Next.js
 
+| For                                           | Plugin Type    | Transport Type |
+| --------------------------------------------- | -------------- | -------------- |
+| [Next.js](https://github.com/vercel/next.js/) | Method handler | HTTP           |
+
 <Alert icon="carbon:warning" type="alert-warning">
 	Unavailable (planned)
 </Alert>
 
-## Nuxt / H3
+## Nuxt / H3 / Nitro
+
+| For                                  | Plugin Type    | Transport Type |
+| ------------------------------------ | -------------- | -------------- |
+| [Nuxt](https://github.com/nuxt/nuxt) | Method handler | HTTP           |
 
 <Alert icon="carbon:warning" type="alert-warning">
 	Unavailable (planned)

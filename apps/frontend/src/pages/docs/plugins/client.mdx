@@ -11,6 +11,11 @@ export default ({ children }) => <LayoutDocs meta={meta}>{children}</LayoutDocs>
 
 # {meta.title}
 
+These are the currently supported plugins for Prim+RPC. For each Prim+RPC client instance you may choose one method
+plugin and one callback plugin (see **Plugin Type** in tables below). Remember that for each _plugin_ on the client you
+must also specify a compatible _handler_ on the server. For plugins/handlers to be compatible they must use the same
+type of transport (given in **Transport Type** in tables below).
+
 ## Table of Contents
 
 ## Fetch API (Browser)
