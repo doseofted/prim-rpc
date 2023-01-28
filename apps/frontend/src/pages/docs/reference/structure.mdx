@@ -277,7 +277,8 @@ Each callback result includes the identifier that we sent in the request for us 
 
 ## With Custom JSON Handler
 
-Up until this point, we've worked with primitive values on the function. With Prim+RPC ...
+Up until this point, we've worked with primitive values on the function. With Prim+RPC we can override the default JSON
+handler and use a custom handler. It doesn't even necessarily need to be JSON.
 
 <Alert icon="carbon:warning" type="alert-warning">
 	Work in Progress
@@ -285,11 +286,17 @@ Up until this point, we've worked with primitive values on the function. With Pr
 
 ## With File
 
+Prim+RPC can handle files in two different ways: by supporting files in a custom JSON-like handler or by using the
+default JSON handler and separating files from the RPC itself (by replacing files in a request with identifiers to the
+file).
+
 <Alert icon="carbon:warning" type="alert-warning">
 	Work in Progress
 </Alert>
 
 ## Batching Requests
+
+Prim+RPC can batch multiple function calls into a single request.
 
 <Alert icon="carbon:warning" type="alert-warning">
 	Work in Progress

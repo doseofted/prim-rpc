@@ -314,9 +314,41 @@ function signature for the server is an object with the names of the given input
 
 ## Use Nested Modules
 
-You can use nested modules with Prim+RPC.
+Functions don't have to be located at the top of your module in Prim+RPC. You can use nested modules like so:
 
-...
+<CH.Code>
+
+```typescript example.ts
+/** Say hello! */
+function sayHello(name: string) {
+	return `Hello ${name ?? "you"}!`
+}
+sayHello.rpc = true
+
+const moduleLike = {
+	i: {
+		would: {
+			like: {
+				to: {
+					sayHello
+				}
+			}
+		}
+	}
+}
+
+export moduleLike
+```
+
+---
+
+```typescript index.ts
+// ...client defined earlier
+const greeting = await client.i.would.like.to.sayHello("Ted")
+console.log(greeting) // "Hello Ted!"
+```
+
+</CH.Code>
 
 ## Use Server Context
 
@@ -324,4 +356,31 @@ You can set the context of the function based on the utilized method and callbac
 Prim+RPC will have its own context (for instance, a Request object in some server framework). This context can be
 accessed from the function's `this` object (Prim+RPC will bind that context to the function).
 
-...
+You may override this context or limit what is bound to functions by setting the `.contextTransform` option, if
+available, on the given handler.
+
+<CH.Code>
+
+```typescript example.ts
+/** Perform action on server if logged in */
+export function performAdministrativeAction(this: PrimFastifyContext) {
+	let allowed = false
+	if (this.cookie.authorized) {
+		allowed = true
+	}
+	return allowed ? "You're in!" : "Oops! Try again."
+}
+performAdministrativeAction.rpc = true
+```
+
+---
+
+```typescript index.ts
+// ...client defined earlier
+
+// we'll pretend that we're already authorized
+const message = await client.performAdministrativeAction()
+console.log(message) // "You're in!"
+```
+
+</CH.Code>
