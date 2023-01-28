@@ -234,6 +234,28 @@ export async function handleForm(given: GenericFormExample | HTMLFormElement | F
 }
 handleForm.rpc = true
 
+interface FormInputs {
+	name: string
+	email: string
+	message: string
+}
+
+/** Server utility to ensure given argument is of type T */
+const server = <T>(given: unknown): given is T => typeof window === "undefined"
+
+/** Submit a contact form */
+export function submitContactForm(form: HTMLFormElement | FormData): string
+export function submitContactForm(inputs: FormInputs): string
+export function submitContactForm(inputs: unknown) {
+	if (!server<FormInputs>(inputs)) {
+		return
+	}
+	const { name, message, email } = inputs
+	console.log("Details to be sent somewhere:", { name, message, email })
+	return `Thank you for your message, ${name}!`
+}
+submitContactForm.rpc = true
+
 /** What's this? What's this? */
 export function whatIsThis(this: unknown) {
 	console.log("What is this?", "This is", this)

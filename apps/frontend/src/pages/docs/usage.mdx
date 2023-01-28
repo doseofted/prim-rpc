@@ -168,7 +168,7 @@ typeMessage.rpc = true
 
 ```typescript index.ts
 // ...client defined earlier
-client.typeMessage("Hello!", letter => {
+await client.typeMessage("Hello!", letter => {
 	console.log(letter) // each letter of "Hello!"
 })
 ```
@@ -182,6 +182,38 @@ and a [`.callbackPlugin`](/docs/reference/configuration#callbackplugin) on the c
 
 </Alert>
 
+## Use Multiple Signatures
+
+As you'll see in the next few examples, you can use multiple signatures on a function when using TypeScript. This is
+useful when accepting file uploads or uploading an HTML form where the type on the client is not the same as or is
+unavailable on the server.
+
+<CH.Code>
+
+```typescript example.ts
+/** Add two numbers together. Strings are converted to numbers automatically. */
+export function add(x: string, y: string): number
+/** Add two numbers together. */
+export function add(x: number, y: number): number
+
+export function add(x: number | string, y: number | string) {
+	return Number(x) + Number(y)
+}
+add.rpc = true
+```
+
+---
+
+```typescript index.ts
+// ...client defined earlier
+
+const result1 = await client.add(5, 5)
+const result2 = await client.add("7", "3")
+console.log(result1, result1 === result2) // 10, true
+```
+
+</CH.Code>
+
 ## Upload Files
 
 You can upload files to Prim+RPC as long as your configured
@@ -192,9 +224,16 @@ You can upload files to Prim+RPC as long as your configured
 ```typescript example.ts
 import fs from "node:fs/promises"
 
+/** TypeScript/server utility to ensure given argument is of type T */
+const server = <T>(given: unknown): given is T => typeof window === "undefined"
+
 /** Upload a file to the server */
 export function uploadFile(someTextFile: File): void
-export function uploadFile(someTextFile: Promise<string>) {
+export function uploadFile(someTextFile: Promise<string>): void
+export function uploadFile(someTextFile: unknown) {
+	if (!server<Promise<string>>(inputs)) {
+		return
+	}
 	const text = await fs.readFile(await someTextFile, "utf-8")
 	console.log("File contents:", text)
 }
@@ -207,7 +246,7 @@ uploadFile.rpc = true
 // ...client defined earlier
 
 const file = new File(["Hello from client!"], "hello.txt", { type: "text/plain" })
-client.uploadFile(file) // server will log contents of file
+await client.uploadFile(file) // server will log contents of file
 ```
 
 </CH.Code>
@@ -238,9 +277,17 @@ interface FormInputs {
 	email: string
 	message: string
 }
+
+/** TypeScript/server utility to ensure given argument is of type T */
+const server = <T>(given: unknown): given is T => typeof window === "undefined"
+
 /** Submit a contact form */
 export function submitContactForm(form: HTMLFormElement | FormData): string
-export function submitContactForm(inputs: FormInputs) {
+export function submitContactForm(inputs: FormInputs): string
+export function submitContactForm(inputs: unknown) {
+	if (!server<FormInputs>(inputs)) {
+		return
+	}
 	const { name, message, email } = inputs
 	console.log("Details to be sent somewhere:", { name, message, email })
 	return `Thank you for your message, ${name}!`
@@ -260,12 +307,10 @@ console.log(thankYouMessage) // `Thank you for your message, Ted!`
 
 </CH.Code>
 
-## Use Multiple Signatures
+It's assumed that the HTML form used in this example has three text/email inputs named `name`, `email`, and `message`.
 
-If you're using TypeScript, you can define multiple signatures on your function and those types will be available on the
-client.
-
-...
+Note that we defined a function signature in TypeScript intended for the browser (accepting a `HTMLFormElement`) and the
+function signature for the server is an object with the names of the given inputs (`FormInputs`).
 
 ## Use Nested Modules
 
