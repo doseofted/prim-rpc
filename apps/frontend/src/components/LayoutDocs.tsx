@@ -33,8 +33,8 @@ export function LayoutDocs({ meta, children }: LayoutDocsProps) {
 		{
 			name: "Integrations",
 			sections: [
-				{ name: "Client Plugins", link: "/plugins/client" },
 				{ name: "Server Plugins", link: "/plugins/server" },
+				{ name: "Client Plugins", link: "/plugins/client" },
 				{ name: "IPC Plugins", link: "/plugins/ipc" },
 				{ name: "Create Your Own", link: "/plugins/create" },
 			],
