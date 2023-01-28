@@ -17,9 +17,55 @@ may not be on the same machine. For each framework below, all of the possible pl
 
 ## Table of Contents
 
-## Web Worker
+## Web Workers
 
-...
+| For                                                                                 | Plugin Type                    | Transport Type |
+| ----------------------------------------------------------------------------------- | ------------------------------ | -------------- |
+| [Web Workers API](https://developer.mozilla.org/en-US/docs/Web/API/Web_Workers_API) | Method/callback plugin/handler | Web Worker     |
+
+You can communicate between a Web Worker and the main thread in either direction (or both) like so:
+
+<CH.Code>
+
+```typescript worker.ts
+import { createPrimServer } from "@doseofted/prim-rpc"
+import { createMethodHandler, createCallbackHandler } from "@doseofted/prim-rpc-plugins/web-worker"
+
+const { methodHandler, jsonHandler } = createMethodHandler({ worker: self })
+const { callbackHandler } = createCallbackHandler({ worker: self })
+
+createPrimServer({ methodHandler, callbackHandler, jsonHandler })
+```
+
+---
+
+```typescript index.ts
+import { createPrimClient } from "@doseofted/prim-rpc"
+import { createMethodPlugin, createCallbackPlugin } from "@doseofted/prim-rpc-plugins/web-worker"
+
+const worker = new Worker(new URL("./worker", import.meta.url), { type: "module" })
+
+const { methodPlugin, jsonHandler } = createMethodPlugin({ worker })
+const { callbackPlugin } = createCallbackPlugin({ worker })
+
+const client = createPrimClient({ methodPlugin, callbackPlugin, jsonHandler })
+```
+
+</CH.Code>
+
+Note that all plugins return a `jsonHandler` result and that they are all exactly the same. This is just a helper
+utility that will disable JSON handling. JSON handling should be disabled because Web Workers will use
+[structured cloning](https://developer.mozilla.org/en-US/docs/Web/API/Web_Workers_API/Structured_clone_algorithm)
+instead which is far more powerful. Of course, you can always override the JSON handler to anything that you'd like if
+you can forgo structured cloning.
+
+<Alert prose icon="carbon:warning" type="alert-warning">
+
+This plugin currently does not yet support other types of worker like
+[Shared Workers](https://developer.mozilla.org/en-US/docs/Web/API/SharedWorker) or
+[Service Workers](https://developer.mozilla.org/en-US/docs/Web/API/ServiceWorker).
+
+</Alert>
 
 ## Electron
 
