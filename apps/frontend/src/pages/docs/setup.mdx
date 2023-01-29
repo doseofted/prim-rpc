@@ -204,8 +204,8 @@ createPrimServer({ module })
 await fastify.listen({ port: 3001 })
 ```
 
-Now we can set up the Fastify-specific "method handler" plugin which will handle method calls (so we can call the
-`sayHello()` method on the Prim+RPC client).
+Now we can set up the [Fastify-specific "method handler" plugin](/docs/plugins/server#fastify) which will handle method
+calls (so we can call the `sayHello()` method on the Prim+RPC client).
 
 ```ts server.ts mark=3,16
 import { createPrimServer } from "@doseofted/prim-rpc"
@@ -296,8 +296,8 @@ const prim = createPrimClient({ endpoint })
 
 Like the Prim+RPC server, this doesn't do much by itself. In order to communicate with the Prim+RPC server, we define
 some sort of transport. This is accomplished with a client-side plugin. There are
-[many plugins available](/docs/plugins/client) for your client. For this example, we'll use a plugin for the Fetch API
-since it's built into the web browser.
+[many plugins available](/docs/plugins/client) for your client. For this example, we'll use a
+[plugin for the Fetch API](/docs/plugins/client#fetch-api-browser) since it's built into the web browser.
 
 ```ts client.ts mark=2,7
 import { createPrimClient } from "@doseofted/prim-rpc"
@@ -415,7 +415,8 @@ await fastify.listen({ port: 3001 })
 export type { module }
 ```
 
-Now our WebSocket server is available! We'll register this with the Prim+RPC server by providing a callback handler.
+Now our WebSocket server is available! We'll register this with the Prim+RPC server by
+[providing a callback handler](/docs/plugins/server#ws).
 
 ```ts server.ts mark=4,20
 import { createPrimServer } from "@doseofted/prim-rpc"
@@ -488,7 +489,8 @@ export type { module }
 Perfect! Now we can set up the client.
 
 Since we're using a WebSocket server as a callback handler, we'll need callback plugin that supports WebSocket
-connections on the client. We'll use Prim+RPC's callback plugin for the browser which uses the WebSocket API.
+connections on the client. We'll use
+[Prim+RPC's callback plugin for the browser](/docs/plugins/client#websocket-api-browser) which uses the WebSocket API.
 
 ```ts client.ts mark=2,8
 import { createPrimClient } from "@doseofted/prim-rpc"
