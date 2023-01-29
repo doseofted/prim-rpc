@@ -138,8 +138,8 @@ tasks:
   changeset:
     desc: "Add a changeset"
     cmds:
-      - "changeset"
+      - "changeset {{.CLI_ARGS}}"
   changeset:publish:
     desc: "Publish changes based on changeset"
     cmds:
-      - "changeset publish"
+      - "changeset publish {{.CLI_ARGS}}"
