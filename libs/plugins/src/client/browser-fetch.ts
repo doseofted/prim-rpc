@@ -2,8 +2,14 @@ import type { PrimClientMethodPlugin, RpcAnswer } from "@doseofted/prim-rpc"
 
 // TODO: test this plugin
 
-export const createMethodPlugin = (headersOverride?: Headers | Record<string, string>) => {
+interface MethodFetchOptions {
+	headers?: Headers | Record<string, string>
+	credentials?: RequestCredentials
+}
+
+export const createMethodPlugin = (options: MethodFetchOptions = {}) => {
 	const methodPlugin: PrimClientMethodPlugin = async (endpoint, jsonBody, jsonHandler, blobs = {}) => {
+		const { headers: headersOverride = {} } = options
 		let fetchOptions: RequestInit = {}
 		const blobList = Object.entries(blobs)
 		if (blobList.length > 0) {
@@ -28,7 +34,10 @@ export const createMethodPlugin = (headersOverride?: Headers | Record<string, st
 				body: jsonHandler.stringify(jsonBody),
 			}
 		}
-		const result = await fetch(endpoint, fetchOptions)
+		const result = await fetch(endpoint, {
+			...fetchOptions,
+			credentials: options.credentials,
+		})
 		const isBinaryLike = result.headers.get("content-type") === "application/octet-stream"
 		return jsonHandler.parse(await (isBinaryLike ? result.blob() : result.text())) as RpcAnswer | RpcAnswer[]
 	}
