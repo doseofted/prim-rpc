@@ -1,11 +1,11 @@
 import React, { useMemo, useState } from "react"
-import { OpinionatedLight } from "@/components/LightsState"
 import { motion } from "framer-motion"
 import { useRouter } from "next/router"
 import { Icon } from "@iconify/react"
 import Link from "next/link"
 import { Modal } from "./Modal"
 import { Dialog } from "@headlessui/react"
+import { PrimTitle } from "./PrimTitle"
 
 type NavigationProps = React.HTMLAttributes<HTMLDivElement>
 export function Navigation(props: NavigationProps) {
@@ -28,15 +28,7 @@ export function Navigation(props: NavigationProps) {
 	return (
 		<div {...attrs} className={[attrs.className, "flex justify-between items-center gap-8"].join(" ")}>
 			<div className="inline-block">
-				<Link href="/" className="group relative">
-					<p className="font-title text-[2.5rem] lg:text-[3rem] select-none font-normal transition-[font-weight] duration-500 group-hover:font-medium text-prim-space uppercase">
-						Prim+
-						<span className="font-bold transition-[font-weight] delay-100 duration-500 group-hover:font-extrabold">
-							RPC
-						</span>
-					</p>
-					<OpinionatedLight count={12} state={state} size={700} />
-				</Link>
+				<PrimTitle state={state} />
 			</div>
 			<motion.div
 				initial={{ y: -20, opacity: 0 }}

@@ -7,7 +7,7 @@ const host = process.env.NEXT_PUBLIC_WEBSITE_HOST ?? ""
 const contained = JSON.parse(process.env.NEXT_PUBLIC_CONTAINED ?? "false") as boolean
 const clientSide = typeof window !== "undefined"
 
-console.log(contained && clientSide ? `https://api.${host}/prim` : "http://localhost:3001/prim")
+// console.log(contained && clientSide ? `https://api.${host}/prim` : "http://localhost:3001/prim")
 
 const client = createPrimClient<typeof exampleClient>({
 	endpoint: contained && clientSide ? `https://api.${host}/prim` : "http://localhost:3001/prim",
