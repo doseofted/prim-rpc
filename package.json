@@ -11,13 +11,14 @@
 		"url": "https://doseofted.com/"
 	},
 	"scripts": {
-		"format": "prettier --write ."
+		"start": "task"
 	},
 	"dependencies": {
 		"@go-task/cli": "^3.20.0",
 		"zx": "^7.1.1"
 	},
 	"devDependencies": {
+		"@changesets/cli": "^2.26.0",
 		"@types/eslint": "^8.4.10",
 		"@typescript-eslint/eslint-plugin": "^5.48.1",
 		"@typescript-eslint/parser": "^5.48.1",
