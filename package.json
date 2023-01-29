@@ -1,15 +1,15 @@
 {
 	"name": "@doseofted/prim-monorepo",
-	"description": "Not a headless CMS but better.",
+	"version": "0.0.1",
+	"packageManager": "pnpm@7.25.0",
+	"description": "Monorepo that houses Prim+RPC projects",
+	"license": "UNLICENSED",
+	"private": true,
 	"author": {
 		"name": "Ted Klingenberg",
 		"email": "ted@doseofted.com",
 		"url": "https://doseofted.com/"
 	},
-	"version": "0.0.1",
-	"packageManager": "pnpm@7.25.0",
-	"license": "UNLICENSED",
-	"private": true,
 	"scripts": {
 		"format": "prettier --write ."
 	},

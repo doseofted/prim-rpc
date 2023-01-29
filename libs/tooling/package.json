@@ -1,8 +1,9 @@
 {
 	"name": "@doseofted/prim-rpc-tooling",
 	"version": "0.0.1",
-	"description": "Completely optional build tools for Prim RPC",
+	"description": "Optional tooling to further enhance Prim+RPC usage.",
 	"license": "UNLICENSED",
+	"private": true,
 	"author": {
 		"name": "Ted Klingenberg",
 		"email": "ted@doseofted.com",

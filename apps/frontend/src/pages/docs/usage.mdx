@@ -363,6 +363,7 @@ available, on the given handler.
 
 ```typescript example.ts
 /** Perform action on server if logged in */
+export function performAdministrativeAction(): string
 export function performAdministrativeAction(this: PrimFastifyContext) {
 	let allowed = false
 	if (this.cookie.authorized) {

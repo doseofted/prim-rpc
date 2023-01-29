@@ -1,8 +1,9 @@
 {
 	"name": "@doseofted/prim-rpc-ui",
 	"version": "0.0.1",
-	"description": "UI components for Prim documentation",
+	"description": "UI components for Prim+RPC documentation",
 	"license": "UNLICENSED",
+	"private": true,
 	"author": {
 		"name": "Ted Klingenberg",
 		"email": "ted@doseofted.com",

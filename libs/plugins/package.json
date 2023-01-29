@@ -1,8 +1,9 @@
 {
 	"name": "@doseofted/prim-rpc-plugins",
 	"version": "0.0.1",
-	"description": "Plugins for using Prim with server/client frameworks",
+	"description": "Prim+RPC plugins/handlers for popular frameworks both server and client side.",
 	"license": "UNLICENSED",
+	"private": true,
 	"author": {
 		"name": "Ted Klingenberg",
 		"email": "ted@doseofted.com",

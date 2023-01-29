@@ -1,8 +1,9 @@
 {
 	"name": "@doseofted/prim-example",
 	"version": "0.0.1",
-	"description": "Example functions to be used from Prim RPC",
+	"description": "Example module exporting functions that can be used with Prim+RPC.",
 	"license": "UNLICENSED",
+	"private": true,
 	"author": {
 		"name": "Ted Klingenberg",
 		"email": "ted@doseofted.com",

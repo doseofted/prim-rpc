@@ -1,7 +1,7 @@
 {
 	"name": "@doseofted/prim-documentation-website",
 	"version": "0.0.1",
-	"description": "An example frontend making use of Prim.",
+	"description": "Prim+RPC website that houses the Prim+RPC documentation project.",
 	"license": "UNLICENSED",
 	"private": true,
 	"author": {
