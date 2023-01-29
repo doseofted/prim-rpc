@@ -1,6 +1,10 @@
+import { Dialog } from "@headlessui/react"
+import { Icon } from "@iconify/react"
+import { useState } from "react"
 import { Alert } from "./Alert"
 import { DocsTableOfContents } from "./DocsToc"
 import { IntroText } from "./IntroText"
+import { Modal } from "./Modal"
 import { Title } from "./Title"
 
 export interface DocsMeta {
@@ -10,6 +14,7 @@ export interface DocsMeta {
 type LayoutDocsProps = { meta?: DocsMeta } & React.HTMLAttributes<HTMLDivElement>
 
 export function LayoutDocs({ meta, children }: LayoutDocsProps) {
+	const [docsMenuOpen, docsMenuToggle] = useState(false)
 	return (
 		<>
 			<Title>{meta?.title}</Title>
@@ -27,6 +32,26 @@ export function LayoutDocs({ meta, children }: LayoutDocsProps) {
 					</div>
 					<div className="hidden lg:block pointer-events-auto col-span-3 bg-white/70 text-black -ml-4 px-4 py-8 rounded-tl-2xl">
 						<DocsTableOfContents />
+					</div>
+					<div className="flex relative justify-end lg:hidden pointer-events-auto col-span-12 bg-white/70 text-black -mb-4">
+						<div className="bg-white/70 w-screen h-full z-1 absolute top-0 right-0 transform translate-x-full" />
+						<div className="bg-white/70 w-screen h-full z-1 absolute top-0 left-0 transform -translate-x-full" />
+						<button
+							onClick={() => docsMenuToggle(true)}
+							className="rounded-tl-2xl p-4 flex gap-4 items-center uppercase transition-all duration-300 bg-transparent group hover:bg-white transform scale-100 hover:scale-110">
+							<div className="w-screen h-full z-1 absolute top-0 right-0 transform translate-x-full transition-all duration-300 bg-transparent group-hover:bg-white" />
+							<span>Table of Contents</span>
+							<Icon className="w-6 h-6 flex-shrink-0 self-start" icon="carbon:table-of-contents" />
+						</button>
+						<Modal open={docsMenuOpen} onToggle={docsMenuToggle}>
+							<div className="flex justify-center items-center h-full w-full">
+								<Dialog.Panel
+									data-lenis-prevent
+									className="bg-white/70 p-6 py-12 rounded-2xl pr-32 max-h-[calc(100vh-4rem)] overflow-auto">
+									<DocsTableOfContents />
+								</Dialog.Panel>
+							</div>
+						</Modal>
 					</div>
 					<div className="pointer-events-auto col-span-12 lg:col-span-9 bg-white -mx-4 px-4 py-8 min-h-[50vh] relative">
 						<div className="bg-white w-screen h-full z-1 absolute top-0 right-0 transform translate-x-full" />

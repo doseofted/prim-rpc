@@ -5,7 +5,8 @@ library is making plain function calls to a server from some client (RPC), as if
 client itself. The goal is to write plain JavaScript, or TypeScript if you prefer, and immediately invoke typed code
 without verbose wrappers around the communication channel.
 
-[Read the Documentation](https://prim.doseofted.com/) ∙ [Work with Ted](https://doseofted.com/)
+[Read the Documentation](https://prim.doseofted.com/) ∙ [Try an Example](https://github.com/doseofted/prim-rpc-examples)
+∙ [Work with Ted](https://doseofted.com/)
 
 ## Security
 
@@ -32,7 +33,8 @@ of the project are welcome!
 
 Some important rules and notes:
 
-- Contributions made to the project will be made available under the [license of that project](#license).
+- Contributions made to a project will be made available under the [license of that project](#license) and may be
+  changed in the future.
 - All projects in this repository follow [semantic versioning](https://semver.org/).
 - Every completed pull request should have an
   [associated changeset](https://github.com/changesets/changesets/blob/main/docs/adding-a-changeset.md).

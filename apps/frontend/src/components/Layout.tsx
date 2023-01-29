@@ -34,6 +34,10 @@ export default function Layout(props: LayoutProps) {
 					{children}
 				</div>
 			</LightsProvider>
+			{/* LINK https://github.com/tailwindlabs/headlessui/discussions/666#discussioncomment-2197931 */}
+			<div id="headlessui-portal-root">
+				<div />
+			</div>
 		</div>
 	)
 }
