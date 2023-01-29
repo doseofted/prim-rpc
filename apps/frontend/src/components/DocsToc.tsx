@@ -1,6 +1,9 @@
 import Link from "next/link"
 
-export function DocsTableOfContents() {
+interface Props {
+	onLinkClicked?: () => void
+}
+export function DocsTableOfContents(props: Props) {
 	const tableOfContents = [
 		{
 			name: "Getting Started",
@@ -39,7 +42,13 @@ export function DocsTableOfContents() {
 					<ul className="space-y-2">
 						{sections.map(({ name, link }) => (
 							<li key={link}>
-								<Link href={`/docs${link}`}>{name}</Link>
+								<Link
+									href={`/docs${link}`}
+									onClick={() => {
+										props.onLinkClicked?.()
+									}}>
+									{name}
+								</Link>
 							</li>
 						))}
 					</ul>

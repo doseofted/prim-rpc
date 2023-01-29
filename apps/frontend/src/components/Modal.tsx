@@ -46,7 +46,7 @@ export function Modal(props: Props) {
 						variants={{
 							hide: {
 								opacity: 0,
-								y: 10,
+								y: -10,
 								transition,
 							},
 							show: {
