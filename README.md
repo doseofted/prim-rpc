@@ -26,10 +26,17 @@ Prim+RPC depends on handlers/plugins to work with a wide variety of frameworks. 
 difficult to integrate with when one is not familiar with the framework. Contributions for handlers/plugins or to rest
 of the project are welcome!
 
-It is possible that a feature is already being or has been developed or that a feature may have been rejected. If you'd
-like to contribute to the project, open a pull request and describe what change that you would like to make.
+> **Warning** It is possible that a feature is already being or has been developed or that a feature may have already
+> been rejected. If you'd like to contribute to the project, open a pull request first and describe what change that you
+> would like to make.
 
-Contributions made to the project will be made available under the [license of that project](#license).
+Some important rules and notes:
+
+- Contributions made to the project will be made available under the [license of that project](#license).
+- All projects in this repository follow [semantic versioning](https://semver.org/).
+- Every completed pull request should have an
+  [associated changeset](https://github.com/changesets/changesets/blob/main/docs/adding-a-changeset.md).
+- All commits should include detailed messages (as a best effort).
 
 ## License
 

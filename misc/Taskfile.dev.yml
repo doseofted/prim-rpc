@@ -135,10 +135,14 @@ tasks:
     desc: "Format and write changes to disk with Prettier"
     cmds:
       - prettier --write . {{.CLI_ARGS}}
-  changeset:
+  changeset:add:
     desc: "Add a changeset"
     cmds:
       - "changeset {{.CLI_ARGS}}"
+  changeset:version:
+    desc: "Apply changes based on changeset"
+    cmds:
+      - "changeset version {{.CLI_ARGS}}"
   changeset:publish:
     desc: "Publish changes based on changeset"
     cmds:
