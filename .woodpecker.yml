@@ -1,0 +1,36 @@
+pipeline:
+  build:dev: &build-base
+    image: node:19.4-bullseye
+    environment:
+      NODE_ENV: "development"
+    commands:
+      - corepack enable
+      - pnpm install
+      - pnpm task dev:build
+    when:
+      event: [push]
+      branch:
+        - develop
+
+  build:prod:
+    <<: *build-base
+    environment:
+      NODE_ENV: "production"
+    when:
+      event: [push]
+      branch:
+        - release/*
+
+  release:
+    <<: *build-base
+    secrets: [npm_username, npm_api_token]
+    environment:
+      NODE_ENV: "production"
+    commands:
+      - corepack enable
+      - pnpm install
+      - pnpm task dev:build
+      - pnpm task changeset:publish
+    when:
+      event: [tag]
+      tag: v*
