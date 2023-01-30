@@ -9,14 +9,14 @@ export function HeaderLink(props: HTMLAttributes<HTMLHeadingElement> & { as: `h$
 	const lenis = useLenis()
 	return createElement(
 		elementName,
-		{ ...attrs, className: "group relative flex items-center" },
+		{ ...attrs, className: "group relative flex items-center !pl-6 sm:!pl-0" },
 		<>
 			{"id" in attrs && (
 				<Link
 					href={["#", attrs.id ?? ""].join("")}
 					aria-hidden="true"
 					tabIndex={-1}
-					className="inline-block absolute opacity-40 group-hover:opacity-100 transition-opacity duration-300 align-middle transform -translate-x-6"
+					className="inline-block absolute sm:opacity-40 group-hover:opacity-100 transition-opacity duration-300 align-middle transform -translate-x-4 sm:-translate-x-6"
 					onClick={event => {
 						// eslint-disable-next-line @typescript-eslint/no-unsafe-member-access, @typescript-eslint/no-unsafe-call
 						lenis?.scrollTo(event.target, { offset: -20 })

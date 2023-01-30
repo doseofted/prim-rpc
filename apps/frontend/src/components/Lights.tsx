@@ -9,13 +9,6 @@ import { easeIn, easeOut } from "popmotion"
 import { PtsCanvas } from "react-pts-canvas"
 import type { RequireExactlyOne } from "type-fest"
 
-/**
- * The Light/Lights component can become intense on system resources in development.
- * Toggle them on in development when they're actively being worked on.
- */
-const USE_LIGHTS_DEVELOPMENT = false
-const SHOW_LIGHTS = process.env.NODE_ENV === "production" || USE_LIGHTS_DEVELOPMENT
-
 export interface LightOptions {
 	/** Brightness from 0-2 */
 	brightness: number
@@ -39,6 +32,7 @@ interface LightInstance extends LightOptions {
 }
 
 type LightsState = {
+	enabled: boolean
 	lights: {
 		[id: string]: LightInstance
 	}
@@ -91,9 +85,12 @@ export interface LightsProps {
 	saturate?: number
 	/** Event handler on the first frame of animation */
 	onFirstFrame?: () => void
+	/** Lighting effect can be disabled as needed */
+	disable?: boolean
 }
 /** Provider for `Light` components */
 export function Lights(props: LightsProps) {
+	const enabled = !(props.disable ?? false)
 	const { children, options: sharedOptions = {}, onFirstFrame } = props
 	const [lights, setLights] = useImmer<{ [id: string]: LightInstance }>({})
 	const windowSize = useWindowSize(0, 0)
@@ -104,7 +101,7 @@ export function Lights(props: LightsProps) {
 	const saturate = useMemo(() => clamp(props.saturate ?? 1, 0, 2), [props.saturate])
 	const ctx = useMemo<LightsContext>(
 		() => [
-			{ lights, windowSize, windowScroll, colors },
+			{ lights, windowSize, windowScroll, colors, enabled },
 			{
 				createLight(opts, position) {
 					const id = nanoid()
@@ -150,7 +147,7 @@ export function Lights(props: LightsProps) {
 				},
 			},
 		],
-		[sharedOptions, lights, windowSize, windowScroll]
+		[sharedOptions, lights, windowSize, windowScroll, enabled]
 	)
 	const fixedCss: React.CSSProperties = { position: "fixed", width: "100%", height: "100%", top: 0, left: 0 }
 	const blurCss = useMemo<React.CSSProperties>(
@@ -164,7 +161,7 @@ export function Lights(props: LightsProps) {
 	)
 	return (
 		<LightsContext.Provider value={ctx}>
-			{SHOW_LIGHTS && <LightsCanvas background={background} style={fixedCss} onFirstFrame={() => onFirstFrame?.()} />}
+			{enabled && <LightsCanvas background={background} style={fixedCss} onFirstFrame={() => onFirstFrame?.()} />}
 			<div style={blurCss} />
 			{children}
 		</LightsContext.Provider>
@@ -209,10 +206,10 @@ export interface LightProps extends React.HTMLAttributes<HTMLDivElement> {
  */
 export function Light(props: LightProps) {
 	const { options: givenOptions, children, onOptionsSet, ...attrs } = props
-	if (!SHOW_LIGHTS) {
+	const [ctx, actions] = useLights()
+	if (!ctx.enabled) {
 		return <div {...attrs}>{children}</div>
 	}
-	const [ctx, actions] = useLights()
 	const color = useMemo(() => shuffle(ctx.colors)[random(0, ctx.colors.length - 1)], [])
 	const options = useMemo<RequireExactlyOne<Partial<LightOptions>, "color">>(
 		() => ({

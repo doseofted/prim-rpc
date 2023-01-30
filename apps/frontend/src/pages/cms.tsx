@@ -17,11 +17,11 @@ export default function Cms() {
 				<div className="col-span-12 h-16" />
 				<div className="relative col-span-12 pointer-events-auto text-center text-prim-space">
 					<p className="font-title text-[3rem] lg:text-[5.5rem] font-semibold uppercase leading-none">
-						<IntroText delay={1.3} stagger={0.9}>
+						<IntroText delay={0.7} stagger={0.9}>
 							A better CMS.
 						</IntroText>
 					</p>
-					<motion.p style={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: 2 }} className="pr-4">
+					<motion.p style={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: 1.5 }} className="pr-4">
 						Content management built on Prim+RPC. Follow for updates.
 					</motion.p>
 					<OpinionatedLight count={14} focus={0.3} size={1200} state={state} />

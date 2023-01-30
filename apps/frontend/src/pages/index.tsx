@@ -33,7 +33,7 @@ export default function Home({ greeting }: Props) {
 				<Navigation className="col-span-12" />
 				<div className="col-span-12 font-sans text-center flex justify-center items-center text-white">
 					<div className="flex flex-col lg:flex-row h-full w-full justify-center items-center gap-16">
-						<div className="transform translate-y-32 lg:translate-y-0 lg:translate-x-32 ml-16 lg:ml-0 lg:mt-16">
+						<div className="transform translate-y-32 lg:translate-y-0 lg:translate-x-32 sm:ml-16 lg:ml-0 lg:mt-16">
 							<div className="transform -translate-y-32 lg:translate-y-0 lg:-translate-x-32">
 								<motion.div
 									className="mockup-code w-96 relative text-left text-sm bg-white/70 border border-white/60 backdrop-blur-lg"
@@ -47,7 +47,7 @@ export default function Home({ greeting }: Props) {
 							</div>
 							<OpinionatedLight count={7} focus={0.9} size={500} state={state} />
 						</div>
-						<div className="transform -translate-y-32 lg:translate-y-0 lg:-translate-x-32 mr-16 lg:mr-0 lg:mb-16">
+						<div className="transform -translate-y-32 lg:translate-y-0 lg:-translate-x-32 sm:mr-16 lg:mr-0 lg:mb-16">
 							<div className="transform translate-y-32 lg:translate-y-0 lg:translate-x-32">
 								<motion.div
 									className="mockup-code w-96 relative text-left text-sm bg-white/70 border border-white/60 backdrop-blur-lg"
@@ -64,7 +64,7 @@ export default function Home({ greeting }: Props) {
 					</div>
 				</div>
 				<div className="col-span-12">
-					<p className="font-title text-[3rem] lg:text-[5.5rem] font-semibold text-white uppercase text-right leading-none">
+					<p className="font-title text-[2.3rem] sm:text-[3rem] lg:text-[5.5rem] font-semibold text-white uppercase text-right leading-none">
 						<IntroText delay={1.3} stagger={0.9}>
 							{greeting.split(", ").map((text, i, g) => (i !== g.length - 1 ? text + ", " : text))}
 						</IntroText>

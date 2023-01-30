@@ -139,6 +139,7 @@ importers:
       type-fest: ^3.5.2
       typescript: ^4.9.4
       use-immer: ^0.8.1
+      valtio: ^1.9.0
       webpack: ^5.75.0
       zustand: ^4.3.2
     dependencies:
@@ -196,6 +197,7 @@ importers:
       type-fest: 3.5.2
       typescript: 4.9.4
       use-immer: 0.8.1_immer@9.0.17+react@18.2.0
+      valtio: 1.9.0_react@18.2.0
       webpack: 5.75.0
       zustand: 4.3.2_immer@9.0.17+react@18.2.0
 
@@ -8158,6 +8160,10 @@ packages:
       forwarded: 0.2.0
       ipaddr.js: 1.9.1
 
+  /proxy-compare/2.4.0:
+    resolution: {integrity: sha512-FD8KmQUQD6Mfpd0hywCOzcon/dbkFP8XBd9F1ycbKtvVsfv6TsFUKJ2eC0Iz2y+KzlkdT1Z8SY6ZSgm07zOyqg==}
+    dev: true
+
   /proxy-deep/3.1.1:
     resolution: {integrity: sha512-kppbvLUNJ4IOMZds9/4gz/rtT5OFiesy3XosLsgMKlF3vb6GA5Y3ptyDlzKLcOcUBW+zaY+RiMINTsgE+O6e+Q==}
     dev: false
@@ -10300,6 +10306,20 @@ packages:
   /validator/13.7.0:
     resolution: {integrity: sha512-nYXQLCBkpJ8X6ltALua9dRrZDHVYxjJ1wgskNt1lH9fzGjs3tgojGSCBjmEPwkWS1y29+DrizMTW19Pr9uB2nw==}
     engines: {node: '>= 0.10'}
+    dev: true
+
+  /valtio/1.9.0_react@18.2.0:
+    resolution: {integrity: sha512-mQLFsAlKbYascZygFQh6lXuDjU5WHLoeZ8He4HqMnWfasM96V6rDbeFkw1XeG54xycmDonr/Jb4xgviHtuySrA==}
+    engines: {node: '>=12.20.0'}
+    peerDependencies:
+      react: '>=16.8'
+    peerDependenciesMeta:
+      react:
+        optional: true
+    dependencies:
+      proxy-compare: 2.4.0
+      react: 18.2.0
+      use-sync-external-store: 1.2.0_react@18.2.0
     dev: true
 
   /vary/1.1.2:
