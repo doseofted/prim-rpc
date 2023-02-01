@@ -1,4 +1,4 @@
-![Prim+RPC. Pictured are two very short JavaScript files: a simple function on the server-side and a call to that function on the client-side. Tagline: "Backend, meet Frontend"](./misc/docs-screenshot.png)
+[![Prim+RPC. Pictured are two very short JavaScript files: a simple function on the server-side and a call to that function on the client-side. Tagline: "Backend, meet Frontend"](./misc/docs-screenshot.png)](https://prim.doseofted.com/)
 
 Prim+RPC is a bridge between JavaScript environments, without the extra boilerplate code. The primary use case of this
 library is making plain function calls to a server from some client (RPC), as if that code had been written on the
@@ -28,11 +28,13 @@ difficult to integrate with when one is not familiar with the framework. Contrib
 of the project are welcome!
 
 > **Warning** It is possible that a feature is already being or has been developed or that a feature may have already
-> been rejected. If you'd like to contribute to the project, open a pull request first and describe what change that you
-> would like to make.
+> been rejected. If you'd like to contribute to the project,
+> [open an issue first](https://github.com/doseofted/prim-rpc/issues/new) and describe what change that you would like
+> to make.
 
 Some important rules and notes:
 
+- Follow the Code of Conduct (TBD)
 - Contributions made to a Prim+RPC project require a CLA (TBD).
 - All projects in this repository follow [semantic versioning](https://semver.org/).
 - Every completed pull request should have an

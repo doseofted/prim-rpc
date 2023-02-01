@@ -346,7 +346,21 @@ const prim = createPrimClient<typeof module>({
 })
 ```
 
-Let's go ahead and make a remote function call!
+<Alert prose icon="carbon:information">
+
+In this example, we're importing types from a folder named `./server` collocated with the client. If your project is set
+up using a monolithic repository (monorepo), you may import the package containing the server types. If the server is
+located in a completely separate repository, you may publish the types of the server to a registry, e.g. NPM or
+Verdaccio, and then import from that package (this package could be either public or private and only needs to export
+the types, not code).
+
+</Alert>
+
+If importing types makes you uneasy, you may use the
+[(optional) build plugin](/docs/reference/tooling#prevent-import-utility) to ensure that code is never imported
+accidentally. This is usually unnecessary but is available if needed.
+
+Now let's go ahead and make a remote function call!
 
 ```ts client.ts mark=10
 import { createPrimClient } from "@doseofted/prim-rpc"
