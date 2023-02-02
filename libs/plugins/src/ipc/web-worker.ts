@@ -18,8 +18,9 @@ import mitt from "mitt"
  */
 const jsonHandlerPassthrough: JsonHandler = {
 	// eslint-disable-next-line @typescript-eslint/no-unsafe-return, @typescript-eslint/no-explicit-any
-	parse: given => given as any,
-	stringify: given => given as string,
+	parse: given => given,
+	// eslint-disable-next-line @typescript-eslint/no-unsafe-return
+	stringify: given => given,
 }
 
 interface SharedWebWorkerOptions {
@@ -40,7 +41,8 @@ export const createCallbackPlugin = (options: CallbackPluginWebWorkerOptions) =>
 		transport.on(`callback:connected:${id}`, () => {
 			transport.on(`server:message:${id}`, result => {
 				// NOTE: result is expected to be string (over network but is likely not over web workers)
-				response(jsonHandler.parse(result as unknown as string))
+				// eslint-disable-next-line @typescript-eslint/no-unsafe-argument
+				response(jsonHandler.parse(result))
 			})
 			connected()
 		})
@@ -52,6 +54,7 @@ export const createCallbackPlugin = (options: CallbackPluginWebWorkerOptions) =>
 				transport.destroy()
 			},
 			send(message, _blobs) {
+				// eslint-disable-next-line @typescript-eslint/no-unsafe-argument
 				transport.send(`client:message:${id}`, jsonHandler.stringify(message))
 			},
 		}
@@ -69,7 +72,9 @@ export const createCallbackHandler = (options: CallbackHandlerWebWorkerOptions) 
 		transport.on("callback:connect", id => {
 			const { rpc: makeRpc } = prim.connected()
 			transport.on(`client:message:${id}`, rpc => {
-				makeRpc(jsonHandler.parse(rpc as string), detail => {
+				// eslint-disable-next-line @typescript-eslint/no-unsafe-argument
+				makeRpc(jsonHandler.parse(rpc), detail => {
+					// eslint-disable-next-line @typescript-eslint/no-unsafe-argument
 					transport.send(`server:message:${id}`, jsonHandler.stringify(detail))
 				})
 			})
@@ -92,8 +97,10 @@ export const createMethodPlugin = (options: MethodPluginWebWorkerOptions) => {
 			const id = nanoid()
 			transport.on(`method:connected:${id}`, () => {
 				transport.on(`response:${id}`, result => {
-					resolve(jsonHandler.parse(result as string))
+					// eslint-disable-next-line @typescript-eslint/no-unsafe-argument
+					resolve(jsonHandler.parse(result))
 				})
+				// eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
 				transport.send(`request:${id}`, { rpc: jsonHandler.stringify(message), blobs })
 			})
 			transport.send("method:connect", id)
@@ -111,7 +118,9 @@ export const createMethodHandler = (options: MethodHandlerWebWorkerOptions) => {
 		transport.on("method:connect", id => {
 			// eslint-disable-next-line @typescript-eslint/no-misused-promises
 			transport.on(`request:${id}`, async ({ rpc, blobs }) => {
-				const result = await prim.server().prepareRpc(jsonHandler.parse(rpc as string), blobs)
+				// eslint-disable-next-line @typescript-eslint/no-unsafe-argument
+				const result = await prim.server().prepareRpc(jsonHandler.parse(rpc), blobs)
+				// eslint-disable-next-line @typescript-eslint/no-unsafe-argument
 				transport.send(`response:${id}`, jsonHandler.stringify(result))
 			})
 			transport.send(`method:connected:${id}`, null)

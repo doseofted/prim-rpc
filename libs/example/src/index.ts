@@ -234,7 +234,7 @@ export async function handleForm(given: GenericFormExample | HTMLFormElement | F
 }
 handleForm.rpc = true
 
-interface FormInputs {
+export interface FormInputs {
 	name: string
 	email: string
 	message: string

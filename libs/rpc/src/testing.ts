@@ -109,10 +109,13 @@ export function createMethodPlugin({ httpConnection }: PrimClientOptions) {
 		return new Promise(resolve => {
 			const reqId = nanoid()
 			httpConnection.on(`res:${reqId}`, httpServer => {
+				// eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
 				const body = jsonHandler.stringify(bodyRpc)
 				httpServer.on("response", body => {
+					// eslint-disable-next-line @typescript-eslint/no-unsafe-argument
 					resolve(jsonHandler.parse(body))
 				})
+				// eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
 				httpServer.emit("request", { body, blobs })
 			})
 			httpConnection.emit(`req:${reqId}`)
@@ -134,6 +137,7 @@ export function createCallbackPlugin({ wsConnection }: PrimSocketOptions) {
 			wsServer.on("connected", ws => {
 				wsSession = ws
 				ws.on("messageServer", msg => {
+					// eslint-disable-next-line @typescript-eslint/no-unsafe-argument
 					response(jsonHandler.parse(msg))
 				})
 				connected()
@@ -145,6 +149,7 @@ export function createCallbackPlugin({ wsConnection }: PrimSocketOptions) {
 		wsConnection.emit(`req:${reqId}`)
 		return {
 			send(msg) {
+				// eslint-disable-next-line @typescript-eslint/no-unsafe-argument
 				wsSession.emit("messageClient", jsonHandler.stringify(msg))
 			},
 		}
