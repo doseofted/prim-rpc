@@ -12,14 +12,18 @@ without verbose wrappers around the communication channel.
 
 > **Warning** Prim+RPC is prerelease software. It has not reached a stable version.
 
-If a security issue is found then please privately [report the issue to Ted](mailto:ted@doseofted.com). Prim+RPC is in
-early stages and, as it progresses, a more robust policy should be created.
+See the [Security Policy](./SECURITY.md).
 
 ## Issues
 
 If you discover an issue with Prim+RPC unrelated to security, search open issues and discussions in this repository to
 determine if someone else has faced the same issue. Otherwise, feel free to report an issue _with_ a minimal
 reproduction (consider [using an example](https://github.com/doseofted/prim-rpc-examples) as a starting point).
+
+## Support
+
+You can support Prim+RPC by contributing code (either to the core or plugins), sponsoring the projects, or
+[working with Ted on a new project](https://doseofted.com/).
 
 ## Contributions
 
@@ -34,8 +38,8 @@ of the project are welcome!
 
 Some important rules and notes:
 
-- Follow the Code of Conduct (TBD)
-- Contributions made to a Prim+RPC project require a CLA (TBD).
+- Follow the [Code of Conduct](./CODE_OF_CONDUCT.md)
+- Contributions made to a Prim+RPC project require a [Contributor License Agreement](./CLA.md).
 - All projects in this repository follow [semantic versioning](https://semver.org/).
 - Every completed pull request should have an
   [associated changeset](https://github.com/changesets/changesets/blob/main/docs/adding-a-changeset.md).
@@ -46,15 +50,15 @@ Some important rules and notes:
 This is a monolithic repository consisting of several projects. The repository itself is proprietary while individual
 projects are separately licensed:
 
-| Project                | Folder                       | License          |
-| ---------------------- | ---------------------------- | ---------------- |
-| Prim+RPC               | `./libs/rpc`                 | To be determined |
-| Prim+RPC Plugins       | `./libs/plugins`             | To be determined |
-| Prim+RPC Tooling       | `./libs/tooling`             | To be determined |
-| Prim+RPC UI            | `./libs/ui`                  | To be determined |
-| Example Library        | `./libs/example`             | To be determined |
-| Prim+RPC Website       | `./apps/frontend`            | To be determined |
-| Prim+RPC Documentation | `./apps/frontend/pages/docs` | To be determined |
+| Project                | Folder                       | License                                        |
+| ---------------------- | ---------------------------- | ---------------------------------------------- |
+| Prim+RPC               | `./libs/rpc`                 | [To be determined](./libs/rpc/LICENSE.md)      |
+| Prim+RPC Plugins       | `./libs/plugins`             | [To be determined](./libs/plugins/LICENSE.md)  |
+| Prim+RPC Tooling       | `./libs/tooling`             | [To be determined](./libs/tooling/LICENSE.md)  |
+| Prim+RPC UI            | `./libs/ui`                  | [To be determined](./libs/ui/LICENSE.md)       |
+| Example Library        | `./libs/example`             | [To be determined](./libs/example/LICENSE.md)  |
+| Prim+RPC Website       | `./apps/frontend`            | [To be determined](./apps/frontend/LICENSE.md) |
+| Prim+RPC Documentation | `./apps/frontend/pages/docs` | [To be determined](./apps/frontend/LICENSE.md) |
 
 You will find a license file (`LICENSE.md`) in each project's folder that describes the detailed license for which it is
 made available. If a license is not made available then it is unlicensed meaning that usage is unauthorized.

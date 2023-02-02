@@ -17,7 +17,7 @@ If You are not the owner (for example, You've assigned this right to Your employ
 owner will also need to sign this agreement. In situations where multiple parties own the work, all parties will be
 required to sign this agreement.
 
-By submitting a contribution to {project}, you grant {owner} a perpetual, worldwide, non-exclusive, no-charge,
+By submitting a Contribution to {project}, you grant {owner} a perpetual, worldwide, non-exclusive, no-charge,
 royalty-free, irrevocable copyright license to reproduce, modify, prepare derivative works of, publish, sublicense,
 transfer, and distribute Your Contribution and such derivative works.
 
