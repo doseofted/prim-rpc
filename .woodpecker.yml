@@ -31,6 +31,7 @@ pipeline:
       - corepack enable
       - pnpm install
       - pnpm task dev:build
+      - pnpm task dev:test
       - pnpm task changeset:publish
     when:
       event: [tag]

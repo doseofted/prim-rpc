@@ -22,7 +22,8 @@ reproduction (consider [using an example](https://github.com/doseofted/prim-rpc-
 
 ## Support
 
-You can support Prim+RPC by contributing code (either to the core or plugins), sponsoring the projects, or
+You can support Prim+RPC by [starring the repository](https://github.com/doseofted/prim-rpc), sharing with others,
+contributing code (either to the core or plugins), sponsoring the project, or
 [working with Ted on a new project](https://doseofted.com/).
 
 ## Contributions
