@@ -7,6 +7,8 @@ tasks:
       - :docker:build-base-images
     cmds:
       - task: :compose:prod:up-only
+        vars:
+          CLI_ARGS: --build
 
   dev:up:
     desc: "[development] Start all services in project"
@@ -24,6 +26,8 @@ tasks:
       - :docker:build-base-images
     cmds:
       - task: :compose:staging:up-only
+        vars:
+          CLI_ARGS: --build
 
   clear:
     desc: "Clear dangling build cache, images, networks, etc. (pass `--all` as needed)"
