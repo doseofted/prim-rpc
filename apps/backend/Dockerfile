@@ -17,14 +17,13 @@ CMD [ "pnpm", "zx", "entrypoint.mjs" ]
 FROM dev as dev-cleanup
 WORKDIR /home/node/project
 # Clean up all development-related node modules before production install (a dependency of `task dev:clean`)
-RUN task dev:clean-node-modules
+RUN pnpm task dev:clean-node-modules
 
 # NOTE: image included below must be built first before building this image
 FROM doseofted/monorepo-production:latest as prod
 # Copy built files
 COPY --chown=node --from=dev-cleanup /home/node/project/misc /home/node/project/misc
 COPY --chown=node --from=dev-cleanup /home/node/project/libs /home/node/project/libs
-COPY --chown=node --from=dev-cleanup /home/node/project/ui /home/node/project/ui
 COPY --chown=node --from=dev-cleanup /home/node/project/apps /home/node/project/apps
 # Install only dependencies needed in production
 RUN pnpm install --prod --offline --frozen-lockfile

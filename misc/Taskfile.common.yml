@@ -3,6 +3,8 @@ version: 3
 tasks:
   prod:up:
     desc: "[production] Start all services in project"
+    deps:
+      - :docker:build-base-images
     cmds:
       - task: :compose:prod:up-only
 
@@ -18,6 +20,8 @@ tasks:
 
   staging:up:
     desc: "[staging] Start all services in project"
+    deps:
+      - :docker:build-base-images
     cmds:
       - task: :compose:staging:up-only
 
