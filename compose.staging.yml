@@ -5,9 +5,6 @@ services:
     build:
       context: ./proxy
       target: staging
-    volumes:
-      - ./proxy/base.Caddyfile:/etc/caddy/base.Caddyfile:ro
-      - ./proxy/staging.Caddyfile:/etc/caddy/Caddyfile:ro
 
   # postgres:
   # backend:

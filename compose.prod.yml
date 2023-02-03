@@ -2,7 +2,6 @@ version: "3"
 
 services:
   caddy:
-    runtime: runsc
     build:
       context: ./proxy
       target: prod
@@ -12,7 +11,7 @@ services:
     restart: "always"
 
   backend:
-    runtime: runsc
+    # runtime: runsc
     build:
       context: ./apps/backend
       target: prod
@@ -21,7 +20,7 @@ services:
     restart: "always"
 
   frontend:
-    runtime: runsc
+    # runtime: runsc
     build:
       context: ./apps/frontend
       target: prod
