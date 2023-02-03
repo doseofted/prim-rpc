@@ -14,6 +14,8 @@ services:
       - "80:80"
       - "443:443"
     restart: "no"
+    networks:
+      - internal
 
   # database available for use in project
   postgres:
@@ -25,6 +27,8 @@ services:
     volumes:
       - ./data/postgres:/var/lib/postgresql/data
     restart: "no"
+    networks:
+      - database
 
   # backend that will serve the API
   backend:
@@ -34,6 +38,9 @@ services:
       WEBSITE_HOST: $WEBSITE_HOST
       CONTAINED: "true"
     restart: "no"
+    networks:
+      - database
+      - internal
 
   # frontend used to serve UI that communicates with API
   frontend:
@@ -42,3 +49,9 @@ services:
       NEXT_PUBLIC_WEBSITE_HOST: $WEBSITE_HOST
       NEXT_PUBLIC_CONTAINED: "true"
     restart: "no"
+    networks:
+      - internal
+
+networks:
+  internal:
+  database:
