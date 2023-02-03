@@ -10,7 +10,6 @@ RUN pnpm install --offline --frozen-lockfile
 # Build the project
 COPY --chown=node . .
 RUN pnpm build
-# RUN pnpm export
 # Run the project. Entrypoint script will detect NODE_ENV
 ENV NODE_ENV=development
 CMD [ "pnpm", "zx", "entrypoint.mjs" ]
@@ -27,9 +26,7 @@ COPY --chown=node --from=dev-cleanup /home/node/project/misc /home/node/project/
 COPY --chown=node --from=dev-cleanup /home/node/project/libs /home/node/project/libs
 COPY --chown=node --from=dev-cleanup /home/node/project/apps /home/node/project/apps
 # Install only dependencies needed in production
-# RUN pnpm install --prod --offline --frozen-lockfile
-# FIXME: for some reason --prod flag breaks Next.js in production (probably related to MDX or CodeHike?)
-RUN pnpm install --offline --frozen-lockfile
+RUN pnpm install --prod --offline --frozen-lockfile
 # Run the project with production settings
 WORKDIR /home/node/project/apps/frontend
 ENV NODE_ENV=production
