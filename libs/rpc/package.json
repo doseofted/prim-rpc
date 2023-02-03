@@ -19,20 +19,20 @@
 		"lint": "eslint ."
 	},
 	"dependencies": {
-		"defu": "^6.1.1",
+		"defu": "^6.1.2",
 		"lodash-es": "^4.17.21",
 		"mitt": "^3.0.0",
 		"nanoid": "^4.0.0",
 		"proxy-deep": "^3.1.1",
 		"query-string": "^8.1.0",
 		"serialize-error": "^11.0.0",
-		"type-fest": "^3.5.2"
+		"type-fest": "^3.5.4"
 	},
 	"devDependencies": {
 		"@doseofted/prim-example": "workspace:*",
 		"@types/lodash-es": "^4.17.6",
 		"@types/node": "^18.11.18",
-		"superjson": "^1.12.1"
+		"superjson": "^1.12.2"
 	},
 	"type": "module",
 	"exports": {
