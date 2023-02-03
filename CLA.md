@@ -1,14 +1,12 @@
 ---
-owner: PROJECT OWNER
+owner: Ted Klingenberg
 ---
 
 # Contribution Agreement
 
 You accept and agree to the following terms and conditions for Your Contributions (present and future) that you submit
-to {owner}. In return, {owner} shall not use Your Contributions in a way that is contrary to the public benefit or
-inconsistent with its nonprofit status and bylaws in effect at the time of the Contribution. Except for the license
-granted herein to {owner} and recipients of software distributed by {owner}, You reserve all right, title, and interest
-in and to Your Contributions.
+to {owner}. Except for the license granted herein to {owner} and recipients of software distributed by {owner}, You
+reserve all right, title, and interest in and to Your Contributions.
 
 1. **Definitions** "You" (or "Your") shall mean the copyright owner or legal entity authorized by the copyright owner
    that is making this Agreement with {owner}. For legal entities, the entity making a Contribution and all other
@@ -41,8 +39,8 @@ in and to Your Contributions.
 
 4. You represent that you are legally entitled to grant the above license. If your employer(s) has rights to
    intellectual property that you create that includes your Contributions, you represent that you have received
-   permission to make Contributions on behalf of that employer, that your employer has waived such rights for your
-   Contributions to {owner}, or that your employer has executed a separate Corporate CLA with {owner}.
+   permission to make Contributions on behalf of that employer or that your employer has waived such rights for your
+   Contributions to {owner}.
 
 5. You represent that each of Your Contributions is Your original creation (see section 7 for submissions on behalf of
    others). You represent that Your Contribution submissions include complete details of any third-party license or
