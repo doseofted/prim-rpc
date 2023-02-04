@@ -20,6 +20,8 @@ If you discover an issue with Prim+RPC unrelated to security, search open issues
 determine if someone else has faced the same issue. Otherwise, feel free to report an issue _with_ a minimal
 reproduction (consider [using an example](https://github.com/doseofted/prim-rpc-examples) as a starting point).
 
+If you are having trouble using Prim+RPC, open a [new discussion](https://github.com/doseofted/prim-rpc/discussions).
+
 ## Support
 
 You can support Prim+RPC by [starring the repository](https://github.com/doseofted/prim-rpc), sharing with others,
