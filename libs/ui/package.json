@@ -9,6 +9,22 @@
 		"email": "ted@doseofted.com",
 		"url": "https://doseofted.com/"
 	},
+	"contributors": [],
+	"repository": {
+		"type": "git",
+		"url": "https://github.com/doseofted/prim-rpc.git",
+		"directory": "libs/ui"
+	},
+	"homepage": "https://prim.doseofted.com/",
+	"keywords": [
+		"api",
+		"json",
+		"ipc",
+		"rpc"
+	],
+	"bugs": {
+		"url": "https://github.com/doseofted/prim-rpc/issues"
+	},
 	"scripts": {
 		"dev": "vite",
 		"watch": "vite build --watch",

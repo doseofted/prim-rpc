@@ -9,6 +9,22 @@
 		"email": "ted@doseofted.com",
 		"url": "https://doseofted.com/"
 	},
+	"contributors": [],
+	"repository": {
+		"type": "git",
+		"url": "https://github.com/doseofted/prim-rpc.git",
+		"directory": "apps/backend"
+	},
+	"homepage": "https://prim.doseofted.com/",
+	"keywords": [
+		"api",
+		"json",
+		"ipc",
+		"rpc"
+	],
+	"bugs": {
+		"url": "https://github.com/doseofted/prim-rpc/issues"
+	},
 	"dependencies": {
 		"@doseofted/prim-example": "workspace:*",
 		"@doseofted/prim-rpc": "workspace:*",
