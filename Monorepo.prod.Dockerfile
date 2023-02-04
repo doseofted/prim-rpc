@@ -9,6 +9,6 @@ RUN mkdir -p /home/node/project && chown node /home/node/project
 WORKDIR /home/node/project
 # Now run a limited install with dependencies needed at runtime
 COPY --chown=node pnpm-*.yaml package.json ./
-RUN NODE_ENV="" pnpm fetch
+RUN pnpm fetch
 # If image is used directly, drop into shell for debugging
 CMD [ "/bin/bash" ]
