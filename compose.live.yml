@@ -1,0 +1,20 @@
+version: "3"
+
+services:
+  caddy:
+    restart: "always"
+
+  postgres:
+    restart: "always"
+
+  backend:
+    runtime: runsc
+    environment:
+      - NODE_ENV=production
+    restart: "always"
+
+  frontend:
+    runtime: runsc
+    environment:
+      - NODE_ENV=production
+    restart: "always"

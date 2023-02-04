@@ -30,6 +30,12 @@ includes:
       COMPOSE_FILE: "compose.yml:compose.prod.yml:compose.staging.yml"
       CHOSEN_ENV: "staging"
       CHOSEN_PREFIX: "staging"
+  compose:live:
+    <<: *base-compose
+    vars:
+      COMPOSE_FILE: "compose.yml:compose.live.yml"
+      CHOSEN_ENV: "live"
+      CHOSEN_PREFIX: "live"
 
   # Sub-project-specific includes
   backend:

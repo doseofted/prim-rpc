@@ -25,6 +25,7 @@ const withMDX = mdx({
 })
 
 const nextConfig = withMDX({
+	// output: "standalone",
 	eslint: {
 		ignoreDuringBuilds: true,
 	},
