@@ -67,11 +67,11 @@ tasks:
   # (otherwise commands work fine)
   # Remove all node_modules (useful especially in container environments when only production dependencies are needed)
   clean-node-modules:
-    cmds: ["find . -name node_modules -type d -prune -exec rm -fr {} +"]
+    cmds: ['find . -name node_modules -not -path "*/.next/standalone/node_modules" -type d -prune -exec rm -fr {} +']
     ignore_error: true
   # Remove all distributable files, useful before uploading a package to a registry
   clean-distributable:
-    cmds: ["find . -name dist -type d -prune -exec rm -fr {} +"]
+    cmds: ['find . -name dist -not -path "*/shiki/dist" -type d -prune -exec rm -fr {} +']
     ignore_error: true
   # clean all TurboRepo cache
   clean-turbo:
