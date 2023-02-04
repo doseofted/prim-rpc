@@ -37,7 +37,8 @@ tasks:
     # NOTE: this is only useful if Task is installed globally already (not through PNPM)
     desc: "Set Node version and install node modules with PNPM"
     cmds:
-      - "corepack enable"
+      - cmd: "corepack enable"
+        ignore_error: true
       - "pnpm env use --global 19.4.0"
       - "pnpm install"
 

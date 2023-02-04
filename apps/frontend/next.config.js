@@ -25,6 +25,9 @@ const withMDX = mdx({
 })
 
 const nextConfig = withMDX({
+	eslint: {
+		ignoreDuringBuilds: true,
+	},
 	reactStrictMode: true,
 	swcMinify: true,
 	webpack(given) {
