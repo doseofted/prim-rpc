@@ -10,7 +10,7 @@ WORKDIR /home/node/project
 # Lockfiles should be copied first when `pnpm fetch` command is used
 # LINK https://pnpm.io/cli/fetch#usage-scenario
 COPY --chown=node pnpm-*.yaml package.json ./
-RUN pnpm fetch
+RUN NODE_ENV="" pnpm fetch
 # Copy miscellaneous configuration related to project that could be used in container
 COPY --chown=node .eslint* .nvmrc Taskfile.yml tsconfig.json turbo.json build-deps.mjs  ./
 COPY --chown=node misc misc
@@ -19,7 +19,7 @@ FROM monorepo-install as monorepo-build
 # Build all project dependencies once (excluding `apps/`, built in each respective Dockerfile)
 # First, start with libraries used in the project
 COPY --chown=node libs libs
-RUN pnpm install --offline --frozen-lockfile
+RUN NODE_ENV="" pnpm install --offline --frozen-lockfile
 RUN pnpm task dev:build -- "--filter=./libs/*"
 ENV NODE_ENV=development
 # "build-libs" task will watch libs and rebuild in development
