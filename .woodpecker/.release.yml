@@ -1,8 +1,8 @@
 pipeline:
-  build:dev: &build-base
+  release:preview:
     image: node:19.4-bullseye
     environment:
-      NODE_ENV: "development"
+      NODE_ENV: "production"
     commands:
       - corepack enable
       - pnpm install
@@ -11,19 +11,10 @@ pipeline:
     when:
       event: [push]
       branch:
-        - develop
-
-  build:prod:
-    <<: *build-base
-    environment:
-      NODE_ENV: "production"
-    when:
-      event: [push]
-      branch:
         - release/*
 
-  release:
-    <<: *build-base
+  release:official:
+    image: node:19.4-bullseye
     secrets: [npm_username, npm_api_token]
     environment:
       NODE_ENV: "production"
