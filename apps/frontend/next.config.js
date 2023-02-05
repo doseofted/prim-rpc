@@ -27,6 +27,9 @@ const withMDX = mdx({
 const nextConfig = withMDX({
 	// NOTE: standalone mode appears to create issues in pnpm workspace
 	// output: "standalone",
+	experimental: {
+		scrollRestoration: true,
+	},
 	eslint: {
 		ignoreDuringBuilds: true,
 	},
