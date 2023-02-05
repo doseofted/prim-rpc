@@ -83,3 +83,28 @@ parts of the project. Run `pnpm task dev:build` for subsequent builds. Watch for
 If you prefer to work in Docker, configure the [`.env` file](./.env.example) and run `pnpm task compose:dev:up` (depends
 on [Docker/Compose](https://docs.docker.com/get-docker/) and [mkcert](https://github.com/FiloSottile/mkcert)). When
 finished, run `pnpm task compose:dev:down`.
+
+## Processes
+
+> **Warning** Work In Progress
+
+Prim+RPC's release process (and general workflow) is as follows:
+
+### Features
+
+- Create an issue describing new feature. Optionally, await feedback.
+- Create a new `feature/[NAME]` branch off of `develop`.
+- Make changes, following the [Contributions Guide](#contributions)
+- Add a changeset describing changes made (`pnpm task changeset:add -- ...`)
+- Create a pull request, target `develop` branch.
+- Sign CLA when requested.
+- Change will be evaluated by maintainer.
+
+### Releases
+
+- Create a new `release/[VERSION]` branch.
+- Version changes as prerelease: `pnpm task changeset:pre -- enter next`
+- Make changes as needed.
+- Create a pull request, target `main`
+- Exit prerelease mode once ready changes are ready.
+- ...
