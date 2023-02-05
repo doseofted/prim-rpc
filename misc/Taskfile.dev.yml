@@ -140,6 +140,10 @@ tasks:
     desc: "Add a changeset"
     cmds:
       - "changeset {{.CLI_ARGS}}"
+  changeset:pre:
+    desc: "Enter/exit prerelease mode with arguments, like so: `task dev:changeset:pre -- enter|exit next|beta|alpha`"
+    cmds:
+      - "changeset pre {{.CLI_ARGS}}"
   changeset:version:
     desc: "Apply changes based on changeset"
     cmds:
