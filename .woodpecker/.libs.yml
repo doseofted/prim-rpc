@@ -1,0 +1,62 @@
+pipeline:
+  build:setup:
+    image: &image node:19.4-bullseye
+    commands:
+      - corepack enable
+      - pnpm install
+    when: &when
+      event:
+        - push
+      branch:
+        - develop
+        - feature/*
+
+  build:example:
+    image: *image
+    group: build
+    commands:
+      - pnpm task dev:build -- --filter=./libs/example
+      - pnpm task dev:test -- --filter=./libs/example
+    when:
+      <<: *when
+      path: "libs/example/*"
+
+  build:rpc:
+    image: *image
+    group: build
+    commands:
+      - pnpm task dev:build -- --filter=./libs/rpc
+      - pnpm task dev:test -- --filter=./libs/rpc
+    when:
+      <<: *when
+      path: "libs/rpc/*"
+
+  build:plugins:
+    image: *image
+    group: build
+    commands:
+      - pnpm task dev:build -- --filter=./libs/plugins
+      - pnpm task dev:test -- --filter=./libs/plugins
+    when:
+      <<: *when
+      path: "libs/plugins/*"
+
+  build:tooling:
+    image: *image
+    group: build
+    commands:
+      - pnpm task dev:build -- --filter=./libs/tooling
+      - pnpm task dev:test -- --filter=./libs/tooling
+    when:
+      <<: *when
+      path: "libs/tooling/*"
+
+  build:ui:
+    image: *image
+    group: build
+    commands:
+      - pnpm task dev:build -- --filter=./libs/ui
+      - pnpm task dev:test -- --filter=./libs/ui
+    when:
+      <<: *when
+      path: "libs/ui/*"

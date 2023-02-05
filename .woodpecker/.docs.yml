@@ -9,10 +9,17 @@ pipeline:
       tag: v*
       branch: release/*
 
-  docs:base:
+  docs:base:dev:
     image: *base-image
+    group: base
     commands:
       - task docker:base:build
+    when: *base-when
+
+  docs:base:prod:
+    image: *base-image
+    group: base
+    commands:
       - task docker:prod:build
     when: *base-when
 
