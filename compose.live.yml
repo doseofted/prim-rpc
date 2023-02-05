@@ -18,3 +18,9 @@ services:
     environment:
       - NODE_ENV=production
     restart: "always"
+
+  # NOTE if postgres database is used in future, this needs to be removed for migration sake
+  # watchtower:
+  #   image: containrrr/watchtower:1.5.3
+  #   volumes:
+  #     - /var/run/docker.sock:/var/run/docker.sock
