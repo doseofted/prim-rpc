@@ -3,7 +3,7 @@ pipeline:
     image: node:19.4-bullseye
     commands:
       - corepack enable
-      - pnpm install --filter=./libs/ui
+      - pnpm install # --filter=./libs/ui
       - pnpm task dev:build -- --filter=./libs/ui
       - pnpm task dev:test -- --filter=./libs/ui
     when:

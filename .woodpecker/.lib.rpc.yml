@@ -3,7 +3,7 @@ pipeline:
     image: node:19.4-bullseye
     commands:
       - corepack enable
-      - pnpm install --filter=./libs/rpc
+      - pnpm install # --filter=./libs/rpc
       - pnpm task dev:build -- --filter=./libs/rpc
       - pnpm task dev:test -- --filter=./libs/rpc
     when:

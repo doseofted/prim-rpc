@@ -3,7 +3,7 @@ pipeline:
     image: node:19.4-bullseye
     commands:
       - corepack enable
-      - pnpm install --filter=./libs/tooling
+      - pnpm install # --filter=./libs/tooling
       - pnpm task dev:build -- --filter=./libs/tooling
       - pnpm task dev:test -- --filter=./libs/tooling
     when:
