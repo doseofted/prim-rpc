@@ -11,6 +11,4 @@ pipeline:
       branch:
         - develop
         - feature/*
-
-when:
-  path: "libs/tooling/*"
+      path: "libs/tooling/*"
