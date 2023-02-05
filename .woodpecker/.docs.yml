@@ -1,0 +1,42 @@
+pipeline:
+  docs:setup:
+    image: &base-image node:19.4-bullseye
+    commands:
+      - corepack enable
+      - npm install -g @go-task/cli
+    when: &base-when
+      event: [tag, push]
+      tag: v*
+      branch: release/*
+
+  docs:base:
+    image: *base-image
+    commands:
+      - task docker:base:build
+      - task docker:prod:build
+    when: *base-when
+
+  docs:build:production:
+    image: &build-image woodpeckerci/plugin-docker-buildx
+    secrets: &build-secrets
+      - docker_user
+      - docker_token
+    settings: &build-settings
+      repo: doseofted/prim-frontend
+      dockerfile: ./apps/frontend/Dockerfile
+      context: ./apps/frontend
+      platforms: linux/amd64
+      tag: ["${CI_COMMIT_TAG}", "latest"]
+    when:
+      event: [tag]
+      tag: v*
+
+  docs:build:staging:
+    image: *build-image
+    secrets: *build-secrets
+    settings:
+      <<: *build-settings
+      tag: ["v${CI_COMMIT_BRANCH##release/}-staging", "staging"]
+    when:
+      event: [push]
+      branch: release/*
