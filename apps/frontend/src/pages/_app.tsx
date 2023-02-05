@@ -8,6 +8,7 @@ import { MDXProvider } from "@mdx-js/react"
 import Link from "next/link"
 import { HeaderLink } from "@/components/Headers"
 import { LenisProvider, useLenis } from "@/components/LenisProvider"
+import { DefaultSeo } from "next-seo"
 
 const mdxComponents = {
 	a: (props: React.HTMLAttributes<HTMLAnchorElement> & { href: string }) => {
@@ -54,6 +55,7 @@ export default function App({ Component, pageProps }: AppProps) {
 				plusJakartaSans.variable,
 				firaCodeMono.variable,
 			].join(" ")}>
+			<DefaultSeo twitter={{ handle: "@doseofted" }} themeColor="#2D0D60" />
 			<LenisProvider>
 				{/* eslint-disable-next-line @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-explicit-any */}
 				<MDXProvider components={mdxComponents as any}>

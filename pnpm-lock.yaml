@@ -121,6 +121,7 @@ importers:
       lodash-es: ^4.17.21
       nanoid: ^4.0.0
       next: 13.1.6
+      next-seo: ^5.15.0
       popmotion: ^11.0.5
       postcss: ^8.4.21
       pts: ^0.11.3
@@ -160,6 +161,7 @@ importers:
       lodash-es: 4.17.21
       nanoid: 4.0.0
       next: 13.1.6_5mhhrw5dq6gnbuirj2awdzvyuu
+      next-seo: 5.15.0_3vryta7zmbcsw4rrqf4axjqggm
       popmotion: 11.0.5
       pts: 0.11.3
       react: 18.2.0
@@ -7167,6 +7169,18 @@ packages:
 
   /neo-async/2.6.2:
     resolution: {integrity: sha512-Yd3UES5mWCSqR+qNT93S3UoYUkqAZ9lLg8a7g9rimsWmYGK8cVToA4/sF3RrshdyV3sAGMXVUmpMYOw+dLpOuw==}
+
+  /next-seo/5.15.0_3vryta7zmbcsw4rrqf4axjqggm:
+    resolution: {integrity: sha512-LGbcY91yDKGMb7YI+28n3g+RuChUkt6pXNpa8FkfKkEmNiJkeRDEXTnnjVtwT9FmMhG6NH8qwHTelGrlYm9rgg==}
+    peerDependencies:
+      next: ^8.1.1-canary.54 || >=9.0.0
+      react: '>=16.0.0'
+      react-dom: '>=16.0.0'
+    dependencies:
+      next: 13.1.6_5mhhrw5dq6gnbuirj2awdzvyuu
+      react: 18.2.0
+      react-dom: 18.2.0_react@18.2.0
+    dev: false
 
   /next/13.1.6_5mhhrw5dq6gnbuirj2awdzvyuu:
     resolution: {integrity: sha512-hHlbhKPj9pW+Cymvfzc15lvhaOZ54l+8sXDXJWm3OBNBzgrVj6hwGPmqqsXg40xO1Leq+kXpllzRPuncpC0Phw==}

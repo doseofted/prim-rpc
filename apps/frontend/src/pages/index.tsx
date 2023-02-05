@@ -6,6 +6,7 @@ import { IntroText } from "@/components/IntroText"
 import { GetServerSideProps } from "next"
 import backend from "../prim-client"
 import { Title } from "@/components/Title"
+import { NextSeo } from "next-seo"
 
 interface Props {
 	greeting: string
@@ -26,9 +27,30 @@ export const getServerSideProps: GetServerSideProps<Props> = async function () {
 
 export default function Home({ greeting }: Props) {
 	const state = "enter"
+	const commonSeo = {
+		title: "Prim+RPC",
+		description:
+			"Easy-to-understand, type-safe, transport-agnostic RPC/IPC for JavaScript, supporting callbacks, batching, file uploads, custom serialization, and more.",
+	}
 	return (
 		<>
 			<Title />
+			<NextSeo
+				{...commonSeo}
+				twitter={{ handle: "@doseofted", cardType: "summary_large_image" }}
+				openGraph={{
+					...commonSeo,
+					images: [
+						{
+							url: `${process.env.NEXT_PUBLIC_WEBSITE_HOST}/social.png`,
+							alt: 'Two very short JavaScript files: a simple function on the server-side and a call to that function on the client-side. Tagline: "Backend, meet Frontend"',
+							width: 1200,
+							height: 630,
+							type: "image/png",
+						},
+					],
+				}}
+			/>
 			<div className="relative min-h-screen py-8 container mx-auto grid grid-cols-12 grid-rows-[auto_1fr_auto] px-4 gap-4">
 				<Navigation className="col-span-12" />
 				<div className="col-span-12 font-sans text-center flex justify-center items-center text-white">
