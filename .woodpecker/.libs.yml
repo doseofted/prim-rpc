@@ -10,6 +10,8 @@ pipeline:
       branch:
         - develop
         - feature/*
+      path:
+        - "libs/*"
 
   build:example:
     image: *image
