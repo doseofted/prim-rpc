@@ -1,2 +1,2 @@
-// TODO: write this plugin (for Nuxt / Nitro / h3)
+// TODO: write this plugin (for Nuxt 3 / Nitro / h3)
 export {}

@@ -15,8 +15,9 @@ pipeline:
 
   build:example:
     image: *image
-    # group: build
+    group: build
     commands:
+      - corepack enable
       - pnpm task dev:build -- --filter=./libs/example
       - pnpm task dev:test -- --filter=./libs/example
     when:
@@ -25,8 +26,9 @@ pipeline:
 
   build:rpc:
     image: *image
-    # group: build
+    group: build
     commands:
+      - corepack enable
       - pnpm task dev:build -- --filter=./libs/rpc
       - pnpm task dev:test -- --filter=./libs/rpc
     when:
@@ -35,8 +37,9 @@ pipeline:
 
   build:plugins:
     image: *image
-    # group: build
+    group: build
     commands:
+      - corepack enable
       - pnpm task dev:build -- --filter=./libs/plugins
       - pnpm task dev:test -- --filter=./libs/plugins
     when:
@@ -45,8 +48,9 @@ pipeline:
 
   build:tooling:
     image: *image
-    # group: build
+    group: build
     commands:
+      - corepack enable
       - pnpm task dev:build -- --filter=./libs/tooling
       - pnpm task dev:test -- --filter=./libs/tooling
     when:
@@ -55,8 +59,9 @@ pipeline:
 
   build:ui:
     image: *image
-    # group: build
+    group: build
     commands:
+      - corepack enable
       - pnpm task dev:build -- --filter=./libs/ui
       - pnpm task dev:test -- --filter=./libs/ui
     when:
