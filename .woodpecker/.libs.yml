@@ -1,6 +1,6 @@
 pipeline:
   build:setup:
-    image: &image node:19.4-bullseye
+    image: &image node:19.6-bullseye
     commands:
       - corepack enable
       - pnpm install

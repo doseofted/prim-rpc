@@ -1,6 +1,6 @@
 pipeline:
   npm:preview:
-    image: node:19.4-bullseye
+    image: node:19.6-bullseye
     environment:
       NODE_ENV: "production"
     commands:
@@ -14,7 +14,7 @@ pipeline:
         - release/*
 
   npm:official:
-    image: node:19.4-bullseye
+    image: node:19.6-bullseye
     secrets: [npm_username, npm_api_token]
     environment:
       NODE_ENV: "production"

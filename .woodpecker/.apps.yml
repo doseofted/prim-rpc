@@ -1,6 +1,6 @@
 pipeline:
   docs:setup:
-    image: &base-image node:19.4-bullseye
+    image: &base-image node:19.6-bullseye
     commands:
       - npm install -g @go-task/cli
     when: &base-when
