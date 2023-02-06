@@ -11,7 +11,7 @@ pipeline:
         - develop
         - feature/*
       path:
-        - "libs/*"
+        - "libs/**"
 
   build:example:
     image: *image
