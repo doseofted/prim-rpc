@@ -132,12 +132,14 @@ tasks:
     desc: "Lint entire project with Stylelint"
     cmds:
       - turbo run lint-style {{.CLI_ARGS}}
+
+  # NOTE: the following are most npm scripts but have been moved to the Taskfile to give each script a description
   format:
     desc: "Format and write changes to disk with Prettier"
     cmds:
       - prettier --write . {{.CLI_ARGS}}
-  changeset:add:
-    desc: "Add a changeset"
+  changeset:
+    desc: "Add a changeset (or pass arguments to use available changeset command, i.e. `task dev:changeset -- status`)"
     cmds:
       - "changeset {{.CLI_ARGS}}"
   changeset:pre:
