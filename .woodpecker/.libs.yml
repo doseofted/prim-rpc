@@ -11,54 +11,54 @@ pipeline:
         - develop
         - feature/*
       path:
-        - "libs/**"
+        - "libs/**/*"
 
   build:example:
     image: *image
-    group: build
+    # group: build
     commands:
       - pnpm task dev:build -- --filter=./libs/example
       - pnpm task dev:test -- --filter=./libs/example
     when:
       <<: *when
-      path: "libs/example/*"
+      path: "libs/example/**/*"
 
   build:rpc:
     image: *image
-    group: build
+    # group: build
     commands:
       - pnpm task dev:build -- --filter=./libs/rpc
       - pnpm task dev:test -- --filter=./libs/rpc
     when:
       <<: *when
-      path: "libs/rpc/*"
+      path: "libs/rpc/**/*"
 
   build:plugins:
     image: *image
-    group: build
+    # group: build
     commands:
       - pnpm task dev:build -- --filter=./libs/plugins
       - pnpm task dev:test -- --filter=./libs/plugins
     when:
       <<: *when
-      path: "libs/plugins/*"
+      path: "libs/plugins/**/*"
 
   build:tooling:
     image: *image
-    group: build
+    # group: build
     commands:
       - pnpm task dev:build -- --filter=./libs/tooling
       - pnpm task dev:test -- --filter=./libs/tooling
     when:
       <<: *when
-      path: "libs/tooling/*"
+      path: "libs/tooling/**/*"
 
   build:ui:
     image: *image
-    group: build
+    # group: build
     commands:
       - pnpm task dev:build -- --filter=./libs/ui
       - pnpm task dev:test -- --filter=./libs/ui
     when:
       <<: *when
-      path: "libs/ui/*"
+      path: "libs/ui/**/*"
