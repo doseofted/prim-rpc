@@ -5,25 +5,33 @@ pipeline:
       NODE_ENV: "production"
     commands:
       - corepack enable
-      - pnpm install
+      - pnpm install --frozen-lockfile
       - pnpm task dev:build
       - pnpm task dev:test
     when:
-      event: [push]
+      event:
+        - push
+        - tag
+      tag: v*
       branch:
         - release/*
 
   npm:official:
     image: node:19.6-bullseye
-    secrets: [npm_username, npm_api_token]
+    secrets: [npm_api_token, github_api_token]
     environment:
       NODE_ENV: "production"
     commands:
       - corepack enable
-      - pnpm install
-      - pnpm task dev:build
-      - pnpm task dev:test
+      # Publish to GitHub Packages
+      - echo '//npm.pkg.github.com/:_authToken=${GITHUB_API_TOKEN}' >> $HOME/.npmrc
       - pnpm task changeset:publish
+      - rm $HOME/.npmrc
+      # Publish to NPM
+      # - echo '//registry.npmjs.org/:_authToken=${NPM_API_TOKEN}' >> $HOME/.npmrc
+      # - pnpm task changeset:publish
+      # - rm $HOME/.npmrc
     when:
-      event: [tag]
+      event:
+        - tag
       tag: v*

@@ -3,7 +3,7 @@ pipeline:
     image: &image node:19.6-bullseye
     commands:
       - corepack enable
-      - pnpm install
+      - pnpm install --frozen-lockfile
     when: &when
       event:
         - push
