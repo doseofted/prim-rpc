@@ -5,7 +5,7 @@ pipeline:
       NODE_ENV: "production"
     commands:
       - corepack enable
-      - pnpm install --frozen-lockfile
+      - NODE_ENV="" pnpm install --frozen-lockfile
       - pnpm task dev:build
       - pnpm task dev:test
     when:

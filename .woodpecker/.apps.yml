@@ -24,7 +24,7 @@ pipeline:
     secrets: &build-secrets
       - docker_username
       - docker_password
-    settings: &build-settings
+    settings: &frontend-settings
       repo: doseofted/prim-frontend
       dockerfile: ./apps/frontend/Dockerfile
       context: ./apps/frontend
@@ -41,7 +41,7 @@ pipeline:
     group: build
     secrets: *build-secrets
     settings:
-      <<: *build-settings
+      <<: *frontend-settings
       tag: ["v${CI_COMMIT_BRANCH##release/}-staging", "staging"]
     when: &when-staging
       event: [push]
