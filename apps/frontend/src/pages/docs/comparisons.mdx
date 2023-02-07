@@ -129,13 +129,23 @@ frameworks but have the simplicity of using Prim+RPC to define resources to be m
 ## tRPC
 
 [tRPC](https://github.com/trpc/trpc) is probably most similar to Prim+RPC in terms of the problems that it serves to
-address. tRPC and Prim+RPC diverge in how they aim to address them. tRPC is an RPC framework designed to make it easier
-to communicate between an HTTP server written in TypeScript and some client written in TypeScript (with React hooks
-available). These are some of the first few differentiators between the two RPC frameworks.
+address. tRPC and Prim+RPC diverge in how they aim to address them. They are similar in many respects: both are RPC
+frameworks, both provide their types over TypeScript, and both are designed to work over multiple types of transports.
 
-While tRPC focuses on server/client communication over HTTP, Prim+RPC focuses on server/client communication regardless
-of transport method (of course, HTTP is well-supported). Prim+RPC aims to be transport-agnostic so that it can support
-various uses of RPC, including IPC (for instance, as used in Electron or between Node.js servers).
+One major difference is the focus of the library regarding transport. Both tRPC and Prim+RPC are designed in a way that
+they can be used with multiple transports but tRPC tends to focus more on transportation over HTTP (or WebSocket when
+using subscriptions). Prim+RPC is built from the start to work well with HTTP/WebSocket but also with IPC meaning you
+can use Prim+RPC to bridge not just over networks but over separated processes like Web Workers.
+
+tRPC and Prim+RPC also differ largely in how much library-specific code needs to be written by a developer and also how
+much library-specific code is ran when an API is developed with it. If you want to utilize a function in tRPC, you must
+write a tRPC procedure defined on tRPC's router which is then passed to the tRPC server instance. This procedure has a
+specific shape where you may define the input and output with a schema validation library, usually Zod, and then define
+this as either a query or a mutation (concepts for those familiar with GraphQL, which we'll talk about in a minute).
+
+In Prim+RPC, it's just JavaScript. Procedures in tRPC are just regular JavaScript functions in Prim+RPC. Routers in tRPC
+are comparable to JavaScript modules. Schema validation in Prim+RPC is left to the developer but, of course, you can
+still use Zod in your functions or any other tool from the JavaScript ecosystem.
 
 tRPC has a lot of features that are comparable to GraphQL. It uses familiar GraphQL terms for defining requests which
 can be super useful for those migrating from GraphQL to a tool like tRPC. If you're familiar with queries, mutations,
@@ -144,11 +154,12 @@ terms may be daunting and become a hurdle in picking up the framework.
 
 Prim+RPC in contrast does not compare itself to GraphQL but rather to JavaScript. If you know JavaScript then Prim+RPC
 should be easy to pick up. Queries in tRPC are simply JavaScript function calls in Prim+RPC, as are mutations.
-Subscriptions (messages sent over WebSocket) in tRPC are a somewhat more advanced feature of the framework while in
-Prim+RPC, they are simply callbacks on a JavaScript function. While tRPC utilizes different methods to define procedures
-explicitly on the server, Prim+RPC follows the structure of the JavaScript module that you give it. In other words, if
-you give Prim+RPC a module named `someModule` with a function `sayHello` then you'd simply call `someModule.sayHello()`.
-No other options are needed for that function call from the client except for those provided from your function.
+Subscriptions (messages typically sent over WebSocket) in tRPC are a somewhat more advanced feature of the framework
+while in Prim+RPC, they are simply callbacks on a JavaScript function. While tRPC utilizes different methods to define
+procedures explicitly on the server, Prim+RPC follows the structure of the JavaScript module that you give it. In other
+words, if you give Prim+RPC a module named `someModule` with a function `sayHello` then you'd simply call
+`someModule.sayHello()`. No other options are needed for that function call from the client except for those provided
+from your function.
 
 tRPC also utilizes Zod to a large extent as a way of defining types that can be enforced during run-time. It also has
 tested a few other popular schema libraries and allows them to be used with tRPC. Prim+RPC on the other hand doesn't
@@ -157,9 +168,8 @@ run-time errors to the developer. This means that you could potentially use Zod,
 also have the option of choosing any other tool from the JavaScript ecosystem if you'd like.
 
 Another difference between the two is how they are used on the client and within frontend frameworks. tRPC provides an
-RPC client with its own fetch client with a variety of features and options built-in. It also provides an adapter for
-React that extends the regular tRPC client. This is useful for getting started but becomes a problem if you need to use
-a custom fetch client like Axios.
+RPC client with its own fetch client with a variety of features and options built-in. This is useful for getting started
+but becomes a problem if you need to use a custom fetch client like Axios or Capacitor's HTTP client.
 
 Prim+RPC's client on the other hand doesn't have a default fetch client. In fact, your method of transport may not be
 HTTP so you may not need a fetch client. This functionality in Prim+RPC is provided over plugins so that you can
@@ -174,12 +184,12 @@ usually provide excellent tools for handling Promises so an additional client is
 
 To sum up differences:
 
-| tRPC                                  | Prim+RPC                                                     |
-| ------------------------------------- | ------------------------------------------------------------ |
-| Focus on HTTP transport               | Transport-agnostic (provided over plugins)                   |
-| Great for those familiar with GraphQL | Great for those familiar with JavaScript                     |
-| Mostly uses Zod for schema validation | Schema validation is left to developer but Zod could be used |
-| Built-in fetch with client            | Fetching ability provided over plugins                       |
+| tRPC                                           | Prim+RPC                                                     |
+| ---------------------------------------------- | ------------------------------------------------------------ |
+| Framework-agnostic but generally HTTP-specific | Transport-agnostic (through plugins), HTTP well supported    |
+| Great for those familiar with GraphQL          | Great for those familiar with JavaScript                     |
+| Mostly uses Zod for schema validation          | Schema validation is left to developer but Zod could be used |
+| Built-in fetch with client                     | Fetching ability provided over plugins                       |
 
 ## gRPC
 
