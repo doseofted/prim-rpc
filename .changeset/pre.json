@@ -10,5 +10,7 @@
     "@doseofted/prim-rpc-tooling": "0.0.0",
     "@doseofted/prim-rpc-ui": "0.0.0"
   },
-  "changesets": []
+  "changesets": [
+    "sixty-buses-bathe"
+  ]
 }
