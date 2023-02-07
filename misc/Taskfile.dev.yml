@@ -142,6 +142,10 @@ tasks:
     desc: "Add a changeset (or pass arguments to use available changeset command, i.e. `task dev:changeset -- status`)"
     cmds:
       - "changeset {{.CLI_ARGS}}"
+  changeset:status:
+    desc: "Ensure that changesets are given (usually prior to release)"
+    cmds:
+      - "changeset status {{.CLI_ARGS}}"
   changeset:pre:
     desc: "Enter/exit prerelease mode with arguments, like so: `task dev:changeset:pre -- enter|exit next|beta|alpha`"
     cmds:

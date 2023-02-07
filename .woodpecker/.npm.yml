@@ -23,13 +23,14 @@ pipeline:
       NODE_ENV: "production"
     commands:
       - corepack enable
+      - pnpm task dev:changeset:status
       # Publish to GitHub Packages
       - echo '//npm.pkg.github.com/:_authToken=${GITHUB_API_TOKEN}' >> $HOME/.npmrc
-      - pnpm task changeset:publish
+      - pnpm task dev:changeset:publish
       - rm $HOME/.npmrc
       # Publish to NPM
       # - echo '//registry.npmjs.org/:_authToken=${NPM_API_TOKEN}' >> $HOME/.npmrc
-      # - pnpm task changeset:publish
+      # - pnpm task dev:changeset:publish
       # - rm $HOME/.npmrc
     when:
       event:

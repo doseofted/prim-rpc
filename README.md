@@ -5,14 +5,16 @@ library is making plain function calls to a server from some client (RPC), as if
 client itself. The goal is to write plain JavaScript, or TypeScript if you prefer, and immediately invoke typed code
 without verbose wrappers around the communication channel.
 
+> **Warning** Prim+RPC is prerelease software. It has not reached a stable version.
+
 [Read the Documentation](https://prim.doseofted.com/) ∙ [Try an Example](https://github.com/doseofted/prim-rpc-examples)
 ∙ [Work with Ted](https://doseofted.com/)
 
-## Security
+## Support
 
-> **Warning** Prim+RPC is prerelease software. It has not reached a stable version.
-
-See the [Security Policy](./SECURITY.md).
+You can support Prim+RPC by [starring the repository](https://github.com/doseofted/prim-rpc), sharing with others,
+contributing code (either to the core or plugins), sponsoring the project, or
+[working with Ted on a new project](https://doseofted.com/).
 
 ## Issues
 
@@ -22,33 +24,15 @@ reproduction (consider [using an example](https://github.com/doseofted/prim-rpc-
 
 If you are having trouble using Prim+RPC, open a [new discussion](https://github.com/doseofted/prim-rpc/discussions).
 
-## Support
+## Security
 
-You can support Prim+RPC by [starring the repository](https://github.com/doseofted/prim-rpc), sharing with others,
-contributing code (either to the core or plugins), sponsoring the project, or
-[working with Ted on a new project](https://doseofted.com/).
+See the [Security Policy](./SECURITY.md).
 
 ## Contributions
 
-Prim+RPC depends on handlers/plugins to work with a wide variety of frameworks. These frameworks can sometimes be
-difficult to integrate with when one is not familiar with the framework. Contributions for handlers/plugins or to rest
-of the project are welcome!
+See the [Contribution Guide](./CONTRIBUTING.md).
 
-> **Warning** It is possible that a feature is already being or has been developed or that a feature may have already
-> been rejected. If you'd like to contribute to the project,
-> [open an issue first](https://github.com/doseofted/prim-rpc/issues/new) and describe what change that you would like
-> to make.
-
-Some important rules and notes:
-
-- Follow the [Code of Conduct](./CODE_OF_CONDUCT.md)
-- Contributions made to a Prim+RPC project require a [Contributor License Agreement](./CLA.md).
-- All projects in this repository follow [semantic versioning](https://semver.org/).
-- Every completed pull request should have an
-  [associated changeset](https://github.com/changesets/changesets/blob/main/docs/adding-a-changeset.md).
-- All commits should include detailed messages (as a best effort).
-
-## License
+## License(s)
 
 This is a monolithic repository consisting of several projects. The repository itself is proprietary while individual
 projects are separately licensed:
@@ -83,28 +67,3 @@ parts of the project. Run `pnpm task dev:build` for subsequent builds. Watch for
 If you prefer to work in Docker, configure the [`.env` file](./.env.example) and run `pnpm task compose:dev:up` (depends
 on [Docker/Compose](https://docs.docker.com/get-docker/) and [mkcert](https://github.com/FiloSottile/mkcert)). When
 finished, run `pnpm task compose:dev:down`.
-
-## Processes
-
-> **Warning** Work In Progress
-
-Prim+RPC's release process (and general workflow) is as follows:
-
-### Features
-
-- Create an issue describing new feature. Optionally, await feedback.
-- Create a new `feature/[NAME]` branch off of `develop`.
-- Make changes, following the [Contributions Guide](#contributions)
-- Add a changeset describing changes made (`pnpm task changeset:add -- ...`)
-- Create a pull request, target `develop` branch.
-- Sign CLA when requested.
-- Change will be evaluated by maintainer.
-
-### Releases
-
-- Create a new `release/[VERSION]` branch.
-- Version changes as prerelease: `pnpm task changeset:pre -- enter next`
-- Make changes as needed.
-- Create a pull request, target `main`
-- Exit prerelease mode once ready changes are ready.
-- ...
