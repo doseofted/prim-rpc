@@ -1,3 +1,7 @@
+services:
+  local_registry:
+    image: registry:2.8
+
 pipeline:
   apps:base:dev:
     image: &build-image woodpeckerci/plugin-docker-buildx
@@ -8,6 +12,7 @@ pipeline:
       context: ./
       platforms: linux/amd64
       tag: ["latest"]
+      registry: http://registry:5000
     when: &base-when
       event: [tag, push]
       tag: v*
