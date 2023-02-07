@@ -1,25 +1,29 @@
 pipeline:
-  docs:base:dev:
-    image: &base-image node:19.6-bullseye
+  apps:base:dev:
+    image: &build-image woodpeckerci/plugin-docker-buildx
     group: base
-    commands:
-      - npm install -g @go-task/cli
-      - task docker:base:build
+    settings: &base-settings
+      repo: doseofted/monorepo-build
+      dockerfile: ./Monorepo.base.Dockerfile
+      context: ./
+      platforms: linux/amd64
+      tag: ["latest"]
     when: &base-when
       event: [tag, push]
       tag: v*
       branch: release/*
 
-  docs:base:prod:
-    image: *base-image
+  apps:base:prod:
+    image: *build-image
     group: base
-    commands:
-      - npm install -g @go-task/cli
-      - task docker:prod:build
+    settings:
+      <<: *base-settings
+      repo: doseofted/monorepo-production
+      dockerfile: ./Monorepo.prod.Dockerfile
     when: *base-when
 
-  docs:build:production:
-    image: &build-image woodpeckerci/plugin-docker-buildx
+  frontend:build:production:
+    image: *build-image
     group: build
     secrets: &build-secrets
       - docker_username
@@ -34,9 +38,7 @@ pipeline:
       event: [tag]
       tag: v*
 
-  # TODO: add backend/production build (or exclude from production launch)
-
-  docs:build:staging:
+  frontend:build:staging:
     image: *build-image
     group: build
     secrets: *build-secrets
@@ -47,4 +49,23 @@ pipeline:
       event: [push]
       branch: release/*
 
-  # TODO: add backend/staging build (or exclude from production launch)
+  backend:build:production:
+    image: *build-image
+    group: build
+    secrets: *build-secrets
+    settings: &backend-settings
+      repo: doseofted/prim-backend
+      dockerfile: ./apps/backend/Dockerfile
+      context: ./apps/backend
+      platforms: linux/amd64
+      tag: ["${CI_COMMIT_TAG}", "latest"]
+    when: *when-production
+
+  backend:build:staging:
+    image: *build-image
+    group: build
+    secrets: *build-secrets
+    settings:
+      <<: *backend-settings
+      tag: ["v${CI_COMMIT_BRANCH##release/}-staging", "staging"]
+    when: *when-staging
