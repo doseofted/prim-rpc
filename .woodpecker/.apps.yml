@@ -1,24 +1,20 @@
 pipeline:
-  docs:setup:
+  docs:base:dev:
     image: &base-image node:19.6-bullseye
+    group: base
     commands:
       - npm install -g @go-task/cli
+      - task docker:base:build
     when: &base-when
       event: [tag, push]
       tag: v*
       branch: release/*
 
-  docs:base:dev:
-    image: *base-image
-    group: base
-    commands:
-      - task docker:base:build
-    when: *base-when
-
   docs:base:prod:
     image: *base-image
     group: base
     commands:
+      - npm install -g @go-task/cli
       - task docker:prod:build
     when: *base-when
 
