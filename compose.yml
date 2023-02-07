@@ -3,13 +3,14 @@ version: "3"
 services:
   # reverse proxy for all other services
   caddy:
-    image: doseofted/prim-proxy:latest
+    image: caddy:2.6.2
     environment:
       - WEBSITE_HOST
       - ADMIN_EMAIL
     volumes:
       - ./data/caddy/config:/config
       - ./data/caddy/data:/data
+      - ./proxy/base.Caddyfile:/etc/caddy/base.Caddyfile:ro
     ports:
       - "80:80"
       - "443:443"

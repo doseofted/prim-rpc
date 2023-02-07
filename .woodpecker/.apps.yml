@@ -38,18 +38,6 @@ pipeline:
       event: [tag]
       tag: v*
 
-  proxy:build:production:
-    image: *build-image
-    group: build
-    secrets: *build-secrets
-    settings:
-      repo: doseofted/prim-proxy
-      dockerfile: ./proxy/Dockerfile
-      context: ./proxy
-      platforms: linux/amd64
-      tag: ["${CI_COMMIT_TAG}", "latest"]
-    when: *when-production
-
   # TODO: add backend/production build (or exclude from production launch)
 
   docs:build:staging:
@@ -62,17 +50,5 @@ pipeline:
     when: &when-staging
       event: [push]
       branch: release/*
-
-  proxy:build:staging:
-    image: *build-image
-    group: build
-    secrets: *build-secrets
-    settings:
-      repo: doseofted/prim-proxy
-      dockerfile: ./proxy/Dockerfile
-      context: ./proxy
-      platforms: linux/amd64
-      tag: ["v${CI_COMMIT_BRANCH##release/}-staging", "staging"]
-    when: *when-staging
 
   # TODO: add backend/staging build (or exclude from production launch)
