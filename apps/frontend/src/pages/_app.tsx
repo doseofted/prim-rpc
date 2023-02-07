@@ -9,6 +9,7 @@ import Link from "next/link"
 import { HeaderLink } from "@/components/Headers"
 import { LenisProvider, useLenis } from "@/components/LenisProvider"
 import { DefaultSeo } from "next-seo"
+import Head from "next/head"
 
 const mdxComponents = {
 	a: (props: React.HTMLAttributes<HTMLAnchorElement> & { href: string }) => {
@@ -55,6 +56,10 @@ export default function App({ Component, pageProps }: AppProps) {
 				plusJakartaSans.variable,
 				firaCodeMono.variable,
 			].join(" ")}>
+			<Head>
+				<link rel="icon" href="/placeholder.png" sizes="192x192" type="image/png" />
+				<link rel="apple-touch-icon" href="/placeholder.png" />
+			</Head>
 			<DefaultSeo twitter={{ handle: "@doseofted" }} themeColor="#2D0D60" />
 			<LenisProvider>
 				{/* eslint-disable-next-line @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-explicit-any */}
