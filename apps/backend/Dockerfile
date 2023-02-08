@@ -1,5 +1,5 @@
 # NOTE: image included below must be built first before building this image
-FROM doseofted/monorepo-build:latest as dev
+FROM doseofted/prim-monorepo-build:latest as dev
 
 # Create directory where this portion of project will live
 RUN mkdir -p apps/backend && chown -R node apps
@@ -20,7 +20,7 @@ WORKDIR /home/node/project
 RUN pnpm task dev:clean-node-modules
 
 # NOTE: image included below must be built first before building this image
-FROM doseofted/monorepo-production:latest as prod
+FROM doseofted/prim-monorepo-production:latest as prod
 # Copy built files
 COPY --chown=node --from=dev-cleanup /home/node/project/misc /home/node/project/misc
 COPY --chown=node --from=dev-cleanup /home/node/project/libs /home/node/project/libs

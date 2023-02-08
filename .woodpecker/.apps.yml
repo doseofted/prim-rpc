@@ -1,19 +1,19 @@
-pipeline:
-  apps:base:try:
-    image: woodpeckerci/plugin-docker-buildx
-    commands:
-      - echo "Hello"
+# services:
+#   local_registry:
+#     image: registry:2.8
 
+pipeline:
   apps:base:dev:
     image: &build-image woodpeckerci/plugin-docker-buildx
     group: base
+    secrets: &build-secrets
+      - docker_username
+      - docker_password
     settings: &base-settings
-      dry_run: true
       context: ./
       platforms: linux/amd64
       tag: ["latest"]
-      repo: doseofted/monorepo-build
-      output: type=oci,dest=doseofted--monorepo-build.tar
+      repo: doseofted/prim-monorepo-build
       dockerfile: ./Monorepo.base.Dockerfile
     when: &base-when
       event: [tag, push]
@@ -23,22 +23,17 @@ pipeline:
   apps:base:prod:
     image: *build-image
     group: base
+    secrets: *build-secrets
     settings:
       <<: *base-settings
-      repo: doseofted/monorepo-production
-      output: type=oci,dest=doseofted--monorepo-production.tar
+      repo: doseofted/prim-monorepo-production
       dockerfile: ./Monorepo.prod.Dockerfile
     when: *base-when
 
   frontend:build:production:
     image: *build-image
-    commands:
-      - docker load doseofted--monorepo-build.tar
-      - docker load doseofted--monorepo-production.tar
     group: build
-    secrets: &build-secrets
-      - docker_username
-      - docker_password
+    secrets: *build-secrets
     settings: &frontend-settings
       repo: doseofted/prim-frontend
       dockerfile: ./apps/frontend/Dockerfile

@@ -4,7 +4,7 @@ tasks:
   base:build:
     desc: "Build base image with installed node modules and built dependencies."
     cmds:
-      - "docker build -f Monorepo.base.Dockerfile -t doseofted/monorepo-build {{.CLI_ARGS}} ."
+      - "docker build -f Monorepo.base.Dockerfile -t doseofted/prim-monorepo-build {{.CLI_ARGS}} ."
 
   base:run:
     desc: "Interactively run base image, usually for fixing potential build issues"
@@ -12,12 +12,12 @@ tasks:
     deps:
       - "base:build"
     cmds:
-      - "docker run -it --rm doseofted/monorepo-build"
+      - "docker run -it --rm doseofted/prim-monorepo-build"
 
   prod:build:
     desc: "Build production base image to be used by other services in production"
     cmds:
-      - "docker build -f Monorepo.prod.Dockerfile -t doseofted/monorepo-production {{.CLI_ARGS}} ."
+      - "docker build -f Monorepo.prod.Dockerfile -t doseofted/prim-monorepo-production {{.CLI_ARGS}} ."
 
   prod:run:
     desc: "Interactively run production base image, usually for fixing potential build issues"
@@ -25,7 +25,7 @@ tasks:
     deps:
       - "prod:build"
     cmds:
-      - "docker run -it --rm doseofted/monorepo-production"
+      - "docker run -it --rm doseofted/prim-monorepo-production"
 
   # NOTE: below is used as a step in apps/** Taskfiles
   # Run dependencies as cmds while debugging so they run sequentially (otherwise output is unreadable)

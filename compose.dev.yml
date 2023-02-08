@@ -15,7 +15,7 @@ services:
 
   # libraries is a development-only image used to easily rebuild dependencies
   libraries:
-    image: doseofted/monorepo-build:latest
+    image: doseofted/prim-monorepo-build:latest
     build:
       dockerfile: Monorepo.base.Dockerfile
     volumes:
