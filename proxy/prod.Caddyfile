@@ -11,6 +11,9 @@ www.{$WEBSITE_HOST} {
 
 {$WEBSITE_HOST} {
   encode zstd gzip
+  basicauth /* {
+    Prim-Preview {$PRERELEASE_PASSWORD}
+  }
   reverse_proxy frontend:3000
 }
 

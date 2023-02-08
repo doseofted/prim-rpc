@@ -10,8 +10,8 @@ tasks:
         docker run -it --rm \
           -p 80:80 -p 443:443 \
           -e WEBSITE_HOST -e ADMIN_EMAIL \
-          -v {{.WORKING_DIR}}/base.Caddyfile:/etc/caddy/base.Caddyfile \
-          -v {{.WORKING_DIR}}/{{.TARGET_CONFIG}}.Caddyfile:/etc/caddy/Caddyfile \
+          -v '{{.WORKING_DIR}}/base.Caddyfile:/etc/caddy/base.Caddyfile' \
+          -v '{{.WORKING_DIR}}/{{trimPrefix "proxy:" .TARGET_CONFIG}}.Caddyfile:/etc/caddy/Caddyfile' \
           caddy:2.6.2 {{.CLI_ARGS}}
 
   # FIXME: dev mode won't work until dev cert volumes (in parent folder) are mounted as volume

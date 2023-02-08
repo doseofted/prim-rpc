@@ -7,14 +7,18 @@ services:
   postgres:
     restart: "always"
 
+# NOTE: using staging for now since website hasn't been officially published yet
+
   backend:
-    runtime: runsc
+    image: doseofted/prim-backend:staging
+    # runtime: runsc
     environment:
       - NODE_ENV=production
     restart: "always"
 
   frontend:
-    runtime: runsc
+    image: doseofted/prim-frontend:latest
+    # runtime: runsc
     environment:
       - NODE_ENV=production
     restart: "always"
