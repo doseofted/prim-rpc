@@ -17,7 +17,7 @@ services:
     restart: "always"
 
   frontend:
-    image: doseofted/prim-frontend:latest
+    image: doseofted/prim-frontend:staging
     # runtime: runsc
     environment:
       - NODE_ENV=production
