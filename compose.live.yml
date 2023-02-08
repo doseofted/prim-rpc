@@ -2,12 +2,14 @@ version: "3"
 
 services:
   caddy:
+    volumes:
+      - ./proxy/prod.Caddyfile:/etc/caddy/Caddyfile:ro
     restart: "always"
 
   postgres:
     restart: "always"
 
-# NOTE: using staging for now since website hasn't been officially published yet
+  # NOTE: using staging for now since website hasn't been officially published yet
 
   backend:
     image: doseofted/prim-backend:staging
