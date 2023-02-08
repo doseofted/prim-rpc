@@ -4,7 +4,7 @@ tasks:
   live:up:
     desc: "[live] Start all services in project, for use in production environment"
     cmds:
-      - task: :compose:prod:up-only
+      - task: :compose:live:up-only
 
   prod:up:
     desc: "[production] Start all services in project (production-like)"
