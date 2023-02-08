@@ -7,7 +7,7 @@ pipeline:
     image: &build-image woodpeckerci/plugin-docker-buildx
     group: base
     settings: &base-settings
-      repo: localhost:5000/doseofted/monorepo-build
+      repo: registry:5000/doseofted/monorepo-build
       dockerfile: ./Monorepo.base.Dockerfile
       context: ./
       platforms: linux/amd64
