@@ -1,18 +1,15 @@
-services:
-  local_registry:
-    image: registry:2.8
-
 pipeline:
   apps:base:dev:
     image: &build-image woodpeckerci/plugin-docker-buildx
     group: base
     settings: &base-settings
-      repo: registry:5000/doseofted/monorepo-build
-      dockerfile: ./Monorepo.base.Dockerfile
+      dry_run: true
       context: ./
+      repo: doseofted/monorepo-build
+      output: type=oci,dest=doseofted--monorepo-build.tar
+      dockerfile: ./Monorepo.base.Dockerfile
       platforms: linux/amd64
       tag: ["latest"]
-      registry: http://registry:5000
     when: &base-when
       event: [tag, push]
       tag: v*
@@ -24,6 +21,7 @@ pipeline:
     settings:
       <<: *base-settings
       repo: doseofted/monorepo-production
+      output: type=oci,dest=doseofted--monorepo-production.tar
       dockerfile: ./Monorepo.prod.Dockerfile
     when: *base-when
 
