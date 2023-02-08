@@ -1,15 +1,20 @@
 pipeline:
+  apps:base:try:
+    image: woodpeckerci/plugin-docker-buildx
+    commands:
+      - echo "Hello"
+
   apps:base:dev:
     image: &build-image woodpeckerci/plugin-docker-buildx
     group: base
     settings: &base-settings
       dry_run: true
       context: ./
+      platforms: linux/amd64
+      tag: ["latest"]
       repo: doseofted/monorepo-build
       output: type=oci,dest=doseofted--monorepo-build.tar
       dockerfile: ./Monorepo.base.Dockerfile
-      platforms: linux/amd64
-      tag: ["latest"]
     when: &base-when
       event: [tag, push]
       tag: v*
@@ -27,6 +32,9 @@ pipeline:
 
   frontend:build:production:
     image: *build-image
+    commands:
+      - docker load doseofted--monorepo-build.tar
+      - docker load doseofted--monorepo-production.tar
     group: build
     secrets: &build-secrets
       - docker_username

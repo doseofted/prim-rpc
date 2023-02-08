@@ -27,8 +27,7 @@ COPY --chown=node --from=dev-cleanup /home/node/project/libs /home/node/project/
 COPY --chown=node --from=dev-cleanup /home/node/project/apps /home/node/project/apps
 # Install only dependencies needed in production
 WORKDIR /home/node/project
-# NOTE: removed --prod flag for now
-RUN NODE_ENV="" pnpm install --offline --frozen-lockfile
+RUN NODE_ENV="" pnpm install --prod --offline --frozen-lockfile
 # Run the project with production settings
 WORKDIR /home/node/project/apps/frontend
 ENV NODE_ENV=production
