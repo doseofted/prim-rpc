@@ -60,10 +60,10 @@ const createBaseServerOptions = (): PrimServerOptions => ({
 	// the default prefix will likely be overridden
 	prefix: "/prim",
 	callbackHandler() {
-		console.debug("Prim-RPC's callback handler was not implemented")
+		// console.debug("Prim-RPC's callback handler was not implemented")
 	},
 	methodHandler() {
-		console.debug("Prim-RPC's method handler was not implemented")
+		// console.debug("Prim-RPC's method handler was not implemented")
 	},
 })
 

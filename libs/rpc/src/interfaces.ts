@@ -370,6 +370,7 @@ export interface PrimServerEvents {
 }
 
 export interface PrimServer extends PrimServerEvents {
+	connected: PrimServerSocketEvents["connected"]
 	options: PrimServerOptions
 	handlersRegistered: Promise<boolean>
 }

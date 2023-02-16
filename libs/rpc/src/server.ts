@@ -263,7 +263,9 @@ export function createPrimServer<
 		serverOptions.methodHandler?.(createServerEvents(serverOptions)),
 	]).then(p => p.map(r => r.status === "fulfilled").reduce((p, n) => p && n, true))
 	// NOTE: return actions so a new client is used every time
+	const { connected } = createSocketEvents(serverOptions)
 	return {
+		connected,
 		...createServerEvents(serverOptions),
 		options: Object.freeze(Object.assign({}, serverOptions)),
 		handlersRegistered,
