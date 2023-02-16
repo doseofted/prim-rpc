@@ -16,7 +16,7 @@ import { join as joinPath } from "node:path"
 
 // eslint-disable-next-line @typescript-eslint/no-empty-interface
 interface SharedH3Options {
-	contextTransform?: (event: H3Event) => unknown
+	contextTransform?: (event: H3Event) => { context: "h3"; event: H3Event }
 }
 
 interface PrimH3PluginOptions extends SharedH3Options {
@@ -24,15 +24,15 @@ interface PrimH3PluginOptions extends SharedH3Options {
 }
 
 export function defineH3PrimHandler(options: PrimH3PluginOptions) {
-	const { prim, contextTransform } = options
+	const { prim, contextTransform = event => ({ context: "h3", event }) } = options
 	let body: string
 	const blobs: { [identifier: string]: unknown } = {}
 	return defineEventHandler(async event => {
-		const givenPath = new URL(event.node.req.url).pathname
+		const givenPath = event.node.req.url
 		if (!givenPath.startsWith(prim.options.prefix)) {
 			return
 		}
-		const requestType = getHeader(event, "content-type")
+		const requestType = getHeader(event, "content-type") ?? ""
 		const method = getMethod(event)
 		const url = event.node.req.url
 		const context = contextTransform(event)
@@ -48,7 +48,7 @@ export function defineH3PrimHandler(options: PrimH3PluginOptions) {
 					blobs[part.name] = tmpFile
 				}
 			}
-		} else {
+		} else if (method === "POST") {
 			body = await readRawBody(event)
 		}
 		const result = await prim.server().call({ body, method, url }, blobs, context)
