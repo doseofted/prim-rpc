@@ -96,6 +96,54 @@ createPrimServer({ callbackHandler })
 You may use the `.contextTransform` option of `createCallbackHandler()` to determine what values from `ws` are bound to
 the function's `this` context.
 
+## Nuxt / Nitro / H3
+
+| For                                                                                                            | Plugin Type    | Transport Type |
+| -------------------------------------------------------------------------------------------------------------- | -------------- | -------------- |
+| [Nuxt](https://github.com/nuxt/nuxt), [Nitro](https://github.com/unjs/nitro), [H3](https://github.com/unjs/h3) | Method handler | HTTP           |
+
+Prim+RPC can be used with H3 and frameworks built upon H3 such as Nitro and Nuxt 3. Setup steps vary depending on which
+framework you are using.
+
+You can configure H3 with Prim+RPC like so:
+
+```typescript
+import { createPrimServer } from "@doseofted/prim-rpc"
+import { createMethodHandler } from "@doseofted/prim-rpc-plugins/h3"
+import { createApp, eventHandler, toNodeListener } from "h3"
+import { createServer } from "node:http"
+
+const app = createApp()
+const server = createServer(toNodeListener(app))
+
+const methodHandler = createMethodHandler({ app })
+createPrimServer({ methodHandler })
+
+server.listen(1234)
+```
+
+If you're not using H3 directly and are instead looking to use Prim+RPC with Nitro (Nuxt 3's server), you can configure
+a route for Prim+RPC like so (note that the filename is `[...].ts`, representing a catch-all route in Nitro):
+
+```typescript api/[...].ts
+import { createPrimServer } from "@doseofted/prim-rpc"
+import { defineH3PrimHandler } from "@doseofted/prim-rpc-plugins/h3"
+
+const prim = createPrimServer({ prefix: "/api/prim" })
+
+export default defineH3PrimHandler({ prim })
+```
+
+## Next.js
+
+| For                                           | Plugin Type    | Transport Type |
+| --------------------------------------------- | -------------- | -------------- |
+| [Next.js](https://github.com/vercel/next.js/) | Method handler | HTTP           |
+
+<Alert icon="carbon:warning" type="alert-warning">
+	Unavailable (planned)
+</Alert>
+
 ## Node / HTTP
 
 | For                                           | Plugin Type    | Transport Type |
@@ -111,26 +159,6 @@ the function's `this` context.
 | For                                                | Plugin Type      | Transport Type |
 | -------------------------------------------------- | ---------------- | -------------- |
 | [Socket.io](https://github.com/socketio/socket.io) | Callback handler | Socket.io      |
-
-<Alert icon="carbon:warning" type="alert-warning">
-	Unavailable (planned)
-</Alert>
-
-## Next.js
-
-| For                                           | Plugin Type    | Transport Type |
-| --------------------------------------------- | -------------- | -------------- |
-| [Next.js](https://github.com/vercel/next.js/) | Method handler | HTTP           |
-
-<Alert icon="carbon:warning" type="alert-warning">
-	Unavailable (planned)
-</Alert>
-
-## Nuxt / H3 / Nitro
-
-| For                                  | Plugin Type    | Transport Type |
-| ------------------------------------ | -------------- | -------------- |
-| [Nuxt](https://github.com/nuxt/nuxt) | Method handler | HTTP           |
 
 <Alert icon="carbon:warning" type="alert-warning">
 	Unavailable (planned)
