@@ -23,6 +23,11 @@ tasks:
       - task: logs
       - cmd: "echo 'Services are still active. Run `task compose:{{.CHOSEN_PREFIX}}:down` to stop running services.'"
 
+  pull:
+    desc: "[{{.CHOSEN_ENV}}] Pull new versions of service for {{.CHOSEN_ENV}} environment"
+    cmds:
+      - "docker compose pull"
+
   down:
     desc: "[{{.CHOSEN_ENV}}] Stop all running services"
     cmds:
