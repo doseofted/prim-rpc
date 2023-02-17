@@ -176,9 +176,9 @@ more.
 
 ## Callback Plugin
 
-<Alert icon="carbon:warning" type="alert-warning">
-	Documentation in Progress
-</Alert>
+The callback plugin is given options from the Prim+RPC client and is called whenever a function is called on the client
+that makes use of a callback. In order to respond to multiple calls of the callback, a persistent connection is
+established. The skeleton of this plugin looks like this:
 
 ```typescript
 import type { PrimClientCallbackPlugin } from "@doseofted/prim-rpc"
@@ -189,15 +189,68 @@ interface Options {
 export function createCallbackPlugin(options: Options): PrimClientCallbackPlugin {
 	return (endpoint, client, jsonHandler) => {
 		// ... plugin code here
+		return {
+			send(message) {},
+			close() {},
+		}
 	}
 }
+
+// this method plugin can be passed to Prim+RPC
+const callbackPlugin = createCallbackPlugin()
 ```
+
+The `createCallbackPlugin` returns a function that is registered with Prim+RPC. This function is given several
+parameters including the endpoint (useful when given a URL on Prim+RPC client on `.endpoint` or `.wsEndpoint`), the
+`client` options (including several methods which we'll cover soon), and a `jsonHandler` for serializing requests and
+responses over your chosen transport.
+
+The `client` parameter contains methods that expected to be called on server events. When a new connection is formed,
+call `client.connected()`. When that connection is closed, call `client.ended()`. When a response is given from the
+Prim+RPC server, call `client.response()`.
+
+This function also returns methods that are used by Prim+RPC: `.send()` will send messages off to the Prim+RPC server
+and `.close()` will close the connection to the server.
+
+We can demonstrate how this plugin works with an example:
+
+```typescript
+import type { PrimClientCallbackPlugin } from "@doseofted/prim-rpc"
+
+interface Options {
+	/* (options for your plugin) */
+}
+export function createCallbackPlugin(options?: Options): PrimClientCallbackPlugin {
+	return (endpoint, client, jsonHandler) => {
+		const ws = new WebSocket(endpoint)
+		ws.addEventListener("open", client.connected)
+		ws.addEventListener("close", client.ended)
+		ws.addEventListener("message", ({ data }) => {
+			response(jsonHandler(data))
+		})
+		return {
+			send(data) {
+				ws.send(jsonHandler.stringify(data))
+			},
+			close() {
+				ws.close()
+			},
+		}
+	}
+}
+
+// this method plugin can be passed to Prim+RPC
+const callbackPlugin = createCallbackPlugin()
+```
+
+Now we can take a look at the corresponding callback handler for which this plugin communicates.
 
 ## Callback Handler
 
-<Alert icon="carbon:warning" type="alert-warning">
-	Documentation in Progress
-</Alert>
+The callback handler plugin is called whenever a method is called that contains a callback. The server receives method
+calls from the server of your choice and returns a result. Unlike the method handler, additional responses may be sent
+back if a callback is called, using an established connection (such as that over a WebSocket, for example). The skeleton
+of this handler plugin is like so:
 
 ```typescript
 import type { PrimServerCallbackHandler } from "@doseofted/prim-rpc"
@@ -211,3 +264,42 @@ export function createCallbackHandler(options: Options): PrimServerCallbackHandl
 	}
 }
 ```
+
+The `createCallbackHandler` configures your chosen server with options you provide to it and returns a function that is
+used by Prim+RPC to register the handler plugin. In this function, you should configure the given server framework. The
+`prim` parameter on this returned function contains a method `connected()` that you can call when a new connection is
+made to the server. This function, in turn, returns three new methods: `rpc()`, `call()`, and `ended()`. Once you
+receive a new request to your server, you can call either `call()` if given a string of data (this function has a
+callback that gives you a string result) or you can call `rpc()` if given an RPC object (this function has a callback
+that gives you the RPC result). When the connection is closed, you can use the `ended()` method to signal this to
+Prim+RPC.
+
+Below is an example of a callback handler that uses WebSocket:
+
+```typescript
+import type { PrimServerCallbackHandler } from "@doseofted/prim-rpc"
+import type { WebSocketServer } from "ws"
+
+interface Options {
+	wss: WebSocketServer
+}
+export function createCallbackHandler(options: Options): PrimServerCallbackHandler {
+	const { wss } = options
+	return prim => {
+		webSocketServer.on("connection", (ws, req) => {
+			const { call, ended } = prim.connected()
+			ws.on("close", ended)
+			ws.on("message", data => {
+				call(data, message => {
+					ws.send(message)
+				})
+			})
+		})
+	}
+}
+```
+
+Like other examples in this guide, this demonstrates the basics of setting up a new plugin with Prim+RPC and could be a
+starting point but additional situations may need to be considered such as error handling.
+
+You can reference the existing plugins and handlers for Prim+RPC as examples of plugins and handlers.
