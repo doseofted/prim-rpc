@@ -1,6 +1,6 @@
 {
 	"name": "@doseofted/prim-rpc",
-	"version": "0.0.1-next.0",
+	"version": "0.0.0",
 	"description": "Easy-to-understand, type-safe, transport-agnostic RPC/IPC for JavaScript, supporting callbacks, batching, file uploads, custom serialization, and more.",
 	"license": "UNLICENSED",
 	"private": true,
