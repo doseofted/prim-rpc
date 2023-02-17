@@ -180,8 +180,34 @@ more.
 	Documentation in Progress
 </Alert>
 
+```typescript
+import type { PrimClientCallbackPlugin } from "@doseofted/prim-rpc"
+
+interface Options {
+	/* (options for your plugin) */
+}
+export function createCallbackPlugin(options: Options): PrimClientCallbackPlugin {
+	return (endpoint, client, jsonHandler) => {
+		// ... plugin code here
+	}
+}
+```
+
 ## Callback Handler
 
 <Alert icon="carbon:warning" type="alert-warning">
 	Documentation in Progress
 </Alert>
+
+```typescript
+import type { PrimServerCallbackHandler } from "@doseofted/prim-rpc"
+
+interface Options {
+	/* (options for your handler plugin) */
+}
+export function createCallbackHandler(options: Options): PrimServerCallbackHandler {
+	return prim => {
+		// ... handler registration here
+	}
+}
+```
