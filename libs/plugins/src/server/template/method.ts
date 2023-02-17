@@ -1,27 +1,38 @@
 import type { PrimServerMethodHandler, PrimServerEvents } from "@doseofted/prim-rpc"
 
-/** NOTE: replace `__SERVER__` with intended server name. note that `Example` is simply that: an example interface. */
+/**
+ * NOTE: replace `__SERVER__` with intended server name. note that `Example` is simply that: an example interface.
+ * This example resembles Express only because it's familiar to many people in the JavaScript community.
+ *
+ * You can use any server framework that you like.
+ */
 type __SERVER__ = {
-	use: (middleware: (req: Example["req"], res: Example["res"], next: Example["next"]) => Promise<void> | void) => void
+	use: (
+		middleware: (
+			req: ServerExample["req"],
+			res: ServerExample["res"],
+			next: ServerExample["next"]
+		) => Promise<void> | void
+	) => void
 }
-interface Example {
+interface ServerExample {
 	req: {
 		method: string
 		url: string
 		body: string
 	}
 	res: {
-		status: (code: number) => Example["res"]
-		setHeaders: (headers: Record<string, string>) => Example["res"]
-		send: (message: string) => Example["res"]
+		status: (code: number) => ServerExample["res"]
+		setHeaders: (headers: Record<string, string>) => ServerExample["res"]
+		send: (message: string) => ServerExample["res"]
 	}
 	next: () => void
 }
 
-export type Prim__SERVER__Context = { context: "__SERVER__"; req: Example["req"]; res: Example["res"] }
+export type Prim__SERVER__Context = { context: "__SERVER__"; req: ServerExample["req"]; res: ServerExample["res"] }
 
 interface Shared__SERVER__Options {
-	contextTransform?: (req: Example["req"], res: Example["res"]) => Prim__SERVER__Context
+	contextTransform?: (req: ServerExample["req"], res: ServerExample["res"]) => Prim__SERVER__Context
 }
 
 interface Prim__SERVER__Options extends Shared__SERVER__Options {
@@ -31,7 +42,7 @@ interface Prim__SERVER__Options extends Shared__SERVER__Options {
 export function define__SERVER__Handler(options: Prim__SERVER__Options) {
 	const { prim, contextTransform = (req, res) => ({ context: "__SERVER__", req, res }) } = options
 	// NOTE: this is some sort of event handler that your chosen server framework expects (like a middleware/plugin)
-	return async (req: Example["req"], res: Example["res"], next: Example["next"]) => {
+	return async (req: ServerExample["req"], res: ServerExample["res"], next: ServerExample["next"]) => {
 		if (!new URL(req.url).pathname.startsWith(prim.options.prefix)) {
 			return next()
 		}
