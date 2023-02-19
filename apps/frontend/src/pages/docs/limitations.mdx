@@ -23,8 +23,8 @@ that this function is provided from your backend service and is subject to these
 
 There are a few categories of limitations. The first category are limitations due to the fact that Prim+RPC is still
 early in development. These are limitations that are intended to be resolved. The second category are serialization
-limitations because every RPC must first be serialized before it can be sent. There are ways to extend the types of data
-that can be serialized that we'll discuss but some limitations still exist. The third category are limitations in
+limitations because every RPC must first be serialized before it can be sent. We can extend the types of data that can
+be serialized by [adding a custom handler](#extending-json-serialization). The third category are limitations in
 language support. JavaScript has many features and while Prim+RPC tries to support many, there are some features that
 are very difficult to support. I'm hesitant to say impossible to support but some are likely infeasible, at least for
 now.
@@ -68,7 +68,7 @@ console.log(await prim.sayHello()) // "Hi!"
 try {
 	await prim.sayHelloPrivately()
 } catch (error) {
-	console.log(error) // Method not allowed
+	console.log(error) // "Method not allowed"
 }
 ```
 
