@@ -36,6 +36,167 @@ rather to communicate limitations clearly.
 
 ## Table of Contents
 
+## Library Usage Notes
+
+These aren't necessarily limitations but are important to point out so that you understand how Prim+RPC works.
+
+### Functions Must Be In An Allow List
+
+Functions used with Prim+RPC must have either: an `.rpc` property assigned a value of `true` or be added to the Prim+RPC
+client's [`.allowList`](/docs/reference/configuration#allowlist). This is a restriction added for security so that only
+the functions that you explicitly allow to be called are callable from the Prim+RPC server.
+
+```typescript
+import { createPrimClient } from "@doseofted/prim-rpc"
+
+// this function has an `.rpc` property added
+function sayHello() {
+	return "Hi!"
+}
+sayHello.rpc = true
+
+// this function does not have an `.rpc` property
+function sayHelloPrivately() {
+	return "Hi?"
+}
+
+const prim = createPrimClient({
+	module: { sayHello, sayHelloPrivately },
+})
+
+console.log(await prim.sayHello()) // "Hi!"
+try {
+	await prim.sayHelloPrivately()
+} catch (error) {
+	console.log(error) // Method not allowed
+}
+```
+
+### Function Results Must Be Awaited
+
+When you call a function with the Prim+RPC client, the result of that call will be wrapped in a Promise and must be
+awaited, even if the function you're calling doesn't return a Promise. This is because you are fetching this result over
+some other channel (in most cases, over HTTP) and this result is not immediately available to you. Prim+RPC sends all
+function results back to the client as Promises of the requested data, similar to how you must await a fetch request.
+
+```typescript
+import { createPrimClient } from "@doseofted/prim-rpc"
+
+/** A random function that returns a string. */
+function sayHello() {
+	return "Hi!"
+}
+sayHello.rpc = true
+
+const module = { sayHello }
+const prim = createPrimClient({ module })
+
+// function called directly (no Promise)
+const resultLocal = module.sayHello()
+// function called with client (Promised)
+const resultRemote = await prim.sayHello()
+```
+
+The results of your function calls on the Prim+RPC client are automatically wrapped in a Promise interface (when using
+TypeScript) so that this is made clear in your IDE of choice.
+
+### Callback Results Must Be Awaited
+
+<Alert icon="carbon:warning" type="alert-warning">
+	Callback return values are not supported yet but are planned.
+</Alert>
+
+Similar to the rule above, callback results on the server must also be awaited. This is because the result is from the
+client and is not immediately available.
+
+```typescript
+import { createPrimClient } from "@doseofted/prim-rpc"
+
+// notice that callback result must be awaited (because result is wrapped in Promise)
+async function confirm(onServerConfirm: (message: string) => Promise<boolean> | boolean) {
+	const serverConfirmation = await new Promise(resolve => setTimeout(() => resolve(true), 1000))
+	if (!serverConfirmation) {
+		throw "Not confirmed on server!"
+	}
+	const clientConfirmation = await onServerConfirm("Everything's okay!")
+	if (!clientConfirmation) {
+		throw "Not confirmed on client!"
+	}
+	return "<some confirmed value>"
+}
+confirm.rpc = true
+
+const prim = createPrimClient({
+	module: { confirm },
+})
+
+const confirmed = await prim.confirm(message => {
+	console.log(message) // "Everything's okay!"
+	return true
+})
+console.log(confirmed) // "<some confirmed value>"
+```
+
+Prim+RPC automatically wraps this data in a Promise. You should assume in your function's type definitions, if using
+TypeScript, that the result of your callback may or may not be wrapped in a Promise.
+
+## Serialization Limitations
+
+RPC messages need to be serialized before they are transported. Simple primitive types are always supported but
+additional types may require a separate serialization library or manual work to deserialize data on the server.
+
+### Default JSON Serialization
+
+Since Prim+RPC messages are JSON, the default JSON handler is used with special handling of callbacks, files, and Error
+objects. However, this is subject to the limitations of the default JSON handler. This means that other types of data
+will need to be serialized to a string and will not automatically convert back to the same type on the server. If the
+data type passed to Prim+RPC is not something that can be serialized then it may not be sent at all.
+
+However, you can change the JSON serialization library used to extend the number of types that can be serialized and add
+more. This way your types from the client that you pass to the server will be preserved on the server without having to
+manually deserialize that data.
+
+### Extending JSON Serialization
+
+You may choose to use a library like [superjson](https://github.com/blitz-js/superjson) to extend the types that can be
+used automatically with Prim+RPC. Prim+RPC supports custom JSON handlers like this and many others as long as they
+provide a `stringify` and `parse` method.
+
+It is important to know that if JSON serialization is extended, you must do so on both the server and client (since
+serialization and deserialzation go hand-in-hand) You can configure it like so:
+
+<CH.Code>
+
+```ts client.ts
+import { createPrimClient } from "@doseofted/prim-rpc"
+import jsonHandler from "superjson"
+
+const client = createPrimClient<typeof exampleClient>({
+	jsonHandler,
+	// ... other client options
+})
+```
+
+---
+
+```ts server.ts
+import { createPrimServer } from "@doseofted/prim-rpc"
+import jsonHandler from "superjson"
+
+const server = createPrimServer({
+	jsonHandler,
+	// ... other server options
+})
+```
+
+</CH.Code>
+
+It's important to note that if a public API is built with Prim+RPC that not everyone can use a custom JSON handler (for
+instance, if a request is made outside of a JavaScript environment). In these situations, you can create two Prim+RPC
+servers referencing the same module: one that supports a custom JSON handler and one that does not. In these situations,
+you'll need to handle serialization when someone makes a request using the default JSON handler from the client (you
+may, for example, use a framework like [Zod](https://github.com/colinhacks/zod) for preprocessing or type coercion).
+
 ## Prerelease Limitations
 
 These are issues that I hope to resolve. Many of these depend on me finding creative solutions to these problems which
@@ -70,9 +231,9 @@ You can pass callbacks to functions defined on a server used with Prim+RPC. Thes
 server and the client's callback will receive the parameters from the server. However, if the client returns a value
 from this callback, the server cannot receive that information yet.
 
-```ts
+```typescript
 // NOTE: DOES NOT WORK
-export function doSomething(askApproval: (status: string) => boolean) {
+export function doSomething(askApproval: (status: string) => Promise<boolean>) {
 	const acknowledged = await askApproval("ready")
 	if (acknowledged) {
 		// ... do something
@@ -163,90 +324,28 @@ class Test {
 		console.log(this.someProperty)
 	}
 }
-const test = new Test()
-export { test }
+const testInstance = new Test()
+export { testInstance }
+
+// NOTE: this DOES work
+function hello() {
+	return testInstance.hello()
+}
+hello.rpc = true
 ```
 
 In the above example, `getCustomHeader()` would work if used with a server framework that provides headers (using
-Fastify as an example). The second example however will log `undefined` instead of the expected `"hello!"` because
-Prim+RPC set the `this` value to another value, where `.someProperty` doesn't exist.
+Fastify as an example). This is because we expect Prim+RPC to set this context when calling the function.
+
+However calling `testInstance.hello()` with the Prim+RPC client would log `undefined` instead of the expected `"hello!"`
+because Prim+RPC set the `this` value to another value, where the logged `.someProperty` doesn't exist.
+
+If we wrap this instance's method in another function, `hello()`, we will see `"hello!"` logged because the `this`
+context of `testInstance.hello()` was not changed.
+
+<Alert prose icon="carbon:information">
 
 This is the default behavior today but this may be changed before a 1.0 release if found that this functionality is more
 of a hurdle than a helpful utility.
 
-## Serialization Limitations
-
-RPC messages need to be serialized before they are transported. Simple primitive types are always supported but
-additional types may require a separate serialization library or manual work to deserialize data on the server.
-
-### Default JSON Serialization
-
-Since Prim+RPC messages are JSON, the default JSON handler is used with special handling of callbacks, files, and Error
-objects. However, this is subject to the limitations of the default JSON handler. This means that other types of data
-will need to be serialized to a string and will not automatically convert back to the same type on the server. If the
-data type passed to Prim+RPC is not something that can be serialized then it may not be sent at all.
-
-However, you can change the JSON serialization library used to extend the number of types that can be serialized and add
-more. This way your types from the client that you pass to the server will be preserved on the server without having to
-manually deserialize that data.
-
-### Extending JSON Serialization
-
-You may choose to use a library like [superjson](https://github.com/blitz-js/superjson) to extend the types that can be
-used automatically with Prim+RPC. Prim+RPC supports custom JSON handlers like this and many others as long as they
-provide a `stringify` and `parse` method.
-
-It is important to know that if JSON serialization is extended, you must do so on both the server and client (since
-serialization and deserialzation go hand-in-hand) You can configure it like so:
-
-<CH.Code>
-
-```ts client.ts
-import { createPrimClient } from "@doseofted/prim-rpc"
-import jsonHandler from "superjson"
-
-const client = createPrimClient<typeof exampleClient>({
-	jsonHandler,
-	// ... other client options
-})
-```
-
----
-
-```ts server.ts
-import { createPrimServer } from "@doseofted/prim-rpc"
-import jsonHandler from "superjson"
-
-const server = createPrimServer({
-	jsonHandler,
-	// ... other server options
-})
-```
-
-</CH.Code>
-
-It's important to note that if a public API is built with Prim+RPC that not everyone can use a custom JSON handler (for
-instance, if a request is made outside of a JavaScript environment). In these situations, you can create two Prim+RPC
-servers referencing the same module: one that supports a custom JSON handler and one that does not. In these situations,
-you'll need to handle serialization when someone makes a request using the default JSON handler from the client (you
-may, for example, use a framework like [Zod](https://github.com/colinhacks/zod) for preprocessing or type coercion).
-
-## Language Limitations
-
-These aren't necessarily limitations but are important to point out so that you understand how Prim+RPC works.
-
-### Function Results Must Be Awaited
-
-When you call a function with the Prim+RPC client, the result of that call will be wrapped in a Promise and must be
-awaited, even if the function you're calling doesn't return a Promise. This is because you are fetching this result over
-some other channel (in most cases, over HTTP) and this result is not immediately available to you. Prim+RPC sends all
-function results back to the client as Promises of the requested data, similar to how you must await a fetch request.
-
-### Callback Results Must Be Awaited
-
-<Alert icon="carbon:warning" type="alert-warning">
-	Callback return values are not supported yet but are planned.
 </Alert>
-
-Similar to the rule above, callback results on the server must also be awaited. This is because the result is from the
-client and is not immediately available. Prim+RPC automatically wraps this data in a Promise.
