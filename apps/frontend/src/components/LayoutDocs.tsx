@@ -59,8 +59,8 @@ export function LayoutDocs({ meta, children }: LayoutDocsProps) {
 						<div className="grid grid-cols-10 gap-4 relative z-2">
 							<div className="text-black col-span-10 lg:col-span-8 col-start-1 lg:col-start-2 prose min-w-full prose-headings:font-title prose-headings:font-bold prose-headings:text-black prose-table:table-normal prose-table:table prose-th:text-xs prose-td:text-xs prose-table:table-zebra">
 								<Alert icon="carbon:warning" type="alert-warning" className="mb-8">
-									Prim+RPC is prerelease software. It has not reached a stable version and the documentation is in
-									progress. Functionality may change and the library potentially be unstable.
+									Prim+RPC is prerelease software. It may be unstable and functionality may change prior to full
+									release.
 								</Alert>
 								{children}
 							</div>
