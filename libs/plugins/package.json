@@ -3,7 +3,6 @@
 	"version": "0.0.1-next.0",
 	"description": "Prim+RPC plugins/handlers for popular frameworks both server and client side.",
 	"license": "UNLICENSED",
-	"private": true,
 	"author": {
 		"name": "Ted Klingenberg",
 		"email": "ted@doseofted.com",

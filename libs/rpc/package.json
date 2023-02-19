@@ -3,7 +3,6 @@
 	"version": "0.0.1-next.0",
 	"description": "Easy-to-understand, type-safe, transport-agnostic RPC/IPC for JavaScript, supporting callbacks, batching, file uploads, custom serialization, and more.",
 	"license": "UNLICENSED",
-	"private": true,
 	"author": {
 		"name": "Ted Klingenberg",
 		"email": "ted@doseofted.com",

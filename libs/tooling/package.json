@@ -3,7 +3,6 @@
 	"version": "0.0.1-next.0",
 	"description": "Optional tooling to further enhance Prim+RPC usage.",
 	"license": "UNLICENSED",
-	"private": true,
 	"author": {
 		"name": "Ted Klingenberg",
 		"email": "ted@doseofted.com",

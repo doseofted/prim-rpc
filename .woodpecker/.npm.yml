@@ -25,7 +25,6 @@ pipeline:
       - corepack enable
       # - pnpm task dev:changeset:status
       # NOTE: if an .nprmc file is added to project in the future, this will need to be considered (instead of deleted)
-      - rm $HOME/.npmrc
       # Publish to GitHub Packages
       - echo '@doseofted:registry=https://npm.pkg.github.com' >> $HOME/.npmrc
       - echo '//npm.pkg.github.com/:_authToken=${GITHUB_API_TOKEN}' >> $HOME/.npmrc
