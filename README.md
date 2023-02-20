@@ -22,7 +22,8 @@ If you discover an issue with Prim+RPC unrelated to security, search open issues
 determine if someone else has faced the same issue. Otherwise, feel free to report an issue _with_ a minimal
 reproduction (consider [using an example](https://github.com/doseofted/prim-rpc-examples) as a starting point).
 
-If you are having trouble using Prim+RPC, open a [new discussion](https://github.com/doseofted/prim-rpc/discussions).
+If you have any questions or are having trouble using Prim+RPC, open a
+[new discussion](https://github.com/doseofted/prim-rpc/discussions).
 
 ## Security
 
@@ -67,3 +68,14 @@ parts of the project. Run `pnpm task dev:build` for subsequent builds. Watch for
 If you prefer to work in Docker, configure the [`.env` file](./.env.example) and run `pnpm task compose:dev:up` (depends
 on [Docker/Compose](https://docs.docker.com/get-docker/) and [mkcert](https://github.com/FiloSottile/mkcert)). When
 finished, run `pnpm task compose:dev:down`.
+
+## Release Plan
+
+Prim+RPC is currently prerelease software but the goal is to reach a stable release. Prim+RPC itself (framework-agnostic
+core of the project) will become stable first. Before Prim+RPC is released however individual plugins
+(framework-specific code, known as method/callback plugins) will need to become stable since Prim+RPC depends on them.
+Lastly, Prim+RPC's optional tooling (such as documentation generation) will become stable.
+
+There is not a target date for these releases but I expect the Prim+RPC packages to generally become stable between Q2
+and Q3. This time frame depends on the initial success of this project and the timeline of projects that will use
+Prim+RPC (such as [Prim+CMS](https://prim.doseofted.com/cms) and the new [Dose of Ted](https://doseofted.com/) website).

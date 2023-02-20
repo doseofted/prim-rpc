@@ -94,7 +94,7 @@ To sum up the differences between the two:
 | File uploads supported by community       | File uploads directly supported with plugins    |
 | Supports many languages                   | Server is expected to be JavaScript/TypeScript  |
 
-## Fastify / Express
+## Fastify / Express (HTTP Frameworks)
 
 It is difficult to compare Prim+RPC against an HTTP server framework because they are so different but they can both be
 used as some method to send/receive data from a function so the comparison is still relevant.
@@ -125,6 +125,41 @@ over a cookie, processed by your HTTP server).
 
 Using Prim+RPC with an HTTP server is powerful combo because you can leverage the middleware available in your existing
 frameworks but have the simplicity of using Prim+RPC to define resources to be made available over the Internet.
+
+## Qwik / Solid Start (Data Loaders)
+
+Recent fullstack frameworks like [Qwik](https://github.com/BuilderIO/qwik),
+[Solid Start](https://github.com/solidjs/solid-start), [Remix](https://github.com/remix-run/remix),
+[Blitz](https://github.com/blitz-js/blitz), and others have introduced an approach that allows you to call backend
+JavaScript code from the same file as your frontend code. These frameworks are generally running that backend code on
+the server and then creating an RPC endpoint that is called from the client (other frameworks will pass the backend
+result as some payload alongside the client and use during a hydration step). Since many of these frameworks are
+creating RPC endpoints, it's worth pointing out the differences with Prim+RPC. Many of these frameworks are using
+similar approaches but to keep the comparison simple we'll use two recent frameworks: Qwik and Solid Start.
+
+One primary difference is the purpose of RPC in each tool. In frameworks like Qwik and Solid Start, RPC is used as a
+method of transforming server-side data into a format expected by the frontend (known as "server data" or "data
+loaders"). Both of these frameworks also offer REST endpoints for the purpose of creating an API with dedicated routes.
+Of course, how you use RPC or REST endpoints in these frameworks is up to the developer. Generally, RPC as used by the
+frameworks is abstracted away from the developer by creating an RPC endpoint during a compile step for use in that
+application only as a means of retrieving data for that page (side note: Prim+RPC does not require a compile step or
+client generation).
+
+Prim+RPC is more akin (in its purpose) to Qwik's or Solid Start's REST endpoints than its data loaders because it is not
+tied to frontend code. Prim+RPC only concerns itself with creating dedicated RPC methods and exposing them for easy
+usage on some client (whether Prim+RPC's client or a request written by hand in JSON). The RPC is intended to be used
+anywhere and could be used for a private API or could be exposed publicly for multiple client applications to use.
+Prim+RPC does not concern itself with the frontend code which means that methods defined with Prim+RPC can be used with
+any framework that you like, including Solid Start and Qwik. In both frameworks you may either wrap the Prim+RPC client
+in a "resource" (a way to resolve promises in the UI frameworks) or you could call a method defined in Prim+RPC with
+that framework's data loaders (where a Prim+RPC instance serves a dedicated role for an API).
+
+In general, data loaders in Qwik and Solid Start (which generate RPC) are a means of translating an API call into
+frontend-specific code. In Prim+RPC, RPC is used as a means to create a full API that works regardless of what your
+frontend needs (calls to a Prim+RPC server could even be used within data loaders). Since Prim+RPC can work with the
+server of your choice, this also means that the API you define can use context and middleware provided by that server
+(and the server can more easily be swapped in the future) whereas with REST endpoints in Qwik or Solid Start you need to
+use middleware or plugins specific to that framework.
 
 ## tRPC
 
