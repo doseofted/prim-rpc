@@ -13,7 +13,7 @@ export default function Cms() {
 	return (
 		<>
 			<Title>CMS</Title>
-			<div className="pointer-events-none relative min-h-screen py-8 container mx-auto grid grid-cols-12 px-4 gap-4">
+			<div className="pointer-events-none relative min-h-[100svh] py-8 container mx-auto grid grid-cols-12 px-4 gap-4">
 				<div className="col-span-12 h-16" />
 				<div className="relative col-span-12 pointer-events-auto text-center text-prim-space">
 					<p className="font-title text-[3rem] lg:text-[5.5rem] font-semibold uppercase leading-none">

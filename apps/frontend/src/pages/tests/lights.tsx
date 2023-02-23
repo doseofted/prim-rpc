@@ -12,7 +12,7 @@ export default function LightsPage() {
 		delay: { value: 50, min: 0, max: 100 },
 	})
 	return (
-		<div className="font-sans flex justify-center items-center min-h-screen">
+		<div className="font-sans flex justify-center items-center min-h-[100svh]">
 			<Lights blur={blur}>
 				<div className="flex flex-wrap justify-center items-center gap-12 relative top-0">
 					{Array.from(Array(count), (_, i) => i).map(key => (

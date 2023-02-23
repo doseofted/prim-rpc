@@ -6,7 +6,7 @@ function Callbacks() {
 	const form = useRef<HTMLFormElement>(null)
 	const input = useRef<HTMLInputElement>(null)
 	return (
-		<div className="w-full h-screen flex justify-center items-center bg-prim-space">
+		<div className="w-full h-[100svh] flex justify-center items-center bg-prim-space">
 			<div className="flex flex-col gap-4 justify-center w-[24rem]">
 				<form
 					ref={form}

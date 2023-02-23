@@ -47,7 +47,7 @@ export function LayoutDocs({ meta, children }: LayoutDocsProps) {
 							<div className="flex justify-center items-center h-full w-full">
 								<Dialog.Panel
 									data-lenis-prevent
-									className="bg-white/70 p-6 py-12 rounded-2xl pr-32 max-h-[calc(100vh-4rem)] overflow-auto">
+									className="bg-white/70 p-6 py-12 rounded-2xl pr-32 max-h-[calc(100svh-4rem)] overflow-auto">
 									<DocsTableOfContents onLinkClicked={() => docsMenuToggle(false)} />
 								</Dialog.Panel>
 							</div>

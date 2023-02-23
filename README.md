@@ -5,7 +5,7 @@ library is making plain function calls to a server from some client (RPC), as if
 client itself. The goal is to write plain JavaScript, or TypeScript if you prefer, and immediately invoke typed code
 without verbose wrappers around the communication channel.
 
-> **Warning** Prim+RPC is prerelease software. It may be unstable and functionality may change prior to full release.
+> **Warning** Prim+RPC is prerelease software. It may be unstable and functionality may change.
 
 [Read the Documentation](https://prim.doseofted.com/) ∙ [Try an Example](https://github.com/doseofted/prim-rpc-examples)
 ∙ [Work with Ted](https://doseofted.com/)

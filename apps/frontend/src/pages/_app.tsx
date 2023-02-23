@@ -51,7 +51,7 @@ export default function App({ Component, pageProps }: AppProps) {
 		<Layout
 			data-theme="prim"
 			className={[
-				"w-full min-h-screen font-sans",
+				"w-full min-h-[100svh] font-sans",
 				montserrat.variable,
 				plusJakartaSans.variable,
 				firaCodeMono.variable,

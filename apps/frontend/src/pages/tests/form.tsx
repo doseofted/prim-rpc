@@ -14,7 +14,7 @@ function Form() {
 		}
 	}
 	return (
-		<div className="w-full h-screen flex justify-center items-center bg-prim-space">
+		<div className="w-full h-[100svh] flex justify-center items-center bg-prim-space">
 			<div className="flex flex-col gap-4 justify-center w-full max-w-md">
 				<form
 					className="bg-white rounded-lg p-8 grid grid-cols-2 gap-4"
