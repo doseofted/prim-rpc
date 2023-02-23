@@ -152,14 +152,30 @@ anywhere and could be used for a private API or could be exposed publicly for mu
 Prim+RPC does not concern itself with the frontend code which means that methods defined with Prim+RPC can be used with
 any framework that you like, including Solid Start and Qwik. In both frameworks you may either wrap the Prim+RPC client
 in a "resource" (a way to resolve promises in the UI frameworks) or you could call a method defined in Prim+RPC with
-that framework's data loaders (where a Prim+RPC instance serves a dedicated role for an API).
+that framework's data loaders (where a Prim+RPC instance serves a dedicated API role and its response is then
+transformed in a data loader for the user interface).
 
 In general, data loaders in Qwik and Solid Start (which generate RPC) are a means of translating an API call into
 frontend-specific code. In Prim+RPC, RPC is used as a means to create a full API that works regardless of what your
 frontend needs (calls to a Prim+RPC server could even be used within data loaders). Since Prim+RPC can work with the
 server of your choice, this also means that the API you define can use context and middleware provided by that server
-(and the server can more easily be swapped in the future) whereas with REST endpoints in Qwik or Solid Start you need to
-use middleware or plugins specific to that framework.
+(such as existing plugins for rate limiting, authentication, security headers, etc.) whereas with REST endpoints in Qwik
+or Solid Start you need to use middleware or plugins specific to that framework.
+
+Using Prim+RPC with an HTTP framework, there's also the possibility of swapping out the server easily by using a
+different Prim+RPC plugin (meaning that the interface/context for your code can stay the same: only server-specific
+implementations needs to change, which is also useful for testing). In Qwik or Solid Start, your routes are tied to its
+specific server framework (this is the same for defining API routes in any HTTP framework directly).
+
+As a summary, Prim+RPC is great for defining an API while data loaders are great for transforming that API response into
+a structure specific to the user interface. To make some direct comparisons:
+
+| Data Loaders                                                          | Prim+RPC                                                        |
+| --------------------------------------------------------------------- | --------------------------------------------------------------- |
+| Frontend and backend code are generally colocated                     | Deals specifically with backend code, easy to use from frontend |
+| Generally intended to be used with a specific UI framework            | Intended to be used with any client                             |
+| Backend code is compiled into RPC calls (or passed as data with page) | No client generation; client generates RPC at runtime           |
+| Generally tied to specific HTTP server framework                      | Works with any framework (HTTP or not) through plugins          |
 
 ## tRPC
 
