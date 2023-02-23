@@ -47,7 +47,7 @@ client's [`.allowList`](/docs/reference/configuration#allowlist). This is a rest
 the functions that you explicitly allow to be called are callable from the Prim+RPC server.
 
 ```typescript
-import { createPrimClient } from "@doseofted/prim-rpc"
+import { createPrimServer, createPrimClient } from "@doseofted/prim-rpc"
 
 // this function has an `.rpc` property added
 function sayHello() {
@@ -60,13 +60,14 @@ function sayHelloPrivately() {
 	return "Hi?"
 }
 
-const prim = createPrimClient({
+const server = createPrimServer({
 	module: { sayHello, sayHelloPrivately },
 })
+const client = createPrimClient()
 
-console.log(await prim.sayHello()) // "Hi!"
+console.log(await client.sayHello()) // "Hi!"
 try {
-	await prim.sayHelloPrivately()
+	await client.sayHelloPrivately()
 } catch (error) {
 	console.log(error) // "Method not allowed"
 }
@@ -80,7 +81,7 @@ some other channel (in most cases, over HTTP) and this result is not immediately
 function results back to the client as Promises of the requested data, similar to how you must await a fetch request.
 
 ```typescript
-import { createPrimClient } from "@doseofted/prim-rpc"
+import { createPrimServer, createPrimClient } from "@doseofted/prim-rpc"
 
 /** A random function that returns a string. */
 function sayHello() {
@@ -89,12 +90,13 @@ function sayHello() {
 sayHello.rpc = true
 
 const module = { sayHello }
-const prim = createPrimClient({ module })
+const server = createPrimServer({ module })
+const client = createPrimClient()
 
 // function called directly (no Promise)
 const resultLocal = module.sayHello()
 // function called with client (Promised)
-const resultRemote = await prim.sayHello()
+const resultRemote = await client.sayHello()
 ```
 
 The results of your function calls on the Prim+RPC client are automatically wrapped in a Promise interface (when using
@@ -110,7 +112,7 @@ Similar to the rule above, callback results on the server must also be awaited. 
 client and is not immediately available.
 
 ```typescript
-import { createPrimClient } from "@doseofted/prim-rpc"
+import { createPrimServer, createPrimClient } from "@doseofted/prim-rpc"
 
 // notice that callback result must be awaited (because result is wrapped in Promise)
 async function confirm(onServerConfirm: (message: string) => Promise<boolean> | boolean) {
@@ -126,11 +128,12 @@ async function confirm(onServerConfirm: (message: string) => Promise<boolean> | 
 }
 confirm.rpc = true
 
-const prim = createPrimClient({
+const server = createPrimClient({
 	module: { confirm },
 })
+const client = createPrimClient()
 
-const confirmed = await prim.confirm(message => {
+const confirmed = await client.confirm(message => {
 	console.log(message) // "Everything's okay!"
 	return true
 })
