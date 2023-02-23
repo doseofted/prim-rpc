@@ -5,7 +5,7 @@ library is making plain function calls to a server from some client (RPC), as if
 client itself. The goal is to write plain JavaScript, or TypeScript if you prefer, and immediately invoke typed code
 without verbose wrappers around the communication channel.
 
-> **Warning** Prim+RPC is prerelease software. It has not reached a stable version.
+> **Warning** Prim+RPC is prerelease software. It may be unstable and functionality may change prior to full release.
 
 [Read the Documentation](https://prim.doseofted.com/) ∙ [Try an Example](https://github.com/doseofted/prim-rpc-examples)
 ∙ [Work with Ted](https://doseofted.com/)
@@ -76,6 +76,7 @@ core of the project) will become stable first. Before Prim+RPC is released howev
 (framework-specific code, known as method/callback plugins) will need to become stable since Prim+RPC depends on them.
 Lastly, Prim+RPC's optional tooling (such as documentation generation) will become stable.
 
-There is not a target date for these releases but I expect the Prim+RPC packages to generally become stable between Q2
-and Q3. This time frame depends on the initial success of this project and the timeline of projects that will use
-Prim+RPC (such as [Prim+CMS](https://prim.doseofted.com/cms) and the new [Dose of Ted](https://doseofted.com/) website).
+There is not yet a specific target date for these releases but I expect the Prim+RPC packages to generally become stable
+between Q2 and Q3. This time frame depends on the initial success of this project and the timeline of projects that will
+use Prim+RPC (such as [Prim+CMS](https://prim.doseofted.com/cms) and the new [Dose of Ted](https://doseofted.com/)
+website).
