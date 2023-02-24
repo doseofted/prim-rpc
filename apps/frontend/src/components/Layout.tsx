@@ -19,7 +19,7 @@ export default function Layout(props: LayoutProps) {
 			{/* eslint-disable-next-line @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-unsafe-member-access */}
 			<LightsProvider disable={!snapshot.useLightEffect} options={{ size: 500 }} blur={25} saturate={1.3}>
 				{/* NOTE: using overflow-hidden below may mean that children can't use sticky positioning (if needed for table of contents) */}
-				<div className="relative min-h-screen w-full z-2 overflow-hidden">
+				<div className="relative min-h-[100svh] w-full z-2 overflow-hidden">
 					{!homepage && (
 						<div className="py-8 absolute container inset-x-0 mx-auto grid grid-cols-12 border-x border-transparent px-4 gap-4">
 							<Navigation className="relative col-span-12" />
