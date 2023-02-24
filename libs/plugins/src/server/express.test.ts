@@ -22,15 +22,15 @@ describe("Express plugin is functional as Prim Plugin", () => {
 	afterEach(() => {
 		server?.close()
 	})
-	const params = { greeting: "What's up", name: "Ted" }
-	const expected = { id: 1, result: module.sayHello(params) }
+	const args = { greeting: "What's up", name: "Ted" }
+	const expected = { id: 1, result: module.sayHello(args) }
 	test("registered as Prim Plugin", async () => {
 		const response = await request(server)
 			.post("/prim")
 			.send({
-				id: 1,
 				method: "sayHello",
-				params,
+				args,
+				id: 1,
 			})
 			.set("accept", "application/json")
 		// eslint-disable-next-line @typescript-eslint/no-unsafe-member-access
@@ -56,15 +56,15 @@ describe("Express plugin is functional as Express plugin", () => {
 	afterEach(() => {
 		server?.close()
 	})
-	const params = { greeting: "What's up", name: "Ted" }
-	const expected = { id: 1, result: module.sayHello(params) }
+	const args = { greeting: "What's up", name: "Ted" }
+	const expected = { id: 1, result: module.sayHello(args) }
 	test("registered as Express middleware", async () => {
 		const response = await request(server)
 			.post("/prim")
 			.send({
-				id: 1,
 				method: "sayHello",
-				params,
+				args,
+				id: 1,
 			})
 			.set("accept", "application/json")
 		// eslint-disable-next-line @typescript-eslint/no-unsafe-member-access

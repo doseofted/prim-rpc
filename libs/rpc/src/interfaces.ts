@@ -7,10 +7,10 @@ interface RpcBase {
 	id?: string | number
 }
 
-export interface RpcCall<Method = string, Params = unknown> extends RpcBase {
+export interface RpcCall<Method = string, Args = unknown> extends RpcBase {
 	method: Method
 	// FIXME: rename this to "args" since this refers to values given to method
-	params?: Params
+	args?: Args
 }
 
 export interface RpcAnswer<Result = unknown, Error = unknown> extends RpcBase {
@@ -44,7 +44,7 @@ export type PrimWebSocketEvents = {
 	ended: undefined
 }
 
-// NOTE: all functions' params must match type of same name given above
+// NOTE: all functions' arguments must match type of same name given above
 interface PrimWebSocketFunctionEvents {
 	connected: () => void
 	// NOTE: I don't need to return multiple answers unless batching is allowed over websocket (not needed)

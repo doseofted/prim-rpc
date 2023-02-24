@@ -25,18 +25,18 @@ describe("Prim client instantiates", () => {
 describe("Prim Client can call methods with a single parameter", () => {
 	test("with local source", async () => {
 		const prim = createPrimClient({ module })
-		const params = { greeting: "Hi", name: "Ted" }
-		const expected = module.sayHello(params)
-		const result = await prim.sayHello(params)
+		const args = { greeting: "Hi", name: "Ted" }
+		const expected = module.sayHello(args)
+		const result = await prim.sayHello(args)
 		expect(result).toEqual(expected)
 	})
 	test("with remote source", async () => {
 		const { callbackPlugin, methodPlugin, callbackHandler, methodHandler } = createPrimTestingPlugins()
 		createPrimServer({ module, callbackHandler, methodHandler })
 		const prim = createPrimClient<IModule>({ callbackPlugin, methodPlugin })
-		const params = { greeting: "Hey", name: "Ted" }
-		const expected = module.sayHello(params)
-		const result = await prim.sayHello(params)
+		const args = { greeting: "Hey", name: "Ted" }
+		const expected = module.sayHello(args)
+		const result = await prim.sayHello(args)
 		expect(result).toEqual(expected)
 	})
 })
@@ -44,18 +44,18 @@ describe("Prim Client can call methods with a single parameter", () => {
 describe("Prim Client can call methods with positional parameters", () => {
 	test("with local source", async () => {
 		const prim = createPrimClient({ module })
-		const params = ["Hi", "Ted"] as const
-		const expected = module.sayHelloAlternative(...params)
-		const result = await prim.sayHelloAlternative(...params)
+		const args = ["Hi", "Ted"] as const
+		const expected = module.sayHelloAlternative(...args)
+		const result = await prim.sayHelloAlternative(...args)
 		expect(result).toEqual(expected)
 	})
 	test("with remote source", async () => {
 		const { callbackPlugin, methodPlugin, callbackHandler, methodHandler } = createPrimTestingPlugins()
 		createPrimServer({ module, callbackHandler, methodHandler })
 		const prim = createPrimClient<IModule>({ callbackPlugin, methodPlugin })
-		const params = ["Hey", "Ted"] as const
-		const expected = module.sayHelloAlternative(...params)
-		const result = await prim.sayHelloAlternative(...params)
+		const args = ["Hey", "Ted"] as const
+		const expected = module.sayHelloAlternative(...args)
+		const result = await prim.sayHelloAlternative(...args)
 		expect(result).toEqual(expected)
 	})
 })
@@ -76,18 +76,18 @@ test("Prim Client can use alternative JSON handler", async () => {
 describe("Prim Client can call deeply nested methods", () => {
 	test("with local source", async () => {
 		const prim = createPrimClient({ module })
-		const params = { greeting: "Sup", name: "Ted" }
-		const expected = module.testLevel2.testLevel1.sayHello(params)
-		const result = await prim.testLevel2.testLevel1.sayHello(params)
+		const args = { greeting: "Sup", name: "Ted" }
+		const expected = module.testLevel2.testLevel1.sayHello(args)
+		const result = await prim.testLevel2.testLevel1.sayHello(args)
 		expect(result).toEqual(expected)
 	})
 	test("with remote source", async () => {
 		const { callbackPlugin, methodPlugin, callbackHandler, methodHandler } = createPrimTestingPlugins()
 		createPrimServer({ module, callbackHandler, methodHandler })
 		const prim = createPrimClient<IModule>({ callbackPlugin, methodPlugin })
-		const params = { greeting: "Yo", name: "Ted" }
-		const expected = module.testLevel2.testLevel1.sayHello(params)
-		const result = await prim.testLevel2.testLevel1.sayHello(params)
+		const args = { greeting: "Yo", name: "Ted" }
+		const expected = module.testLevel2.testLevel1.sayHello(args)
+		const result = await prim.testLevel2.testLevel1.sayHello(args)
 		expect(result).toEqual(expected)
 	})
 })

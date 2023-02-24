@@ -224,15 +224,15 @@ This may be fixed by storing a function reference on the server while a WebSocke
 open and then once the returned function on the client is called, sending a new WebSocket message with a reference to
 that temporary function.
 
-This becomes complicated when you consider that these functions could be passed a file parameter or a callback
+This becomes complicated when you consider that these functions could be passed a file argument or a callback
 themselves, when they're not directly accessible except for during the WebSocket session. This may be difficult to
 support and may involve adding a new limitation that returned functions cannot have files/callbacks themselves.
 
 ### Callbacks Cannot Return Value to Client Yet
 
 You can pass callbacks to functions defined on a server used with Prim+RPC. These callbacks can be called from the
-server and the client's callback will receive the parameters from the server. However, if the client returns a value
-from this callback, the server cannot receive that information yet.
+server and the client's callback will receive the arguments from the server. However, if the client returns a value from
+this callback, the server cannot receive that information yet.
 
 ```typescript
 // NOTE: DOES NOT WORK

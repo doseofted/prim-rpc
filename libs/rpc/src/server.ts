@@ -72,11 +72,11 @@ function createServerActions(
 				}
 				positional[index] = value
 			}
-			const params =
+			const args =
 				positional.length > 0 && positional.length === entries.length ? positional : entries.length === 0 ? [] : query
 			let method = url.replace(RegExp("^" + serverPrefix + "\\/?"), "")
 			method = method !== "" ? method : "default"
-			return { id, method, params }
+			return { id, method, args }
 		}
 		// NOTE: consider failing instead of falling back to default export
 		return { method: "default" }
@@ -92,7 +92,7 @@ function createServerActions(
 		const callList = Array.isArray(calls) ? calls : [calls]
 		const answeringCalls = callList.map(async (given): Promise<RpcAnswer> => {
 			// eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
-			const { method, params, id } = given
+			const { method, args, id } = given
 			try {
 				const methodExpanded = method.split("/")
 				// using `configured.module` if module was provided directly to server
@@ -127,15 +127,15 @@ function createServerActions(
 						}
 					}
 				}
-				const argsArray = Array.isArray(params) ? params : [params]
-				const args =
+				const argsArray = Array.isArray(args) ? args : [args]
+				const argsForCall =
 					Object.entries(blobs || {}).length > 0 ? argsArray.map(arg => mergeBlobLikeWithGiven(arg, blobs)) : argsArray
 				if (cbResults) {
 					event.on("response", cbResults)
 				}
 				// NOTE: use `remoteTarget` (even if target is local) to ensure callbacks are handled properly by Prim client
 				// eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
-				const result: RpcAnswer = await Reflect.apply(targetRemote, context, args)
+				const result: RpcAnswer = await Reflect.apply(targetRemote, context, argsForCall)
 				// TODO: today, result must be supported by JSON handler but consider supporting returned functions
 				// in the same way that callback are supported today (by passing reference to client)
 				return { result, id }
@@ -176,8 +176,8 @@ function createServerEvents(serverOptions: PrimServerOptions): PrimServerEvents 
 			blobs: Record<string, unknown> = {},
 			context?: unknown
 		): Promise<CommonServerResponseOptions> => {
-			const preparedParams = prepareCall(given)
-			const result = await prepareRpc(preparedParams, blobs, context)
+			const preparedArgs = prepareCall(given)
+			const result = await prepareRpc(preparedArgs, blobs, context)
 			const preparedResult = prepareSend(result)
 			return preparedResult
 		}
@@ -204,8 +204,8 @@ function createSocketEvents(serverOptions: PrimServerOptions): PrimServerSocketE
 				const { body } = prepareSend(data)
 				send(body)
 			})
-			const preparedParams = prepareCall({ body })
-			const result = await prepareRpcBase(preparedParams, null, context)
+			const preparedArgs = prepareCall({ body })
+			const result = await prepareRpcBase(preparedArgs, null, context)
 			const preparedResult = prepareSend(result)
 			send(preparedResult.body)
 		}
@@ -232,7 +232,7 @@ function createSocketEvents(serverOptions: PrimServerOptions): PrimServerSocketE
 // calling example function: `hello()`. So, a function named `beforeHello()` would be called
 // with parameters matching `beforeCall()` and `afterHello()` would be called with parameters
 // matching `afterCall()`
-// beforeCall: <Params = unknown[]>(params: Params, ctx: Context) => Params
+// beforeCall: <Args = unknown[]>(args: Args, ctx: Context) => Args
 // afterCall: <Return = unknown>(returned: Return, ctx: Context) => Return
 /**
  * Unlike `createPrimClient()`, this function is designed purely for the server. Rather than integrating directly with a

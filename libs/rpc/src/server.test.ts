@@ -38,7 +38,7 @@ describe("Prim Server can call methods with local module", () => {
 		const server = prim.server()
 		const call: RpcCall = {
 			method: "sayHello",
-			params: { greeting: "Hola", name: "Ted" },
+			args: { greeting: "Hola", name: "Ted" },
 			id: 1,
 		}
 		const body = JSON.stringify(call)
@@ -55,7 +55,7 @@ test("Prim Server can call remote methods (without module directly)", async () =
 	const server = prim.server()
 	const call: RpcCall = {
 		method: "sayHello",
-		params: { greeting: "Hellooo", name: "Ted" },
+		args: { greeting: "Hellooo", name: "Ted" },
 		id: 1,
 	}
 	const body = JSON.stringify(call)

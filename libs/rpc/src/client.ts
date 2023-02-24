@@ -58,13 +58,13 @@ export function createPrimClient<
 	const givenModule = configured.module as ModuleType
 	// SECTION Proxy to handle function calls
 	const proxy = new ProxyDeep<ModuleType>(givenModule ?? ({} as ModuleType), {
-		apply(_target, targetContext, args: unknown[]) {
+		apply(_target, targetContext, givenArgs: unknown[]) {
 			// SECTION Server-side module handling
 			const targetFunction = getProperty<ModuleType, keyof ModuleType>(givenModule, this.path as [keyof ModuleType])
 			const targetIsCallable = typeof targetFunction === "function"
 			if (targetIsCallable) {
 				// if an argument is a callback reference, the created callback below will send the result back to client
-				const argsWithListeners = args.map(arg => {
+				const argsWithListeners = givenArgs.map(arg => {
 					const argIsReferenceToCallback = typeof arg === "string" && arg.startsWith(CB_PREFIX)
 					if (!argIsReferenceToCallback) {
 						return arg
@@ -84,7 +84,7 @@ export function createPrimClient<
 			// SECTION Client-side module handling
 			let callbacksWereGiven = false
 			const blobs: BlobRecords = {}
-			const params = args.map(arg => {
+			const args = givenArgs.map(arg => {
 				if (configured.handleBlobs) {
 					const [replacedArg, newBlobs, givenFromFormElement] = handlePossibleBlobs(arg)
 					const blobEntries = Object.entries(newBlobs)
@@ -115,7 +115,7 @@ export function createPrimClient<
 				wsEvent.on("response", handleRpcCallbackResult)
 				return callbackReferenceIdentifier
 			})
-			const rpc: RpcCall = { method: this.path.join("/"), params, id: nanoid() }
+			const rpc: RpcCall = { method: this.path.join("/"), args: args, id: nanoid() }
 			if ((callbackPluginGiven && callbacksWereGiven) || !methodPluginGiven) {
 				// TODO: add fallback in case client cannot support websocket
 				const result = new Promise<RpcAnswer>((resolve, reject) => {

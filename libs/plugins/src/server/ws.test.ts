@@ -43,9 +43,9 @@ describe("ws is functional as Prim Plugin", async () => {
 		let response = request(server)
 			.ws("/prim")
 			.sendJson({
-				id: 1,
 				method: "typeMessage",
-				params: [message, callbackId, 0],
+				args: [message, callbackId, 0],
+				id: 1,
 			})
 			.expectJson({ id: 1 })
 		expected.forEach(letter => {

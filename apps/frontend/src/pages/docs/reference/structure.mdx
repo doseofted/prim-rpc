@@ -70,9 +70,9 @@ The function call above, when used with Prim+RPC, would generate the following R
 
 ```json request.json
 {
-	"id": "...",
 	"method": "add",
-	"params": [1, 2]
+	"args": [1, 2],
+	"id": "..."
 }
 ```
 
@@ -110,7 +110,7 @@ When used with Prim+RPC, this would result in the following RPC:
 ```json request.json
 {
 	"method": "add",
-	"params": {
+	"args": {
 		"a": 1,
 		"b": 2
 	}
@@ -169,7 +169,7 @@ Running this code would result in the following RPC:
 ```json request.json
 {
 	"method": "add",
-	"params": {
+	"args": {
 		"a": "not a number",
 		"b": 2
 	}
@@ -222,7 +222,7 @@ between each letter. Similar to other function calls, there is an initial RPC an
 ```json request.json
 {
 	"method": "typeMessage",
-	"params": ["Hi!", "_cb_1234"]
+	"args": ["Hi!", "_cb_1234"]
 }
 ```
 

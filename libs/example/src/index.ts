@@ -265,13 +265,13 @@ whatIsThis.rpc = true
 
 /**
  *
- * @param params - Any kind of parameter really
- * @returns The parameters you gave
+ * @param args - Any kind of argument really
+ * @returns The arguments you gave
  *
  * @public
  */
-function defaultFunction(...params: unknown[]) {
-	return { params: params.length === 1 ? params[0] : params }
+function defaultFunction(...args: unknown[]) {
+	return { args: args.length === 1 ? args[0] : args }
 }
 defaultFunction.rpc = true
 

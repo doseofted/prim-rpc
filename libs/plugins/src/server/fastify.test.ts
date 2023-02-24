@@ -23,15 +23,15 @@ describe("Fastify plugin is functional as Prim Plugin", () => {
 	afterEach(() => {
 		fastify.server.close()
 	})
-	const params = { greeting: "What's up", name: "Ted" }
-	const expected = { id: 1, result: module.sayHello(params) }
+	const args = { greeting: "What's up", name: "Ted" }
+	const expected = { id: 1, result: module.sayHello(args) }
 	test("registered as Prim Plugin", async () => {
 		const response = await request(fastify.server)
 			.post("/prim")
 			.send({
-				id: 1,
 				method: "sayHello",
-				params,
+				args,
+				id: 1,
 			})
 			.set("accept", "application/json")
 		// eslint-disable-next-line @typescript-eslint/no-unsafe-member-access
@@ -58,15 +58,15 @@ describe("Fastify plugin is functional as Fastify plugin", async () => {
 	afterEach(() => {
 		fastify.server.close()
 	})
-	const params = { greeting: "What's up", name: "Ted" }
-	const expected = { id: 1, result: module.sayHello(params) }
+	const args = { greeting: "What's up", name: "Ted" }
+	const expected = { id: 1, result: module.sayHello(args) }
 	test("registered as Fastify Plugin", async () => {
 		const response = await request(fastify.server)
 			.post("/prim")
 			.send({
-				id: 1,
 				method: "sayHello",
-				params,
+				args,
+				id: 1,
 			})
 			.set("accept", "application/json")
 		// eslint-disable-next-line @typescript-eslint/no-unsafe-member-access
@@ -93,15 +93,15 @@ describe("Fastify plugin works with over GET/POST", () => {
 	afterEach(() => {
 		fastify.server.close()
 	})
-	const params = { greeting: "What's up", name: "Ted" }
-	const expected = { id: 1, result: module.sayHello(params) }
+	const args = { greeting: "What's up", name: "Ted" }
+	const expected = { id: 1, result: module.sayHello(args) }
 	test("POST requests", async () => {
 		const response = await request(fastify.server)
 			.post("/prim")
 			.send({
-				id: 1,
 				method: "sayHello",
-				params,
+				args,
+				id: 1,
 			})
 			.set("accept", "application/json")
 		// eslint-disable-next-line @typescript-eslint/no-unsafe-member-access
@@ -112,7 +112,7 @@ describe("Fastify plugin works with over GET/POST", () => {
 	test("GET requests", async () => {
 		const url = queryString.stringifyUrl({
 			url: "/prim/sayHello",
-			query: { ...params, "-": 1 },
+			query: { ...args, "-": 1 },
 		})
 		const response = await request(fastify.server).get(url).send().set("accept", "application/json")
 		// eslint-disable-next-line @typescript-eslint/no-unsafe-member-access
@@ -135,20 +135,20 @@ describe("Fastify plugin works with over GET/POST", () => {
 // 		})
 // 	})
 // 	afterEach(() => { fastify.server.close() })
-// 	const params = {
+// 	const args = {
 // 		name: "Ted",
 // 		email: "test@example.com",
 // 		password: "secret",
 // 	}
-// 	const expected = { id: 1, result: module.handleForm(params) }
+// 	const expected = { id: 1, result: module.handleForm(args) }
 // 	test("a single file", async () => {
 // 		const response = await request(fastify.server)
 // 			.post("/prim")
-// 			.field(params)
+// 			.field(args)
 // 			.send({
 // 				id: 1,
 // 				method: "sayHello",
-// 				params,
+// 				args,
 // 			})
 // 			.set("accept", "application/json")
 // 		// eslint-disable-next-line @typescript-eslint/no-unsafe-member-access
