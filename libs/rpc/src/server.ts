@@ -2,7 +2,7 @@ import { get as getProperty } from "lodash-es"
 import mitt from "mitt"
 import queryString from "query-string"
 import { serializeError } from "serialize-error"
-import { createPrimOptions } from "./options"
+import { createPrimOptions, primMajorVersion, useVersionInRpc } from "./options"
 import { createPrimClient } from "./client"
 import { mergeBlobLikeWithGiven } from "./blobs"
 import type { AnyFunction } from "./client"
@@ -93,6 +93,8 @@ function createServerActions(
 		const answeringCalls = callList.map(async (given): Promise<RpcAnswer> => {
 			// eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
 			const { method, args, id } = given
+			const rpcVersion: Partial<RpcAnswer> = useVersionInRpc ? { prim: primMajorVersion } : {}
+			const rpcBase: Partial<RpcAnswer> = { ...rpcVersion, id }
 			try {
 				const methodExpanded = method.split("/")
 				// using `configured.module` if module was provided directly to server
@@ -108,14 +110,14 @@ function createServerActions(
 							typeof previousPath === "function" &&
 							!serverOptions.methodsOnMethods.includes(methodExpanded.slice(-1)[0])
 						if (disallowedMethodOnMethod) {
-							return { error: "Given method on method was not allowed" }
+							return { ...rpcBase, error: "Given method on method was not allowed" }
 						}
 					}
 					if (typeof target === "undefined") {
-						return { error: "Requested method was not found" }
+						return { ...rpcBase, error: "Requested method was not found" }
 					}
 					if (typeof target !== "function") {
-						return { error: "Requested method is not callable" }
+						return { ...rpcBase, error: "Requested method is not callable" }
 					}
 					const methodAllowedDirectly = "rpc" in target && typeof target.rpc == "boolean" && target.rpc
 					if (!methodAllowedDirectly) {
@@ -123,7 +125,7 @@ function createServerActions(
 							Object.entries(serverOptions.allowList ?? {}).length > 0 &&
 							!!getProperty(serverOptions.allowList, methodExpanded)
 						if (!allowedInSchema) {
-							return { error: "Method not allowed" }
+							return { ...rpcBase, error: "Method not allowed" }
 						}
 					}
 				}
@@ -138,16 +140,16 @@ function createServerActions(
 				const result: RpcAnswer = await Reflect.apply(targetRemote, context, argsForCall)
 				// TODO: today, result must be supported by JSON handler but consider supporting returned functions
 				// in the same way that callback are supported today (by passing reference to client)
-				return { result, id }
+				return { ...rpcBase, result }
 			} catch (e) {
 				// JSON.stringify on Error results in an empty object. Since Error is common, serialize it
 				// when a custom JSON handler is not provided
 				if (handleError && e instanceof Error) {
 					const error = serializeError<unknown>(e)
-					return { error, id }
+					return { ...rpcBase, error }
 				}
 				// eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
-				return { error: e, id }
+				return { ...rpcBase, error: e }
 			}
 		})
 		const answeredCalls = await Promise.all(answeringCalls)

@@ -4,6 +4,7 @@ import type { Asyncify } from "type-fest"
 
 // SECTION RPC call and result structure
 interface RpcBase {
+	prim?: 0 // as new major versions are announced (only that change message structure), bump version
 	id?: string | number
 }
 

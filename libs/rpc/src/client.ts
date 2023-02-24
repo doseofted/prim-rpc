@@ -14,7 +14,7 @@ import mitt from "mitt"
 import { nanoid } from "nanoid"
 import { get as getProperty, remove as removeFromArray } from "lodash-es"
 import { deserializeError } from "serialize-error"
-import { createPrimOptions } from "./options"
+import { createPrimOptions, primMajorVersion, useVersionInRpc } from "./options"
 import { handlePossibleBlobs } from "./blobs"
 import { PromiseResolveStatus } from "./interfaces"
 import type {
@@ -115,7 +115,8 @@ export function createPrimClient<
 				wsEvent.on("response", handleRpcCallbackResult)
 				return callbackReferenceIdentifier
 			})
-			const rpc: RpcCall = { method: this.path.join("/"), args: args, id: nanoid() }
+			const rpcBase: Partial<RpcCall> = useVersionInRpc ? { prim: primMajorVersion } : {}
+			const rpc: RpcCall = { ...rpcBase, method: this.path.join("/"), args: args, id: nanoid() }
 			if ((callbackPluginGiven && callbacksWereGiven) || !methodPluginGiven) {
 				// TODO: add fallback in case client cannot support websocket
 				const result = new Promise<RpcAnswer>((resolve, reject) => {

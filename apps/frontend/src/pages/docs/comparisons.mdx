@@ -29,7 +29,8 @@ for it.
 Naturally, all of these comparisons will be biased towards Prim+RPC since it's written by the same author but it's
 intended to make a general comparison for those unfamiliar with Prim+RPC but familiar with another framework.
 
-Enough disclaimers. Let's discuss.
+Finally, if Prim+RPC doesn't fit your use case, all of the frameworks below are great alternatives. But enough
+disclaimers. Let's discuss.
 
 ## Table of Contents
 
@@ -308,9 +309,11 @@ the two difficult. Prim+RPC however has an official client.
 While JSON RPC and Prim+RPC messages may appear similar at first glance, there are some major differences worth
 mentioning. For instance, RPC with Prim+RPC does not require an ID while JSON RPC does (however, it's recommended and
 the Prim+RPC will create an ID for its own internal purpose of managing batched requests). Obviously, the `jsonrpc`
-property is also missing in Prim+RPC since it is not JSON RPC. Errors in Prim+RPC are also handled differently and
-depend entirely on how a thrown Error in JavaScript is serialized (there is no standard). There are no standardized
-error codes in Prim+RPC and none are planned while JSON RPC has a few codes intended for RPC-specific errors.
+property is also missing in Prim+RPC since it is not JSON RPC. Another noticeable difference is that Prim+RPC uses an
+`args` property in its RPC structure while JSON RPC uses a property named `params` (but both are used for passing
+arguments). Errors in Prim+RPC are also handled differently and depend entirely on how a thrown Error in JavaScript is
+serialized (there is no standard). There are no standardized error codes in Prim+RPC and none are planned while JSON RPC
+has a few codes intended for RPC-specific errors.
 
 Prim+RPC also has additional features like the ability to receive data from callbacks which has a similar structure to
 regular Prim+RPC messages but is formatted slightly different. This feature is not part of JSON RPC. Prim+RPC can also

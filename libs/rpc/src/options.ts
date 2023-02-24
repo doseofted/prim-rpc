@@ -1,6 +1,16 @@
 import { defu } from "defu"
 import { PrimOptions, PrimServerOptions, RpcCall } from "./interfaces"
 
+/**
+ * As Prim+RPC introduces new updates to RPC message structure, update this version.
+ * Don't update just because major version changes though (only if version changes RPC structure)
+ */
+export const primMajorVersion = 0
+// NOTE: I'm still undecided if version should be in RPC at all (this should probably be moved to communication channel
+// instead since it's not related to RPC itself but rather how RPC is transferred)
+/** Only show version in RPC if structure of message has changed (and would be incompatible with old Prim+RPC versions) */
+export const useVersionInRpc = primMajorVersion !== 0
+
 // TODO: consider separating server-specific options from client options so I can reduce the number
 // of options given on the client
 // TODO: add presets option for dev and production to configure which fallback settings to use when not provided
