@@ -43,6 +43,7 @@ services:
     ports:
       - "3000:3000"
     volumes:
+      - ./docs:/home/node/project/docs
       - ./apps/frontend/src:/home/node/project/apps/frontend/src
       - ./apps/frontend/public:/home/node/project/apps/frontend/public
       - ./apps/frontend/next.config.js:/home/node/project/apps/frontend/next.config.js

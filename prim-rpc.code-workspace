@@ -30,7 +30,7 @@
 		},
 		{
 			"name": "🌐 Documentation",
-			"path": "./apps/frontend/src/pages/docs"
+			"path": "./docs"
 		},
 		{
 			"name": "📗 Example Server",

@@ -25,32 +25,6 @@ reproduction (consider [using an example](https://github.com/doseofted/prim-rpc-
 If you have any questions or are having trouble using Prim+RPC, open a
 [new discussion](https://github.com/doseofted/prim-rpc/discussions).
 
-## Security
-
-See the [Security Policy](./SECURITY.md).
-
-## Contributions
-
-See the [Contribution Guide](./CONTRIBUTING.md).
-
-## License(s)
-
-This is a monolithic repository consisting of several projects. The repository itself is proprietary while individual
-projects are separately licensed:
-
-| Project                | Folder                       | License                                        |
-| ---------------------- | ---------------------------- | ---------------------------------------------- |
-| Prim+RPC               | `./libs/rpc`                 | [To be determined](./libs/rpc/LICENSE.md)      |
-| Prim+RPC Plugins       | `./libs/plugins`             | [To be determined](./libs/plugins/LICENSE.md)  |
-| Prim+RPC Tooling       | `./libs/tooling`             | [To be determined](./libs/tooling/LICENSE.md)  |
-| Prim+RPC UI            | `./libs/ui`                  | [To be determined](./libs/ui/LICENSE.md)       |
-| Example Library        | `./libs/example`             | [To be determined](./libs/example/LICENSE.md)  |
-| Prim+RPC Website       | `./apps/frontend`            | [To be determined](./apps/frontend/LICENSE.md) |
-| Prim+RPC Documentation | `./apps/frontend/pages/docs` | [To be determined](./apps/frontend/LICENSE.md) |
-
-You will find a license file (`LICENSE.md`) in each project's folder that describes the detailed license for which it is
-made available. If a license is not made available then it is unlicensed meaning that usage is unauthorized.
-
 ## Development
 
 See the [Documentation](https://prim.doseofted.com/) for usage instructions. These instructions refer to development of
@@ -80,3 +54,15 @@ There is not yet a specific target date for these releases but I expect the Prim
 between Q2 and Q3. This time frame depends on the initial success of this project and the timeline of projects that will
 use Prim+RPC (such as [Prim+CMS](https://prim.doseofted.com/cms) and the new [Dose of Ted](https://doseofted.com/)
 website).
+
+## Security
+
+See the [Security Policy](./SECURITY.md).
+
+## Contributions
+
+See the [Contribution Guide](./CONTRIBUTING.md).
+
+## License(s)
+
+Please refer to [Licenses](./LICENSE.md).

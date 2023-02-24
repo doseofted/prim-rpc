@@ -14,6 +14,7 @@ RUN pnpm fetch
 # Copy miscellaneous configuration related to project that could be used in container
 COPY --chown=node .eslint* .nvmrc Taskfile.yml tsconfig.json turbo.json build-deps.mjs  ./
 COPY --chown=node misc misc
+COPY --chown=node docs docs
 
 FROM monorepo-install as prim-monorepo-build
 # Build all project dependencies once (excluding `apps/`, built in each respective Dockerfile)
