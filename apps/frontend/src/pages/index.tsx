@@ -233,6 +233,20 @@ export default function Home({ greeting }: Props) {
 							</div>
 						</div>
 					</div>
+					<div className="lg:w-1/2 space-y-4">
+						<p className="text-xs lg:text-base">
+							You can choose your own server, client, transport, JSON handler, and more with Prim+RPC. See the available
+							integrations in the documentation or try out an example.
+						</p>
+						<div className="flex gap-4">
+							<Link href="/docs" className="btn text-white">
+								Documentation
+							</Link>
+							<Link href="/docs/examples" className="btn text-white">
+								Try an Example
+							</Link>
+						</div>
+					</div>
 				</div>
 			</div>
 			<div className="relative pt-32 py-8 container mx-auto grid grid-cols-12 px-4 gap-4">
@@ -283,55 +297,49 @@ export default function Home({ greeting }: Props) {
 const serverCodeSnippet = `// on server:
 export function sayHello (x, y) {
   return \`\${x}, meet \${y}.\`
-}`
-const clientCodeSnippet = `// in browser:
-const greeting = await sayHello(
+}
+sayHello.rpc = true`
+const clientCodeSnippet = `// on client:
+const hello = await client.sayHello(
   "Backend", "Frontend"
-)`
+)
+console.log(hello)`
 
 const serverExampleCode = `import { createPrimServer } from "@doseofted/prim-rpc"
 import { createMethodHandler } from "@doseofted/prim-rpc-plugins/fastify"
-import { createCallbackHandler } from "@doseofted/prim-rpc-plugins/ws"
 import Fastify from "fastify"
-import { WebSocketServer } from "ws"
 
 // write your functions
-function hello (name: string) {
+function hello (name?: string) {
 	return \`Hello \${name ?? "you"}!\`
 }
-export function typeMessage(message: string, cb: (letter: string) => void) {
-	let timeout = 0
-	for (letter of message.split("")) {
-		setTimeout(() => typeLetter(letter), ++timeout * 300)
-	}
-}
-typeMessage.rpc = true
+hello.rpc = true
 const module = { hello }
 
+// setup your favorite server
 const fastify = Fastify()
-const wss = new WebSocketServer({ server: fastify.server })
 createPrimServer({
 	module,
 	methodHandler: createMethodHandler({ fastify }),
-	callbackHandler: createCallbackHandler({ wss }),
 })
 await fastify.listen({ port: 80 })
 console.log("Prim+RPC available at http://website.localhost/prim")
+
+// optionally, export types
+export type { module }
 `
 
 const clientExampleCode = `import { createPrimClient } from "@doseofted/prim-rpc"
-import { createMethodPlugin, createCallbackPlugin } from "@doseofted/prim-rpc-plugins/browser"
+import { createMethodPlugin } from "@doseofted/prim-rpc-plugins/browser"
 import type { module } from "./server"
 
+// set up your client (zero client generation)
 const client = createPrimClient<typeof module>({
 	endpoint: "http://website.localhost/prim",
-	methodPlugin: createMethodPlugin(),
-	callbackPlugin: createCallbackPlugin()
+	methodPlugin: createMethodPlugin()
 })
 
 // call your functions
 const greeting = await client.hello()
-client.typeMessage(greeting, (letter) => {
-	document.body.innerText += letter
-}) // every letter logged
+console.log(greeting) // "Hello you!"
 `
