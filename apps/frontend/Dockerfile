@@ -23,6 +23,7 @@ WORKDIR /home/node/project
 FROM doseofted/prim-monorepo-production:latest as prod
 # Copy built files
 COPY --chown=node --from=dev-cleanup /home/node/project/misc /home/node/project/misc
+COPY --chown=node --from=dev-cleanup /home/node/project/docs /home/node/project/docs
 COPY --chown=node --from=dev-cleanup /home/node/project/libs /home/node/project/libs
 COPY --chown=node --from=dev-cleanup /home/node/project/apps /home/node/project/apps
 # Install only dependencies needed in production
