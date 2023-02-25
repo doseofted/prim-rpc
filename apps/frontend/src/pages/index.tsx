@@ -172,9 +172,9 @@ export default function Home({ greeting }: Props) {
 			<div className="relative py-8 container mx-auto grid grid-cols-12 px-4 gap-4">
 				<div className="col-span-12 lg:col-span-6 text-white space-y-4">
 					<p className="font-title text-xl sm:text-2xl lg:text-4xl font-semibold uppercase leading-none">
-						RPC for the Rest of Us.
+						RPC for the Rest&nbsp;of&nbsp;Us.
 					</p>
-					<p className="text-xs lg:text-base">
+					<p className="text-sm lg:text-base">
 						Prim+RPC bridges incompatible JavaScript environments. Call a JavaScript function on the server remotely as
 						if it was defined on the client itself.
 					</p>
@@ -186,11 +186,54 @@ export default function Home({ greeting }: Props) {
 						key={key}
 						className="relative bg-white/70 rounded-lg border border-white/60 backdrop-blur-lg p-4 col-span-12 md:col-span-4 text-prim-space space-y-4">
 						<p className="font-bold">{title}</p>
-						<p>{details}</p>
+						<p className="text-sm lg:text-base">{details}</p>
 						<OpinionatedLight count={1} focus={0.9} size={400} state={state} className="top-0 left-0 absolute" />
 						<OpinionatedLight count={1} focus={0.9} size={400} state={state} className="bottom-0 right-0 absolute" />
 					</div>
 				))}
+			</div>
+			<div className="relative pt-32 container mx-auto grid grid-cols-12 px-4 gap-4">
+				<div className="relative bg-white/70 rounded-lg border border-white/60 backdrop-blur-lg p-4 col-span-12 text-prim-space space-y-4">
+					<div className="lg:w-1/2 space-y-4">
+						<p className="font-title text-xl sm:text-2xl lg:text-4xl font-semibold uppercase leading-none">
+							Write A Function. Call&nbsp;It.&nbsp;Done.
+						</p>
+						<p className="text-xs lg:text-base">
+							With Prim+RPC, you can write regular JavaScript on a server and expose it for some client to use.
+							Communicate between frontend/backend, browser/worker, and more. Easily.
+						</p>
+					</div>
+					<div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
+						<div className="flex flex-col">
+							<div className="tabs">
+								<div className="tab tab-md tab-lifted" />
+								<div className="tab tab-md tab-lifted tab-active">server.ts</div>
+								<div className="tab tab-md tab-lifted" />
+							</div>
+							<div className="bg-white p-3 rounded-xl flex-grow">
+								<CodeHighlighted
+									transparent
+									className="h-full text-xs lg:text-sm bg-prim-space p-2 rounded-lg overflow-x-auto">
+									{serverExampleCode}
+								</CodeHighlighted>
+							</div>
+						</div>
+						<div className="flex flex-col">
+							<div className="tabs">
+								<div className="tab tab-md tab-lifted" />
+								<div className="tab tab-md tab-lifted tab-active">client.ts</div>
+								<div className="tab tab-md tab-lifted" />
+							</div>
+							<div className="bg-white p-3 rounded-xl flex-grow">
+								<CodeHighlighted
+									transparent
+									className="h-full text-xs lg:text-sm bg-prim-space p-2 rounded-lg overflow-x-auto">
+									{clientExampleCode}
+								</CodeHighlighted>
+							</div>
+						</div>
+					</div>
+				</div>
 			</div>
 			<div className="relative pt-32 py-8 container mx-auto grid grid-cols-12 px-4 gap-4">
 				<div className="col-span-12 lg:col-span-6 text-white space-y-4">
@@ -205,7 +248,7 @@ export default function Home({ greeting }: Props) {
 						key={key}
 						className="relative bg-white/70 rounded-lg border border-white/60 backdrop-blur-lg p-4 col-span-12 md:col-span-4 text-prim-space space-y-4">
 						<p className="font-bold">{title}</p>
-						<p>{details}</p>
+						<p className="text-sm lg:text-base">{details}</p>
 						<OpinionatedLight count={1} focus={0.9} size={400} state={state} className="top-0 left-0 absolute" />
 						<OpinionatedLight count={1} focus={0.9} size={400} state={state} className="bottom-0 right-0 absolute" />
 					</div>
@@ -216,13 +259,14 @@ export default function Home({ greeting }: Props) {
 					<p className="font-title text-xl sm:text-2xl lg:text-4xl font-semibold uppercase leading-none">
 						It's Available Now. Like, Right Now.
 					</p>
-					<div className="flex justify-center mx-auto gap-4">
+					<div className="flex flex-wrap lg:flex-nowrap justify-center mx-auto gap-4">
 						<Link href="/docs" className="btn glass text-white">
 							Get Started
 						</Link>
 						<Link href="/docs/usage" className="btn glass text-white">
 							Learn to Use
 						</Link>
+						<div className="w-full block lg:hidden" />
 						<Link href="/docs/plugins/create" className="btn glass text-white">
 							Plugins
 						</Link>
@@ -244,3 +288,50 @@ const clientCodeSnippet = `// in browser:
 const greeting = await sayHello(
   "Backend", "Frontend"
 )`
+
+const serverExampleCode = `import { createPrimServer } from "@doseofted/prim-rpc"
+import { createMethodHandler } from "@doseofted/prim-rpc-plugins/fastify"
+import { createCallbackHandler } from "@doseofted/prim-rpc-plugins/ws"
+import Fastify from "fastify"
+import { WebSocketServer } from "ws"
+
+// write your functions
+function hello (name: string) {
+	return \`Hello \${name ?? "you"}!\`
+}
+export function typeMessage(message: string, cb: (letter: string) => void) {
+	let timeout = 0
+	for (letter of message.split("")) {
+		setTimeout(() => typeLetter(letter), ++timeout * 300)
+	}
+}
+typeMessage.rpc = true
+const module = { hello }
+
+const fastify = Fastify()
+const wss = new WebSocketServer({ server: fastify.server })
+createPrimServer({
+	module,
+	methodHandler: createMethodHandler({ fastify }),
+	callbackHandler: createCallbackHandler({ wss }),
+})
+await fastify.listen({ port: 80 })
+console.log("Prim+RPC available at http://website.localhost/prim")
+`
+
+const clientExampleCode = `import { createPrimClient } from "@doseofted/prim-rpc"
+import { createMethodPlugin, createCallbackPlugin } from "@doseofted/prim-rpc-plugins/browser"
+import type { module } from "./server"
+
+const client = createPrimClient<typeof module>({
+	endpoint: "http://website.localhost/prim",
+	methodPlugin: createMethodPlugin(),
+	callbackPlugin: createCallbackPlugin()
+})
+
+// call your functions
+const greeting = await client.hello()
+client.typeMessage(greeting, (letter) => {
+	document.body.innerText += letter
+}) // every letter logged
+`

@@ -15,17 +15,17 @@ Prim+RPC works over the transport of your choice through the usage of plugins. T
 into two categories: a **client plugin** that sends RPC and expects a result, and a **server handler** that receives
 given RPC and returns a result.
 
-On both the client and the server, there are two types of plugins/handlers. There are **method handlers** used to send
-RPC and receive an immediate RPC result and **callback handlers** which are used to send RPC and await multiple results
-over time. Each method _handler_ on the server-side works with the client through a method _plugin_. The same applies to
-callbacks: each server-side handler must have a client-side plugin.
-
 <Alert prose icon="carbon:information">
 
 You may not need to create your own plugin. Check out the available [plugins for the server](/docs/plugins/server),
 [plugins for the client](/docs/plugins/client), and [plugins for process communication](/docs/plugins/ipc).
 
 </Alert>
+
+On both the client and the server, there are two types of plugins/handlers. There are **method handlers** used to send
+RPC and receive an immediate RPC result and **callback handlers** which are used to send RPC and await multiple results
+over time. Each method _handler_ on the server-side works with the client through a method _plugin_. The same applies to
+callbacks: each server-side handler must have a client-side plugin.
 
 For example: if you're already using Express as an HTTP server then you may want to use Prim+RPC with the
 [Express method handler](/docs/plugins/server#express) on the server. Since you're using an HTTP server, you'll also

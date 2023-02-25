@@ -42,13 +42,21 @@ export default function Layout(props: LayoutProps) {
 					{children}
 					<div className="py-32 pb-16 text-white text-center flex flex-col items-center gap-8 relative">
 						<div>
+							<p className="text-white/80 text-xs drop-shadow-lg mb-4 max-w-md leading-6">
+								The Prim+RPC project and website are designed and developed by Ted.
+								<br /> Contact Ted to{" "}
+								<Link href="https://doseofted.com/" target="_blank" className="link">
+									start your own project
+								</Link>
+								.
+							</p>
 							<Link href="https://doseofted.com/" target="_blank">
 								<Image
 									src="/prim-doseofted-attribution.png"
 									width={361}
 									height={150}
 									alt="Dose of Ted"
-									className="w-60 lg:w-80"
+									className="w-60 lg:w-80 mx-auto"
 								/>
 							</Link>
 							<OpinionatedLight count={9} focus={0.9} size={900} state="enter" className="top-96 left-0 absolute" />
