@@ -223,6 +223,9 @@ export default function Home({ greeting }: Props) {
 						<Link href="/docs/usage" className="btn glass text-white">
 							Learn to Use
 						</Link>
+						<Link href="/docs/plugins/create" className="btn glass text-white">
+							Plugins
+						</Link>
 						<Link href="/docs/examples" className="btn glass text-white">
 							Try An Example
 						</Link>
