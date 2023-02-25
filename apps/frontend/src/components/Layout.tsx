@@ -49,12 +49,10 @@ export default function Layout(props: LayoutProps) {
 						</div>
 						<div className="container mx-auto flex justify-between px-4 gap-4 text-white/80 text-xs">
 							<p>
-								<p>
-									<strong>Prim+RPC</strong>: a project by{" "}
-									<Link className="link" href="https://doseofted.com/" target="_blank">
-										Ted Klingenberg
-									</Link>
-								</p>
+								<strong>Prim+RPC</strong>: a project by{" "}
+								<Link className="link" href="https://doseofted.com/" target="_blank">
+									Ted Klingenberg
+								</Link>
 							</p>
 							<p>
 								Anonymous analytics collected with{" "}
