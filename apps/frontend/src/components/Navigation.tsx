@@ -26,7 +26,7 @@ export function Navigation(props: NavigationProps) {
 	function clickHandler() {
 		menuToggle(false)
 	}
-	const showAttributionInNavigation = false
+	const showAttributionInNavigation = true
 	return (
 		<div {...attrs} className={[attrs.className, "flex justify-between items-center gap-8"].join(" ")}>
 			<div className="inline-block">
@@ -50,6 +50,23 @@ export function Navigation(props: NavigationProps) {
 						<span className="transition-all duration-300 transform">{name}</span>
 					</Link>
 				))}
+				{showAttributionInNavigation && (
+					<Link
+						onClick={clickHandler}
+						className="hidden lg:flex group font-semibold uppercase text-sm h-full px-4 p-4 justify-center items-center rounded-b-2xl transition-all duration-300
+								bg-transparent hover:bg-white transform scale-100 hover:scale-110"
+						href="https://doseofted.com/"
+						target="_blank">
+						<div className="pointer-events-none w-full h-[100svh] transition-all duration-300 bg-transparent group-hover:bg-white absolute top-0 transform -translate-y-full" />
+						<Image
+							src="/prim-nav-doseofted-attribution.png"
+							width={547}
+							height={96}
+							alt="Dose of Ted"
+							className="w-auto max-h-6"
+						/>
+					</Link>
+				)}
 				{socials.map(({ icon, link, name }, i) => (
 					<Link
 						key={i}
@@ -66,23 +83,6 @@ export function Navigation(props: NavigationProps) {
 						</span>
 					</Link>
 				))}
-				{showAttributionInNavigation && (
-					<Link
-						onClick={clickHandler}
-						className="hidden lg:flex group font-semibold uppercase text-sm h-full px-6 p-0 justify-center items-center rounded-b-2xl transition-all duration-300
-								bg-transparent hover:bg-white transform scale-100 hover:scale-110"
-						href="https://doseofted.com/"
-						target="_blank">
-						<div className="pointer-events-none w-full h-[100svh] transition-all duration-300 bg-transparent group-hover:bg-white absolute top-0 transform -translate-y-full" />
-						<Image
-							src="/prim-nav-doseofted-attribution.png"
-							width={370}
-							height={150}
-							alt="Dose of Ted"
-							className="w-auto max-h-12"
-						/>
-					</Link>
-				)}
 				<button
 					onClick={() => menuToggle(true)}
 					className="flex lg:hidden group font-semibold uppercase text-sm h-full px-4 p-4 justify-center items-center rounded-b-2xl transition-all duration-300
