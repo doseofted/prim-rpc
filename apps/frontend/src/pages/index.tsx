@@ -205,29 +205,31 @@ export default function Home({ greeting }: Props) {
 					</div>
 					<div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
 						<div className="flex flex-col">
-							<div className="tabs">
-								<div className="tab tab-md tab-lifted" />
+							<div className="tabs relative top-[1px]">
+								<div className="tab tab-md border-transparent tab-lifted" />
 								<div className="tab tab-md tab-lifted tab-active">server.ts</div>
-								<div className="tab tab-md tab-lifted" />
+								<div className="tab tab-md border-transparent tab-lifted" />
+								<OpinionatedLight count={4} focus={0.9} size={500} state={state} />
 							</div>
-							<div className="bg-white p-3 rounded-xl flex-grow">
+							<div className="bg-white border border-gray-300 p-3 rounded-xl flex-grow">
 								<CodeHighlighted
 									transparent
-									className="h-full text-xs lg:text-sm bg-prim-space p-2 rounded-lg overflow-x-auto">
+									className="h-full text-xs lg:text-sm bg-prim-space p-3 rounded-lg overflow-x-auto">
 									{serverExampleCode}
 								</CodeHighlighted>
 							</div>
 						</div>
 						<div className="flex flex-col">
-							<div className="tabs">
-								<div className="tab tab-md tab-lifted" />
+							<div className="tabs relative top-[1px]">
+								<div className="tab tab-md border-transparent tab-lifted" />
 								<div className="tab tab-md tab-lifted tab-active">client.ts</div>
-								<div className="tab tab-md tab-lifted" />
+								<div className="tab tab-md border-transparent tab-lifted" />
+								<OpinionatedLight count={4} focus={0.9} size={500} state={state} />
 							</div>
-							<div className="bg-white p-3 rounded-xl flex-grow">
+							<div className="bg-white border border-gray-300 p-3 rounded-xl flex-grow">
 								<CodeHighlighted
 									transparent
-									className="h-full text-xs lg:text-sm bg-prim-space p-2 rounded-lg overflow-x-auto">
+									className="h-full text-xs lg:text-sm bg-prim-space p-3 rounded-lg overflow-x-auto">
 									{clientExampleCode}
 								</CodeHighlighted>
 							</div>
