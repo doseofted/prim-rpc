@@ -30,7 +30,7 @@ export function LayoutDocs({ meta, children }: LayoutDocsProps) {
 							</div>
 						)}
 					</div>
-					<div className="hidden lg:block pointer-events-auto col-span-3 bg-white/70 text-black -ml-4 px-4 py-8 rounded-tl-2xl">
+					<div className="hidden lg:block pointer-events-auto col-span-3 bg-white/70 text-black -ml-4 px-4 py-8 rounded-l-2xl">
 						<DocsTableOfContents />
 					</div>
 					<div className="flex relative justify-end lg:hidden pointer-events-auto col-span-12 bg-white/70 text-black -mb-4">

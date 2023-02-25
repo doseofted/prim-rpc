@@ -6,6 +6,9 @@ import { useRouter } from "next/router"
 import { useMemo } from "react"
 import { websiteState } from "store"
 import { useSnapshot } from "valtio"
+import Link from "next/link"
+import { OpinionatedLight } from "./LightsState"
+import Image from "next/image"
 
 type LayoutProps = React.HTMLAttributes<HTMLDivElement>
 export default function Layout(props: LayoutProps) {
@@ -37,6 +40,20 @@ export default function Layout(props: LayoutProps) {
 						))}
 					</div>
 					{children}
+					<div className="py-32 text-white text-center flex flex-col items-center gap-8 relative">
+						<p>
+							<strong>Prim+RPC</strong>: a project by{" "}
+							<Link className="link" href="https://doseofted.com/" target="_blank">
+								Ted Klingenberg
+							</Link>
+						</p>
+						<div>
+							<Link href="https://doseofted.com/" target="_blank">
+								<Image src="/prim-doseofted-attribution.png" width={361} height={150} alt="Dose of Ted" />
+							</Link>
+							<OpinionatedLight count={9} focus={0.9} size={900} state="enter" className="top-96 left-0 absolute" />
+						</div>
+					</div>
 				</div>
 			</LightsProvider>
 			{/* LINK https://github.com/tailwindlabs/headlessui/discussions/666#discussioncomment-2197931 */}

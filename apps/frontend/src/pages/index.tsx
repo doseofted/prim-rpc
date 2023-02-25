@@ -211,7 +211,7 @@ export default function Home({ greeting }: Props) {
 					</div>
 				))}
 			</div>
-			<div className="relative py-32 container mx-auto grid grid-cols-12 px-4 gap-4">
+			<div className="relative pt-32 pb-8 container mx-auto grid grid-cols-12 px-4 gap-4">
 				<div className="col-span-12 text-white space-y-4 text-center">
 					<p className="font-title text-xl sm:text-2xl lg:text-4xl font-semibold uppercase leading-none">
 						It's Available Now. Like, Right Now.
