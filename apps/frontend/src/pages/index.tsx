@@ -7,6 +7,7 @@ import { GetServerSideProps } from "next"
 import backend from "../prim-client"
 import { Title } from "@/components/Title"
 import { NextSeo } from "next-seo"
+import Link from "next/link"
 
 interface Props {
 	greeting: string
@@ -32,6 +33,81 @@ export default function Home({ greeting }: Props) {
 		description:
 			"Easy-to-understand, type-safe, transport-agnostic RPC/IPC for JavaScript, supporting callbacks, batching, file uploads, custom serialization, and more.",
 	}
+	const features = [
+		{
+			title: "It's Just JavaScript",
+			details:
+				"If you know JavaScript basics then you know how to use Prim+RPC. Great for beginners and experts alike.",
+		},
+		{
+			title: "No Guessing: It's Fully Typed",
+			details:
+				"When you use TypeScript you get full type definitions in your client. Not using TypeScript? Get typed results with JSDoc using plain JavaScript.",
+		},
+		{
+			title: "Zero Client Generation",
+			details:
+				"You don't have to compile an API client with Prim+RPC: instead it's generated at runtime based on the functions that you call.",
+		},
+		{
+			title: "Bring Your Own Server",
+			details:
+				"Prim+RPC is built to be framework-agnostic. It can support the server you're already using through the use of plugins.",
+		},
+		{
+			title: "Choose Your Client",
+			details:
+				"Not only can you use the server of your choice but you can use your favorite HTTP client by creating a plugin in Prim+RPC.",
+		},
+		{
+			title: "It's Transport-Agnostic",
+			details:
+				"Prim+RPC can bridge any gap between two JavaScript environments: not just HTTP. Bridge processes, Web Workers, and more.",
+		},
+		{
+			title: "Upload Files",
+			details: "You can upload a file in Prim+RPC by simply passing a file as an argument to your function.",
+		},
+		{
+			title: "Use Your Callbacks",
+			details:
+				"By using a callback on your function, you can receive events from your server on the client without all of the setup!",
+		},
+		{
+			title: "Advanced Types Supported",
+			details:
+				"Prim+RPC can send advanced structures like Dates, RegExps, Errors, and more by using a custom JSON handler.",
+		},
+		{
+			title: "Throw Errors on Server and Client",
+			details: "Errors thrown on the server get thrown on the client. Try / catch is your friend here.",
+		},
+		{
+			title: "Upload Forms Easily",
+			details:
+				"Pass your form directly to the Prim+RPC client and receive all fields, including files, on the server. No additional form processing.",
+		},
+		{
+			title: "Share It with the World",
+			details:
+				"You can use Prim+RPC either privately in a single project or share your API with the world by hosting and publishing your types to a private/public registry.",
+		},
+		{
+			title: "Batch RPCs",
+			details:
+				"When you call many functions at once using the Prim+RPC client, they can be combined into a single request automatically.",
+		},
+		{
+			title: "Share Only What's Allowed",
+			details:
+				"As a security precaution, only the functions you explicitly mark as RPC will be callable from Prim+RPC.",
+		},
+		{
+			title: "Generate Documentation",
+			details:
+				"Prim+RPC can generate RPC-specific documentation from your code's TypeDoc documentation. Build your own documentation website how you want.",
+		},
+	]
 	return (
 		<>
 			<Title />
@@ -91,6 +167,63 @@ export default function Home({ greeting }: Props) {
 							{greeting.split(", ").map((text, i, g) => (i !== g.length - 1 ? text + ", " : text))}
 						</IntroText>
 					</p>
+				</div>
+			</div>
+			<div className="relative py-8 container mx-auto grid grid-cols-12 px-4 gap-4">
+				<div className="col-span-12 lg:col-span-6 text-white space-y-4">
+					<p className="font-title text-xl sm:text-2xl lg:text-4xl font-semibold uppercase leading-none">
+						RPC for the Rest of Us.
+					</p>
+					<p className="text-xs lg:text-base">
+						Prim+RPC bridges incompatible JavaScript environments. Call a JavaScript function on the server remotely as
+						if it was defined on the client itself.
+					</p>
+				</div>
+			</div>
+			<div className="relative container mx-auto grid grid-cols-12 px-4 gap-4">
+				{features.slice(0, 6).map(({ title, details }, key) => (
+					<div
+						key={key}
+						className="relative bg-white/70 rounded-lg border border-white/60 backdrop-blur-lg p-4 col-span-12 md:col-span-4 text-prim-space space-y-4">
+						<p className="font-bold">{title}</p>
+						<p>{details}</p>
+						<OpinionatedLight count={1} focus={0.9} size={400} state={state} className="top-0 left-0 absolute" />
+						<OpinionatedLight count={1} focus={0.9} size={400} state={state} className="bottom-0 right-0 absolute" />
+					</div>
+				))}
+			</div>
+			<div className="relative pt-32 py-8 container mx-auto grid grid-cols-12 px-4 gap-4">
+				<div className="col-span-12 lg:col-span-6 text-white space-y-4">
+					<p className="font-title text-xl sm:text-2xl lg:text-4xl font-semibold uppercase leading-none">
+						Oh, But That's Not All.
+					</p>
+				</div>
+			</div>
+			<div className="relative container mx-auto grid grid-cols-12 px-4 gap-4">
+				{features.slice(6).map(({ title, details }, key) => (
+					<div
+						key={key}
+						className="relative bg-white/70 rounded-lg border border-white/60 backdrop-blur-lg p-4 col-span-12 md:col-span-4 text-prim-space space-y-4">
+						<p className="font-bold">{title}</p>
+						<p>{details}</p>
+						<OpinionatedLight count={1} focus={0.9} size={400} state={state} className="top-0 left-0 absolute" />
+						<OpinionatedLight count={1} focus={0.9} size={400} state={state} className="bottom-0 right-0 absolute" />
+					</div>
+				))}
+			</div>
+			<div className="relative py-32 container mx-auto grid grid-cols-12 px-4 gap-4">
+				<div className="col-span-12 text-white space-y-4 text-center">
+					<p className="font-title text-xl sm:text-2xl lg:text-4xl font-semibold uppercase leading-none">
+						It's Available Now. Like, Right Now.
+					</p>
+					<div className="flex justify-center mx-auto gap-4">
+						<Link href="/docs" className="btn glass text-white">
+							Get Started
+						</Link>
+						<Link href="/docs/examples" className="btn glass text-white">
+							Try An Example
+						</Link>
+					</div>
 				</div>
 			</div>
 		</>
