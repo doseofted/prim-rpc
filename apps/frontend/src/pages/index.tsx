@@ -118,7 +118,7 @@ export default function Home({ greeting }: Props) {
 					...commonSeo,
 					images: [
 						{
-							url: `${process.env.NEXT_PUBLIC_WEBSITE_HOST}/social.png`,
+							url: `https://${process.env.NEXT_PUBLIC_WEBSITE_HOST}/social.png`,
 							alt: 'Two very short JavaScript files: a simple function on the server-side and a call to that function on the client-side. Tagline: "Backend, meet Frontend"',
 							width: 1200,
 							height: 630,
@@ -219,6 +219,9 @@ export default function Home({ greeting }: Props) {
 					<div className="flex justify-center mx-auto gap-4">
 						<Link href="/docs" className="btn glass text-white">
 							Get Started
+						</Link>
+						<Link href="/docs/usage" className="btn glass text-white">
+							Learn to Use
 						</Link>
 						<Link href="/docs/examples" className="btn glass text-white">
 							Try An Example

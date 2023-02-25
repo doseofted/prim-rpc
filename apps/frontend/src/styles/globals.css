@@ -30,15 +30,26 @@
 	background-color: #2D0D6011;
 	padding: 0.5rem 0;
 	border-radius: 0.35rem;
+	margin-bottom: 0;
 	border-bottom-left-radius: 0;
 	border-bottom-right-radius: 0;
 }
 
-.prose :where(h1, h2, h3) + table {
-	margin-top: -0.7rem;
+/* Remove sticky header in tables given by DaisyUI */
+.prose-table\:table table th:first-child {
+	position: relative !important;
+}
+
+.prose :where(h1, h2, h3) + table,
+.prose :where(h1, h2, h3) + div > table {
+	margin-top: 0;
+	margin-bottom: 0;
 	top: -1px;
 }
-.prose :where(h1, h2, h3) + table th {
+
+/* stylelint-disable-next-line no-descending-specificity */
+.prose :where(h1, h2, h3) + table th,
+.prose :where(h1, h2, h3) + div > table th {
 	background-color: #2D0D6011;
 	border-radius: 0;
 }
@@ -78,4 +89,37 @@
 		/* Override default 420px width since it feels small */
 		width: 520px;
 	}
+}
+
+/* Make tabs from Code Hike easier to see (with given theme) */
+.ch-editor-tab {
+	position: relative;
+	color: #ffffffaa !important;
+}
+.ch-editor-tab.ch-editor-tab-active {
+	color: #ffffffff !important;
+}
+
+.ch-editor-tab::before {
+	content: "";
+	display: block;
+	position: absolute;
+	height: 3px;
+	background-color: #8f8798;
+	width: calc(100% + 2px);
+	left: -1px;
+	right: -1px;
+	margin: 0 auto;
+	transition: width 300ms;
+}
+.ch-editor-tab.ch-editor-tab-active::before {
+	width: calc(100% - 12px);
+	background-color: #6D53FF;
+}
+/* Make marked lines of code use a color from theme of website */
+.ch-code-multiline-mark-border {
+	background: #5bb8ff !important;
+}
+.ch-code-multiline-mark {
+	background: #5bb8ff20 !important;
 }

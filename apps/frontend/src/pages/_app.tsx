@@ -29,6 +29,11 @@ const mdxComponents = {
 	},
 	h2: (props: React.HTMLAttributes<HTMLHeadingElement>) => <HeaderLink as="h2" {...props} />,
 	h3: (props: React.HTMLAttributes<HTMLHeadingElement>) => <HeaderLink as="h3" {...props} />,
+	table: (props: React.HTMLAttributes<HTMLTableElement>) => (
+		<div className="overflow-x-auto">
+			<table {...props} />
+		</div>
+	),
 }
 
 const montserrat = Montserrat({
@@ -61,12 +66,14 @@ export default function App({ Component, pageProps }: AppProps) {
 				<link rel="icon" href="/placeholder.png" sizes="192x192" type="image/png" />
 				<link rel="apple-touch-icon" href="/placeholder.png" />
 			</Head>
-			<Script
-				async
-				src="https://stat.dose.host/tracker.js"
-				data-ackee-server="https://stat.dose.host"
-				data-ackee-domain-id="04a095d6-ada1-4669-81fc-45276bc24609"
-			/>
+			{process.env.NODE_ENV !== "development" && (
+				<Script
+					async
+					src="https://stat.dose.host/tracker.js"
+					data-ackee-server="https://stat.dose.host"
+					data-ackee-domain-id="04a095d6-ada1-4669-81fc-45276bc24609"
+				/>
+			)}
 			<DefaultSeo twitter={{ handle: "@doseofted" }} themeColor="#2D0D60" />
 			<LenisProvider>
 				{/* eslint-disable-next-line @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-explicit-any */}

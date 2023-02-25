@@ -40,14 +40,20 @@ export default function Layout(props: LayoutProps) {
 						))}
 					</div>
 					{children}
-					<div className="py-32 text-white text-center flex flex-col items-center gap-8 relative">
+					<div className="py-32 pb-16 text-white text-center flex flex-col items-center gap-8 relative">
 						<div>
 							<Link href="https://doseofted.com/" target="_blank">
-								<Image src="/prim-doseofted-attribution.png" width={361} height={150} alt="Dose of Ted" />
+								<Image
+									src="/prim-doseofted-attribution.png"
+									width={361}
+									height={150}
+									alt="Dose of Ted"
+									className="w-60 lg:w-80"
+								/>
 							</Link>
 							<OpinionatedLight count={9} focus={0.9} size={900} state="enter" className="top-96 left-0 absolute" />
 						</div>
-						<div className="container mx-auto flex justify-between px-4 gap-4 text-white/80 text-xs">
+						<div className="container mx-auto flex flex-col lg:flex-row lg:justify-between px-4 gap-4 text-white/80 text-xs drop-shadow-lg">
 							<p>
 								<strong>Prim+RPC</strong>: a project by{" "}
 								<Link className="link" href="https://doseofted.com/" target="_blank">
