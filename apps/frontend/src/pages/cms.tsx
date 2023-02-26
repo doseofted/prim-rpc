@@ -2,6 +2,7 @@ import { IntroText } from "@/components/IntroText"
 import { OpinionatedLight } from "@/components/LightsState"
 import { Title } from "@/components/Title"
 import { motion } from "framer-motion"
+import Link from "next/link"
 import { useEffect, useState } from "react"
 export default function Cms() {
 	const [state, setState] = useState<"enter" | "exit">("exit")
@@ -21,9 +22,25 @@ export default function Cms() {
 							A better CMS.
 						</IntroText>
 					</p>
-					<motion.p style={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: 1.5 }} className="pr-4">
+					<motion.p
+						style={{ opacity: 0, y: 10 }}
+						animate={{ opacity: 1, y: 0 }}
+						transition={{ delay: 1.5, duration: 0.5 }}
+						className="pr-4 pb-4">
 						Content management built on Prim+RPC. Follow for updates.
 					</motion.p>
+					<motion.div
+						style={{ opacity: 0, y: 10 }}
+						animate={{ opacity: 1, y: 0 }}
+						transition={{ delay: 1.75, duration: 0.5 }}
+						className="flex gap-4 justify-center">
+						<Link href="https://twitter.com/doseofted" className="btn text-white">
+							Follow for Updates
+						</Link>
+						<Link href="https://doseofted.com/" className="btn text-white">
+							Blog
+						</Link>
+					</motion.div>
 					<OpinionatedLight count={14} focus={0.3} size={1200} state={state} />
 				</div>
 			</div>
