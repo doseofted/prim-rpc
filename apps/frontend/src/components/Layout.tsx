@@ -63,7 +63,12 @@ export default function Layout(props: LayoutProps) {
 						</div>
 						<div className="container mx-auto flex flex-col lg:flex-row lg:justify-between px-4 gap-4 text-white/80 text-xs drop-shadow-lg">
 							<p>
-								<strong>Prim+RPC</strong>: a project by{" "}
+								<strong>
+									<Link className="link" href="/">
+										Prim+RPC
+									</Link>
+								</strong>
+								: a project by{" "}
 								<Link className="link" href="https://doseofted.com/" target="_blank">
 									Ted Klingenberg
 								</Link>

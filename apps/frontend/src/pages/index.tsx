@@ -8,6 +8,7 @@ import backend from "../prim-client"
 import { Title } from "@/components/Title"
 import { NextSeo } from "next-seo"
 import Link from "next/link"
+import { Icon } from "@iconify/react"
 
 interface Props {
 	greeting: string
@@ -167,6 +168,20 @@ export default function Home({ greeting }: Props) {
 							{greeting.split(", ").map((text, i, g) => (i !== g.length - 1 ? text + ", " : text))}
 						</IntroText>
 					</p>
+					<div className="flex justify-end">
+						<motion.div animate={{ opacity: [0, 1] }} transition={{ delay: 3.5 }} className="w-6 h-6">
+							<motion.div
+								animate={{ y: [0, 10, 0] }}
+								transition={{
+									repeat: Infinity,
+									repeatType: "loop",
+									duration: 1.5,
+									easings: ["circOut", "circIn"],
+								}}>
+								<Icon className="w-6 h-6 text-white" icon="carbon:chevron-down" />
+							</motion.div>
+						</motion.div>
+					</div>
 				</div>
 			</div>
 			<div className="relative py-8 container mx-auto grid grid-cols-12 px-4 gap-4">
