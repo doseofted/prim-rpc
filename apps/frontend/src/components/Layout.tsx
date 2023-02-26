@@ -1,13 +1,13 @@
 import { Lights as LightsProvider } from "@/components/Lights"
 import { motion } from "framer-motion"
 import { transparentize } from "color2k"
-import { Navigation } from "./Navigation"
+import { Navigation } from "@/components/Navigation"
 import { useRouter } from "next/router"
 import { useMemo } from "react"
 import { websiteState } from "store"
 import { useSnapshot } from "valtio"
 import Link from "next/link"
-import { OpinionatedLight } from "./LightsState"
+import { OpinionatedLight } from "@/components/LightsState"
 import Image from "next/image"
 
 type LayoutProps = React.HTMLAttributes<HTMLDivElement>

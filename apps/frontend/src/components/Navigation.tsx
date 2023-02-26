@@ -1,12 +1,13 @@
-import React, { useMemo, useState } from "react"
+import React, { useEffect, useMemo, useState } from "react"
 import { motion } from "framer-motion"
 import { useRouter } from "next/router"
 import { Icon } from "@iconify/react"
 import Link from "next/link"
-import { Modal } from "./Modal"
-import { Dialog } from "@headlessui/react"
-import { PrimTitle } from "./PrimTitle"
 import Image from "next/image"
+import { useSessionStorage } from "react-use"
+import { Dialog } from "@headlessui/react"
+import { Modal } from "@/components/Modal"
+import { PrimTitle } from "@/components/PrimTitle"
 
 type NavigationProps = React.HTMLAttributes<HTMLDivElement>
 export function Navigation(props: NavigationProps) {
@@ -27,6 +28,10 @@ export function Navigation(props: NavigationProps) {
 		menuToggle(false)
 	}
 	const showAttributionInNavigation = true
+	const [navigated, setNavigated] = useSessionStorage("navigated", false)
+	useEffect(() => {
+		setNavigated(true)
+	}, [router.pathname])
 	return (
 		<div {...attrs} className={[attrs.className, "flex justify-between items-center gap-8"].join(" ")}>
 			<div className="inline-block">
@@ -35,7 +40,7 @@ export function Navigation(props: NavigationProps) {
 			<motion.div
 				initial={{ y: -20, opacity: 0 }}
 				animate={{ y: 0, opacity: 1 }}
-				transition={{ duration: 1, delay: homepage ? 2.8 : 0.5, ease: "circOut" }}
+				transition={{ duration: 1, delay: navigated ? 0 : homepage ? 2.8 : 0.5, ease: "circOut" }}
 				className="flex bg-white/70 border-b border-l border-white/70 text-black rounded-bl-2xl h-full items-center relative">
 				<div className="bg-white/70 border-l border-white/70 w-screen h-[100svh] absolute top-0 -left-[1px] transform -translate-y-full" />
 				<div className="bg-white/70 border-b border-white/70 w-screen absolute top-0 -bottom-[1px] right-0 transform translate-x-full" />

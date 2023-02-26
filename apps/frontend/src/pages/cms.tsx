@@ -4,6 +4,7 @@ import { Title } from "@/components/Title"
 import { motion } from "framer-motion"
 import Link from "next/link"
 import { useEffect, useState } from "react"
+
 export default function Cms() {
 	const [state, setState] = useState<"enter" | "exit">("exit")
 	useEffect(() => {

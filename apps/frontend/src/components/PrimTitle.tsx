@@ -1,5 +1,5 @@
 import Link from "next/link"
-import { OpinionatedLight } from "./LightsState"
+import { OpinionatedLight } from "@/components/LightsState"
 
 interface Props {
 	state: "enter" | "exit"

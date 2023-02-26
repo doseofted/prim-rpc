@@ -1,8 +1,9 @@
+/* eslint-disable @typescript-eslint/no-unsafe-return, @typescript-eslint/no-unsafe-argument */
+/* eslint-disable @typescript-eslint/no-unsafe-member-access, @typescript-eslint/no-unsafe-assignment */
 import { random } from "lodash-es"
 import { useEffect, useMemo, useState } from "react"
-// eslint-disable-next-line @typescript-eslint/no-unused-vars
-import { useInterval, useToggle } from "react-use"
-import { Light, LightOptions } from "./Lights"
+import { useToggle } from "react-use"
+import { Light, LightOptions } from "@/components/Lights"
 
 type PossibleStates = "enter" | "exit"
 interface LightStateProps extends React.HTMLAttributes<HTMLDivElement> {

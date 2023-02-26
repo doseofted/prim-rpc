@@ -1,11 +1,11 @@
 import { Dialog } from "@headlessui/react"
 import { Icon } from "@iconify/react"
 import { useState } from "react"
-import { Alert } from "./Alert"
-import { DocsTableOfContents } from "./DocsToc"
-import { IntroText } from "./IntroText"
-import { Modal } from "./Modal"
-import { Title } from "./Title"
+import { Alert } from "@/components/Alert"
+import { DocsTableOfContents } from "@/components/DocsToc"
+import { IntroText } from "@/components/IntroText"
+import { Modal } from "@/components/Modal"
+import { Title } from "@/components/Title"
 
 export interface DocsMeta {
 	title?: string

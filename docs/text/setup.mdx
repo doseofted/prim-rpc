@@ -373,9 +373,10 @@ Now let's go ahead and make a remote function call!
 ```ts client.ts mark=10
 import { createPrimClient } from "@doseofted/prim-rpc"
 import { createMethodPlugin } from "@doseofted/prim-rpc-plugins/browser"
+import type { module } from "./server"
 
 const endpoint = "http://localhost:3001/prim"
-const prim = createPrimClient({
+const prim = createPrimClient<typeof module>({
 	endpoint,
 	methodPlugin: createMethodPlugin(),
 })
@@ -517,9 +518,10 @@ connections on the client. We'll use
 ```ts client.ts mark=2,8
 import { createPrimClient } from "@doseofted/prim-rpc"
 import { createMethodPlugin, createCallbackPlugin } from "@doseofted/prim-rpc-plugins/browser"
+import type { module } from "./server"
 
 const endpoint = "http://localhost:3001/prim"
-const prim = createPrimClient({
+const prim = createPrimClient<typeof module>({
 	endpoint,
 	methodPlugin: createMethodPlugin(),
 	callbackPlugin: createCallbackPlugin(),
