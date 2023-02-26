@@ -16,7 +16,7 @@ export function Navigation(props: NavigationProps) {
 	]
 	const socials = [
 		{ name: "Twitter", link: "https://twitter.com/doseofted", icon: "simple-icons:twitter" },
-		{ name: "GitHub", link: "https://github.com/doseofted/prim-rpc", icon: "simple-icons:github" },
+		{ name: "GitHub", link: "https://github.com/doseofted", icon: "simple-icons:github" },
 	]
 	const { ...attrs } = props
 	const state = "enter"
@@ -56,12 +56,13 @@ export function Navigation(props: NavigationProps) {
 						className="hidden lg:flex group font-semibold uppercase text-sm h-full px-4 p-4 justify-center items-center rounded-b-2xl transition-all duration-300
 								bg-transparent hover:bg-white transform scale-100 hover:scale-110"
 						href="https://doseofted.com/"
-						target="_blank">
+						target="_blank"
+						title="Dose of Ted">
 						<div className="pointer-events-none w-full h-[100svh] transition-all duration-300 bg-transparent group-hover:bg-white absolute top-0 transform -translate-y-full" />
 						<Image
 							src="/prim-nav-doseofted-attribution.png"
-							width={547}
-							height={96}
+							width={120}
+							height={120}
 							alt="Dose of Ted"
 							className="w-auto max-h-6"
 						/>
@@ -75,7 +76,8 @@ export function Navigation(props: NavigationProps) {
 						transition-all duration-300
 						bg-transparent hover:bg-white transform scale-100 hover:scale-110"
 						href={link}
-						target="_blank">
+						target="_blank"
+						title={name}>
 						<div className="pointer-events-none w-full h-[100svh] transition-all duration-300 bg-transparent group-hover:bg-white absolute top-0 transform -translate-y-full" />
 						<span className="transition-all duration-300 transform">
 							<Icon className="w-6 h-6" icon={icon} />
@@ -107,32 +109,35 @@ export function Navigation(props: NavigationProps) {
 										<span className="transition-all duration-300 transform">{name}</span>
 									</Link>
 								))}
+								{showAttributionInNavigation && (
+									<Link
+										onClick={clickHandler}
+										className="flex justify-start items-center gap-4 w-full font-semibold uppercase text-sm h-full px-6 p-4 rounded-2xl transition-all duration-300 bg-transparent hover:bg-white transform scale-100 hover:scale-105"
+										href="https://doseofted.com/"
+										target="_blank"
+										title="Dose of Ted">
+										<Image
+											src="/prim-nav-doseofted-attribution.png"
+											width={120}
+											height={120}
+											alt="Dose of Ted"
+											className="w-auto max-h-6"
+										/>
+										<span className="transition-all duration-300 transform">Dose of Ted</span>
+									</Link>
+								)}
 								{socials.map(({ name, link, icon }, i) => (
 									<Link
 										key={i}
 										onClick={clickHandler}
 										className="flex justify-start items-center gap-4 w-full font-semibold uppercase text-sm h-full px-6 p-4 rounded-2xl transition-all duration-300 bg-transparent hover:bg-white transform scale-100 hover:scale-105"
 										href={link}
-										target="_blank">
+										target="_blank"
+										title={name}>
 										<Icon className="w-6 h-6" icon={icon} />
 										<span className="transition-all duration-300 transform">{name}</span>
 									</Link>
 								))}
-								{showAttributionInNavigation && (
-									<Link
-										onClick={clickHandler}
-										className="flex justify-start items-center gap-4 w-full font-semibold uppercase text-sm h-full px-6 p-4 rounded-2xl transition-all duration-300 bg-transparent hover:bg-white transform scale-100 hover:scale-105"
-										href="https://doseofted.com/"
-										target="_blank">
-										<Image
-											src="/prim-nav-doseofted-attribution.png"
-											width={370}
-											height={150}
-											alt="Dose of Ted"
-											className="w-auto max-h-12"
-										/>
-									</Link>
-								)}
 							</div>
 						</Dialog.Panel>
 					</div>
