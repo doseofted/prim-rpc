@@ -1,5 +1,5 @@
 pipeline:
-  npm:preview: &preview
+  npm:preview:
     image: node:19.6-bullseye
     environment:
       NODE_ENV: "production"
@@ -14,13 +14,6 @@ pipeline:
       branch:
         - release/*
 
-  npm:build:
-    <<: *preview
-    when:
-      event:
-        - tag
-      tag: v*
-
   npm:official:
     image: node:19.6-bullseye
     secrets: [npm_api_token, github_api_token]
@@ -28,6 +21,10 @@ pipeline:
       NODE_ENV: "production"
     commands:
       - corepack enable
+      # NOTE: the next few steps are copied from `npm:preview` step above because Woodpecker is skipping steps when multiple tag conditions are added
+      - NODE_ENV="" pnpm install --frozen-lockfile
+      - pnpm task dev:build
+      - pnpm task dev:test
       # - pnpm task dev:changeset:status
       # NOTE: if an .nprmc file is added to project in the future, this will need to be considered (instead of deleted)
       # Publish to NPM
