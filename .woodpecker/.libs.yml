@@ -8,7 +8,7 @@ pipeline:
       event:
         - push
       branch:
-        - develop
+        - main
         - feature/*
       path:
         - "libs/**/*"
