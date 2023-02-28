@@ -1,3 +1,7 @@
+// Part of the Prim+RPC project ( https://prim.doseofted.com/ )
+// Copyright 2023 Ted Klingenberg
+// SPDX-License-Identifier: Apache-2.0
+
 import type { PrimServerMethodHandler, PrimServerEvents } from "@doseofted/prim-rpc"
 import type { FastifyPluginAsync, FastifyInstance, FastifyError, FastifyRequest, FastifyReply } from "fastify"
 import type FastifyMultipartPlugin from "@fastify/multipart"

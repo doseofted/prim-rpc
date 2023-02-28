@@ -2,7 +2,7 @@
 	"name": "@doseofted/prim-example",
 	"version": "0.0.0",
 	"description": "Example module exporting functions that can be used with Prim+RPC.",
-	"license": "UNLICENSED",
+	"license": "MIT",
 	"private": true,
 	"author": {
 		"name": "Ted Klingenberg",

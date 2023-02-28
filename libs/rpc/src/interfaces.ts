@@ -1,3 +1,7 @@
+// Part of the Prim+RPC project ( https://prim.doseofted.com/ )
+// Copyright 2023 Ted Klingenberg
+// SPDX-License-Identifier: Apache-2.0
+
 import type { Emitter } from "mitt"
 import type { Schema } from "type-fest"
 import type { Asyncify } from "type-fest"

@@ -25,7 +25,7 @@ reserve all right, title, and interest in and to Your Contributions.
 2. **Grant of Copyright License.** Subject to the terms and conditions of this Agreement, You hereby grant to {owner}
    and to recipients of software distributed by {owner} a perpetual, worldwide, non-exclusive, no-charge, royalty-free,
    irrevocable copyright license to reproduce, prepare derivative works of, publicly display, publicly perform,
-   sublicense, transfer, and distribute Your Contributions and such derivative works.
+   sublicense, and distribute Your Contributions and such derivative works.
 
 3. **Grant of Patent License.** Subject to the terms and conditions of this Agreement, You hereby grant to {owner} and
    to recipients of software distributed by {owner} a perpetual, worldwide, non-exclusive, no-charge, royalty-free,

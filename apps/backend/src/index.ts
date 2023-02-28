@@ -8,6 +8,11 @@ import { createMethodHandler } from "@doseofted/prim-rpc-plugins/fastify"
 import { createCallbackHandler } from "@doseofted/prim-rpc-plugins/ws"
 import * as module from "@doseofted/prim-example"
 
+const { sayHello } = module
+// if server is hosted publicly / in production, limit the functions that are allowed to run
+// (since example module's purpose is just for testing)
+const filteredModule = process.env.NODE_ENV === "development" ? module : { sayHello }
+
 /** Flag to determine if project is running locally or in a container */
 const contained = JSON.parse(process.env.CONTAINED ?? "false") === true
 
@@ -26,7 +31,7 @@ const callbackHandler = createCallbackHandler({ wss })
 createPrimServer({
 	prefix: "/prim",
 	jsonHandler,
-	module,
+	module: filteredModule,
 	methodHandler,
 	// eslint-disable-next-line @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-unsafe-call
 	callbackHandler,

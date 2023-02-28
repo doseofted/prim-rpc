@@ -1,3 +1,7 @@
+// Part of the Prim+RPC project ( https://prim.doseofted.com/ )
+// Copyright 2023 Ted Klingenberg
+// SPDX-License-Identifier: Apache-2.0
+
 /**
  * Prim-RPC is intended to allow me to write plain functions on the server and
  * then make those same function calls on the client as if they were written

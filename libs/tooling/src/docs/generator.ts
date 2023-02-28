@@ -1,3 +1,7 @@
+// Part of the Prim+RPC project ( https://prim.doseofted.com/ )
+// Copyright 2023 Ted Klingenberg
+// SPDX-License-Identifier: Apache-2.0
+
 import type { JSONOutput } from "typedoc"
 import type { SetOptional } from "type-fest"
 import { /* get as getProperty, */ set as setProperty } from "lodash-es"

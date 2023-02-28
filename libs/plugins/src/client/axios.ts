@@ -1,3 +1,7 @@
+// Part of the Prim+RPC project ( https://prim.doseofted.com/ )
+// Copyright 2023 Ted Klingenberg
+// SPDX-License-Identifier: Apache-2.0
+
 import type { PrimClientMethodPlugin, RpcAnswer } from "@doseofted/prim-rpc"
 import type { AxiosInstance } from "axios"
 

@@ -1,3 +1,7 @@
+// Part of the Prim+RPC project ( https://prim.doseofted.com/ )
+// Copyright 2023 Ted Klingenberg
+// SPDX-License-Identifier: Apache-2.0
+
 import * as example from "@doseofted/prim-example"
 import exampleDocs from "@doseofted/prim-example/dist/docs.json"
 import { test, expect } from "vitest"

@@ -2,7 +2,7 @@
 	"name": "@doseofted/prim-rpc-plugins",
 	"version": "0.0.0",
 	"description": "Prim+RPC plugins/handlers for popular frameworks both server and client side.",
-	"license": "UNLICENSED",
+	"license": "Apache-2.0",
 	"author": {
 		"name": "Ted Klingenberg",
 		"email": "ted@doseofted.com",
@@ -127,7 +127,8 @@
 		}
 	},
 	"files": [
-		"dist"
+		"dist",
+		"NOTICE.md"
 	],
 	"dependencies": {
 		"mitt": "^3.0.0",

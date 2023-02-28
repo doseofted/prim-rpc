@@ -1,3 +1,7 @@
+// Part of the Prim+RPC project ( https://prim.doseofted.com/ )
+// Copyright 2023 Ted Klingenberg
+// SPDX-License-Identifier: Apache-2.0
+
 export { createPrimClient } from "./client"
 export { createPrimServer } from "./server"
 export * as testing from "./testing"
