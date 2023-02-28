@@ -53,7 +53,7 @@ pipeline:
       tag: ["v${CI_COMMIT_BRANCH##release/}-staging", "staging"]
     when: &when-staging
       event: [push]
-      branch: release/*
+      branch: [main, release/*]
 
   backend:build:production:
     image: *build-image
