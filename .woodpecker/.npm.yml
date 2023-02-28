@@ -1,5 +1,5 @@
 pipeline:
-  npm:preview:
+  npm:preview: &preview
     image: node:19.6-bullseye
     environment:
       NODE_ENV: "production"
@@ -11,10 +11,15 @@ pipeline:
     when:
       event:
         - push
-        - tag
-      tag: v*
       branch:
         - release/*
+
+  npm:build:
+    <<: *preview
+    when:
+      event:
+        - tag
+      tag: v*
 
   npm:official:
     image: node:19.6-bullseye
