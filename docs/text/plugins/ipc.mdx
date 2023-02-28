@@ -1,0 +1,111 @@
+{/* SECTION: setup */}
+
+import { LayoutDocs } from "@/components/LayoutDocs"
+import { Alert } from "@/components/Alert"
+export const meta = {
+	title: "IPC Plugins and Handlers",
+}
+export default ({ children }) => <LayoutDocs meta={meta}>{children}</LayoutDocs>
+
+{/* !SECTION setup */}
+
+# {meta.title}
+
+These are the currently supported plugins and handlers for Prim+RPC. This guide is slightly different from
+[Client Plugins](/docs/plugins/client) and [Server Plugins](/docs/plugins/server) in that the client and server may be
+on the same machine. For each framework below, all of the possible plugins for that framework will be given.
+
+## Table of Contents
+
+## Web Workers
+
+| For                                                                                 | Plugin Type                        | Transport Type |
+| ----------------------------------------------------------------------------------- | ---------------------------------- | -------------- |
+| [Web Workers API](https://developer.mozilla.org/en-US/docs/Web/API/Web_Workers_API) | Method and callback plugin/handler | Web Worker     |
+
+You can communicate between a Web Worker and the main thread in either direction (or both) like so:
+
+<CH.Code>
+
+```typescript worker.ts
+import { createPrimServer } from "@doseofted/prim-rpc"
+import { createMethodHandler, createCallbackHandler } from "@doseofted/prim-rpc-plugins/web-worker"
+
+const { methodHandler, jsonHandler } = createMethodHandler({ worker: self })
+const { callbackHandler } = createCallbackHandler({ worker: self })
+
+createPrimServer({ methodHandler, callbackHandler, jsonHandler })
+```
+
+---
+
+```typescript index.ts
+import { createPrimClient } from "@doseofted/prim-rpc"
+import { createMethodPlugin, createCallbackPlugin } from "@doseofted/prim-rpc-plugins/web-worker"
+
+const worker = new Worker(new URL("./worker", import.meta.url), { type: "module" })
+
+const { methodPlugin, jsonHandler } = createMethodPlugin({ worker })
+const { callbackPlugin } = createCallbackPlugin({ worker })
+
+const client = createPrimClient({ methodPlugin, callbackPlugin, jsonHandler })
+```
+
+</CH.Code>
+
+Note that all plugins return a `jsonHandler` result and that they are all exactly the same. This is just a helper
+utility that will disable JSON handling. JSON handling should be disabled because Web Workers will use
+[structured cloning](https://developer.mozilla.org/en-US/docs/Web/API/Web_Workers_API/Structured_clone_algorithm)
+instead which is far more powerful. Of course, you can always override the JSON handler to anything that you'd like if
+you can forgo structured cloning.
+
+<Alert prose icon="carbon:warning" type="alert-warning">
+
+This plugin currently does not yet support other types of worker like
+[Shared Workers](https://developer.mozilla.org/en-US/docs/Web/API/SharedWorker) or
+[Service Workers](https://developer.mozilla.org/en-US/docs/Web/API/ServiceWorker).
+
+</Alert>
+
+## Vitest / Jest
+
+| For                                                                                                      | Plugin Type                        | Transport Type    |
+| -------------------------------------------------------------------------------------------------------- | ---------------------------------- | ----------------- |
+| Testing ([Vitest](https://github.com/vitest-dev/vitest), [Jest](https://github.com/facebook/jest), etc.) | Method and callback plugin/handler | Local (Same File) |
+
+It's easy to use Prim+RPC in a single file by communicating over a generic event handler. Use like so:
+
+```typescript index.ts
+import { createPrimClient, createPrimServer, testing } from "@doseofted/prim-rpc"
+
+const plugins = testing.createPrimTestingPlugins()
+
+const { callbackHandler, methodHandler } = plugins
+const server = createPrimServer({ callbackHandler, methodHandler })
+
+const { methodPlugin, callbackPlugin } = plugins
+const client = createPrimClient({ callbackPlugin, methodPlugin })
+```
+
+Note that the results of `createPrimTestingPlugins()` must be passed to both the Prim+RPC server and client because they
+are linked during setup.
+
+## Child Process
+
+| For                                               | Plugin Type                        | Transport Type |
+| ------------------------------------------------- | ---------------------------------- | -------------- |
+| [Node](https://nodejs.org/api/child_process.html) | Method and callback plugin/handler | Child Process  |
+
+<Alert icon="carbon:warning" type="alert-warning">
+	Unavailable (planned)
+</Alert>
+
+## Electron
+
+| For                                              | Plugin Type                        | Transport Type |
+| ------------------------------------------------ | ---------------------------------- | -------------- |
+| [Electron](https://github.com/electron/electron) | Method and callback plugin/handler | Electron       |
+
+<Alert icon="carbon:warning" type="alert-warning">
+	Unavailable (planned)
+</Alert>

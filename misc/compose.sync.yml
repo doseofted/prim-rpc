@@ -1,0 +1,25 @@
+version: "3"
+
+services:
+  libraries:
+    volumes:
+      # dist folder of each dependency to sync to other containers
+      &dist-shared
+      - dist-example:/home/node/project/libs/example/dist
+      - dist-plugins:/home/node/project/libs/plugins/dist
+      - dist-rpc:/home/node/project/libs/rpc/dist
+      - dist-ui:/home/node/project/libs/ui/dist
+      - dist-tooling:/home/node/project/libs/tooling/dist
+
+  backend:
+    volumes: *dist-shared
+
+  frontend:
+    volumes: *dist-shared
+
+volumes:
+  dist-example:
+  dist-plugins:
+  dist-rpc:
+  dist-ui:
+  dist-tooling:

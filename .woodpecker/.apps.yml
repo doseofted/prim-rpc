@@ -1,0 +1,77 @@
+# services:
+#   local_registry:
+#     image: registry:2.8
+
+pipeline:
+  apps:base:dev:
+    image: &build-image woodpeckerci/plugin-docker-buildx
+    group: base
+    secrets: &build-secrets
+      - docker_username
+      - docker_password
+    settings: &base-settings
+      context: ./
+      platforms: linux/amd64
+      tag: ["latest"]
+      repo: doseofted/prim-monorepo-build
+      dockerfile: ./Monorepo.base.Dockerfile
+    when: &base-when
+      event: [tag, push]
+      tag: v*
+      branch: release/*
+
+  apps:base:prod:
+    image: *build-image
+    group: base
+    secrets: *build-secrets
+    settings:
+      <<: *base-settings
+      repo: doseofted/prim-monorepo-production
+      dockerfile: ./Monorepo.prod.Dockerfile
+    when: *base-when
+
+  frontend:build:production:
+    image: *build-image
+    group: build
+    secrets: *build-secrets
+    settings: &frontend-settings
+      repo: doseofted/prim-frontend
+      dockerfile: ./apps/frontend/Dockerfile
+      context: ./apps/frontend
+      platforms: linux/amd64
+      tag: ["${CI_COMMIT_TAG}", "latest"]
+    when: &when-production
+      event: [tag]
+      tag: v*
+
+  frontend:build:staging:
+    image: *build-image
+    group: build
+    secrets: *build-secrets
+    settings:
+      <<: *frontend-settings
+      tag: ["v${CI_COMMIT_BRANCH##release/}-staging", "staging"]
+    when: &when-staging
+      event: [push]
+      branch: release/*
+
+  backend:build:production:
+    image: *build-image
+    group: build
+    secrets: *build-secrets
+    settings: &backend-settings
+      repo: doseofted/prim-backend
+      dockerfile: ./apps/backend/Dockerfile
+      context: ./apps/backend
+      platforms: linux/amd64
+      tag: ["${CI_COMMIT_TAG}", "latest"]
+    when: *when-production
+
+  backend:build:staging:
+    image: *build-image
+    group: build
+    secrets: *build-secrets
+    settings:
+      <<: *backend-settings
+      tag: ["v${CI_COMMIT_BRANCH##release/}-staging", "staging"]
+    when: *when-staging

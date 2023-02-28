@@ -1,0 +1,71 @@
+{
+	"name": "@doseofted/prim-rpc-tooling",
+	"version": "0.1.0-alpha.0",
+	"description": "Optional tooling to further enhance Prim+RPC usage.",
+	"license": "Apache-2.0",
+	"author": {
+		"name": "Ted Klingenberg",
+		"email": "ted@doseofted.com",
+		"url": "https://doseofted.com/"
+	},
+	"contributors": [],
+	"repository": {
+		"type": "git",
+		"url": "https://github.com/doseofted/prim-rpc.git",
+		"directory": "libs/tooling"
+	},
+	"homepage": "https://prim.doseofted.com/",
+	"keywords": [
+		"api",
+		"json",
+		"ipc",
+		"rpc"
+	],
+	"bugs": {
+		"url": "https://github.com/doseofted/prim-rpc/issues"
+	},
+	"scripts": {
+		"watch": "tsup --watch --config build.config.js",
+		"build": "tsup --config build.config.js",
+		"check": "tsc --noEmit",
+		"test": "vitest run",
+		"testing": "vitest watch",
+		"lint": "eslint ."
+	},
+	"dependencies": {
+		"lodash-es": "^4.17.21",
+		"unplugin": "^1.0.1",
+		"zx": "^7.1.1"
+	},
+	"devDependencies": {
+		"@doseofted/prim-example": "workspace:*",
+		"@sinclair/typebox": "^0.25.21",
+		"@types/json-schema": "^7.0.11",
+		"@types/lodash": "^4.14.191",
+		"@types/lodash-es": "^4.17.6",
+		"lodash": "^4.17.21",
+		"type-fest": "^3.5.5",
+		"typedoc": "^0.23.24",
+		"typescript": "^4.9.5"
+	},
+	"type": "module",
+	"exports": {
+		"./build": "./dist/build/index.js",
+		"./docs": "./dist/docs/index.js",
+		"./package.json": "./package.json"
+	},
+	"typesVersions": {
+		"*": {
+			"build": [
+				"dist/build/index.d.ts"
+			],
+			"docs": [
+				"dist/docs/index.d.ts"
+			]
+		}
+	},
+	"files": [
+		"dist",
+		"NOTICE.md"
+	]
+}

@@ -1,0 +1,87 @@
+{/* SECTION: setup */}
+
+import { LayoutDocs } from "@/components/LayoutDocs"
+import { Alert } from "@/components/Alert"
+export const meta = {
+	title: "Client Plugins",
+}
+export default ({ children }) => <LayoutDocs meta={meta}>{children}</LayoutDocs>
+
+{/* !SECTION setup */}
+
+# {meta.title}
+
+These are the currently supported plugins for Prim+RPC. For each Prim+RPC client instance you may choose one method
+plugin and one callback plugin (see **Plugin Type** in tables below). Remember that for each _plugin_ on the client you
+must also specify a [compatible _handler_ on the server](/docs/plugins/server). For plugins/handlers to be compatible
+they must use the same type of transport (given in **Transport Type** in tables below).
+
+## Table of Contents
+
+## Fetch API (Browser)
+
+| For                                                                     | Plugin Type   | Transport Type |
+| ----------------------------------------------------------------------- | ------------- | -------------- |
+| [Fetch API](https://developer.mozilla.org/en-US/docs/Web/API/Fetch_API) | Method plugin | HTTP           |
+
+You can use the Fetch API to send Prim+RPC requests (method calls) like so:
+
+```typescript
+import { createPrimClient } from "@doseofted/prim-rpc"
+import { createMethodPlugin } from "@doseofted/prim-rpc-plugins/browser-fetch"
+
+const methodPlugin = createMethodPlugin()
+const client = createPrimClient({ methodPlugin })
+```
+
+Remember to set the [`.endpoint`](/docs/reference/configuration#endpoint) so the plugin knows where the server is
+located.
+
+## WebSocket API (Browser)
+
+| For                                                                              | Plugin Type     | Transport Type |
+| -------------------------------------------------------------------------------- | --------------- | -------------- |
+| [WebSocket API](https://developer.mozilla.org/en-US/docs/Web/API/WebSockets_API) | Callback plugin | WebSocket      |
+
+You can use the WebSocket API to send Prim+RPC requests (method calls with callbacks) like so:
+
+```typescript
+import { createPrimClient } from "@doseofted/prim-rpc"
+import { createCallbackPlugin } from "@doseofted/prim-rpc-plugins/browser-websocket"
+
+const callbackPlugin = createCallbackPlugin()
+const client = createPrimClient({ callbackPlugin })
+```
+
+Remember to set the [`.wsEndpoint`](/docs/reference/configuration#wsendpoint) so the plugin knows where the server is
+located.
+
+## Axios
+
+| For                                     | Plugin Type   | Transport Type |
+| --------------------------------------- | ------------- | -------------- |
+| [Axios](https://github.com/axios/axios) | Method plugin | HTTP           |
+
+<Alert icon="carbon:warning" type="alert-warning">
+	Unavailable (planned)
+</Alert>
+
+## Socket.io
+
+| For                                                | Plugin Type   | Transport Type |
+| -------------------------------------------------- | ------------- | -------------- |
+| [Socket.io](https://github.com/socketio/socket.io) | Method plugin | Socket.io      |
+
+<Alert icon="carbon:warning" type="alert-warning">
+	Unavailable (planned)
+</Alert>
+
+## Capacitor HTTP
+
+| For                                                      | Plugin Type   | Transport Type |
+| -------------------------------------------------------- | ------------- | -------------- |
+| [Capacitor HTTP](https://capacitorjs.com/docs/apis/http) | Method plugin | HTTP           |
+
+<Alert icon="carbon:warning" type="alert-warning">
+	Unavailable (planned)
+</Alert>

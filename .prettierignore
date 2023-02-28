@@ -1,0 +1,12 @@
+# Defaults
+**/.git
+**/.svn
+**/.hg
+**/node_modules
+# Project-specific
+**/dist
+**/.task
+**/.turbo
+/data
+pnpm-*.yaml
+pnpm-*.yml

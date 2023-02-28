@@ -1,0 +1,41 @@
+pipeline:
+  npm:preview:
+    image: node:19.6-bullseye
+    environment:
+      NODE_ENV: "production"
+    commands:
+      - corepack enable
+      - NODE_ENV="" pnpm install --frozen-lockfile
+      - pnpm task dev:build
+      - pnpm task dev:test
+    when:
+      event:
+        - push
+        - tag
+      tag: v*
+      branch:
+        - release/*
+
+  npm:official:
+    image: node:19.6-bullseye
+    secrets: [npm_api_token, github_api_token]
+    environment:
+      NODE_ENV: "production"
+    commands:
+      - corepack enable
+      # - pnpm task dev:changeset:status
+      # NOTE: if an .nprmc file is added to project in the future, this will need to be considered (instead of deleted)
+      # Publish to NPM
+      - echo '@doseofted:registry=https://registry.npmjs.org' >> $HOME/.npmrc
+      - echo '//registry.npmjs.org/:_authToken=$${NPM_API_TOKEN}' >> $HOME/.npmrc
+      - pnpm task dev:changeset:publish
+      - rm $HOME/.npmrc
+      # Publish to GitHub Packages
+      # - echo '@doseofted:registry=https://npm.pkg.github.com' >> $HOME/.npmrc
+      # - echo '//npm.pkg.github.com/:_authToken=$${GITHUB_API_TOKEN}' >> $HOME/.npmrc
+      # - pnpm task dev:changeset:publish
+      # - rm $HOME/.npmrc
+    when:
+      event:
+        - tag
+      tag: v*

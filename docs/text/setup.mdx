@@ -1,0 +1,553 @@
+{/* SECTION: setup */}
+
+import { LayoutDocs } from "@/components/LayoutDocs"
+import { Alert } from "@/components/Alert"
+import { Tab } from "@headlessui/react"
+export const meta = {
+	title: "Setup",
+}
+export default ({ children }) => <LayoutDocs meta={meta}>{children}</LayoutDocs>
+
+{/* !SECTION setup */}
+
+# {meta.title}
+
+<Alert prose icon="carbon:information">
+
+This guide shows you how to fully set up a project from scratch and teaches you how Prim+RPC works.
+
+If you'd like to quickly get started using Prim+RPC in a pre-configured project, you may reference
+[the available examples](/docs/examples) on this website to act as a starting point.
+
+</Alert>
+
+In this guide, we'll learn how to set up a project to use Prim+RPC. If you don't have an existing project to set up, you
+can easily download an example project to follow along. This example project doesn't yet use Prim+RPC but we'll learn in
+this guide how to do that! The command below will download the example project or you can download the it
+[directly from GitHub](https://github.com/doseofted/prim-rpc-examples/tree/main/starter):
+
+```zsh
+// link[18:1000] https://github.com/doseofted/prim-rpc-examples/tree/main/starter
+npx giget@latest gh:doseofted/prim-rpc-examples/starter
+```
+
+Once you've finished this guide and set up your project, you can [learn how to write functions](/docs/usage) to be
+shared as Prim+RPC.
+
+## Table of Contents
+
+## Installation
+
+We will be setting up Prim+RPC on both the **server** and the **client**.
+
+The server is where your JavaScript functions are located; functions that you'd like to share somewhere else. The client
+will call these JavaScript functions remotely. Typically the server is some HTTP or WebSocket server and the client is a
+web browser or native application that makes requests to this server. In other cases, the server may be running in one
+process while the client is running in a separate process on the same machine. However you're using up Prim+RPC, this
+guide should apply to all relationships between client and server.
+
+The first step to use Prim+RPC will be to add the library to both the server and client portions of your project. If
+your client and server are located in separate projects, you should install the following packages in both:
+
+- **Prim+RPC**: contains both client and server tools for making RPC; framework-agnostic
+- **Prim+RPC Plugins**: framework-specific plugins for Prim+RPC, both client and server side
+
+You may optionally install **Prim+RPC Tooling** for helpful Prim+RPC-related tools. The Tooling package is completely
+optional and includes utilities like a documentation generator as well as a build plugin that prevents the import of a
+function from the server directly (also optional). The Tooling package is included in the install commands below.
+
+Provided are installation commands for common package managers.
+
+<CH.Code>
+
+```zsh npm
+npm add @doseofted/prim-rpc @doseofted/prim-rpc-plugins @doseofted/prim-rpc-tooling
+```
+
+```zsh yarn
+yarn add @doseofted/prim-rpc @doseofted/prim-rpc-plugins @doseofted/prim-rpc-tooling
+```
+
+```zsh pnpm
+pnpm add @doseofted/prim-rpc @doseofted/prim-rpc-plugins @doseofted/prim-rpc-tooling
+```
+
+```zsh bun
+bun add @doseofted/prim-rpc @doseofted/prim-rpc-plugins @doseofted/prim-rpc-tooling
+```
+
+</CH.Code>
+
+You may also use Prim+RPC with Deno or from a CDN:
+
+<CH.Code>
+
+```ts Deno
+import { createPrimServer, createPrimClient } from "npm:@doseofted/prim-rpc"
+// use available export in place of {PLUGIN_NAME} below
+import {
+	createMethodHandler,
+	createCallbackHandler,
+	createMethodPlugin,
+	createCallbackPlugin,
+} from "npm:@doseofted/prim-rpc-plugins/{PLUGIN_NAME}"
+// the following import is only if you're using Prim+RPC tooling
+import "npm:@doseofted/prim-rpc-tooling/{TOOL_NAME}"
+```
+
+```ts esm.sh
+import { createPrimServer, createPrimClient } from "https://esm.sh/@doseofted/prim-rpc"
+// use available export in place of {PLUGIN_NAME} below
+import {
+	createMethodHandler,
+	createCallbackHandler,
+	createMethodPlugin,
+	createCallbackPlugin,
+} from "https://esm.sh/@doseofted/prim-rpc-plugins/{PLUGIN_NAME}"
+// the following import is only if you're using Prim+RPC tooling
+import "https://esm.sh/@doseofted/prim-rpc-tooling/{TOOL_NAME}"
+```
+
+```ts skypack.dev
+import { createPrimServer, createPrimClient } from "https://cdn.skypack.dev/@doseofted/prim-rpc"
+// use available export in place of {PLUGIN_NAME} below
+import {
+	createMethodHandler,
+	createCallbackHandler,
+	createMethodPlugin,
+	createCallbackPlugin,
+} from "https://cdn.skypack.dev/@doseofted/prim-rpc-plugins/{PLUGIN_NAME}"
+// the following import is only if you're using Prim+RPC tooling
+import "https://cdn.skypack.dev/@doseofted/prim-rpc-tooling/{TOOL_NAME}"
+```
+
+```ts unpkg.com
+import { createPrimServer, createPrimClient } from "https://unpkg.com/@doseofted/prim-rpc"
+// use available export in place of {PLUGIN_NAME} below
+import {
+	createMethodHandler,
+	createCallbackHandler,
+	createMethodPlugin,
+	createCallbackPlugin,
+} from "https://unpkg.com/@doseofted/prim-rpc-plugins/{PLUGIN_NAME}"
+// the following import is only if you're using Prim+RPC tooling
+import "https://unpkg.com/@doseofted/prim-rpc-tooling/{TOOL_NAME}"
+```
+
+</CH.Code>
+
+Now you're ready to start setting up the client and the server! We'll start with the server first.
+
+This setup guide will use Prim+RPC plugins for Fastify and WS for demonstration but you may swap these out the framework
+of your choice. Find available [plugins for the server](/docs/plugins/server),
+[plugins for the client](/docs/plugins/client), and [plugins for process communication](/docs/plugins/ipc).
+
+## Server Setup
+
+The Prim+RPC server hosts your JavaScript functions and makes them available to the Prim+RPC client. You can write
+regular JavaScript functions and then pass them to Prim+RPC to make them available to the server.
+
+The first step is to write a JavaScript function that we want to call from the client. Let's use the example from the
+homepage:
+
+```typescript server.ts
+/** This function just says hello. */
+export function sayHello(x: string, y: string) {
+	return `${x}, meet ${y}.`
+}
+
+const result = sayHello("Frontend", "Backend") // result === "Frontend, meet Backend."
+```
+
+The next step will be to give this function to the Prim+RPC server:
+
+```ts server.ts mark=1,7,9:10
+import { createPrimServer } from "@doseofted/prim-rpc"
+
+/** This function just says hello. */
+export function sayHello(x: string, y: string) {
+	return `${x}, meet ${y}.`
+}
+sayHello.rpc = true
+
+const module = { sayHello }
+createPrimServer({ module })
+```
+
+We've now configured the Prim+RPC server with our function by providing the
+[`.module` option](/docs/reference/configuration#module). Notice that we added a property `.rpc` with a value of `true`
+to the function. This will signal to Prim+RPC that it's allowed to call this function. This is valid JavaScript since
+functions in JavaScript are Objects and can have additional properties.
+
+<Alert prose icon="carbon:information">
+
+If you can't add the the `.rpc` property (maybe the
+[function is frozen](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Object/freeze))
+then you can also specify that it's allowed to be called by using the
+[`.allowList`](/docs/reference/configuration#allowlist) option on the Prim+RPC server.
+
+</Alert>
+
+This Prim+RPC server doesn't do much by itself. In order to communicate with a remote Prim+RPC client, we must define
+some method of transport. This is accomplished by using Prim+RPC's server-side "handler" plugins. There are
+[many handlers available](/docs/plugins/server) for your server. For this example, we'll use a handler for Fastify (an
+HTTP server framework) but you can choose the handler for your own server framework. First, let's set up a basic Fastify
+server:
+
+```ts server.ts mark=2,4,15
+import { createPrimServer } from "@doseofted/prim-rpc"
+import Fastify from "fastify"
+
+const fastify = Fastify()
+
+/** This function just says hello. */
+export function sayHello(x: string, y: string) {
+	return `${x}, meet ${y}.`
+}
+sayHello.rpc = true
+
+const module = { sayHello }
+createPrimServer({ module })
+
+await fastify.listen({ port: 3001 })
+```
+
+Now we can set up the [Fastify-specific "method handler" plugin](/docs/plugins/server#fastify) which will handle method
+calls (so we can call the `sayHello()` method on the Prim+RPC client).
+
+```ts server.ts mark=3,16
+import { createPrimServer } from "@doseofted/prim-rpc"
+import Fastify from "fastify"
+import { createMethodHandler } from "@doseofted/prim-rpc-plugins/fastify"
+
+const fastify = Fastify()
+
+/** This function just says hello. */
+export function sayHello(x: string, y: string) {
+	return `${x}, meet ${y}.`
+}
+sayHello.rpc = true
+
+const module = { sayHello }
+createPrimServer({
+	module,
+	methodHandler: createMethodHandler({ fastify }),
+})
+
+await fastify.listen({ port: 3001 })
+```
+
+Now we can call our `sayHello()` function from the client using the Fastify server that we set up. Note that this server
+is running at `http://localhost:3001/prim` because we'll use this location in the Prim+RPC client next. Note that if you
+want to change the default `/prim` path, you can always set the
+[`.prefix` option](/docs/reference/configuration#prefix).
+
+<Alert prose icon="carbon:information">
+
+Prim+RPC works with the server of your choice through the use of handler plugins.
+
+The **method handler** is used to resolve method calls in Prim+RPC (but can't resolve callbacks on a method).
+
+The **callback handler** is optional and can be used both to resolve methods but also to resolve callbacks given on a
+method. You can use both a method and callback handler with Prim+RPC at the same time or use one of them at a time (your
+choice).
+
+</Alert>
+
+As a last step, we'll export the types of our `module` so that we can utilize them from the Prim+RPC client.
+
+```ts server.ts mark=21
+import { createPrimServer } from "@doseofted/prim-rpc"
+import Fastify from "fastify"
+import { createMethodHandler } from "@doseofted/prim-rpc-plugins/fastify"
+
+const fastify = Fastify()
+
+/** This function just says hello. */
+export function sayHello(x: string, y: string) {
+	return `${x}, meet ${y}.`
+}
+sayHello.rpc = true
+
+const module = { sayHello }
+createPrimServer({
+	module,
+	methodHandler: createMethodHandler({ fastify }),
+})
+
+await fastify.listen({ port: 3001 })
+
+export type { module }
+```
+
+Note that we're only exporting the TypeScript types and not the function itself. This step is not required to use
+Prim+RPC but can be incredibly useful if you'd like to have typed function calls on the Prim+RPC client.
+
+Now we're ready to move on and set up the client!
+
+## Client Setup
+
+The Prim+RPC client communicates with the Prim+RPC server. You simply call your JavaScript function on the client, as if
+it exists on the client (but it's actually on the server), and get a result back. The client intercepts the function
+call and sends that to the Prim+RPC server. Once a response is received from the server, the client receives this result
+and hands it back to the function that you called.
+
+Let's set up a Prim+RPC client. From the [Server Setup](#server-setup) section we know that our server is running at
+`http://localhost:3001/prim` so let's pass that address to Prim+RPC like so:
+
+```ts client.ts
+import { createPrimClient } from "@doseofted/prim-rpc"
+
+const endpoint = "http://localhost:3001/prim"
+const prim = createPrimClient({ endpoint })
+```
+
+Like the Prim+RPC server, this doesn't do much by itself. In order to communicate with the Prim+RPC server, we define
+some sort of transport. This is accomplished with a client-side plugin. There are
+[many plugins available](/docs/plugins/client) for your client. For this example, we'll use a
+[plugin for the Fetch API](/docs/plugins/client#fetch-api-browser) since it's built into the web browser.
+
+```ts client.ts mark=2,7
+import { createPrimClient } from "@doseofted/prim-rpc"
+import { createMethodPlugin } from "@doseofted/prim-rpc-plugins/browser"
+
+const endpoint = "http://localhost:3001/prim"
+const prim = createPrimClient({
+	endpoint,
+	methodPlugin: createMethodPlugin(),
+})
+```
+
+We've now set up a "method plugin" that will be used to send method calls to the server of our choice. In this case, it
+is Fastify which is available at the address configured with the `.endpoint` option.
+
+It is important to use a compatible plugin and handler. For instance, since we use a server-side handler that accepts
+HTTP requests, we need to use a client-side plugin that can send HTTP requests.
+
+<Alert prose icon="carbon:information">
+
+The Prim+RPC client communicates with your server through the use of plugins.
+
+The **method plugin** receives a function call from the client, sends and receives results from the server which are
+given back to the Prim+RPC client. The method _plugin_ communicates with the method _handler_ defined on the Prim+RPC
+server.
+
+The **callback plugin** is optional. It receives a function call from the client when a callback is given, sends it to
+the server, and awaits multiple results from the server. As these results are received, they are given back to the
+Prim+RPC client. The callback _plugin_ communicates with the callback _handler_ defined on the Prim+RPC server.
+
+</Alert>
+
+We can actually use the client right now! However if you're using TypeScript then you'll notice that we don't yet have
+type definitions. Let's add them now. The TypeScript definitions that we exported from the server can be imported in the
+client and passed as a generic argument, like so:
+
+```ts client.ts mark=3,6
+import { createPrimClient } from "@doseofted/prim-rpc"
+import { createMethodPlugin } from "@doseofted/prim-rpc-plugins/browser"
+import type { module } from "./server"
+
+const endpoint = "http://localhost:3001/prim"
+const prim = createPrimClient<typeof module>({
+	endpoint,
+	methodPlugin: createMethodPlugin(),
+})
+```
+
+<Alert prose icon="carbon:information">
+
+In this example, we're importing types from a folder named `./server` collocated with the client. If your project is set
+up using a monolithic repository (monorepo), you may import the package containing the server types. If the server is
+located in a completely separate repository, you may publish the types of the server to a registry, e.g. NPM or
+Verdaccio, and then import from that package (this package could be either public or private and only needs to export
+the types, not code).
+
+</Alert>
+
+If importing types makes you uneasy, you may use the
+[(optional) build plugin](/docs/reference/tooling#prevent-import-utility) to ensure that code is never imported
+accidentally. This is usually unnecessary but is available if needed.
+
+Now let's go ahead and make a remote function call!
+
+```ts client.ts mark=10
+import { createPrimClient } from "@doseofted/prim-rpc"
+import { createMethodPlugin } from "@doseofted/prim-rpc-plugins/browser"
+import type { module } from "./server"
+
+const endpoint = "http://localhost:3001/prim"
+const prim = createPrimClient<typeof module>({
+	endpoint,
+	methodPlugin: createMethodPlugin(),
+})
+
+const result = await prim.sayHello("Frontend", "Backend") // result === "Frontend, meet Backend."
+```
+
+Note that we must await the result of the function even though the function does not return a Promise on the server.
+This is because the function doesn't actually exist on the client and is retrieved remotely from the server. Just like
+we must await a Fetch API call, we must also await all functions defined on the Prim+RPC client since the result is
+fetched.
+
+We're now able to make method calls to the server as if they exist on the client!
+
+There's one more optional step that you can complete. If you'd like to support callbacks on a method you define on the
+server, you'll need to set up a callback handler on the server and a callback plugin on the client. If you don't use
+callback then this isn't necessary. If you would like to set this up, follow along in the next step!
+
+Otherwise, you're now ready to [learn how to further use Prim+RPC](/docs/usage). You can also customize the Prim+RPC
+client and server by following the [configuration reference](/docs/reference/configuration).
+
+## Use Callbacks
+
+Utilizing callbacks on a method used with Prim+RPC is optional but a requires a special handler on the server and a
+plugin on the client. Follow the [Server Setup](#server-setup) and [Client Setup](#client-setup) guides first before
+completing this section.
+
+Callbacks in Prim+RPC are handled by creating a persistent connection from the client to the server. As callbacks are
+called on the server, arguments are passed to the client over this connection. In order to support this feature, it's
+not enough to use an HTTP server like Fastify where each request is followed by a single response. We need to use a
+server that supports multiple responses over time, like a WebSocket server would provide.
+
+So let's set up a WebSocket server first. We can easily do this like so (using the
+[ws](https://github.com/websockets/ws) package):
+
+```ts server.ts mark=4,7
+import { createPrimServer } from "@doseofted/prim-rpc"
+import Fastify from "fastify"
+import { createMethodHandler } from "@doseofted/prim-rpc-plugins/fastify"
+import { WebSocketServer } from "ws"
+
+const fastify = Fastify()
+const wss = new WebSocketServer({ server: fastify.server })
+
+/** This function just says hello. */
+export function sayHello(x: string, y: string) {
+	return `${x}, meet ${y}.`
+}
+sayHello.rpc = true
+
+const module = { sayHello }
+createPrimServer({
+	module,
+	methodHandler: createMethodHandler({ fastify }),
+})
+
+await fastify.listen({ port: 3001 })
+
+export type { module }
+```
+
+Now our WebSocket server is available! We'll register this with the Prim+RPC server by
+[providing a callback handler](/docs/plugins/server#ws).
+
+```ts server.ts mark=4,20
+import { createPrimServer } from "@doseofted/prim-rpc"
+import Fastify from "fastify"
+import { createMethodHandler } from "@doseofted/prim-rpc-plugins/fastify"
+import { createCallbackHandler } from "@doseofted/prim-rpc-plugins/ws"
+import { WebSocketServer } from "ws"
+
+const fastify = Fastify()
+const wss = new WebSocketServer({ server: fastify.server })
+
+/** This function just says hello. */
+export function sayHello(x: string, y: string) {
+	return `${x}, meet ${y}.`
+}
+sayHello.rpc = true
+
+const module = { sayHello }
+createPrimServer({
+	module,
+	methodHandler: createMethodHandler({ fastify }),
+	callbackHandler: createCallbackHandler({ wss }),
+})
+
+await fastify.listen({ port: 3001 })
+
+export type { module }
+```
+
+Of course, this callback handler is only useful if we have a callback that we want to use. Let's add a new method on the
+server that has a callback:
+
+```ts server.ts mark=16:23,25
+import { createPrimServer } from "@doseofted/prim-rpc"
+import Fastify from "fastify"
+import { createMethodHandler } from "@doseofted/prim-rpc-plugins/fastify"
+import { createCallbackHandler } from "@doseofted/prim-rpc-plugins/ws"
+import { WebSocketServer } from "ws"
+
+const fastify = Fastify()
+const wss = new WebSocketServer({ server: fastify.server })
+
+/** This function just says hello. */
+export function sayHello(x: string, y: string) {
+	return `${x}, meet ${y}.`
+}
+sayHello.rpc = true
+
+/** This function takes a message and types each letter. */
+export function typeMessage(message: string, typeLetter: (typed: string) => void, speed = 300) {
+	let timeout = 0
+	message.split("").forEach(letter => {
+		setTimeout(() => typeLetter(letter), ++timeout * speed)
+	})
+}
+typeMessage.rpc = true
+
+const module = { sayHello, typeMessage }
+createPrimServer({
+	module,
+	methodHandler: createMethodHandler({ fastify }),
+	callbackHandler: createCallbackHandler({ wss }),
+})
+
+await fastify.listen({ port: 3001 })
+
+export type { module }
+```
+
+Perfect! Now we can set up the client.
+
+Since we're using a WebSocket server as a callback handler, we'll need callback plugin that supports WebSocket
+connections on the client. We'll use
+[Prim+RPC's callback plugin for the browser](/docs/plugins/client#websocket-api-browser) which uses the WebSocket API.
+
+```ts client.ts mark=2,8
+import { createPrimClient } from "@doseofted/prim-rpc"
+import { createMethodPlugin, createCallbackPlugin } from "@doseofted/prim-rpc-plugins/browser"
+import type { module } from "./server"
+
+const endpoint = "http://localhost:3001/prim"
+const prim = createPrimClient<typeof module>({
+	endpoint,
+	methodPlugin: createMethodPlugin(),
+	callbackPlugin: createCallbackPlugin(),
+})
+
+const result = await prim.sayHello("Frontend", "Backend") // result === "Frontend, meet Backend."
+```
+
+Now we can make use of our callback!
+
+```ts client.ts mark=12:14
+import { createPrimClient } from "@doseofted/prim-rpc"
+import { createMethodPlugin, createCallbackPlugin } from "@doseofted/prim-rpc-plugins/browser"
+
+const endpoint = "http://localhost:3001/prim"
+const prim = createPrimClient({
+	endpoint,
+	methodPlugin: createMethodPlugin(),
+	callbackPlugin: createCallbackPlugin(),
+})
+
+const result = await prim.sayHello("Frontend", "Backend") // result === "Frontend, meet Backend."
+prim.typeMessage(result, letter => {
+	console.log(letter) // all letters in result, one-by-one
+})
+```
+
+You're now ready to [learn how to further use Prim+RPC](/docs/usage). You can also customize the Prim+RPC client and
+server by following the [configuration reference](/docs/reference/configuration).

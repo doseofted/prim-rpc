@@ -1,0 +1,46 @@
+version: 3
+
+env:
+  COMPOSE_FILE: "{{.COMPOSE_FILE}}"
+
+tasks:
+  ps:
+    desc: "[{{.CHOSEN_ENV}}] List all running service names"
+    cmds:
+      - "docker compose ps --services"
+
+  logs:
+    desc: "[{{.CHOSEN_ENV}}] Show and follow recent logs for running services"
+    cmds:
+      - cmd: "docker compose logs -f --tail=25"
+        ignore_error: true
+
+  # NOTE: used in "common" Taskfile
+  # LINK ./Taskfile.common.yml
+  up-only:
+    cmds:
+      - cmd: "docker compose up -d {{.CLI_ARGS}}"
+      - task: logs
+      - cmd: "echo 'Services are still active. Run `task compose:{{.CHOSEN_PREFIX}}:down` to stop running services.'"
+
+  pull:
+    desc: "[{{.CHOSEN_ENV}}] Pull new versions of service for {{.CHOSEN_ENV}} environment"
+    cmds:
+      - "docker compose pull"
+
+  down:
+    desc: "[{{.CHOSEN_ENV}}] Stop all running services"
+    cmds:
+      - "docker compose down -v"
+
+  exe:
+    desc: "[{{.CHOSEN_ENV}}] Run shell in running service, like so: `task {{.TASK}} -- backend`"
+    interactive: true
+    cmds:
+      - "docker compose exec {{.CLI_ARGS}} bash"
+
+  run:
+    desc: "[{{.CHOSEN_ENV}}] Run shell in one-off service, like so: `task {{.TASK}} -- backend`"
+    interactive: true
+    cmds:
+      - "docker compose run {{.CLI_ARGS}} bash"

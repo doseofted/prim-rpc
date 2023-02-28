@@ -1,0 +1,326 @@
+{/* SECTION: setup */}
+
+import { LayoutDocs } from "@/components/LayoutDocs"
+import { Alert } from "@/components/Alert"
+export const meta = {
+	title: "Comparisons",
+}
+export default ({ children }) => <LayoutDocs meta={meta}>{children}</LayoutDocs>
+
+{/* !SECTION setup */}
+
+# {meta.title}
+
+Why use Prim+RPC over some other framework? What does Prim+RPC offer in comparison to other frameworks? If I've already
+learned another framework then how can I find the equivalent features in Prim+RPC? Let's answer these questions by
+comparing Prim+RPC with other popular methods of transfer and frameworks.
+
+First, it's important to know Prim+RPC only concerns itself with making RPC and offering tools that assists in making
+RPC. It also is not intended to completely replace your existing tooling (like an HTTP server) but rather work alongside
+them. Although in some cases, you may be able to replace some tooling.
+
+Some tools are easy to compare against Prim+RPC. For instance, GraphQL is a form of RPC so it's easy to make a direct
+comparison. Since GraphQL is so popular, it's also the first framework that we'll tackle. Other frameworks however are
+harder to compare, such as Prim+RPC versus a REST API using a framework like Express or Fastify. While some of your HTTP
+routes could be replaced with RPC, it's not intended to replace these frameworks. There are different goals for using
+each. Regardless, we'll discuss the differences and how Prim+RPC can be used alongside a REST API or as a replacement
+for it.
+
+Naturally, all of these comparisons will be biased towards Prim+RPC since it's written by the same author but it's
+intended to make a general comparison for those unfamiliar with Prim+RPC but familiar with another framework.
+
+Finally, if Prim+RPC doesn't fit your use case, all of the frameworks below are great alternatives. But enough
+disclaimers. Let's discuss.
+
+## Table of Contents
+
+## GraphQL
+
+[GraphQL](https://graphql.org/) is a form of RPC that comes with its own query language. You define a schema up front
+for your methods, parameters, and returned types in GraphQL's SDL and then you use special types to get this data back
+using the GraphQL querying language. These special types include: queries for reading data, and mutations for changing
+data. Once all of these types are defined, it is then time to implement these queries and mutations in the language of
+your choice which are expected to strictly adhere to the types that you have defined.
+
+Prim+RPC is also a form of RPC however it doesn't have a built-in querying language. Instead it relies on the features
+of JavaScript. A request with Prim+RPC is synonymous with making a function call in JavaScript. Because of this, there's
+no separation between queries and mutations. Instead you are expected to use your own naming scheme to determine what
+will read data and what will write it.
+
+Prim+RPC also doesn't have a separate type system. Instead types are completely optional and can be utilized with the
+language that you're already programming in. JavaScript itself doesn't have a strongly typed system but TypeScript is
+widely adopted today. This means that you can define types to be as strict as you'd like in TypeScript and then enforce
+these rules when someone utilizes your RPC library with JavaScript/TypeScript. Unlike GraphQL, these types are only
+understood at compile-time which makes Prim+RPC very flexible. This doesn't mean that Prim+RPC isn't capable of
+following a type system however. There are popular libraries like [Zod](https://github.com/colinhacks/zod) and
+[TypeBox](https://github.com/sinclairzx81/typebox) that provide schema validation that can be used in the place of
+something like GraphQL's type system. Unlike GraphQL, you're not restricted to the types defined by their language but
+rather you can choose to validate your data however you'd like by taking advantage of the JavaScript ecosystem.
+
+Unlike GraphQL, Prim+RPC is a tool designed for usage in JavaScript. While you are welcome to use Prim+RPC outside of
+JavaScript, since the RPC is very easy to structure and understand, it's expected that you are at least running a server
+that uses JavaScript. This is largely because Prim+RPC builds on top of JavaScript language features. By directly
+supporting some other language, Prim+RPC would need to consider additional constraints such as those imposed by a
+programming language's meta-programming abilities or lack thereof, type system, and overall design (for instance,
+Prim+RPC relies on the fact that JavaScript functions are also Objects, that TypeScript types are structural and
+incredibly flexible, and JavaScript language design regarding context).
+
+GraphQL also has additional features that can be compared with Prim+RPC such as subscriptions. Subscriptions in GraphQL
+allow you to query data and receive multiple updates about that data. In other words, you don't receive a single
+response with a subscription but instead multiple responses whenever something changes to that data on the server. This
+feature typically uses WebSockets to send data back intermittently without the client polling the server.
+
+In Prim+RPC, you can also "subscribe" to data but instead of defining a separate subscription query, you simply make a
+call to a function that uses a callback. Whenever the server uses the callback, the client receives that data. This
+functionality is provided over a plugin, typically that uses a WebSocket (but may optionally use some other method of
+transfer).
+
+One last feature of GraphQL, or rather an extension of it, is the ability to upload files. This isn't supported by
+GraphQL itself but rather is implemented in several tools based on a GraphQL multipart specification that's generally
+accepted by the GraphQL community. While it's generally accepted, it's not widely supported and can be difficult to
+setup.
+
+In Prim+RPC, the type of data that is supported is totally up to plugins which means that file uploads are generally
+supported as long as the plugin being used supports it. In other words, Prim+RPC has already considered file uploads and
+how they should be sent over RPC. Once plugins are configured, sending a file over Prim+RPC is as simple as calling a
+function with your file as an argument.
+
+To sum up the differences between the two:
+
+| GraphQL                                   | Prim+RPC                                        |
+| ----------------------------------------- | ----------------------------------------------- |
+| Uses separate SDL to define types         | Uses already-defined types in application       |
+| Uses queries and mutations for requests   | Requests are just JavaScript function calls     |
+| Uses subscriptions for server-sent events | Server-sent events are received using callbacks |
+| File uploads supported by community       | File uploads directly supported with plugins    |
+| Supports many languages                   | Server is expected to be JavaScript/TypeScript  |
+
+## Fastify / Express (HTTP Frameworks)
+
+It is difficult to compare Prim+RPC against an HTTP server framework because they are so different but they can both be
+used as some method to send/receive data from a function so the comparison is still relevant.
+[Fastify](https://www.fastify.io/) and [Express](https://expressjs.com/) are two examples of popular server frameworks
+that extend Node's http module. They are used for manually creating API routes with explicit HTTP methods, paths,
+headers, and possibly a body. There are various middleware to add almost any kind of functionality that you need to your
+server. In fact, these frameworks can be difficult to use without a large stack of middleware.
+
+Prim+RPC does not aim to replace these frameworks. Similar to how frameworks like GraphQL can integrate with frameworks
+like Express and Fastify, so can Prim+RPC. Prim+RPC does not come with a default transport mechanism and supports both
+Fastify and Express (as well as other HTTP servers) through the use of plugins. This means that you could add Prim+RPC
+to your project and use it alongside your existing, defined HTTP routes.
+
+Since Prim+RPC integrates directly with both Fastify and Express (and other servers through plugins), you could register
+Prim as middleware for these frameworks and simply give Prim+RPC a function. Prim+RPC will automatically create a route
+for your functions. For instance, a request to `/prim/someModule/sayHello?name=Ted` would call a function given to
+Prim+RPC like so: `someModule.sayHello({ name: "Ted" })`. Requests sent to Prim+RPC are typically sent as POST requests
+(with GET requests available for simple requests, as shown in example) and have simple HTTP status codes already defined
+based on whether your function returns (`200`), isn't found (`400`), or throws an error (`500`). This means you do not
+have to concern yourself with these various HTTP resources and can use regular JavaScript errors (optionally attaching
+codes if needed) without worrying about a whole separate class of HTTP error codes.
+
+You can also access the request context from your server framework using `this` context. For instance, the Fastify
+plugin for Prim+RPC will expose the request to your function by binding these variables to your function's `this` object
+bound by Prim+RPC. While it's generally encouraged to pass variables as arguments to the function, this functions as an
+escape hatch when you need a resource given through your HTTP server (for instance, some existing authentication given
+over a cookie, processed by your HTTP server).
+
+Using Prim+RPC with an HTTP server is powerful combo because you can leverage the middleware available in your existing
+frameworks but have the simplicity of using Prim+RPC to define resources to be made available over the Internet.
+
+## Qwik / Solid Start (Data Loaders)
+
+Recent fullstack frameworks like [Qwik](https://github.com/BuilderIO/qwik),
+[Solid Start](https://github.com/solidjs/solid-start), [Remix](https://github.com/remix-run/remix),
+[Blitz](https://github.com/blitz-js/blitz), and others have introduced an approach that allows you to call backend
+JavaScript code from the same file as your frontend code. These frameworks are generally running that backend code on
+the server and then creating an RPC endpoint that is called from the client (other frameworks will pass the backend
+result as some payload alongside the client and use during a hydration step). Since many of these frameworks are
+creating RPC endpoints, it's worth pointing out the differences with Prim+RPC. Many of these frameworks are using
+similar approaches but to keep the comparison simple we'll use two recent frameworks: Qwik and Solid Start.
+
+One primary difference is the purpose of RPC in each tool. In frameworks like Qwik and Solid Start, RPC is used as a
+method of transforming server-side data into a format expected by the frontend (known as "server data" or "data
+loaders"). Both of these frameworks also offer REST endpoints for the purpose of creating an API with dedicated routes.
+Of course, how you use RPC or REST endpoints in these frameworks is up to the developer. Generally, RPC as used by the
+frameworks is abstracted away from the developer by creating an RPC endpoint during a compile step for use in that
+application only as a means of retrieving data for that page (side note: Prim+RPC does not require a compile step or
+client generation).
+
+Prim+RPC is more akin (in its purpose) to Qwik's or Solid Start's REST endpoints than its data loaders because it is not
+tied to frontend code. Prim+RPC only concerns itself with creating dedicated RPC methods and exposing them for easy
+usage on some client (whether Prim+RPC's client or a request written by hand in JSON). The RPC is intended to be used
+anywhere and could be used for a private API or could be exposed publicly for multiple client applications to use.
+Prim+RPC does not concern itself with the frontend code which means that methods defined with Prim+RPC can be used with
+any framework that you like, including Solid Start and Qwik. In both frameworks you may either wrap the Prim+RPC client
+in a "resource" (a way to resolve promises in the UI frameworks) or you could call a method defined in Prim+RPC with
+that framework's data loaders (where a Prim+RPC instance serves a dedicated API role and its response is then
+transformed in a data loader for the user interface).
+
+In general, data loaders in Qwik and Solid Start (which generate RPC) are a means of translating an API call into
+frontend-specific code. In Prim+RPC, RPC is used as a means to create a full API that works regardless of what your
+frontend needs (calls to a Prim+RPC server could even be used within data loaders). Since Prim+RPC can work with the
+server of your choice, this also means that the API you define can use context and middleware provided by that server
+(such as existing plugins for rate limiting, authentication, security headers, etc.) whereas with REST endpoints in Qwik
+or Solid Start you need to use middleware or plugins specific to that framework.
+
+Using Prim+RPC with an HTTP framework, there's also the possibility of swapping out the server easily by using a
+different Prim+RPC plugin (meaning that the interface/context for your code can stay the same: only server-specific
+implementations needs to change, which is also useful for testing). In Qwik or Solid Start, your routes are tied to its
+specific server framework (this is the same for defining API routes in any HTTP framework directly).
+
+As a summary, Prim+RPC is great for defining an API while data loaders are great for transforming that API response into
+a structure specific to the user interface. To make some direct comparisons:
+
+| Data Loaders                                                          | Prim+RPC                                                        |
+| --------------------------------------------------------------------- | --------------------------------------------------------------- |
+| Frontend and backend code are generally colocated                     | Deals specifically with backend code, easy to use from frontend |
+| Generally intended to be used with a specific UI framework            | Intended to be used with any client                             |
+| Backend code is compiled into RPC calls (or passed as data with page) | No client generation; client generates RPC at runtime           |
+| Generally tied to specific HTTP server framework                      | Works with any framework (HTTP or not) through plugins          |
+
+## tRPC
+
+[tRPC](https://github.com/trpc/trpc) is probably most similar to Prim+RPC in terms of the problems that it serves to
+address. tRPC and Prim+RPC diverge in how they aim to address them. They are similar in many respects: both are RPC
+frameworks, both provide their types over TypeScript, and both are designed to work over multiple types of transports.
+
+One major difference is the focus of the library regarding transport. Both tRPC and Prim+RPC are designed in a way that
+they can be used with multiple transports but tRPC tends to focus more on transportation over HTTP (or WebSocket when
+using subscriptions). Prim+RPC is built from the start to work well with HTTP/WebSocket but also with IPC meaning you
+can use Prim+RPC to bridge not just over networks but over separated processes like Web Workers.
+
+tRPC and Prim+RPC also differ largely in how much library-specific code needs to be written by a developer and also how
+much library-specific code is ran when an API is developed with it. If you want to utilize a function in tRPC, you must
+write a tRPC procedure defined on tRPC's router which is then passed to the tRPC server instance. This procedure has a
+specific shape where you may define the input and output with a schema validation library, usually Zod, and then define
+this as either a query or a mutation (concepts for those familiar with GraphQL, which we'll talk about in a minute).
+
+In Prim+RPC, it's just JavaScript. Procedures in tRPC are just regular JavaScript functions in Prim+RPC. Routers in tRPC
+are comparable to JavaScript modules. Schema validation in Prim+RPC is left to the developer but, of course, you can
+still use Zod in your functions or any other tool from the JavaScript ecosystem.
+
+tRPC has a lot of features that are comparable to GraphQL. It uses familiar GraphQL terms for defining requests which
+can be super useful for those migrating from GraphQL to a tool like tRPC. If you're familiar with queries, mutations,
+subscriptions, and the like, then tRPC can be an easy tool for which to migrate. However, if you're unfamiliar, these
+terms may be daunting and become a hurdle in picking up the framework.
+
+Prim+RPC in contrast does not compare itself to GraphQL but rather to JavaScript. If you know JavaScript then Prim+RPC
+should be easy to pick up. Queries in tRPC are simply JavaScript function calls in Prim+RPC, as are mutations.
+Subscriptions (messages typically sent over WebSocket) in tRPC are a somewhat more advanced feature of the framework
+while in Prim+RPC, they are simply callbacks on a JavaScript function. While tRPC utilizes different methods to define
+procedures explicitly on the server, Prim+RPC follows the structure of the JavaScript module that you give it. In other
+words, if you give Prim+RPC a module named `someModule` with a function `sayHello` then you'd simply call
+`someModule.sayHello()`. No other options are needed for that function call from the client except for those provided
+from your function.
+
+tRPC also utilizes Zod to a large extent as a way of defining types that can be enforced during run-time. It also has
+tested a few other popular schema libraries and allows them to be used with tRPC. Prim+RPC on the other hand doesn't
+have a run-time validation system and only has compile-time validation of types through TypeScript and leaves the
+run-time errors to the developer. This means that you could potentially use Zod, just like you would in tRPC, but you
+also have the option of choosing any other tool from the JavaScript ecosystem if you'd like.
+
+Another difference between the two is how they are used on the client and within frontend frameworks. tRPC provides an
+RPC client with its own fetch client with a variety of features and options built-in. This is useful for getting started
+but becomes a problem if you need to use a custom fetch client like Axios or Capacitor's HTTP client.
+
+Prim+RPC's client on the other hand doesn't have a default fetch client. In fact, your method of transport may not be
+HTTP so you may not need a fetch client. This functionality in Prim+RPC is provided over plugins so that you can
+customize how data is received. This is useful when you need to specify specific details about a connection to a server
+or if you need a specific fetch client (for instance, in Ionic Capacitor apps you may need to use the Capacitor HTTP API
+instead of the default browser fetch client, which is something that you can do in Prim+RPC by building a plugin).
+
+While tRPC can be used in any UI framework, it provides a React-specific client. Prim+RPC doesn't provide clients for
+React or other UI frameworks directly because it's generally not needed. The result of a function call in Prim+RPC's
+client is simply a Promise in JavaScript containing your result of the function call. Popular UI frameworks today
+usually provide excellent tools for handling Promises so an additional client isn't needed for Prim+RPC.
+
+To sum up differences:
+
+| tRPC                                           | Prim+RPC                                                     |
+| ---------------------------------------------- | ------------------------------------------------------------ |
+| Framework-agnostic but generally HTTP-specific | Transport-agnostic (through plugins), HTTP well supported    |
+| Great for those familiar with GraphQL          | Great for those familiar with JavaScript                     |
+| Mostly uses Zod for schema validation          | Schema validation is left to developer but Zod could be used |
+| Built-in fetch with client                     | Fetching ability provided over plugins                       |
+
+## gRPC
+
+Prim+RPC and [gRPC](https://github.com/grpc/grpc) are very different which makes it difficult to accurately compare both
+without leaving something out or oversimplifying. However, we'll try to make some general comparisons.
+
+Prim+RPC focuses on JavaScript and takes advantage of JavaScript-specific features. It supports other languages through
+the use of simple and easy-to-understand RPCs that can be made over any HTTP client but does not provide clients for
+other, specific languages. gRPC on the other hand is intended to be more language-neutral though the usage of protocol
+buffers ("protobufs"). While this flexibility can be useful, it does mean that service definitions need to be written in
+another language and then implemented in the language of your choice (this is similar to GraphQL in the fact that an
+intermediary language is used; in GraphQL it's their SDL, gRPC it's protocol buffers, however they are very different
+languages). In Prim+RPC, you only need to use TypeScript to define types without some other intermediary language (or
+you could call TypeScript that "intermediary language"). The difference being that TypeScript is written alongside your
+code while protocol buffers live outside of it.
+
+gRPC and Prim+RPC also approach data flow differently. gRPC has many different methods to send and receive results from
+RPCs including unary/server/client/bidirectional streaming. Prim+RPC does not utilize HTTP/2 streaming or any kind of
+transport method because this is specified by plugins. Plugins available by default today do not support HTTP/2
+streaming but, of course, you may choose to create a plugin that does (once it's made possible in web browsers).
+
+As a simple comparison (streaming support aside), **unary streaming** in gRPC is comparable to making a simple function
+call in Prim+RPC. **Server-side streaming** in gRPC is comparable to adding a callback to your function in Prim+RPC.
+**Client-side streaming** and **Bidrectional streaming** methods aren't directly comparable in Prim+RPC. You could
+potentially make a comparison by saying that they're similar to using generator functions
+([however this is not supported yet](/docs/limitations#generator-functions-are-not-supported-yet)) or maintaining an
+open connection using Prim+RPC's callback handler but this isn't a fair comparison so, for simplicity, we'll say that
+only unary and server streaming have comparisons with Prim+RPC.
+
+It's also worth noting that only unary and server-side streaming are supported in gRPC's web client as of January 2023,
+both of which have comparisons in Prim+RPC (again, we're generalizing here). Even so, they're only supported in web
+browsers if you use the Envoy proxy.
+
+Another major difference between the two is that Prim+RPC doesn't require client generation. It instead intercepts the
+function calls that you make on a JavaScript Proxy and turns them into RPC. TypeScript types can be used with the client
+but they're entirely optional and really only serve to make development easier. In gRPC, the written protocol buffers
+need to be converted into code for your specific language and then that resulting client must be used in your code.
+
+In gRPC, authentication has a dedicated, extendable API for authentication that supports both credentials over the
+connection and to individual calls. Prim+RPC is in early stages today but can use authentication provided either over a
+server-side handler plugin or through RPCs themselves. Using a server-side handler in Prim+RPC, you can integrate with
+an existing authentication system defined on that transport. You can either let that transport handle authentication
+entirely or pass some of the server context to Prim+RPC to let your RPC calls integrate with authentication on that
+server framework. There's also the option of defining authentication as part of your RPC however this would likely
+require some token to be passed back and forth (in which case it's recommended to move this to the transport). All of
+this said, authentication is a topic that I'm interested in providing better support for in Prim+RPC.
+
+Some general differences are summed up below.
+
+| gRPC                                         | Prim+RPC                                                  |
+| -------------------------------------------- | --------------------------------------------------------- |
+| Works with most systems languages            | Great for those familiar with JavaScript                  |
+| HTTP/streaming transport                     | Transport-agnostic (provided over plugins)                |
+| Built-in authentication API                  | Authentication left to Prim+RPC plugins or function calls |
+| Client generation required (using protobufs) | No client generation (import types from server)           |
+
+## JSON RPC
+
+Prim+RPC's structure probably most resembles [JSON RPC](https://www.jsonrpc.org/). However, it is not JSON RPC and does
+not adhere to the standard. Prim+RPC is also not a standard (although it may be standardized before reaching version
+1.0) but rather it's a tool for constructing and understanding simple RPCs over JSON. While there are JSON RPC clients
+provided by a community of developers, I'm unaware of an official client for it which makes direct comparisons between
+the two difficult. Prim+RPC however has an official client.
+
+While JSON RPC and Prim+RPC messages may appear similar at first glance, there are some major differences worth
+mentioning. For instance, RPC with Prim+RPC does not require an ID while JSON RPC does (however, it's recommended and
+the Prim+RPC will create an ID for its own internal purpose of managing batched requests). Obviously, the `jsonrpc`
+property is also missing in Prim+RPC since it is not JSON RPC. Another noticeable difference is that Prim+RPC uses an
+`args` property in its RPC structure while JSON RPC uses a property named `params` (but both are used for passing
+arguments). Errors in Prim+RPC are also handled differently and depend entirely on how a thrown Error in JavaScript is
+serialized (there is no standard). There are no standardized error codes in Prim+RPC and none are planned while JSON RPC
+has a few codes intended for RPC-specific errors.
+
+Prim+RPC also has additional features like the ability to receive data from callbacks which has a similar structure to
+regular Prim+RPC messages but is formatted slightly different. This feature is not part of JSON RPC. Prim+RPC can also
+support file uploads by referencing file IDs in some other object (typically form-data) while file uploads are not a
+topic mentioned in JSON RPC.
+
+One last difference between the two is that Prim+RPC does not feature extensions like JSON RPC. It's possible that
+Prim+RPC may look to create a standard for its messages in which case features for extending the RPC format may be
+considered (like extensions). Today Prim+RPC is still in an early phase and this is something to consider in the future
+as Prim+RPC becomes stable.

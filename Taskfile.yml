@@ -1,0 +1,57 @@
+# https://taskfile.dev
+version: 3
+
+dotenv:
+  - ".env"
+
+includes:
+  # Project-wide includes
+  dev: ./misc/Taskfile.dev.yml
+  docker: ./misc/Taskfile.docker.yml
+  compose: ./misc/Taskfile.common.yml
+
+  # Environment-specific Docker Compose configuration
+  compose:dev: &base-compose
+    taskfile: ./misc/Taskfile.compose.yml
+    optional: true
+    vars:
+      COMPOSE_FILE: "compose.yml:compose.dev.yml:misc/compose.sync.yml"
+      CHOSEN_ENV: "development"
+      CHOSEN_PREFIX: "dev"
+  compose:prod:
+    <<: *base-compose
+    vars:
+      COMPOSE_FILE: "compose.yml:compose.prod.yml"
+      CHOSEN_ENV: "production"
+      CHOSEN_PREFIX: "prod"
+  compose:staging:
+    <<: *base-compose
+    vars:
+      COMPOSE_FILE: "compose.yml:compose.prod.yml:compose.staging.yml"
+      CHOSEN_ENV: "staging"
+      CHOSEN_PREFIX: "staging"
+  compose:live:
+    <<: *base-compose
+    vars:
+      COMPOSE_FILE: "compose.yml:compose.live.yml"
+      CHOSEN_ENV: "live"
+      CHOSEN_PREFIX: "live"
+
+  # Sub-project-specific includes
+  backend:
+    taskfile: ./apps/backend/Taskfile.yml
+    dir: ./apps/backend
+    optional: true
+  frontend:
+    taskfile: ./apps/frontend/Taskfile.yml
+    dir: ./apps/frontend
+    optional: true
+  proxy:
+    taskfile: ./proxy/Taskfile.yml
+    dir: ./proxy
+    optional: true
+
+tasks:
+  default:
+    cmds:
+      - "task --list"

@@ -1,0 +1,41 @@
+version: 3
+
+tasks:
+  live:up:
+    desc: "[live] Start all services in project, for use in production environment"
+    cmds:
+      - task: :compose:live:up-only
+
+  prod:up:
+    desc: "[production] Start all services in project (production-like)"
+    deps:
+      - :docker:build-base-images
+    cmds:
+      - task: :compose:prod:up-only
+        vars:
+          CLI_ARGS: --build
+
+  dev:up:
+    desc: "[development] Start all services in project"
+    deps:
+      - :docker:build-base-images
+      - :dev:cert
+    cmds:
+      - task: :compose:dev:up-only
+        vars:
+          CLI_ARGS: --build
+
+  staging:up:
+    desc: "[staging] Start all services in project"
+    deps:
+      - :docker:build-base-images
+    cmds:
+      - task: :compose:staging:up-only
+        vars:
+          CLI_ARGS: --build
+
+  clear:
+    desc: "Clear dangling build cache, images, networks, etc. (pass `--all` as needed)"
+    cmds:
+      - docker system prune {{.CLI_ARGS}}
+      - docker builder prune {{.CLI_ARGS}}

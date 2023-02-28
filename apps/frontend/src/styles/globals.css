@@ -1,0 +1,125 @@
+/* stylelint-disable scss/at-rule-no-unknown */
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+::selection {
+	background-color: #6d53ff70;
+}
+
+/**
+ * DaisyUI-provided "mockup-code" adds space for prefix even when there is no prefix.
+ * This conflicts with the way Shiki formats HTML so this is an adjustment for that integration.
+ */
+.mockup-code pre.shiki:not([data-prefix])::before {
+	margin-right: 0;
+}
+.mockup-code pre.shiki {
+	padding: 0.5rem 0.75rem;
+}
+
+/** Buttons are hard to see on homepage with default DaisyUI opacity. */
+.mockup-code::before {
+	opacity: 1;
+}
+
+/* Make code headings appear nicer in documentation across entire website */
+.prose h1:has(code),
+.prose h2:has(code),
+.prose h3:has(code) {
+	background-color: #2D0D6011;
+	padding: 0.5rem 0;
+	border-radius: 0.35rem;
+	margin-bottom: 0;
+	border-bottom-left-radius: 0;
+	border-bottom-right-radius: 0;
+}
+
+/* Remove sticky header in tables given by DaisyUI */
+.prose-table\:table table th:first-child {
+	position: relative !important;
+}
+
+.prose :where(h1, h2, h3) + table,
+.prose :where(h1, h2, h3) + div > table {
+	margin-top: 0;
+	margin-bottom: 0;
+	top: -1px;
+}
+
+/* stylelint-disable-next-line no-descending-specificity */
+.prose :where(h1, h2, h3) + table th,
+.prose :where(h1, h2, h3) + div > table th {
+	background-color: #2D0D6011;
+	border-radius: 0;
+}
+
+/**
+ * Provided from Code Hike
+ * https://codehike.org/docs/configuration#copy-button
+ */
+.ch-codeblock .ch-code-button,
+.ch-editor-frame .ch-editor-button {
+	display: none;
+}
+.ch-codeblock:hover .ch-code-button,
+.ch-editor-frame:hover .ch-editor-button {
+	display: block;
+}
+
+/** Fix mobile styling on Code Hike Spotlight component */
+.ch-spotlight {
+	flex-direction: column;
+}
+.ch-spotlight-sticker {
+	width: 100%;
+}
+.ch-spotlight-tab {
+	margin: 0;
+}
+/* Reset Code Hike Spotlight to defaults on large screens */
+@media (min-width: theme("screens.xl")) {
+	.ch-spotlight-tab {
+		margin: 0 -0.5rem;
+	}
+	.ch-spotlight {
+		flex-direction: row;
+	}
+	.ch-spotlight-sticker {
+		/* Override default 420px width since it feels small */
+		width: 520px;
+	}
+}
+
+/* Make tabs from Code Hike easier to see (with given theme) */
+.ch-editor-tab {
+	position: relative;
+	color: #ffffffaa !important;
+}
+.ch-editor-tab.ch-editor-tab-active {
+	color: #ffffffff !important;
+}
+
+.ch-editor-tab::before {
+	content: "";
+	display: block;
+	position: absolute;
+	height: 3px;
+	background-color: #8f8798;
+	width: calc(100% + 2px);
+	left: -1px;
+	right: -1px;
+	margin: 0 auto;
+	transition: width 300ms;
+}
+.ch-editor-tab.ch-editor-tab-active::before {
+	width: calc(100% - 12px);
+	background-color: #6D53FF;
+}
+/* Make marked lines of code use a color from theme of website */
+.ch-code-multiline-mark-border {
+	background: #5bb8ff !important;
+}
+.ch-code-multiline-mark {
+	background: #5bb8ff20 !important;
+}

@@ -1,0 +1,674 @@
+{/* SECTION: setup */}
+
+import { LayoutDocs } from "@/components/LayoutDocs"
+import { Alert } from "@/components/Alert"
+export const meta = {
+	title: "Configuration Reference",
+}
+export default ({ children }) => <LayoutDocs meta={meta}>{children}</LayoutDocs>
+
+{/* !SECTION setup */}
+
+# {meta.title}
+
+Prim+RPC includes two functions for configuring Prim+RPC: one for the client (`createPrimClient()`) and another for the
+server (`createPrimServer()`). Both of these functions accept options and are given in this reference guide.
+
+This guide is split up into two sections: client options and server options. The Prim+RPC client expects client options
+only while the Prim+RPC server accepts both client and server options.
+
+The Prim+RPC server shares options with the client for two reasons. The first: some options should be shared with both
+the server and client. For instance, if the JSON handler is changed on the client then it should also be changed on the
+server for proper serialization. The second: if a function doesn't exist on module provided to Prim+RPC server then the
+Prim+RPC server will create a new Prim+RPC client to contact another server (this is totally optional and allows
+communication between multiple servers with dedicated responsibilities).
+
+<Alert icon="carbon:information" type="alert-info" prose>
+
+Some options must be set to the same value on both the server and the client. To make clear which properties must be
+synced between client/server, you'll find **Sync Required** for each option below that will be either: **🟢 No** meaning
+that the option can differ, or **🔴 Yes** meaning that option must be the same.
+
+</Alert>
+
+## Table of Contents
+
+## Client
+
+The following options are available to the `createPrimClient`:
+
+```typescript
+import { createPrimClient } from "@doseofted/prim-rpc"
+import { createMethodPlugin, createCallbackPlugin } from "@doseofted/prim-rpc-plugins/{CHOOSE_YOUR_PLUGIN}"
+
+// Tap option name below to see documentation
+// You do not need to provide all of these options. This is just a demonstration.
+
+const client = createPrimClient({
+	// link[2:13] #methodplugin
+	methodPlugin: createMethodPlugin(),
+	// link[2:15] #callbackplugin
+	callbackPlugin: createCallbackPlugin(),
+	// link[2:12] #jsonhandler
+	jsonHandler: JSON,
+	// link[2:12] #handleerror
+	handleError: true,
+	// link[2:12] #handleblobs
+	handleBlobs: true,
+	// link[2:9] #endpoint
+	endpoint: "http://example.localhost/prim",
+	// link[2:11] #wsendpoint
+	wsEndpoint: "ws://example.localhost/prim",
+	// link[2:16] #clientbatchtime
+	clientBatchTime: 15,
+})
+
+// link[32:59] #server
+// NOTE: all options above are also available on the server
+```
+
+### `.methodPlugin`
+
+| Required  | Default                               | Sync Required |
+| --------- | ------------------------------------- | ------------- |
+| _`false`_ | _`(): { error: string, id: string }`_ | 🟢 No         |
+
+Prim+RPC is designed to be flexible and work with the frameworks that you're already using. By default, Prim+RPC can
+generate RPCs based on your method calls but does not include a way to send that RPC. This is handled through the usage
+of plugins.
+
+Specifically, the "method" plugin is used to generate a request and parse the response given from the Prim+RPC server.
+For example, the "Browser API" plugin includes a method plugin that uses the web browser's Fetch API to send and receive
+RPC.
+
+You can either use a pre-built plugin (included with Prim+RPC) or
+[you can build your own](/docs/plugins/create#method-plugin). Below is an example of how to register an existing method
+plugin with the Prim+RPC client.
+
+```typescript
+import { createPrimClient } from "@doseofted/prim-rpc"
+import { createMethodPlugin } from "@doseofted/prim-rpc-plugins/browser-fetch"
+
+const methodPlugin = createMethodPlugin()
+createPrimClient({ methodPlugin })
+```
+
+Each method plugin may (or may not) include its own options specific to that plugin. You can find a list of available
+method plugins on this documentation website or you can
+[follow this guide to create your own](/docs/plugins/create#method-plugin).
+
+Once your method plugin is registered with the Prim+RPC client then you will also need to specify a compatible
+[method "handler"](#methodhandler) on the Prim+RPC server. In general, a "plugin" in Prim+RPC is used to send/receive
+RPC on a client while a "handler" (sometimes called a "handler plugin") is used by the Prim+RPC server to handle RPC and
+send the RPC result back to the client.
+
+One limitation of the "method" plugin is that it is intended to work with a single request (consisting of one or
+multiple RPCs) and a single response (also consisting of one/multiple RPCs). This means that the method plugin is not
+designed to work with callbacks because they require an open connection where multiple responses can be sent back (one
+response being the function result, the others as a result of a callback). If your functions use callbacks or you expect
+multiple responses, you should also set up the [`.callbackPlugin`](#callbackplugin).
+
+### `.callbackPlugin`
+
+| Required  | Default                                               | Sync Required |
+| --------- | ----------------------------------------------------- | ------------- |
+| _`false`_ | _`(): { send: ((): { error: string, id: string }) }`_ | 🟢 No         |
+
+The "callback" plugin is very similar to the "method" plugin in the fact that it creates a request with the given RPC
+and parses a response from the Prim+RPC server. The primary difference between the two plugins is that the callback
+plugin keeps an open connection with the server to receive multiple responses. This is required for callbacks since your
+function call may return a value and you expect a response on your provided callback. Callbacks could also be fired
+multiple times (like an event handler) so it's important to keep the connection open.
+
+Callbacks in Prim+RPC are typically useful for real-time information where results are not immediately available but you
+need a response as soon as one is available, without polling a server at a set interval. This is the case for event
+handlers where you may expect a response at some point but not immediately as the result of the function call.
+
+As an example, you may compare the usage of a callback plugin to an open WebSocket connection while a method plugin can
+be likened to a single HTTP request/response (this is the actual case for the Browser API plugins).
+
+Of course, many applications don't need support for callbacks which is why the callback plugin is optional, as long as
+callbacks are not being used.
+
+You can configure the callback plugin like so:
+
+```typescript
+import { createPrimClient } from "@doseofted/prim-rpc"
+import { createCallbackPlugin } from "@doseofted/prim-rpc-plugins/browser-websocket"
+
+const callbackPlugin = createCallbackPlugin()
+createPrimClient({ callbackPlugin })
+```
+
+Each callback plugin may (or may not) include its own options specific to that plugin. You can find a list of available
+callback plugins on this documentation website or you can
+[follow this guide to create your own](/docs/plugins/create#callback-plugin).
+
+If a callback plugin is given, it's important to note that each plugin used on the Prim+RPC client must have a
+[compatible "handler" plugin](#callbackhandler) on the Prim+RPC server (just like method plugins/handlers).
+
+### `.jsonHandler`
+
+| Required  | Default  | Sync Required |
+| --------- | -------- | ------------- |
+| _`false`_ | _`JSON`_ | 🔴 Yes        |
+
+Functions used with Prim+RPC have to be serialized before sending a function call (RPC) to the server. By default, any
+RPC made with Prim+RPC will use the environment's default JSON handler.
+
+This can be overridden by providing your own JSON handler. The given handler must follow the same/similar signature of
+the default JSON handler: namely, it needs to have `.parse()` and `.stringify()` methods.
+
+```typescript
+import { createPrimClient } from "@doseofted/prim-rpc"
+import superjson from "superjson"
+
+createPrimClient({
+	// superjson has both a stringify and parse method that can be used by Prim+RPC.
+	jsonHandler: superjson,
+})
+```
+
+This can be useful for parsing additional types. For example, [`superjson`](https://www.npmjs.com/package/superjson) is
+great for parsing additional JavaScript types, [`devalue`](https://www.npmjs.com/package/devalue) is useful for cyclical
+references, [`destr`](https://www.npmjs.com/package/destr) for someone security-minded. You could even use
+[`yaml`](https://www.npmjs.com/package/yaml) if readability is top priority. These are only examples and you can use any
+JSON handler or create your own.
+
+<Alert icon="carbon:warning" type="alert-warning" prose>
+
+At this stage of the project, the JSON handler must serialize data into a string. Binary data support for the JSON
+handler is planned for the future to support other potential JSON-like handlers like
+[`@msgpack/msgpack`](https://www.npmjs.com/package/@msgpack/msgpack). Of course, you can still upload files using
+Prim+RPC because, by default, files are extracted from the RPC and sent separately.
+
+</Alert>
+
+It is important to note that this option must be set to the same option on both the server and client since
+serialization on the client and deserialization on the server go hand-in-hand.
+
+<Alert icon="carbon:information" type="alert-info" prose>
+
+Some clients may not be able to support a custom JSON handler (for instance, native apps that don't use JavaScript). In
+these instances, you may consider creating two Prim+RPC servers that use the same module: one that uses the default JSON
+handler, and the second that uses your custom JSON handler (for clients that _can_ support it).
+
+</Alert>
+
+### `.handleError`
+
+| Required  | Default  | Sync Required |
+| --------- | -------- | ------------- |
+| _`false`_ | _`true`_ | 🔴 Yes        |
+
+By default in JavaScript, the `Error` instance used in JavaScript does not make useful properties like `.message`
+enumerable which means that when you try to stringify an `Error` with `JSON` you do not get back these properties.
+Instead, you get an empty object.
+
+To make for an easier development experience, Prim+RPC will serialize thrown errors to be sent back to the client using
+[serialize-error](https://www.npmjs.com/package/serialize-error), when using the default JSON handler. This means that
+if you throw an error from a function on a Prim+RPC server, the Prim+RPC client will receive that same error message. By
+default, this option is set to `true`.
+
+If the default JSON handler is changed, for instance if you use [superjson](https://github.com/blitz-js/superjson) which
+already serializes errors, then this option is set to `false` so as not to conflict with possible error handling done in
+the custom JSON handler.
+
+Importantly, if you explicitly specify the `.handleError` property then your choice will be respected regardless of what
+JSON handler you are using. The default conditions of setting `handleError` only apply when the option is not provided
+by the developer.
+
+This option must be set to the same value on the server and client.
+
+### `.handleBlobs`
+
+| Required  | Default  | Sync Required |
+| --------- | -------- | ------------- |
+| _`false`_ | _`true`_ | 🔴 Yes        |
+
+The Prim+RPC client can call many server-provided functions including those that expect binary arguments. By default,
+Prim+RPC sends RPC using JSON: a format that doesn't support binary data. In order to support binary data there are two
+options: The first is overriding the default JSON handler with some JSON-like handler that does support binary data.
+Support for these handlers is planned for Prim+RPC but is not available yet. The second however is supported and
+involves separating binary data from the RPC.
+
+The `.handleBlobs` option tells Prim+RPC to read the given function arguments for anything Blob-like, including Files
+(which are Blobs). The binary arguments are a replaced with an identifier in the RPC. The configured
+[`.methodPlugin`](#methodplugin) is then responsible for sending both the RPC and binary data to the Prim+RPC server.
+The Prim+RPC server will have a [`.methodHandler`](#methodhandler) that will piece back together the RPC and binary data
+into a function call. This is useful because, while JSON cannot support binary data, your method of transport (like
+using FormData over HTTP) may be able to transport the binary file(s) and JSON separately.
+
+Since splitting up blobs from RPC is done on the client, this option must also be specified on the server so it knows to
+piece these two pieces back together.
+
+<Alert icon="carbon:information" type="alert-info" prose>
+
+Today, blob handling is done with the method plugin/handler but in the future there are plans to support binary data in
+the callback handler as well. There's also planned support for JSON-like handlers that support binary data. Prim+RPC is
+still in early stages.
+
+</Alert>
+
+### `.endpoint`
+
+| Required  | Default     | Sync Required |
+| --------- | ----------- | ------------- |
+| _`false`_ | _`"/prim"`_ | 🟢 No         |
+
+It is very common to use Prim+RPC with a web server so the `endpoint` option is a URL provided directly on the Prim+RPC
+client. This option is passed to both the [`methodHandler`](#methodhandler) and the
+[`callbackHandler`](#callbackhandler) functions as an argument so that they can make connections.
+
+This option can be overridden for the [`callbackHandler`](#callbackhandler) by providing the [`wsEndpoint`](#wsendpoint)
+option.
+
+<CH.Spotlight>
+
+```typescript
+import { createPrimClient } from "@doseofted/prim-rpc"
+
+createPrimClient({
+	// Provide the path if the Prim+RPC client/server are on the same domain
+	endpoint: "/prim",
+})
+```
+
+---
+
+Path
+
+---
+
+```typescript
+import { createPrimClient } from "@doseofted/prim-rpc"
+
+createPrimClient({
+	// You don't have to provide endpoint if not utilized (for instance when using IPC)
+	endpoint: null,
+})
+```
+
+None
+
+---
+
+```typescript
+import { createPrimClient } from "@doseofted/prim-rpc"
+
+createPrimClient({
+	// Provide a full URL if Prim+RPC server is on separate domain
+	// (tip: make sure proper CORS rules are enabled on server)
+	endpoint: "https://api.example.com/prim",
+})
+```
+
+Full URL
+
+---
+
+```typescript
+import { createPrimClient } from "@doseofted/prim-rpc"
+
+createPrimClient({
+	// Pass a different URL depending if rendered on client/server (SSR)
+	endpoint: typeof window === "undefined" ? "http://localhost:1234" : "https://api.example.com/prim",
+})
+```
+
+Conditional URL
+
+</CH.Spotlight>
+
+### `.wsEndpoint`
+
+| Required  | Default | Sync Required |
+| --------- | ------- | ------------- |
+| _`false`_ | _`""`_  | 🟢 No         |
+
+The [`callbackHandler`](#callbackhandler) may use a different URL from the [`methodHandler`](#methodhandler). In these
+events, `wsEndpoint` can be provided. This is common when the method handler uses the HTTPS protocol while the callback
+handler uses the WebSocket protocol.
+
+### `.clientBatchTime`
+
+| Required  | Default | Sync Required |
+| --------- | ------- | ------------- |
+| _`false`_ | _`0`_   | 🟢 No         |
+
+The Prim+RPC client can batch RPCs made with its method handler. This is useful when using Prim+RPC with an HTTP server
+and you want to avoid sending hundreds of HTTP requests.
+
+By default, Prim+RPC does not batch requests: the batch time is set to zero. If non-zero then Prim+RPC will wait a short
+time, in milliseconds, before sending HTTP requests. Of course, if one function call depends on another then that will
+not be batched (because you need the result of the first to make the second call).
+
+As a recommendation, keep this time very low (under `15`ms). The default is `0` (don't batch).
+
+<Alert icon="carbon:information" prose>
+
+This does not apply to the callback handler which will send RPCs one-by-one regardless of this setting. The reason for
+this that the method handler is used to send a single request and receive a single response, usually over HTTP, which
+results in additional overhead. The callback handler however will typically keep an open connection so there is less
+overhead in sending requests, usually over WebSocket, where batching requests isn't as useful.
+
+</Alert>
+
+## Server
+
+The following options are available to the `createPrimServer`:
+
+```typescript
+import { createPrimServer } from "@doseofted/prim-rpc"
+import { createMethodHandler, createCallbackHandler } from "@doseofted/prim-rpc-plugins/{CHOOSE_YOUR_HANDLER}"
+
+// Tap option name below to see documentation
+// You do not need to provide all of these options. This is just a demonstration.
+
+const server = createPrimServer({
+	// link[11:33] #client
+	// NOTE: all options from client are available here
+	// link[2:7] #module
+	module: { sayHello: () => "Hello!" },
+	// link[2:14] #methodhandler
+	methodHandler: createMethodHandler(),
+	// link[2:16] #callbackhandler
+	callbackHandler: createCallbackHandler(),
+	// link[2:7] #prefix
+	prefix: "/prim",
+	// link[2:10] #allowlist
+	allowList: { sayHello: true },
+	// link[2:17] #methodsonmethods
+	methodsOnMethods: [],
+})
+```
+
+### `.module`
+
+| Required  | Default       | Sync Required |
+| --------- | ------------- | ------------- |
+| _`false`_ | _`undefined`_ | 🟢 No         |
+
+When an RPC is received by the Prim+RPC server, it will be translated into a function call to be made on the provided
+JavaScript module. If a module is not provided then Prim+RPC will return an error.
+
+However, if a module is not provided but a method plugin or callback plugin are given, then the Prim+RPC server will
+forward that request using the provided plugins (potentially to a separate Prim+RPC instance that does have the module).
+
+<CH.Spotlight>
+
+```typescript
+import { createPrimServer } from "@doseofted/prim-rpc"
+import * as module from "./my-local-module"
+
+createPrimServer({
+	module,
+})
+```
+
+---
+
+Local Module
+
+---
+
+```typescript
+import { createPrimServer } from "@doseofted/prim-rpc"
+
+function helloWorld() {
+	return "Hello!"
+}
+helloWorld.rpc = true
+
+createPrimServer({
+	module: { helloWorld },
+})
+```
+
+Inline Module
+
+---
+
+```typescript
+import { createPrimServer } from "@doseofted/prim-rpc"
+import { startCase } from "lodash"
+
+createPrimServer({
+	module: { startCase },
+	allowList: { startCase: true },
+})
+```
+
+External Module
+
+</CH.Spotlight>
+
+<Alert icon="carbon:information" prose>
+
+All functions need to be explicitly allowed before being used with Prim+RPC. This is typically done by adding a `.rpc`
+property to each function. When using an external module you may not be able to add a property to an existing function.
+In these cases you can use the [`allowList`](#allowlist) option of Prim+RPC to specify that a module is allowed to be
+used.
+
+</Alert>
+
+### `.methodHandler`
+
+| Required  | Default        | Sync Required |
+| --------- | -------------- | ------------- |
+| _`false`_ | _`() => void`_ | 🟢 No         |
+
+When a function call is made with the Prim+RPC client, that call is serialized into an RPC and is sent using the
+configured [`.methodPlugin`](#methodplugin) to the server of your choice. The Prim+RPC server receives these requests
+from your chosen server with its `.methodHandler`. In Prim+RPC, each client _plugin_ needs a corresponding server
+_handler_.
+
+The method handler in Prim+RPC is a plugin that integrates with your server (for example, an HTTP server) to receive a
+request containing RPC. The responsibility of the method handler is to transform given server properties into RPC, make
+the function call, and send back the result to your server in a format that it can understand. Your server then sends a
+result back to the client.
+
+There are many method handlers available that you integrate with the server framework of your choice. You can also
+[create your own](/docs/plugins/create#method-handler) if a server handler doesn't meet your needs or you need support
+for an additional server. An example of how to use an existing method handler is demonstrated below:
+
+```typescript
+import { createPrimServer } from "@doseofted/prim-rpc"
+import { createMethodHandler } from "@doseofted/prim-rpc-plugins/fastify"
+
+// initialize your server (this example uses Fastify)
+import Fastify from "fastify"
+const fastify = Fastify()
+
+// and pass this instance to the method handler so the server can be configured to accept RPC
+createPrimServer({
+	methodHandler: createMethodHandler({ fastify }),
+})
+
+const address = await fastify.listen({ port: 1234 })
+console.log("Listening:", address)
+```
+
+Similar to the [`.methodPlugin`](#methodplugin), the limitation of method handlers is that they receive a single request
+(containing one or multiple RPCs) and send a single response (containing one or multiple RPCs). This means that the
+method handler cannot support callbacks because multiple responses must be sent back (typically by keeping an open
+connection). Prim+RPC has a dedicated handler for callbacks through the use of a [`.callbackHandler`](#callbackhandler).
+
+### `.callbackHandler`
+
+| Required  | Default        | Sync Required |
+| --------- | -------------- | ------------- |
+| _`false`_ | _`() => void`_ | 🟢 No         |
+
+The callback handler serves a similar role to the [`.methodHandler`](#methodhandler) and the goal of this handler is
+very similar. The primary difference is that the callback handler is used to maintain a connection to the client from
+the server so that callbacks can be called, potentially multiple times.
+
+When a function call is made to Prim+RPC that contains a callback, that function call is turned into an RPC and any
+callbacks on that function are transformed into a string identifier with the client's `.callbackPlugin`. This RPC is
+sent to the server of your choice which then forwards that RPC to the Prim+RPC server's corresponding
+`.callbackHandler`.
+
+The callback handler usually is usually a plugin for some kind of event handler where a persistent connection is kept
+open, like a WebSocket connection. The callback handler's responsibility is to transform RPC from the server into a
+return value, just like the method handler. However it has an additional responsibility of creating functions in place
+of the callbacks that you give and then listening for events on them. When a callback is called, those arguments are
+captured and forwarded to the Prim+RPC client.
+
+There are callback handlers available for the server of your choice and it is
+[also easy to create your own](/docs/plugins/create#callback-handler). An example of how to utilize an existing callback
+handler is given below:
+
+```typescript
+import { createPrimServer } from "@doseofted/prim-rpc"
+import { createCallbackHandler } from "@doseofted/prim-rpc-plugins/ws"
+
+const wss = new WebSocketServer({ port: 1234 })
+
+createPrimServer({
+	callbackHandler: createCallbackHandler({ wss }),
+})
+```
+
+### `.prefix`
+
+| Required  | Default     | Sync Required |
+| --------- | ----------- | ------------- |
+| _`false`_ | _`"/prim"`_ | 🟢 No         |
+
+This option is used to configure HTTP routers used inside of a method/callback handler. The prefix will become the path
+for which the Prim+RPC client's plugins will communicate.
+
+In general, if you are using an HTTP/WS server with Prim+RPC then the `.prefix` option given on the Prim+RPC server is
+the pathname that you should give as the [`.endpoint](#endpoint) in the Prim+RPC client. If you are not using a
+transport that makes use of a URL (i.e. Web Workers, other forms of IPC) then this option isn't needed.
+
+As an example, using some HTTP server:
+
+<CH.Code>
+
+```ts server.ts
+import { createPrimServer } from "@doseofted/prim-rpc"
+
+createPrimServer({
+	prefix: "/my-rpc-endpoint",
+})
+
+// ... start HTTP server
+```
+
+---
+
+```ts client.ts
+import { createPrimClient } from "@doseofted/prim-rpc"
+
+// We'll pretend that the server is running on http://localhost:1234
+createPrimClient({
+	endpoint: "http://localhost:1234/my-rpc-endpoint",
+})
+```
+
+</CH.Code>
+
+This option also tells Prim+RPC what parts of a path to exclude if a request is given over a URL. While most requests
+are given using the Prim+RPC client, you could also make a simple request like so:
+
+```zsh
+curl --request GET \
+  --url http://localhost:1234/my-rpc-endpoint/sayHello?name=Ted&greeting=Hello
+```
+
+This example is the equivalent of calling `sayHello({ name: "Ted", greeting: "Hello" })`. Prim+RPC will know to remove
+the `/my-rpc-endpoint` part of the path because we configured it as the `.prefix`. Making requests over a URL isn't the
+primary use of Prim+RPC but it is possible as long as the method handler supports it.
+
+### `.allowList`
+
+| Required  | Default | Sync Required |
+| --------- | ------- | ------------- |
+| _`false`_ | _`{}`_  | 🟢 No         |
+
+All functions provided to Prim+RPC must explicitly be marked usable as RPC. This is typically done by adding a `.rpc`
+property to the function in question. Sometimes this is not possible, such as when using a separate package directly
+with Prim+RPC that does not have an RPC property. In these events, you may specify an allowed list of functions that can
+be used.
+
+When Prim+RPC receives an RPC it will check the `.rpc` property and, if not found, follow the allow-list. The allow list
+is expected to follow the same structure as the module you provide. The allow list below is a simple example and follows
+the same structure of the module provided:
+
+```typescript
+import { createPrimServer } from "@doseofted/prim-rpc"
+
+// it's easier to specify the `.rpc` property on functions but below is also completely valid
+createPrimServer({
+	module: {
+		hi() {
+			return "Hi!"
+		},
+		good: {
+			bye() {
+				return "Goodbye!"
+			},
+		},
+	},
+	allowList: {
+		hi: true,
+		good: {
+			bye: true,
+		},
+	},
+})
+```
+
+### `.methodsOnMethods`
+
+| Required  | Default | Sync Required |
+| --------- | ------- | ------------- |
+| _`false`_ | _`[]`_  | 🟢 No         |
+
+By default, Prim+RPC will not answer methods calls made on a function. For instance, if you have a function named
+`hello()`, you cannot call `hello.toString()`. However, there may be circumstances where you'd like to allow certain
+methods on a defined function. For instance, the following could be useful:
+
+```typescript
+function sayHello() {
+	return "Hello!"
+}
+sayHello.rpc = true
+sayHello.docs = function () {
+	return "I say hello!"
+}
+```
+
+By default, `sayHello.docs()` is not allowed to be called. This can be fixed by specifying the following:
+
+```typescript
+import { createPrimServer } from "@doseofted/prim-rpc"
+import { sayHello } from "./previous-example"
+
+createPrimServer({
+	module: { sayHello },
+	methodsOnMethods: ["docs"],
+})
+```
+
+Now, any function that has a `.docs()` method can be called.
+
+<Alert icon="carbon:warning" type="alert-warning" prose>
+
+It is recommended, but not required, that you choose unique method names and avoid exposing or using the same names as
+built-in methods, when using this option.
+
+</Alert>
+
+## Testing
+
+Included in Prim+RPC are utilities for running local tests with Prim+RPC, intended to be used with tools like Vitest or
+Jest.
+
+<Alert icon="carbon:warning" type="alert-warning">
+
+Documentation in Progress
+
+</Alert>

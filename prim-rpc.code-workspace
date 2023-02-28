@@ -1,0 +1,112 @@
+{
+	"folders": [
+		{
+			"name": "🌳 Prim+RPC",
+			"path": "."
+		},
+		{
+			"name": "📙 Library",
+			"path": "./libs/rpc"
+		},
+		{
+			"name": "📙 Plugins",
+			"path": "./libs/plugins"
+		},
+		{
+			"name": "📙 Tooling",
+			"path": "./libs/tooling"
+		},
+		{
+			"name": "📘 Interface",
+			"path": "./libs/ui"
+		},
+		{
+			"name": "☁️ Reverse Proxy",
+			"path": "./proxy"
+		},
+		{
+			"name": "🌐 Website",
+			"path": "./apps/frontend"
+		},
+		{
+			"name": "🌐 Documentation",
+			"path": "./docs"
+		},
+		{
+			"name": "📗 Example Server",
+			"path": "./apps/backend"
+		},
+		{
+			"name": "📗 Example Module",
+			"path": "./libs/example"
+		}
+	],
+	"settings": {
+		"editor.rulers": [80, 120],
+		"editor.tabSize": 2,
+		"editor.renderWhitespace": "selection",
+		"editor.detectIndentation": true,
+		"editor.insertSpaces": false,
+		"editor.wordWrapColumn": 120,
+		"editor.codeActionsOnSave": {
+			"source.fixAll": true
+		},
+		"editor.linkedEditing": true,
+		"editor.formatOnSave": true,
+		"editor.defaultFormatter": "esbenp.prettier-vscode",
+		"workbench.editor.pinnedTabSizing": "compact",
+		"npm.packageManager": "auto",
+		"stylelint.validate": ["css", "less", "postcss", "scss"],
+		"eslint.validate": ["javascript", "javascriptreact", "typescript", "typescriptreact"],
+		"yaml.schemas": {
+			"https://raw.githubusercontent.com/compose-spec/compose-spec/master/schema/compose-spec.json": "compose.*.yml",
+			"https://json.schemastore.org/taskfile.json": "Taskfile.*.yml"
+		},
+		"files.associations": {
+			"*.Corefile": "caddyfile"
+		},
+		"peacock.color": "#57b0ca",
+		"peacock.affectStatusAndTitleBorders": true,
+		"peacock.affectTitleBar": false,
+		"peacock.affectActivityBar": false,
+		"peacock.showColorInStatusBar": false,
+		"workbench.colorCustomizations": {
+			"sash.hoverBorder": "#7ec2d6",
+			"statusBar.background": "#57b0ca",
+			"statusBar.border": "#57b0ca",
+			"statusBar.foreground": "#15202b",
+			"statusBarItem.hoverBackground": "#3999b5",
+			"statusBarItem.remoteBackground": "#57b0ca",
+			"statusBarItem.remoteForeground": "#15202b"
+		},
+		"cSpell.words": [
+			"composables",
+			"defu",
+			"doseofted",
+			"fastify",
+			"Klingenberg",
+			"pnpm",
+			"Taskfile",
+			"Turborepo",
+			"websockets"
+		],
+		"cSpell.enableFiletypes": ["dockerfile", "mdx"],
+		"css.lint.unknownAtRules": "ignore",
+		"typescript.tsdk": "🌳 Monorepo/node_modules/typescript/lib",
+		"[typescript]": {
+			"editor.defaultFormatter": "esbenp.prettier-vscode"
+		}
+	},
+	"extensions": {
+		"recommendations": [
+			"redhat.vscode-yaml",
+			"zamerick.vscode-caddyfile-syntax",
+			"ms-azuretools.vscode-docker",
+			"dbaeumer.vscode-eslint",
+			"esbenp.prettier-vscode",
+			"stylelint.vscode-stylelint",
+			"irongeek.vscode-env",
+			"streetsidesoftware.code-spell-checker"
+		]
+	}
+}

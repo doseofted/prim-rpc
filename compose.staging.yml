@@ -1,0 +1,10 @@
+version: "3"
+
+services:
+  caddy:
+    volumes:
+      - ./proxy/staging.Caddyfile:/etc/caddy/Caddyfile:ro
+
+  # postgres:
+  # backend:
+  # frontend:

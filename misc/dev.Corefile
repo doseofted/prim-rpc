@@ -1,0 +1,18 @@
+# This configuration is used to create a local DNS server
+# so that the local server can be used from other devices.
+# Environment variables are set from `devdns` function in `source.sh`
+
+# Forward all requests to Google's DNS (or change if needed)...
+. {
+  log
+  forward . 8.8.8.8 8.8.4.4
+  cache
+}
+
+# ...except for requests for the local server (using given TLD)
+{$DNS_TLD} {
+  log
+  template IN A {
+    answer "{{ .Name }} 0 IN A {$DNS_BIND}"
+  }
+}
