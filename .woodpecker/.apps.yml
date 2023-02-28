@@ -18,7 +18,7 @@ pipeline:
     when: &base-when
       event: [tag, push]
       tag: v*
-      branch: release/*
+      branch: [main, release/*]
 
   apps:base:prod:
     image: *build-image

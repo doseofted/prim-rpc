@@ -261,7 +261,7 @@ code while protocol buffers live outside of it.
 gRPC and Prim+RPC also approach data flow differently. gRPC has many different methods to send and receive results from
 RPCs including unary/server/client/bidirectional streaming. Prim+RPC does not utilize HTTP/2 streaming or any kind of
 transport method because this is specified by plugins. Plugins available by default today do not support HTTP/2
-streaming but, of course, you may choose to create a plugin that does (once it's made possible in web browsers).
+streaming but, of course, you may choose to create a plugin that does.
 
 As a simple comparison (streaming support aside), **unary streaming** in gRPC is comparable to making a simple function
 call in Prim+RPC. **Server-side streaming** in gRPC is comparable to adding a callback to your function in Prim+RPC.
