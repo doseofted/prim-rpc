@@ -3,7 +3,7 @@ import { Navigation } from "@/components/Navigation"
 import { CodeHighlighted } from "@/components/CodeHighlighted"
 import { motion } from "framer-motion"
 import { IntroText } from "@/components/IntroText"
-import { GetServerSideProps } from "next"
+import { GetStaticProps } from "next"
 import backend from "../prim-client"
 import { Title } from "@/components/Title"
 import { NextSeo } from "next-seo"
@@ -14,7 +14,7 @@ interface Props {
 	greeting: string
 }
 
-export const getServerSideProps: GetServerSideProps<Props> = async function () {
+export const getStaticProps: GetStaticProps<Props> = async function () {
 	// NOTE: using Prim+RPC on homepage is just for fun (show fallback if server isn't running)
 	let greeting = "Backend, meet Frontend."
 	try {
