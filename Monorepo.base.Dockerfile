@@ -1,4 +1,4 @@
-FROM node:19.9-bullseye as monorepo-install
+FROM node:20-bullseye as monorepo-install
 USER root
 # Corepack is still experimental and not enabled by default
 # LINK https://nodejs.org/api/corepack.html#enabling-the-feature

@@ -1,6 +1,6 @@
 pipeline:
   build:setup:
-    image: &image node:19.9-bullseye
+    image: &image node:20-bullseye
     commands:
       - corepack enable
       - pnpm install --frozen-lockfile

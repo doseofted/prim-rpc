@@ -39,7 +39,7 @@ tasks:
     cmds:
       - cmd: "corepack enable"
         ignore_error: true
-      - "pnpm env use --global 19.9.0"
+      - "pnpm env use --global 20.1.0"
       - "pnpm install"
 
   setup:
