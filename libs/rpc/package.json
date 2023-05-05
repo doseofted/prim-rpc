@@ -41,13 +41,13 @@
 		"proxy-deep": "^3.1.1",
 		"query-string": "^8.1.0",
 		"serialize-error": "^11.0.0",
-		"type-fest": "^3.8.0"
+		"type-fest": "^3.10.0"
 	},
 	"devDependencies": {
 		"@doseofted/prim-example": "workspace:*",
 		"@types/lodash-es": "^4.17.7",
-		"@types/node": "^18.15.11",
-		"superjson": "^1.12.2"
+		"@types/node": "^20.0.0",
+		"superjson": "^1.12.3"
 	},
 	"type": "module",
 	"exports": {

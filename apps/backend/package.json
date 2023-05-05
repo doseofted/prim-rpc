@@ -31,8 +31,8 @@
 		"@doseofted/prim-rpc-plugins": "workspace:*",
 		"@fastify/cors": "^8.2.1",
 		"@fastify/multipart": "^7.6.0",
-		"fastify": "^4.15.0",
-		"superjson": "^1.12.2",
+		"fastify": "^4.17.0",
+		"superjson": "^1.12.3",
 		"ws": "^8.13.0"
 	},
 	"scripts": {
