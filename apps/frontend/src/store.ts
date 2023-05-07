@@ -5,7 +5,7 @@ export const websiteState = proxy({
 	 * The `<Lights />` component can become intense on system resources in development.
 	 * Toggle them on in development when they're actively being worked on.
 	 */
-	useLightEffect: false || process.env.NODE_ENV === "production",
+	useLightEffect: true || process.env.NODE_ENV === "production",
 })
 
 async function setUpDevTools() {
