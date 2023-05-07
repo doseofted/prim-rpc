@@ -73,12 +73,6 @@ export default function Layout(props: LayoutProps) {
 									Ted Klingenberg
 								</Link>
 							</p>
-							<p>
-								Anonymous analytics collected with{" "}
-								<Link className="link" href="https://github.com/electerious/Ackee#-introduction" target="_blank">
-									Ackee
-								</Link>
-							</p>
 						</div>
 					</div>
 				</div>

@@ -25,7 +25,6 @@ const withMDX = mdx({
 })
 
 const nextConfig = withMDX({
-	output: "export",
 	// NOTE: standalone mode appears to create issues in pnpm workspace
 	// output: "standalone",
 	experimental: {
@@ -36,9 +35,6 @@ const nextConfig = withMDX({
 	},
 	reactStrictMode: true,
 	swcMinify: true,
-	images: {
-		unoptimized: true // NOTE: only to be used for static exports
-	},
 	webpack(given) {
 		/** @type {import("webpack").Configuration} */
 		const config = given
