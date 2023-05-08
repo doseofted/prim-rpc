@@ -1,11 +1,11 @@
-import { defineConfig, PluginOption } from "vite"
+import { defineConfig } from "vite"
 import react from "@vitejs/plugin-react"
 import dts from "vite-plugin-dts"
 import vue from "@vitejs/plugin-vue"
 
 // https://vitejs.dev/config/
 export default defineConfig({
-	plugins: [dts(), react(), vue() as unknown as PluginOption],
+	plugins: [dts(), react(), vue()],
 	build: {
 		lib: {
 			formats: ["es"],
