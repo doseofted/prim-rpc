@@ -17,7 +17,7 @@ const filteredModule = process.env.NODE_ENV === "development" ? module : { sayHe
 const contained = JSON.parse(process.env.CONTAINED ?? "false") === true
 
 // Setup Fastify (HTTP server)
-const fastify = Fastify({ logger: true })
+const fastify = Fastify({ trustProxy: true, logger: true })
 await fastify.register(Cors, { origin: contained ? `https://${process.env.WEBSITE_HOST}` : "http://localhost:3000" })
 // Setup WS-Server (WebSocket server)
 const wss = new WebSocketServer({ server: fastify.server })

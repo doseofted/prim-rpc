@@ -15,7 +15,7 @@ export default defineConfig(options => ({
 		"src/client/browser-websocket.ts",
 		"src/ipc/web-worker.ts",
 	],
-	target: "ES2020",
+	target: "es2020",
 	dts: true,
 	format: ["esm"],
 	clean: true,

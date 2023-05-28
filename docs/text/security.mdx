@@ -1,0 +1,54 @@
+{/* SECTION: setup */}
+
+import { LayoutDocs } from "@/components/LayoutDocs"
+import { Alert } from "@/components/Alert"
+import { Tab } from "@headlessui/react"
+export const meta = {
+	title: "Security",
+}
+export default ({ children }) => <LayoutDocs meta={meta}>{children}</LayoutDocs>
+
+{/* !SECTION setup */}
+
+# {meta.title}
+
+<Alert prose icon="carbon:information">
+
+Prim+RPC does not have a stable release and should not yet be used in production applications.
+
+</Alert>
+
+Prim+RPC's goal is simple: write a function on the server and call it from the client. Once Prim+RPC is set up, it is
+incredibly easy to add new functions to the backend. However caution should be taken since input given to the server
+cannot be trusted. Tasks such as validation, sanitation, authentication, and more are outside of Prim+RPC's
+responsibilities and are left to the developer (and the libraries that you choose).
+
+<Alert icon="carbon:warning" type="alert-warning">
+	Documentation in Progress
+</Alert>
+
+## Table of Contents
+
+## Set RPC Property on Functions
+
+<Alert icon="carbon:warning" type="alert-warning">
+	Documentation in Progress
+</Alert>
+
+## Use the Allow List
+
+<Alert icon="carbon:warning" type="alert-warning">
+	Documentation in Progress
+</Alert>
+
+## Don't Trust Arguments
+
+<Alert icon="carbon:warning" type="alert-warning">
+	Documentation in Progress
+</Alert>
+
+## Override the JSON Handler
+
+<Alert icon="carbon:warning" type="alert-warning">
+	Documentation in Progress
+</Alert>

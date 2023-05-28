@@ -60,7 +60,7 @@ export function Navigation(props: NavigationProps) {
 						onClick={clickHandler}
 						className="hidden lg:flex group font-semibold uppercase text-sm h-full px-4 p-4 justify-center items-center rounded-b-2xl transition-all duration-300
 								bg-transparent hover:bg-white transform scale-100 hover:scale-110"
-						href="https://doseofted.com/"
+						href="https://doseofted.me/"
 						target="_blank"
 						title="Dose of Ted">
 						<div className="pointer-events-none w-full h-[100svh] transition-all duration-300 bg-transparent group-hover:bg-white absolute top-0 transform -translate-y-full" />
@@ -118,7 +118,7 @@ export function Navigation(props: NavigationProps) {
 									<Link
 										onClick={clickHandler}
 										className="flex justify-start items-center gap-4 w-full font-semibold uppercase text-sm h-full px-6 p-4 rounded-2xl transition-all duration-300 bg-transparent hover:bg-white transform scale-100 hover:scale-105"
-										href="https://doseofted.com/"
+										href="https://doseofted.me/"
 										target="_blank"
 										title="Dose of Ted">
 										<Image

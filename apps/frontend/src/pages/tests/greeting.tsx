@@ -6,6 +6,7 @@ interface Props {
 }
 
 export const getServerSideProps: GetServerSideProps<Props> = async function (ctx) {
+	// NOTE: docs are now static (but turn back into server-side props if no longer the case)
 	const name = ctx.query?.name ? String(ctx.query.name) : undefined
 	const message = await backend.sayHello({ name })
 	return {

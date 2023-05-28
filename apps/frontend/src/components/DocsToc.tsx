@@ -11,6 +11,7 @@ export function DocsTableOfContents(props: Props) {
 				{ name: "Introduction", link: "/" },
 				{ name: "Setup", link: "/setup" },
 				{ name: "Usage", link: "/usage" },
+				{ name: "Security", link: "/security" },
 				{ name: "Examples", link: "/examples" },
 				{ name: "Comparisons", link: "/comparisons" },
 				{ name: "Limitations", link: "/limitations" },

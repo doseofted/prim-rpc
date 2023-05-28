@@ -1,13 +1,13 @@
 {
 	"name": "@doseofted/prim-example-server",
-	"version": "0.1.0-alpha.0",
+	"version": "0.1.0-alpha.1",
 	"description": "An example backend making use of Prim+RPC.",
 	"license": "UNLICENSED",
 	"private": true,
 	"author": {
 		"name": "Ted Klingenberg",
 		"email": "ted@doseofted.com",
-		"url": "https://doseofted.com/"
+		"url": "https://doseofted.me/"
 	},
 	"contributors": [],
 	"repository": {
@@ -15,7 +15,7 @@
 		"url": "https://github.com/doseofted/prim-rpc.git",
 		"directory": "apps/backend"
 	},
-	"homepage": "https://prim.doseofted.com/",
+	"homepage": "https://prim.doseofted.me/",
 	"keywords": [
 		"api",
 		"json",
@@ -29,11 +29,11 @@
 		"@doseofted/prim-example": "workspace:*",
 		"@doseofted/prim-rpc": "workspace:*",
 		"@doseofted/prim-rpc-plugins": "workspace:*",
-		"@fastify/cors": "^8.2.0",
-		"@fastify/multipart": "^7.4.0",
-		"fastify": "^4.12.0",
-		"superjson": "^1.12.2",
-		"ws": "^8.12.0"
+		"@fastify/cors": "^8.3.0",
+		"@fastify/multipart": "^7.6.0",
+		"fastify": "^4.17.0",
+		"superjson": "^1.12.3",
+		"ws": "^8.13.0"
 	},
 	"scripts": {
 		"watch": "tsup --watch --config build.config.js",

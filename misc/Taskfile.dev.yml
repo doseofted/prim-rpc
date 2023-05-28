@@ -39,7 +39,7 @@ tasks:
     cmds:
       - cmd: "corepack enable"
         ignore_error: true
-      - "pnpm env use --global 19.6.0"
+      - "pnpm env use --global 18.16.0"
       - "pnpm install"
 
   setup:
@@ -88,6 +88,7 @@ tasks:
       - task: clean-turbo
       # Remove Next.js cache
       - "rm -fr apps/frontend/.next"
+      - "rm -fr apps/frontend/out"
       # Remove Task cache
       - "rm -fr .task"
       # Task doesn't run as root and it could be dangerous to remove project data, so this will be a manual step

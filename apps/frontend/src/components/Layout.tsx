@@ -45,12 +45,12 @@ export default function Layout(props: LayoutProps) {
 							<p className="text-white/80 text-xs drop-shadow-lg mb-4 max-w-md leading-6">
 								The Prim+RPC project and website are designed and developed by Ted.
 								<br /> Contact Ted to{" "}
-								<Link href="https://doseofted.com/" target="_blank" className="link">
+								<Link href="https://doseofted.me/" target="_blank" className="link">
 									start your own project
 								</Link>
 								.
 							</p>
-							<Link href="https://doseofted.com/" target="_blank">
+							<Link href="https://doseofted.me/" target="_blank">
 								<Image
 									src="/prim-doseofted-attribution.png"
 									width={361}
@@ -69,14 +69,8 @@ export default function Layout(props: LayoutProps) {
 									</Link>
 								</strong>
 								: a project by{" "}
-								<Link className="link" href="https://doseofted.com/" target="_blank">
+								<Link className="link" href="https://doseofted.me/" target="_blank">
 									Ted Klingenberg
-								</Link>
-							</p>
-							<p>
-								Anonymous analytics collected with{" "}
-								<Link className="link" href="https://github.com/electerious/Ackee#-introduction" target="_blank">
-									Ackee
 								</Link>
 							</p>
 						</div>

@@ -1,12 +1,12 @@
 {
 	"name": "@doseofted/prim-rpc",
-	"version": "0.1.0-alpha.0",
+	"version": "0.1.0-alpha.1",
 	"description": "Easy-to-understand, type-safe, transport-agnostic RPC/IPC for JavaScript, supporting callbacks, batching, file uploads, custom serialization, and more.",
 	"license": "Apache-2.0",
 	"author": {
 		"name": "Ted Klingenberg",
 		"email": "ted@doseofted.com",
-		"url": "https://doseofted.com/"
+		"url": "https://doseofted.me/"
 	},
 	"contributors": [],
 	"repository": {
@@ -14,7 +14,7 @@
 		"url": "https://github.com/doseofted/prim-rpc.git",
 		"directory": "libs/rpc"
 	},
-	"homepage": "https://prim.doseofted.com/",
+	"homepage": "https://prim.doseofted.me/",
 	"keywords": [
 		"api",
 		"json",
@@ -37,17 +37,17 @@
 		"defu": "^6.1.2",
 		"lodash-es": "^4.17.21",
 		"mitt": "^3.0.0",
-		"nanoid": "^4.0.1",
+		"nanoid": "^4.0.2",
 		"proxy-deep": "^3.1.1",
 		"query-string": "^8.1.0",
 		"serialize-error": "^11.0.0",
-		"type-fest": "^3.5.5"
+		"type-fest": "^3.11.0"
 	},
 	"devDependencies": {
 		"@doseofted/prim-example": "workspace:*",
-		"@types/lodash-es": "^4.17.6",
-		"@types/node": "^18.11.19",
-		"superjson": "^1.12.2"
+		"@types/lodash-es": "^4.17.7",
+		"@types/node": "^20.2.5",
+		"superjson": "^1.12.3"
 	},
 	"type": "module",
 	"exports": {

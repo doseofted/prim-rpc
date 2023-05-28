@@ -2,4 +2,4 @@
 
 Plugins for **Prim+RPC** for both the server and client.
 
-[Learn more about Prim+RPC](https://prim.doseofted.com/)
+[Learn more about Prim+RPC](https://prim.doseofted.me/)
