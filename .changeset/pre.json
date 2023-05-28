@@ -11,6 +11,7 @@
     "@doseofted/prim-rpc-ui": "0.0.0"
   },
   "changesets": [
-    "afraid-starfishes-occur"
+    "afraid-starfishes-occur",
+    "plenty-wombats-invent"
   ]
 }

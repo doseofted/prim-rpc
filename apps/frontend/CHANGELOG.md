@@ -1,5 +1,17 @@
 # @doseofted/prim-documentation-website
 
+## 0.1.0-alpha.1
+
+### Patch Changes
+
+- 10f935c: Upgraded dependencies used in project
+- Updated dependencies [10f935c]
+  - @doseofted/prim-example@0.1.0-alpha.1
+  - @doseofted/prim-rpc-plugins@0.1.0-alpha.1
+  - @doseofted/prim-rpc-tooling@0.1.0-alpha.1
+  - @doseofted/prim-rpc@0.1.0-alpha.1
+  - @doseofted/prim-rpc-ui@0.1.0-alpha.1
+
 ## 0.1.0-alpha.0
 
 ### Minor Changes
