@@ -46,7 +46,6 @@
 		"@headlessui/react": "^1.7.14",
 		"@iconify/react": "^4.1.0",
 		"@mdx-js/react": "^2.3.0",
-		"@next/font": "^13.4.1",
 		"@next/mdx": "^13.4.1",
 		"@studio-freight/lenis": "^1.0.12",
 		"color2k": "^2.0.2",
