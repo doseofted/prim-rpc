@@ -29,7 +29,7 @@
 		"@doseofted/prim-example": "workspace:*",
 		"@doseofted/prim-rpc": "workspace:*",
 		"@doseofted/prim-rpc-plugins": "workspace:*",
-		"@fastify/cors": "^8.2.1",
+		"@fastify/cors": "^8.3.0",
 		"@fastify/multipart": "^7.6.0",
 		"fastify": "^4.17.0",
 		"superjson": "^1.12.3",

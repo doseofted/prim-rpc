@@ -39,12 +39,12 @@
 	},
 	"devDependencies": {
 		"@doseofted/prim-example": "workspace:*",
-		"@sinclair/typebox": "^0.28.9",
-		"@types/json-schema": "^7.0.11",
-		"@types/lodash": "^4.14.194",
+		"@sinclair/typebox": "^0.28.13",
+		"@types/json-schema": "^7.0.12",
+		"@types/lodash": "^4.14.195",
 		"@types/lodash-es": "^4.17.7",
 		"lodash": "^4.17.21",
-		"type-fest": "^3.10.0",
+		"type-fest": "^3.11.0",
 		"typedoc": "^0.23.28",
 		"typescript": "^5.0.4"
 	},
