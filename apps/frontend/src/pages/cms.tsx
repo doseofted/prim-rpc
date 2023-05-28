@@ -38,7 +38,7 @@ export default function Cms() {
 						<Link href="https://twitter.com/doseofted" className="btn text-white">
 							Follow for Updates
 						</Link>
-						<Link href="https://blog.doseofted.com/" className="btn text-white">
+						<Link href="https://blog.doseofted.me/" className="btn text-white">
 							Blog
 						</Link>
 					</motion.div>

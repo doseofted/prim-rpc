@@ -7,7 +7,7 @@
 	"author": {
 		"name": "Ted Klingenberg",
 		"email": "ted@doseofted.com",
-		"url": "https://doseofted.com/"
+		"url": "https://doseofted.me/"
 	},
 	"contributors": [],
 	"repository": {
@@ -15,7 +15,7 @@
 		"url": "https://github.com/doseofted/prim-rpc.git",
 		"directory": "libs/ui"
 	},
-	"homepage": "https://prim.doseofted.com/",
+	"homepage": "https://prim.doseofted.me/",
 	"keywords": [
 		"api",
 		"json",

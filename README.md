@@ -1,4 +1,4 @@
-[![Prim+RPC. Pictured are two very short JavaScript files: a simple function on the server-side and a call to that function on the client-side. Tagline: "Backend, meet Frontend"](./misc/docs-screenshot.png)](https://prim.doseofted.com/)
+[![Prim+RPC. Pictured are two very short JavaScript files: a simple function on the server-side and a call to that function on the client-side. Tagline: "Backend, meet Frontend"](./misc/docs-screenshot.png)](https://prim.doseofted.me/)
 
 Prim+RPC is a bridge between JavaScript environments, without the extra boilerplate code. The primary use case of this
 library is making plain function calls to a server from some client (RPC), as if that code had been written on the
@@ -7,14 +7,14 @@ without verbose wrappers around the communication channel.
 
 > **Warning** Prim+RPC is prerelease software. It may be unstable and functionality may change.
 
-[Read the Documentation](https://prim.doseofted.com/) ∙ [Try an Example](https://github.com/doseofted/prim-rpc-examples)
-∙ [Work with Ted](https://doseofted.com/)
+[Read the Documentation](https://prim.doseofted.me/) ∙ [Try an Example](https://github.com/doseofted/prim-rpc-examples)
+∙ [Work with Ted](https://doseofted.me/)
 
 ## Support
 
 You can support Prim+RPC by [starring the repository](https://github.com/doseofted/prim-rpc), sharing with others,
 contributing code (either to the core or plugins), sponsoring the project, or
-[working with Ted on a new project](https://doseofted.com/).
+[working with Ted on a new project](https://doseofted.me/).
 
 ## Issues
 
@@ -27,7 +27,7 @@ If you have any questions or are having trouble using Prim+RPC, open a
 
 ## Development
 
-See the [Documentation](https://prim.doseofted.com/) for usage instructions. These instructions refer to development of
+See the [Documentation](https://prim.doseofted.me/) for usage instructions. These instructions refer to development of
 the project itself.
 
 [Node](https://nodejs.org/) is required for development. Install dependencies with `pnpm install`. If
@@ -52,7 +52,7 @@ Lastly, Prim+RPC's optional tooling (such as documentation generation) will beco
 
 There is not yet a specific target date for these releases but I expect the Prim+RPC packages to generally become stable
 between Q2 and Q3. This time frame depends on the initial success of this project and the timeline of projects that will
-use Prim+RPC (such as [Prim+CMS](https://prim.doseofted.com/cms) and the new [Dose of Ted](https://doseofted.com/)
+use Prim+RPC (such as [Prim+CMS](https://prim.doseofted.me/cms) and the new [Dose of Ted](https://doseofted.me/)
 website).
 
 ## Security
