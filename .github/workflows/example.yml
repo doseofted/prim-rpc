@@ -1,0 +1,19 @@
+name: Build example library
+on:
+  push:
+    branches:
+      - main
+      - feature/*
+    paths:
+      - libs/example/**/*
+jobs:
+  build-example:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+      - uses: actions/setup-node@v3
+        with:
+          node-version: 18
+          cache: "pnpm"
+      - run: pnpm task dev:build -- --filter=./libs/example
+      - run: pnpm task dev:test -- --filter=./libs/example
