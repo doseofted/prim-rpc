@@ -1,5 +1,11 @@
 # @doseofted/prim-rpc-plugins
 
+## 0.1.0-alpha.2
+
+### Patch Changes
+
+- 551f2c0: Added provenance option to package.json
+
 ## 0.1.0-alpha.1
 
 ### Patch Changes
