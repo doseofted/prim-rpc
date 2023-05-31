@@ -15,13 +15,16 @@ jobs:
     steps:
       - uses: actions/checkout@v3
       - uses: pnpm/action-setup@v2
+        with:
+          run_install: |
+            - recursive: true
+              args: [--frozen-lockfile]
       - uses: actions/setup-node@v3
         with:
           node-version: 18
           cache: "pnpm"
-      - run: corepack enable
-      - name: Install
-        run: pnpm install --frozen-lockfile
+      # - name: Install
+      #   run: pnpm install --frozen-lockfile
       - name: Build
         run: pnpm task dev:build
       - name: Test
