@@ -23,8 +23,6 @@ jobs:
         with:
           node-version: 18
           cache: "pnpm"
-      # - name: Install
-      #   run: pnpm install --frozen-lockfile
       - name: Build
         run: pnpm task dev:build
       - name: Test
