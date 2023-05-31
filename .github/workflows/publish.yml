@@ -1,17 +1,13 @@
-name: Build Prim+RPC Project
+name: Build Prim+RPC
 on:
   push:
-    tags:
-      - v*
+    branches: ["main"]
 jobs:
   build:
     runs-on: ubuntu-latest
+    container: node:18-bullseye
     steps:
       - uses: actions/checkout@v3
-      - uses: actions/setup-node@v3
-        with:
-          node-version: 18
-          cache: "pnpm"
       - run: corepack enable
       - name: Install
         run: pnpm install --frozen-lockfile
@@ -19,10 +15,10 @@ jobs:
         run: pnpm task dev:build
       - name: Test
         run: pnpm task dev:test
-      # - name: Create Release PR
-      #   uses: changesets/action@v1
-      #   with:
-      #     publish: pnpm task dev:changeset:publish
-      #   env:
-      #     GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-      #     NPM_TOKEN: ${{ secrets.NPM_TOKEN }}
+      - name: Create Release PR
+        uses: changesets/action@v1
+        with:
+          publish: pnpm task dev:changeset:publish
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          NPM_TOKEN: ${{ secrets.NPM_TOKEN }}

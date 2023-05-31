@@ -1,7 +1,5 @@
-name: Build Prim+RPC Project
+name: Build Prim+RPC
 on:
-  push:
-    branches: ["main"]
   pull_request:
     types: [opened, synchronize]
 jobs:
@@ -13,10 +11,6 @@ jobs:
       TURBO_TEAM: ${{ secrets.TURBO_TEAM }}
     steps:
       - uses: actions/checkout@v3
-      # - uses: actions/setup-node@v3
-      #   with:
-      #     node-version: 18
-      #     cache: "pnpm"
       - run: corepack enable
       - name: Install
         run: pnpm install --frozen-lockfile
