@@ -8,9 +8,13 @@ on:
 jobs:
   build:
     runs-on: ubuntu-latest
-    container: node:18-bullseye
     steps:
       - uses: actions/checkout@v3
+      - uses: pnpm/action-setup@v2
+      - uses: actions/setup-node@v3
+        with:
+          node-version: 18
+          cache: "pnpm"
       - run: corepack enable
       - name: Install
         run: pnpm install --frozen-lockfile
