@@ -22,7 +22,7 @@ jobs:
         run: pnpm task dev:build
       - name: Test
         run: pnpm task dev:test
-      - name: Create Release PR
+      - name: Release
         uses: changesets/action@v1
         with:
           publish: pnpm task dev:changeset:publish
