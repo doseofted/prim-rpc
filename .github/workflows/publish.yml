@@ -1,4 +1,4 @@
-name: Build Prim+RPC
+name: Publish Prim+RPC
 
 on:
   push:
