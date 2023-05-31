@@ -15,6 +15,9 @@
 		"url": "https://github.com/doseofted/prim-rpc.git",
 		"directory": "libs/ui"
 	},
+	"publishConfig": {
+		"provenance": true
+	},
 	"homepage": "https://prim.doseofted.me/",
 	"keywords": [
 		"api",
