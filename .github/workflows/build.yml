@@ -1,7 +1,11 @@
 name: Build Prim+RPC
+
 on:
   pull_request:
-    types: [opened, synchronize]
+    types:
+      - opened
+      - synchronize
+
 jobs:
   build:
     runs-on: ubuntu-latest
