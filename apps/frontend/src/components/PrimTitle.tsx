@@ -16,7 +16,7 @@ export function PrimTitle(props: Props) {
 					{product}
 				</span>
 			</p>
-			<OpinionatedLight count={12} state={props.state} size={700} />
+			<OpinionatedLight count={10} state={props.state} size={700} />
 		</Link>
 	)
 }

@@ -110,7 +110,7 @@ function generateLightOptions(
 ): Partial<LightOptions>[] {
 	const focusStrength = 1 - focus
 	return Array.from(Array(count), (_, i) => ({
-		brightness: i % 3 === 0 ? random(1.1, 1.3) : random(0.7, 1.1),
+		brightness: i % 3 === 0 ? random(1.3, 1.5) : random(0.9, 1.3),
 		offset:
 			i % 3 === 0
 				? [

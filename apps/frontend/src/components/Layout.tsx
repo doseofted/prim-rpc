@@ -40,29 +40,9 @@ export default function Layout(props: LayoutProps) {
 						))}
 					</div>
 					{children}
-					<div className="py-32 pb-16 text-white text-center flex flex-col items-center gap-8 relative">
+					<div className="py-20 pb-16 text-white text-center flex flex-col items-center gap-8 relative">
 						<div>
 							<p className="text-white/80 text-xs drop-shadow-lg mb-4 max-w-md leading-6">
-								The Prim+RPC project and website are designed and developed by Ted.
-								<br /> Contact Ted to{" "}
-								<Link href="https://doseofted.me/" target="_blank" className="link">
-									start your own project
-								</Link>
-								.
-							</p>
-							<Link href="https://doseofted.me/" target="_blank">
-								<Image
-									src="/prim-doseofted-attribution.png"
-									width={361}
-									height={150}
-									alt="Dose of Ted"
-									className="w-60 lg:w-80 mx-auto"
-								/>
-							</Link>
-							<OpinionatedLight count={9} focus={0.9} size={900} state="enter" className="top-96 left-0 absolute" />
-						</div>
-						<div className="container mx-auto flex flex-col lg:flex-row lg:justify-between px-4 gap-4 text-white/80 text-xs drop-shadow-lg">
-							<p>
 								<strong>
 									<Link className="link" href="/">
 										Prim+RPC
@@ -73,6 +53,16 @@ export default function Layout(props: LayoutProps) {
 									Ted Klingenberg
 								</Link>
 							</p>
+							<Link href="https://doseofted.me/" target="_blank">
+								<Image
+									src="/prim-doseofted-attribution.png"
+									width={361}
+									height={150}
+									alt="Dose of Ted"
+									className="w-52 lg:w-72 mx-auto"
+								/>
+							</Link>
+							<OpinionatedLight count={4} focus={0.9} size={1000} state="enter" className="top-96 left-0 absolute" />
 						</div>
 					</div>
 				</div>

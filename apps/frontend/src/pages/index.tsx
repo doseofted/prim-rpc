@@ -4,7 +4,6 @@ import { CodeHighlighted } from "@/components/CodeHighlighted"
 import { motion } from "framer-motion"
 import { IntroText } from "@/components/IntroText"
 import { GetServerSideProps } from "next"
-import backend from "../prim-client"
 import { Title } from "@/components/Title"
 import { NextSeo } from "next-seo"
 import Link from "next/link"
@@ -14,14 +13,15 @@ interface Props {
 	greeting: string
 }
 
+// eslint-disable-next-line @typescript-eslint/require-await
 export const getServerSideProps: GetServerSideProps<Props> = async function () {
 	// NOTE: using Prim+RPC on homepage is just for fun (show fallback if server isn't running)
-	let greeting = "Backend, meet Frontend."
-	try {
+	const greeting = "Backend, meet Frontend."
+	/* try {
 		greeting = await backend.greetings("Backend", "Frontend")
 	} catch (error) {
-		/* empty */
-	}
+		// ...
+	} */
 	return {
 		props: { greeting },
 	}
@@ -144,7 +144,7 @@ export default function Home({ greeting }: Props) {
 									</CodeHighlighted>
 								</motion.div>
 							</div>
-							<OpinionatedLight count={7} focus={0.9} size={500} state={state} />
+							<OpinionatedLight count={4} focus={0.9} size={600} state={state} />
 						</div>
 						<div className="transform -translate-y-32 lg:translate-y-0 lg:-translate-x-32 sm:mr-16 lg:mr-0 lg:mb-16">
 							<div className="transform translate-y-32 lg:translate-y-0 lg:translate-x-32">
@@ -158,7 +158,7 @@ export default function Home({ greeting }: Props) {
 									</CodeHighlighted>
 								</motion.div>
 							</div>
-							<OpinionatedLight count={7} focus={0.9} size={400} state={state} />
+							<OpinionatedLight count={4} focus={0.9} size={600} state={state} />
 						</div>
 					</div>
 				</div>
@@ -202,8 +202,7 @@ export default function Home({ greeting }: Props) {
 						className="relative bg-white/70 rounded-lg border border-white/60 backdrop-blur-lg p-4 col-span-12 md:col-span-4 text-prim-space space-y-4">
 						<p className="font-bold">{title}</p>
 						<p className="text-sm lg:text-base">{details}</p>
-						<OpinionatedLight count={1} focus={0.9} size={400} state={state} className="top-0 left-0 absolute" />
-						<OpinionatedLight count={1} focus={0.9} size={400} state={state} className="bottom-0 right-0 absolute" />
+						<OpinionatedLight count={2} focus={0.9} size={400} state={state} className="top-0 left-0 absolute" />
 					</div>
 				))}
 			</div>
@@ -224,7 +223,7 @@ export default function Home({ greeting }: Props) {
 								<div className="tab tab-md border-transparent tab-lifted" />
 								<div className="tab tab-md tab-lifted tab-active">server.ts</div>
 								<div className="tab tab-md border-transparent tab-lifted" />
-								<OpinionatedLight count={4} focus={0.9} size={500} state={state} />
+								<OpinionatedLight count={2} focus={0.9} size={700} state={state} />
 							</div>
 							<div className="bg-white border border-gray-300 p-3 rounded-xl flex-grow">
 								<CodeHighlighted
@@ -239,7 +238,7 @@ export default function Home({ greeting }: Props) {
 								<div className="tab tab-md border-transparent tab-lifted" />
 								<div className="tab tab-md tab-lifted tab-active">client.ts</div>
 								<div className="tab tab-md border-transparent tab-lifted" />
-								<OpinionatedLight count={4} focus={0.9} size={500} state={state} />
+								<OpinionatedLight count={2} focus={0.9} size={700} state={state} />
 							</div>
 							<div className="bg-white border border-gray-300 p-3 rounded-xl flex-grow">
 								<CodeHighlighted
@@ -280,8 +279,7 @@ export default function Home({ greeting }: Props) {
 						className="relative bg-white/70 rounded-lg border border-white/60 backdrop-blur-lg p-4 col-span-12 md:col-span-4 text-prim-space space-y-4">
 						<p className="font-bold">{title}</p>
 						<p className="text-sm lg:text-base">{details}</p>
-						<OpinionatedLight count={1} focus={0.9} size={400} state={state} className="top-0 left-0 absolute" />
-						<OpinionatedLight count={1} focus={0.9} size={400} state={state} className="bottom-0 right-0 absolute" />
+						<OpinionatedLight count={1} focus={0.9} size={600} state={state} className="bottom-0 right-0 absolute" />
 					</div>
 				))}
 			</div>
