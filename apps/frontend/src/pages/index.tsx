@@ -144,7 +144,7 @@ export default function Home({ greeting }: Props) {
 									</CodeHighlighted>
 								</motion.div>
 							</div>
-							<OpinionatedLight count={4} focus={0.9} size={600} state={state} />
+							<OpinionatedLight count={4} focus={0.9} size={500} state={state} />
 						</div>
 						<div className="transform -translate-y-32 lg:translate-y-0 lg:-translate-x-32 sm:mr-16 lg:mr-0 lg:mb-16">
 							<div className="transform translate-y-32 lg:translate-y-0 lg:translate-x-32">
@@ -158,7 +158,7 @@ export default function Home({ greeting }: Props) {
 									</CodeHighlighted>
 								</motion.div>
 							</div>
-							<OpinionatedLight count={4} focus={0.9} size={600} state={state} />
+							<OpinionatedLight count={4} focus={0.9} size={500} state={state} />
 						</div>
 					</div>
 				</div>
@@ -202,7 +202,7 @@ export default function Home({ greeting }: Props) {
 						className="relative bg-white/70 rounded-lg border border-white/60 backdrop-blur-lg p-4 col-span-12 md:col-span-4 text-prim-space space-y-4">
 						<p className="font-bold">{title}</p>
 						<p className="text-sm lg:text-base">{details}</p>
-						<OpinionatedLight count={2} focus={0.9} size={400} state={state} className="top-0 left-0 absolute" />
+						<OpinionatedLight count={2} focus={0.9} size={500} state={state} className="top-0 left-0 absolute" />
 					</div>
 				))}
 			</div>
@@ -279,7 +279,7 @@ export default function Home({ greeting }: Props) {
 						className="relative bg-white/70 rounded-lg border border-white/60 backdrop-blur-lg p-4 col-span-12 md:col-span-4 text-prim-space space-y-4">
 						<p className="font-bold">{title}</p>
 						<p className="text-sm lg:text-base">{details}</p>
-						<OpinionatedLight count={1} focus={0.9} size={600} state={state} className="bottom-0 right-0 absolute" />
+						<OpinionatedLight count={1} focus={0.9} size={500} state={state} className="bottom-0 right-0 absolute" />
 					</div>
 				))}
 			</div>
