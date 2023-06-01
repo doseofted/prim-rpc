@@ -8,13 +8,17 @@ without verbose wrappers around the communication channel.
 > **Warning** Prim+RPC is prerelease software. It may be unstable and functionality may change.
 
 [Read the Documentation](https://prim.doseofted.me/) ∙ [Try an Example](https://github.com/doseofted/prim-rpc-examples)
-∙ [Work with Ted](https://doseofted.me/)
+∙ [Follow Ted](https://doseofted.me/)
 
 ## Support
 
 You can support Prim+RPC by [starring the repository](https://github.com/doseofted/prim-rpc), sharing with others,
-contributing code (either to the core or plugins), sponsoring the project, or
-[working with Ted on a new project](https://doseofted.me/).
+contributing code (either to the core or plugins), sponsoring the project, or [following Ted](https://doseofted.me/) for
+project updates.
+
+## Security
+
+See the [Security Policy](./SECURITY.md).
 
 ## Issues
 
@@ -43,6 +47,10 @@ If you prefer to work in Docker, configure the [`.env` file](./.env.example) and
 on [Docker/Compose](https://docs.docker.com/get-docker/) and [mkcert](https://github.com/FiloSottile/mkcert)). When
 finished, run `pnpm task compose:dev:down`.
 
+## Contributions
+
+See the [Contribution Guide](./CONTRIBUTING.md).
+
 ## Release Plan
 
 Prim+RPC is currently prerelease software but the goal is to reach a stable release. Prim+RPC itself (framework-agnostic
@@ -51,17 +59,8 @@ core of the project) will become stable first. Before Prim+RPC is released howev
 Lastly, Prim+RPC's optional tooling (such as documentation generation) will become stable.
 
 There is not yet a specific target date for these releases but I expect the Prim+RPC packages to generally become stable
-between Q2 and Q3. This time frame depends on the initial success of this project and the timeline of projects that will
-use Prim+RPC (such as [Prim+CMS](https://prim.doseofted.me/cms) and the new [Dose of Ted](https://doseofted.me/)
-website).
-
-## Security
-
-See the [Security Policy](./SECURITY.md).
-
-## Contributions
-
-See the [Contribution Guide](./CONTRIBUTING.md).
+by end-of-year. This time frame depends on the initial success of this project and the timeline of projects that will
+use Prim+RPC (such as [Prim+CMS](https://prim.doseofted.me/cms) and my [new portfolio](https://doseofted.me/) website).
 
 ## License(s)
 

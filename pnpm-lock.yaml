@@ -139,8 +139,8 @@ importers:
         specifier: workspace:*
         version: link:../../libs/ui
       '@headlessui/react':
-        specifier: ^1.7.14
-        version: 1.7.14(react-dom@18.2.0)(react@18.2.0)
+        specifier: 1.7.10
+        version: 1.7.10(react-dom@18.2.0)(react@18.2.0)
       '@iconify/react':
         specifier: ^4.1.0
         version: 4.1.0(react@18.2.0)
@@ -1502,8 +1502,8 @@ packages:
     hasBin: true
     dev: false
 
-  /@headlessui/react@1.7.14(react-dom@18.2.0)(react@18.2.0):
-    resolution: {integrity: sha512-znzdq9PG8rkwcu9oQ2FwIy0ZFtP9Z7ycS+BAqJ3R5EIqC/0bJGvhT7193rFf+45i9nnPsYvCQVW4V/bB9Xc+gA==}
+  /@headlessui/react@1.7.10(react-dom@18.2.0)(react@18.2.0):
+    resolution: {integrity: sha512-1m66h/5eayTEZVT2PI13/2PG3EVC7a9XalmUtVSC8X76pcyKYMuyX1XAL2RUtCr8WhoMa/KrDEyoeU5v+kSQOw==}
     engines: {node: '>=10'}
     peerDependencies:
       react: ^16 || ^17 || ^18

@@ -43,7 +43,7 @@
 		"@doseofted/prim-rpc-plugins": "workspace:*",
 		"@doseofted/prim-rpc-tooling": "workspace:*",
 		"@doseofted/prim-rpc-ui": "workspace:*",
-		"@headlessui/react": "^1.7.14",
+		"@headlessui/react": "1.7.10",
 		"@iconify/react": "^4.1.0",
 		"@mdx-js/react": "^2.3.0",
 		"@next/mdx": "^13.4.4",

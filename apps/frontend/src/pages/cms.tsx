@@ -28,7 +28,7 @@ export default function Cms() {
 						animate={{ opacity: 1, y: 0 }}
 						transition={{ delay: 1.5, duration: 0.5 }}
 						className="pr-4 pb-4">
-						Content management built on Prim+RPC. Follow for updates.
+						Content management built on Prim+RPC.
 					</motion.p>
 					<motion.div
 						style={{ opacity: 0, y: 10 }}
