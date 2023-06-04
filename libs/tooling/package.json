@@ -1,6 +1,6 @@
 {
 	"name": "@doseofted/prim-rpc-tooling",
-	"version": "0.1.0-alpha.2",
+	"version": "0.1.0-alpha.3",
 	"description": "Optional tooling to further enhance Prim+RPC usage.",
 	"license": "Apache-2.0",
 	"author": {

@@ -1,5 +1,12 @@
 # @doseofted/prim-rpc-ui
 
+## 0.1.0-alpha.3
+
+### Patch Changes
+
+- Updated dependencies [d31b1a3]
+  - @doseofted/prim-rpc-tooling@0.1.0-alpha.3
+
 ## 0.1.0-alpha.2
 
 ### Patch Changes

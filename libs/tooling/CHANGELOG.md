@@ -1,5 +1,11 @@
 # @doseofted/prim-rpc-tooling
 
+## 0.1.0-alpha.3
+
+### Minor Changes
+
+- d31b1a3: Replaced usage of Lodash with "just" utilities
+
 ## 0.1.0-alpha.2
 
 ### Patch Changes

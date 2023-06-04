@@ -1,5 +1,13 @@
 # @doseofted/prim-example-server
 
+## 0.1.0-alpha.3
+
+### Patch Changes
+
+- Updated dependencies [d31b1a3]
+  - @doseofted/prim-rpc@0.1.0-alpha.3
+  - @doseofted/prim-rpc-plugins@0.1.0-alpha.2
+
 ## 0.1.0-alpha.2
 
 ### Patch Changes
