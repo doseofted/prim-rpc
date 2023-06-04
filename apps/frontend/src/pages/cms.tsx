@@ -27,19 +27,26 @@ export default function Cms() {
 						style={{ opacity: 0, y: 10 }}
 						animate={{ opacity: 1, y: 0 }}
 						transition={{ delay: 1.5, duration: 0.5 }}
-						className="pr-4 pb-4">
+						className="pr-4 pb-4 max-w-md mx-auto">
 						Content management built on Prim+RPC.
+					</motion.p>
+					<motion.p
+						style={{ opacity: 0, y: 10 }}
+						animate={{ opacity: 1, y: 0 }}
+						transition={{ delay: 1.75, duration: 0.5 }}
+						className="pr-4 pb-4 max-w-md mx-auto">
+						Follow Ted for developer-related updates about Prim+RPC, CMS, and the JavaScript ecosystem.
 					</motion.p>
 					<motion.div
 						style={{ opacity: 0, y: 10 }}
 						animate={{ opacity: 1, y: 0 }}
-						transition={{ delay: 1.75, duration: 0.5 }}
+						transition={{ delay: 2, duration: 0.5 }}
 						className="flex gap-4 justify-center">
 						<Link href="https://twitter.com/doseofted" className="btn text-white">
-							Follow for Updates
+							Follow
 						</Link>
-						<Link href="https://blog.doseofted.me/" className="btn text-white">
-							Blog
+						<Link href="https://blog.doseofted.me/newsletter" className="btn text-white">
+							Subscribe
 						</Link>
 					</motion.div>
 					<OpinionatedLight count={14} focus={0.3} size={1200} state={state} />

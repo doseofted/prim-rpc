@@ -7,8 +7,8 @@ without verbose wrappers around the communication channel.
 
 > **Warning** Prim+RPC is prerelease software. It may be unstable and functionality may change.
 
-[Read the Documentation](https://prim.doseofted.me/) ∙ [Try an Example](https://github.com/doseofted/prim-rpc-examples)
-∙ [Follow Ted](https://doseofted.me/)
+[Read the Documentation](https://prim.doseofted.me/) ∙ [Try an Example](https://prim.doseofted.me/docs/examples) ∙
+[Installation](https://prim.doseofted.me/docs/setup#installation) ∙ [Follow Ted](https://doseofted.me/)
 
 ## Support
 

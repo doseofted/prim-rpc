@@ -78,60 +78,60 @@ bun add @doseofted/prim-rpc @doseofted/prim-rpc-plugins @doseofted/prim-rpc-tool
 
 </CH.Code>
 
-You may also use Prim+RPC with Deno or from a CDN:
+You may also use Prim+RPC with Deno or from a CDN.
 
 <CH.Code>
 
 ```ts Deno
-import { createPrimServer, createPrimClient } from "npm:@doseofted/prim-rpc"
+import { createPrimServer, createPrimClient } from "npm:@doseofted/prim-rpc@latest"
 // use available export in place of {PLUGIN_NAME} below
 import {
 	createMethodHandler,
 	createCallbackHandler,
 	createMethodPlugin,
 	createCallbackPlugin,
-} from "npm:@doseofted/prim-rpc-plugins/{PLUGIN_NAME}"
+} from "npm:@doseofted/prim-rpc-plugins@latest/{PLUGIN_NAME}"
 // the following import is only if you're using Prim+RPC tooling
-import "npm:@doseofted/prim-rpc-tooling/{TOOL_NAME}"
+import "npm:@doseofted/prim-rpc-tooling@latest/{TOOL_NAME}"
 ```
 
 ```ts esm.sh
-import { createPrimServer, createPrimClient } from "https://esm.sh/@doseofted/prim-rpc"
+import { createPrimServer, createPrimClient } from "https://esm.sh/@doseofted/prim-rpc@latest"
 // use available export in place of {PLUGIN_NAME} below
 import {
 	createMethodHandler,
 	createCallbackHandler,
 	createMethodPlugin,
 	createCallbackPlugin,
-} from "https://esm.sh/@doseofted/prim-rpc-plugins/{PLUGIN_NAME}"
+} from "https://esm.sh/@doseofted/prim-rpc-plugins@latest/{PLUGIN_NAME}"
 // the following import is only if you're using Prim+RPC tooling
-import "https://esm.sh/@doseofted/prim-rpc-tooling/{TOOL_NAME}"
+import "https://esm.sh/@doseofted/prim-rpc-tooling@latest/{TOOL_NAME}"
 ```
 
-```ts skypack.dev
-import { createPrimServer, createPrimClient } from "https://cdn.skypack.dev/@doseofted/prim-rpc"
+```ts jsdelivr
+import { createPrimServer, createPrimClient } from "https://esm.run/@doseofted/prim-rpc@latest"
 // use available export in place of {PLUGIN_NAME} below
 import {
 	createMethodHandler,
 	createCallbackHandler,
 	createMethodPlugin,
 	createCallbackPlugin,
-} from "https://cdn.skypack.dev/@doseofted/prim-rpc-plugins/{PLUGIN_NAME}"
+} from "https://esm.run/@doseofted/prim-rpc-plugins@latest/{PLUGIN_NAME}"
 // the following import is only if you're using Prim+RPC tooling
-import "https://cdn.skypack.dev/@doseofted/prim-rpc-tooling/{TOOL_NAME}"
+import "https://esm.run/@doseofted/prim-rpc-tooling@latest/{TOOL_NAME}"
 ```
 
 ```ts unpkg.com
-import { createPrimServer, createPrimClient } from "https://unpkg.com/@doseofted/prim-rpc"
-// use available export in place of {PLUGIN_NAME} below
+import { createPrimServer, createPrimClient } from "https://unpkg.com/@doseofted/prim-rpc@latest?module"
+// use available export in place of {PLUGIN_NAME} below (you may need to specify file path for plugins/tools)
 import {
 	createMethodHandler,
 	createCallbackHandler,
 	createMethodPlugin,
 	createCallbackPlugin,
-} from "https://unpkg.com/@doseofted/prim-rpc-plugins/{PLUGIN_NAME}"
+} from "https://unpkg.com/@doseofted/prim-rpc-plugins@latest/{PLUGIN_NAME}?module"
 // the following import is only if you're using Prim+RPC tooling
-import "https://unpkg.com/@doseofted/prim-rpc-tooling/{TOOL_NAME}"
+import "https://unpkg.com/@doseofted/prim-rpc-tooling@latest/{TOOL_NAME}?module"
 ```
 
 </CH.Code>

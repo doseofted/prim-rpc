@@ -40,7 +40,7 @@ export default function Layout(props: LayoutProps) {
 						))}
 					</div>
 					{children}
-					<div className="py-20 pb-16 text-white text-center flex flex-col items-center gap-8 relative">
+					<div className="py-14 pb-10 text-white text-center flex flex-col items-center gap-8 relative">
 						<div>
 							<p className="text-white/80 text-xs drop-shadow-lg mb-4 max-w-md leading-6">
 								<strong>
@@ -59,10 +59,10 @@ export default function Layout(props: LayoutProps) {
 									width={361}
 									height={150}
 									alt="Dose of Ted"
-									className="w-52 lg:w-72 mx-auto"
+									className="w-52 lg:w-60 mx-auto"
 								/>
 							</Link>
-							<OpinionatedLight count={4} focus={0.9} size={1000} state="enter" className="top-96 left-0 absolute" />
+							<OpinionatedLight count={4} focus={0.9} size={800} state="enter" className="top-96 left-0 absolute" />
 						</div>
 					</div>
 				</div>

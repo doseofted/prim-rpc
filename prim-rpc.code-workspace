@@ -100,7 +100,7 @@
 	"extensions": {
 		"recommendations": [
 			"redhat.vscode-yaml",
-			"zamerick.vscode-caddyfile-syntax",
+			"matthewpi.caddyfile-support",
 			"ms-azuretools.vscode-docker",
 			"dbaeumer.vscode-eslint",
 			"esbenp.prettier-vscode",

@@ -48,7 +48,7 @@ export default function Home({ greeting }: Props) {
 		{
 			title: "Zero Client Generation",
 			details:
-				"You don't have to compile an API client with Prim+RPC: instead it's generated at runtime based on the functions that you call.",
+				"You don't have to compile an API client with Prim+RPC: instead it's determined at runtime based on the functions that you call.",
 		},
 		{
 			title: "Bring Your Own Server",
@@ -315,7 +315,7 @@ export function sayHello (x, y) {
 }
 sayHello.rpc = true`
 const clientCodeSnippet = `// on client:
-const hello = await client.sayHello(
+const hello = await sayHello(
   "Backend", "Frontend"
 )
 console.log(hello)`
@@ -333,12 +333,10 @@ const module = { hello }
 
 // setup your favorite server
 const fastify = Fastify()
-createPrimServer({
-	module,
-	methodHandler: createMethodHandler({ fastify }),
-})
-await fastify.listen({ port: 80 })
-console.log("Prim+RPC available at http://website.localhost/prim")
+const methodHandler = createMethodHandler({ fastify })
+createPrimServer({ module, methodHandler })
+fastify.listen({ port: 80 })
+console.log("Serving Prim+RPC: http://website.localhost/prim")
 
 // optionally, export types
 export type { module }
