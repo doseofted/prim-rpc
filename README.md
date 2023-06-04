@@ -1,5 +1,9 @@
 [![Prim+RPC. Pictured are two very short JavaScript files: a simple function on the server-side and a call to that function on the client-side. Tagline: "Backend, meet Frontend"](./misc/docs-screenshot.png)](https://prim.doseofted.me/)
 
+![npm](https://img.shields.io/npm/v/@doseofted/prim-rpc)
+![npm bundle size](https://img.shields.io/bundlephobia/minzip/@doseofted/prim-rpc/latest)
+[![Twitter Follow](https://img.shields.io/twitter/follow/doseofted?style=social)](https://twitter.com/doseofted)
+
 Prim+RPC is a bridge between JavaScript environments, without the extra boilerplate code. The primary use case of this
 library is making plain function calls to a server from some client (RPC), as if that code had been written on the
 client itself. The goal is to write plain JavaScript, or TypeScript if you prefer, and immediately invoke typed code
