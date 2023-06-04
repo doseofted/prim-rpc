@@ -4,7 +4,7 @@
 
 import type { JSONOutput } from "typedoc"
 import type { SetOptional } from "type-fest"
-import { /* get as getProperty, */ set as setProperty } from "lodash-es"
+import setProperty from "just-safe-set"
 import { getDeclarationPropReflected, isTypeDoc, parseComment } from "./helpers/create"
 import {
 	PrimRpcDocs,
@@ -99,7 +99,8 @@ function addModuleToDocs(docs: SetOptional<PrimRpcDocs, "docs" | "props">, modul
 	pathParts.push("docs")
 	const index = docs.modules.push(module) - 1
 	const reference: PrimRpcDocs["docs"] = ["modules", index]
-	return setProperty<PrimRpcDocs>(docs, pathParts, reference)
+	setProperty(docs, pathParts, reference)
+	return docs as PrimRpcDocs
 }
 
 /**
@@ -118,7 +119,8 @@ function addMethodToDocs(docs: SetOptional<PrimRpcDocs, "docs" | "props">, metho
 	pathParts.push("docs")
 	const index = docs.methods.push(method) - 1
 	const reference: PrimRpcDocs["docs"] = ["methods", index]
-	return setProperty<PrimRpcDocs>(docs, pathParts, reference)
+	setProperty(docs, pathParts, reference)
+	return docs as PrimRpcDocs
 }
 
 /**

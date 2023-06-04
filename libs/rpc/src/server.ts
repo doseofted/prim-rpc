@@ -2,7 +2,7 @@
 // Copyright 2023 Ted Klingenberg
 // SPDX-License-Identifier: Apache-2.0
 
-import { get as getProperty } from "lodash-es"
+import getProperty from "just-safe-get"
 import mitt from "mitt"
 import queryString from "query-string"
 import { serializeError } from "serialize-error"
