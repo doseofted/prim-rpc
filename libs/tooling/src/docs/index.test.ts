@@ -5,7 +5,7 @@
 import * as example from "@doseofted/prim-example"
 import exampleDocs from "@doseofted/prim-example/dist/docs.json"
 import { test, expect } from "vitest"
-import { get as getProperty } from "lodash-es"
+import getProperty from "just-safe-get"
 import { createDocsForModule, helpers } from "./"
 import { PrimModuleStructure, PrimRpcDocs } from "./interfaces"
 

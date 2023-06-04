@@ -380,9 +380,12 @@ importers:
       defu:
         specifier: ^6.1.2
         version: 6.1.2
-      lodash-es:
-        specifier: ^4.17.21
-        version: 4.17.21
+      just-remove:
+        specifier: ^3.2.0
+        version: 3.2.0
+      just-safe-get:
+        specifier: ^4.2.0
+        version: 4.2.0
       mitt:
         specifier: ^3.0.0
         version: 3.0.0
@@ -417,9 +420,12 @@ importers:
 
   libs/tooling:
     dependencies:
-      lodash-es:
-        specifier: ^4.17.21
-        version: 4.17.21
+      just-safe-get:
+        specifier: ^4.2.0
+        version: 4.2.0
+      just-safe-set:
+        specifier: ^4.2.1
+        version: 4.2.1
       unplugin:
         specifier: ^1.3.1
         version: 1.3.1
@@ -442,9 +448,6 @@ importers:
       '@types/lodash-es':
         specifier: ^4.17.7
         version: 4.17.7
-      lodash:
-        specifier: ^4.17.21
-        version: 4.17.21
       type-fest:
         specifier: ^3.11.0
         version: 3.11.0
@@ -6386,6 +6389,18 @@ packages:
       array-includes: 3.1.6
       object.assign: 4.1.4
     dev: true
+
+  /just-remove@3.2.0:
+    resolution: {integrity: sha512-gR3EOFIkZapF3g0K4IRRqH4lM+czJEfaOFgrwZl5vNfVUeJqfke9/L67Mf3CgnT3j2HM46C+mdCRvqaCD77Nqg==}
+    dev: false
+
+  /just-safe-get@4.2.0:
+    resolution: {integrity: sha512-+tS4Bvgr/FnmYxOGbwziJ8I2BFk+cP1gQHm6rm7zo61w1SbxBwWGEq/Ryy9Gb6bvnloPq6pz7Bmm4a0rjTNlXA==}
+    dev: false
+
+  /just-safe-set@4.2.1:
+    resolution: {integrity: sha512-La5CP41Ycv52+E4g7w1sRV8XXk7Sp8a/TwWQAYQKn6RsQz1FD4Z/rDRRmqV3wJznS1MDF3YxK7BCudX1J8FxLg==}
+    dev: false
 
   /kind-of@6.0.3:
     resolution: {integrity: sha512-dcS1ul+9tmeD95T+x28/ehLgd9mENa3LsvDTtzm3vyBEO7RPptvAD+t44WVXaUjTBRcrpFeFlC8WCruUR456hw==}

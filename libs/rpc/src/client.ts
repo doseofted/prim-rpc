@@ -16,7 +16,8 @@
 import ProxyDeep from "proxy-deep"
 import mitt from "mitt"
 import { nanoid } from "nanoid"
-import { get as getProperty, remove as removeFromArray } from "lodash-es"
+import getProperty from "just-safe-get"
+import removeFromArray from "just-remove"
 import { deserializeError } from "serialize-error"
 import { createPrimOptions, primMajorVersion, useVersionInRpc } from "./options"
 import { handlePossibleBlobs } from "./blobs"
@@ -64,7 +65,7 @@ export function createPrimClient<
 	const proxy = new ProxyDeep<ModuleType>(givenModule ?? ({} as ModuleType), {
 		apply(_target, targetContext, givenArgs: unknown[]) {
 			// SECTION Server-side module handling
-			const targetFunction = getProperty<ModuleType, keyof ModuleType>(givenModule, this.path as [keyof ModuleType])
+			const targetFunction = getProperty(givenModule, this.path) as ModuleType
 			const targetIsCallable = typeof targetFunction === "function"
 			if (targetIsCallable) {
 				// if an argument is a callback reference, the created callback below will send the result back to client
@@ -81,7 +82,7 @@ export function createPrimClient<
 						// NOTE: return value of callback on server will have to be awaited since result is from client
 					}
 				})
-				const functionResult = Reflect.apply(targetFunction, targetContext, argsWithListeners) as unknown
+				const functionResult = Reflect.apply(targetFunction, targetContext, argsWithListeners)
 				return functionResult
 			}
 			// !SECTION
@@ -254,7 +255,8 @@ export function createPrimClient<
 					rpcList.forEach(r => {
 						r.resolved = PromiseResolveStatus.Resolved
 					})
-					removeFromArray(queuedCalls, given => given.resolved === PromiseResolveStatus.Resolved)
+					const toBeRemoved = queuedCalls.filter(given => given.resolved === PromiseResolveStatus.Resolved)
+					removeFromArray(queuedCalls, toBeRemoved)
 				})
 		}, configured.clientBatchTime)
 	}
