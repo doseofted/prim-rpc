@@ -17,7 +17,7 @@ export function Navigation(props: NavigationProps) {
 	]
 	const socials = [
 		{ name: "Twitter", link: "https://twitter.com/doseofted", icon: "simple-icons:twitter" },
-		{ name: "GitHub", link: "https://github.com/doseofted", icon: "simple-icons:github" },
+		{ name: "GitHub", link: "https://github.com/doseofted/prim-rpc", icon: "simple-icons:github" },
 	]
 	const { ...attrs } = props
 	const state = "enter"

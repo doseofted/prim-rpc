@@ -59,9 +59,15 @@ export default function Layout(props: LayoutProps) {
 									width={361}
 									height={150}
 									alt="Dose of Ted"
-									className="w-52 lg:w-60 mx-auto"
+									className="w-52 lg:w-60 mb-4 mx-auto"
 								/>
 							</Link>
+							<p className="text-white/80 text-xs drop-shadow-lg mb-4 max-w-md leading-6">
+								Anonymous analytics collected with{" "}
+								<Link className="link" href="https://github.com/electerious/Ackee#-introduction" target="_blank">
+									Ackee
+								</Link>
+							</p>
 							<OpinionatedLight count={4} focus={0.9} size={800} state="enter" className="top-96 left-0 absolute" />
 						</div>
 					</div>
