@@ -340,6 +340,7 @@ function LightsCanvas(props: LightCanvasProps) {
 			<PtsCanvas
 				background={background}
 				onAnimate={onAnimate}
+				retina={false} // NOTE: the end result is blurred anyway so retina isn't needed
 				resize
 				onStart={onFirstFrame}
 				play
