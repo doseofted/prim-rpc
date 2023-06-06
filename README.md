@@ -4,7 +4,7 @@
 [![npm bundle size](https://img.shields.io/bundlephobia/minzip/@doseofted/prim-rpc/latest)](https://bundlephobia.com/package/@doseofted/prim-rpc@latest)
 [![Twitter Follow](https://img.shields.io/twitter/follow/doseofted?style=social)](https://twitter.com/doseofted)
 
-Prim+RPC is a bridge between JavaScript environments, without the extra boilerplate code. The primary use case of this
+Prim+RPC is a bridge between JavaScript environments, without the extra boilerplate code. The primary use of this
 library is making plain function calls to a server from some client (RPC), as if that code had been written on the
 client itself. The goal is to write plain JavaScript, or TypeScript if you prefer, and immediately invoke typed code
 without verbose wrappers around the communication channel.
