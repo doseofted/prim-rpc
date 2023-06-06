@@ -7,6 +7,11 @@
 	background-color: #6d53ff70;
 }
 
+html { font-size: 14px; }
+@media (min-width: theme("screens.xl")) {
+	html { font-size: 16px; }
+}
+
 /**
  * DaisyUI-provided "mockup-code" adds space for prefix even when there is no prefix.
  * This conflicts with the way Shiki formats HTML so this is an adjustment for that integration.
