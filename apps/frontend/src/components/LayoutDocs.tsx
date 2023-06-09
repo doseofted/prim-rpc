@@ -20,7 +20,7 @@ export function LayoutDocs({ meta, children }: LayoutDocsProps) {
 			<Title>{meta?.title}</Title>
 			<div className="pointer-events-none px-4 container mx-auto relative">
 				<div className="grid grid-cols-12 gap-4">
-					<div className="col-span-12 min-h-[50vh] flex items-end justify-end -mt-4">
+					<div className="col-span-12 min-h-[50svh] flex items-end justify-end -mt-4">
 						{meta?.title && (
 							<div className="pointer-events-auto">
 								{/* Each documentation page has its own header so this should be a paragraph (really, it's just decoration) */}
@@ -30,7 +30,7 @@ export function LayoutDocs({ meta, children }: LayoutDocsProps) {
 							</div>
 						)}
 					</div>
-					<div className="hidden lg:block pointer-events-auto col-span-3 bg-white/70 text-black -ml-4 px-4 py-8 rounded-l-2xl">
+					<div className="hidden lg:block pointer-events-auto col-span-2 bg-white/70 text-black -ml-4 px-4 py-8 rounded-l-2xl">
 						<DocsTableOfContents />
 					</div>
 					<div className="flex relative justify-end lg:hidden pointer-events-auto col-span-12 bg-white/70 text-black -mb-4">
@@ -53,7 +53,7 @@ export function LayoutDocs({ meta, children }: LayoutDocsProps) {
 							</div>
 						</Modal>
 					</div>
-					<div className="pointer-events-auto col-span-12 lg:col-span-9 bg-white -mx-4 px-4 py-8 min-h-[50vh] relative">
+					<div className="pointer-events-auto col-span-12 lg:col-span-10 bg-white -mx-4 px-4 py-8 min-h-[50svh] relative">
 						<div className="bg-white w-screen h-full z-1 absolute top-0 right-0 transform translate-x-full" />
 						<div className="block lg:hidden bg-white w-screen h-full z-1 absolute top-0 left-0 transform -translate-x-full" />
 						<div className="grid grid-cols-10 gap-4 relative z-2">
