@@ -7,7 +7,11 @@ import type * as module from "@doseofted/prim-example"
 // const contained = JSON.parse(process.env.NEXT_PUBLIC_CONTAINED ?? "false") as boolean
 
 const endpoint = typeof window === "undefined" ? "http://localhost:3000/prim" : "/prim"
+const myModule = {
+	randomTestServer: typeof window === "undefined" ? await import("@doseofted/prim-example") : undefined,
+}
 const client = createPrimClient<typeof module>({
+	module: myModule.randomTestServer,
 	endpoint,
 	jsonHandler,
 	methodPlugin: createMethodPlugin(),
