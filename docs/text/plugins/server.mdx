@@ -141,7 +141,7 @@ either server or client side, you may conditionally set the URL depending on the
 import { createMethodPlugin } from "@doseofted/prim-rpc-plugins/browser"
 
 const endpoint = typeof window === "undefined" ? "http://localhost:3000/prim" : "/prim"
-const client = createPrimClient<typeof module>({
+const client = createPrimClient({
 	endpoint,
 	methodPlugin: createMethodPlugin(),
 })
@@ -175,8 +175,8 @@ either server or client side, you may conditionally set the URL depending on the
 ```typescript
 import { createMethodPlugin } from "@doseofted/prim-rpc-plugins/browser"
 
-const endpoint = typeof window === "undefined" ? "http://localhost:3000/prim" : "/prim"
-const client = createPrimClient<typeof module>({
+const endpoint = typeof window === "undefined" ? "http://127.0.0.1:3000/prim" : "/prim"
+const client = createPrimClient({
 	endpoint,
 	methodPlugin: createMethodPlugin(),
 })
