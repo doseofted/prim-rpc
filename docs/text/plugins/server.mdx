@@ -134,15 +134,51 @@ const prim = createPrimServer({ prefix: "/api/prim" })
 export default defineH3PrimHandler({ prim })
 ```
 
+On the client-side, you can use the Prim+RPC client with a compatible method plugin. Since the client could be used
+either server or client side, you may conditionally set the URL depending on the environment, like so:
+
+```typescript
+import { createMethodPlugin } from "@doseofted/prim-rpc-plugins/browser"
+
+const endpoint = typeof window === "undefined" ? "http://localhost:3000/prim" : "/prim"
+const client = createPrimClient({
+	endpoint,
+	methodPlugin: createMethodPlugin(),
+})
+```
+
 ## Next.js
 
 | For                                           | Plugin Type    | Transport Type |
 | --------------------------------------------- | -------------- | -------------- |
 | [Next.js](https://github.com/vercel/next.js/) | Method handler | HTTP           |
 
-<Alert icon="carbon:warning" type="alert-warning">
-	Unavailable (planned)
-</Alert>
+Prim+RPC can be used with Next.js by defining a dedicated route. Currently, only the App Router is supported but Pages
+Router support is being considered. Next.js allows App/Page Routers to live in the same project.
+
+You can configure the integration on the server like so (the `[[...prim]]` folder represents a catch-all route in
+Next.js]]`):
+
+```typescript app/prim/[[...prim]]/route.ts
+import { createPrimServer } from "@doseofted/prim-rpc"
+import { defineNextjsAppHandler } from "@doseofted/prim-rpc-plugins/nextjs"
+
+const prim = createPrimServer({ prefix: "/prim" })
+export const { GET, POST } = defineNextjsAppHandler({ prim })
+```
+
+On the client-side, you can use the Prim+RPC client with a compatible method plugin. Since the client could be used
+either server or client side, you may conditionally set the URL depending on the environment, like so:
+
+```typescript
+import { createMethodPlugin } from "@doseofted/prim-rpc-plugins/browser"
+
+const endpoint = typeof window === "undefined" ? "http://localhost:3000/prim" : "/prim"
+const client = createPrimClient({
+	endpoint,
+	methodPlugin: createMethodPlugin(),
+})
+```
 
 ## Node / HTTP
 
