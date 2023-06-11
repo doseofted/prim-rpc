@@ -153,13 +153,11 @@ const client = createPrimClient({
 | --------------------------------------------- | -------------- | -------------- |
 | [Next.js](https://github.com/vercel/next.js/) | Method handler | HTTP           |
 
-You can use Prim+RPC with Next.js by defining a dedicated route.
+Prim+RPC can be used with Next.js by defining a dedicated route. Currently, only the App Router is supported but Pages
+Router support is being considered. Next.js allows App/Page Routers to live in the same project.
 
-<Alert icon="carbon:information" type="alert-info">
-	Currently, only the App Router introduced in Next.js 13 is supported but support for the Pages Router is planned.
-</Alert>
-
-You can configure the integration on the server like so (note that names of files are important):
+You can configure the integration on the server like so (the `[[...prim]]` folder represents a catch-all route in
+Next.js]]`):
 
 ```typescript app/prim/[[...prim]]/route.ts
 import { createPrimServer } from "@doseofted/prim-rpc"
@@ -175,7 +173,7 @@ either server or client side, you may conditionally set the URL depending on the
 ```typescript
 import { createMethodPlugin } from "@doseofted/prim-rpc-plugins/browser"
 
-const endpoint = typeof window === "undefined" ? "http://127.0.0.1:3000/prim" : "/prim"
+const endpoint = typeof window === "undefined" ? "http://localhost:3000/prim" : "/prim"
 const client = createPrimClient({
 	endpoint,
 	methodPlugin: createMethodPlugin(),
