@@ -140,9 +140,35 @@ export default defineH3PrimHandler({ prim })
 | --------------------------------------------- | -------------- | -------------- |
 | [Next.js](https://github.com/vercel/next.js/) | Method handler | HTTP           |
 
-<Alert icon="carbon:warning" type="alert-warning">
-	Unavailable (planned)
+You can use Prim+RPC with Next.js by defining a dedicated route.
+
+<Alert icon="carbon:information" type="alert-info">
+	Currently, only the App Router introduced in Next.js 13 is supported but support for the Pages Router is planned.
 </Alert>
+
+You can configure the integration on the server like so (note that names of files are important):
+
+```typescript app/prim/[[...prim]]/route.ts
+import { createPrimServer } from "@doseofted/prim-rpc"
+import { defineNextjsAppHandler } from "@doseofted/prim-rpc-plugins/nextjs"
+
+const prim = createPrimServer({ prefix: "/prim" })
+export const { GET, POST } = defineNextjsAppHandler({ prim })
+```
+
+On the client-side, you can use the Prim+RPC client just like any other integration using a compatible method plugin.
+Since the client could be used on either the server or client, you may conditional set the URL depending on the
+environment, like so:
+
+```typescript
+import { createMethodPlugin } from "@doseofted/prim-rpc-plugins/browser"
+
+const endpoint = typeof window === "undefined" ? "http://localhost:3000/prim" : "/prim"
+const client = createPrimClient<typeof module>({
+	endpoint,
+	methodPlugin: createMethodPlugin(),
+})
+```
 
 ## Node / HTTP
 
