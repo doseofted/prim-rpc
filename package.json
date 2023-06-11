@@ -37,10 +37,10 @@
 		"stylelint-config-recommended": "^12.0.0",
 		"stylelint-config-recommended-scss": "^12.0.0",
 		"tsup": "^6.7.0",
-		"turbo": "^1.9.9",
+		"turbo": "^1.10.3",
 		"typedoc": "^0.24.8",
 		"typescript": "5.0.4",
-		"unocss": "^0.52.4",
+		"unocss": "^0.53.1",
 		"vite": "^4.3.9",
 		"vitest": "^0.32.0"
 	}

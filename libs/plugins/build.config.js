@@ -14,6 +14,8 @@ export default defineConfig(options => ({
 		"src/client/browser-fetch.ts",
 		"src/client/browser-websocket.ts",
 		"src/ipc/web-worker.ts",
+		"src/server/nextjs-app.ts",
+		"src/server/nextjs-api.ts",
 	],
 	target: "es2020",
 	dts: true,
