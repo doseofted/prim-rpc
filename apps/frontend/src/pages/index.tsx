@@ -8,7 +8,7 @@ import { Title } from "@/components/Title"
 import { NextSeo } from "next-seo"
 import Link from "next/link"
 import { Icon } from "@iconify/react"
-import backend from "@/app/prim/client"
+import backend from "../app/prim/client"
 
 interface Props {
 	greeting: string
@@ -19,11 +19,10 @@ export const getServerSideProps: GetServerSideProps<Props> = async function () {
 	// NOTE: using Prim+RPC on homepage is just for fun (show fallback if server isn't running)
 	const props = { greeting: "" }
 	try {
-		// eslint-disable-next-line @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-unsafe-member-access, @typescript-eslint/no-unsafe-call
 		props.greeting = await backend.greetings("Backend", "Frontend")
 	} catch (error) {
-		console.log(error)
-		props.greeting = "Backend, meet Frontend?"
+		console.debug(error)
+		props.greeting = "Backend, meet Frontend."
 	}
 	return { props }
 }

@@ -1,5 +1,5 @@
 import { useRef, useState } from "react"
-import backend from "../../prim-client"
+import backend from "../../app/prim/client"
 
 function Callbacks() {
 	const [typed, setTyped] = useState<string>("")

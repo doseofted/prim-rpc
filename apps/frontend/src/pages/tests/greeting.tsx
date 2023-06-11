@@ -1,5 +1,5 @@
 import { GetServerSideProps } from "next"
-import backend from "../../prim-client"
+import backend from "../../app/prim/client"
 
 interface Props {
 	message: string
