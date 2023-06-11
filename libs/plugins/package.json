@@ -100,8 +100,7 @@
 		"./h3": "./dist/server/h3.js",
 		"./ws": "./dist/server/ws.js",
 		"./web-worker": "./dist/ipc/web-worker.js",
-		"./nextjs-app": "./dist/server/nextjs-app.js",
-		"./nextjs-api": "./dist/server/nextjs-api.js",
+		"./nextjs": "./dist/server/nextjs.js",
 		"./package.json": "./package.json"
 	},
 	"typesVersions": {
@@ -133,11 +132,8 @@
 			"web-worker": [
 				"dist/ipc/web-worker.d.ts"
 			],
-			"nextjs-app": [
-				"./dist/server/nextjs-app.d.ts"
-			],
-			"nextjs-api": [
-				"./dist/server/nextjs-api.d.ts"
+			"nextjs": [
+				"./dist/server/nextjs.d.ts"
 			]
 		}
 	},

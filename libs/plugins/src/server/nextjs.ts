@@ -8,18 +8,16 @@ import { join as joinPath } from "node:path"
 import { PipelineSource } from "node:stream"
 
 interface SharedNextjsOptions {
-	contextTransform?: (request: Request) => { context: "nextjs-app"; request: Request }
-}
-
-interface PrimNextjsPluginOptions extends SharedNextjsOptions {
 	prim: PrimServerEvents
 }
 
-// NOTE: this is currently for the app router, not the api router
-// TODO: add support for the api router
-// TODO: consider way of sharing both app/api router handler from same file
+interface PrimNextjsPluginOptions extends SharedNextjsOptions {
+	headers: Headers | Record<string, string>
+	contextTransform?: (request: Request) => { context: "nextjs-app"; request: Request }
+}
+
 export function defineNextjsAppHandler(options: PrimNextjsPluginOptions) {
-	const { prim, contextTransform = request => ({ context: "nextjs-app", request }) } = options
+	const { prim, headers = {}, contextTransform = request => ({ context: "nextjs-app", request }) } = options
 	async function handler(request: Request) {
 		let body: string
 		const blobs: { [identifier: string]: unknown } = {}
@@ -59,7 +57,7 @@ export function defineNextjsAppHandler(options: PrimNextjsPluginOptions) {
 		}
 		const result = await prim.server().call({ body, method, url }, blobs, context)
 		return new Response(result.body, {
-			headers: result.headers,
+			headers: { ...result.headers, ...headers },
 			status: result.status,
 		})
 	}
@@ -68,3 +66,8 @@ export function defineNextjsAppHandler(options: PrimNextjsPluginOptions) {
 		POST: handler,
 	}
 }
+
+/* export function defineNextjsPagesHandler(options: PrimNextjsPluginOptions) {
+	const { prim, contextTransform = request => ({ context: "nextjs-app", request }) } = options
+	// ...
+} */
