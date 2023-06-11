@@ -255,10 +255,12 @@ export default function Home({ greeting }: Props) {
 							integrations in the documentation or try out an example.
 						</p>
 						<div className="flex gap-4">
-							<Link href="/docs" className="btn text-white">
+							<Link href="/docs" className="btn btn-neutral text-white">
+								<Icon className="w-6 h-6" icon="carbon:notebook-reference" />
 								Documentation
 							</Link>
-							<Link href="/docs/examples" className="btn text-white">
+							<Link href="/docs/examples" className="btn btn-neutral text-white">
+								<Icon className="w-6 h-6" icon="carbon:terminal-3270" />
 								Try an Example
 							</Link>
 						</div>
@@ -289,17 +291,21 @@ export default function Home({ greeting }: Props) {
 						It's Available Now. Like, Right Now.
 					</p>
 					<div className="flex flex-wrap lg:flex-nowrap justify-center mx-auto gap-4">
-						<Link href="/docs" className="btn glass text-white">
+						<Link href="/docs" className="btn glass hover:bg-neutral text-white">
+							<Icon className="w-6 h-6" icon="carbon:notebook-reference" />
 							Get Started
 						</Link>
-						<Link href="/docs/usage" className="btn glass text-white">
+						<Link href="/docs/usage" className="btn glass hover:bg-neutral text-white">
+							<Icon className="w-6 h-6" icon="carbon:idea" />
 							Learn to Use
 						</Link>
 						<div className="w-full block lg:hidden" />
-						<Link href="/docs/plugins/create" className="btn glass text-white">
+						<Link href="/docs/plugins/create" className="btn glass hover:bg-neutral text-white">
+							<Icon className="w-6 h-6" icon="carbon:plug" />
 							Plugins
 						</Link>
-						<Link href="/docs/examples" className="btn glass text-white">
+						<Link href="/docs/examples" className="btn glass hover:bg-neutral text-white">
+							<Icon className="w-6 h-6" icon="carbon:terminal-3270" />
 							Try An Example
 						</Link>
 					</div>

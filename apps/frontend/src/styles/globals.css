@@ -25,7 +25,15 @@ html { font-size: 14px; }
 
 /** Buttons are hard to see on homepage with default DaisyUI opacity. */
 .mockup-code::before {
-	opacity: 1;
+	opacity: 0.2;
+	box-shadow:
+		1.4em 0 0 theme("colors.prim.space"), 
+		2.8em 0 0 theme("colors.prim.space"),
+		4.2em 0 0 theme("colors.prim.space");
+}
+
+.menu :where(li ul):before {
+	content: none;
 }
 
 /* Make code headings appear nicer in documentation across entire website */

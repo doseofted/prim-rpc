@@ -13,10 +13,8 @@ export function Alert(props: Props) {
 	const { type = "alert-info", icon = "carbon:information", children, prose = false, className } = props
 	return (
 		<div className={["alert shadow-lg", className, type].join(" ")}>
-			<div className="w-full">
-				<Icon className="w-6 h-6 flex-shrink-0 self-start mt-1" icon={icon} />
-				<div className={prose ? "prose max-w-none" : "not-prose space-y-4"}>{children}</div>
-			</div>
+			<Icon className="w-6 h-6 shrink-0 self-start mt-1" icon={icon} />
+			<div className={prose ? "prose max-w-none" : "not-prose space-y-4"}>{children}</div>
 		</div>
 	)
 }
