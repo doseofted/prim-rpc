@@ -32,6 +32,7 @@ import { createPrimServer } from "@doseofted/prim-rpc"
 import { createMethodHandler } from "@doseofted/prim-rpc-plugins/fastify"
 import Fastify from "fastify"
 import multipartPlugin from "@fastify/multipart"
+import module from "./my-example-module"
 
 const fastify = Fastify()
 const methodHandler = createMethodHandler({
@@ -39,7 +40,7 @@ const methodHandler = createMethodHandler({
 	multipartPlugin,
 })
 
-createPrimServer({ methodHandler })
+createPrimServer({ module, methodHandler })
 fastify.listen({ port: 1234 })
 ```
 
@@ -60,6 +61,7 @@ import { createPrimServer } from "@doseofted/prim-rpc"
 import { createMethodHandler } from "@doseofted/prim-rpc-plugins/express"
 import express from "express"
 import multipartPlugin from "multer"
+import module from "./my-example-module"
 
 const app = express()
 const methodHandler = createMethodHandler({
@@ -67,7 +69,7 @@ const methodHandler = createMethodHandler({
 	multipartPlugin,
 })
 
-createPrimServer({ methodHandler })
+createPrimServer({ module, methodHandler })
 app.listen(1234)
 ```
 
@@ -86,15 +88,16 @@ You can configure `ws` with Prim+RPC like so:
 import { createPrimServer } from "@doseofted/prim-rpc"
 import { createCallbackHandler } from "@doseofted/prim-rpc-plugins/ws"
 import { WebSocketServer } from "ws"
+import module from "./my-example-module"
 
 const wss = new WebSocketServer({ port: 1234 })
 const callbackHandler = createCallbackHandler({ wss })
 
-createPrimServer({ callbackHandler })
+createPrimServer({ module, callbackHandler })
 ```
 
 You may use the `.contextTransform` option of `createCallbackHandler()` to determine what values from `ws` are bound to
-the function's `this` context.
+the function's `this` context. The callback handler can be used with the method handler of your choice.
 
 ## Nuxt / Nitro / H3
 
@@ -112,12 +115,13 @@ import { createPrimServer } from "@doseofted/prim-rpc"
 import { createMethodHandler } from "@doseofted/prim-rpc-plugins/h3"
 import { createApp, eventHandler, toNodeListener } from "h3"
 import { createServer } from "node:http"
+import module from "./my-example-module"
 
 const app = createApp()
 const server = createServer(toNodeListener(app))
 
 const methodHandler = createMethodHandler({ app })
-createPrimServer({ methodHandler })
+createPrimServer({ module, methodHandler })
 
 server.listen(1234)
 ```
@@ -128,8 +132,9 @@ a route for Prim+RPC like so (note that the filename is `[...].ts`, representing
 ```typescript api/[...].ts
 import { createPrimServer } from "@doseofted/prim-rpc"
 import { defineH3PrimHandler } from "@doseofted/prim-rpc-plugins/h3"
+import module from "./my-example-module"
 
-const prim = createPrimServer({ prefix: "/api/prim" })
+const prim = createPrimServer({ module, prefix: "/api/prim" })
 
 export default defineH3PrimHandler({ prim })
 ```
@@ -162,8 +167,9 @@ Next.js):
 ```typescript app/prim/[[...prim]]/route.ts
 import { createPrimServer } from "@doseofted/prim-rpc"
 import { defineNextjsAppHandler } from "@doseofted/prim-rpc-plugins/nextjs"
+import module from "./my-example-module"
 
-const prim = createPrimServer({ prefix: "/prim" })
+const prim = createPrimServer({ module, prefix: "/prim" })
 export const { GET, POST } = defineNextjsAppHandler({ prim })
 ```
 
