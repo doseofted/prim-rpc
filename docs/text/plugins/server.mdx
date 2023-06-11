@@ -134,6 +134,19 @@ const prim = createPrimServer({ prefix: "/api/prim" })
 export default defineH3PrimHandler({ prim })
 ```
 
+On the client-side, you can use the Prim+RPC client with a compatible method plugin. Since the client could be used
+either server or client side, you may conditionally set the URL depending on the environment, like so:
+
+```typescript
+import { createMethodPlugin } from "@doseofted/prim-rpc-plugins/browser"
+
+const endpoint = typeof window === "undefined" ? "http://localhost:3000/prim" : "/prim"
+const client = createPrimClient<typeof module>({
+	endpoint,
+	methodPlugin: createMethodPlugin(),
+})
+```
+
 ## Next.js
 
 | For                                           | Plugin Type    | Transport Type |
@@ -156,9 +169,8 @@ const prim = createPrimServer({ prefix: "/prim" })
 export const { GET, POST } = defineNextjsAppHandler({ prim })
 ```
 
-On the client-side, you can use the Prim+RPC client just like any other integration using a compatible method plugin.
-Since the client could be used on either the server or client, you may conditional set the URL depending on the
-environment, like so:
+On the client-side, you can use the Prim+RPC client with a compatible method plugin. Since the client could be used
+either server or client side, you may conditionally set the URL depending on the environment, like so:
 
 ```typescript
 import { createMethodPlugin } from "@doseofted/prim-rpc-plugins/browser"
