@@ -1,9 +1,11 @@
 import Link from "next/link"
+import { useRouter } from "next/router"
 
 interface Props {
 	onLinkClicked?: () => void
 }
 export function DocsTableOfContents(props: Props) {
+	const route = useRouter()
 	const tableOfContents = [
 		{
 			name: "Getting Started",
@@ -36,15 +38,18 @@ export function DocsTableOfContents(props: Props) {
 		},
 	]
 	return (
-		<ul className="space-y-8">
+		<ul className="menu menu-sm px-0 space-y-4">
 			{tableOfContents.map(({ name, sections }) => (
 				<li key={name} className="space-y-2">
-					<span className="font-title font-semibold">{name}</span>
-					<ul className="space-y-2">
+					<span className="menu-title !text-black px-0 font-title font-semibold">{name}</span>
+					<ul className="ml-0 px-0 !mt-0 border-l-0">
 						{sections.map(({ name, link }) => (
 							<li key={link}>
 								<Link
 									href={`/docs${link}`}
+									className={
+										route.pathname === `/docs${link}` || (route.pathname === "/docs" && link === "/") ? "active" : ""
+									}
 									onClick={() => {
 										props.onLinkClicked?.()
 									}}>

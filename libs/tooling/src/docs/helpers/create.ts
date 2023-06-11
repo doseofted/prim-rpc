@@ -10,8 +10,8 @@ import type { JSONOutput } from "typedoc"
 // }
 
 /** Determine if given structure is a TypeDoc */
-export function isTypeDoc(docs: unknown): docs is JSONOutput.ProjectReflection {
-	const likelyDocs = docs as JSONOutput.ProjectReflection
+export function isTypeDoc(docs: unknown): docs is JSONOutput.DeclarationReflection {
+	const likelyDocs = docs as JSONOutput.DeclarationReflection
 	return typeof likelyDocs === "object" && likelyDocs.kind === 1 // ReflectionKind.Project === 1
 }
 
