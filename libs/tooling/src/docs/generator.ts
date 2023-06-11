@@ -157,7 +157,7 @@ function queryGivenReference(
  * @returns whether the given object contains functions
  */
 function navigateModuleLike(
-	root: JSONOutput.ProjectReflection,
+	root: JSONOutput.DeclarationReflection,
 	given: JSONOutput.DeclarationReflection,
 	docs: PrimRpcDocs,
 	path: string[] = []
@@ -167,7 +167,8 @@ function navigateModuleLike(
 	const children = givenChildren.reflected?.children ?? givenChildren.given?.children ?? []
 	children.forEach(child => {
 		// NOTE: if function has properties (like `.rpc`), it will probably have a signature **and** children
-		const referencedIdentifier = (child.type && child.type.type === "query" && child.type.queryType.id) || false
+		// eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
+		const referencedIdentifier = (child.type && child.type.type === "query" && child.type.queryType.target) || false
 		// if given type is "query" then use the given ID to find the referenced type
 		const childActual =
 			(typeof referencedIdentifier === "number" ? queryGivenReference(root, referencedIdentifier) : child) || child
