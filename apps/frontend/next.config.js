@@ -1,5 +1,6 @@
 // @ts-check
 // import path from "node:path"
+// import preventImport from "@doseofted/prim-rpc-tooling/build"
 import mdx from "@next/mdx"
 import { remarkCodeHike } from "@code-hike/mdx"
 import { readFileSync } from "fs"
@@ -7,7 +8,6 @@ import remarkToc from "remark-toc"
 import remarkGfm from "remark-gfm"
 import rehypeSlug from "rehype-slug"
 // import rehypeAutolinkHeadings from "rehype-autolink-headings"
-// import preventImport from "@doseofted/prim-rpc-tooling/build"
 
 // NOTE: eslint doesn't appear to support assert syntax yet on imports
 // LINK: https://github.com/eslint/eslint/discussions/15305#discussioncomment-1634740
@@ -35,6 +35,7 @@ const nextConfig = withMDX({
 	},
 	reactStrictMode: true,
 	swcMinify: true,
+	// NOTE: since server is contained in the Next.js project itself, the module shouldn't be ignored across entire project
 	// webpack(given) {
 	// 	/** @type {import("webpack").Configuration} */
 	// 	const config = given

@@ -14,15 +14,13 @@ interface Props {
 	greeting: string
 }
 
-// eslint-disable-next-line @typescript-eslint/require-await
 export const getServerSideProps: GetServerSideProps<Props> = async function () {
-	// NOTE: using Prim+RPC on homepage is just for fun (show fallback if server isn't running)
 	const props = { greeting: "" }
 	try {
 		props.greeting = await backend.greetings("Backend", "Frontend")
 	} catch (error) {
 		console.debug(error)
-		props.greeting = "Backend, meet Frontend."
+		props.greeting = "Backend, meet Frontend..."
 	}
 	return { props }
 }
