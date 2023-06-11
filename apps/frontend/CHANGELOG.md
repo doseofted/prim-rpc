@@ -1,5 +1,13 @@
 # @doseofted/prim-documentation-website
 
+## 0.1.0-alpha.4
+
+### Patch Changes
+
+- 6d4fdf1: Documentation menu now highlights active item, added icons to buttons
+- Updated dependencies [fe2704f]
+  - @doseofted/prim-rpc-plugins@0.1.0-alpha.3
+
 ## 0.1.0-alpha.3
 
 ### Patch Changes

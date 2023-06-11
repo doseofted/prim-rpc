@@ -1,5 +1,11 @@
 # @doseofted/prim-rpc-plugins
 
+## 0.1.0-alpha.3
+
+### Patch Changes
+
+- fe2704f: Added Next.js server handler (for App Router)
+
 ## 0.1.0-alpha.2
 
 ### Patch Changes
