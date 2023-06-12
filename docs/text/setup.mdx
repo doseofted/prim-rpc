@@ -515,7 +515,7 @@ Since we're using a WebSocket server as a callback handler, we'll need callback 
 connections on the client. We'll use
 [Prim+RPC's callback plugin for the browser](/docs/plugins/client#websocket-api-browser) which uses the WebSocket API.
 
-```ts client.ts mark=2,8
+```ts client.ts mark=2,9
 import { createPrimClient } from "@doseofted/prim-rpc"
 import { createMethodPlugin, createCallbackPlugin } from "@doseofted/prim-rpc-plugins/browser"
 import type { module } from "./server"
