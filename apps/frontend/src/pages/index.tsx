@@ -3,7 +3,7 @@ import { Navigation } from "@/components/Navigation"
 import { CodeHighlighted } from "@/components/CodeHighlighted"
 import { motion } from "framer-motion"
 import { IntroText } from "@/components/IntroText"
-import { GetServerSideProps } from "next"
+import { GetStaticProps } from "next"
 import { Title } from "@/components/Title"
 import { NextSeo } from "next-seo"
 import Link from "next/link"
@@ -14,15 +14,16 @@ interface Props {
 	greeting: string
 }
 
-export const getServerSideProps: GetServerSideProps<Props> = async function () {
+export const getStaticProps: GetStaticProps<Props> = async function () {
 	const props = { greeting: "" }
 	try {
 		props.greeting = await backend.greetings("Backend", "Frontend")
 	} catch (error) {
 		console.debug(error)
-		props.greeting = "Backend, meet Frontend..."
+		props.greeting = "Backend, meet Frontend."
 	}
-	return { props }
+	// documentation site is basically static other than example RPC usage (only call once per day)
+	return { props, revalidate: 60 * 60 * 24 }
 }
 
 export default function Home({ greeting }: Props) {
