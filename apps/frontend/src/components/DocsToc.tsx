@@ -11,10 +11,10 @@ export function DocsTableOfContents(props: Props) {
 			name: "Getting Started",
 			sections: [
 				{ name: "Introduction", link: "/" },
+				{ name: "Examples", link: "/examples" },
 				{ name: "Setup", link: "/setup" },
 				{ name: "Usage", link: "/usage" },
 				{ name: "Security", link: "/security" },
-				{ name: "Examples", link: "/examples" },
 				{ name: "Comparisons", link: "/comparisons" },
 				{ name: "Limitations", link: "/limitations" },
 			],

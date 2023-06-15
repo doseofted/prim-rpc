@@ -254,13 +254,13 @@ export default function Home({ greeting }: Props) {
 							integrations in the documentation or try out an example.
 						</p>
 						<div className="flex gap-4">
-							<Link href="/docs" className="btn btn-neutral text-white">
-								<Icon className="w-6 h-6" icon="carbon:notebook-reference" />
-								Documentation
-							</Link>
 							<Link href="/docs/examples" className="btn btn-neutral text-white">
 								<Icon className="w-6 h-6" icon="carbon:terminal-3270" />
 								Try an Example
+							</Link>
+							<Link href="/docs" className="btn btn-neutral text-white">
+								<Icon className="w-6 h-6" icon="carbon:notebook-reference" />
+								Documentation
 							</Link>
 						</div>
 					</div>
@@ -294,6 +294,10 @@ export default function Home({ greeting }: Props) {
 							<Icon className="w-6 h-6" icon="carbon:notebook-reference" />
 							Get Started
 						</Link>
+						<Link href="/docs/examples" className="btn glass hover:bg-neutral text-white">
+							<Icon className="w-6 h-6" icon="carbon:terminal-3270" />
+							Try An Example
+						</Link>
 						<Link href="/docs/usage" className="btn glass hover:bg-neutral text-white">
 							<Icon className="w-6 h-6" icon="carbon:idea" />
 							Learn to Use
@@ -302,10 +306,6 @@ export default function Home({ greeting }: Props) {
 						<Link href="/docs/plugins/create" className="btn glass hover:bg-neutral text-white">
 							<Icon className="w-6 h-6" icon="carbon:plug" />
 							Plugins
-						</Link>
-						<Link href="/docs/examples" className="btn glass hover:bg-neutral text-white">
-							<Icon className="w-6 h-6" icon="carbon:terminal-3270" />
-							Try An Example
 						</Link>
 					</div>
 				</div>
