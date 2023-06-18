@@ -128,7 +128,7 @@ export default function Home({ greeting }: Props) {
 				}}
 			/>
 			<div className="relative min-h-[100svh] py-8 container mx-auto grid grid-cols-12 grid-rows-[auto_1fr_auto] px-4 gap-4">
-				<Navigation className="col-span-12" />
+				<Navigation className="col-span-12" style={{ contain: "layout" }} />
 				<div className="col-span-12 font-sans text-center flex justify-center items-center text-white">
 					<div className="flex flex-col lg:flex-row h-full w-full justify-center items-center gap-16">
 						<div className="transform translate-y-32 lg:translate-y-0 lg:translate-x-32 sm:ml-16 lg:ml-0 lg:mt-16">

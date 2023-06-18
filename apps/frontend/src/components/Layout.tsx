@@ -22,10 +22,10 @@ export default function Layout(props: LayoutProps) {
 			{/* eslint-disable-next-line @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-unsafe-member-access */}
 			<LightsProvider disable={!snapshot.useLightEffect} options={{ size: 500 }} blur={25} saturate={1.3}>
 				{/* NOTE: using overflow-hidden below may mean that children can't use sticky positioning (if needed for table of contents) */}
-				<div className="relative min-h-[100svh] w-full z-2 overflow-hidden">
+				<div className="relative min-h-[100svh] w-full z-2">
 					{!homepage && (
 						<div className="py-8 absolute container inset-x-0 mx-auto grid grid-cols-12 border-x border-transparent px-4 gap-4">
-							<Navigation className="relative col-span-12" />
+							<Navigation className="relative col-span-12 z-10" style={{ contain: "layout" }} />
 						</div>
 					)}
 					<div className="pointer-events-none fixed container w-full h-full inset-0 mx-auto grid grid-cols-12 border-x border-white/30 px-4 gap-4 mix-blend-overlay">
@@ -74,7 +74,7 @@ export default function Layout(props: LayoutProps) {
 				</div>
 			</LightsProvider>
 			{/* LINK https://github.com/tailwindlabs/headlessui/discussions/666#discussioncomment-2197931 */}
-			<div id="headlessui-portal-root">
+			<div id="headlessui-portal-root" className="fixed z-50">
 				<div />
 			</div>
 		</div>

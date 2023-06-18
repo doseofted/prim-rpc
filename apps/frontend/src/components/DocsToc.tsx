@@ -1,7 +1,7 @@
 import Link from "next/link"
 import { useRouter } from "next/router"
 
-interface Props {
+interface Props extends React.HTMLAttributes<HTMLDivElement> {
 	onLinkClicked?: () => void
 }
 export function DocsTableOfContents(props: Props) {
@@ -38,7 +38,7 @@ export function DocsTableOfContents(props: Props) {
 		},
 	]
 	return (
-		<ul className="menu menu-sm px-0 space-y-4">
+		<ul className={["menu menu-sm px-0 space-y-4 flex-nowrap", props.className].join(" ")} data-lenis-prevent>
 			{tableOfContents.map(({ name, sections }) => (
 				<li key={name} className="space-y-2">
 					<span className="menu-title !text-black px-0 font-title font-semibold">{name}</span>
