@@ -5,16 +5,14 @@
 import type { PrimServerEvents, PrimServerMethodHandler } from "@doseofted/prim-rpc"
 import type { Hono, Context, MiddlewareHandler } from "hono"
 
-// eslint-disable-next-line @typescript-eslint/no-empty-interface
 interface SharedHonoOptions {
-	// ...
+	contextTransform?: (c: Context) => unknown
 }
 
 export type PrimHonoContext = { type: "hono"; ctx: Context }
 
 interface PrimHonoPluginOptions extends SharedHonoOptions {
 	prim: PrimServerEvents
-	contextTransform?: (c: Context) => unknown
 }
 
 export function honoPrimRpc(options: PrimHonoPluginOptions) {
