@@ -65,7 +65,6 @@ export const createMethodHandler = (options: MethodHonoOptions): PrimServerMetho
 	const { app } = options
 	return prim => {
 		const prefix = prim.options.prefix ?? "/"
-		const path = prefix.endsWith("/*") ? prefix : prefix + "/*"
-		app.use(path, honoPrimRpc({ ...options, prim }))
+		app.use(prefix.endsWith("/") ? prefix + "*" : prefix + "/*", honoPrimRpc({ ...options, prim }))
 	}
 }
