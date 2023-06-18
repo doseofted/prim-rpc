@@ -1,5 +1,11 @@
 # @doseofted/prim-rpc-plugins
 
+## 0.1.0-alpha.5
+
+### Patch Changes
+
+- 14dfdc2: Fix for custom paths used with Hono method handler
+
 ## 0.1.0-alpha.4
 
 ### Minor Changes
