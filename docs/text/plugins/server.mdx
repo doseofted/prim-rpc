@@ -53,6 +53,9 @@ createPrimServer({ module, methodHandler })
 export default app
 ```
 
+You may also register the Hono middleware yourself by importing `honoPrimRpc` and using it directly with Hono. The
+`.contextTransform` option of the module can be used to set the `this` value inside of functions used with Prim+RPC.
+
 ## Fastify
 
 | For                                           | Plugin Type    | Transport Type | File Support      |
