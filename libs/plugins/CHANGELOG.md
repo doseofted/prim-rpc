@@ -1,5 +1,11 @@
 # @doseofted/prim-rpc-plugins
 
+## 0.1.0-alpha.4
+
+### Minor Changes
+
+- b017c42: Added method handler for Hono framework
+
 ## 0.1.0-alpha.3
 
 ### Patch Changes
