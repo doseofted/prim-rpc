@@ -16,13 +16,48 @@ method handler and one callback handler (see **Plugin Type** in tables below). R
 server you must also specify a [compatible _plugin_ on the client](/docs/plugins/client). For plugins/handlers to be
 compatible they must use the same type of transport (given in **Transport Type** in tables below).
 
+<Alert prose icon="carbon:information">
+
+File upload support is a work-in-progress. In the **File Support** column, you will find if a handler supports file
+uploads and, if so, what type is given to your defined functions.
+
+In the future, all file uploads may be given as `File` by default or the expected type suitable for the handler's
+environment. Some handlers today will return `Promise<string>` where the string is the file location in your operating
+system's temporary directory. This behavior will change and the current statuses are documented below.
+
+</Alert>
+
 ## Table of Contents
+
+## Hono
+
+| For                                    | Plugin Type    | Transport Type | File Support |
+| -------------------------------------- | -------------- | -------------- | ------------ |
+| [Hono](https://github.com/honojs/hono) | Method handler | HTTP           | `File`       |
+
+Prim+RPC supports Hono allowing it to be used from serverless environments easily.
+
+You can configure Hono with Prim+RPC like so:
+
+```typescript
+import { createPrimServer } from "@doseofted/prim-rpc"
+import { createMethodHandler } from "@doseofted/prim-rpc-plugins/hono"
+import { Hono } from "hono"
+import module from "./my-example-module"
+
+const app = new Hono()
+
+const methodHandler = createMethodHandler({ app })
+createPrimServer({ module, methodHandler })
+
+export default app
+```
 
 ## Fastify
 
-| For                                           | Plugin Type    | Transport Type |
-| --------------------------------------------- | -------------- | -------------- |
-| [Fastify](https://github.com/fastify/fastify) | Method handler | HTTP           |
+| For                                           | Plugin Type    | Transport Type | File Support      |
+| --------------------------------------------- | -------------- | -------------- | ----------------- |
+| [Fastify](https://github.com/fastify/fastify) | Method handler | HTTP           | `Promise<string>` |
 
 You can configure Fastify with Prim+RPC like so (note that the multipart plugin is optional and used for uploading
 files):
@@ -49,9 +84,9 @@ the function's `this` context.
 
 ## Express
 
-| For                                             | Plugin Type    | Transport Type |
-| ----------------------------------------------- | -------------- | -------------- |
-| [Express](https://github.com/expressjs/express) | Method handler | HTTP           |
+| For                                             | Plugin Type    | Transport Type | File Support      |
+| ----------------------------------------------- | -------------- | -------------- | ----------------- |
+| [Express](https://github.com/expressjs/express) | Method handler | HTTP           | `Promise<string>` |
 
 You can configure Express with Prim+RPC like so (note that the multipart plugin is optional and used for uploading
 files):
@@ -78,9 +113,9 @@ the function's `this` context.
 
 ## WS
 
-| For                                    | Plugin Type      | Transport Type |
-| -------------------------------------- | ---------------- | -------------- |
-| [ws](https://github.com/websockets/ws) | Callback handler | WebSocket      |
+| For                                    | Plugin Type      | Transport Type | File Support |
+| -------------------------------------- | ---------------- | -------------- | ------------ |
+| [ws](https://github.com/websockets/ws) | Callback handler | WebSocket      | None         |
 
 You can configure `ws` with Prim+RPC like so:
 
@@ -101,9 +136,9 @@ the function's `this` context. The callback handler can be used with the method 
 
 ## Nuxt / Nitro / H3
 
-| For                                                                                                            | Plugin Type    | Transport Type |
-| -------------------------------------------------------------------------------------------------------------- | -------------- | -------------- |
-| [Nuxt](https://github.com/nuxt/nuxt), [Nitro](https://github.com/unjs/nitro), [H3](https://github.com/unjs/h3) | Method handler | HTTP           |
+| For                                                                                                            | Plugin Type    | Transport Type | File Support      |
+| -------------------------------------------------------------------------------------------------------------- | -------------- | -------------- | ----------------- |
+| [Nuxt](https://github.com/nuxt/nuxt), [Nitro](https://github.com/unjs/nitro), [H3](https://github.com/unjs/h3) | Method handler | HTTP           | `Promise<string>` |
 
 Prim+RPC can be used with H3 and frameworks built upon H3 such as Nitro and Nuxt 3. Setup steps vary depending on which
 framework you are using.
@@ -154,9 +189,9 @@ const client = createPrimClient({
 
 ## Next.js
 
-| For                                           | Plugin Type    | Transport Type |
-| --------------------------------------------- | -------------- | -------------- |
-| [Next.js](https://github.com/vercel/next.js/) | Method handler | HTTP           |
+| For                                           | Plugin Type    | Transport Type | File Support      |
+| --------------------------------------------- | -------------- | -------------- | ----------------- |
+| [Next.js](https://github.com/vercel/next.js/) | Method handler | HTTP           | `Promise<string>` |
 
 Prim+RPC can be used with Next.js by defining a dedicated route. Currently, only the App Router is supported but Pages
 Router support is being considered. Next.js allows App/Page Routers to live in the same project.
@@ -188,9 +223,9 @@ const client = createPrimClient({
 
 ## Node / HTTP
 
-| For                                           | Plugin Type    | Transport Type |
-| --------------------------------------------- | -------------- | -------------- |
-| [Node](https://nodejs.org/api/http.html#http) | Method handler | HTTP           |
+| For                                           | Plugin Type    | Transport Type | File Support |
+| --------------------------------------------- | -------------- | -------------- | ------------ |
+| [Node](https://nodejs.org/api/http.html#http) | Method handler | HTTP           | N/A          |
 
 <Alert icon="carbon:warning" type="alert-warning">
 	Unavailable (planned)
@@ -198,9 +233,9 @@ const client = createPrimClient({
 
 ## Socket.io
 
-| For                                                | Plugin Type      | Transport Type |
-| -------------------------------------------------- | ---------------- | -------------- |
-| [Socket.io](https://github.com/socketio/socket.io) | Callback handler | Socket.io      |
+| For                                                | Plugin Type      | Transport Type | File Support |
+| -------------------------------------------------- | ---------------- | -------------- | ------------ |
+| [Socket.io](https://github.com/socketio/socket.io) | Callback handler | Socket.io      | N/A          |
 
 <Alert icon="carbon:warning" type="alert-warning">
 	Unavailable (planned)
