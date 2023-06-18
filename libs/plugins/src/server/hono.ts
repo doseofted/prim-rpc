@@ -1,13 +1,19 @@
+// Part of the Prim+RPC project ( https://prim.doseofted.me/ )
+// Copyright 2023 Ted Klingenberg
+// SPDX-License-Identifier: Apache-2.0
+
 import type { PrimServerEvents, PrimServerMethodHandler } from "@doseofted/prim-rpc"
 import type { Hono, Context, MiddlewareHandler } from "hono"
 
+// eslint-disable-next-line @typescript-eslint/no-empty-interface
 interface SharedHonoOptions {
-	prim: PrimServerEvents
+	// ...
 }
 
 export type PrimHonoContext = { type: "hono"; ctx: Context }
 
 interface PrimHonoPluginOptions extends SharedHonoOptions {
+	prim: PrimServerEvents
 	contextTransform?: (c: Context) => unknown
 }
 
@@ -56,11 +62,10 @@ interface MethodHonoOptions extends SharedHonoOptions {
  * If you would like to register Prim with Hono yourself, try importing `honoPrimRpc` instead.
  */
 export const createMethodHandler = (options: MethodHonoOptions): PrimServerMethodHandler => {
-	const {
-		app,
-		prim: { options: primOptions },
-	} = options
+	const { app } = options
 	return prim => {
-		app.use(primOptions.prefix + "*", honoPrimRpc({ ...options, prim }))
+		const prefix = prim.options.prefix ?? "/"
+		const path = prefix.endsWith("/*") ? prefix : prefix + "/*"
+		app.use(path, honoPrimRpc({ ...options, prim }))
 	}
 }

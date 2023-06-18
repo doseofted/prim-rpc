@@ -264,6 +264,18 @@ export function whatIsThis(this: unknown) {
 whatIsThis.rpc = true
 
 /**
+ * Give me a file and I'll throw it into the void, for free.
+ *
+ * @param file
+ * @returns The file name
+ */
+export function uploadTheThing(file: File | import("node:buffer").File) {
+	const { name, size } = file
+	return { name, size }
+}
+uploadTheThing.rpc = true
+
+/**
  *
  * @param args - Any kind of argument really
  * @returns The arguments you gave
