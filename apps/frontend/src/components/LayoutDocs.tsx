@@ -1,6 +1,6 @@
 import { Dialog } from "@headlessui/react"
 import { Icon } from "@iconify/react"
-import { useState } from "react"
+import { useEffect, useState } from "react"
 import { Alert } from "@/components/Alert"
 import { DocsTableOfContents } from "@/components/DocsToc"
 import { IntroText } from "@/components/IntroText"
@@ -15,6 +15,12 @@ type LayoutDocsProps = { meta?: DocsMeta } & React.HTMLAttributes<HTMLDivElement
 
 export function LayoutDocs({ meta, children }: LayoutDocsProps) {
 	const [docsMenuOpen, docsMenuToggle] = useState(false)
+	// NOTE: detect Safari since sticky position creates scrolling issue in Safari
+	const [isWebkit, setIsWebkit] = useState(true)
+	useEffect(() => {
+		// https://gist.github.com/michancio/10105690?permalink_comment_id=3944342#gistcomment-3944342
+		setIsWebkit(navigator.userAgent.indexOf("Safari") > -1 && navigator.userAgent.indexOf("Chrome") <= -1)
+	}, [])
 	return (
 		<>
 			<Title>{meta?.title}</Title>
@@ -31,7 +37,9 @@ export function LayoutDocs({ meta, children }: LayoutDocsProps) {
 						)}
 					</div>
 					<div className="hidden lg:block pointer-events-auto col-span-2 bg-white/70 text-black -ml-4 px-4 py-8 rounded-l-2xl">
-						<DocsTableOfContents className="sticky top-0 max-h-screen overflow-auto lenis lenis-smooth" />
+						<DocsTableOfContents
+							className={["max-h-screen overflow-auto lenis lenis-smooth", isWebkit ? "" : "sticky top-0"].join(" ")}
+						/>
 					</div>
 					<div
 						className="flex justify-end lg:hidden pointer-events-auto col-span-12 bg-white/70 text-black -mb-4 sticky top-0 z-10"
