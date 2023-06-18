@@ -1,4 +1,4 @@
 packages:
   - "libs/**"
   - "apps/**"
-  - "!apps/frontend/.next/**"
+  # - "!apps/frontend/.next/**"
