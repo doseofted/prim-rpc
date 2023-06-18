@@ -298,11 +298,11 @@ export default function Home({ greeting }: Props) {
 							<Icon className="w-6 h-6" icon="carbon:terminal-3270" />
 							Try An Example
 						</Link>
+						<div className="w-full block lg:hidden" />
 						<Link href="/docs/usage" className="btn glass hover:bg-neutral text-white">
 							<Icon className="w-6 h-6" icon="carbon:idea" />
 							Learn to Use
 						</Link>
-						<div className="w-full block lg:hidden" />
 						<Link href="/docs/plugins/create" className="btn glass hover:bg-neutral text-white">
 							<Icon className="w-6 h-6" icon="carbon:plug" />
 							Plugins
