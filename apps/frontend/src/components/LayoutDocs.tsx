@@ -42,7 +42,7 @@ export function LayoutDocs({ meta, children }: LayoutDocsProps) {
 						/>
 					</div>
 					<div
-						className="flex justify-end lg:hidden pointer-events-auto col-span-12 bg-white/70 text-black -mb-4 sticky top-0 z-10"
+						className="flex justify-end lg:hidden pointer-events-auto col-span-12 bg-white/70 text-black -mb-4 sticky top-0 z-10 backdrop-blur-sm"
 						style={{ contain: "layout" }}>
 						<div className="bg-white/70 w-screen h-full z-1 absolute top-0 right-0 transform translate-x-full" />
 						<div className="bg-white/70 w-screen h-full z-1 absolute top-0 left-0 transform -translate-x-full" />
