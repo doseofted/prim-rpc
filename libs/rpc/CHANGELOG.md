@@ -1,5 +1,11 @@
 # @doseofted/prim-rpc
 
+## 0.1.0-alpha.4
+
+### Minor Changes
+
+- bbffc52: The default JSON parser is now unjs/destr
+
 ## 0.1.0-alpha.3
 
 ### Minor Changes

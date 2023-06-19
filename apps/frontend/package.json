@@ -1,6 +1,6 @@
 {
 	"name": "@doseofted/prim-documentation-website",
-	"version": "0.1.0-alpha.6",
+	"version": "0.1.0-alpha.7",
 	"description": "Prim+RPC website that houses the Prim+RPC documentation project.",
 	"license": "UNLICENSED",
 	"private": true,
