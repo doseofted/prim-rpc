@@ -3,6 +3,7 @@
 // SPDX-License-Identifier: Apache-2.0
 
 import { defu } from "defu"
+import { destr } from "destr"
 import { PrimOptions, PrimServerOptions, RpcCall } from "./interfaces"
 
 /**
@@ -33,7 +34,7 @@ const createBaseClientOptions = (server = false): PrimOptions => ({
 	clientBatchTime: 0,
 	// allow options of using a different JSON parsing/conversion library (for instance, "superjson")
 	// NOTE: JSON properties are not enumerable so create an object with enumerable properties referencing JSON methods
-	jsonHandler: { stringify: JSON.stringify, parse: JSON.parse },
+	jsonHandler: { stringify: JSON.stringify, parse: destr },
 	// `client()` is intended to be overridden so as not to force any one HTTP framework but default is fine for most cases
 	// eslint-disable-next-line @typescript-eslint/require-await
 	methodPlugin: async (_endpoint, jsonBody) => {

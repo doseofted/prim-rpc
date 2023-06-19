@@ -150,6 +150,10 @@ additional types may require a separate serialization library or manual work to 
 
 ### Default JSON Serialization
 
+By default, Prim+RPC uses the native `JSON` object for serializing JSON and
+[unjs/destr](https://github.com/unjs/destr#readme) for parsing JSON (which mostly behaves similar to `JSON` but also
+avoids prototype pollution). This is considered the default JSON handler.
+
 Since Prim+RPC messages are JSON, the default JSON handler is used with special handling of callbacks, files, and Error
 objects. However, this is subject to the limitations of the default JSON handler. This means that other types of data
 will need to be serialized to a string and will not automatically convert back to the same type on the server. If the
