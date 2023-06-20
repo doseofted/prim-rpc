@@ -5,9 +5,7 @@
 import type { PrimServerMethodHandler, PrimServerEvents } from "@doseofted/prim-rpc"
 import type * as Express from "express"
 import type Multer from "multer"
-import { tmpdir } from "node:os"
-// import { mkdtemp } from "node:fs/promises"
-// import { join as joinPath } from "node:path"
+import { File } from "node:buffer"
 
 /** The default Prim context when used with Express. Overridden with `contextTransform` option. */
 export type PrimExpressContext = { context: "express"; req: Express.Request; res: Express.Response }
@@ -38,7 +36,7 @@ export const expressPrimRpc = (options: PrimExpressPluginOptions) => {
 		contextTransform = (req, res) => ({ context: "express", req, res }),
 	} = options
 	const handler = (req: Express.Request, res: Express.Response, next: Express.NextFunction) => {
-		const processRpc = async () => {
+		const processRpc = async (req: Express.Request, res: Express.Response, next: Express.NextFunction) => {
 			if (!req.path.startsWith(prim.options.prefix)) {
 				next()
 				return
@@ -51,10 +49,13 @@ export const expressPrimRpc = (options: PrimExpressPluginOptions) => {
 				// NOTE: multer manipulates the body if it's used as well as adding files to a ".files" object
 				// eslint-disable-next-line @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-unsafe-member-access
 				bodyForm = req.body.rpc
-				for (const [fieldName, file] of Object.entries(req.files)) {
+				for (const [, fileDetails] of Object.entries(req.files)) {
+					const given = fileDetails as { buffer: Buffer; originalname: string; mimetype: string; fieldname: string }
+					const fieldName = String(given.fieldname)
 					if (fieldName.startsWith("_bin_")) {
 						// eslint-disable-next-line @typescript-eslint/no-unsafe-member-access
-						blobs[fieldName] = file.path
+						const file = new File([given.buffer], given.originalname, { type: given.mimetype })
+						blobs[fieldName] = file
 					}
 				}
 			} else {
@@ -80,12 +81,12 @@ export const expressPrimRpc = (options: PrimExpressPluginOptions) => {
 			res.send(response.body)
 		}
 		if (multipartPlugin) {
-			// const tmpFolder = await mkdtemp(joinPath(tmpdir(), "prim-rpc-"))
-			multipartPlugin({ limits: { fileSize: fileSizeLimitBytes }, dest: tmpdir() })
-				// eslint-disable-next-line @typescript-eslint/no-misused-promises
-				.any()(req, res, processRpc)
+			const multipart = multipartPlugin({ limits: { fileSize: fileSizeLimitBytes } }).any()
+			multipart(req, res, () => {
+				void processRpc(req, res, next)
+			})
 		} else {
-			void processRpc()
+			void processRpc(req, res, next)
 		}
 	}
 	return handler
