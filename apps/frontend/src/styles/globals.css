@@ -17,6 +17,12 @@ html { font-size: 14px; }
 	overscroll-behavior: contain;
 }
 
+/** Container created by Headless UI, placed directly before body */
+#headlessui-portal-root {
+	position: fixed;
+	z-index: 9999;
+}
+
 /**
  * DaisyUI-provided "mockup-code" adds space for prefix even when there is no prefix.
  * This conflicts with the way Shiki formats HTML so this is an adjustment for that integration.

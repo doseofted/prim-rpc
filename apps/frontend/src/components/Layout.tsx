@@ -73,10 +73,6 @@ export default function Layout(props: LayoutProps) {
 					</div>
 				</div>
 			</LightsProvider>
-			{/* LINK https://github.com/tailwindlabs/headlessui/discussions/666#discussioncomment-2197931 */}
-			<div id="headlessui-portal-root" className="fixed z-50">
-				<div />
-			</div>
 		</div>
 	)
 }

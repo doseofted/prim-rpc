@@ -10,9 +10,6 @@ interface Props extends HTMLAttributes<HTMLDivElement> {
 }
 /**
  * Generic modal to be used for navigation.
- *
- * **Note:** Modal will render to portal located at `#headlessui-portal-root`,
- * placed at end of `<Layout />` (see Headless UI workaround)
  */
 export function Modal(props: Props) {
 	const { open = false, className = "", onToggle, children, ...attrs } = props
