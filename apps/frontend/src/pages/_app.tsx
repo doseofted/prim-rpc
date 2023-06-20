@@ -11,10 +11,11 @@ import { LenisProvider, useLenis } from "@/components/LenisProvider"
 import { DefaultSeo } from "next-seo"
 import Head from "next/head"
 import Script from "next/script"
+import { useMount } from "react-use"
 
 const mdxComponents = {
 	a: (props: React.HTMLAttributes<HTMLAnchorElement> & { href: string }) => {
-		// eslint-disable-next-line @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-unsafe-call
+		// eslint-disable-next-line @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-unsafe-call, react-hooks/rules-of-hooks
 		const lenis = useLenis()
 		return (
 			<Link
@@ -53,15 +54,14 @@ const firaCodeMono = Fira_Code({
 })
 
 export default function App({ Component, pageProps }: AppProps) {
+	const fonts = [montserrat.variable, plusJakartaSans.variable, firaCodeMono.variable]
+	useMount(() => {
+		// NOTE: this is a workaround since Headless UI renders outside of this layout component
+		// where font classes are given (they also need to be applied to the body for modals to be styled)
+		document.body.classList.add("font-sans", ...fonts)
+	})
 	return (
-		<Layout
-			data-theme="prim"
-			className={[
-				"w-full min-h-[100svh] font-sans",
-				montserrat.variable,
-				plusJakartaSans.variable,
-				firaCodeMono.variable,
-			].join(" ")}>
+		<Layout data-theme="prim" className={["w-full min-h-[100svh] font-sans", ...fonts].join(" ")}>
 			<Head>
 				<link rel="icon" href="/placeholder.png" sizes="192x192" type="image/png" />
 				<link rel="apple-touch-icon" href="/placeholder.png" />

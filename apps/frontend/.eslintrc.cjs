@@ -22,6 +22,7 @@ const config = {
 				"plugin:@typescript-eslint/recommended-requiring-type-checking",
 				"plugin:@next/next/recommended",
 				"prettier",
+				"next/core-web-vitals",
 			],
 			rules: {
 				"@next/next/no-html-link-for-pages": ["error", "src/pages/"],

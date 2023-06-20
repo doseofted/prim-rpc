@@ -48,7 +48,9 @@ export function DocsTableOfContents(props: Props) {
 								<Link
 									href={`/docs${link}`}
 									className={
-										route.pathname === `/docs${link}` || (route.pathname === "/docs" && link === "/") ? "active" : ""
+										route.pathname === `/docs${link}` || (route.pathname === "/docs" && link === "/")
+											? "active text-white"
+											: ""
 									}
 									onClick={() => {
 										props.onLinkClicked?.()
