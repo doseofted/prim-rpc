@@ -1,5 +1,11 @@
 # @doseofted/prim-rpc-plugins
 
+## 0.1.0-alpha.8
+
+### Patch Changes
+
+- eeee54f: Plugins now use dynamic import for Node-specific logic to support other runtimes
+
 ## 0.1.0-alpha.7
 
 ### Minor Changes
