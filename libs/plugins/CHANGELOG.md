@@ -1,5 +1,18 @@
 # @doseofted/prim-rpc-plugins
 
+## 0.1.0-alpha.7
+
+### Minor Changes
+
+- 84184c2: Next.js now uses File object, no longer uses tmp directory
+- ce950ec: H3 integration now uses File object, no longer saves file to tmp directory
+- 9ad59c9: Fastify plugin now saves to File object, no longer saves to tmp directory
+- 04a8ac0: Express integration now uses File object, no longer uses tmp directory
+
+### Patch Changes
+
+- 8716903: Next.js handler renamed defineNextjsAppHandler -> defineNextjsAppPrimHandler
+
 ## 0.1.0-alpha.6
 
 ### Patch Changes
