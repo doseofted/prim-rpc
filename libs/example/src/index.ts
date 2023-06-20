@@ -178,59 +178,35 @@ export function addThings(...things: AddableThing[]): AddableThing {
 addThings.rpc = true
 
 /** Server-provided details about an imaginary profile. */
-export interface ServerImaginaryProfile {
+export interface ImaginaryProfile {
 	name: string
 	password: string
 	email: string
-	picture: Promise<string>
+	picture: File | import("node:buffer").File
 }
-/** Client-provided details about an imaginary profile. */
-export interface ClientImaginaryProfile {
-	name: string
-	password: string
-	email: string
-	picture: Blob
-}
-export function createImaginaryProfile(input: ServerImaginaryProfile): boolean
-export function createImaginaryProfile(input: ClientImaginaryProfile): boolean
-export function createImaginaryProfile(input: ServerImaginaryProfile | ClientImaginaryProfile) {
-	const isServerSide = (given: typeof input): given is ServerImaginaryProfile => !(given.picture instanceof Blob)
-	if (!isServerSide(input)) {
-		return false
-	}
+export function createImaginaryProfile(input: ImaginaryProfile) {
 	const { name, email, picture } = input
-	console.log(new Date(), "Look, a profile:", { name, email })
-	const logUpload = async (picture: Promise<string>) =>
-		console.log(new Date(), "Profile picture is here too!", await picture)
-	void logUpload(picture) // we can return before upload is processed
+	console.log(new Date(), "Look, a profile:", { name, email, pictureName: picture.name })
 	return true
 }
 createImaginaryProfile.rpc = true
 
-export type GenericFormExample = Record<string, Promise<string> | string | string[]>
-export async function handleForm(entries: GenericFormExample): Promise<string[]>
+export type GenericFormExample = Record<string, string | string[] | File | import("node:buffer").File>
+export function handleForm(given: GenericFormExample): string[]
 /**
  * Upload a form to the server but without all of the hassle. Even with file uploads. What?!
  *
  * @param form - An HTML Form element or Form Data used with the HTML Form
  * @returns The field names as received from the server. Field values are logged server-side.
  */
-export async function handleForm(form: HTMLFormElement | FormData): Promise<string[]>
-export async function handleForm(given: GenericFormExample | HTMLFormElement | FormData): Promise<string[]> {
+export function handleForm(form: HTMLFormElement | FormData): string[]
+export function handleForm(form: GenericFormExample | HTMLFormElement | FormData): string[] {
 	const serverSide = (given: unknown): given is GenericFormExample => typeof window === "undefined"
-	if (!serverSide(given)) {
+	if (!serverSide(form)) {
 		return []
 	}
-	const resolved: GenericFormExample = {}
-	for (const [key, input] of Object.entries(given)) {
-		if (Array.isArray(input)) {
-			resolved[key] = await Promise.all(input)
-		} else {
-			resolved[key] = await input
-		}
-	}
-	console.log("Received form data on server:", resolved)
-	return Object.keys(resolved)
+	console.log("Received form data on server:", form)
+	return Object.keys(form)
 }
 handleForm.rpc = true
 

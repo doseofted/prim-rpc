@@ -128,10 +128,7 @@ describe("Express middleware works with over GET/POST", () => {
 })
 
 describe("Express middleware can support files", async () => {
-	const prim = createPrimServer({
-		module,
-		showErrorStack: true,
-	})
+	const prim = createPrimServer({ module })
 	const app = express()
 	app.use(expressPrimRpc({ prim, multipartPlugin }))
 	let server: Server
