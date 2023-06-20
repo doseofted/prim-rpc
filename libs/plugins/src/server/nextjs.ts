@@ -25,11 +25,12 @@ export function defineNextjsAppPrimHandler(options: PrimNextjsAppPluginOptions) 
 		const method = request.method
 		const context = contextTransform(request)
 		if (requestType.startsWith("multipart/form-data")) {
+			const FileObj = typeof File === "undefined" ? (await import("node:buffer")).File : File
 			const formData = await request.formData()
 			formData.forEach((value, key) => {
 				if (key === "rpc") {
 					body = value.toString()
-				} else if (key.startsWith("_bin_") && value instanceof File) {
+				} else if (key.startsWith("_bin_") && value instanceof FileObj) {
 					blobs[key] = value
 				}
 			})

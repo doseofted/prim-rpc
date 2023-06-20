@@ -14,7 +14,6 @@ import {
 	App,
 	H3Event,
 } from "h3"
-import { File } from "node:buffer"
 
 // eslint-disable-next-line @typescript-eslint/no-empty-interface
 interface SharedH3Options {
@@ -44,7 +43,8 @@ export function defineH3PrimHandler(options: PrimH3PluginOptions) {
 				if (part.name === "rpc") {
 					body = part.data.toString("utf-8")
 				} else if (part.filename && part.name.startsWith("_bin_")) {
-					const file = new File([part.data], part.filename, { type: part.type })
+					const FileObj = typeof File === "undefined" ? (await import("node:buffer")).File : File
+					const file = new FileObj([part.data], part.filename, { type: part.type })
 					blobs[part.name] = file
 				}
 			}

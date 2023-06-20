@@ -30,10 +30,11 @@ export function honoPrimRpc(options: PrimHonoPluginOptions) {
 		const requestType = req.headers.get("content-type") ?? ""
 		if (requestType.startsWith("multipart/form-data")) {
 			const formData = await req.formData()
+			const BlobObj = typeof Blob === "undefined" ? (await import("node:buffer")).Blob : Blob
 			formData.forEach((value, key) => {
 				if (key === "rpc") {
 					body = value.toString()
-				} else if (key.startsWith("_bin_") && value instanceof Blob) {
+				} else if (key.startsWith("_bin_") && value instanceof BlobObj) {
 					blobs[key] = value
 				}
 			})
