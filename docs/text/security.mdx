@@ -14,7 +14,8 @@ export default ({ children }) => <LayoutDocs meta={meta}>{children}</LayoutDocs>
 
 <Alert prose icon="carbon:information">
 
-Prim+RPC does not have a stable release and should not yet be used in production applications.
+Prim+RPC does not have a stable release and should not yet be used in production applications. Please report any
+security issues that you find according to the [security policy](https://github.com/doseofted/prim-rpc/security/policy).
 
 </Alert>
 
@@ -23,32 +24,119 @@ incredibly easy to add new functions to the backend. However caution should be t
 cannot be trusted. Tasks such as validation, sanitation, authentication, and more are outside of Prim+RPC's
 responsibilities and are left to the developer (and the libraries that you choose).
 
-<Alert icon="carbon:warning" type="alert-warning">
-	Documentation in Progress
-</Alert>
-
 ## Table of Contents
 
-## Set RPC Property on Functions
+## Set Allowed Functions as RPC
 
-<Alert icon="carbon:warning" type="alert-warning">
-	Documentation in Progress
-</Alert>
+When you pass a function to the `.module` option of Prim+RPC, it is intended to become RPC. By default however you will
+be denied access to execute the function remotely on the client until you explicitly mark it as an RPC. This is done in
+one of two ways: by setting the `.rpc` property on the function to `true` or by adding your function to the `.allowList`
+option of the Prim+RPC server.
 
-## Use the Allow List
+```ts
+import { createPrimServer } from "@doseofted/prim-rpc"
 
-<Alert icon="carbon:warning" type="alert-warning">
-	Documentation in Progress
-</Alert>
+// This can be called from the client because we set the `.rpc` property to `true`
+function myPublicFunction() {
+	return "I'm allowed to be called from the client"
+}
+myPublicFunction.rpc = true
+
+// This cannot be called from the client even though we passed it to the client
+// (note: type definitions are still shared because is is given to server below)
+function myPrivateFunction() {
+	return "I'm only allowed to be called on the server"
+}
+
+// While we cannot add an `.rpc` property directly, we can add it to the allow list below
+// We could alternatively create a wrapper function with an `.rpc` property that calls `myFrozenFunction()`
+function myFrozenFunction() {
+	return "I'm allowed to be called from the client"
+}
+Object.freeze(myFrozenFunction)
+
+createPrimServer({
+	module: { myPublicFunction, myPrivateFunction, myFrozenFunction },
+	allowList: { myFrozenFunction: true },
+})
+```
 
 ## Don't Trust Arguments
 
-<Alert icon="carbon:warning" type="alert-warning">
-	Documentation in Progress
-</Alert>
+Prim+RPC does not validate or sanitize arguments passed to the server. It is up to the developer to ensure that the
+arguments provided are of the expected type and shape. You may choose a validation library of your choice to accomplish
+this. Without a validation library, it should be expected that types given from the client could not match your type
+definitions. Consider the following:
 
-## Override the JSON Handler
+<CH.Code>
 
-<Alert icon="carbon:warning" type="alert-warning">
-	Documentation in Progress
-</Alert>
+```typescript server.ts
+import { subscribeToNewsLetter } from "./my-newsletter-service"
+
+interface FormInputs {
+	email: string
+	subscribe: boolean
+}
+// this is only a simple demonstration
+function submitForm(form: FormInputs) {
+	return form.subscribe ? subscribeToNewsLetter(form.email) : false
+}
+submitForm.rpc = true
+
+createPrimServer({ module: { submitForm } })
+```
+
+---
+
+```typescript client.ts
+import { backend } from "./created-prim-client"
+// backend was given truthy value so the email will be subscribed without their consent
+await backend.submitForm({ email: "ted@example.com", subscribe: "no" })
+```
+
+</CH.Code>
+
+In this example a user is subscribed without their consent because the string `no` is a truthy value. This can be
+avoided with validation of given arguments. You may choose any library that you'd like to validate arguments. We'll use
+Zod in this example but you could also use libraries like TypeBox, ArkType, or many others. Below is a safer example:
+
+```typescript
+import { subscribeToNewsLetter } from "./my-newsletter-service"
+import { z } from "zod"
+
+const formInputsSchema = z.object({
+	email: z.string().trim().email(),
+	subscribe: z.boolean().default(false),
+})
+
+// this is only a simple demonstration
+export function submitForm(givenForm: z.infer<typeof formInputsSchema>) {
+	const form = formInputsSchema.parse(givenForm)
+	return form.subscribe ? subscribeToNewsLetter(form.email) : false
+}
+submitForm.rpc = true
+
+createPrimServer({ module: { submitForm } })
+```
+
+Now when we submit this form, we will be presented an error because the client did not provide the boolean value that is
+expected.
+
+## Consider the JSON Handler
+
+By default, Prim+RPC will use the environment's default JSON handler for serialization and
+[unjs/destr](https://github.com/unjs/destr) for deserialization (which provides the benefit of protection from prototype
+pollution while behaving predictably).
+
+You may override the JSON handler with your own as you'd like. This may provide support for additional types or may even
+be used to serialize to a format other than JSON. However be aware that a new handler could introduce new security
+issues and this should be considered, especially if RPC is intended to be shared over public channels.
+
+## Secure the Transport
+
+Prim+RPC keeps a narrow scope: it handles RPC but it utilizes plugins for transport. This means that you can choose any
+transport that you'd like by using an available plugin or creating your own but it means that the security of the
+transport falls outside of Prim+RPC's scope.
+
+Securing the transport means something different for every environment. For instance, if you're using Prim+RPC on a web
+server then you may consider ...

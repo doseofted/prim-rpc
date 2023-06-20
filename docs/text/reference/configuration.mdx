@@ -154,10 +154,12 @@ If a callback plugin is given, it's important to note that each plugin used on t
 | _`false`_ | _`JSON`_ | 🔴 Yes        |
 
 Functions used with Prim+RPC have to be serialized before sending a function call (RPC) to the server. By default, any
-RPC made with Prim+RPC will use the environment's default JSON handler.
+RPC made with Prim+RPC will use the environment's default JSON handler for serialization and
+[unjs/destr](https://github.com/unjs/destr) for deserialization (which provides the benefit of protection from prototype
+pollution while behaving predictably).
 
-This can be overridden by providing your own JSON handler. The given handler must follow the same/similar signature of
-the default JSON handler: namely, it needs to have `.parse()` and `.stringify()` methods.
+You can override the default JSON handler as you'd like. The given handler must follow the same/similar signature of the
+default JSON handler: namely, it needs to have `.parse()` and `.stringify()` methods.
 
 ```typescript
 import { createPrimClient } from "@doseofted/prim-rpc"
@@ -170,10 +172,21 @@ createPrimClient({
 ```
 
 This can be useful for parsing additional types. For example, [`superjson`](https://www.npmjs.com/package/superjson) is
-great for parsing additional JavaScript types, [`devalue`](https://www.npmjs.com/package/devalue) is useful for cyclical
-references, [`destr`](https://www.npmjs.com/package/destr) for someone security-minded. You could even use
-[`yaml`](https://www.npmjs.com/package/yaml) if readability is top priority. These are only examples and you can use any
-JSON handler or create your own.
+great for parsing additional JavaScript types. A library like [`devalue`](https://www.npmjs.com/package/devalue) is
+useful for cyclical references. You could even use [`yaml`](https://www.npmjs.com/package/yaml) if readability is top
+priority. These are only examples and you can use any JSON handler or create your own.
+
+You may also use the default JSON handler for your environment (foregoing safety provided by the default) by setting the
+JSON handler explictly, like so:
+
+```typescript
+import { createPrimClient } from "@doseofted/prim-rpc"
+
+createPrimClient({
+	// NOT RECOMMENDED: using unjs/destr for parsing is recommended (and the default)
+	jsonHandler: { stringify: JSON.stringify, parse: JSON.parse },
+})
+```
 
 <Alert icon="carbon:warning" type="alert-warning" prose>
 

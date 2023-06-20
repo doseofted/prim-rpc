@@ -276,18 +276,6 @@ export function uploadTheThing(file: File | import("node:buffer").File) {
 uploadTheThing.rpc = true
 
 /**
- *
- * @param args - Any kind of argument really
- * @returns The arguments you gave
- *
- * @public
- */
-function defaultFunction(...args: unknown[]) {
-	return { args: args.length === 1 ? args[0] : args }
-}
-defaultFunction.rpc = true
-
-/**
  * Make an introduction.
  *
  * @param x Introducee 1
@@ -298,5 +286,17 @@ export function greetings(x: string, y: string) {
 	return `${x}, meet ${y}.`
 }
 greetings.rpc = true
+
+/**
+ *
+ * @param args - Any kind of argument really
+ * @returns The arguments you gave
+ *
+ * @public
+ */
+function defaultFunction(...args: unknown[]) {
+	return { args: args.length === 1 ? args[0] : args }
+}
+defaultFunction.rpc = true
 
 export default defaultFunction
