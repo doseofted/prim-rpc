@@ -139,9 +139,9 @@ the function's `this` context. The callback handler can be used with the method 
 
 ## Nuxt / Nitro / H3
 
-| For                                                                                                            | Plugin Type    | Transport Type | File Support      |
-| -------------------------------------------------------------------------------------------------------------- | -------------- | -------------- | ----------------- |
-| [Nuxt](https://github.com/nuxt/nuxt), [Nitro](https://github.com/unjs/nitro), [H3](https://github.com/unjs/h3) | Method handler | HTTP           | `Promise<string>` |
+| For                                                                                                            | Plugin Type    | Transport Type | File Support |
+| -------------------------------------------------------------------------------------------------------------- | -------------- | -------------- | ------------ |
+| [Nuxt](https://github.com/nuxt/nuxt), [Nitro](https://github.com/unjs/nitro), [H3](https://github.com/unjs/h3) | Method handler | HTTP           | `File`       |
 
 Prim+RPC can be used with H3 and frameworks built upon H3 such as Nitro and Nuxt 3. Setup steps vary depending on which
 framework you are using.
@@ -151,7 +151,7 @@ You can configure H3 with Prim+RPC like so:
 ```typescript
 import { createPrimServer } from "@doseofted/prim-rpc"
 import { createMethodHandler } from "@doseofted/prim-rpc-plugins/h3"
-import { createApp, eventHandler, toNodeListener } from "h3"
+import { createApp, toNodeListener } from "h3"
 import { createServer } from "node:http"
 import module from "./my-example-module"
 
