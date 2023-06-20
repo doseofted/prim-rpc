@@ -1,6 +1,6 @@
 {
 	"name": "@doseofted/prim-example",
-	"version": "0.1.0-alpha.1",
+	"version": "0.1.0-alpha.2",
 	"description": "Example module exporting functions that can be used with Prim+RPC.",
 	"license": "MIT",
 	"private": true,

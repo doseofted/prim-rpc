@@ -1,5 +1,15 @@
 # @doseofted/prim-example-server
 
+## 0.1.0-alpha.8
+
+### Patch Changes
+
+- a139617: Upgraded project dependencies
+- Updated dependencies [a139617]
+  - @doseofted/prim-example@0.1.0-alpha.2
+  - @doseofted/prim-rpc-plugins@0.1.0-alpha.6
+  - @doseofted/prim-rpc@0.1.0-alpha.5
+
 ## 0.1.0-alpha.7
 
 ### Patch Changes
