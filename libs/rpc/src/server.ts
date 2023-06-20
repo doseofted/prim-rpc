@@ -150,6 +150,9 @@ function createServerActions(
 				// when a custom JSON handler is not provided
 				if (handleError && e instanceof Error) {
 					const error = serializeError<unknown>(e)
+					if (!serverOptions.showErrorStack) {
+						delete error.stack
+					}
 					return { ...rpcBase, error }
 				}
 				// eslint-disable-next-line @typescript-eslint/no-unsafe-assignment

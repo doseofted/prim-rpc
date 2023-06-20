@@ -215,6 +215,12 @@ export interface PrimOptions<M extends object = object, J extends JsonHandler = 
 	 */
 	handleError?: boolean
 	/**
+	 * This option is `false` by default and only applies when the `.handleError` option is `true`.
+	 * When enabled, the `.stack` property of an error, if present, will be sent to the client.
+	 * This is useful for debugging but should be disabled in production.
+	 */
+	showErrorStack?: boolean
+	/**
 	 * This option only applies if you need to upload files (otherwise, you can ignore).
 	 *
 	 * Prim RPC creates RPC calls formatted as JSON. JSON, by itself, doesn't support binary data. When a function is

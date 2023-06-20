@@ -61,6 +61,9 @@ const createBaseClientOptions = (server = false): PrimOptions => ({
 	// thrown from the server so set this to `true` (if presets are used, this may be set to `false` for
 	// "production" settings)
 	handleError: true,
+	// the error stack shouldn't be shown in production (but can be enabled in development)
+	// NOTE: in the future, this option should probably move so that it isn't dependent on `handleError` option
+	showErrorStack: false,
 	// Assume that default JSON handler is used and handle blobs separately from JSON
 	handleBlobs: true,
 	// !SECTION
