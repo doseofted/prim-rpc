@@ -5,7 +5,6 @@
 import type { PrimServerMethodHandler, PrimServerEvents } from "@doseofted/prim-rpc"
 import type { FastifyPluginAsync, FastifyInstance, FastifyError, FastifyRequest, FastifyReply } from "fastify"
 import type FastifyMultipartPlugin from "@fastify/multipart"
-import { File } from "node:buffer"
 /** The default Prim context when used with Fastify. Overridden with `contextTransform` option. */
 export type PrimFastifyContext = { context: "fastify"; request: FastifyRequest; reply: FastifyReply }
 
@@ -83,7 +82,8 @@ export const fastifyPrimRpc: FastifyPluginAsync<PrimFastifyPluginOptions> = asyn
 							part.file.on("end", () => resolve(chunks))
 						})
 						if (fileBuffer.length > 0) {
-							const file = new File(fileBuffer, part.filename, { type: part.mimetype })
+							const FileObj = typeof File === "undefined" ? (await import("node:buffer")).File : File
+							const file = new FileObj(fileBuffer, part.filename, { type: part.mimetype })
 							blobs[part.fieldname] = file
 						}
 					}

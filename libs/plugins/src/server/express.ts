@@ -5,7 +5,6 @@
 import type { PrimServerMethodHandler, PrimServerEvents } from "@doseofted/prim-rpc"
 import type * as Express from "express"
 import type Multer from "multer"
-import { File } from "node:buffer"
 
 /** The default Prim context when used with Express. Overridden with `contextTransform` option. */
 export type PrimExpressContext = { context: "express"; req: Express.Request; res: Express.Response }
@@ -53,8 +52,8 @@ export const expressPrimRpc = (options: PrimExpressPluginOptions) => {
 					const given = fileDetails as { buffer: Buffer; originalname: string; mimetype: string; fieldname: string }
 					const fieldName = String(given.fieldname)
 					if (fieldName.startsWith("_bin_")) {
-						// eslint-disable-next-line @typescript-eslint/no-unsafe-member-access
-						const file = new File([given.buffer], given.originalname, { type: given.mimetype })
+						const FileObj = typeof File === "undefined" ? (await import("node:buffer")).File : File
+						const file = new FileObj([given.buffer], given.originalname, { type: given.mimetype })
 						blobs[fieldName] = file
 					}
 				}
