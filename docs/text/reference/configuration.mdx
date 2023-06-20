@@ -675,6 +675,20 @@ built-in methods, when using this option.
 
 </Alert>
 
+### `.showErrorStack`
+
+| Required  | Default   | Sync Required |
+| --------- | --------- | ------------- |
+| _`false`_ | _`false`_ | 🟢 No         |
+
+When using the [`.handleError`](#handleerror) option of Prim+RPC, errors thrown on the server are recreated on the
+client. This error may possibly include the call stack which generally shouldn't be sent to the client. By default, this
+property is removed from the error before sending an RPC response.
+
+In development, this stack trace can be useful for tracing an error so you may enable showing this stack when available
+by toggling this option to `true`. Care should be taken with this option to ensure that it is not enabled in a
+production environment.
+
 ## Testing
 
 Included in Prim+RPC are utilities for running local tests with Prim+RPC, intended to be used with tools like Vitest or
