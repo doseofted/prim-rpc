@@ -120,7 +120,30 @@ createPrimServer({ module: { submitForm } })
 ```
 
 Now when we submit this form, we will be presented an error because the client did not provide the boolean value that is
-expected.
+expected. If you're coming from tRPC, you may consider using Zod's syntax for defining a function (which bears some
+resemblance to defining a tRPC router):
+
+```typescript
+import { subscribeToNewsLetter } from "./my-newsletter-service"
+import { z } from "zod"
+
+// this is only a simple demonstration
+const submitForm = z
+	.function()
+	.args(
+		z.object({
+			email: z.string().trim().email(),
+			subscribe: z.boolean().default(false),
+		})
+	)
+	.returns(z.boolean())
+	.implements(form => {
+		return form.subscribe ? subscribeToNewsLetter(form.email) : false
+	})
+submitForm.rpc = true
+
+createPrimServer({ module: { submitForm } })
+```
 
 ## Consider the JSON Handler
 
@@ -134,9 +157,10 @@ issues and this should be considered, especially if RPC is intended to be shared
 
 ## Secure the Transport
 
-Prim+RPC keeps a narrow scope: it handles RPC but it utilizes plugins for transport. This means that you can choose any
-transport that you'd like by using an available plugin or creating your own but it means that the security of the
-transport falls outside of Prim+RPC's scope.
+Prim+RPC keeps a narrow scope: it handles RPC but it utilizes separate plugins for transport. This means that you can
+choose any transport that you'd like by using an available plugin or creating your own but it means that the security of
+the transport falls outside of Prim+RPC's scope.
 
-Securing the transport means something different for every environment. For instance, if you're using Prim+RPC on a web
-server then you may consider ...
+Securing the transport may mean something different depending on the environment. For instance, if you're using Prim+RPC
+on a web server then you may consider using TLS, CORS headers, rate limiting, authentication, and other means. On a web
+client, you may consider the possibility of XSS.
