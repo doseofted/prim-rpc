@@ -16,17 +16,6 @@ method handler and one callback handler (see **Plugin Type** in tables below). R
 server you must also specify a [compatible _plugin_ on the client](/docs/plugins/client). For plugins/handlers to be
 compatible they must use the same type of transport (given in **Transport Type** in tables below).
 
-<Alert prose icon="carbon:information">
-
-File upload support is a work-in-progress. In the **File Support** column, you will find if a handler supports file
-uploads and, if so, what type is given to your defined functions.
-
-In the future, all file uploads may be given as `File` by default or the expected type suitable for the handler's
-environment. Some handlers today will return `Promise<string>` where the string is the file location in your operating
-system's temporary directory. This behavior will change and the current statuses are documented below.
-
-</Alert>
-
 ## Table of Contents
 
 ## Hono
@@ -58,9 +47,9 @@ You may also register the Hono middleware yourself by importing `honoPrimRpc` an
 
 ## Fastify
 
-| For                                           | Plugin Type    | Transport Type | File Support      |
-| --------------------------------------------- | -------------- | -------------- | ----------------- |
-| [Fastify](https://github.com/fastify/fastify) | Method handler | HTTP           | `Promise<string>` |
+| For                                           | Plugin Type    | Transport Type | File Support |
+| --------------------------------------------- | -------------- | -------------- | ------------ |
+| [Fastify](https://github.com/fastify/fastify) | Method handler | HTTP           | `File`       |
 
 You can configure Fastify with Prim+RPC like so (note that the multipart plugin is optional and used for uploading
 files):
@@ -87,9 +76,9 @@ the function's `this` context.
 
 ## Express
 
-| For                                             | Plugin Type    | Transport Type | File Support      |
-| ----------------------------------------------- | -------------- | -------------- | ----------------- |
-| [Express](https://github.com/expressjs/express) | Method handler | HTTP           | `Promise<string>` |
+| For                                             | Plugin Type    | Transport Type | File Support |
+| ----------------------------------------------- | -------------- | -------------- | ------------ |
+| [Express](https://github.com/expressjs/express) | Method handler | HTTP           | `File`       |
 
 You can configure Express with Prim+RPC like so (note that the multipart plugin is optional and used for uploading
 files):
@@ -139,9 +128,9 @@ the function's `this` context. The callback handler can be used with the method 
 
 ## Nuxt / Nitro / H3
 
-| For                                                                                                            | Plugin Type    | Transport Type | File Support      |
-| -------------------------------------------------------------------------------------------------------------- | -------------- | -------------- | ----------------- |
-| [Nuxt](https://github.com/nuxt/nuxt), [Nitro](https://github.com/unjs/nitro), [H3](https://github.com/unjs/h3) | Method handler | HTTP           | `Promise<string>` |
+| For                                                                                                            | Plugin Type    | Transport Type | File Support |
+| -------------------------------------------------------------------------------------------------------------- | -------------- | -------------- | ------------ |
+| [Nuxt](https://github.com/nuxt/nuxt), [Nitro](https://github.com/unjs/nitro), [H3](https://github.com/unjs/h3) | Method handler | HTTP           | `File`       |
 
 Prim+RPC can be used with H3 and frameworks built upon H3 such as Nitro and Nuxt 3. Setup steps vary depending on which
 framework you are using.
@@ -151,7 +140,7 @@ You can configure H3 with Prim+RPC like so:
 ```typescript
 import { createPrimServer } from "@doseofted/prim-rpc"
 import { createMethodHandler } from "@doseofted/prim-rpc-plugins/h3"
-import { createApp, eventHandler, toNodeListener } from "h3"
+import { createApp, toNodeListener } from "h3"
 import { createServer } from "node:http"
 import module from "./my-example-module"
 
@@ -192,9 +181,9 @@ const client = createPrimClient({
 
 ## Next.js
 
-| For                                           | Plugin Type    | Transport Type | File Support      |
-| --------------------------------------------- | -------------- | -------------- | ----------------- |
-| [Next.js](https://github.com/vercel/next.js/) | Method handler | HTTP           | `Promise<string>` |
+| For                                           | Plugin Type    | Transport Type | File Support |
+| --------------------------------------------- | -------------- | -------------- | ------------ |
+| [Next.js](https://github.com/vercel/next.js/) | Method handler | HTTP           | `File`       |
 
 Prim+RPC can be used with Next.js by defining a dedicated route. Currently, only the App Router is supported but Pages
 Router support is being considered. Next.js allows App/Page Routers to live in the same project.
@@ -204,11 +193,11 @@ Next.js):
 
 ```typescript app/prim/[[...prim]]/route.ts
 import { createPrimServer } from "@doseofted/prim-rpc"
-import { defineNextjsAppHandler } from "@doseofted/prim-rpc-plugins/nextjs"
+import { defineNextjsAppPrimHandler } from "@doseofted/prim-rpc-plugins/nextjs"
 import module from "./my-example-module"
 
 const prim = createPrimServer({ module, prefix: "/prim" })
-export const { GET, POST } = defineNextjsAppHandler({ prim })
+export const { GET, POST } = defineNextjsAppPrimHandler({ prim })
 ```
 
 On the client-side, you can use the Prim+RPC client with a compatible method plugin. Since the client could be used

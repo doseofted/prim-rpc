@@ -1,11 +1,5 @@
 import type { PrimServerEvents } from "@doseofted/prim-rpc"
 import { File } from "node:buffer"
-import { pipeline } from "node:stream/promises"
-import { createWriteStream } from "node:fs"
-import { mkdtemp } from "node:fs/promises"
-import { tmpdir } from "node:os"
-import { join as joinPath } from "node:path"
-import { PipelineSource } from "node:stream"
 // import type { NextApiRequest, NextApiResponse } from "next"
 
 interface SharedNextjsOptions {
@@ -17,7 +11,7 @@ interface PrimNextjsAppPluginOptions extends SharedNextjsOptions {
 	contextTransform?: (request: Request) => { context: "nextjs-app"; request: Request }
 }
 
-export function defineNextjsAppHandler(options: PrimNextjsAppPluginOptions) {
+export function defineNextjsAppPrimHandler(options: PrimNextjsAppPluginOptions) {
 	const { prim, headers = {}, contextTransform = request => ({ context: "nextjs-app", request }) } = options
 	async function handler(request: Request) {
 		let body: string
@@ -32,27 +26,13 @@ export function defineNextjsAppHandler(options: PrimNextjsAppPluginOptions) {
 		const context = contextTransform(request)
 		if (requestType.startsWith("multipart/form-data")) {
 			const formData = await request.formData()
-			const blobsAdded: Promise<void>[] = []
 			formData.forEach((value, key) => {
-				blobsAdded.push(
-					(async () => {
-						if (key === "rpc") {
-							body = value.toString()
-						} else if (key.startsWith("_bin_") && value instanceof File) {
-							const tmpFolder = await mkdtemp(joinPath(tmpdir(), "prim-rpc-"))
-							const tmpFile = joinPath(tmpFolder, value.name)
-							const filenamePromise = pipeline(
-								value.stream() as PipelineSource<ReadableStream>,
-								createWriteStream(tmpFile)
-							)
-								.then(() => tmpFile)
-								.catch(() => "")
-							blobs[key] = filenamePromise
-						}
-					})()
-				)
+				if (key === "rpc") {
+					body = value.toString()
+				} else if (key.startsWith("_bin_") && value instanceof File) {
+					blobs[key] = value
+				}
 			})
-			await Promise.all(blobsAdded)
 		} else if (method === "POST") {
 			body = await request.text()
 		}

@@ -5,35 +5,29 @@
 import { describe, test, beforeEach, afterEach, expect } from "vitest"
 import request from "superwstest"
 import * as module from "@doseofted/prim-example"
-import Fastify from "fastify"
-import multipartPlugin from "@fastify/multipart"
 import { createPrimServer } from "@doseofted/prim-rpc"
-import { createMethodHandler, fastifyPrimRpc } from "./fastify"
+import { createMethodHandler, defineH3PrimHandler } from "./h3"
+import { createApp, toNodeListener } from "h3"
+import { createServer } from "node:http"
 import queryString from "query-string"
 import FormData from "form-data"
 import { Blob, File } from "node:buffer"
 
-describe("Fastify plugin is functional as Prim Plugin", () => {
-	const fastify = Fastify()
-	createPrimServer({
-		module,
-		methodHandler: createMethodHandler({ fastify }),
-	})
-	beforeEach(async () => {
-		await fastify.ready()
-		await new Promise(resolve => {
-			fastify.server.listen(0, "localhost", () => {
-				resolve(true)
-			})
-		})
+describe("H3 plugin is functional as Prim Plugin", () => {
+	const app = createApp()
+	const server = createServer(toNodeListener(app))
+	const methodHandler = createMethodHandler({ app })
+	createPrimServer({ module, methodHandler })
+	beforeEach(() => {
+		server.listen(0)
 	})
 	afterEach(() => {
-		fastify.server.close()
+		server.close()
 	})
 	const args = { greeting: "What's up", name: "Ted" }
 	const expected = { id: 1, result: module.sayHello(args) }
 	test("registered as Prim Plugin", async () => {
-		const response = await request(fastify.server)
+		const response = await request(server)
 			.post("/prim")
 			.send({
 				method: "sayHello",
@@ -48,27 +42,22 @@ describe("Fastify plugin is functional as Prim Plugin", () => {
 	})
 })
 
-describe("Fastify plugin is functional as Fastify plugin", async () => {
-	const prim = createPrimServer({
-		module,
-	})
-	const fastify = Fastify()
-	await fastify.register(fastifyPrimRpc, { prim })
-	beforeEach(async () => {
-		await fastify.ready()
-		await new Promise(resolve => {
-			fastify.server.listen(0, "localhost", () => {
-				resolve(true)
-			})
-		})
+describe("H3 plugin is functional as H3 middleware", () => {
+	const app = createApp()
+	const server = createServer(toNodeListener(app))
+	const prim = createPrimServer({ module })
+	const primHandler = defineH3PrimHandler({ prim })
+	app.use(primHandler)
+	beforeEach(() => {
+		server.listen(0)
 	})
 	afterEach(() => {
-		fastify.server.close()
+		server.close()
 	})
 	const args = { greeting: "What's up", name: "Ted" }
 	const expected = { id: 1, result: module.sayHello(args) }
 	test("registered as Fastify Plugin", async () => {
-		const response = await request(fastify.server)
+		const response = await request(server)
 			.post("/prim")
 			.send({
 				method: "sayHello",
@@ -83,27 +72,21 @@ describe("Fastify plugin is functional as Fastify plugin", async () => {
 	})
 })
 
-describe("Fastify plugin works with over GET/POST", () => {
-	const fastify = Fastify()
-	createPrimServer({
-		module,
-		methodHandler: createMethodHandler({ fastify }),
-	})
-	beforeEach(async () => {
-		await fastify.ready()
-		await new Promise(resolve => {
-			fastify.server.listen(0, "localhost", () => {
-				resolve(true)
-			})
-		})
+describe("H3 plugin works with over GET/POST", () => {
+	const app = createApp()
+	const server = createServer(toNodeListener(app))
+	const methodHandler = createMethodHandler({ app })
+	createPrimServer({ module, methodHandler })
+	beforeEach(() => {
+		server.listen(0)
 	})
 	afterEach(() => {
-		fastify.server.close()
+		server.close()
 	})
 	const args = { greeting: "What's up", name: "Ted" }
 	const expected = { id: 1, result: module.sayHello(args) }
 	test("POST requests", async () => {
-		const response = await request(fastify.server)
+		const response = await request(server)
 			.post("/prim")
 			.send({
 				method: "sayHello",
@@ -121,7 +104,7 @@ describe("Fastify plugin works with over GET/POST", () => {
 			url: "/prim/sayHello",
 			query: { ...args, "-": 1 },
 		})
-		const response = await request(fastify.server).get(url).send().set("accept", "application/json")
+		const response = await request(server).get(url).send().set("accept", "application/json")
 		// eslint-disable-next-line @typescript-eslint/no-unsafe-member-access
 		expect(response.headers["content-type"]).toContain("application/json")
 		expect(response.status).toEqual(200)
@@ -130,21 +113,15 @@ describe("Fastify plugin works with over GET/POST", () => {
 })
 
 describe("Fastify plugin can support files", async () => {
-	const fastify = Fastify()
-	createPrimServer({
-		module,
-		methodHandler: createMethodHandler({ fastify, multipartPlugin }),
-	})
-	beforeEach(async () => {
-		await fastify.ready()
-		await new Promise(resolve => {
-			fastify.server.listen(0, "localhost", () => {
-				resolve(true)
-			})
-		})
+	const app = createApp()
+	const server = createServer(toNodeListener(app))
+	const methodHandler = createMethodHandler({ app })
+	createPrimServer({ module, methodHandler })
+	beforeEach(() => {
+		server.listen(0)
 	})
 	afterEach(() => {
-		fastify.server.close()
+		server.close()
 	})
 	const formData = new FormData()
 	formData.append(
@@ -161,7 +138,7 @@ describe("Fastify plugin can support files", async () => {
 	formData.append("_bin_cool", await fileContents.text(), fileName)
 	const expected = { id: 1, result: module.uploadTheThing(file) }
 	test("given a text file", async () => {
-		const response = await request(fastify.server)
+		const response = await request(server)
 			.post("/prim")
 			.send(formData.getBuffer())
 			.set("content-type", `multipart/form-data; boundary=${formData.getBoundary()}`)

@@ -14,9 +14,7 @@ import {
 	App,
 	H3Event,
 } from "h3"
-import { mkdtemp, writeFile } from "node:fs/promises"
-import { tmpdir } from "node:os"
-import { join as joinPath } from "node:path"
+import { File } from "node:buffer"
 
 // eslint-disable-next-line @typescript-eslint/no-empty-interface
 interface SharedH3Options {
@@ -46,10 +44,8 @@ export function defineH3PrimHandler(options: PrimH3PluginOptions) {
 				if (part.name === "rpc") {
 					body = part.data.toString("utf-8")
 				} else if (part.filename && part.name.startsWith("_bin_")) {
-					const tmpFolder = await mkdtemp(joinPath(tmpdir(), "prim-rpc-"))
-					const tmpFile = joinPath(tmpFolder, part.filename)
-					await writeFile(tmpFile, part.data)
-					blobs[part.name] = tmpFile
+					const file = new File([part.data], part.filename, { type: part.type })
+					blobs[part.name] = file
 				}
 			}
 		} else if (method === "POST") {

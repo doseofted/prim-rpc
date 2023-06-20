@@ -206,14 +206,3 @@ describe("Prim Client can batch RPC calls over HTTP", () => {
 		await expect(result).resolves.toEqual(expected)
 	})
 })
-
-/**
- * NOTE: this is currently handled primarily by plugins so tests should be written there (for now).
- * Once some sort of "blob handler" is used in Prim (see `blobHandler` idea) then these tests can be expanded on.
- */
-// test("Prim Client can send binary contents", async () => {
-// 	const { client, socket, callbackHandler, methodHandler } = createPrimTestingPlugins()
-// 	createPrimServer({ module, callbackHandler, methodHandler })
-// 	const prim = createPrimClient<IModule>({ client, socket, clientBatchTime: 15 })
-// 	const result = await prim.createImaginaryProfile({/* ... */})
-// })
