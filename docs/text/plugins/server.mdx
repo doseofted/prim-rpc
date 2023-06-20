@@ -204,11 +204,11 @@ Next.js):
 
 ```typescript app/prim/[[...prim]]/route.ts
 import { createPrimServer } from "@doseofted/prim-rpc"
-import { defineNextjsAppHandler } from "@doseofted/prim-rpc-plugins/nextjs"
+import { defineNextjsAppPrimHandler } from "@doseofted/prim-rpc-plugins/nextjs"
 import module from "./my-example-module"
 
 const prim = createPrimServer({ module, prefix: "/prim" })
-export const { GET, POST } = defineNextjsAppHandler({ prim })
+export const { GET, POST } = defineNextjsAppPrimHandler({ prim })
 ```
 
 On the client-side, you can use the Prim+RPC client with a compatible method plugin. Since the client could be used

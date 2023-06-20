@@ -17,7 +17,7 @@ interface PrimNextjsAppPluginOptions extends SharedNextjsOptions {
 	contextTransform?: (request: Request) => { context: "nextjs-app"; request: Request }
 }
 
-export function defineNextjsAppHandler(options: PrimNextjsAppPluginOptions) {
+export function defineNextjsAppPrimHandler(options: PrimNextjsAppPluginOptions) {
 	const { prim, headers = {}, contextTransform = request => ({ context: "nextjs-app", request }) } = options
 	async function handler(request: Request) {
 		let body: string
