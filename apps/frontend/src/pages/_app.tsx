@@ -15,7 +15,7 @@ import { useMount } from "react-use"
 
 const mdxComponents = {
 	a: (props: React.HTMLAttributes<HTMLAnchorElement> & { href: string }) => {
-		// eslint-disable-next-line @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-unsafe-call
+		// eslint-disable-next-line @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-unsafe-call, react-hooks/rules-of-hooks
 		const lenis = useLenis()
 		return (
 			<Link

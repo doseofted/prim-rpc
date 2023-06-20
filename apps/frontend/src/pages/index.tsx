@@ -269,7 +269,7 @@ export default function Home({ greeting }: Props) {
 			<div className="relative pt-32 py-8 container mx-auto grid grid-cols-12 px-4 gap-4">
 				<div className="col-span-12 lg:col-span-6 text-white space-y-4">
 					<p className="font-title text-xl sm:text-2xl lg:text-4xl font-semibold uppercase leading-none">
-						Oh, But That's Not All.
+						Oh, But That&apos;s Not All.
 					</p>
 				</div>
 			</div>
@@ -287,7 +287,7 @@ export default function Home({ greeting }: Props) {
 			<div className="relative pt-32 pb-8 container mx-auto grid grid-cols-12 px-4 gap-4">
 				<div className="col-span-12 text-white space-y-4 text-center">
 					<p className="font-title text-xl sm:text-2xl lg:text-4xl font-semibold uppercase leading-none">
-						It's Available Now. Like, Right Now.
+						It&apos;s Available Now. Like, Right Now.
 					</p>
 					<div className="flex flex-wrap lg:flex-nowrap justify-center mx-auto gap-4">
 						<Link href="/docs" className="btn glass hover:bg-neutral text-white">

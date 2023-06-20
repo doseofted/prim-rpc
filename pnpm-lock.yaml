@@ -241,6 +241,9 @@ importers:
       '@types/lodash-es':
         specifier: ^4.17.7
         version: 4.17.7
+      '@types/mdx':
+        specifier: ^2.0.5
+        version: 2.0.5
       '@types/node':
         specifier: 20.3.1
         version: 20.3.1

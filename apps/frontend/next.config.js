@@ -29,6 +29,8 @@ const nextConfig = withMDX({
 	// output: "standalone",
 	experimental: {
 		scrollRestoration: true,
+		// recommended for usage with App Router but breaks Code Hike
+		// mdxRs: true,
 	},
 	eslint: {
 		ignoreDuringBuilds: true,
