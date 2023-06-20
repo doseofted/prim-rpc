@@ -3,7 +3,7 @@
 import { LayoutDocs } from "@/components/LayoutDocs"
 import { Alert } from "@/components/Alert"
 export const meta = {
-	title: "Usage",
+	title: "Features and How to Use",
 }
 export default ({ children }) => <LayoutDocs meta={meta}>{children}</LayoutDocs>
 
@@ -244,7 +244,7 @@ uploadFile.rpc = true
 // ...client defined earlier
 
 const file = new File(["Hello from client!"], "hello.txt", { type: "text/plain" })
-await client.uploadFile(file) // server will log contents of file
+await client.uploadFile(file) // server will log file name and save to disk
 ```
 
 </CH.Code>

@@ -299,7 +299,7 @@ export default function Home({ greeting }: Props) {
 							Try An Example
 						</Link>
 						<div className="w-full block lg:hidden" />
-						<Link href="/docs/usage" className="btn glass hover:bg-neutral text-white">
+						<Link href="/docs/features" className="btn glass hover:bg-neutral text-white">
 							<Icon className="w-6 h-6" icon="carbon:idea" />
 							Learn to Use
 						</Link>
