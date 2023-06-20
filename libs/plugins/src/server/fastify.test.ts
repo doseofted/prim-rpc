@@ -6,9 +6,12 @@ import { describe, test, beforeEach, afterEach, expect } from "vitest"
 import request from "superwstest"
 import * as module from "@doseofted/prim-example"
 import Fastify from "fastify"
+import multipartPlugin from "@fastify/multipart"
 import { createPrimServer } from "@doseofted/prim-rpc"
 import { createMethodHandler, fastifyPrimRpc } from "./fastify"
 import queryString from "query-string"
+import FormData from "form-data"
+import { Blob, File } from "node:buffer"
 
 describe("Fastify plugin is functional as Prim Plugin", () => {
 	const fastify = Fastify()
@@ -126,40 +129,46 @@ describe("Fastify plugin works with over GET/POST", () => {
 	})
 })
 
-// describe("Fastify plugin can handle files", () => {
-// 	const fastify = Fastify()
-// 	createPrimServer({
-// 		module,
-// 		methodHandler: primMethodFastify({ fastify }),
-// 	})
-// 	beforeEach(async () => {
-// 		await fastify.ready()
-// 		await new Promise(resolve => {
-// 			fastify.server.listen(0, "localhost", () => { resolve(true) })
-// 		})
-// 	})
-// 	afterEach(() => { fastify.server.close() })
-// 	const args = {
-// 		name: "Ted",
-// 		email: "test@example.com",
-// 		password: "secret",
-// 	}
-// 	const expected = { id: 1, result: module.handleForm(args) }
-// 	test("a single file", async () => {
-// 		const response = await request(fastify.server)
-// 			.post("/prim")
-// 			.field(args)
-// 			.send({
-// 				id: 1,
-// 				method: "sayHello",
-// 				args,
-// 			})
-// 			.set("accept", "application/json")
-// 		// eslint-disable-next-line @typescript-eslint/no-unsafe-member-access
-// 		expect(response.headers["content-type"]).toContain("application/json")
-// 		expect(response.status).toEqual(200)
-// 		expect(response.body).toEqual(expected)
-// 	})
-// })
-
-// TODO: consider multiple instances of Prim server attached to Fastify
+describe("Fastify plugin can support files", async () => {
+	const fastify = Fastify()
+	createPrimServer({
+		module,
+		methodHandler: createMethodHandler({ fastify, multipartPlugin }),
+	})
+	beforeEach(async () => {
+		await fastify.ready()
+		await new Promise(resolve => {
+			fastify.server.listen(0, "localhost", () => {
+				resolve(true)
+			})
+		})
+	})
+	afterEach(() => {
+		fastify.server.close()
+	})
+	const formData = new FormData()
+	formData.append(
+		"rpc",
+		JSON.stringify({
+			method: "uploadTheThing",
+			args: ["_bin_cool"],
+			id: 1,
+		})
+	)
+	const fileName = "hi.txt"
+	const fileContents = new Blob(["hello"], { type: "text/plain" })
+	const file = new File([fileContents], fileName)
+	formData.append("_bin_cool", await fileContents.text(), fileName)
+	const expected = { id: 1, result: module.uploadTheThing(file) }
+	test("given a text file", async () => {
+		const response = await request(fastify.server)
+			.post("/prim")
+			.send(formData.getBuffer())
+			.set("content-type", `multipart/form-data; boundary=${formData.getBoundary()}`)
+			.set("accept", "application/json")
+		// eslint-disable-next-line @typescript-eslint/no-unsafe-member-access
+		expect(response.headers["content-type"]).toContain("application/json")
+		expect(response.status).toEqual(200)
+		expect(response.body).toEqual(expected)
+	})
+})

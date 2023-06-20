@@ -5,12 +5,7 @@
 import type { PrimServerMethodHandler, PrimServerEvents } from "@doseofted/prim-rpc"
 import type { FastifyPluginAsync, FastifyInstance, FastifyError, FastifyRequest, FastifyReply } from "fastify"
 import type FastifyMultipartPlugin from "@fastify/multipart"
-import { pipeline } from "node:stream/promises"
-import { createWriteStream } from "node:fs"
-import { mkdtemp } from "node:fs/promises"
-import { tmpdir } from "node:os"
-import { join as joinPath } from "node:path"
-
+import { File } from "node:buffer"
 /** The default Prim context when used with Fastify. Overridden with `contextTransform` option. */
 export type PrimFastifyContext = { context: "fastify"; request: FastifyRequest; reply: FastifyReply }
 
@@ -81,12 +76,16 @@ export const fastifyPrimRpc: FastifyPluginAsync<PrimFastifyPluginOptions> = asyn
 					if (!("file" in part) && part.fieldname === "rpc") {
 						bodyForm = part.value as string
 					} else if ("file" in part && part.fieldname.startsWith("_bin_")) {
-						const tmpFolder = await mkdtemp(joinPath(tmpdir(), "prim-rpc-"))
-						const tmpFile = joinPath(tmpFolder, part.filename)
-						const filenamePromise = pipeline(part.file, createWriteStream(tmpFile))
-							.then(() => tmpFile)
-							.catch(() => "")
-						blobs[part.fieldname] = filenamePromise
+						const fileBuffer = await new Promise<Buffer[]>(resolve => {
+							const chunks: Buffer[] = []
+							part.file.on("data", data => chunks.push(data as Buffer))
+							part.file.on("error", () => resolve([]))
+							part.file.on("end", () => resolve(chunks))
+						})
+						if (fileBuffer.length > 0) {
+							const file = new File(fileBuffer, part.filename, { type: part.mimetype })
+							blobs[part.fieldname] = file
+						}
 					}
 				}
 			}

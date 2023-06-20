@@ -217,25 +217,23 @@ console.log(result1, result1 === result2) // 10, true
 ## Upload Files
 
 You can upload files to Prim+RPC as long as your configured
-[`.methodHandler`](/docs/reference/configuration#methodhandler) supports it. Files (and Blobs) can be sent like so:
+[`.methodHandler`](/docs/reference/configuration#methodhandler) supports it. Files can be sent like so (this example
+uses Node):
 
 <CH.Code>
 
 ```typescript example.ts
 import fs from "node:fs/promises"
-
-/** TypeScript/server utility to ensure given argument is of type T */
-const server = <T>(given: unknown): given is T => typeof window === "undefined"
+import path from "node:path"
 
 /** Upload a file to the server */
-export function uploadFile(someTextFile: File): void
-export function uploadFile(someTextFile: Promise<string>): void
-export function uploadFile(someTextFile: unknown) {
-	if (!server<Promise<string>>(inputs)) {
-		return
+export function uploadFile(file: File) {
+	try {
+		await fs.writeFile(path.resolve("./uploads"), Buffer.from(await file.arrayBuffer()))
+		console.log("Saved uploaded file:", file.name)
+	} catch (error) {
+		console.error("Failed to saved:", file.name, error)
 	}
-	const text = await fs.readFile(await someTextFile, "utf-8")
-	console.log("File contents:", text)
 }
 uploadFile.rpc = true
 ```
