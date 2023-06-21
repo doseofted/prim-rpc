@@ -414,10 +414,10 @@ forward that request using the provided plugins (potentially to a separate Prim+
 
 ```typescript
 import { createPrimServer } from "@doseofted/prim-rpc"
-import * as module from "./my-local-module"
+import * as myLocalModule from "./my-local-module"
 
 createPrimServer({
-	module,
+	module: myLocalModule,
 })
 ```
 
