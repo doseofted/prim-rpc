@@ -1,9 +1,12 @@
-import { useRef, useState } from "react"
+import { useEffect, useRef, useState } from "react"
 import backend from "../../app/prim/client"
 
 function Form() {
 	const form = useRef<HTMLFormElement>(null)
 	const [names, setNames] = useState<string[]>([])
+	useEffect(() => {
+		void backend.sayHelloAlternative("Hi", "Ted").then(console.log)
+	}, [])
 	async function handleForm(form: HTMLFormElement) {
 		try {
 			const inputNames = await backend.handleForm(form)

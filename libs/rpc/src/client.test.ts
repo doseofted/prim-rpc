@@ -34,6 +34,20 @@ describe("Prim Client can call methods with a single parameter", () => {
 		const result = await prim.sayHello(args)
 		expect(result).toEqual(expected)
 	})
+	test("with local source, dynamic import", async () => {
+		const prim = createPrimClient({ module: import("@doseofted/prim-example") })
+		const args = { greeting: "Hi", name: "Ted" }
+		const expected = module.sayHello(args)
+		const result = await prim.sayHello(args)
+		expect(result).toEqual(expected)
+	})
+	test("with local source, function that returns dynamic import", async () => {
+		const prim = createPrimClient({ module: import("@doseofted/prim-example") })
+		const args = { greeting: "Hi", name: "Ted" }
+		const expected = module.sayHello(args)
+		const result = await prim.sayHello(args)
+		expect(result).toEqual(expected)
+	})
 	test("with remote source", async () => {
 		const { callbackPlugin, methodPlugin, callbackHandler, methodHandler } = createPrimTestingPlugins()
 		createPrimServer({ module, callbackHandler, methodHandler })

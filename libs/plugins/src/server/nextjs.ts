@@ -7,7 +7,7 @@ interface SharedNextjsOptions {
 }
 
 interface PrimNextjsAppPluginOptions extends SharedNextjsOptions {
-	headers: Headers | Record<string, string>
+	headers?: Headers | Record<string, string>
 	contextTransform?: (request: Request) => { context: "nextjs-app"; request: Request }
 }
 

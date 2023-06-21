@@ -64,13 +64,33 @@ interface PrimWebSocketFunctionEvents {
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 export type AnyFunction = (...args: any[]) => any
 // NOTE: Asyncify might need to be replaced since TSDoc comments aren't shown in editor when used
-export type PromisifiedModule<ModuleGiven extends object> = {
+type PromisifiedModuleDirect<ModuleGiven extends object> = {
 	[Key in keyof ModuleGiven]: ModuleGiven[Key] extends AnyFunction
 		? Asyncify<ModuleGiven[Key]>
 		: ModuleGiven[Key] extends object
-		? PromisifiedModule<ModuleGiven[Key]>
+		? PromisifiedModuleDirect<ModuleGiven[Key]>
 		: ModuleGiven[Key]
 }
+
+// NOTE: this is a non-recursive version of default `Awaited` type that comes with TypeScript
+type PromisifiedModuleDynamicImport<ModuleGiven extends object> = ModuleGiven extends object & {
+	// eslint-disable-next-line @typescript-eslint/no-explicit-any
+	then(onfulfilled: infer F, ...args: infer _): any
+}
+	? // eslint-disable-next-line @typescript-eslint/no-explicit-any
+	  F extends (value: infer V, ...args: infer _) => any
+		? V extends object
+			? PromisifiedModuleDirect<V>
+			: never
+		: never
+	: PromisifiedModuleDirect<ModuleGiven>
+
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+export type AnyFunctionReturnsPromise = (...args: any[]) => PromiseLike<any>
+// If given a function that returns a promise, get the returned promise (pattern used often with dynamic imports)
+export type PromisifiedModule<Given extends object> = Given extends AnyFunctionReturnsPromise
+	? PromisifiedModuleDynamicImport<ReturnType<Given>>
+	: PromisifiedModuleDynamicImport<Given>
 
 export interface JsonHandler {
 	// eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -119,7 +139,7 @@ export interface PrimOptions<M extends object = object, J extends JsonHandler = 
 	 * Module to use with Prim. When a function call is made, given module will be used first, otherwise an RPC will
 	 * be made.
 	 */
-	module?: M
+	module?: M | null
 	/**
 	 * Provide the server URL where Prim is being used. This will be provided to the HTTP client as the endpoint
 	 * parameter.
