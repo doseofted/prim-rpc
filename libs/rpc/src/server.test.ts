@@ -52,6 +52,33 @@ describe("Prim Server can call methods with local module", () => {
 	})
 })
 
+describe("Prim Server can call methods with dynamically imported module", () => {
+	test("dynamic import only", async () => {
+		const prim = createPrimServer({ module: import("@doseofted/prim-example"), prefix: "/prim" })
+		const server = prim.server()
+		const url = queryString.stringifyUrl({
+			url: "/prim/sayHello",
+			query: { greeting: "Salut", name: "Ted" },
+		})
+		const response = await server.call({ method: "GET", url })
+		const result = JSON.parse(response.body) as RpcAnswer
+		expect(result).toEqual({ result: "Salut Ted!" })
+	})
+	test("function that returns a dynamic import", async () => {
+		const prim = createPrimServer({ module: () => import("@doseofted/prim-example"), prefix: "/prim" })
+		const server = prim.server()
+		const call: RpcCall = {
+			method: "sayHello",
+			args: { greeting: "Hola", name: "Ted" },
+			id: 1,
+		}
+		const body = JSON.stringify(call)
+		const response = await server.call({ method: "POST", body })
+		const result = JSON.parse(response.body) as RpcAnswer
+		expect(result).toEqual({ result: "Hola Ted!", id: 1 })
+	})
+})
+
 test("Prim Server can call remote methods (without module directly)", async () => {
 	const { callbackPlugin, methodPlugin, callbackHandler, methodHandler } = createPrimTestingPlugins()
 	createPrimServer({ module, callbackHandler, methodHandler }) // server 1
