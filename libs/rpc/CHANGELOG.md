@@ -1,5 +1,11 @@
 # @doseofted/prim-rpc
 
+## 0.1.0-alpha.6
+
+### Minor Changes
+
+- c15bde3: Module option of client and server now accepts dynamic imports and explicitly setting module value to null
+
 ## 0.1.0-alpha.5
 
 ### Patch Changes

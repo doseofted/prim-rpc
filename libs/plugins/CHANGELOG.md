@@ -1,5 +1,11 @@
 # @doseofted/prim-rpc-plugins
 
+## 0.1.0-alpha.9
+
+### Patch Changes
+
+- 78e736c: .headers is no longer a required parameter on the Next.js plugin
+
 ## 0.1.0-alpha.8
 
 ### Patch Changes
