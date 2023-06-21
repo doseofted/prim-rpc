@@ -459,7 +459,7 @@ External Module
 ---
 
 ```typescript
-import { createPrimServer } from "@doseofted/prim-rpc"
+import { createPrimServer, createPrimClient } from "@doseofted/prim-rpc"
 
 // Conditional import of module is useful in fullstack frameworks like Next.js, Nuxt, etc.
 const myModule = typeof window === "undefined" ? import("./my-module") : null
