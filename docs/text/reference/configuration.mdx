@@ -456,6 +456,21 @@ createPrimServer({
 
 External Module
 
+---
+
+```typescript
+import { createPrimServer } from "@doseofted/prim-rpc"
+
+// Conditional import of module is useful in fullstack frameworks like Next.js, Nuxt, etc.
+const myModule = typeof window === "undefined" ? import("./my-module") : null
+// Using conditional import on server means you can avoid a network call by calling directly
+createPrimClient({ module: myModule })
+// using conditional import on server is also possible
+createPrimServer({ module: myModule })
+```
+
+Conditional Module
+
 </CH.Spotlight>
 
 <Alert icon="carbon:information" prose>
