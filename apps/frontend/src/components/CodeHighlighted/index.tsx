@@ -1,6 +1,6 @@
 import { useAsync, useMount } from "react-use"
 import { createPrimClient, PromisifiedModule } from "@doseofted/prim-rpc"
-import { createMethodPlugin, createCallbackPlugin } from "@doseofted/prim-rpc-plugins/web-worker"
+import { createMethodPlugin, createCallbackPlugin, jsonHandler } from "@doseofted/prim-rpc-plugins/web-worker"
 import type { module } from "./worker"
 import { useState } from "react"
 
@@ -16,8 +16,8 @@ export function CodeHighlighted(props: CodeHighlightedProps) {
 	const [worker, setWorker] = useState<PromisifiedModule<typeof module>>()
 	useMount(() => {
 		const worker = new Worker(new URL("./worker", import.meta.url), { type: "module" })
-		const { methodPlugin, jsonHandler } = createMethodPlugin({ worker })
-		const { callbackPlugin } = createCallbackPlugin({ worker })
+		const methodPlugin = createMethodPlugin({ worker })
+		const callbackPlugin = createCallbackPlugin({ worker })
 		const client = createPrimClient<typeof module>({ jsonHandler, methodPlugin, callbackPlugin })
 		setWorker(client)
 	})
