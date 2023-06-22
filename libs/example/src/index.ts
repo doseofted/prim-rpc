@@ -23,6 +23,17 @@ export { startCase } from "lodash-es"
 // import things, { ThingInstance, Things } from "./things"
 // export type { ThingInstance }
 
+/** TODO: Maybe we shouldn't share this. Just a thought. */
+export const superSecret = {
+	myApiKey: "<fake>",
+}
+export const superSecret2 = "I'm not telling you."
+
+/** It's a simulated secret. */
+export function definitelyNotRpc() {
+	return { superSecret, superSecret2 }
+}
+
 /**
  * Not me.
  *

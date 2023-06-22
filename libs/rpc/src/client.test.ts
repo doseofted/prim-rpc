@@ -59,6 +59,37 @@ describe("Prim Client can call methods with a single parameter", () => {
 	})
 })
 
+describe("Prim Client cannot call non-RPC", () => {
+	test("with exported object", async () => {
+		const { callbackPlugin, methodPlugin, callbackHandler, methodHandler } = createPrimTestingPlugins()
+		createPrimServer({ module, callbackHandler, methodHandler })
+		const prim = createPrimClient<IModule>({ callbackPlugin, methodPlugin })
+		// eslint-disable-next-line @typescript-eslint/no-unsafe-return, @typescript-eslint/no-unsafe-call, @typescript-eslint/no-explicit-any
+		const functionCall1 = () => (prim.superSecret.myApiKey as any)?.()
+		expect(prim.superSecret).toBeTypeOf("function")
+		await expect(functionCall1()).rejects.toThrow("Requested method is not callable")
+		// eslint-disable-next-line @typescript-eslint/no-unsafe-return, @typescript-eslint/no-unsafe-call, @typescript-eslint/no-explicit-any
+		const functionCall2 = () => (prim.superSecret2 as any)?.()
+		await expect(functionCall2()).rejects.toThrow("Requested method is not callable")
+	})
+	test("with function not in allow list", async () => {
+		const { callbackPlugin, methodPlugin, callbackHandler, methodHandler } = createPrimTestingPlugins()
+		createPrimServer({ module, callbackHandler, methodHandler })
+		const prim = createPrimClient<IModule>({ callbackPlugin, methodPlugin })
+		const functionCall = () => prim.definitelyNotRpc()
+		await expect(functionCall()).rejects.toThrow("Method not allowed")
+	})
+	test("with method on method that's not allowed", async () => {
+		const { callbackPlugin, methodPlugin, callbackHandler, methodHandler } = createPrimTestingPlugins()
+		createPrimServer({ module, callbackHandler, methodHandler })
+		const prim = createPrimClient<IModule>({ callbackPlugin, methodPlugin })
+		const functionCall1 = () => prim.greetings.toString()
+		await expect(functionCall1()).rejects.toThrow("Given method on method was not allowed")
+		const functionCall2 = () => prim.greetings.toString.toString()
+		await expect(functionCall2()).rejects.toThrow("Given method on method was not allowed")
+	})
+})
+
 describe("Prim Client can call methods with positional parameters", () => {
 	test("with local source", async () => {
 		const prim = createPrimClient({ module })

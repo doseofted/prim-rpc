@@ -145,6 +145,111 @@ submitForm.rpc = true
 createPrimServer({ module: { submitForm } })
 ```
 
+## Watch Your Imports
+
+Prim+RPC will not allow functions to be called unless they have a property `.rpc` set to `true` or the function names
+are given in an `.allowList`. This means that if you accidentally pass a function to the server that wasn't intended, it
+still can't be called. However you should be cautious with the type definitions of the given module, especially if your
+type exports use the `typeof` operator on your module. Consider the following:
+
+<CH.Code>
+
+```typescript module.ts
+import { mailingClient } from "./my-mailing-client"
+
+export const settings = {
+	/** Some example API key */
+	mailingApiKey: process.env.MAILING_API_KEY,
+}
+
+export function sendEmail(to: string, subject: string, body: string) {
+	// for example only, of course: validation, sanitation, rate-limiting, bot-checks, etc. excluded
+	return mailingClient.send({ to, subject, body })
+}
+sendEmail.rpc = true
+```
+
+---
+
+```typescript server.ts
+import { createPrimServer } from "@doseofted/prim-rpc"
+import * as module from "./module"
+
+createPrimServer({ module })
+
+export type { module }
+```
+
+</CH.Code>
+
+In this example, the server is given the `module` object which includes the `settings` that were exported. While this is
+definitely a problem (settings and environment variables should _not_ be exported like this, regardless of whether you
+are using Prim+RPC), at least the values are not shared directly with the Prim+RPC client.
+
+```typescript client.ts
+import { createPrimClient } from "@doseofted/prim-rpc"
+import { createMethodPlugin } from "@doseofted/prim-rpc-plugins/browser"
+import type { module } from "../my-server-code/server"
+
+const client = createPrimClient<typeof module>({
+	endpoint: "http://website.localhost:3000",
+	methodPlugin: createMethodPlugin(),
+})
+
+// this is allowed because `.rpc` is set to `true`
+client.sendEmail("ted@example.com", "Hello!", "How are you?")
+// this will fail
+const mailingKey = client.settings.mailingApiKey()
+```
+
+The email will send in this example but the `mailingApiKey` will fail as it's not a function and not marked as RPC.
+However, we've also exported the types of the module including `client.settings.mailingApiKey`. While we can't see the
+value of the secret, we now know where the secret is located. Security through obscurity is not security but we
+certainly don't need to tell anyone where our secrets are located.
+
+While exporting secrets is not recommended, it's more likely that you may need to export an internal function for usage
+in your server and it could be collocated with a function intended as RPC. Extra caution should be taken with exports
+when using that module with Prim+RPC so that TypeScript types of those functions aren't shared (even if the functions
+themselves are not shared).
+
+There are a few ways to tackle this. The easiest is not to export secret information or internal logic but this may not
+always be possible. Another possible solution: you could use a file naming scheme to make clear what is internal and
+what is external (marked RPC). For example, you may export functions as usual and use another file `public.ts` that only
+re-exports functions marked as RPC.
+
+<CH.Code>
+
+```typescript server/private.ts
+const settings = {
+	/** Some example API key */
+	mailingApiKey: process.env.MAILING_API_KEY,
+}
+
+export function sendEmailPrivately() {
+	// ... sends email directly, for usage on server and not subject to rate limiting
+	return { success: true }
+}
+sendEmail.rpc = true
+```
+
+---
+
+```typescript server/public.ts
+import { sendEmailPrivately } from "./server/private"
+
+export function sendEmail() {
+	// ... sends email with with rate limiting, bot-checks, etc.
+	const { success } = sendEmailPrivately()
+	return success
+}
+sendEmail.rpc = true
+```
+
+</CH.Code>
+
+As long as we use the `server/public.ts` module/types with the Prim+RPC server, we can avoid exposing the
+`sendEmailPrivately` types to the client.
+
 ## Consider the JSON Handler
 
 By default, Prim+RPC will use the environment's default JSON handler for serialization and
@@ -155,12 +260,20 @@ You may override the JSON handler with your own as you'd like. This may provide 
 be used to serialize to a format other than JSON. However be aware that a new handler could introduce new security
 issues and this should be considered, especially if RPC is intended to be shared over public channels.
 
+```typescript
+import { createPrimClient, createPrimServer } from "@doseofted/prim-rpc"
+import jsonHandler from "superjson"
+
+// superjson could be used, for example: it also guards against attacks such as prototype pollution.
+createPrimClient({ jsonHandler })
+createPrimServer({ jsonHandler })
+```
+
 ## Secure the Transport
 
 Prim+RPC keeps a narrow scope: it handles RPC but it utilizes separate plugins for transport. This means that you can
-choose any transport that you'd like by using an available plugin or creating your own but it means that the security of
-the transport falls outside of Prim+RPC's scope.
-
-Securing the transport may mean something different depending on the environment. For instance, if you're using Prim+RPC
-on a web server then you may consider using TLS, CORS headers, rate limiting, authentication, and other means. On a web
-client, you may consider the possibility of XSS.
+choose any transport that you'd like by using an available plugin or creating your own but it also means that the
+security of the transport falls outside of Prim+RPC's scope. Securing the transport may mean something different
+depending on the environment. For instance, on a web client, you may consider the possibility of XSS. If you're using
+Prim+RPC on a web server then you may consider using TLS, CORS headers, rate limiting, authentication, and other means.
+These are good practices in general for an application and are not specific to Prim+RPC.
