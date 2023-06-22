@@ -20,7 +20,7 @@ import mitt from "mitt"
  * A passthrough JSON handler that doesn't serialize data.
  * Useful when structured cloning is used with Web Workers.
  */
-const jsonHandlerPassthrough: JsonHandler = {
+export const jsonHandler: JsonHandler = {
 	// eslint-disable-next-line @typescript-eslint/no-unsafe-return, @typescript-eslint/no-explicit-any
 	parse: given => given,
 	// eslint-disable-next-line @typescript-eslint/no-unsafe-return
@@ -63,7 +63,7 @@ export const createCallbackPlugin = (options: CallbackPluginWebWorkerOptions) =>
 			},
 		}
 	}
-	return { callbackPlugin, jsonHandler: jsonHandlerPassthrough }
+	return callbackPlugin
 }
 
 // eslint-disable-next-line @typescript-eslint/no-empty-interface
@@ -85,7 +85,7 @@ export const createCallbackHandler = (options: CallbackHandlerWebWorkerOptions) 
 			transport.send(`callback:connected:${id}`, null)
 		})
 	}
-	return { callbackHandler, jsonHandler: jsonHandlerPassthrough }
+	return callbackHandler
 }
 // !SECTION
 
@@ -109,7 +109,7 @@ export const createMethodPlugin = (options: MethodPluginWebWorkerOptions) => {
 			})
 			transport.send("method:connect", id)
 		})
-	return { methodPlugin, jsonHandler: jsonHandlerPassthrough }
+	return methodPlugin
 }
 
 // eslint-disable-next-line @typescript-eslint/no-empty-interface
@@ -130,7 +130,7 @@ export const createMethodHandler = (options: MethodHandlerWebWorkerOptions) => {
 			transport.send(`method:connected:${id}`, null)
 		})
 	}
-	return { methodHandler, jsonHandler: jsonHandlerPassthrough }
+	return methodHandler
 }
 // !SECTION
 

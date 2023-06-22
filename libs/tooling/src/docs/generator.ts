@@ -58,13 +58,14 @@ function handleMethodLike(given: JSONOutput.DeclarationReflection, docs: PrimRpc
 	const signatures: PrimMethodSignature[] = getDeclarationPropReflected(given, "signatures").value.map(signature => {
 		const comment = parseComment(signature.comment)
 		const flags = signature.flags
-		const params: PrimParam[] = signature.parameters.map(param => {
-			const name = param.name
-			const flags = param.flags
-			const comment = parseComment(param.comment)
-			const type = handleType(param.type)
-			return { name, comment, flags, type }
-		})
+		const params: PrimParam[] =
+			signature.parameters?.map(param => {
+				const name = param.name
+				const flags = param.flags
+				const comment = parseComment(param.comment)
+				const type = handleType(param.type)
+				return { name, comment, flags, type }
+			}) ?? []
 		const returns: PrimReturn = {
 			comment: parseComment(signature.comment, "@returns"),
 			type: handleType(signature.type),
