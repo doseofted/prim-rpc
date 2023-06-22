@@ -29,10 +29,10 @@ You can communicate between a Web Worker and the main thread in either direction
 
 ```typescript worker.ts
 import { createPrimServer } from "@doseofted/prim-rpc"
-import { createMethodHandler, createCallbackHandler } from "@doseofted/prim-rpc-plugins/web-worker"
+import { createMethodHandler, createCallbackHandler, jsonHandler } from "@doseofted/prim-rpc-plugins/web-worker"
 
-const { methodHandler, jsonHandler } = createMethodHandler({ worker: self })
-const { callbackHandler } = createCallbackHandler({ worker: self })
+const methodHandler = createMethodHandler({ worker: self })
+const callbackHandler = createCallbackHandler({ worker: self })
 
 createPrimServer({ methodHandler, callbackHandler, jsonHandler })
 ```
@@ -41,20 +41,20 @@ createPrimServer({ methodHandler, callbackHandler, jsonHandler })
 
 ```typescript index.ts
 import { createPrimClient } from "@doseofted/prim-rpc"
-import { createMethodPlugin, createCallbackPlugin } from "@doseofted/prim-rpc-plugins/web-worker"
+import { createMethodPlugin, createCallbackPlugin, jsonHandler } from "@doseofted/prim-rpc-plugins/web-worker"
 
 const worker = new Worker(new URL("./worker", import.meta.url), { type: "module" })
 
-const { methodPlugin, jsonHandler } = createMethodPlugin({ worker })
-const { callbackPlugin } = createCallbackPlugin({ worker })
+const methodPlugin = createMethodPlugin({ worker })
+const callbackPlugin = createCallbackPlugin({ worker })
 
 const client = createPrimClient({ methodPlugin, callbackPlugin, jsonHandler })
 ```
 
 </CH.Code>
 
-Note that all plugins return a `jsonHandler` result and that they are all exactly the same. This is just a helper
-utility that will disable JSON handling. JSON handling should be disabled because Web Workers will use
+Note that the web worker plugin has a `jsonHandler` export. This is just a helper utility that will disable JSON
+handling. JSON handling should be disabled because Web Workers will use
 [structured cloning](https://developer.mozilla.org/en-US/docs/Web/API/Web_Workers_API/Structured_clone_algorithm)
 instead which is far more powerful. Of course, you can always override the JSON handler to anything that you'd like if
 you can forgo structured cloning.
