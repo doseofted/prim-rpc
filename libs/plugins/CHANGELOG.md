@@ -1,5 +1,12 @@
 # @doseofted/prim-rpc-plugins
 
+## 0.1.0-alpha.10
+
+### Minor Changes
+
+- 20df825: Web Worker plugin now has new jsonHandler export (existing plugins now only return plugin without extra JSON
+  handler)
+
 ## 0.1.0-alpha.9
 
 ### Patch Changes
