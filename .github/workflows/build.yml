@@ -22,7 +22,6 @@ jobs:
       - name: Install
         run: pnpm install --frozen-lockfile
       - name: Build
-        # NOTE: Vercel deploy already builds documentation site, so I don't need to do it here
-        run: pnpm task dev:build -- --filter=./libs/*
+        run: pnpm task dev:build
       - name: Test
         run: pnpm task dev:test
