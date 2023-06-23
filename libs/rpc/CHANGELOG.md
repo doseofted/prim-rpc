@@ -1,5 +1,11 @@
 # @doseofted/prim-rpc
 
+## 0.1.0-alpha.8
+
+### Patch Changes
+
+- 2bf318d: File/Blob size is now checked prior to sending RPC (discarded if size is 0)
+
 ## 0.1.0-alpha.7
 
 ### Patch Changes
