@@ -1,5 +1,11 @@
 # @doseofted/prim-rpc-plugins
 
+## 0.1.0-alpha.11
+
+### Patch Changes
+
+- fb51478: Relaxed Hono file checking to prevent binary prefix string being returned for empty file
+
 ## 0.1.0-alpha.10
 
 ### Minor Changes
