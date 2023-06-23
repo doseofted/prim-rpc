@@ -1,5 +1,13 @@
 # @doseofted/prim-rpc
 
+## 0.1.0-alpha.7
+
+### Patch Changes
+
+- d0d9402: Bug fix: Batch time of 0 now makes RPC immediately instead of using timer with 0 seconds (fixes possibly
+  sending batched request when not configured to do so)
+- e007373: Bug fix: 400 HTTP status code no longer utilized when RPC result is a falsy value
+
 ## 0.1.0-alpha.6
 
 ### Minor Changes
