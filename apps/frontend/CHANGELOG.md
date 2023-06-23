@@ -1,5 +1,14 @@
 # @doseofted/prim-documentation-website
 
+## 0.1.0-alpha.15
+
+### Patch Changes
+
+- Updated dependencies [fb51478]
+- Updated dependencies [fb51478]
+  - @doseofted/prim-rpc@0.1.0-alpha.9
+  - @doseofted/prim-rpc-plugins@0.1.0-alpha.11
+
 ## 0.1.0-alpha.14
 
 ### Patch Changes

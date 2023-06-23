@@ -1,5 +1,11 @@
 # @doseofted/prim-rpc
 
+## 0.1.0-alpha.9
+
+### Patch Changes
+
+- fb51478: Reverted file size check behavior (types on server should reflect client more closely)
+
 ## 0.1.0-alpha.8
 
 ### Patch Changes
