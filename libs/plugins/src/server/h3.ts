@@ -42,7 +42,7 @@ export function defineH3PrimHandler(options: PrimH3PluginOptions) {
 			for (const part of parts) {
 				if (part.name === "rpc") {
 					body = part.data.toString("utf-8")
-				} else if (part.filename && part.name.startsWith("_bin_")) {
+				} else if (typeof part.filename === "string" && part.name.startsWith("_bin_")) {
 					const FileObj = typeof File === "undefined" ? (await import("node:buffer")).File : File
 					const file = new FileObj([part.data], part.filename, { type: part.type })
 					blobs[part.name] = file

@@ -50,8 +50,8 @@ export function handlePossibleBlobs(
 ): [given: unknown, blobs: Record<string, Blob | Buffer>, fromForm: boolean] {
 	const blobs: Record<string, Blob | Buffer> = {}
 	const isBinaryLike = (possiblyBin: unknown) =>
-		(typeof Blob !== "undefined" && possiblyBin instanceof Blob && possiblyBin.size > 0) ||
-		(typeof Buffer !== "undefined" && possiblyBin instanceof Buffer && possiblyBin.byteLength > 0)
+		(typeof Blob !== "undefined" && possiblyBin instanceof Blob) ||
+		(typeof Buffer !== "undefined" && possiblyBin instanceof Buffer)
 			? possiblyBin
 			: false
 	const binaryGiven = isBinaryLike(given)
