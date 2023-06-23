@@ -220,10 +220,7 @@ export function createPrimClient<
 		batchedRequests()
 	})
 	const batchedRequests = () => {
-		if (timer) {
-			return
-		}
-		timer = setTimeout(() => {
+		function handleRpcCallsMethodPlugin() {
 			const rpcList = queuedCalls.filter(c => c.resolved === PromiseResolveStatus.Unhandled)
 			rpcList.forEach(r => {
 				r.resolved = PromiseResolveStatus.Pending
@@ -272,7 +269,15 @@ export function createPrimClient<
 					const toBeRemoved = queuedCalls.filter(given => given.resolved === PromiseResolveStatus.Resolved)
 					removeFromArray(queuedCalls, toBeRemoved)
 				})
-		}, configured.clientBatchTime)
+		}
+		if (configured.clientBatchTime === 0) {
+			handleRpcCallsMethodPlugin()
+			return
+		}
+		if (timer) {
+			return
+		}
+		timer = setTimeout(handleRpcCallsMethodPlugin, configured.clientBatchTime)
 	}
 	// !SECTION
 	const client = proxy as PromisifiedModule<ModuleType>

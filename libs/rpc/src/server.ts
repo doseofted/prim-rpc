@@ -114,14 +114,14 @@ function createServerActions(
 							typeof previousPath === "function" &&
 							!serverOptions.methodsOnMethods.includes(methodExpanded.slice(-1)[0])
 						if (disallowedMethodOnMethod) {
-							return { ...rpcBase, error: "Given method on method was not allowed" }
+							return { ...rpcBase, error: "Method on method was not allowed" }
 						}
 					}
 					if (typeof target === "undefined") {
-						return { ...rpcBase, error: "Requested method was not found" }
+						return { ...rpcBase, error: "Method was not found" }
 					}
 					if (typeof target !== "function") {
-						return { ...rpcBase, error: "Requested method is not callable" }
+						return { ...rpcBase, error: "Method was not callable" }
 					}
 					const methodAllowedDirectly = "rpc" in target && typeof target.rpc == "boolean" && target.rpc
 					if (!methodAllowedDirectly) {
@@ -129,7 +129,7 @@ function createServerActions(
 							Object.entries(serverOptions.allowList ?? {}).length > 0 &&
 							!!getProperty(serverOptions.allowList, methodExpanded)
 						if (!allowedInSchema) {
-							return { ...rpcBase, error: "Method not allowed" }
+							return { ...rpcBase, error: "Method was not allowed" }
 						}
 					}
 				}
@@ -167,7 +167,7 @@ function createServerActions(
 		// NOTE: body length is generally handled by server framework, I think
 		const headers = { "content-type": jsonHandler.mediaType ?? "application/json" }
 		const answers = Array.isArray(given) ? given : [given]
-		const statuses = answers.map(answer => (answer.error ? 500 : answer.result ? 200 : 400))
+		const statuses = answers.map(answer => ("error" in answer ? 500 : "result" in answer ? 200 : 400))
 		const notOkay = statuses.filter(stat => stat !== 200)
 		const errored = statuses.filter(stat => stat === 500)
 		// NOTE: return 200:okay, 400:missing, 500:error if any call has that status
