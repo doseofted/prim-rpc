@@ -65,7 +65,6 @@ export function createPrimClient<
 		| Promise<ModuleType>
 	// SECTION Proxy to handle function calls
 	const proxy = new ProxyDeep<ModuleType>({} as ModuleType, {
-		// FIXME: I need to make sure returned proxy is not a promise (this may not work, promise should be resolved first)
 		apply(_target, targetContext, givenArgs: unknown[]) {
 			// NOTE: client could've been given either Promise or function that resolves to Promise (dynamic imports)
 			// eslint-disable-next-line @typescript-eslint/no-explicit-any

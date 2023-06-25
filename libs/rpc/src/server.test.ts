@@ -79,6 +79,53 @@ describe("Prim Server can call methods with dynamically imported module", () => 
 	})
 })
 
+describe("Prim Server cannot call non-RPC", () => {
+	test("with exported object", async () => {
+		const prim = createPrimServer({ module, prefix: "/prim" })
+		const server = prim.server()
+		const call: RpcCall = { method: "superSecret", id: 1 }
+		const body = JSON.stringify(call)
+		const response = await server.call({ method: "POST", body })
+		const notExpected = module.superSecret
+		const result = JSON.parse(response.body) as RpcAnswer
+		expect(result).not.toEqual({ result: notExpected, id: 1 })
+		expect(result).toEqual({ error: "Method was not callable", id: 1 })
+	})
+	test("with local import", async () => {
+		const prim = createPrimServer({ module, prefix: "/prim" })
+		const server = prim.server()
+		const call: RpcCall = { method: "definitelyNotRpc", id: 1 }
+		const body = JSON.stringify(call)
+		const response = await server.call({ method: "POST", body })
+		const expected = module.definitelyNotRpc()
+		const result = JSON.parse(response.body) as RpcAnswer
+		expect(result).not.toEqual({ result: expected, id: 1 })
+		expect(result).toEqual({ error: "Method was not allowed", id: 1 })
+	})
+	test("with dynamic import", async () => {
+		const prim = createPrimServer({ module: import("@doseofted/prim-example"), prefix: "/prim" })
+		const server = prim.server()
+		const call: RpcCall = { method: "definitelyNotRpc", id: 1 }
+		const body = JSON.stringify(call)
+		const response = await server.call({ method: "POST", body })
+		const expected = module.definitelyNotRpc()
+		const result = JSON.parse(response.body) as RpcAnswer
+		expect(result).not.toEqual({ result: expected, id: 1 })
+		expect(result).toEqual({ error: "Method was not allowed", id: 1 })
+	})
+	test("with method on method that's not allowed", async () => {
+		const prim = createPrimServer({ module: import("@doseofted/prim-example"), prefix: "/prim" })
+		const server = prim.server()
+		const call: RpcCall = { method: "greetings/toString", id: 1 }
+		const body = JSON.stringify(call)
+		const response = await server.call({ method: "POST", body })
+		const notExpected = module.greetings.toString()
+		const result = JSON.parse(response.body) as RpcAnswer
+		expect(result).not.toEqual({ result: notExpected, id: 1 })
+		expect(result).toEqual({ error: "Method on method was not allowed", id: 1 })
+	})
+})
+
 test("Prim Server can call remote methods (without module directly)", async () => {
 	const { callbackPlugin, methodPlugin, callbackHandler, methodHandler } = createPrimTestingPlugins()
 	createPrimServer({ module, callbackHandler, methodHandler }) // server 1

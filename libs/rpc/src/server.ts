@@ -102,14 +102,19 @@ function createServerActions(
 			try {
 				const methodExpanded = method.split("/")
 				// using `configured.module` if module was provided directly to server
-				const targetLocal = getProperty(configured.module, methodExpanded) as AnyFunction & { rpc?: boolean }
+				// resolve given module if it was dynamically imported
+				const givenModulePromise = (
+					typeof configured.module === "function" ? configured.module() : configured.module
+				) as PrimServerOptions["module"] | Promise<PrimServerOptions["module"]>
+				const givenModule = givenModulePromise instanceof Promise ? await givenModulePromise : givenModulePromise
+				const targetLocal = getProperty(givenModule, methodExpanded) as AnyFunction & { rpc?: boolean }
 				// using `client` to request remote module if not provided directly to server
 				const targetRemote = getProperty(client, methodExpanded) as AnyFunction & { rpc?: boolean }
 				const target = targetLocal ?? targetRemote
 				if (targetLocal) {
 					// these checks only apply if module is provided directly (TBD on actual server with module)
 					if (methodExpanded.length > 1) {
-						const previousPath = getProperty(configured.module, methodExpanded.slice(0, -1)) as unknown
+						const previousPath = getProperty(givenModule, methodExpanded.slice(0, -1)) as unknown
 						const disallowedMethodOnMethod =
 							typeof previousPath === "function" &&
 							!serverOptions.methodsOnMethods.includes(methodExpanded.slice(-1)[0])
