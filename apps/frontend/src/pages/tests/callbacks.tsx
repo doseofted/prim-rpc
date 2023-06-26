@@ -1,5 +1,5 @@
 import { useRef, useState } from "react"
-import backend from "../../app/prim/client"
+import { testingClient as backend } from "../../app/prim/client"
 
 function Callbacks() {
 	const [typed, setTyped] = useState<string>("")
@@ -19,7 +19,7 @@ function Callbacks() {
 						const message = data.get("message")?.toString() ?? ""
 						setTyped(" ")
 						input.current.value = ""
-						void backend.typeMessage(message, letter => setTyped(typed => typed + letter), 50)
+						void backend.typeMessage(message, letter => setTyped(typed => typed + letter), 150)
 					}}>
 					<input
 						ref={input}
