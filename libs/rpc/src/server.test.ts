@@ -4,7 +4,7 @@
 
 import { describe, test, expect } from "vitest"
 import { createPrimServer } from "."
-import { RpcAnswer, RpcCall } from "./interfaces"
+import { PrimServerActionsExtended, RpcAnswer, RpcCall } from "./interfaces"
 import type * as exampleClient from "@doseofted/prim-example"
 import * as exampleServer from "@doseofted/prim-example"
 import queryString from "query-string"
@@ -79,50 +79,75 @@ describe("Prim Server can call methods with dynamically imported module", () => 
 	})
 })
 
+/** Utility to make sending POST-like requests easier for tests */
+async function handlePost(server: PrimServerActionsExtended, call: RpcCall): Promise<RpcAnswer> {
+	const body = JSON.stringify(call)
+	const response = await server.call({ method: "POST", body })
+	const result = JSON.parse(response.body) as RpcAnswer
+	return result
+}
+
 describe("Prim Server cannot call non-RPC", () => {
+	// function prepareCall (given: RpcCall) {
+	// 	const body = JSON.stringify(given)
+	// 	return { method: "POST", body }
+	// }
 	test("with exported object", async () => {
 		const prim = createPrimServer({ module, prefix: "/prim" })
 		const server = prim.server()
-		const call: RpcCall = { method: "superSecret", id: 1 }
-		const body = JSON.stringify(call)
-		const response = await server.call({ method: "POST", body })
+		const result = await handlePost(server, {
+			method: "superSecret",
+			id: 1,
+		})
 		const notExpected = module.superSecret
-		const result = JSON.parse(response.body) as RpcAnswer
 		expect(result).not.toEqual({ result: notExpected, id: 1 })
 		expect(result).toEqual({ error: "Method was not callable", id: 1 })
 	})
 	test("with local import", async () => {
 		const prim = createPrimServer({ module, prefix: "/prim" })
 		const server = prim.server()
-		const call: RpcCall = { method: "definitelyNotRpc", id: 1 }
-		const body = JSON.stringify(call)
-		const response = await server.call({ method: "POST", body })
+		const result = await handlePost(server, {
+			method: "definitelyNotRpc",
+			id: 1,
+		})
 		const expected = module.definitelyNotRpc()
-		const result = JSON.parse(response.body) as RpcAnswer
 		expect(result).not.toEqual({ result: expected, id: 1 })
 		expect(result).toEqual({ error: "Method was not allowed", id: 1 })
 	})
 	test("with dynamic import", async () => {
 		const prim = createPrimServer({ module: import("@doseofted/prim-example"), prefix: "/prim" })
 		const server = prim.server()
-		const call: RpcCall = { method: "definitelyNotRpc", id: 1 }
-		const body = JSON.stringify(call)
-		const response = await server.call({ method: "POST", body })
+		const result = await handlePost(server, {
+			method: "definitelyNotRpc",
+			id: 1,
+		})
 		const expected = module.definitelyNotRpc()
-		const result = JSON.parse(response.body) as RpcAnswer
 		expect(result).not.toEqual({ result: expected, id: 1 })
 		expect(result).toEqual({ error: "Method was not allowed", id: 1 })
+	})
+	test("with dynamic import inside of static import", async () => {
+		const prim = createPrimServer({ module, prefix: "/prim" })
+		const server = prim.server()
+		const result = await handlePost(server, {
+			method: "dynamic/synergy",
+			id: 1,
+		})
+		const dynamicResolved = await module.dynamic
+		const notExpected = dynamicResolved.synergy()
+		expect(result).not.toEqual({ result: notExpected, id: 1 })
+		// NOTE: method is not found because it's in a promise
+		expect(result).toEqual({ error: "Method was not found", id: 1 })
 	})
 	test("with method on method that's not allowed", async () => {
 		const prim = createPrimServer({ module: import("@doseofted/prim-example"), prefix: "/prim" })
 		const server = prim.server()
-		const call: RpcCall = { method: "greetings/toString", id: 1 }
-		const body = JSON.stringify(call)
-		const response = await server.call({ method: "POST", body })
+		const result = await handlePost(server, {
+			method: "greetings/toString",
+			id: 1,
+		})
 		const notExpected = module.greetings.toString()
-		const result = JSON.parse(response.body) as RpcAnswer
 		expect(result).not.toEqual({ result: notExpected, id: 1 })
-		expect(result).toEqual({ error: "Method on method was not allowed", id: 1 })
+		expect(result).toEqual({ error: "Method was not valid", id: 1 })
 	})
 })
 

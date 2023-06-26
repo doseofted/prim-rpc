@@ -81,12 +81,23 @@ describe("Prim Client cannot call non-RPC", () => {
 	})
 	test("with method on method that's not allowed", async () => {
 		const { callbackPlugin, methodPlugin, callbackHandler, methodHandler } = createPrimTestingPlugins()
-		createPrimServer({ module, callbackHandler, methodHandler })
+		// We pass some made-up method-on-method name because if none are given then no methods on methods are allowed
+		// and I need to test to make sure that the allow list is working
+		createPrimServer({ module, callbackHandler, methodHandler, methodsOnMethods: ["somethingMadeUp"] })
 		const prim = createPrimClient<IModule>({ callbackPlugin, methodPlugin })
+		// below is not valid because it's in Prim RPC's deny list
 		const functionCall1 = () => prim.greetings.toString()
-		await expect(functionCall1()).rejects.toThrow("Method on method was not allowed")
-		const functionCall2 = () => prim.greetings.toString.toString()
-		await expect(functionCall2()).rejects.toThrow("Method on method was not allowed")
+		await expect(functionCall1()).rejects.toThrow("Method was not valid")
+		// this is not valid because, while the method-on-method is allowed, it's called on the prototype
+		// eslint-disable-next-line @typescript-eslint/no-unsafe-member-access, @typescript-eslint/no-unsafe-call, @typescript-eslint/no-unsafe-return
+		const functionCall2 = () => prim.lookAtThisMess.prototype.somethingMadeUp()
+		await expect(functionCall2()).rejects.toThrow("Method was not valid")
+		// below is not valid because "docs" method-on-method is not in the allowed list
+		const functionCall3 = () => prim.lookAtThisMess.docs()
+		await expect(functionCall3()).rejects.toThrow("Method on method was not allowed")
+		// below is not valid because method-on-method is not defined directly on a function
+		const functionCall4 = () => prim.lookAtThisMess.messy.technicallyNotRpc("Hi", "there")
+		await expect(functionCall4()).rejects.toThrow("Method on method was not valid")
 	})
 })
 

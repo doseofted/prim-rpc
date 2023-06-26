@@ -30,9 +30,8 @@ export class Things {
 		return true
 	}
 }
-const things = new Things()
 
 /**
  * Work on things.
  */
-export default things
+export const things = new Things()
