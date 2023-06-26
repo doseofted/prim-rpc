@@ -6,7 +6,7 @@ import type { Emitter } from "mitt"
 import type { Schema } from "type-fest"
 
 // SECTION RPC call and result structure
-interface RpcBase {
+export interface RpcBase {
 	prim?: 0 // as new major versions are announced (only that change message structure), bump version
 	id?: string | number
 }

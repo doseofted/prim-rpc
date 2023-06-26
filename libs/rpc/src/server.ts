@@ -25,6 +25,7 @@ import type {
 	PrimServer,
 	PrimServerSocketAnswerRpc,
 } from "./interfaces"
+import { checkHttpLikeRequest, checkHttpLikeResponse, checkRpcCall, checkRpcResult } from "./validate"
 
 /**
  *
@@ -65,13 +66,14 @@ function createServerActions(
 ): PrimServerActionsBase {
 	const { jsonHandler, prefix: serverPrefix, handleError } = serverOptions
 	const prepareCall = (given: CommonServerSimpleGivenOptions = {}): RpcCall | RpcCall[] => {
-		const { body = "", method = "POST", url: possibleUrl = "" } = given
-		const providedBody = body && method === "POST"
+		const givenReq = checkHttpLikeRequest(given)
+		const { body, method, url: possibleUrl } = givenReq
+		const providedBody = method === "POST" && body
 		if (providedBody) {
-			const prepared = jsonHandler.parse(given.body) as RpcCall | RpcCall[]
+			const prepared = jsonHandler.parse(givenReq.body) as RpcCall | RpcCall[]
 			return prepared
 		}
-		const providedUrl = possibleUrl !== "" && method === "GET"
+		const providedUrl = method === "GET" && possibleUrl
 		if (providedUrl) {
 			const positional = []
 			const { query, url } = queryString.parseUrl(possibleUrl, {
@@ -100,8 +102,7 @@ function createServerActions(
 			method = method !== "" ? method : "default"
 			return { id, method, args }
 		}
-		// NOTE: consider failing instead of falling back to default export
-		return { method: "default" }
+		throw { error: "Response can not be generated from request" }
 	}
 	const prepareRpc = async (
 		calls: RpcCall | RpcCall[],
@@ -111,7 +112,7 @@ function createServerActions(
 	): Promise<RpcAnswer | RpcAnswer[]> => {
 		// NOTE: new Prim client should be created on each request so callback results are not shared
 		const { client, socketEvent: event, configured } = instance ?? createPrimInstance(serverOptions)
-		const callList = Array.isArray(calls) ? calls : [calls]
+		const callList = Array.isArray(calls) ? checkRpcCall(calls) : checkRpcCall([calls])
 		const answeringCalls = callList.map(async (given): Promise<RpcAnswer> => {
 			const { method, args, id } = given
 			const rpcVersion: Partial<RpcAnswer> = useVersionInRpc ? { prim: primMajorVersion } : {}
@@ -125,7 +126,6 @@ function createServerActions(
 				) as PrimServerOptions["module"] | Promise<PrimServerOptions["module"]>
 				const givenModule = givenModulePromise instanceof Promise ? await givenModulePromise : givenModulePromise
 				const targetLocal = getProperty(givenModule, methodExpanded) as AnyFunction & { rpc?: boolean }
-				if (givenModule instanceof Promise) console.warn("DEBUG", givenModule, targetLocal)
 				if (givenModule) {
 					// While subsequent checks cover these situations, some key props will immediately invalidate a given method
 					if (denyList.filter(given => methodExpanded.includes(given)).length > 0) {
@@ -170,7 +170,7 @@ function createServerActions(
 						}
 					}
 				}
-				const argsArray = Array.isArray(args) ? args : [args]
+				const argsArray = args as unknown[] // already validated in `checkRpcCall`
 				const argsForCall =
 					Object.entries(blobs || {}).length > 0 ? argsArray.map(arg => mergeBlobLikeWithGiven(arg, blobs)) : argsArray
 				// NOTE: use `targetRemote` below even if target is local to allow callbacks to be used with server
@@ -214,7 +214,7 @@ function createServerActions(
 				return { ...rpcBase, error: e }
 			}
 		})
-		const answeredCalls = await Promise.all(answeringCalls)
+		const answeredCalls = checkRpcResult(await Promise.all(answeringCalls))
 		return answeredCalls.length === 1 ? answeredCalls[0] : answeredCalls
 	}
 	const prepareSend = (given: RpcAnswer | RpcAnswer[]): CommonServerResponseOptions => {
@@ -227,12 +227,13 @@ function createServerActions(
 		const errored = statuses.filter(stat => stat === 500)
 		// NOTE: return 200:okay, 400:missing, 500:error if any call has that status
 		const status = notOkay.length > 0 ? (errored.length > 0 ? 500 : 400) : 200
-		return { body, headers, status }
+		return checkHttpLikeResponse({ body, headers, status })
 	}
 	return { prepareCall, prepareRpc, prepareSend }
 }
 
 function createServerEvents(serverOptions: PrimServerOptions): PrimServerEvents {
+	// TODO: handle error from createServerActions
 	const server = () => {
 		const { prepareCall, prepareRpc, prepareSend } = createServerActions(serverOptions)
 		const call = async (
@@ -251,6 +252,7 @@ function createServerEvents(serverOptions: PrimServerOptions): PrimServerEvents 
 }
 
 function createSocketEvents(serverOptions: PrimServerOptions): PrimServerSocketEvents {
+	// TODO: handle error from createServerActions
 	const connected = () => {
 		const instance = createPrimInstance(serverOptions)
 		const { socketEvent: event } = instance
