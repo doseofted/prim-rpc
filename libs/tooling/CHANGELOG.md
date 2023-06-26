@@ -1,5 +1,12 @@
 # @doseofted/prim-rpc-tooling
 
+## 0.1.0-alpha.5
+
+### Minor Changes
+
+- fe310d3: New option added to preventImport tool that throws an error if imported on client at run-time (useful for
+  testing with fullstack frameworks)
+
 ## 0.1.0-alpha.4
 
 ### Patch Changes

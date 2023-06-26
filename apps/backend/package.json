@@ -1,6 +1,6 @@
 {
 	"name": "@doseofted/prim-example-server",
-	"version": "0.1.0-alpha.15",
+	"version": "0.1.0-alpha.16",
 	"description": "An example backend making use of Prim+RPC.",
 	"license": "UNLICENSED",
 	"private": true,
