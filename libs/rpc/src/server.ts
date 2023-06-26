@@ -34,12 +34,30 @@ import type {
  */
 function createPrimInstance(options?: PrimServerOptions) {
 	const configured = createPrimOptions(options)
-	const socketEvent = mitt<PrimWebSocketEvents>()
-	const clientEvent = mitt<PrimHttpEvents>()
-	configured.internal = { socketEvent, clientEvent }
+	if (!configured.internal.clientEvent) {
+		configured.internal.clientEvent = mitt<PrimHttpEvents>()
+	}
+	if (!configured.internal.socketEvent) {
+		configured.internal.socketEvent = mitt<PrimWebSocketEvents>()
+	}
 	const client = createPrimClient(configured)
+	const { socketEvent, clientEvent } = configured.internal
 	return { client, socketEvent, clientEvent, configured }
 }
+
+const denyList = [
+	"prototype",
+	"__proto__",
+	"constructor",
+	"toString",
+	"toLocaleString",
+	"valueOf",
+	"apply",
+	"bind",
+	"call",
+	"arguments",
+	"caller",
+]
 
 function createServerActions(
 	serverOptions: PrimServerOptions,
@@ -95,35 +113,54 @@ function createServerActions(
 		const { client, socketEvent: event, configured } = instance ?? createPrimInstance(serverOptions)
 		const callList = Array.isArray(calls) ? calls : [calls]
 		const answeringCalls = callList.map(async (given): Promise<RpcAnswer> => {
-			// eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
 			const { method, args, id } = given
 			const rpcVersion: Partial<RpcAnswer> = useVersionInRpc ? { prim: primMajorVersion } : {}
 			const rpcBase: Partial<RpcAnswer> = { ...rpcVersion, id }
 			try {
 				const methodExpanded = method.split("/")
 				// using `configured.module` if module was provided directly to server
-				const targetLocal = getProperty(configured.module, methodExpanded) as AnyFunction & { rpc?: boolean }
-				// using `client` to request remote module if not provided directly to server
-				const targetRemote = getProperty(client, methodExpanded) as AnyFunction & { rpc?: boolean }
-				const target = targetLocal ?? targetRemote
-				if (targetLocal) {
-					// these checks only apply if module is provided directly (TBD on actual server with module)
+				// and resolve given module first if it was dynamically imported
+				const givenModulePromise = (
+					typeof configured.module === "function" ? configured.module() : configured.module
+				) as PrimServerOptions["module"] | Promise<PrimServerOptions["module"]>
+				const givenModule = givenModulePromise instanceof Promise ? await givenModulePromise : givenModulePromise
+				const targetLocal = getProperty(givenModule, methodExpanded) as AnyFunction & { rpc?: boolean }
+				if (givenModule instanceof Promise) console.warn("DEBUG", givenModule, targetLocal)
+				if (givenModule) {
+					// While subsequent checks cover these situations, some key props will immediately invalidate a given method
+					if (denyList.filter(given => methodExpanded.includes(given)).length > 0) {
+						return { ...rpcBase, error: "Method was not valid" }
+					}
+					// these checks only apply if module is provided directly (determined on actual server with module)
 					if (methodExpanded.length > 1) {
-						const previousPath = getProperty(configured.module, methodExpanded.slice(0, -1)) as unknown
+						const currentPathCheck: string[] = []
+						// NOTE: `.methodsOnMethods` is only allowed if method is defined _directly_ on another method
+						const previousPathsIncludeFunction = methodExpanded
+							.slice(0, serverOptions.methodsOnMethods.length > 0 ? -2 : -1)
+							.map(method => {
+								currentPathCheck.push(method)
+								const currentPath = getProperty(givenModule, currentPathCheck) as unknown
+								return typeof currentPath !== "object" // paths cannot contain "function" type any other type
+							})
+							.reduce((a, b) => a || b, false)
+						if (previousPathsIncludeFunction) {
+							return { ...rpcBase, error: "Method on method was not valid" }
+						}
+						const directPreviousPath = getProperty(givenModule, methodExpanded.slice(0, -1)) as unknown
 						const disallowedMethodOnMethod =
-							typeof previousPath === "function" &&
+							typeof directPreviousPath === "function" &&
 							!serverOptions.methodsOnMethods.includes(methodExpanded.slice(-1)[0])
 						if (disallowedMethodOnMethod) {
 							return { ...rpcBase, error: "Method on method was not allowed" }
 						}
 					}
-					if (typeof target === "undefined") {
+					if (typeof targetLocal === "undefined" || targetLocal === null) {
 						return { ...rpcBase, error: "Method was not found" }
 					}
-					if (typeof target !== "function") {
+					if (typeof targetLocal !== "function") {
 						return { ...rpcBase, error: "Method was not callable" }
 					}
-					const methodAllowedDirectly = "rpc" in target && typeof target.rpc == "boolean" && target.rpc
+					const methodAllowedDirectly = "rpc" in targetLocal && typeof targetLocal.rpc == "boolean" && targetLocal.rpc
 					if (!methodAllowedDirectly) {
 						const allowedInSchema =
 							Object.entries(serverOptions.allowList ?? {}).length > 0 &&
@@ -136,15 +173,34 @@ function createServerActions(
 				const argsArray = Array.isArray(args) ? args : [args]
 				const argsForCall =
 					Object.entries(blobs || {}).length > 0 ? argsArray.map(arg => mergeBlobLikeWithGiven(arg, blobs)) : argsArray
-				if (cbResults) {
-					event.on("response", cbResults)
+				// NOTE: use `targetRemote` below even if target is local to allow callbacks to be used with server
+				// (server and client share event handlers on `.internal` option that allows for usage of callbacks)
+				if (givenModule && targetLocal) {
+					// The module was provided and the target exists. Checks have already run and did not return an error
+					// so we can call the method using the client.
+					if (cbResults) {
+						event.on("response", cbResults)
+					}
+					// call module with `client` if not provided directly to server (checks already ran on module, if provided)
+					const targetRemote = getProperty(client, methodExpanded) as AnyFunction & { rpc?: boolean }
+					const result = (await Reflect.apply(targetRemote, context, argsForCall)) as unknown
+					return { ...rpcBase, result }
+				} else {
+					// If either the module wasn't provided or target doesn't exist (even if module does), send a request using
+					// a client that doesn't know about the module provided (will use provided plugin to server).
+					// eslint-disable-next-line @typescript-eslint/no-unused-vars
+					const { module: moduleProvided, ...limitedOptions } = serverOptions
+					// create client that doesn't have access to module (target may not exist but other targets might)
+					const { client: limitedClient, socketEvent: limitedEvent } = createPrimInstance(limitedOptions)
+					if (cbResults) {
+						limitedEvent.on("response", cbResults)
+					}
+					const targetRemote = getProperty(limitedClient, methodExpanded) as AnyFunction & { rpc?: boolean }
+					const result = (await Reflect.apply(targetRemote, context, argsForCall)) as unknown
+					return { ...rpcBase, result }
 				}
-				// NOTE: use `remoteTarget` (even if target is local) to ensure callbacks are handled properly by Prim client
-				// eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
-				const result: RpcAnswer = await Reflect.apply(targetRemote, context, argsForCall)
 				// TODO: today, result must be supported by JSON handler but consider supporting returned functions
 				// in the same way that callback are supported today (by passing reference to client)
-				return { ...rpcBase, result }
 			} catch (e) {
 				// JSON.stringify on Error results in an empty object. Since Error is common, serialize it
 				// when a custom JSON handler is not provided
@@ -155,7 +211,6 @@ function createServerActions(
 					}
 					return { ...rpcBase, error }
 				}
-				// eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
 				return { ...rpcBase, error: e }
 			}
 		})
@@ -252,7 +307,6 @@ function createSocketEvents(serverOptions: PrimServerOptions): PrimServerSocketE
  * @param options Options for utilizing functions provided with Prim
  * @returns A function that expects JSON resembling an RPC call
  */
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
 export function createPrimServer<
 	// eslint-disable-next-line @typescript-eslint/no-unused-vars
 	ModuleType extends OptionsType["module"] = object,
@@ -264,7 +318,7 @@ export function createPrimServer<
 	// client options should be re-instantiated on every request
 	// TODO: instead of merging options, considering adding client options to server options as separate property
 	// and creating client options separately from server
-	const serverOptions = createPrimOptions(options, true)
+	const serverOptions = Object.freeze(Object.assign({}, createPrimOptions(options, true)))
 	// TODO: consider emitting some kind of event once handlers are configured (for all that have resolved promises)
 	// this could be useful for plugins of a server framework where plugins must be given and resolved in order
 	const handlersRegistered = Promise.allSettled([
@@ -276,7 +330,7 @@ export function createPrimServer<
 	return {
 		connected,
 		...createServerEvents(serverOptions),
-		options: Object.freeze(Object.assign({}, serverOptions)),
+		options: serverOptions,
 		handlersRegistered,
 	}
 }

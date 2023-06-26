@@ -15,7 +15,7 @@ export default ({ children }) => <LayoutDocs meta={meta}>{children}</LayoutDocs>
 <Alert prose icon="carbon:information">
 
 Prim+RPC does not have a stable release and should not yet be used in production applications. Please report any
-security issues that you find according to the [security policy](https://github.com/doseofted/prim-rpc/security/policy).
+security issues that you find according to the [security policy](https://github.com/doseofted/prim-rpc/security).
 
 </Alert>
 
@@ -275,5 +275,5 @@ Prim+RPC keeps a narrow scope: it handles RPC but it utilizes separate plugins f
 choose any transport that you'd like by using an available plugin or creating your own but it also means that the
 security of the transport falls outside of Prim+RPC's scope. Securing the transport may mean something different
 depending on the environment. For instance, on a web client, you may consider the possibility of XSS. If you're using
-Prim+RPC on a web server then you may consider using TLS, CORS headers, rate limiting, authentication, and other means.
-These are good practices in general for an application and are not specific to Prim+RPC.
+Prim+RPC on a web server then you may consider using TLS, CORS headers, CSRF tokens, rate limiting, authentication, and
+other means. These are good practices in general for an application and are not specific to Prim+RPC.

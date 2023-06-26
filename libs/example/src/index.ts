@@ -20,8 +20,10 @@ export * as additional from "./submodule"
 // external module directly imported (no RPC property added)
 export { startCase } from "lodash-es"
 
-// import things, { ThingInstance, Things } from "./things"
-// export type { ThingInstance }
+export const dynamic = import("./dynamic")
+
+// export { things, Things } from "./things"
+// export type { ThingInstance } from "./things"
 
 /** TODO: Maybe we shouldn't share this. Just a thought. */
 export const superSecret = {
@@ -273,6 +275,17 @@ export function greetings(x: string, y: string) {
 	return `${x}, meet ${y}.`
 }
 greetings.rpc = true
+
+/** I don't even know what's going on here. And that's the point. */
+export function lookAtThisMess() {
+	return "Clean it up!"
+}
+lookAtThisMess.rpc = true
+lookAtThisMess.docs = () => "This is example documentation defined on the function itself."
+lookAtThisMess.somethingMadeUp = () => "Maybe we'll allow it"
+// eslint-disable-next-line @typescript-eslint/no-unsafe-member-access
+lookAtThisMess.prototype.somethingMadeUp = () => "Nope"
+lookAtThisMess.messy = { technicallyNotRpc: sayHelloAlternative, definitelyNotRpc: () => "Hi" }
 
 /**
  *

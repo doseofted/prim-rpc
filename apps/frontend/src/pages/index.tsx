@@ -10,6 +10,10 @@ import Link from "next/link"
 import { Icon } from "@iconify/react"
 import backend from "../app/prim/client"
 
+// This direct import will throw an error (see next.config.js)
+// import { greetings } from "@doseofted/prim-example"
+// console.log(greetings("Backend", "Frontend"))
+
 interface Props {
 	greeting: string
 }
@@ -100,7 +104,7 @@ export default function Home({ greeting }: Props) {
 		{
 			title: "Share Only What's Allowed",
 			details:
-				"As a security precaution, only the functions you explicitly mark as RPC will be callable from Prim+RPC.",
+				"As a security precaution, only the functions you explicitly export and mark as RPC will be callable from Prim+RPC.",
 		},
 		{
 			title: "Generate Documentation",
