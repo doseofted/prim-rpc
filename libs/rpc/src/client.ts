@@ -63,12 +63,13 @@ export function createPrimClient<
 	const givenModulePromise = (typeof configured.module === "function" ? configured.module() : configured.module) as
 		| ModuleType
 		| Promise<ModuleType>
+	// Once promise and possible wrapper function are removed from module, store to avoid unwrapping again unnecessarily
+	let determinedModule: ModuleType
 	// SECTION Proxy to handle function calls
 	const proxy = new ProxyDeep<ModuleType>({} as ModuleType, {
 		apply(_target, targetContext, givenArgs: unknown[]) {
 			// NOTE: client could've been given either Promise or function that resolves to Promise (dynamic imports)
-			// eslint-disable-next-line @typescript-eslint/no-explicit-any
-			function applySync(givenPath: string[], givenModule: ModuleType, targetContext: any, givenArgs: unknown[]) {
+			function applySync(givenPath: string[], givenModule: ModuleType, targetContext: unknown, givenArgs: unknown[]) {
 				// SECTION Server-side module handling
 				const targetFunction = getProperty(givenModule, givenPath) as ModuleType
 				const targetIsCallable = typeof targetFunction === "function"
@@ -167,12 +168,17 @@ export function createPrimClient<
 				return result
 				// !SECTION
 			}
+			if (determinedModule) {
+				return applySync(this.path, determinedModule, targetContext, givenArgs)
+			}
 			if (givenModulePromise instanceof Promise) {
 				return givenModulePromise.then(givenModule => {
-					return applySync(this.path, givenModule, targetContext, givenArgs)
+					determinedModule = givenModule
+					return applySync(this.path, determinedModule, targetContext, givenArgs)
 				})
 			} else {
-				return applySync(this.path, givenModulePromise, targetContext, givenArgs)
+				determinedModule = givenModulePromise
+				return applySync(this.path, determinedModule, targetContext, givenArgs)
 			}
 		},
 		get(_target, _prop, _receiver) {
