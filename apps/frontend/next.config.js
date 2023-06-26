@@ -1,6 +1,6 @@
 // @ts-check
-// import path from "node:path"
-// import preventImport from "@doseofted/prim-rpc-tooling/build"
+import path from "node:path"
+import preventImport, { BuildModifyMethod } from "@doseofted/prim-rpc-tooling/build"
 import mdx from "@next/mdx"
 import { remarkCodeHike } from "@code-hike/mdx"
 import { readFileSync } from "fs"
@@ -38,14 +38,14 @@ const nextConfig = withMDX({
 	reactStrictMode: true,
 	swcMinify: true,
 	// NOTE: since server is contained in the Next.js project itself, the module shouldn't be ignored across entire project
-	// webpack(given) {
-	// 	/** @type {import("webpack").Configuration} */
-	// 	const config = given
-	// 	const dirname = new URL("", import.meta.url).pathname
-	// 	const modulePath = path.join(dirname, "../../..", "libs/example")
-	// 	config.plugins?.push(preventImport.webpack({ name: modulePath }))
-	// 	return config
-	// },
+	webpack(given) {
+		/** @type {import("webpack").Configuration} */
+		const config = given
+		const dirname = new URL("", import.meta.url).pathname
+		const modulePath = path.join(dirname, "../../..", "libs/example")
+		config.plugins?.push(preventImport.webpack({ name: modulePath, method: BuildModifyMethod.RunTimeWindowCheck }))
+		return config
+	},
 	pageExtensions: ["ts", "tsx", "js", "jsx", "md", "mdx"],
 })
 
