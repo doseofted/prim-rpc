@@ -1,5 +1,12 @@
 # @doseofted/prim-rpc
 
+## 0.1.0-alpha.10
+
+### Patch Changes
+
+- 33fdeb6: Fix for dynamic imports used with Prim RPC server
+- b52fe0a: More in-depth checks added for calling module provided to Prim+RPC server
+
 ## 0.1.0-alpha.9
 
 ### Patch Changes
