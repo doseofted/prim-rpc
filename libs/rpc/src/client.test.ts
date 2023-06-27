@@ -64,12 +64,12 @@ describe("Prim Client cannot call non-RPC", () => {
 		const { callbackPlugin, methodPlugin, callbackHandler, methodHandler } = createPrimTestingPlugins()
 		createPrimServer({ module, callbackHandler, methodHandler })
 		const prim = createPrimClient<IModule>({ callbackPlugin, methodPlugin })
-		// eslint-disable-next-line @typescript-eslint/no-unsafe-return, @typescript-eslint/no-unsafe-call, @typescript-eslint/no-explicit-any
-		const functionCall1 = () => (prim.superSecret.myApiKey as any)?.()
+		// eslint-disable-next-line @typescript-eslint/no-unsafe-return, @typescript-eslint/no-unsafe-call, @typescript-eslint/no-explicit-any, @typescript-eslint/no-unsafe-member-access
+		const functionCall1 = () => (prim as any)?.superSecret.myApiKey?.()
 		expect(prim.superSecret).toBeTypeOf("function")
 		await expect(functionCall1()).rejects.toThrow("Method was not callable")
-		// eslint-disable-next-line @typescript-eslint/no-unsafe-return, @typescript-eslint/no-unsafe-call, @typescript-eslint/no-explicit-any
-		const functionCall2 = () => (prim.superSecret2 as any)?.()
+		// eslint-disable-next-line @typescript-eslint/no-unsafe-return, @typescript-eslint/no-unsafe-call, @typescript-eslint/no-explicit-any, @typescript-eslint/no-unsafe-member-access
+		const functionCall2 = () => (prim as any)?.superSecret2?.()
 		await expect(functionCall2()).rejects.toThrow("Method was not callable")
 	})
 	test("with function not in allow list", async () => {

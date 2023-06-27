@@ -3,7 +3,7 @@
 // SPDX-License-Identifier: Apache-2.0
 
 import type { Emitter } from "mitt"
-import type { Schema } from "type-fest"
+import type { Schema, ConditionalExcept } from "type-fest"
 
 // SECTION RPC call and result structure
 export interface RpcBase {
@@ -63,13 +63,16 @@ interface PrimWebSocketFunctionEvents {
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 export type AnyFunction = (...args: any[]) => any
 // NOTE: consider condition of checking `.rpc` property on function (but also remember that it may be in allow list)
-type PromisifiedModuleDirect<ModuleGiven extends object> = {
-	[Key in keyof ModuleGiven]: ModuleGiven[Key] extends ((...args: infer A) => infer R) & object
-		? ((...args: A) => Promise<Awaited<R>>) & ModuleGiven[Key]
-		: ModuleGiven[Key] extends object
-		? PromisifiedModuleDirect<ModuleGiven[Key]>
-		: ModuleGiven[Key]
-}
+type PromisifiedModuleDirect<ModuleGiven extends object> = ConditionalExcept<
+	{
+		[Key in keyof ModuleGiven]: ModuleGiven[Key] extends ((...args: infer A) => infer R) & object
+			? ((...args: A) => Promise<Awaited<R>>) & PromisifiedModuleDirect<ModuleGiven[Key]>
+			: ModuleGiven[Key] extends object
+			? PromisifiedModuleDirect<ModuleGiven[Key]>
+			: never
+	},
+	never
+>
 
 // NOTE: this is a non-recursive version of default `Awaited` type that comes with TypeScript
 type PromisifiedModuleDynamicImport<ModuleGiven extends object> = ModuleGiven extends object & {

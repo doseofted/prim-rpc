@@ -3,7 +3,7 @@ export interface ThingInstance {
 	name: string
 }
 export class Things {
-	things: ThingInstance[]
+	private things: ThingInstance[]
 	create(thing: ThingInstance) {
 		this.things.push(thing)
 		return true
