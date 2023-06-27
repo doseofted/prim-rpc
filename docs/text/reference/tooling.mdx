@@ -29,21 +29,28 @@ from the server. You can use it like so (we'll use Vite as an example but you co
 ```typescript
 import path from "node:path"
 import { defineConfig } from "vite"
-import preventImport from "@doseofted/prim-rpc-tooling/build"
-
-const preventServerImport = preventImport.vite({
-	name: path.join(__dirname, "server"),
-})
+import preventImport, { BuildModifyMethod } from "@doseofted/prim-rpc-tooling/build"
 
 export default defineConfig({
-	plugins: [preventServerImport],
+	plugins: [
+		preventImport.vite({
+			name: path.join(__dirname, "server"),
+			method: BuildModifyMethod.BuildTimeEmptyExport,
+		}),
+	],
 })
 ```
 
 In this example we assume that server-related code is located in the same directory as the Vite config (`./server`).
 
 Now if we try to import a function directly from the server (the code itself, not the types as used with Prim+RPC) that
-function call will fail because the plugin replaces all server imports with an empty export (`export {}`).
+function call will fail because we selected the `BuildTimeEmptyExport` method. The plugin will replace all server
+imports with an empty export (`export {}`) during the build process.
+
+There are two other methods available: `RunTimeWindowCheck` and `RunTimeProcessCheck`. These two options are very
+similar and will simply prepend a conditional error only if imported on the client. The `RunTimeWindowCheck` method, for
+instance, will prepend `if (typeof window !== "undefined") { throw new Error("...")` to the top of the file (with your
+chosen error message). While this does not prevent the import itself, it should flag some errors in your testing tools.
 
 ## Documentation Generator
 
