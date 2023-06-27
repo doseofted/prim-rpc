@@ -63,12 +63,14 @@ interface PrimWebSocketFunctionEvents {
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 export type AnyFunction = (...args: any[]) => any
 // NOTE: consider condition of checking `.rpc` property on function (but also remember that it may be in allow list)
-type PromisifiedModuleDirect<ModuleGiven extends object> = ConditionalExcept<
+type PromisifiedModuleDirect<ModuleGiven extends object, Recursive extends true | false = true> = ConditionalExcept<
 	{
 		[Key in keyof ModuleGiven]: ModuleGiven[Key] extends ((...args: infer A) => infer R) & object
-			? ((...args: A) => Promise<Awaited<R>>) & PromisifiedModuleDirect<ModuleGiven[Key]>
+			? ((...args: A) => Promise<Awaited<R>>) & PromisifiedModuleDirect<ModuleGiven[Key], false>
 			: ModuleGiven[Key] extends object
-			? PromisifiedModuleDirect<ModuleGiven[Key]>
+			? Recursive extends true
+				? PromisifiedModuleDirect<ModuleGiven[Key]>
+				: never
 			: never
 	},
 	never
