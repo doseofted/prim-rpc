@@ -9,7 +9,7 @@ import { serializeError } from "serialize-error"
 import { createPrimOptions, primMajorVersion, useVersionInRpc } from "./options"
 import { createPrimClient } from "./client"
 import { mergeBlobLikeWithGiven } from "./blobs"
-import type { AnyFunction } from "./client"
+import type { AnyFunction } from "./interfaces"
 import type {
 	CommonServerSimpleGivenOptions,
 	CommonServerResponseOptions,

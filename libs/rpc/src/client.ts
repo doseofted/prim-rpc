@@ -33,8 +33,6 @@ import type {
 	BlobRecords,
 } from "./interfaces"
 
-export type { AnyFunction } from "./interfaces"
-
 /** Callback prefix */ export const CB_PREFIX = "_cb_"
 /** Binary prefix (Blob/File) */ export const BLOB_PREFIX = "_bin_"
 
@@ -285,7 +283,7 @@ export function createPrimClient<
 		timer = setTimeout(handleRpcCallsMethodPlugin, configured.clientBatchTime)
 	}
 	// !SECTION
-	const client = proxy as PromisifiedModule<ModuleType>
+	const client = proxy as unknown as PromisifiedModule<ModuleType>
 	// function destroy() {
 	// 	wsDestroyedEvents.forEach(shutDown => shutDown())
 	// 	wsEvent.all.clear()

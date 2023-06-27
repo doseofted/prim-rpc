@@ -94,6 +94,11 @@ export type PromisifiedModule<Given extends object> = Given extends AnyFunctionR
 	? PromisifiedModuleDynamicImport<ReturnType<Given>>
 	: PromisifiedModuleDynamicImport<Given>
 
+// The following is intended to be used to export a module used with the client
+// (useful for JSDocs or usage outside of the Prim Client that provides this type)
+/** Module transformed as it is done by the Prim+RPC client */
+export type RpcModule<M extends object> = PromisifiedModule<M>
+
 export interface JsonHandler {
 	// eslint-disable-next-line @typescript-eslint/no-explicit-any
 	stringify: (value: any) => any

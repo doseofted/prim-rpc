@@ -27,5 +27,5 @@ export type {
 	BlobRecords,
 	// other potentially useful utilities
 	AnyFunction,
-	PromisifiedModule as PromisifiedModule,
+	RpcModule,
 } from "./interfaces"
