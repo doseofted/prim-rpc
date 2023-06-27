@@ -1,5 +1,12 @@
 # @doseofted/prim-rpc
 
+## 0.1.0-alpha.13
+
+### Patch Changes
+
+- 36cbb7d: Fix for "excessively deep" type error on Prim RPC client (methods-on-methods type now only shown if method is
+  defined directly on function)
+
 ## 0.1.0-alpha.12
 
 ### Patch Changes
