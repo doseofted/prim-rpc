@@ -25,7 +25,7 @@ import type {
 	PrimServer,
 	PrimServerSocketAnswerRpc,
 } from "./interfaces"
-import { checkHttpLikeRequest, checkHttpLikeResponse, checkRpcCall, checkRpcResult } from "./validate"
+import { PrimRpcSpecific, checkHttpLikeRequest, checkHttpLikeResponse, checkRpcCall, checkRpcResult } from "./validate"
 
 /**
  *
@@ -232,7 +232,7 @@ function createServerActions(
 			const answeredCalls = checkRpcResult(await Promise.all(answeringCalls))
 			return answeredCalls.length === 1 ? answeredCalls[0] : answeredCalls
 		} catch (error: unknown) {
-			if (typeof error === "object" && error !== null && "primRpc" in error && error.primRpc === true) {
+			if (typeof error === "object" && error !== null && "primRpc" in error && error.primRpc === PrimRpcSpecific) {
 				return error as RpcAnswer | RpcAnswer[]
 			}
 			return { error: "Unknown RPC error" }
@@ -251,7 +251,7 @@ function createServerActions(
 		try {
 			return checkHttpLikeResponse({ body, headers, status })
 		} catch (error: unknown) {
-			if (typeof error === "object" && error !== null && "primRpc" in error && error.primRpc === true) {
+			if (typeof error === "object" && error !== null && "primRpc" in error && error.primRpc === PrimRpcSpecific) {
 				return { body: jsonHandler.stringify(error) as string, headers: {}, status: 500 }
 			}
 			const fallbackError = { error: "Unknown RPC error during send" }

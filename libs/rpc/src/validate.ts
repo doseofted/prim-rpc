@@ -6,7 +6,8 @@ import type {
 	RpcCall,
 } from "./interfaces"
 
-const NotGiven = Symbol("unknown")
+export const NotGiven = Symbol("unknown")
+export const PrimRpcSpecific = Symbol("primRpc")
 
 // SECTION: Validation of RPC calls and results
 
@@ -29,7 +30,7 @@ function checkRpcBase<T extends RpcBase>(given: unknown) {
 				: NotGiven
 			: NotGiven
 	const toError: RpcAnswer = {} // possible error
-	Object.defineProperty(toError, "primRpc", { value: true, enumerable: false, writable: false })
+	Object.defineProperty(toError, "primRpc", { value: PrimRpcSpecific, enumerable: false, writable: false })
 	const toBase: Partial<T> = {} // possible valid call
 	if (id !== NotGiven) {
 		toError.id = id
