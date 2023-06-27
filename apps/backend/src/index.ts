@@ -35,6 +35,7 @@ createPrimServer({
 	methodHandler,
 	callbackHandler,
 	allowList: { startCase: true },
+	methodsOnMethods: ["docs"],
 })
 
 // Start listening for requests to server

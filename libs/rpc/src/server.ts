@@ -132,6 +132,7 @@ function createServerActions(
 					) as PrimServerOptions["module"] | Promise<PrimServerOptions["module"]>
 					const givenModule = givenModulePromise instanceof Promise ? await givenModulePromise : givenModulePromise
 					const targetLocal = getProperty(givenModule, methodExpanded) as AnyFunction & { rpc?: boolean }
+					let possiblyMethodOnMethod = false
 					if (givenModule) {
 						// While subsequent checks cover these situations, some key props will immediately invalidate a given method
 						if (denyList.filter(given => methodExpanded.includes(given)).length > 0) {
@@ -159,6 +160,11 @@ function createServerActions(
 							if (disallowedMethodOnMethod) {
 								return { ...rpcBase, error: "Method on method was not allowed" }
 							}
+							possiblyMethodOnMethod =
+								typeof directPreviousPath === "function" &&
+								"rpc" in directPreviousPath &&
+								typeof directPreviousPath.rpc == "boolean" &&
+								directPreviousPath.rpc
 						}
 						if (typeof targetLocal === "undefined" || targetLocal === null) {
 							return { ...rpcBase, error: "Method was not found" }
@@ -166,12 +172,13 @@ function createServerActions(
 						if (typeof targetLocal !== "function") {
 							return { ...rpcBase, error: "Method was not callable" }
 						}
+						// TODO: methods on methods can't be called (need to check entry one level up for RPC property)
 						const methodAllowedDirectly = "rpc" in targetLocal && typeof targetLocal.rpc == "boolean" && targetLocal.rpc
 						if (!methodAllowedDirectly) {
 							const allowedInSchema =
 								Object.entries(serverOptions.allowList ?? {}).length > 0 &&
 								!!getProperty(serverOptions.allowList, methodExpanded)
-							if (!allowedInSchema) {
+							if (!allowedInSchema && !possiblyMethodOnMethod) {
 								return { ...rpcBase, error: "Method was not allowed" }
 							}
 						}
