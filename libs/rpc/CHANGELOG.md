@@ -1,5 +1,11 @@
 # @doseofted/prim-rpc
 
+## 0.1.0-alpha.12
+
+### Patch Changes
+
+- 8788b57: Fixed methods-on-methods that were in allowed list not being callable
+
 ## 0.1.0-alpha.11
 
 ### Minor Changes
