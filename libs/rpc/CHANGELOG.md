@@ -1,5 +1,18 @@
 # @doseofted/prim-rpc
 
+## 0.1.0-alpha.11
+
+### Minor Changes
+
+- e8b8c64: Errors are now better handled during processing of HTTP-like requests/responses and processing of RPC
+  calls/results
+
+### Patch Changes
+
+- 20164e9: Fix for broken type definitions (introduced in last version) on async functions used with client
+- 8f0ff34: Only function types are given on module used with Prim RPC client, also available as new "RpcModule" type for
+  usage outside of client or with JSDocs
+
 ## 0.1.0-alpha.10
 
 ### Patch Changes
