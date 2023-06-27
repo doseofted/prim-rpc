@@ -1,5 +1,5 @@
 import { useAsync, useMount } from "react-use"
-import { createPrimClient, PromisifiedModule } from "@doseofted/prim-rpc"
+import { createPrimClient, RpcModule } from "@doseofted/prim-rpc"
 import { createMethodPlugin, createCallbackPlugin, jsonHandler } from "@doseofted/prim-rpc-plugins/web-worker"
 import type { module } from "./worker"
 import { useState } from "react"
@@ -13,7 +13,7 @@ interface CodeHighlightedProps extends React.HTMLAttributes<HTMLDivElement> {
 export function CodeHighlighted(props: CodeHighlightedProps) {
 	const { code, children, transparent = false, className, ...attrs } = props
 	const toBeHighlighted = code ?? children ?? ""
-	const [worker, setWorker] = useState<PromisifiedModule<typeof module>>()
+	const [worker, setWorker] = useState<RpcModule<typeof module>>()
 	useMount(() => {
 		const worker = new Worker(new URL("./worker", import.meta.url), { type: "module" })
 		const methodPlugin = createMethodPlugin({ worker })
