@@ -49,7 +49,7 @@ imports with an empty export (`export {}`) during the build process.
 
 There are two other methods available: `RunTimeWindowCheck` and `RunTimeProcessCheck`. These two options are very
 similar and will simply prepend a conditional error only if imported on the client. The `RunTimeWindowCheck` method, for
-instance, will prepend `if (typeof window !== "undefined") { throw new Error("...")` to the top of the file (with your
+instance, will prepend `if (typeof window !== "undefined") { throw new Error("...") }` to the top of the file (with your
 chosen error message). While this does not prevent the import itself, it should flag some errors in your testing tools.
 
 ## Documentation Generator
