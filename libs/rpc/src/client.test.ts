@@ -120,6 +120,16 @@ describe("Prim Client can call methods with positional parameters", () => {
 	})
 })
 
+test("Prim Client can call allowed methods on methods", async () => {
+	const { callbackPlugin, methodPlugin, callbackHandler, methodHandler } = createPrimTestingPlugins()
+	// JSON handler is only useful with remote source (no local source test needed)
+	createPrimServer({ module, callbackHandler, methodHandler, methodsOnMethods: ["docs"] })
+	const prim = createPrimClient<IModule>({ callbackPlugin, methodPlugin })
+	const expected = module.lookAtThisMess.docs()
+	const result = await prim.lookAtThisMess.docs()
+	expect(result).toEqual(expected)
+})
+
 test("Prim Client can use alternative JSON handler", async () => {
 	const { callbackPlugin, methodPlugin, callbackHandler, methodHandler } = createPrimTestingPlugins()
 	// JSON handler is only useful with remote source (no local source test needed)
