@@ -10,7 +10,13 @@ const NotGiven = Symbol("unknown")
 
 // SECTION: Validation of RPC calls and results
 
-/** Check that RPC call/result is valid object with/without an ID */
+/**
+ * Check that RPC call/result is valid object with/without an ID
+ *
+ * @param given RPC call or result
+ * @returns The base error, base call/rpc, and given object
+ * @throws RPC response, an error
+ */
 function checkRpcBase<T extends RpcBase>(given: unknown) {
 	const givenRpc = typeof given === "object" && given !== null && given
 	if (!givenRpc) {
@@ -23,6 +29,7 @@ function checkRpcBase<T extends RpcBase>(given: unknown) {
 				: NotGiven
 			: NotGiven
 	const toError: RpcAnswer = {} // possible error
+	Object.defineProperty(toError, "primRpc", { value: true, enumerable: false, writable: false })
 	const toBase: Partial<T> = {} // possible valid call
 	if (id !== NotGiven) {
 		toError.id = id
@@ -72,7 +79,7 @@ export function checkRpcResult<T = unknown, V = T extends unknown[] ? RpcAnswer[
 		return given.map(g => checkRpcResult(g)) as V
 	}
 	// eslint-disable-next-line @typescript-eslint/no-unused-vars
-	const { toError: _errorNotNeeded, toBase: toResult, givenRpc } = checkRpcBase<RpcAnswer>(given)
+	const { toError, toBase: toResult, givenRpc } = checkRpcBase<RpcAnswer>(given)
 	const result = "result" in givenRpc ? givenRpc.result : NotGiven
 	if (result !== NotGiven) {
 		toResult.result = result
@@ -82,7 +89,8 @@ export function checkRpcResult<T = unknown, V = T extends unknown[] ? RpcAnswer[
 		toResult.error = error
 	}
 	if (result === NotGiven && error === NotGiven) {
-		throw { error: "Invalid RPC result" }
+		toError.error = "Invalid RPC result"
+		throw toError
 	}
 	return toResult as V
 }
@@ -108,6 +116,8 @@ export function checkHttpLikeRequest(given: unknown) {
 		throw { error: "Either a URL or body must be given" }
 	}
 	const method = "method" in givenObject && typeof givenObject.method === "string" && givenObject.method
+	// const validGET = method === "GET" && toCall.url
+	// const validPOST = method === "POST" && toCall.body
 	if (method) {
 		toCall.method = method
 	} else if (!toCall.body && toCall.url) {
