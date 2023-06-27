@@ -25,6 +25,7 @@ import type {
 	PrimServer,
 	PrimServerSocketAnswerRpc,
 } from "./interfaces"
+import { checkHttpLikeRequest, checkHttpLikeResponse, checkRpcCall, checkRpcResult } from "./validate"
 
 /**
  *
@@ -65,43 +66,48 @@ function createServerActions(
 ): PrimServerActionsBase {
 	const { jsonHandler, prefix: serverPrefix, handleError } = serverOptions
 	const prepareCall = (given: CommonServerSimpleGivenOptions = {}): RpcCall | RpcCall[] => {
-		const { body = "", method = "POST", url: possibleUrl = "" } = given
-		const providedBody = body && method === "POST"
-		if (providedBody) {
-			const prepared = jsonHandler.parse(given.body) as RpcCall | RpcCall[]
-			return prepared
-		}
-		const providedUrl = possibleUrl !== "" && method === "GET"
-		if (providedUrl) {
-			const positional = []
-			const { query, url } = queryString.parseUrl(possibleUrl, {
-				arrayFormat: "comma",
-				parseBooleans: true,
-				parseNumbers: true,
-			})
-			const id: string | number = "-" in query && !Array.isArray(query["-"]) ? query["-"] : undefined
-			delete query["-"]
-			const entries = Object.entries(query)
-			// determine if positional arguments were given (must start at 0, none can be missing)
-			for (const [possibleIndex, value] of entries) {
-				const index = Number.parseInt(possibleIndex)
-				if (Number.isNaN(index)) {
-					break
-				}
-				const nextIndex = index === 0 || typeof positional[index - 1] !== "undefined"
-				if (!nextIndex) {
-					break
-				}
-				positional[index] = value
+		try {
+			const givenReq = checkHttpLikeRequest(given)
+			const { body, method, url: possibleUrl } = givenReq
+			const providedBody = method === "POST" && body
+			if (providedBody) {
+				const prepared = jsonHandler.parse(givenReq.body) as RpcCall | RpcCall[]
+				return prepared
 			}
-			const args =
-				positional.length > 0 && positional.length === entries.length ? positional : entries.length === 0 ? [] : query
-			let method = url.replace(RegExp("^" + serverPrefix + "\\/?"), "")
-			method = method !== "" ? method : "default"
-			return { id, method, args }
+			const providedUrl = method === "GET" && possibleUrl
+			if (providedUrl) {
+				const positional = []
+				const { query, url } = queryString.parseUrl(possibleUrl, {
+					arrayFormat: "comma",
+					parseBooleans: true,
+					parseNumbers: true,
+				})
+				const id: string | number = "-" in query && !Array.isArray(query["-"]) ? query["-"] : undefined
+				delete query["-"]
+				const entries = Object.entries(query)
+				// determine if positional arguments were given (must start at 0, none can be missing)
+				for (const [possibleIndex, value] of entries) {
+					const index = Number.parseInt(possibleIndex)
+					if (Number.isNaN(index)) {
+						break
+					}
+					const nextIndex = index === 0 || typeof positional[index - 1] !== "undefined"
+					if (!nextIndex) {
+						break
+					}
+					positional[index] = value
+				}
+				const args =
+					positional.length > 0 && positional.length === entries.length ? positional : entries.length === 0 ? [] : query
+				let method = url.replace(RegExp("^" + serverPrefix + "\\/?"), "")
+				method = method !== "" ? method : "default"
+				return { id, method, args }
+			}
+			throw { error: "Response can not be generated from request" }
+		} catch (error) {
+			// RPC call is purposefully invalid to trigger invalid RPC error in next step
+			return { method: "" }
 		}
-		// NOTE: consider failing instead of falling back to default export
-		return { method: "default" }
 	}
 	const prepareRpc = async (
 		calls: RpcCall | RpcCall[],
@@ -110,112 +116,120 @@ function createServerActions(
 		cbResults?: (a: RpcAnswer) => void
 	): Promise<RpcAnswer | RpcAnswer[]> => {
 		// NOTE: new Prim client should be created on each request so callback results are not shared
-		const { client, socketEvent: event, configured } = instance ?? createPrimInstance(serverOptions)
-		const callList = Array.isArray(calls) ? calls : [calls]
-		const answeringCalls = callList.map(async (given): Promise<RpcAnswer> => {
-			const { method, args, id } = given
-			const rpcVersion: Partial<RpcAnswer> = useVersionInRpc ? { prim: primMajorVersion } : {}
-			const rpcBase: Partial<RpcAnswer> = { ...rpcVersion, id }
-			try {
-				const methodExpanded = method.split("/")
-				// using `configured.module` if module was provided directly to server
-				// and resolve given module first if it was dynamically imported
-				const givenModulePromise = (
-					typeof configured.module === "function" ? configured.module() : configured.module
-				) as PrimServerOptions["module"] | Promise<PrimServerOptions["module"]>
-				const givenModule = givenModulePromise instanceof Promise ? await givenModulePromise : givenModulePromise
-				const targetLocal = getProperty(givenModule, methodExpanded) as AnyFunction & { rpc?: boolean }
-				if (givenModule instanceof Promise) console.warn("DEBUG", givenModule, targetLocal)
-				if (givenModule) {
-					// While subsequent checks cover these situations, some key props will immediately invalidate a given method
-					if (denyList.filter(given => methodExpanded.includes(given)).length > 0) {
-						return { ...rpcBase, error: "Method was not valid" }
-					}
-					// these checks only apply if module is provided directly (determined on actual server with module)
-					if (methodExpanded.length > 1) {
-						const currentPathCheck: string[] = []
-						// NOTE: `.methodsOnMethods` is only allowed if method is defined _directly_ on another method
-						const previousPathsIncludeFunction = methodExpanded
-							.slice(0, serverOptions.methodsOnMethods.length > 0 ? -2 : -1)
-							.map(method => {
-								currentPathCheck.push(method)
-								const currentPath = getProperty(givenModule, currentPathCheck) as unknown
-								return typeof currentPath !== "object" // paths cannot contain "function" type any other type
-							})
-							.reduce((a, b) => a || b, false)
-						if (previousPathsIncludeFunction) {
-							return { ...rpcBase, error: "Method on method was not valid" }
+		try {
+			const { client, socketEvent: event, configured } = instance ?? createPrimInstance(serverOptions)
+			const callList = Array.isArray(calls) ? checkRpcCall(calls) : checkRpcCall([calls])
+			const answeringCalls = callList.map(async (given): Promise<RpcAnswer> => {
+				const { method, args, id } = given
+				const rpcVersion: Partial<RpcAnswer> = useVersionInRpc ? { prim: primMajorVersion } : {}
+				const rpcBase: Partial<RpcAnswer> = { ...rpcVersion, id }
+				try {
+					const methodExpanded = method.split("/")
+					// using `configured.module` if module was provided directly to server
+					// and resolve given module first if it was dynamically imported
+					const givenModulePromise = (
+						typeof configured.module === "function" ? configured.module() : configured.module
+					) as PrimServerOptions["module"] | Promise<PrimServerOptions["module"]>
+					const givenModule = givenModulePromise instanceof Promise ? await givenModulePromise : givenModulePromise
+					const targetLocal = getProperty(givenModule, methodExpanded) as AnyFunction & { rpc?: boolean }
+					if (givenModule) {
+						// While subsequent checks cover these situations, some key props will immediately invalidate a given method
+						if (denyList.filter(given => methodExpanded.includes(given)).length > 0) {
+							return { ...rpcBase, error: "Method was not valid" }
 						}
-						const directPreviousPath = getProperty(givenModule, methodExpanded.slice(0, -1)) as unknown
-						const disallowedMethodOnMethod =
-							typeof directPreviousPath === "function" &&
-							!serverOptions.methodsOnMethods.includes(methodExpanded.slice(-1)[0])
-						if (disallowedMethodOnMethod) {
-							return { ...rpcBase, error: "Method on method was not allowed" }
+						// these checks only apply if module is provided directly (determined on actual server with module)
+						if (methodExpanded.length > 1) {
+							const currentPathCheck: string[] = []
+							// NOTE: `.methodsOnMethods` is only allowed if method is defined _directly_ on another method
+							const previousPathsIncludeFunction = methodExpanded
+								.slice(0, serverOptions.methodsOnMethods.length > 0 ? -2 : -1)
+								.map(method => {
+									currentPathCheck.push(method)
+									const currentPath = getProperty(givenModule, currentPathCheck) as unknown
+									return typeof currentPath !== "object" // paths cannot contain "function" type any other type
+								})
+								.reduce((a, b) => a || b, false)
+							if (previousPathsIncludeFunction) {
+								return { ...rpcBase, error: "Method on method was not valid" }
+							}
+							const directPreviousPath = getProperty(givenModule, methodExpanded.slice(0, -1)) as unknown
+							const disallowedMethodOnMethod =
+								typeof directPreviousPath === "function" &&
+								!serverOptions.methodsOnMethods.includes(methodExpanded.slice(-1)[0])
+							if (disallowedMethodOnMethod) {
+								return { ...rpcBase, error: "Method on method was not allowed" }
+							}
+						}
+						if (typeof targetLocal === "undefined" || targetLocal === null) {
+							return { ...rpcBase, error: "Method was not found" }
+						}
+						if (typeof targetLocal !== "function") {
+							return { ...rpcBase, error: "Method was not callable" }
+						}
+						const methodAllowedDirectly = "rpc" in targetLocal && typeof targetLocal.rpc == "boolean" && targetLocal.rpc
+						if (!methodAllowedDirectly) {
+							const allowedInSchema =
+								Object.entries(serverOptions.allowList ?? {}).length > 0 &&
+								!!getProperty(serverOptions.allowList, methodExpanded)
+							if (!allowedInSchema) {
+								return { ...rpcBase, error: "Method was not allowed" }
+							}
 						}
 					}
-					if (typeof targetLocal === "undefined" || targetLocal === null) {
-						return { ...rpcBase, error: "Method was not found" }
-					}
-					if (typeof targetLocal !== "function") {
-						return { ...rpcBase, error: "Method was not callable" }
-					}
-					const methodAllowedDirectly = "rpc" in targetLocal && typeof targetLocal.rpc == "boolean" && targetLocal.rpc
-					if (!methodAllowedDirectly) {
-						const allowedInSchema =
-							Object.entries(serverOptions.allowList ?? {}).length > 0 &&
-							!!getProperty(serverOptions.allowList, methodExpanded)
-						if (!allowedInSchema) {
-							return { ...rpcBase, error: "Method was not allowed" }
+					const argsArray = args as unknown[] // already validated in `checkRpcCall`
+					const argsForCall =
+						Object.entries(blobs || {}).length > 0
+							? argsArray.map(arg => mergeBlobLikeWithGiven(arg, blobs))
+							: argsArray
+					// NOTE: use `targetRemote` below even if target is local to allow callbacks to be used with server
+					// (server and client share event handlers on `.internal` option that allows for usage of callbacks)
+					if (givenModule && targetLocal) {
+						// The module was provided and the target exists. Checks have already run and did not return an error
+						// so we can call the method using the client.
+						if (cbResults) {
+							event.on("response", cbResults)
 						}
+						// call module with `client` if not provided directly to server (checks already ran on module, if provided)
+						const targetRemote = getProperty(client, methodExpanded) as AnyFunction & { rpc?: boolean }
+						const result = (await Reflect.apply(targetRemote, context, argsForCall)) as unknown
+						return { ...rpcBase, result }
+					} else {
+						// If either the module wasn't provided or target doesn't exist (even if module does), send a request using
+						// a client that doesn't know about the module provided (will use provided plugin to server).
+						// eslint-disable-next-line @typescript-eslint/no-unused-vars
+						const { module: moduleProvided, ...limitedOptions } = serverOptions
+						// create client that doesn't have access to module (target may not exist but other targets might)
+						const { client: limitedClient, socketEvent: limitedEvent } = createPrimInstance(limitedOptions)
+						if (cbResults) {
+							limitedEvent.on("response", cbResults)
+						}
+						const targetRemote = getProperty(limitedClient, methodExpanded) as AnyFunction & { rpc?: boolean }
+						const result = (await Reflect.apply(targetRemote, context, argsForCall)) as unknown
+						return { ...rpcBase, result }
 					}
+					// TODO: today, result must be supported by JSON handler but consider supporting returned functions
+					// in the same way that callback are supported today (by passing reference to client)
+				} catch (e) {
+					// JSON.stringify on Error results in an empty object. Since Error is common, serialize it
+					// when a custom JSON handler is not provided
+					if (handleError && e instanceof Error) {
+						const error = serializeError<unknown>(e)
+						if (!serverOptions.showErrorStack) {
+							delete error.stack
+						}
+						return { ...rpcBase, error }
+					}
+					return { ...rpcBase, error: e }
 				}
-				const argsArray = Array.isArray(args) ? args : [args]
-				const argsForCall =
-					Object.entries(blobs || {}).length > 0 ? argsArray.map(arg => mergeBlobLikeWithGiven(arg, blobs)) : argsArray
-				// NOTE: use `targetRemote` below even if target is local to allow callbacks to be used with server
-				// (server and client share event handlers on `.internal` option that allows for usage of callbacks)
-				if (givenModule && targetLocal) {
-					// The module was provided and the target exists. Checks have already run and did not return an error
-					// so we can call the method using the client.
-					if (cbResults) {
-						event.on("response", cbResults)
-					}
-					// call module with `client` if not provided directly to server (checks already ran on module, if provided)
-					const targetRemote = getProperty(client, methodExpanded) as AnyFunction & { rpc?: boolean }
-					const result = (await Reflect.apply(targetRemote, context, argsForCall)) as unknown
-					return { ...rpcBase, result }
-				} else {
-					// If either the module wasn't provided or target doesn't exist (even if module does), send a request using
-					// a client that doesn't know about the module provided (will use provided plugin to server).
-					// eslint-disable-next-line @typescript-eslint/no-unused-vars
-					const { module: moduleProvided, ...limitedOptions } = serverOptions
-					// create client that doesn't have access to module (target may not exist but other targets might)
-					const { client: limitedClient, socketEvent: limitedEvent } = createPrimInstance(limitedOptions)
-					if (cbResults) {
-						limitedEvent.on("response", cbResults)
-					}
-					const targetRemote = getProperty(limitedClient, methodExpanded) as AnyFunction & { rpc?: boolean }
-					const result = (await Reflect.apply(targetRemote, context, argsForCall)) as unknown
-					return { ...rpcBase, result }
-				}
-				// TODO: today, result must be supported by JSON handler but consider supporting returned functions
-				// in the same way that callback are supported today (by passing reference to client)
-			} catch (e) {
-				// JSON.stringify on Error results in an empty object. Since Error is common, serialize it
-				// when a custom JSON handler is not provided
-				if (handleError && e instanceof Error) {
-					const error = serializeError<unknown>(e)
-					if (!serverOptions.showErrorStack) {
-						delete error.stack
-					}
-					return { ...rpcBase, error }
-				}
-				return { ...rpcBase, error: e }
+			})
+			const answeredCalls = checkRpcResult(await Promise.all(answeringCalls))
+			return answeredCalls.length === 1 ? answeredCalls[0] : answeredCalls
+		} catch (error: unknown) {
+			if (typeof error === "object" && error !== null && "primRpc" in error && error.primRpc === true) {
+				return error as RpcAnswer | RpcAnswer[]
 			}
-		})
-		const answeredCalls = await Promise.all(answeringCalls)
-		return answeredCalls.length === 1 ? answeredCalls[0] : answeredCalls
+			return { error: "Unknown RPC error" }
+		}
 	}
 	const prepareSend = (given: RpcAnswer | RpcAnswer[]): CommonServerResponseOptions => {
 		const body = jsonHandler.stringify(given) as string
@@ -227,12 +241,21 @@ function createServerActions(
 		const errored = statuses.filter(stat => stat === 500)
 		// NOTE: return 200:okay, 400:missing, 500:error if any call has that status
 		const status = notOkay.length > 0 ? (errored.length > 0 ? 500 : 400) : 200
-		return { body, headers, status }
+		try {
+			return checkHttpLikeResponse({ body, headers, status })
+		} catch (error: unknown) {
+			if (typeof error === "object" && error !== null && "primRpc" in error && error.primRpc === true) {
+				return { body: jsonHandler.stringify(error) as string, headers: {}, status: 500 }
+			}
+			const fallbackError = { error: "Unknown RPC error during send" }
+			return { body: jsonHandler.stringify(fallbackError) as string, headers: {}, status: 500 }
+		}
 	}
 	return { prepareCall, prepareRpc, prepareSend }
 }
 
 function createServerEvents(serverOptions: PrimServerOptions): PrimServerEvents {
+	// TODO: handle error from createServerActions
 	const server = () => {
 		const { prepareCall, prepareRpc, prepareSend } = createServerActions(serverOptions)
 		const call = async (
@@ -251,6 +274,7 @@ function createServerEvents(serverOptions: PrimServerOptions): PrimServerEvents 
 }
 
 function createSocketEvents(serverOptions: PrimServerOptions): PrimServerSocketEvents {
+	// TODO: handle error from createServerActions
 	const connected = () => {
 		const instance = createPrimInstance(serverOptions)
 		const { socketEvent: event } = instance

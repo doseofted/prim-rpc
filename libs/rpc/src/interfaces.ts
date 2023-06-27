@@ -6,7 +6,7 @@ import type { Emitter } from "mitt"
 import type { Schema } from "type-fest"
 
 // SECTION RPC call and result structure
-interface RpcBase {
+export interface RpcBase {
 	prim?: 0 // as new major versions are announced (only that change message structure), bump version
 	id?: string | number
 }
@@ -62,11 +62,10 @@ interface PrimWebSocketFunctionEvents {
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 export type AnyFunction = (...args: any[]) => any
-// NOTE: Asyncify might need to be replaced since TSDoc comments aren't shown in editor when used
 // NOTE: consider condition of checking `.rpc` property on function (but also remember that it may be in allow list)
 type PromisifiedModuleDirect<ModuleGiven extends object> = {
 	[Key in keyof ModuleGiven]: ModuleGiven[Key] extends ((...args: infer A) => infer R) & object
-		? ((...args: A) => Promise<R>) & PromisifiedModuleDirect<ModuleGiven[Key]>
+		? ((...args: A) => Promise<Awaited<R>>) & ModuleGiven[Key]
 		: ModuleGiven[Key] extends object
 		? PromisifiedModuleDirect<ModuleGiven[Key]>
 		: ModuleGiven[Key]

@@ -80,6 +80,21 @@ export function sayHelloAlternative(greeting: string, name: string) {
 }
 sayHelloAlternative.rpc = true
 
+/** Patience is a virtue and I hope that you can respect my time. */
+export async function takeYourTime(howMuch = 300, statusCb?: (status: string) => void) {
+	const excuses = ["I'm busy.", "Gimme a minute.", "I'm almost ready."]
+	statusCb?.(excuses.pop())
+	const interval = setInterval(() => {
+		statusCb?.(excuses.pop())
+		if (excuses.length === 0) {
+			clearInterval(interval)
+		}
+	}, howMuch / 4)
+	await new Promise(resolve => setTimeout(resolve, howMuch))
+	return "I'm ready, let's go."
+}
+takeYourTime.rpc = true
+
 /**
  * This is an example of an entire that module that might be exported.
  *

@@ -167,6 +167,53 @@ test("Prim Server can call remote methods (without module directly)", async () =
 	expect(result).toEqual({ result: "Hellooo Ted!", id: 1 })
 })
 
+describe("Prim Server can handle invalid requests", () => {
+	const { callbackHandler, methodHandler } = createPrimTestingPlugins()
+	const prim = createPrimServer({ module, callbackHandler, methodHandler })
+
+	test("with no method name", async () => {
+		const server = prim.server()
+		const call: RpcCall = {
+			method: "",
+			id: 1,
+		}
+		const body = JSON.stringify(call)
+		const response = await server.call({ method: "POST", body })
+		const result = JSON.parse(response.body) as RpcAnswer
+		expect(result).toEqual({ error: "Invalid method name", id: 1 })
+	})
+	test("with invalid JSON body", async () => {
+		const server = prim.server()
+		const body = '{ "method": "sayHello", "id": 1 ]'
+		const response = await server.call({ method: "POST", body })
+		const result = JSON.parse(response.body) as RpcAnswer
+		// thrown unknown error because container request was invalid
+		expect(result).toEqual({ error: "Unknown RPC error" })
+	})
+	// TODO: "Invalid method name" may not be the correct error (this may be related to testing plugin, need to check)
+	// test("with wrong HTTP method and body/url given (GET)", async () => {
+	// 	const server = prim.server()
+	// 	const call: RpcCall = {
+	// 		method: "greetings",
+	// 		id: 1,
+	// 	}
+	// 	const body = JSON.stringify(call)
+	// 	const response = await server.call({ method: "GET", body })
+	// 	const result = JSON.parse(response.body) as RpcAnswer
+	// 	expect(result).toEqual({ error: "Invalid method name" })
+	// })
+	// test("with wrong HTTP method and body/url given (POST)", async () => {
+	// 	const server = prim.server()
+	// 	const url = queryString.stringifyUrl({
+	// 		url: "/greetings",
+	// 		query: { greeting: "Howdy", name: "Ted" },
+	// 	})
+	// 	const response = await server.call({ method: "POST", url })
+	// 	const result = JSON.parse(response.body) as RpcAnswer
+	// 	expect(result).toEqual({ error: "Invalid method name" })
+	// })
+})
+
 describe("Prim Server can understand its given context", () => {
 	const prim = createPrimServer({ module, prefix: "/prim" })
 	test("using a JSON body", async () => {
