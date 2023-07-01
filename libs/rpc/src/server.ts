@@ -118,9 +118,9 @@ function createServerActions(
 		// NOTE: new Prim client should be created on each request so callback results are not shared
 		try {
 			const { client, socketEvent: event, configured } = instance ?? createPrimInstance(serverOptions)
-			const callList = Array.isArray(calls) ? checkRpcCall(calls) : checkRpcCall([calls])
-			const answeringCalls = callList.map(async (given): Promise<RpcAnswer> => {
-				const { method, args, id } = given
+			const callList = Array.isArray(calls) ? calls : [calls]
+			const answeringCalls = callList.map(async (givenUnchecked): Promise<RpcAnswer> => {
+				const { method, args, id } = checkRpcCall(givenUnchecked)
 				const rpcVersion: Partial<RpcAnswer> = useVersionInRpc ? { prim: primMajorVersion } : {}
 				const rpcBase: Partial<RpcAnswer> = { ...rpcVersion, id }
 				try {
@@ -172,7 +172,6 @@ function createServerActions(
 						if (typeof targetLocal !== "function") {
 							return { ...rpcBase, error: "Method was not callable" }
 						}
-						// TODO: methods on methods can't be called (need to check entry one level up for RPC property)
 						const methodAllowedDirectly = "rpc" in targetLocal && typeof targetLocal.rpc == "boolean" && targetLocal.rpc
 						if (!methodAllowedDirectly) {
 							const allowedInSchema =
@@ -183,11 +182,8 @@ function createServerActions(
 							}
 						}
 					}
-					const argsArray = args as unknown[] // already validated in `checkRpcCall`
 					const argsForCall =
-						Object.entries(blobs || {}).length > 0
-							? argsArray.map(arg => mergeBlobLikeWithGiven(arg, blobs))
-							: argsArray
+						Object.entries(blobs || {}).length > 0 ? args.map(arg => mergeBlobLikeWithGiven(arg, blobs)) : args
 					// NOTE: use `targetRemote` below even if target is local to allow callbacks to be used with server
 					// (server and client share event handlers on `.internal` option that allows for usage of callbacks)
 					if (givenModule && targetLocal) {

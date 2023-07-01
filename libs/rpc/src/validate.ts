@@ -51,7 +51,10 @@ function checkRpcBase<T extends RpcBase>(given: unknown) {
  * @returns Valid RPC call
  * @throws RPC response, an error
  */
-export function checkRpcCall<T = unknown, V = T extends unknown[] ? RpcCall[] : RpcCall>(given: T): V {
+export function checkRpcCall<
+	T = unknown,
+	V = T extends unknown[] ? RpcCall<string, unknown[]>[] : RpcCall<string, unknown[]>
+>(given: T): V {
 	if (Array.isArray(given)) {
 		return given.map(g => checkRpcCall(g)) as V
 	}
