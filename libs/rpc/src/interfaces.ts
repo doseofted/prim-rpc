@@ -63,18 +63,58 @@ interface PrimWebSocketFunctionEvents {
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 export type AnyFunction = (...args: any[]) => any
 // NOTE: consider condition of checking `.rpc` property on function (but also remember that it may be in allow list)
-type PromisifiedModuleDirect<ModuleGiven extends object, Recursive extends true | false = true> = ConditionalExcept<
+type PromisifiedModuleDirect<
+	ModuleGiven extends object,
+	Recursive extends true | false = true,
+	Keys extends keyof ModuleGiven = Extract<keyof ModuleGiven, string>
+> = ConditionalExcept<
 	{
-		[Key in keyof ModuleGiven]: ModuleGiven[Key] extends ((...args: infer A) => infer R) & object
-			? ((...args: A) => Promise<Awaited<R>>) & PromisifiedModuleDirect<ModuleGiven[Key], false>
+		[Key in Keys]: ModuleGiven[Key] extends ((...args: infer A) => infer R) & object
+			? // eslint-disable-next-line @typescript-eslint/no-explicit-any
+			  R extends PromiseLike<any>
+				? ModuleGiven[Key] // NOTE: function comment is kept here but lost in function transform (need a workaround)
+				: ((...args: A) => Promise<Awaited<R>>) & PromisifiedModuleDirect<ModuleGiven[Key], false>
 			: ModuleGiven[Key] extends object
 			? Recursive extends true
-				? PromisifiedModuleDirect<ModuleGiven[Key]>
+				? PromisifiedModuleDirect<ModuleGiven[Key], true>
 				: never
 			: never
 	},
 	never
 >
+
+// NOTE: it appears JSDocs may not be kept with new types (below is another attempt)
+// LINK: https://github.com/microsoft/TypeScript/issues/31992
+// type PromisifiedModule2Picked<
+// 	ModuleGiven extends object,
+// 	Keys extends keyof ModuleGiven = keyof ModuleGiven // Extract<keyof ModuleGiven, string>
+// > = {
+// 	[Key in Keys]: ModuleGiven[Key] extends AnyFunction
+// 		? Key
+// 		: ModuleGiven[Key] extends object
+// 		? Key // PromisifiedModule2Picked<ModuleGiven[Key]>
+// 		: never
+// }[Keys]
+// type PromisifiedModule2<ModuleGiven extends object> = Pick<
+// 	PromisifiedModuleDirect<ModuleGiven>,
+// 	PromisifiedModule2Picked<ModuleGiven>
+// >
+// /** Do something */
+// type FuncTest = ((w: string) => boolean) & { rpc: true }
+// declare const promTest: PromisifiedModule2<{
+// 	/** What? */ cool: () => void
+// 	/** maybe */
+// 	what: {
+// 		/** What again? */
+// 		cool: () => void
+// 	}
+// 	uhOh: 123
+// 	/** do something else */
+// 	abc: FuncTest
+// }>
+// void promTest.cool()
+// void promTest.what.cool()
+// void promTest.abc("what")
 
 // NOTE: this is a non-recursive version of default `Awaited` type that comes with TypeScript
 type PromisifiedModuleDynamicImport<ModuleGiven extends object> = ModuleGiven extends object & {
