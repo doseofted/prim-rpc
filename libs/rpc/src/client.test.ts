@@ -6,7 +6,6 @@ import { describe, test, expect } from "vitest"
 import { createPrimClient, createPrimServer } from "."
 import type * as exampleClient from "@doseofted/prim-example"
 import * as exampleServer from "@doseofted/prim-example"
-import type { PrimServerOptions } from "./interfaces"
 import jsonHandler from "superjson"
 import { createPrimTestingPlugins } from "./testing"
 
@@ -42,7 +41,7 @@ describe("Prim Client can call methods with a single parameter", () => {
 		expect(result).toEqual(expected)
 	})
 	test("with local source, function that returns dynamic import", async () => {
-		const prim = createPrimClient({ module: import("@doseofted/prim-example") })
+		const prim = createPrimClient({ module: () => import("@doseofted/prim-example") })
 		const args = { greeting: "Hi", name: "Ted" }
 		const expected = module.sayHello(args)
 		const result = await prim.sayHello(args)
@@ -134,7 +133,7 @@ test("Prim Client can call allowed methods on methods", async () => {
 test("Prim Client can use alternative JSON handler", async () => {
 	const { callbackPlugin, methodPlugin, callbackHandler, methodHandler } = createPrimTestingPlugins()
 	// JSON handler is only useful with remote source (no local source test needed)
-	const commonOptions: PrimServerOptions = { jsonHandler }
+	const commonOptions = { jsonHandler }
 	createPrimServer({ ...commonOptions, module, callbackHandler, methodHandler })
 	const prim = createPrimClient<IModule>({ ...commonOptions, callbackPlugin, methodPlugin })
 	const date = new Date()

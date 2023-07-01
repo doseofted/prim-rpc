@@ -3,7 +3,7 @@
 // SPDX-License-Identifier: Apache-2.0
 
 import type { Emitter } from "mitt"
-import type { Schema, ConditionalExcept } from "type-fest"
+import type { Schema, ConditionalExcept, PartialDeep } from "type-fest"
 
 // SECTION RPC call and result structure
 export interface RpcBase {
@@ -225,7 +225,7 @@ export interface PrimOptions<M extends object = object, J extends JsonHandler = 
 	 * If given function specifies a `.rpc` boolean property with a value of `true` then those functions do not need
 	 * to be added to the allow-list.
 	 */
-	allowList?: Schema<M, boolean>
+	allowList?: PartialDeep<Schema<M, boolean>>
 	/**
 	 * In JavaScript, functions are objects. Those objects can have methods. This means that functions can have methods.
 	 *

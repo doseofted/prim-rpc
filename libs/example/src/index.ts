@@ -302,6 +302,13 @@ lookAtThisMess.somethingMadeUp = () => "Maybe we'll allow it"
 lookAtThisMess.prototype.somethingMadeUp = () => "Nope"
 lookAtThisMess.messy = { technicallyNotRpc: sayHelloAlternative, definitelyNotRpc: () => "Hi" }
 
+/** I don't mind unwrapping layers of needless properties. It makes me feel alive. */
+// eslint-disable-next-line @typescript-eslint/require-await
+export async function wrapReturn<U>(given: U) {
+	// eslint-disable-next-line @typescript-eslint/await-thenable
+	return { response: { ["v1.2.3"]: { entity: { data: [{ attributes: { given } }] } } } }
+}
+
 /**
  *
  * @param args - Any kind of argument really
