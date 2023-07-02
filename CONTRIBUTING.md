@@ -20,7 +20,7 @@ This guide is specific to project development and changes.
   [associated changeset](https://github.com/changesets/changesets/blob/main/docs/adding-a-changeset.md).
 - All commits should be professional and include detailed messages (as a best effort).
 
-See the [Development Guide](./README.md#development) to learn how to get started.
+See the [Development Guide](./README.md#development) to learn how to get started with the project.
 
 ## Processes
 
@@ -32,13 +32,13 @@ Prim+RPC's processes are given today as follows:
 
 1. Create an issue describing new feature and await feedback from community.
 2. Develop a new feature:
-   1. Create a new branch off of `develop`.
+   1. Create a new branch off of `main`.
    2. Make changes, following the [Contribution Rules](#rules).
    3. Add a changeset describing changes made (`pnpm task dev:changeset`)
    4. Create a pull request, target `main` branch.
 3. Review feature:
    1. Sign CLA when requested.
-   2. Feature will be evaluated by Ted for release in a future version.
+   2. Feature will be evaluated by admin for release in a future version.
 
 ### Releases
 
