@@ -72,7 +72,8 @@ type PromisifiedModuleDirect<
 		[Key in Keys]: ModuleGiven[Key] extends ((...args: infer A) => infer R) & object
 			? // eslint-disable-next-line @typescript-eslint/no-explicit-any
 			  R extends PromiseLike<any>
-				? ModuleGiven[Key] // NOTE: function comment is kept here but lost in function transform (need a workaround)
+				? // NOTE: function comment is kept here but lost in function transform (need a workaround)
+				  ModuleGiven[Key] & PromisifiedModuleDirect<ModuleGiven[Key], false>
 				: ((...args: A) => Promise<Awaited<R>>) & PromisifiedModuleDirect<ModuleGiven[Key], false>
 			: ModuleGiven[Key] extends object
 			? Recursive extends true
@@ -188,6 +189,8 @@ export interface PrimOptions<M extends object = object, J extends JsonHandler = 
 	 * Module to use with Prim. When a function call is made, given module will be used first, otherwise an RPC will
 	 * be made.
 	 */
+	// NOTE: instead of using `M` generic, consider using `object` for flexibility on client so dynamic imports can be
+	//supported by explicitly providing module type generic (otherwise `Promise<M>` does not align with `M` generic)
 	module?: M | null
 	/**
 	 * Provide the server URL where Prim is being used. This will be provided to the HTTP client as the endpoint
