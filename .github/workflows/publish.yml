@@ -8,6 +8,7 @@ on:
 jobs:
   publish:
     runs-on: ubuntu-latest
+    # NOTE: don't add any Turbo cache here, publishing workflow needs to be clean
     permissions:
       contents: write
       pull-requests: write
@@ -18,7 +19,7 @@ jobs:
       - uses: actions/setup-node@v3
         with:
           node-version: 18
-          # cache: "pnpm"
+          # NOTE: don't use cache for publishing (install needs to be clean)
       - name: Install
         run: pnpm install --frozen-lockfile
       - name: Build
