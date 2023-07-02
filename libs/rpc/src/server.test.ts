@@ -9,6 +9,7 @@ import type * as exampleClient from "@doseofted/prim-example"
 import * as exampleServer from "@doseofted/prim-example"
 import queryString from "query-string"
 import { createPrimTestingPlugins } from "./testing"
+import justSafeGet from "just-safe-get"
 
 const module = exampleServer
 type IModule = typeof exampleClient
@@ -148,6 +149,19 @@ describe("Prim Server cannot call non-RPC", () => {
 		const notExpected = module.greetings.toString()
 		expect(result).not.toEqual({ result: notExpected, id: 1 })
 		expect(result).toEqual({ error: "Method was not valid", id: 1 })
+	})
+	test("property retrieval works as expected", () => {
+		// "just-safe-get" will not expand "." in if given `string[]` but will when given `string`
+		// This test is just to ensure a future upgrade doesn't change that
+		const testing = { abc: () => 123 }
+		// eslint-disable-next-line @typescript-eslint/unbound-method
+		const toStringFunc = testing.abc.toString
+		const retrievedPropFromString = justSafeGet(testing, "abc.toString") as () => string
+		const retrievedPropFromArray = justSafeGet(testing, "abc.toString".split("/")) as undefined
+		expect(retrievedPropFromString).toEqual(toStringFunc)
+		expect(retrievedPropFromString).toBeTypeOf("function")
+		expect(retrievedPropFromArray).not.toEqual(toStringFunc)
+		expect(retrievedPropFromArray).toBeTypeOf("undefined")
 	})
 })
 

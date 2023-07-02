@@ -31,6 +31,7 @@ import type {
 	PrimHttpEvents,
 	PrimHttpQueueItem,
 	BlobRecords,
+	JsonHandler,
 } from "./interfaces"
 
 /** Callback prefix */ export const CB_PREFIX = "_cb_"
@@ -53,7 +54,8 @@ export type PrimClient<ModuleType extends PrimOptions["module"]> = PromisifiedMo
  */
 export function createPrimClient<
 	ModuleType extends OptionsType["module"] = object,
-	OptionsType extends PrimOptions = PrimOptions
+	JsonHandlerType extends OptionsType["jsonHandler"] = JsonHandler,
+	OptionsType extends PrimOptions = PrimOptions<ModuleType, JsonHandlerType>
 >(options?: OptionsType): PrimClient<ModuleType> {
 	const methodPluginGiven = typeof options?.methodPlugin !== "undefined"
 	const callbackPluginGiven = typeof options?.callbackPlugin !== "undefined"
