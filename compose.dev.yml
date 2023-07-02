@@ -23,7 +23,6 @@ services:
       - ./libs/example/src:/home/node/project/libs/example/src
       - ./libs/plugins/src:/home/node/project/libs/plugins/src
       - ./libs/rpc/src:/home/node/project/libs/rpc/src
-      - ./libs/ui/src:/home/node/project/libs/ui/src
       - ./libs/tooling/src:/home/node/project/libs/tooling/src
     restart: "no"
 

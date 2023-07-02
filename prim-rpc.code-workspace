@@ -17,10 +17,6 @@
 			"path": "./libs/tooling"
 		},
 		{
-			"name": "📘 Interface",
-			"path": "./libs/ui"
-		},
-		{
 			"name": "☁️ Reverse Proxy",
 			"path": "./proxy"
 		},
