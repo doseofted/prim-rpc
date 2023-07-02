@@ -11,7 +11,6 @@ This is a monolithic repository consisting of several projects. Individual proje
 | Prim+RPC Documentation | [`./docs`](./docs)                   | Proprietary                              |
 | Prim+RPC Website       | [`./apps/frontend`](./apps/frontend) | Proprietary                              |
 | Example Server         | [`./apps/backend`](./apps/backend)   | Proprietary                              |
-| Prim+RPC UI            | [`./libs/ui`](./libs/ui)             | TBD (WIP)                                |
 
 You will find a license file (`LICENSE`) in each project's folder that describes the detailed license for which it is
 made available. If a license is not made available then it is proprietary meaning that usage is unauthorized.

@@ -8,7 +8,6 @@ services:
       - dist-example:/home/node/project/libs/example/dist
       - dist-plugins:/home/node/project/libs/plugins/dist
       - dist-rpc:/home/node/project/libs/rpc/dist
-      - dist-ui:/home/node/project/libs/ui/dist
       - dist-tooling:/home/node/project/libs/tooling/dist
 
   backend:
