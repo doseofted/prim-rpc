@@ -11,8 +11,7 @@
 		"url": "https://doseofted.me/"
 	},
 	"scripts": {
-		"start": "task",
-		"task": "task"
+		"start": "task"
 	},
 	"dependencies": {
 		"@go-task/cli": "3.27.1",
