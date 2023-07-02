@@ -189,9 +189,8 @@ export interface PrimOptions<M extends object = object, J extends JsonHandler = 
 	 * Module to use with Prim. When a function call is made, given module will be used first, otherwise an RPC will
 	 * be made.
 	 */
-	// NOTE: instead of using `M` generic, consider using `object` for flexibility on client so dynamic imports can be
-	//supported by explicitly providing module type generic (otherwise `Promise<M>` does not align with `M` generic)
-	module?: M | null
+	// NOTE: `PartialDeep` allows for partial modules to be provided while full type definitions are provided as generic
+	module?: PartialDeep<M> | null
 	/**
 	 * Provide the server URL where Prim is being used. This will be provided to the HTTP client as the endpoint
 	 * parameter.
@@ -268,7 +267,7 @@ export interface PrimOptions<M extends object = object, J extends JsonHandler = 
 	 * If given function specifies a `.rpc` boolean property with a value of `true` then those functions do not need
 	 * to be added to the allow-list.
 	 */
-	allowList?: PartialDeep<Schema<M, boolean>>
+	allowList?: PartialDeep<Schema<PromisifiedModule<M>, boolean>>
 	/**
 	 * In JavaScript, functions are objects. Those objects can have methods. This means that functions can have methods.
 	 *
