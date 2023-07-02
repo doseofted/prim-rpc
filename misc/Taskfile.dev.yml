@@ -23,7 +23,7 @@ tasks:
         sh: "pnpm --silent zx misc/dns-answer-address.mjs --begin=192"
       DNS_TLD: "test"
     cmds:
-      - "docker pull coredns/coredns:1.8.4"
+      - "docker pull coredns/coredns:1.10.1"
       - |
         docker run -it --rm --name coredns \
           -v "$(pwd)/misc/dev.Corefile:/root/Corefile" \
