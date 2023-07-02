@@ -1,4 +1,3 @@
 packages:
   - "libs/**"
   - "apps/**"
-  - "!apps/frontend/.next/types/**"
