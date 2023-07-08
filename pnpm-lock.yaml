@@ -336,6 +336,9 @@ importers:
       '@types/ws':
         specifier: ^8.5.5
         version: 8.5.5
+      '@vitest/web-worker':
+        specifier: ^0.33.0
+        version: 0.33.0(vitest@0.32.2)
       axios:
         specifier: ^1.4.0
         version: 1.4.0
@@ -2739,6 +2742,17 @@ packages:
       diff-sequences: 29.4.3
       loupe: 2.3.6
       pretty-format: 27.5.1
+    dev: true
+
+  /@vitest/web-worker@0.33.0(vitest@0.32.2):
+    resolution: {integrity: sha512-sStiwW6AuA2zV5O/nFJ0Xn0j+eepNomOX2f7opHXkGQg1Lo2VxTfEkY0y0lyby+GIFwdoMTvVsInKseFrE2dJw==}
+    peerDependencies:
+      vitest: '*'
+    dependencies:
+      debug: 4.3.4
+      vitest: 0.32.2(@vitest/ui@0.32.2)(jsdom@22.1.0)(sass@1.63.6)
+    transitivePeerDependencies:
+      - supports-color
     dev: true
 
   /@webassemblyjs/ast@1.11.6:
