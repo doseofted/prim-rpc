@@ -354,7 +354,8 @@ export type PrimServerCallbackHandler<T = unknown> = (
 	options?: T
 ) => void | Promise<void>
 
-export interface PrimServerOptions<C = unknown> extends PrimOptions {
+export interface PrimServerOptions<M extends object = object, J extends JsonHandler = JsonHandler, C = unknown>
+	extends PrimOptions<M, J> {
 	/**
 	 * The path prefix as used on the request. When processing GET requests to Prim-RPC, the prefix will
 	 * be removed from the function name.

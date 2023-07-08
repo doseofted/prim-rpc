@@ -339,8 +339,8 @@ export function createPrimServer<
 	ModuleType extends OptionsType["module"] = object,
 	// eslint-disable-next-line @typescript-eslint/no-unused-vars
 	Context extends ReturnType<OptionsType["context"]> = never,
-	OptionsType extends PrimServerOptions = PrimServerOptions
->(options?: PrimServerOptions): PrimServer {
+	OptionsType extends PrimServerOptions = PrimServerOptions<ModuleType>
+>(options?: OptionsType): PrimServer {
 	// NOTE: server options may include client options but only server options should be used
 	// client options should be re-instantiated on every request
 	// TODO: instead of merging options, considering adding client options to server options as separate property
