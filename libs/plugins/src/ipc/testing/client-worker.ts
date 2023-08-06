@@ -8,8 +8,8 @@ import {
 } from "../web-worker"
 import type * as exampleModule from "@doseofted/prim-example"
 
-const methodPlugin = createMethodPlugin({ worker: self })
-const callbackPlugin = createCallbackPlugin({ worker: self })
+const methodPlugin = createMethodPlugin({ worker: self, context: "WebWorker" })
+const callbackPlugin = createCallbackPlugin({ worker: self, context: "WebWorker" })
 
 // this is the intended client
 const client = createPrimClient<typeof exampleModule>({
@@ -23,8 +23,8 @@ const client = createPrimClient<typeof exampleModule>({
 // NOTE: using Prim to test itself may be problematic (?) but it's the easiest way to test the client
 createPrimServer<typeof client>({
 	module: client,
-	methodHandler: createMethodHandler({ worker: self }),
-	callbackHandler: createCallbackHandler({ worker: self }),
+	methodHandler: createMethodHandler({ worker: self, context: "WebWorker" }),
+	callbackHandler: createCallbackHandler({ worker: self, context: "WebWorker" }),
 	jsonHandler,
 	// NOTE: I've given the Prim RPC server a proxy where it doesn't know if .rpc is defined
 	// (because it's making a "remote" call back to the main thread) so I have to tell it what's allowed again

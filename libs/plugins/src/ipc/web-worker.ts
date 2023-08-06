@@ -28,7 +28,10 @@ export const jsonHandler: JsonHandler = {
 }
 
 interface SharedWebWorkerOptions {
-	worker: Worker | Window // | SharedWorker | ServiceWorker
+	/** Worker (Dedicated or Shared) or the provided context within a worker (usually `self`) */
+	worker: Worker | SharedWorker | Window | WorkerGlobalScope | SharedWorkerGlobalScope | DedicatedWorkerGlobalScope
+	/** Optional hint to tell plugin about context when web workers are emulated (for instance, during testing) */
+	context?: "WebWorker" | "SharedWorker"
 }
 
 // !SECTION
@@ -153,30 +156,78 @@ type PrimEventDetail = CallbackEvents & MethodEvents
 type PrimEventName = keyof PrimEventDetail
 type PrimEventStructure<T extends PrimEventName> = { event: T; data: PrimEventDetail[T] }
 
-// declare const self: SharedWorkerGlobalScope
-
 function setupMessageTransport(options: SharedWebWorkerOptions) {
-	const { worker: parent } = options
-	// const inSharedWorker = typeof SharedWorkerGlobalScope !== "undefined" && self instanceof SharedWorkerGlobalScope
-	// const isSharedWorker = typeof Window !== "undefined" && parent instanceof SharedWorker
-	// const inWebWorker = typeof DedicatedWorkerGlobalScope !== "undefined" && self instanceof DedicatedWorkerGlobalScope
-	// const isWebWorker = typeof Window !== "undefined" && parent instanceof Worker
+	// eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
+	const { worker, context } = options
 	const eventsReceived = mitt<PrimEventDetail>()
 	const callback = ({ data: given }: MessageEvent<PrimEventStructure<PrimEventName>>) => {
 		eventsReceived.emit(given.event, given.data)
 	}
-	parent.addEventListener("message", callback)
+	const isWebWorker = worker instanceof Worker
+	const checkWebContext = (given: unknown): given is DedicatedWorkerGlobalScope =>
+		context === "WebWorker" ||
+		(typeof DedicatedWorkerGlobalScope !== "undefined" && given instanceof DedicatedWorkerGlobalScope)
+	const isWebWorkerContext = checkWebContext(worker)
+	if (isWebWorker || isWebWorkerContext) {
+		// eslint-disable-next-line @typescript-eslint/no-unsafe-member-access, @typescript-eslint/no-unsafe-call
+		worker.addEventListener("message", callback)
+	}
+	const isSharedWorker = worker instanceof SharedWorker
+	if (isSharedWorker) {
+		worker.port.addEventListener("message", callback)
+	}
+	const checkSharedContext = (given: unknown): given is SharedWorkerGlobalScope =>
+		context === "SharedWorker" ||
+		(typeof SharedWorkerGlobalScope !== "undefined" && given instanceof SharedWorkerGlobalScope)
+	const isSharedWorkerContext = checkSharedContext(worker)
+	let givenPort: MessagePort | null = null
+	if (isSharedWorkerContext) {
+		const connectEvent = (event: MessageEvent) => {
+			givenPort = event.ports[0]
+			givenPort.addEventListener("message", callback)
+			givenPort.start()
+			// FIXME: for some reason this breaks testing (this may be specific to Vitest and mocked Web Worker)
+			// eslint-disable-next-line @typescript-eslint/no-unsafe-member-access, @typescript-eslint/no-unsafe-call
+			// worker.removeEventListener("connect", connectEvent)
+		}
+		// eslint-disable-next-line @typescript-eslint/no-unsafe-member-access, @typescript-eslint/no-unsafe-call
+		worker.addEventListener("connect", connectEvent)
+	}
+	// console.log({
+	// 	isWebWorker,
+	// 	isWebWorkerContext,
+	// 	isSharedWorker,
+	// 	isSharedWorkerContext,
+	// })
 	return {
 		on<T extends PrimEventName>(event: T, cb: (data: PrimEventDetail[T]) => void) {
 			eventsReceived.on(event, cb)
 			return () => eventsReceived.off(event, cb)
 		},
 		send<T extends PrimEventName>(event: T, data: PrimEventDetail[T]) {
-			parent.postMessage({ event, data })
+			if (isWebWorker || isWebWorkerContext) {
+				// eslint-disable-next-line @typescript-eslint/no-unsafe-member-access, @typescript-eslint/no-unsafe-call
+				worker.postMessage({ event, data })
+			}
+			if (isSharedWorker) {
+				worker.port.postMessage({ event, data })
+			}
+			if (isSharedWorkerContext) {
+				givenPort?.postMessage({ event, data })
+			}
 		},
 		destroy() {
 			eventsReceived.all.clear()
-			parent.removeEventListener("message", callback)
+			if (isWebWorker || isWebWorkerContext) {
+				// eslint-disable-next-line @typescript-eslint/no-unsafe-member-access, @typescript-eslint/no-unsafe-call
+				worker.removeEventListener("message", callback)
+			}
+			if (isSharedWorker) {
+				worker.port.removeEventListener("message", callback)
+			}
+			if (isSharedWorkerContext) {
+				givenPort?.removeEventListener("message", callback)
+			}
 		},
 	}
 }
