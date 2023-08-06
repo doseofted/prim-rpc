@@ -156,11 +156,24 @@ type PrimEventDetail = CallbackEvents & MethodEvents
 type PrimEventName = keyof PrimEventDetail
 type PrimEventStructure<T extends PrimEventName> = { event: T; data: PrimEventDetail[T] }
 
+const ports: MessagePort[] = []
+/** "connect" event is fired only for Shared Workers and added once */
+// let connectEventHandlerAdded = false
+
+// const connectEvents = mitt()
+// function setupConnectHandler (scope: SharedWorkerGlobalScope) {
+// 	scope.addEventListener("connect", event => {
+// 		const givenPort = event.ports[0]
+// 		givenPort.start()
+// 	})
+// }
+
 function setupMessageTransport(options: SharedWebWorkerOptions) {
 	// eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
 	const { worker, context } = options
 	const eventsReceived = mitt<PrimEventDetail>()
 	const callback = ({ data: given }: MessageEvent<PrimEventStructure<PrimEventName>>) => {
+		console.log("receive", given.event /* given.data */)
 		eventsReceived.emit(given.event, given.data)
 	}
 	const isWebWorker = worker instanceof Worker
@@ -175,6 +188,7 @@ function setupMessageTransport(options: SharedWebWorkerOptions) {
 	const isSharedWorker = worker instanceof SharedWorker
 	if (isSharedWorker) {
 		worker.port.addEventListener("message", callback)
+		worker.port.start()
 	}
 	const checkSharedContext = (given: unknown): given is SharedWorkerGlobalScope =>
 		context === "SharedWorker" ||
@@ -184,27 +198,30 @@ function setupMessageTransport(options: SharedWebWorkerOptions) {
 	if (isSharedWorkerContext) {
 		const connectEvent = (event: MessageEvent) => {
 			givenPort = event.ports[0]
+			ports.push(givenPort)
+			// console.log({ ports })
+			console.log("connect ports:", event.ports.length, { isSharedWorker, isSharedWorkerContext })
 			givenPort.addEventListener("message", callback)
 			givenPort.start()
 			// FIXME: for some reason this breaks testing (this may be specific to Vitest and mocked Web Worker)
 			// eslint-disable-next-line @typescript-eslint/no-unsafe-member-access, @typescript-eslint/no-unsafe-call
 			// worker.removeEventListener("connect", connectEvent)
 		}
+		// if (!connectEventHandlerAdded) {
+		// 	// eslint-disable-next-line @typescript-eslint/no-unsafe-member-access, @typescript-eslint/no-unsafe-call
+		// 	worker.addEventListener("connect", connectEvent)
+		// }
+		// connectEventHandlerAdded = true
 		// eslint-disable-next-line @typescript-eslint/no-unsafe-member-access, @typescript-eslint/no-unsafe-call
 		worker.addEventListener("connect", connectEvent)
 	}
-	// console.log({
-	// 	isWebWorker,
-	// 	isWebWorkerContext,
-	// 	isSharedWorker,
-	// 	isSharedWorkerContext,
-	// })
 	return {
 		on<T extends PrimEventName>(event: T, cb: (data: PrimEventDetail[T]) => void) {
 			eventsReceived.on(event, cb)
 			return () => eventsReceived.off(event, cb)
 		},
 		send<T extends PrimEventName>(event: T, data: PrimEventDetail[T]) {
+			console.log("send", event, { isSharedWorker, isSharedWorkerContext } /* data */)
 			if (isWebWorker || isWebWorkerContext) {
 				// eslint-disable-next-line @typescript-eslint/no-unsafe-member-access, @typescript-eslint/no-unsafe-call
 				worker.postMessage({ event, data })
@@ -213,6 +230,8 @@ function setupMessageTransport(options: SharedWebWorkerOptions) {
 				worker.port.postMessage({ event, data })
 			}
 			if (isSharedWorkerContext) {
+				console.log({ givenPort: givenPort !== null })
+				// ports.forEach(port => { port.postMessage({ event, data }) })
 				givenPort?.postMessage({ event, data })
 			}
 		},

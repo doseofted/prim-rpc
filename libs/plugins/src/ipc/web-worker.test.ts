@@ -234,7 +234,7 @@ describe("Shared worker: Main thread as client, worker as server", () => {
 	// 	clientBatchTime: 0,
 	// })
 
-	// FIXME: this may not work due to connect event handler not being removed after finding port
+	// // FIXME: this may not work due to connect event handler not being removed after finding port
 	// test("with second instance of SharedWorker", () => {
 	// 	const args = { greeting: "What's up", name: "Ted" }
 	// 	void expect(client2.sayHello(args)).resolves.toBe(example.sayHello(args))
