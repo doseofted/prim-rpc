@@ -44,18 +44,3 @@ createPrimServer<typeof client>({
 		},
 	},
 })
-
-// self.onmessage = async (event: MessageEvent) => {
-// 	if (typeof event.data !== "string") {
-// 		return
-// 	}
-// 	switch (event.data) {
-// 		case "sayHello": {
-// 			self.postMessage(await client.sayHello({ greeting: "What's up", name: "Ted" }))
-// 			break
-// 		}
-// 		default: {
-// 			break
-// 		}
-// 	}
-// }

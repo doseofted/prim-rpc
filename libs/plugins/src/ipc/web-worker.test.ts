@@ -12,9 +12,9 @@ import { exampleModule } from "./testing/worker-server"
 import * as example from "@doseofted/prim-example"
 
 describe("Main thread as client, worker as server", () => {
-	const worker = new Worker(new URL("./testing/worker-server", import.meta.url), { type: "module" })
-	const methodPlugin = createMethodPlugin({ worker })
-	const callbackPlugin = createCallbackPlugin({ worker })
+	const webWorker = new Worker(new URL("./testing/worker-server", import.meta.url), { type: "module" })
+	const methodPlugin = createMethodPlugin({ worker: webWorker })
+	const callbackPlugin = createCallbackPlugin({ worker: webWorker })
 	const client = createPrimClient<typeof exampleModule>({
 		methodPlugin,
 		callbackPlugin,
@@ -78,9 +78,9 @@ describe("Main thread as client, worker as server", () => {
 })
 
 describe("Main thread as server, worker as client", () => {
-	const worker = new Worker(new URL("./testing/worker-client", import.meta.url), { type: "module" })
-	const methodHandler = createMethodHandler({ worker })
-	const callbackHandler = createCallbackHandler({ worker })
+	const webWorker = new Worker(new URL("./testing/worker-client", import.meta.url), { type: "module" })
+	const methodHandler = createMethodHandler({ worker: webWorker })
+	const callbackHandler = createCallbackHandler({ worker: webWorker })
 	// this where functions will actually be called from worker
 	createPrimServer({
 		module: example,
@@ -88,8 +88,8 @@ describe("Main thread as server, worker as client", () => {
 		callbackHandler,
 		jsonHandler,
 	})
-	const methodPlugin = createMethodPlugin({ worker })
-	const callbackPlugin = createCallbackPlugin({ worker })
+	const methodPlugin = createMethodPlugin({ worker: webWorker })
+	const callbackPlugin = createCallbackPlugin({ worker: webWorker })
 	// this will be an easy way to call client in web worker from main thread
 	const client = createPrimClient<typeof exampleModule>({
 		methodPlugin,
@@ -155,3 +155,20 @@ describe("Main thread as server, worker as client", () => {
 		])
 	})
 })
+
+// describe("Shared worker: Main thread as client, worker as server", () => {
+// 	const sharedWorker = new SharedWorker(new URL("./testing/worker-server", import.meta.url), { type: "module" })
+// 	const methodPlugin = createMethodPlugin({ worker: sharedWorker })
+// 	const callbackPlugin = createCallbackPlugin({ worker: sharedWorker })
+// 	const client = createPrimClient<typeof exampleModule>({
+// 		methodPlugin,
+// 		callbackPlugin,
+// 		jsonHandler,
+// 		clientBatchTime: 0,
+// 	})
+
+// 	test("with single argument", () => {
+// 		const args = { greeting: "What's up", name: "Ted" }
+// 		void expect(client.sayHello(args)).resolves.toBe(example.sayHello(args))
+// 	})
+// })

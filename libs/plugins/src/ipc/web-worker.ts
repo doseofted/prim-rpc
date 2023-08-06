@@ -38,8 +38,7 @@ interface SharedWebWorkerOptions {
 // eslint-disable-next-line @typescript-eslint/no-empty-interface
 interface CallbackPluginWebWorkerOptions extends SharedWebWorkerOptions {}
 export const createCallbackPlugin = (options: CallbackPluginWebWorkerOptions) => {
-	const { worker = self } = options
-	const transport = setupMessageTransport(worker)
+	const transport = setupMessageTransport(options)
 	const callbackPlugin: PrimClientCallbackPlugin = (_endpoint, { connected, response }, jsonHandler) => {
 		const id = nanoid()
 		transport.on(`callback:connected:${id}`, () => {
@@ -69,8 +68,7 @@ export const createCallbackPlugin = (options: CallbackPluginWebWorkerOptions) =>
 // eslint-disable-next-line @typescript-eslint/no-empty-interface
 interface CallbackHandlerWebWorkerOptions extends SharedWebWorkerOptions {}
 export const createCallbackHandler = (options: CallbackHandlerWebWorkerOptions) => {
-	const { worker = self } = options
-	const transport = setupMessageTransport(worker)
+	const transport = setupMessageTransport(options)
 	const callbackHandler: PrimServerCallbackHandler = prim => {
 		const jsonHandler = prim.options.jsonHandler
 		transport.on("callback:connect", id => {
@@ -94,8 +92,7 @@ export const createCallbackHandler = (options: CallbackHandlerWebWorkerOptions) 
 // eslint-disable-next-line @typescript-eslint/no-empty-interface
 interface MethodPluginWebWorkerOptions extends SharedWebWorkerOptions {}
 export const createMethodPlugin = (options: MethodPluginWebWorkerOptions) => {
-	const { worker = self } = options
-	const transport = setupMessageTransport(worker)
+	const transport = setupMessageTransport(options)
 	const methodPlugin: PrimClientMethodPlugin = (_endpoint, message, jsonHandler, blobs) =>
 		new Promise(resolve => {
 			const id = nanoid()
@@ -115,8 +112,7 @@ export const createMethodPlugin = (options: MethodPluginWebWorkerOptions) => {
 // eslint-disable-next-line @typescript-eslint/no-empty-interface
 interface MethodHandlerWebWorkerOptions extends SharedWebWorkerOptions {}
 export const createMethodHandler = (options: MethodHandlerWebWorkerOptions) => {
-	const { worker } = options
-	const transport = setupMessageTransport(worker)
+	const transport = setupMessageTransport(options)
 	const methodHandler: PrimServerMethodHandler = prim => {
 		const jsonHandler = prim.options.jsonHandler
 		transport.on("method:connect", id => {
@@ -157,9 +153,14 @@ type PrimEventDetail = CallbackEvents & MethodEvents
 type PrimEventName = keyof PrimEventDetail
 type PrimEventStructure<T extends PrimEventName> = { event: T; data: PrimEventDetail[T] }
 
-type PossibleContext = Window | Worker // | SharedWorker | ServiceWorker
+// declare const self: SharedWorkerGlobalScope
 
-function setupMessageTransport(parent: PossibleContext) {
+function setupMessageTransport(options: SharedWebWorkerOptions) {
+	const { worker: parent } = options
+	// const inSharedWorker = typeof SharedWorkerGlobalScope !== "undefined" && self instanceof SharedWorkerGlobalScope
+	// const isSharedWorker = typeof Window !== "undefined" && parent instanceof SharedWorker
+	// const inWebWorker = typeof DedicatedWorkerGlobalScope !== "undefined" && self instanceof DedicatedWorkerGlobalScope
+	// const isWebWorker = typeof Window !== "undefined" && parent instanceof Worker
 	const eventsReceived = mitt<PrimEventDetail>()
 	const callback = ({ data: given }: MessageEvent<PrimEventStructure<PrimEventName>>) => {
 		eventsReceived.emit(given.event, given.data)
