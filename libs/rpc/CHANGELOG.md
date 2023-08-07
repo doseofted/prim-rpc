@@ -1,5 +1,13 @@
 # @doseofted/prim-rpc
 
+## 0.1.0-alpha.14
+
+### Patch Changes
+
+- 382d472: Client module generic parameter must now match module option if provided
+- 382d472: Allow list option is now typed according to module given on server
+- 556b06f: Improved type support for allow list option of Prim+RPC
+
 ## 0.1.0-alpha.13
 
 ### Patch Changes
