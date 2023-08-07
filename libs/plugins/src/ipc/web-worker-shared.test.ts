@@ -75,24 +75,24 @@ describe("Shared worker: Main thread as client, worker as server", () => {
 		])
 	})
 
-	// const sharedWorker2 = new SharedWorker(new URL("./testing/server-shared", import.meta.url), { type: "module" })
+	const sharedWorker2 = new SharedWorker(new URL("./testing/server-shared", import.meta.url), { type: "module" })
 	// const methodPlugin2 = createMethodPlugin({ worker: sharedWorker2 })
-	// // const callbackPlugin2 = createCallbackPlugin({ worker: sharedWorker2 })
-	// const client2 = createPrimClient<typeof exampleModule>({
-	// 	methodPlugin: methodPlugin2,
-	// 	// callbackPlugin: callbackPlugin2,
-	// 	jsonHandler,
-	// 	clientBatchTime: 0,
-	// })
+	const callbackPlugin2 = createCallbackPlugin({ worker: sharedWorker2 })
+	const client2 = createPrimClient<typeof exampleModule>({
+		methodPlugin: methodPlugin,
+		callbackPlugin: callbackPlugin2,
+		jsonHandler,
+		clientBatchTime: 0,
+	})
 
-	// test("with single argument and second Shared Worker connected", () => {
-	// 	const args = { greeting: "What's up", name: "Ted" }
-	// 	void expect(client.sayHello(args)).resolves.toBe(example.sayHello(args))
-	// })
+	test("with single argument and second Shared Worker connected", () => {
+		const args = { greeting: "What's up", name: "Ted" }
+		void expect(client.sayHello(args)).resolves.toBe(example.sayHello(args))
+	})
 
 	// FIXME: this may not work due to connect event handler not being removed after finding port
-	// test("with second instance of SharedWorker", () => {
-	// 	const args = { greeting: "What's up", name: "Ted" }
-	// 	void expect(client2.sayHello(args)).resolves.toBe(example.sayHello(args))
-	// })
+	test("with second instance of SharedWorker", () => {
+		const args = { greeting: "What's up", name: "Ted" }
+		void expect(client2.sayHello(args)).resolves.toBe(example.sayHello(args))
+	})
 })

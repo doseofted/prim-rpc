@@ -157,52 +157,16 @@ type PrimEventName = keyof PrimEventDetail
 type PrimEventStructure<T extends PrimEventName> = { event: T; data: PrimEventDetail[T] }
 
 const ports: MessagePort[] = []
-/** "connect" event is fired only for Shared Workers and added once */
-let connectEventHandlerAdded = false
-
-const connectEvents = mitt<{ connected: MessagePort }>()
-function setupConnectHandler(scope: SharedWorkerGlobalScope, onMessageCallback?: (event: MessageEvent) => void) {
-	const connectPromise = new Promise<MessagePort>(resolve => {
-		const handler = (port: MessagePort) => {
-			port.addEventListener("message", event => {
-				console.log("CONNECTED PLEASE", event.data)
-				onMessageCallback?.(event)
-			})
-			resolve(port)
-			connectEvents.off("connected", handler)
-		}
-		connectEvents.on("connected", handler)
-	})
-	if (connectEventHandlerAdded) {
-		return connectPromise
-	}
-	// eslint-disable-next-line @typescript-eslint/no-unsafe-member-access, @typescript-eslint/no-unsafe-call
-	scope.addEventListener("connect", event => {
-		console.log("NEW CONNECTION", event)
-		// eslint-disable-next-line @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-unsafe-member-access
-		const [givenPort] = event.ports
-		// eslint-disable-next-line @typescript-eslint/no-unsafe-argument
-		ports.push(givenPort)
-		// eslint-disable-next-line @typescript-eslint/no-unsafe-member-access, @typescript-eslint/no-unsafe-call
-		givenPort?.addEventListener("message", onMessageCallback)
-		// eslint-disable-next-line @typescript-eslint/no-unsafe-argument
-		connectEvents.emit("connected", givenPort)
-		// eslint-disable-next-line @typescript-eslint/no-unsafe-member-access, @typescript-eslint/no-unsafe-call
-		givenPort?.start()
-	})
-	connectEventHandlerAdded = true
-	return connectPromise
-}
 
 function setupMessageTransport(options: SharedWebWorkerOptions) {
 	// eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
 	const { worker, context } = options
 	const eventsReceived = mitt<PrimEventDetail>()
 	const callback = ({ data: given }: MessageEvent<PrimEventStructure<PrimEventName>>) => {
-		console.log("receive", given.event, { isSharedWorker, isSharedWorkerContext } /* given.data */)
+		// console.log("receive", given.event, { isSharedWorker, isSharedWorkerContext } /* given.data */)
 		eventsReceived.emit(given.event, given.data)
 	}
-	const isWebWorker = worker instanceof Worker
+	const isWebWorker = typeof Worker !== "undefined" && worker instanceof Worker
 	const checkWebContext = (given: unknown): given is DedicatedWorkerGlobalScope =>
 		context === "WebWorker" ||
 		(typeof DedicatedWorkerGlobalScope !== "undefined" && given instanceof DedicatedWorkerGlobalScope)
@@ -211,7 +175,7 @@ function setupMessageTransport(options: SharedWebWorkerOptions) {
 		// eslint-disable-next-line @typescript-eslint/no-unsafe-member-access, @typescript-eslint/no-unsafe-call
 		worker.addEventListener("message", callback)
 	}
-	const isSharedWorker = worker instanceof SharedWorker
+	const isSharedWorker = typeof SharedWorker !== "undefined" && worker instanceof SharedWorker
 	if (isSharedWorker) {
 		worker.port.addEventListener("message", callback)
 		worker.port.start()
@@ -220,11 +184,27 @@ function setupMessageTransport(options: SharedWebWorkerOptions) {
 		context === "SharedWorker" ||
 		(typeof SharedWorkerGlobalScope !== "undefined" && given instanceof SharedWorkerGlobalScope)
 	const isSharedWorkerContext = checkSharedContext(worker)
-	let givenPort: Promise<MessagePort>
 	if (isSharedWorkerContext) {
-		givenPort = setupConnectHandler(worker, callback)
-		// void givenPort.then(port => port.addEventListener("message", callback))
-
+		console.log("SHARED CONTEXT")
+		// eslint-disable-next-line @typescript-eslint/no-unsafe-member-access, @typescript-eslint/no-unsafe-call
+		worker.addEventListener("connect", event => {
+			// eslint-disable-next-line @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-unsafe-member-access
+			const [port] = event.ports
+			// eslint-disable-next-line @typescript-eslint/no-unsafe-argument
+			if (ports.includes(port)) {
+				console.log("already added port")
+				// eslint-disable-next-line @typescript-eslint/no-unsafe-member-access, @typescript-eslint/no-unsafe-call
+				port.addEventListener("message", callback)
+			} else {
+				console.log("adding port")
+				// eslint-disable-next-line @typescript-eslint/no-unsafe-argument
+				ports.push(port)
+				// eslint-disable-next-line @typescript-eslint/no-unsafe-member-access, @typescript-eslint/no-unsafe-call
+				port.addEventListener("message", callback)
+				// eslint-disable-next-line @typescript-eslint/no-unsafe-member-access, @typescript-eslint/no-unsafe-call
+				port.start()
+			}
+		})
 		// const connectEvent = (event: MessageEvent) => {
 		// 	givenPort = event.ports[0]
 		// 	ports.push(givenPort)
@@ -251,7 +231,7 @@ function setupMessageTransport(options: SharedWebWorkerOptions) {
 			return () => eventsReceived.off(event, cb)
 		},
 		send<T extends PrimEventName>(event: T, data: PrimEventDetail[T]) {
-			console.log("send", event, { isSharedWorker, isSharedWorkerContext } /* data */)
+			// console.log("send", event, { isSharedWorker, isSharedWorkerContext } /* data */)
 			if (isWebWorker || isWebWorkerContext) {
 				// eslint-disable-next-line @typescript-eslint/no-unsafe-member-access, @typescript-eslint/no-unsafe-call
 				worker.postMessage({ event, data })
@@ -260,7 +240,6 @@ function setupMessageTransport(options: SharedWebWorkerOptions) {
 				worker.port.postMessage({ event, data })
 			}
 			if (isSharedWorkerContext) {
-				console.log({ givenPort: givenPort !== null })
 				for (const port of ports) {
 					port.postMessage({ event, data })
 				}
