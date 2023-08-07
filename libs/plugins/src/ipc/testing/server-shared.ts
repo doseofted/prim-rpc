@@ -4,7 +4,6 @@ import * as exampleModule from "@doseofted/prim-example"
 
 const context = "SharedWorker"
 
-console.log("i'm shared")
 createPrimServer({
 	module: exampleModule,
 	methodHandler: createMethodHandler({ worker: self, context }),
@@ -13,10 +12,3 @@ createPrimServer({
 })
 
 export type { exampleModule }
-
-// self.addEventListener("connect", () => {
-// 	console.log("WHAT'S UP?")
-// })
-// self.onconnect = () => {
-// 	console.log("WHAT'S UP? 2")
-// }

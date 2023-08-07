@@ -163,7 +163,7 @@ function setupMessageTransport(options: SharedWebWorkerOptions) {
 	const { worker, context } = options
 	const eventsReceived = mitt<PrimEventDetail>()
 	const callback = ({ data: given }: MessageEvent<PrimEventStructure<PrimEventName>>) => {
-		// console.log("receive", given.event, { isSharedWorker, isSharedWorkerContext } /* given.data */)
+		// console.log("receive", given.event)
 		eventsReceived.emit(given.event, given.data)
 	}
 	const isWebWorker = typeof Worker !== "undefined" && worker instanceof Worker
@@ -185,18 +185,15 @@ function setupMessageTransport(options: SharedWebWorkerOptions) {
 		(typeof SharedWorkerGlobalScope !== "undefined" && given instanceof SharedWorkerGlobalScope)
 	const isSharedWorkerContext = checkSharedContext(worker)
 	if (isSharedWorkerContext) {
-		console.log("SHARED CONTEXT")
 		// eslint-disable-next-line @typescript-eslint/no-unsafe-member-access, @typescript-eslint/no-unsafe-call
 		worker.addEventListener("connect", event => {
 			// eslint-disable-next-line @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-unsafe-member-access
 			const [port] = event.ports
 			// eslint-disable-next-line @typescript-eslint/no-unsafe-argument
 			if (ports.includes(port)) {
-				console.log("already added port")
 				// eslint-disable-next-line @typescript-eslint/no-unsafe-member-access, @typescript-eslint/no-unsafe-call
 				port.addEventListener("message", callback)
 			} else {
-				console.log("adding port")
 				// eslint-disable-next-line @typescript-eslint/no-unsafe-argument
 				ports.push(port)
 				// eslint-disable-next-line @typescript-eslint/no-unsafe-member-access, @typescript-eslint/no-unsafe-call
@@ -205,25 +202,6 @@ function setupMessageTransport(options: SharedWebWorkerOptions) {
 				port.start()
 			}
 		})
-		// const connectEvent = (event: MessageEvent) => {
-		// 	givenPort = event.ports[0]
-		// 	ports.push(givenPort)
-		// 	// console.log({ ports })
-		// 	console.log("CONNECTED EVENT:", event.ports.length, { isSharedWorker, isSharedWorkerContext })
-		// 	givenPort.addEventListener("message", callback)
-		// 	givenPort.start()
-		// 	// FIXME: for some reason this breaks testing (this may be specific to Vitest and mocked Web Worker)
-		// 	// eslint-disable-next-line @typescript-eslint/no-unsafe-member-access, @typescript-eslint/no-unsafe-call
-		// 	// worker.removeEventListener("connect", connectEvent)
-		// }
-
-		// if (!connectEventHandlerAdded) {
-		// 	// eslint-disable-next-line @typescript-eslint/no-unsafe-member-access, @typescript-eslint/no-unsafe-call
-		// 	worker.addEventListener("connect", connectEvent)
-		// }
-		// connectEventHandlerAdded = true
-		// eslint-disable-next-line @typescript-eslint/no-unsafe-member-access, @typescript-eslint/no-unsafe-call
-		// worker.addEventListener("connect", connectEvent)
 	}
 	return {
 		on<T extends PrimEventName>(event: T, cb: (data: PrimEventDetail[T]) => void) {
@@ -231,7 +209,7 @@ function setupMessageTransport(options: SharedWebWorkerOptions) {
 			return () => eventsReceived.off(event, cb)
 		},
 		send<T extends PrimEventName>(event: T, data: PrimEventDetail[T]) {
-			// console.log("send", event, { isSharedWorker, isSharedWorkerContext } /* data */)
+			// console.log("send", event)
 			if (isWebWorker || isWebWorkerContext) {
 				// eslint-disable-next-line @typescript-eslint/no-unsafe-member-access, @typescript-eslint/no-unsafe-call
 				worker.postMessage({ event, data })
@@ -243,8 +221,6 @@ function setupMessageTransport(options: SharedWebWorkerOptions) {
 				for (const port of ports) {
 					port.postMessage({ event, data })
 				}
-				// void givenPort?.then(port => port.postMessage({ event, data }))
-				// givenPort?.postMessage({ event, data })
 			}
 		},
 		destroy() {
@@ -260,8 +236,6 @@ function setupMessageTransport(options: SharedWebWorkerOptions) {
 				for (const port of ports) {
 					port.removeEventListener("message", callback)
 				}
-				// void givenPort?.then(port => port.removeEventListener("message", callback))
-				// givenPort?.removeEventListener("message", callback)
 			}
 		},
 	}

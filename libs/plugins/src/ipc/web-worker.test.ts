@@ -11,17 +11,34 @@ import {
 import { exampleModule } from "./testing/server-worker"
 import * as example from "@doseofted/prim-example"
 
-describe("Main thread as client, worker as server", () => {
-	const webWorker = new Worker(new URL("./testing/server-worker", import.meta.url), { type: "module" })
-	const methodPlugin = createMethodPlugin({ worker: webWorker })
-	const callbackPlugin = createCallbackPlugin({ worker: webWorker })
+function createClient(worker: Worker | SharedWorker) {
+	const methodPlugin = createMethodPlugin({ worker })
+	const callbackPlugin = createCallbackPlugin({ worker })
 	const client = createPrimClient<typeof exampleModule>({
 		methodPlugin,
 		callbackPlugin,
 		jsonHandler,
 		clientBatchTime: 0,
 	})
+	return { worker, client }
+}
 
+describe.each([
+	{
+		name: "Dedicated Worker",
+		...createClient(new Worker(new URL("./testing/server-worker", import.meta.url), { type: "module" })),
+	},
+	{
+		name: "Shared Worker",
+		...createClient(new SharedWorker(new URL("./testing/server-shared", import.meta.url), { type: "module" })),
+	},
+	// FIXME: In the browser, two Shared Workers can be started successfully but behavior of mock Shared Worker
+	// in Vitest appears to have different behavior. I need to find a way to test this without manually running the browser.
+	// {
+	// 	name: "Second Shared Worker",
+	// 	...createClient(new SharedWorker(new URL("./testing/server-shared", import.meta.url), { type: "module" })),
+	// },
+])("$name: Main thread as client, worker as server", ({ client, worker }) => {
 	test("with single argument", () => {
 		const args = { greeting: "What's up", name: "Ted" }
 		void expect(client.sayHello(args)).resolves.toBe(example.sayHello(args))
@@ -58,8 +75,8 @@ describe("Main thread as client, worker as server", () => {
 	})
 
 	const clientBatched = createPrimClient<typeof exampleModule>({
-		methodPlugin,
-		callbackPlugin,
+		methodPlugin: createMethodPlugin({ worker }),
+		callbackPlugin: createCallbackPlugin({ worker }),
 		jsonHandler,
 		clientBatchTime: 15,
 	})
@@ -77,10 +94,9 @@ describe("Main thread as client, worker as server", () => {
 	})
 })
 
-describe("Main thread as server, worker as client", () => {
-	const webWorker = new Worker(new URL("./testing/client-worker", import.meta.url), { type: "module" })
-	const methodHandler = createMethodHandler({ worker: webWorker })
-	const callbackHandler = createCallbackHandler({ worker: webWorker })
+function createServerWithClientAccess(worker: Worker | SharedWorker) {
+	const methodHandler = createMethodHandler({ worker })
+	const callbackHandler = createCallbackHandler({ worker })
 	// this where functions will actually be called from worker
 	createPrimServer({
 		module: example,
@@ -88,8 +104,8 @@ describe("Main thread as server, worker as client", () => {
 		callbackHandler,
 		jsonHandler,
 	})
-	const methodPlugin = createMethodPlugin({ worker: webWorker })
-	const callbackPlugin = createCallbackPlugin({ worker: webWorker })
+	const methodPlugin = createMethodPlugin({ worker })
+	const callbackPlugin = createCallbackPlugin({ worker })
 	// this will be an easy way to call client in web worker from main thread
 	const client = createPrimClient<typeof exampleModule>({
 		methodPlugin,
@@ -97,7 +113,23 @@ describe("Main thread as server, worker as client", () => {
 		jsonHandler,
 		clientBatchTime: 0,
 	})
+	return { client, worker }
+}
 
+describe.each([
+	{
+		name: "Dedicated Worker",
+		...createServerWithClientAccess(
+			new Worker(new URL("./testing/client-worker", import.meta.url), { type: "module" })
+		),
+	},
+	{
+		name: "Shared Worker",
+		...createServerWithClientAccess(
+			new SharedWorker(new URL("./testing/client-shared", import.meta.url), { type: "module" })
+		),
+	},
+])("$name: Main thread as server, worker as client", ({ client, worker }) => {
 	test("with single argument", () => {
 		const args = { greeting: "What's up", name: "Ted" }
 		void expect(client.sayHello(args)).resolves.toBe(example.sayHello(args))
@@ -134,8 +166,8 @@ describe("Main thread as server, worker as client", () => {
 	})
 
 	const clientBatched = createPrimClient<typeof exampleModule>({
-		methodPlugin,
-		callbackPlugin,
+		methodPlugin: createMethodPlugin({ worker }),
+		callbackPlugin: createCallbackPlugin({ worker }),
 		jsonHandler,
 		clientBatchTime: 15,
 	})

@@ -8,7 +8,7 @@ import {
 } from "../web-worker"
 import type * as exampleModule from "@doseofted/prim-example"
 
-const context = "WebWorker"
+const context = "SharedWorker"
 
 const methodPlugin = createMethodPlugin({ worker: self, context })
 const callbackPlugin = createCallbackPlugin({ worker: self, context })
