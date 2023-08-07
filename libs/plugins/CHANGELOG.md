@@ -1,5 +1,11 @@
 # @doseofted/prim-rpc-plugins
 
+## 0.1.0-alpha.12
+
+### Patch Changes
+
+- 556b06f: Web Worker plugin now supports Shared Workers
+
 ## 0.1.0-alpha.11
 
 ### Patch Changes
