@@ -46,8 +46,8 @@
 		"dist"
 	],
 	"devDependencies": {
-		"@types/lodash-es": "^4.17.7",
-		"@types/node": "^20.3.3",
+		"@types/lodash-es": "^4.17.8",
+		"@types/node": "^20.4.8",
 		"lodash-es": "^4.17.21"
 	}
 }
