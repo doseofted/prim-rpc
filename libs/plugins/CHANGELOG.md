@@ -1,5 +1,11 @@
 # @doseofted/prim-rpc-plugins
 
+## 0.1.0-alpha.13
+
+### Patch Changes
+
+- d88195a: Upgraded dependencies
+
 ## 0.1.0-alpha.12
 
 ### Patch Changes

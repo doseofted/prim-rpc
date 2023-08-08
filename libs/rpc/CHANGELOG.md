@@ -1,5 +1,12 @@
 # @doseofted/prim-rpc
 
+## 0.1.0-alpha.15
+
+### Patch Changes
+
+- d88195a: Upgraded dependencies
+- d88195a: Adjusted type definitions to resolve internal type issue caught with upgraded TypeScript 5.1.6
+
 ## 0.1.0-alpha.14
 
 ### Patch Changes

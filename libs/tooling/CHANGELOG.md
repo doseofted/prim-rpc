@@ -1,5 +1,11 @@
 # @doseofted/prim-rpc-tooling
 
+## 0.1.0-alpha.6
+
+### Patch Changes
+
+- d88195a: Upgraded dependencies
+
 ## 0.1.0-alpha.5
 
 ### Minor Changes
