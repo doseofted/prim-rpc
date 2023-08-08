@@ -66,7 +66,7 @@ export type AnyFunction = (...args: any[]) => any
 type PromisifiedModuleDirect<
 	ModuleGiven extends object,
 	Recursive extends true | false = true,
-	Keys extends keyof ModuleGiven = Extract<keyof ModuleGiven, string>
+	Keys extends keyof ModuleGiven = Extract<keyof ModuleGiven, string>,
 > = ConditionalExcept<
 	{
 		[Key in Keys]: ModuleGiven[Key] extends ((...args: infer A) => infer R) & object
@@ -178,7 +178,12 @@ export type PrimClientCallbackPlugin<J = JsonHandler> = (
 
 type OptionsPresetFallback = "development" | "production"
 
-export interface PrimOptions<M extends object = object, J extends JsonHandler = JsonHandler> {
+export type PossibleModule = object
+// | Record<string, unknown>
+// | Promise<Record<string, unknown>>
+// | (() => Promise<Record<string, unknown>>)
+
+export interface PrimOptions<M extends PossibleModule = object, J extends JsonHandler = JsonHandler> {
 	/**
 	 * This option is not yet implemented.
 	 *
@@ -354,7 +359,7 @@ export type PrimServerCallbackHandler<T = unknown> = (
 	options?: T
 ) => void | Promise<void>
 
-export interface PrimServerOptions<M extends object = object, J extends JsonHandler = JsonHandler, C = unknown>
+export interface PrimServerOptions<M extends PossibleModule = object, J extends JsonHandler = JsonHandler, C = unknown>
 	extends PrimOptions<M, J> {
 	/**
 	 * The path prefix as used on the request. When processing GET requests to Prim-RPC, the prefix will

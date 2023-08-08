@@ -15,7 +15,7 @@ export function CodeHighlighted(props: CodeHighlightedProps) {
 	const toBeHighlighted = code ?? children ?? ""
 	const [worker, setWorker] = useState<RpcModule<typeof module>>()
 	useMount(() => {
-		const worker = new Worker(new URL("./worker", import.meta.url), { type: "module" })
+		const worker = new SharedWorker(new URL("./worker", import.meta.url), { type: "module" })
 		const methodPlugin = createMethodPlugin({ worker })
 		const callbackPlugin = createCallbackPlugin({ worker })
 		const client = createPrimClient<typeof module>({ jsonHandler, methodPlugin, callbackPlugin })
