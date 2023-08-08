@@ -55,11 +55,11 @@ export type PrimClient<ModuleType extends PrimOptions["module"]> = PromisifiedMo
 export function createPrimClient<
 	ModuleType extends OptionsType["module"] = object,
 	JsonHandlerType extends OptionsType["jsonHandler"] = JsonHandler,
-	OptionsType extends PrimOptions = PrimOptions<ModuleType, JsonHandlerType>
+	OptionsType extends PrimOptions = PrimOptions<Partial<ModuleType>, JsonHandlerType>,
 >(options?: OptionsType): PrimClient<ModuleType> {
 	const methodPluginGiven = typeof options?.methodPlugin !== "undefined"
 	const callbackPluginGiven = typeof options?.callbackPlugin !== "undefined"
-	const configured = createPrimOptions(options)
+	const configured = createPrimOptions(options as unknown as PrimOptions)
 	const givenModulePromise = (typeof configured.module === "function" ? configured.module() : configured.module) as
 		| ModuleType
 		| Promise<ModuleType>

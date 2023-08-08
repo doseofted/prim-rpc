@@ -9,7 +9,7 @@ import { serializeError } from "serialize-error"
 import { createPrimOptions, primMajorVersion, useVersionInRpc } from "./options"
 import { createPrimClient } from "./client"
 import { mergeBlobLikeWithGiven } from "./blobs"
-import type { AnyFunction } from "./interfaces"
+import type { AnyFunction, JsonHandler } from "./interfaces"
 import type {
 	CommonServerSimpleGivenOptions,
 	CommonServerResponseOptions,
@@ -339,7 +339,7 @@ export function createPrimServer<
 	ModuleType extends OptionsType["module"] = object,
 	// eslint-disable-next-line @typescript-eslint/no-unused-vars
 	Context extends ReturnType<OptionsType["context"]> = never,
-	OptionsType extends PrimServerOptions = PrimServerOptions<ModuleType>
+	OptionsType extends PrimServerOptions = PrimServerOptions<Partial<ModuleType>, JsonHandler>,
 >(options?: OptionsType): PrimServer {
 	// NOTE: server options may include client options but only server options should be used
 	// client options should be re-instantiated on every request
