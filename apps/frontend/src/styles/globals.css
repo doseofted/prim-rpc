@@ -120,7 +120,7 @@ html { font-size: 14px; }
 	position: relative;
 	color: #ffffffaa !important;
 }
-.ch-editor-tab.ch-editor-tab-active {
+.ch-editor-tab[data-active="true"] {
 	color: #ffffffff !important;
 }
 
@@ -136,7 +136,7 @@ html { font-size: 14px; }
 	margin: 0 auto;
 	transition: width 300ms;
 }
-.ch-editor-tab.ch-editor-tab-active::before {
+.ch-editor-tab[data-active="true"]::before {
 	width: calc(100% - 12px);
 	background-color: #6D53FF;
 }
