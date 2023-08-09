@@ -19,9 +19,9 @@ import { createPrimServer } from "./server"
 
 // SECTION: mock servers
 /** Represents an open WebSocket connection */
-type ConnectedEvent = Emitter<{ messageClient: string; messageServer: string; ended: void }>
+type ConnectedEvent = Emitter<{ messageClient: string; messageServer: string; ended: undefined }>
 /** Represents a request over HTTP (after connection is made) to upgrade to a WS connection */
-type WsRequest = { connect: void; connected: ConnectedEvent }
+type WsRequest = { connect: undefined; connected: ConnectedEvent }
 /** Represent an HTTP request (after initial connection is made) */
 type HttpRequest = { request: { body: string; blobs?: BlobRecords }; response: string }
 
@@ -60,7 +60,6 @@ export const createMethodHandler = (options: MethodTestingOptions): PrimServerMe
 				return
 			}
 			const httpServer = mitt<HttpRequest>()
-			// eslint-disable-next-line @typescript-eslint/no-misused-promises
 			httpServer.on("request", async ({ body, blobs }) => {
 				const { call } = server()
 				const response = await call({ body: String(body) }, blobs, context)
@@ -89,6 +88,7 @@ export const createCallbackHandler = (options: CallbackTestingOptions): PrimServ
 				wsSession.on("messageClient", m => {
 					call(
 						String(m),
+						// eslint-disable-next-line max-nested-callbacks
 						data => {
 							wsSession.emit("messageServer", data)
 						},

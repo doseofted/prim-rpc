@@ -8,7 +8,7 @@ import {
 	createMethodHandler,
 	createCallbackHandler,
 } from "./web-worker"
-import { exampleModule } from "./testing/server-worker"
+import type { exampleModule } from "./testing/server.worker"
 import * as example from "@doseofted/prim-example"
 
 function createClient(worker: Worker | SharedWorker) {
@@ -26,17 +26,17 @@ function createClient(worker: Worker | SharedWorker) {
 describe.each([
 	{
 		name: "Dedicated Worker",
-		...createClient(new Worker(new URL("./testing/server-worker", import.meta.url), { type: "module" })),
+		...createClient(new Worker(new URL("./testing/server.worker", import.meta.url), { type: "module" })),
 	},
 	{
 		name: "Shared Worker",
-		...createClient(new SharedWorker(new URL("./testing/server-shared", import.meta.url), { type: "module" })),
+		...createClient(new SharedWorker(new URL("./testing/server.sharedworker", import.meta.url), { type: "module" })),
 	},
 	// FIXME: In the browser, two Shared Workers can be started successfully but behavior of mock Shared Worker
 	// in Vitest appears to have different behavior. I need to find a way to test this without manually running the browser.
 	// {
 	// 	name: "Second Shared Worker",
-	// 	...createClient(new SharedWorker(new URL("./testing/server-shared", import.meta.url), { type: "module" })),
+	// 	...createClient(new SharedWorker(new URL("./testing/server.sharedworker", import.meta.url), { type: "module" })),
 	// },
 ])("$name: Main thread as client, worker as server", ({ client, worker }) => {
 	test("with single argument", () => {
@@ -120,13 +120,13 @@ describe.each([
 	{
 		name: "Dedicated Worker",
 		...createServerWithClientAccess(
-			new Worker(new URL("./testing/client-worker", import.meta.url), { type: "module" })
+			new Worker(new URL("./testing/client.worker", import.meta.url), { type: "module" })
 		),
 	},
 	{
 		name: "Shared Worker",
 		...createServerWithClientAccess(
-			new SharedWorker(new URL("./testing/client-shared", import.meta.url), { type: "module" })
+			new SharedWorker(new URL("./testing/client.sharedworker", import.meta.url), { type: "module" })
 		),
 	},
 ])("$name: Main thread as server, worker as client", ({ client, worker }) => {

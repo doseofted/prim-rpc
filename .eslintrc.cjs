@@ -1,55 +1,37 @@
 // @ts-check
 /** @type {import("eslint").ESLint.ConfigData} */
-const config = {
+module.exports = {
 	root: true,
+	extends: ["eslint:recommended", "plugin:@typescript-eslint/recommended-type-checked", "prettier"],
+	plugins: ["@typescript-eslint"],
+	parser: "@typescript-eslint/parser",
 	parserOptions: {
-		ecmaVersion: "latest",
-		sourceType: "module",
-		ecmaFeatures: {
-			jsx: true,
-		},
-	},
-	env: {
-		browser: true,
-		es2021: true,
-		node: true,
+		project: true,
+		tsconfigRootDir: __dirname,
+		// Needed for tsconfig project references
+		EXPERIMENTAL_useSourceOfProjectReferenceRedirect: true,
 	},
 	overrides: [
 		{
-			files: ["*.js", "*.jsx", "*.mjs", "*.cjs"],
-			extends: ["eslint:recommended", "prettier"],
-			rules: {
-				"no-unused-vars": ["error", { argsIgnorePattern: "^_" }],
-			},
-		},
-		{
-			files: ["*.ts", "*.tsx", "*.cts", "*.mts"],
-			parser: "@typescript-eslint/parser",
-			plugins: ["@typescript-eslint"],
-			parserOptions: {
-				tsconfigRootDir: __dirname,
-				sourceType: "module",
-				project: ["./tsconfig.json", "./libs/**/tsconfig.json", "./apps/**/tsconfig.json"],
-				ecmaFeatures: {
-					jsx: true,
-				},
-			},
-			extends: [
-				"eslint:recommended",
-				"plugin:@typescript-eslint/recommended",
-				"plugin:@typescript-eslint/recommended-requiring-type-checking",
-				"prettier",
-			],
-			rules: {
-				"no-unused-vars": ["off"],
-				"@typescript-eslint/no-unused-vars": ["error", { argsIgnorePattern: "^_" }],
-			},
+			files: ["*.js"],
+			extends: ["plugin:@typescript-eslint/disable-type-checked"],
 		},
 	],
+	env: {
+		browser: true,
+		node: true,
+		es2023: true,
+	},
+	ignorePatterns: [".eslintrc.*", "dist/", "/data/"],
+	globals: {},
+	rules: {
+		"@typescript-eslint/no-unused-vars": [
+			"warn",
+			{
+				argsIgnorePattern: "^_",
+				varsIgnorePattern: "^_",
+			},
+		],
+		"@typescript-eslint/no-misused-promises": ["warn", { checksVoidReturn: false }],
+	},
 }
-// Run command below to see final config
-// DEBUG_CONFIG=true node .eslintrc.cjs | jq
-if (process.env.DEBUG_CONFIG) {
-	console.log(JSON.stringify(config, null, "  "))
-}
-module.exports = config

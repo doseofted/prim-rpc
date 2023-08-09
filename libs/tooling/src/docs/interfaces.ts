@@ -35,7 +35,6 @@ export interface PrimParam extends PrimType, PrimComment {
 	name: string
 }
 export interface PrimReturn extends PrimType, PrimComment {}
-// eslint-disable-next-line @typescript-eslint/no-empty-interface
 export interface PrimThrow extends PrimComment {}
 export interface PrimMethodSignature extends PrimComment {
 	params: PrimParam[]

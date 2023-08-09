@@ -36,7 +36,7 @@ const createBaseClientOptions = (server = false): PrimOptions => ({
 	// NOTE: JSON properties are not enumerable so create an object with enumerable properties referencing JSON methods
 	jsonHandler: { stringify: JSON.stringify, parse: destr },
 	// `client()` is intended to be overridden so as not to force any one HTTP framework but default is fine for most cases
-	// eslint-disable-next-line @typescript-eslint/require-await
+	// eslint-disable-next-line @typescript-eslint/require-await -- Type definitions expects async function (even if not needed here)
 	methodPlugin: async (_endpoint, jsonBody) => {
 		const error = `Prim-RPC's method plugin was not provided (${server ? "server" : "client"})`
 		if (Array.isArray(jsonBody)) {
@@ -96,7 +96,7 @@ export function createPrimOptions<OptionsType extends PrimOptions = PrimOptions>
 	server = false
 ) {
 	// first initialize given options and values for which to fallback
-	const overrideBaseOptions = {} as OptionsType
+	const overrideBaseOptions: Partial<OptionsType> = {}
 	if (options?.jsonHandler) {
 		overrideBaseOptions.handleError = false
 	}

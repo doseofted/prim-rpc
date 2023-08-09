@@ -87,7 +87,7 @@ function createServerActions(
 				const entries = Object.entries(query)
 				// determine if positional arguments were given (must start at 0, none can be missing)
 				for (const [possibleIndex, value] of entries) {
-					const index = Number.parseInt(possibleIndex)
+					const index = Number.parseInt(possibleIndex, 10)
 					if (Number.isNaN(index)) {
 						break
 					}
@@ -163,7 +163,7 @@ function createServerActions(
 							possiblyMethodOnMethod =
 								typeof directPreviousPath === "function" &&
 								"rpc" in directPreviousPath &&
-								typeof directPreviousPath.rpc == "boolean" &&
+								typeof directPreviousPath.rpc === "boolean" &&
 								directPreviousPath.rpc
 						}
 						if (typeof targetLocal === "undefined" || targetLocal === null) {
@@ -172,7 +172,8 @@ function createServerActions(
 						if (typeof targetLocal !== "function") {
 							return { ...rpcBase, error: "Method was not callable" }
 						}
-						const methodAllowedDirectly = "rpc" in targetLocal && typeof targetLocal.rpc == "boolean" && targetLocal.rpc
+						const methodAllowedDirectly =
+							"rpc" in targetLocal && typeof targetLocal.rpc === "boolean" && targetLocal.rpc
 						if (!methodAllowedDirectly) {
 							const allowedInSchema =
 								Object.entries(serverOptions.allowList ?? {}).length > 0 &&
@@ -199,8 +200,7 @@ function createServerActions(
 					} else {
 						// If either the module wasn't provided or target doesn't exist (even if module does), send a request using
 						// a client that doesn't know about the module provided (will use provided plugin to server).
-						// eslint-disable-next-line @typescript-eslint/no-unused-vars
-						const { module: moduleProvided, ...limitedOptions } = serverOptions
+						const { module: _moduleProvided, ...limitedOptions } = serverOptions
 						// create client that doesn't have access to module (target may not exist but other targets might)
 						const { client: limitedClient, socketEvent: limitedEvent } = createPrimInstance(limitedOptions)
 						if (cbResults) {
@@ -335,7 +335,6 @@ function createSocketEvents(serverOptions: PrimServerOptions): PrimServerSocketE
  * @returns A function that expects JSON resembling an RPC call
  */
 export function createPrimServer<
-	// eslint-disable-next-line @typescript-eslint/no-unused-vars
 	ModuleType extends OptionsType["module"] = object,
 	// eslint-disable-next-line @typescript-eslint/no-unused-vars
 	Context extends ReturnType<OptionsType["context"]> = never,
@@ -345,7 +344,7 @@ export function createPrimServer<
 	// client options should be re-instantiated on every request
 	// TODO: instead of merging options, considering adding client options to server options as separate property
 	// and creating client options separately from server
-	const serverOptions = Object.freeze(Object.assign({}, createPrimOptions(options, true)))
+	const serverOptions = Object.freeze({ ...createPrimOptions(options, true) })
 	// TODO: consider emitting some kind of event once handlers are configured (for all that have resolved promises)
 	// this could be useful for plugins of a server framework where plugins must be given and resolved in order
 	const handlersRegistered = Promise.allSettled([

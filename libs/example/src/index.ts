@@ -305,7 +305,6 @@ lookAtThisMess.messy = { technicallyNotRpc: sayHelloAlternative, definitelyNotRp
 /** I don't mind unwrapping layers of needless properties. It makes me feel alive. */
 // eslint-disable-next-line @typescript-eslint/require-await
 export async function wrapReturn<U>(given: U) {
-	// eslint-disable-next-line @typescript-eslint/await-thenable
 	return { response: { ["v1.2.3"]: { entity: { data: [{ attributes: { given } }] } } } }
 }
 

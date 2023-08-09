@@ -26,7 +26,6 @@ interface PrimExpressPluginOptions extends SharedExpressOptions {
  *
  * To let Prim handle registration with Express, try importing `methodHandler` instead.
  */
-// eslint-disable-next-line @typescript-eslint/require-await
 export const expressPrimRpc = (options: PrimExpressPluginOptions) => {
 	const {
 		prim,
@@ -105,7 +104,6 @@ interface MethodExpressOptions extends SharedExpressOptions {
 export const createMethodHandler = (options: MethodExpressOptions): PrimServerMethodHandler => {
 	const { app } = options
 	return prim => {
-		// eslint-disable-next-line @typescript-eslint/no-misused-promises
-		void app.use(expressPrimRpc({ ...options, prim }))
+		app.use(expressPrimRpc({ ...options, prim }))
 	}
 }

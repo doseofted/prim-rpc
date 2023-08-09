@@ -2,6 +2,8 @@
 // Copyright 2023 Ted Klingenberg
 // SPDX-License-Identifier: Apache-2.0
 
+/* eslint-disable @typescript-eslint/unbound-method -- Test the unexpected */
+
 import { describe, test, expect } from "vitest"
 import { createPrimServer } from "."
 import { PrimServerActionsExtended, RpcAnswer, RpcCall } from "./interfaces"
@@ -154,7 +156,6 @@ describe("Prim Server cannot call non-RPC", () => {
 		// "just-safe-get" will not expand "." in if given `string[]` but will when given `string`
 		// This test is just to ensure a future upgrade doesn't change that
 		const testing = { abc: () => 123 }
-		// eslint-disable-next-line @typescript-eslint/unbound-method
 		const toStringFunc = testing.abc.toString
 		const retrievedPropFromString = justSafeGet(testing, "abc.toString") as () => string
 		const retrievedPropFromArray = justSafeGet(testing, "abc.toString".split("/")) as undefined

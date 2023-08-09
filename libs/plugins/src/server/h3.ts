@@ -15,7 +15,6 @@ import {
 	H3Event,
 } from "h3"
 
-// eslint-disable-next-line @typescript-eslint/no-empty-interface
 interface SharedH3Options {
 	contextTransform?: (event: H3Event) => { context: "h3"; event: H3Event }
 }

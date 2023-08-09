@@ -25,7 +25,6 @@ interface PrimFastifyPluginOptions extends SharedFastifyOptions {
  *
  * To let Prim handle registration with Fastify, try importing `createMethodHandler` instead.
  */
-// eslint-disable-next-line @typescript-eslint/require-await
 export const fastifyPrimRpc: FastifyPluginAsync<PrimFastifyPluginOptions> = async (fastify, options) => {
 	const {
 		prim,
