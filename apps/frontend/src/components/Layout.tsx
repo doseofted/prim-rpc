@@ -15,11 +15,9 @@ export default function Layout(props: LayoutProps) {
 	const { children, ...attrs } = props
 	const router = useRouter()
 	const homepage = useMemo(() => router.pathname === "/", [router.pathname])
-	// eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
 	const snapshot = useSnapshot(websiteState)
 	return (
 		<div {...attrs} className={["bg-prim-space", attrs.className].join(" ")}>
-			{/* eslint-disable-next-line @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-unsafe-member-access */}
 			<LightsProvider disable={!snapshot.useLightEffect} options={{ size: 500 }} blur={25} saturate={1.3}>
 				{/* NOTE: using overflow-hidden below may mean that children can't use sticky positioning (if needed for table of contents) */}
 				<div className="relative min-h-[100svh] w-full z-2">

@@ -1,0 +1,8 @@
+{
+	"compilerOptions": {
+		"lib": ["DOM", "WebWorker", "ESNext"],
+		"composite": true
+	},
+	"extends": "../../tsconfig.json",
+	"include": ["src/ipc/web-worker.ts", "src/**/*.worker.ts", "src/**/*.sharedworker.ts"]
+}

@@ -61,7 +61,7 @@ export function iterateDocs<T extends PrimRootStructureKeys, U extends T extends
  * @returns The method requested in your module
  */
 export function getFunctionForDocumentation<
-	Given extends (...args: unknown[]) => unknown = (...args: unknown[]) => unknown
+	Given extends (...args: unknown[]) => unknown = (...args: unknown[]) => unknown,
 >(
 	docs: PrimRpcDocs,
 	module: unknown,

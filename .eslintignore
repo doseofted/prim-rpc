@@ -1,8 +1,0 @@
-# don't lint node_modules
-node_modules
-# don't lint build output
-dist
-# ignore data folder of this project
-/data
-# for some reason eslint is trying to lint this file even though it doesn't exist (but build.config.js does?)
-build.config.mjs

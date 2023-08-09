@@ -66,125 +66,128 @@ export function createPrimClient<
 	// Once promise and possible wrapper function are removed from module, store to avoid unwrapping again unnecessarily
 	let determinedModule: ModuleType
 	// SECTION Proxy to handle function calls
-	const proxy = new ProxyDeep<ModuleType>({} as ModuleType, {
-		apply(_target, targetContext, givenArgs: unknown[]) {
-			// NOTE: client could've been given either Promise or function that resolves to Promise (dynamic imports)
-			function applySync(givenPath: string[], givenModule: ModuleType, targetContext: unknown, givenArgs: unknown[]) {
-				// SECTION Server-side module handling
-				const targetFunction = getProperty(givenModule, givenPath) as ModuleType
-				const targetIsCallable = typeof targetFunction === "function"
-				if (targetIsCallable) {
-					// if an argument is a callback reference, the created callback below will send the result back to client
-					const argsWithListeners = givenArgs.map(arg => {
-						const argIsReferenceToCallback = typeof arg === "string" && arg.startsWith(CB_PREFIX)
-						if (!argIsReferenceToCallback) {
+	const proxy = new ProxyDeep(
+		{},
+		{
+			apply(_target, targetContext, givenArgs: unknown[]) {
+				// NOTE: client could've been given either Promise or function that resolves to Promise (dynamic imports)
+				function applySync(givenPath: string[], givenModule: ModuleType, targetContext: unknown, givenArgs: unknown[]) {
+					// SECTION Server-side module handling
+					const targetFunction = getProperty(givenModule, givenPath) as ModuleType
+					const targetIsCallable = typeof targetFunction === "function"
+					if (targetIsCallable) {
+						// if an argument is a callback reference, the created callback below will send the result back to client
+						const argsWithListeners = givenArgs.map(arg => {
+							const argIsReferenceToCallback = typeof arg === "string" && arg.startsWith(CB_PREFIX)
+							if (!argIsReferenceToCallback) {
+								return arg
+							}
+							return (...cbArgs: unknown[]) => {
+								wsEvent.emit("response", { result: cbArgs, id: arg })
+								// NOTE: today, callbacks can be called but server cannot see return value given by client
+								// TODO: when callback given to method defined on client returns value, emit event to server
+								// TODO: listen for callback return value on server, return value to called method as callback return value
+								// NOTE: return value of callback on server will have to be awaited since result is from client
+							}
+						})
+						const functionResult = Reflect.apply(targetFunction, targetContext, argsWithListeners)
+						return functionResult
+					}
+					// !SECTION
+					// SECTION Client-side module handling
+					let callbacksWereGiven = false
+					const blobs: BlobRecords = {}
+					const args = givenArgs.map(arg => {
+						if (configured.handleBlobs) {
+							const [replacedArg, newBlobs, givenFromFormElement] = handlePossibleBlobs(arg)
+							const blobEntries = Object.entries(newBlobs)
+							for (const [key, val] of blobEntries) {
+								blobs[key] = val
+							}
+							if (givenFromFormElement || blobEntries.length > 0) {
+								return replacedArg
+							}
+						}
+						const callbackArg = typeof arg === "function" ? arg : false
+						if (!callbackArg) {
 							return arg
 						}
-						return (...cbArgs: unknown[]) => {
-							wsEvent.emit("response", { result: cbArgs, id: arg })
-							// NOTE: today, callbacks can be called but server cannot see return value given by client
-							// TODO: when callback given to method defined on client returns value, emit event to server
-							// TODO: listen for callback return value on server, return value to called method as callback return value
-							// NOTE: return value of callback on server will have to be awaited since result is from client
+						callbacksWereGiven = true
+						const callbackReferenceIdentifier = [CB_PREFIX, nanoid()].join("")
+						const handleRpcCallbackResult = (msg: RpcAnswer) => {
+							if (msg.id !== callbackReferenceIdentifier) {
+								return
+							}
+							const targetArgs = Array.isArray(msg.result) ? msg.result : [msg.result]
+							Reflect.apply(callbackArg, undefined, targetArgs)
+							// NOTE: it's hard to unbind until I know that callback won't fire anymore
+							wsEvent.on("ended", () => {
+								wsEvent.off("response", handleRpcCallbackResult)
+							})
 						}
+						wsEvent.on("response", handleRpcCallbackResult)
+						return callbackReferenceIdentifier
 					})
-					const functionResult = Reflect.apply(targetFunction, targetContext, argsWithListeners)
-					return functionResult
-				}
-				// !SECTION
-				// SECTION Client-side module handling
-				let callbacksWereGiven = false
-				const blobs: BlobRecords = {}
-				const args = givenArgs.map(arg => {
-					if (configured.handleBlobs) {
-						const [replacedArg, newBlobs, givenFromFormElement] = handlePossibleBlobs(arg)
-						const blobEntries = Object.entries(newBlobs)
-						for (const [key, val] of blobEntries) {
-							blobs[key] = val
-						}
-						if (givenFromFormElement || blobEntries.length > 0) {
-							return replacedArg
-						}
-					}
-					const callbackArg = typeof arg === "function" ? arg : false
-					if (!callbackArg) {
-						return arg
-					}
-					callbacksWereGiven = true
-					const callbackReferenceIdentifier = [CB_PREFIX, nanoid()].join("")
-					const handleRpcCallbackResult = (msg: RpcAnswer) => {
-						if (msg.id !== callbackReferenceIdentifier) {
-							return
-						}
-						const targetArgs = Array.isArray(msg.result) ? msg.result : [msg.result]
-						Reflect.apply(callbackArg, undefined, targetArgs)
-						// NOTE: it's hard to unbind until I know that callback won't fire anymore
-						wsEvent.on("ended", () => {
-							wsEvent.off("response", handleRpcCallbackResult)
+					const rpcBase: Partial<RpcCall> = useVersionInRpc ? { prim: primMajorVersion } : {}
+					const rpc: RpcCall = { ...rpcBase, method: givenPath.join("/"), args: args, id: nanoid() }
+					if ((callbackPluginGiven && callbacksWereGiven) || !methodPluginGiven) {
+						// TODO: add fallback in case client cannot support websocket
+						const result = new Promise<RpcAnswer>((resolve, reject) => {
+							wsEvent.on("response", answer => {
+								if (rpc.id !== answer.id) {
+									return
+								}
+								if (answer.error) {
+									// TODO: if callback result, handle potential Errors (as given in options)
+									reject(answer.error)
+								} else {
+									resolve(answer.result)
+								}
+							})
 						})
+						sendMessage(rpc, blobs)
+						return result
 					}
-					wsEvent.on("response", handleRpcCallbackResult)
-					return callbackReferenceIdentifier
-				})
-				const rpcBase: Partial<RpcCall> = useVersionInRpc ? { prim: primMajorVersion } : {}
-				const rpc: RpcCall = { ...rpcBase, method: givenPath.join("/"), args: args, id: nanoid() }
-				if ((callbackPluginGiven && callbacksWereGiven) || !methodPluginGiven) {
-					// TODO: add fallback in case client cannot support websocket
+					// TODO: consider extending Promise to include methods like `.refetch()` or `.stopListening()` (for callbacks)
+					// NOTE: if promises are extended, this also needs to be done on results returned with callbacks (above)
+					// NOTE: If I ever decide to chain methods, those methods would also have to extend the Promise
 					const result = new Promise<RpcAnswer>((resolve, reject) => {
-						wsEvent.on("response", answer => {
+						httpEvent.on("response", answer => {
 							if (rpc.id !== answer.id) {
 								return
 							}
 							if (answer.error) {
-								// TODO: if callback result, handle potential Errors (as given in options)
+								if (configured.handleError) {
+									answer.error = deserializeError(answer.error)
+								}
 								reject(answer.error)
 							} else {
 								resolve(answer.result)
 							}
 						})
 					})
-					sendMessage(rpc, blobs)
+					httpEvent.emit("queue", { rpc, result, blobs, resolved: PromiseResolveStatus.Unhandled })
 					return result
+					// !SECTION
 				}
-				// TODO: consider extending Promise to include methods like `.refetch()` or `.stopListening()` (for callbacks)
-				// NOTE: if promises are extended, this also needs to be done on results returned with callbacks (above)
-				// NOTE: If I ever decide to chain methods, those methods would also have to extend the Promise
-				const result = new Promise<RpcAnswer>((resolve, reject) => {
-					httpEvent.on("response", answer => {
-						if (rpc.id !== answer.id) {
-							return
-						}
-						if (answer.error) {
-							if (configured.handleError) {
-								answer.error = deserializeError(answer.error)
-							}
-							reject(answer.error)
-						} else {
-							resolve(answer.result)
-						}
-					})
-				})
-				httpEvent.emit("queue", { rpc, result, blobs, resolved: PromiseResolveStatus.Unhandled })
-				return result
-				// !SECTION
-			}
-			if (determinedModule) {
-				return applySync(this.path, determinedModule, targetContext, givenArgs)
-			}
-			if (givenModulePromise instanceof Promise) {
-				return givenModulePromise.then(givenModule => {
-					determinedModule = givenModule
+				if (determinedModule) {
 					return applySync(this.path, determinedModule, targetContext, givenArgs)
-				})
-			} else {
-				determinedModule = givenModulePromise
-				return applySync(this.path, determinedModule, targetContext, givenArgs)
-			}
-		},
-		get(_target, _prop, _receiver) {
-			return this.nest(() => undefined)
-		},
-	})
+				}
+				if (givenModulePromise instanceof Promise) {
+					return givenModulePromise.then(givenModule => {
+						determinedModule = givenModule
+						return applySync(this.path, determinedModule, targetContext, givenArgs)
+					})
+				} else {
+					determinedModule = givenModulePromise
+					return applySync(this.path, determinedModule, targetContext, givenArgs)
+				}
+			},
+			get(_target, _prop, _receiver) {
+				return this.nest(() => undefined)
+			},
+		}
+	)
 	// !SECTION
 	// SECTION: WebSocket event handling
 	const wsEvent = configured.internal.socketEvent ?? mitt<PrimWebSocketEvents>()
@@ -285,7 +288,7 @@ export function createPrimClient<
 		timer = setTimeout(handleRpcCallsMethodPlugin, configured.clientBatchTime)
 	}
 	// !SECTION
-	const client = proxy as unknown as PromisifiedModule<ModuleType>
+	const client = proxy as PromisifiedModule<ModuleType>
 	// function destroy() {
 	// 	wsDestroyedEvents.forEach(shutDown => shutDown())
 	// 	wsEvent.all.clear()

@@ -53,7 +53,7 @@ function checkRpcBase<T extends RpcBase>(given: unknown) {
  */
 export function checkRpcCall<
 	T = unknown,
-	V = T extends unknown[] ? RpcCall<string, unknown[]>[] : RpcCall<string, unknown[]>
+	V = T extends unknown[] ? RpcCall<string, unknown[]>[] : RpcCall<string, unknown[]>,
 >(given: T): V {
 	if (Array.isArray(given)) {
 		return given.map(g => checkRpcCall(g)) as V
@@ -82,7 +82,6 @@ export function checkRpcResult<T = unknown, V = T extends unknown[] ? RpcAnswer[
 	if (Array.isArray(given)) {
 		return given.map(g => checkRpcResult(g)) as V
 	}
-	// eslint-disable-next-line @typescript-eslint/no-unused-vars
 	const { toError, toBase: toResult, givenRpc } = checkRpcBase<RpcAnswer>(given)
 	const result = "result" in givenRpc ? givenRpc.result : NotGiven
 	if (result !== NotGiven) {

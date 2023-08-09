@@ -2,6 +2,11 @@
 // Copyright 2023 Ted Klingenberg
 // SPDX-License-Identifier: Apache-2.0
 
+/* eslint-disable @typescript-eslint/no-explicit-any -- Test the unexpected */
+/* eslint-disable @typescript-eslint/no-unsafe-call -- Test the unexpected */
+/* eslint-disable @typescript-eslint/no-unsafe-member-access -- Test the unexpected */
+/* eslint-disable @typescript-eslint/no-unsafe-return -- Test the unexpected */
+
 import { describe, test, expect } from "vitest"
 import { createPrimClient, createPrimServer } from "."
 import type * as exampleClient from "@doseofted/prim-example"
@@ -63,11 +68,9 @@ describe("Prim Client cannot call non-RPC", () => {
 		const { callbackPlugin, methodPlugin, callbackHandler, methodHandler } = createPrimTestingPlugins()
 		createPrimServer({ module, callbackHandler, methodHandler })
 		const prim = createPrimClient<IModule>({ callbackPlugin, methodPlugin })
-		// eslint-disable-next-line @typescript-eslint/no-unsafe-return, @typescript-eslint/no-unsafe-call, @typescript-eslint/no-explicit-any, @typescript-eslint/no-unsafe-member-access
 		const functionCall1 = () => (prim as any).superSecret.myApiKey()
 		expect(prim.superSecret).toBeTypeOf("function")
 		await expect(functionCall1()).rejects.toThrow("Method was not callable")
-		// eslint-disable-next-line @typescript-eslint/no-unsafe-return, @typescript-eslint/no-unsafe-call, @typescript-eslint/no-explicit-any, @typescript-eslint/no-unsafe-member-access
 		const functionCall2 = () => (prim as any).superSecret2()
 		await expect(functionCall2()).rejects.toThrow("Method was not callable")
 	})
@@ -88,14 +91,12 @@ describe("Prim Client cannot call non-RPC", () => {
 		const functionCall1 = () => prim.greetings.toString()
 		await expect(functionCall1()).rejects.toThrow("Method was not valid")
 		// this is not valid because, while the method-on-method is allowed, it's called on the prototype
-		// eslint-disable-next-line @typescript-eslint/no-unsafe-member-access, @typescript-eslint/no-unsafe-call, @typescript-eslint/no-unsafe-return
 		const functionCall2 = () => prim.lookAtThisMess.prototype.somethingMadeUp()
 		await expect(functionCall2()).rejects.toThrow("Method was not valid")
 		// below is not valid because "docs" method-on-method is not in the allowed list
 		const functionCall3 = () => prim.lookAtThisMess.docs()
 		await expect(functionCall3()).rejects.toThrow("Method on method was not allowed")
 		// below is not valid because method-on-method is not defined directly on a function
-		// eslint-disable-next-line @typescript-eslint/no-unsafe-return, @typescript-eslint/no-unsafe-member-access, @typescript-eslint/no-unsafe-call, @typescript-eslint/no-explicit-any
 		const functionCall4 = () => (prim.lookAtThisMess as any).messy.technicallyNotRpc("Hi", "there")
 		await expect(functionCall4()).rejects.toThrow("Method on method was not valid")
 	})
@@ -267,7 +268,6 @@ describe("Prim Client can batch RPC calls over HTTP", () => {
 			return results
 		}
 		const expected = calls(module)
-		// eslint-disable-next-line @typescript-eslint/no-unsafe-return
 		const result = Promise.allSettled(calls(prim)).then(list => list.map(r => ("value" in r ? r.value : r.reason)))
 		await expect(result).resolves.toEqual(expected)
 	})

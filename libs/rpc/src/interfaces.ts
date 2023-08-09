@@ -120,7 +120,7 @@ type PromisifiedModuleDirect<
 // NOTE: this is a non-recursive version of default `Awaited` type that comes with TypeScript
 type PromisifiedModuleDynamicImport<ModuleGiven extends object> = ModuleGiven extends object & {
 	// eslint-disable-next-line @typescript-eslint/no-explicit-any
-	then(onfulfilled: infer F, ...args: infer _): any
+	then: (onfulfilled: infer F, ...args: infer _) => any
 }
 	? // eslint-disable-next-line @typescript-eslint/no-explicit-any
 	  F extends (value: infer V, ...args: infer _) => any

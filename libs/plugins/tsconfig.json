@@ -1,12 +1,9 @@
 {
 	"compilerOptions": {
-		"target": "ES2020",
-		"module": "ES2020",
-		"moduleResolution": "Node",
-		"esModuleInterop": true,
-		"isolatedModules": true,
-		"lib": ["DOM", "ES2020", "WebWorker"]
+		// NOTE: WebWorker is not needed here (included in .references) but ESLint complains if it's not included
+		"lib": ["DOM", "ESNext", "WebWorker"]
 	},
+	"extends": "../../tsconfig.json",
 	"include": ["src/**/*"],
-	"exclude": ["src/**/*.test.ts"]
+	"references": [{ "path": "./tsconfig.worker.json" }]
 }

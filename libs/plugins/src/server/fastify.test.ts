@@ -2,6 +2,8 @@
 // Copyright 2023 Ted Klingenberg
 // SPDX-License-Identifier: Apache-2.0
 
+/* eslint-disable @typescript-eslint/no-unsafe-member-access -- `request` doesn't have full type definitions */
+
 import { describe, test, beforeEach, afterEach, expect } from "vitest"
 import request from "superwstest"
 import * as module from "@doseofted/prim-example"
@@ -41,7 +43,6 @@ describe("Fastify plugin is functional as Prim Plugin", () => {
 				id: 1,
 			})
 			.set("accept", "application/json")
-		// eslint-disable-next-line @typescript-eslint/no-unsafe-member-access
 		expect(response.headers["content-type"]).toContain("application/json")
 		expect(response.status).toEqual(200)
 		expect(response.body).toEqual(expected)
@@ -76,7 +77,6 @@ describe("Fastify plugin is functional as Fastify plugin", async () => {
 				id: 1,
 			})
 			.set("accept", "application/json")
-		// eslint-disable-next-line @typescript-eslint/no-unsafe-member-access
 		expect(response.headers["content-type"]).toContain("application/json")
 		expect(response.status).toEqual(200)
 		expect(response.body).toEqual(expected)
@@ -111,7 +111,6 @@ describe("Fastify plugin works with over GET/POST", () => {
 				id: 1,
 			})
 			.set("accept", "application/json")
-		// eslint-disable-next-line @typescript-eslint/no-unsafe-member-access
 		expect(response.headers["content-type"]).toContain("application/json")
 		expect(response.status).toEqual(200)
 		expect(response.body).toEqual(expected)
@@ -122,7 +121,6 @@ describe("Fastify plugin works with over GET/POST", () => {
 			query: { ...args, "-": 1 },
 		})
 		const response = await request(fastify.server).get(url).send().set("accept", "application/json")
-		// eslint-disable-next-line @typescript-eslint/no-unsafe-member-access
 		expect(response.headers["content-type"]).toContain("application/json")
 		expect(response.status).toEqual(200)
 		expect(response.body).toEqual(expected)
@@ -166,7 +164,6 @@ describe("Fastify plugin can support files", async () => {
 			.send(formData.getBuffer())
 			.set("content-type", `multipart/form-data; boundary=${formData.getBoundary()}`)
 			.set("accept", "application/json")
-		// eslint-disable-next-line @typescript-eslint/no-unsafe-member-access
 		expect(response.headers["content-type"]).toContain("application/json")
 		expect(response.status).toEqual(200)
 		expect(response.body).toEqual(expected)

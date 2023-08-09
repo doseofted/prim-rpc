@@ -44,12 +44,12 @@
 		"editor.detectIndentation": true,
 		"editor.insertSpaces": false,
 		"editor.wordWrapColumn": 120,
+		"editor.defaultFormatter": "esbenp.prettier-vscode",
 		"editor.codeActionsOnSave": {
 			"source.fixAll": true
 		},
 		"editor.linkedEditing": true,
 		"editor.formatOnSave": true,
-		"editor.defaultFormatter": "esbenp.prettier-vscode",
 		"workbench.editor.pinnedTabSizing": "compact",
 		"npm.packageManager": "auto",
 		"stylelint.validate": ["css", "less", "postcss", "scss"],

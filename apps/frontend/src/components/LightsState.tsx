@@ -1,5 +1,3 @@
-/* eslint-disable @typescript-eslint/no-unsafe-return, @typescript-eslint/no-unsafe-argument */
-/* eslint-disable @typescript-eslint/no-unsafe-member-access, @typescript-eslint/no-unsafe-assignment */
 import { random } from "lodash-es"
 import { useEffect, useMemo, useState } from "react"
 import { useToggle } from "react-use"
@@ -68,8 +66,7 @@ export function LightState(props: LightStateProps) {
 	}, [configured])
 	const [options, setOptions] = useState(optionsGiven)
 	const lightReady = useMemo(() => Object.keys(configured).length > 0, [configured])
-	// eslint-disable-next-line @typescript-eslint/no-unused-vars
-	const [jitter, setJitter] = useToggle(false)
+	const [_jitter, setJitter] = useToggle(false)
 	useEffect(() => {
 		if (!lightReady) {
 			return
@@ -90,7 +87,7 @@ export function LightState(props: LightStateProps) {
 		return () => {
 			cancellations.map(cancelId => clearTimeout(cancelId))
 		}
-	}, [state, lightReady])
+	}, [state, lightReady, timelines, setJitter])
 	// useInterval(() => console.log("jitter"), jitter ? 1000 : null)
 	return (
 		<Light {...attrs} options={options} onOptionsSet={opts => setConfigured(opts)}>

@@ -21,7 +21,7 @@ import mitt from "mitt"
  * Useful when structured cloning is used with Web Workers.
  */
 export const jsonHandler: JsonHandler = {
-	// eslint-disable-next-line @typescript-eslint/no-unsafe-return, @typescript-eslint/no-explicit-any
+	// eslint-disable-next-line @typescript-eslint/no-unsafe-return
 	parse: given => given,
 	// eslint-disable-next-line @typescript-eslint/no-unsafe-return
 	stringify: given => given,
@@ -38,7 +38,6 @@ interface SharedWebWorkerOptions {
 
 // SECTION Callback handler / plugin
 
-// eslint-disable-next-line @typescript-eslint/no-empty-interface
 interface CallbackPluginWebWorkerOptions extends SharedWebWorkerOptions {}
 export const createCallbackPlugin = (options: CallbackPluginWebWorkerOptions) => {
 	const transport = setupMessageTransport(options)
@@ -68,7 +67,6 @@ export const createCallbackPlugin = (options: CallbackPluginWebWorkerOptions) =>
 	return callbackPlugin
 }
 
-// eslint-disable-next-line @typescript-eslint/no-empty-interface
 interface CallbackHandlerWebWorkerOptions extends SharedWebWorkerOptions {}
 export const createCallbackHandler = (options: CallbackHandlerWebWorkerOptions) => {
 	const transport = setupMessageTransport(options)
@@ -92,7 +90,6 @@ export const createCallbackHandler = (options: CallbackHandlerWebWorkerOptions) 
 
 // SECTION Method handler / plugin
 
-// eslint-disable-next-line @typescript-eslint/no-empty-interface
 interface MethodPluginWebWorkerOptions extends SharedWebWorkerOptions {}
 export const createMethodPlugin = (options: MethodPluginWebWorkerOptions) => {
 	const transport = setupMessageTransport(options)
@@ -112,14 +109,12 @@ export const createMethodPlugin = (options: MethodPluginWebWorkerOptions) => {
 	return methodPlugin
 }
 
-// eslint-disable-next-line @typescript-eslint/no-empty-interface
 interface MethodHandlerWebWorkerOptions extends SharedWebWorkerOptions {}
 export const createMethodHandler = (options: MethodHandlerWebWorkerOptions) => {
 	const transport = setupMessageTransport(options)
 	const methodHandler: PrimServerMethodHandler = prim => {
 		const jsonHandler = prim.options.jsonHandler
 		transport.on("method:connect", id => {
-			// eslint-disable-next-line @typescript-eslint/no-misused-promises
 			transport.on(`request:${id}`, async ({ rpc, blobs }) => {
 				// eslint-disable-next-line @typescript-eslint/no-unsafe-argument
 				const result = await prim.server().prepareRpc(jsonHandler.parse(rpc), blobs)
@@ -159,7 +154,6 @@ type PrimEventStructure<T extends PrimEventName> = { event: T; data: PrimEventDe
 const ports: MessagePort[] = []
 
 function setupMessageTransport(options: SharedWebWorkerOptions) {
-	// eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
 	const { worker, context } = options
 	const eventsReceived = mitt<PrimEventDetail>()
 	const callback = ({ data: given }: MessageEvent<PrimEventStructure<PrimEventName>>) => {
@@ -172,7 +166,6 @@ function setupMessageTransport(options: SharedWebWorkerOptions) {
 		(typeof DedicatedWorkerGlobalScope !== "undefined" && given instanceof DedicatedWorkerGlobalScope)
 	const isWebWorkerContext = checkWebContext(worker)
 	if (isWebWorker || isWebWorkerContext) {
-		// eslint-disable-next-line @typescript-eslint/no-unsafe-member-access, @typescript-eslint/no-unsafe-call
 		worker.addEventListener("message", callback)
 	}
 	const isSharedWorker = typeof SharedWorker !== "undefined" && worker instanceof SharedWorker
@@ -185,20 +178,13 @@ function setupMessageTransport(options: SharedWebWorkerOptions) {
 		(typeof SharedWorkerGlobalScope !== "undefined" && given instanceof SharedWorkerGlobalScope)
 	const isSharedWorkerContext = checkSharedContext(worker)
 	if (isSharedWorkerContext) {
-		// eslint-disable-next-line @typescript-eslint/no-unsafe-member-access, @typescript-eslint/no-unsafe-call
 		worker.addEventListener("connect", event => {
-			// eslint-disable-next-line @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-unsafe-member-access
 			const [port] = event.ports
-			// eslint-disable-next-line @typescript-eslint/no-unsafe-argument
 			if (ports.includes(port)) {
-				// eslint-disable-next-line @typescript-eslint/no-unsafe-member-access, @typescript-eslint/no-unsafe-call
 				port.addEventListener("message", callback)
 			} else {
-				// eslint-disable-next-line @typescript-eslint/no-unsafe-argument
 				ports.push(port)
-				// eslint-disable-next-line @typescript-eslint/no-unsafe-member-access, @typescript-eslint/no-unsafe-call
 				port.addEventListener("message", callback)
-				// eslint-disable-next-line @typescript-eslint/no-unsafe-member-access, @typescript-eslint/no-unsafe-call
 				port.start()
 			}
 		})
@@ -211,7 +197,6 @@ function setupMessageTransport(options: SharedWebWorkerOptions) {
 		send<T extends PrimEventName>(event: T, data: PrimEventDetail[T]) {
 			// console.log("send", event)
 			if (isWebWorker || isWebWorkerContext) {
-				// eslint-disable-next-line @typescript-eslint/no-unsafe-member-access, @typescript-eslint/no-unsafe-call
 				worker.postMessage({ event, data })
 			}
 			if (isSharedWorker) {
@@ -226,7 +211,6 @@ function setupMessageTransport(options: SharedWebWorkerOptions) {
 		destroy() {
 			eventsReceived.all.clear()
 			if (isWebWorker || isWebWorkerContext) {
-				// eslint-disable-next-line @typescript-eslint/no-unsafe-member-access, @typescript-eslint/no-unsafe-call
 				worker.removeEventListener("message", callback)
 			}
 			if (isSharedWorker) {

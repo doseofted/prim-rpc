@@ -9,7 +9,10 @@ const errorMessages = {
 export class PrimRpcError extends Error {
 	public primRpc = true
 
-	constructor(public code: PrimErr, messageOverride?: string) {
+	public constructor(
+		public code: PrimErr,
+		messageOverride?: string
+	) {
 		super(messageOverride || errorMessages[code])
 	}
 }
