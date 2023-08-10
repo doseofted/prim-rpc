@@ -1,3 +1,7 @@
+> **Warning**
+>
+> Prim+RPC is prerelease software. It may be unstable and functionality may change.
+
 [![Prim+RPC. Pictured are two very short JavaScript files: a simple function on the server-side and a call to that function on the client-side. Tagline: "Backend, meet Frontend"](./misc/docs-screenshot.png)](https://prim.doseofted.me/)
 
 [![npm](https://img.shields.io/npm/v/@doseofted/prim-rpc)](https://www.npmjs.com/package/@doseofted/prim-rpc)
@@ -9,12 +13,8 @@ library is making plain function calls to a server from some client (RPC), as if
 client itself. The goal is to write plain JavaScript, or TypeScript if you prefer, and immediately invoke typed code
 without verbose wrappers around the communication channel.
 
-You're reading the developer/contributor documentation. For library usage, please
+You're reading the **project development documentation**. To get started with Prim+RPC,
 [see the official documentation website](https://prim.doseofted.me/).
-
-> **Warning**
->
-> Prim+RPC is prerelease software. It may be unstable and functionality may change.
 
 [📖 Read the Documentation](https://prim.doseofted.me/) ∙ [💡 Try an Example](https://prim.doseofted.me/docs/examples) ∙
 [⚙️ Installation](https://prim.doseofted.me/docs/setup#installation) ∙ [🧑‍💻 Follow Ted](https://doseofted.me/)
