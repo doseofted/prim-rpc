@@ -11,31 +11,13 @@ without verbose wrappers around the communication channel.
 [📖 Read the Documentation](https://prim.doseofted.me/) ∙ [💡 Try an Example](https://prim.doseofted.me/docs/examples) ∙
 [⚙️ Installation](https://prim.doseofted.me/docs/setup#installation) ∙ [🧑‍💻 Follow Ted](https://doseofted.me/)
 
-You're reading the **project development documentation**. To get started with Prim+RPC,
-[see the official documentation website](https://prim.doseofted.me/).
-
 > **Warning**
 >
 > Prim+RPC is prerelease software. It may be unstable and functionality may change.
 
-## Support
+## Contributions
 
-You can support Prim+RPC by [starring the repository](https://github.com/doseofted/prim-rpc), sharing with others,
-contributing code (either to the core or plugins), sponsoring the project, or [following Ted](https://doseofted.me/) for
-project updates.
-
-## Security
-
-See the [Security Policy](./SECURITY.md).
-
-## Issues
-
-If you discover an issue with Prim+RPC unrelated to security, search open issues and discussions in this repository to
-determine if someone else has faced the same issue. Otherwise, feel free to report an issue _with_ a minimal
-reproduction (consider [using an example](https://github.com/doseofted/prim-rpc-examples) as a starting point).
-
-If you have any questions or are having trouble using Prim+RPC, open a
-[new discussion](https://github.com/doseofted/prim-rpc/discussions).
+See the [Contribution Guide](./CONTRIBUTING.md).
 
 ## Development
 
@@ -55,9 +37,24 @@ If you prefer to work in Docker, configure the [`.env` file](./.env.example) and
 on [Docker/Compose](https://docs.docker.com/get-docker/) and [mkcert](https://github.com/FiloSottile/mkcert)). When
 finished, run `pnpm task compose:dev:down`.
 
-## Contributions
+## Support
 
-See the [Contribution Guide](./CONTRIBUTING.md).
+You can support Prim+RPC by [starring the repository](https://github.com/doseofted/prim-rpc), sharing with others,
+contributing code (either to the core or plugins), sponsoring the project, or [following Ted](https://doseofted.me/) for
+project updates.
+
+## Issues
+
+If you discover an issue with Prim+RPC [unrelated to security](./SECURITY.md), search open issues and discussions in
+this repository to determine if someone else has faced the same issue. Otherwise, feel free to report an issue _with_ a
+minimal reproduction (consider [using an example](https://github.com/doseofted/prim-rpc-examples) as a starting point).
+
+If you have any questions or are having trouble using Prim+RPC, open a
+[new discussion](https://github.com/doseofted/prim-rpc/discussions).
+
+## Security
+
+See the [Security Policy](./SECURITY.md).
 
 ## Release Plan
 
