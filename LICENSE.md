@@ -15,5 +15,7 @@ This is a monolithic repository consisting of several projects. Individual proje
 You will find a license file (`LICENSE`) in each project's folder that describes the detailed license for which it is
 made available. If a license is not made available then it is proprietary meaning that usage is unauthorized.
 
-> **Warning** The Prim+RPC name and logo (as well as the Dose of Ted logo) are excluded from all licenses and usage of
-> them outside of fair use is strictly prohibited.
+> **Warning**
+>
+> The Prim+RPC name and logo (as well as the Dose of Ted logo) are excluded from all licenses and usage of them outside
+> of fair use is strictly prohibited.

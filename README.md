@@ -9,10 +9,15 @@ library is making plain function calls to a server from some client (RPC), as if
 client itself. The goal is to write plain JavaScript, or TypeScript if you prefer, and immediately invoke typed code
 without verbose wrappers around the communication channel.
 
-> **Warning** Prim+RPC is prerelease software. It may be unstable and functionality may change.
+You're reading the developer/contributor documentation. For library usage, please
+[see the official documentation website](https://prim.doseofted.me/).
 
-[Read the Documentation](https://prim.doseofted.me/) ∙ [Try an Example](https://prim.doseofted.me/docs/examples) ∙
-[Installation](https://prim.doseofted.me/docs/setup#installation) ∙ [Follow Ted](https://doseofted.me/)
+> **Warning**
+>
+> Prim+RPC is prerelease software. It may be unstable and functionality may change.
+
+[📖 Read the Documentation](https://prim.doseofted.me/) ∙ [💡 Try an Example](https://prim.doseofted.me/docs/examples) ∙
+[⚙️ Installation](https://prim.doseofted.me/docs/setup#installation) ∙ [🧑‍💻 Follow Ted](https://doseofted.me/)
 
 ## Support
 

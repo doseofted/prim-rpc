@@ -4,10 +4,11 @@ Prim+RPC depends on handlers/plugins to work with a wide variety of frameworks. 
 difficult to integrate with when one is not familiar with the framework. Contributions for handlers/plugins or to rest
 of the project are welcome!
 
-> **Warning** It is possible that a feature is already being or has been developed or that a feature may have already
-> been rejected. If you'd like to contribute to the project,
-> [open an issue first](https://github.com/doseofted/prim-rpc/issues/new) and describe what change that you would like
-> to make.
+> **Warning**
+>
+> It is possible that a feature is already being or has been developed or that a feature may have already been rejected.
+> If you'd like to contribute to the project, [open an issue first](https://github.com/doseofted/prim-rpc/issues/new)
+> and describe what change that you would like to make.
 
 This guide is specific to project development and changes.
 
@@ -24,7 +25,9 @@ See the [Development Guide](./README.md#development) to learn how to get started
 
 ## Processes
 
-> **Warning** Work In Progress
+> **Warning**
+>
+> Work In Progress
 
 Prim+RPC's processes are given today as follows:
 

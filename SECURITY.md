@@ -1,6 +1,8 @@
 # Security
 
-> **Warning** Prim+RPC is prerelease software. It may be unstable and functionality may change.
+> **Warning**
+>
+> Prim+RPC is prerelease software. It may be unstable and functionality may change.
 
 If a security issue is found then please either
 [report a vulnerability](https://github.com/doseofted/prim-rpc/security/advisories/new) on Github or
