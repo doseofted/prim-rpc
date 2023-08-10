@@ -16,7 +16,7 @@ export function Navigation(props: NavigationProps) {
 		{ name: "CMS", link: "/cms" },
 	]
 	const socials = [
-		{ name: "Twitter", link: "https://twitter.com/doseofted", icon: "simple-icons:twitter" },
+		{ name: "Threads", link: "https://www.threads.net/@doseofted", icon: "simple-icons:threads" },
 		{ name: "GitHub", link: "https://github.com/doseofted/prim-rpc", icon: "simple-icons:github" },
 	]
 	const { ...attrs } = props

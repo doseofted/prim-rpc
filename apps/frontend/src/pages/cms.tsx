@@ -42,7 +42,7 @@ export default function Cms() {
 						animate={{ opacity: 1, y: 0 }}
 						transition={{ delay: 2, duration: 0.5 }}
 						className="flex gap-4 justify-center">
-						<Link href="https://twitter.com/doseofted" className="btn btn-neutral text-white">
+						<Link href="https://www.threads.net/@doseofted" className="btn btn-neutral text-white">
 							Follow
 						</Link>
 						<Link href="https://blog.doseofted.me/newsletter" className="btn btn-neutral text-white">
