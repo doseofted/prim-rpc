@@ -19,11 +19,12 @@ on the same machine. For each framework below, all of the possible plugins for t
 
 ## Web Workers
 
-| For                                                                                 | Plugin Type                        | Transport Type |
-| ----------------------------------------------------------------------------------- | ---------------------------------- | -------------- |
-| [Web Workers API](https://developer.mozilla.org/en-US/docs/Web/API/Web_Workers_API) | Method and callback plugin/handler | Web Worker     |
+| For                                                                                                                                                     | Plugin Type                        | Transport Type |
+| ------------------------------------------------------------------------------------------------------------------------------------------------------- | ---------------------------------- | -------------- |
+| [Web Workers](https://developer.mozilla.org/en-US/docs/Web/API/Worker), [Shared Workers](https://developer.mozilla.org/en-US/docs/Web/API/SharedWorker) | Method and callback plugin/handler | Web Worker     |
 
-You can communicate between a Web Worker and the main thread in either direction (or both) like so:
+You can communicate between a Web Worker and the main thread in either direction, or both, like so (both Dedicated and
+Shared Workers are supported):
 
 <CH.Code>
 
@@ -43,6 +44,7 @@ createPrimServer({ methodHandler, callbackHandler, jsonHandler })
 import { createPrimClient } from "@doseofted/prim-rpc"
 import { createMethodPlugin, createCallbackPlugin, jsonHandler } from "@doseofted/prim-rpc-plugins/web-worker"
 
+// You may use a Dedicated Worker or a Shared Worker (both are supported)
 const worker = new Worker(new URL("./worker", import.meta.url), { type: "module" })
 
 const methodPlugin = createMethodPlugin({ worker })
@@ -58,14 +60,6 @@ handling. JSON handling should be disabled because Web Workers will use
 [structured cloning](https://developer.mozilla.org/en-US/docs/Web/API/Web_Workers_API/Structured_clone_algorithm)
 instead which is far more powerful. Of course, you can always override the JSON handler to anything that you'd like if
 you can forgo structured cloning.
-
-<Alert prose icon="carbon:warning" type="alert-warning">
-
-This plugin currently does not yet support other types of worker like
-[Shared Workers](https://developer.mozilla.org/en-US/docs/Web/API/SharedWorker) or
-[Service Workers](https://developer.mozilla.org/en-US/docs/Web/API/ServiceWorker).
-
-</Alert>
 
 ## Vitest / Jest
 
