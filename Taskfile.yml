@@ -8,6 +8,20 @@ tasks:
     cmds:
       - "task --list"
 
+  setup:node:
+    desc: "Set the version of Node using pnpm, as specified in project's .nvmrc"
+    vars:
+      given_node_version:
+        sh: "cat .nvmrc"
+    cmds:
+      - "pnpm env use --global {{.given_node_version}}"
+
+  setup:
+    desc: "Set up the project for development"
+    cmds:
+      - "pnpm install"
+      - task: build
+
   build:
     desc: "Build all parts of the project"
     cmds:

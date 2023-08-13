@@ -1,4 +1,4 @@
-[![Prim+RPC. Pictured are two very short JavaScript files: a simple function on the server-side and a call to that function on the client-side. Tagline: "Backend, meet Frontend"](./misc/docs-screenshot.png)](https://prim.doseofted.me/)
+[![Prim+RPC. Pictured are two very short JavaScript files: a simple function on the server-side and a call to that function on the client-side. Tagline: "Backend, meet Frontend"](./.github/docs-screenshot.png)](https://prim.doseofted.me/)
 
 [![npm](https://img.shields.io/npm/v/@doseofted/prim-rpc)](https://www.npmjs.com/package/@doseofted/prim-rpc)
 [![npm bundle size](https://img.shields.io/bundlephobia/minzip/@doseofted/prim-rpc/latest)](https://bundlephobia.com/package/@doseofted/prim-rpc@latest)

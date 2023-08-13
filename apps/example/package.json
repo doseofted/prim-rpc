@@ -33,17 +33,16 @@
 		"@fastify/multipart": "^7.7.3",
 		"fastify": "^4.21.0",
 		"superjson": "^1.13.1",
+		"tsx": "^3.12.7",
 		"ws": "^8.13.0"
 	},
 	"scripts": {
-		"dev": "tsup --watch --config build.config.js",
-		"build": "tsup --config build.config.js",
+		"dev": "tsx watch --clear-screen=false src/index.ts",
+		"start": "tsx --clear-screen=false src/index.ts",
 		"check": "tsc --noEmit",
 		"test": "vitest run",
 		"testing": "vitest watch",
 		"lint": "eslint .",
-		"start": "node dist/index.js",
-		"watch": "node --watch dist/index.js",
 		"entrypoint": "zx entrypoint.mjs"
 	},
 	"engines": {
