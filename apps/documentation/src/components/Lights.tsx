@@ -1,3 +1,6 @@
+// FIXME: this component needs to be rewritten for better performance
+/* eslint-disable react-hooks/exhaustive-deps -- This component needs to be rewritten. */
+/* eslint-disable react-hooks/rules-of-hooks -- This component needs to be rewritten. */
 import { createContext, useContext, useEffect, useMemo, useRef, useState } from "react"
 import { useImmer } from "use-immer"
 import { nanoid } from "nanoid"

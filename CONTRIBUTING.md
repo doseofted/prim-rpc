@@ -1,7 +1,7 @@
 # Contributions
 
-Prim+RPC is intended to become **a standard way to communicate between JavaScript environments**. This means several
-things. Prim+RPC should be:
+Prim+RPC is intended to become **a standard way to communicate between JavaScript environments**. This means Prim+RPC
+should be:
 
 - Easy to use for developers of all skill levels
 - Simple to integrate into your favorite server/client frameworks
@@ -22,10 +22,9 @@ It can be difficult to achieve all of these goals and your contributions can hel
 See the [Documentation](https://prim.doseofted.me/) for usage instructions. These instructions refer to development of
 the project itself.
 
-[Node](https://nodejs.org/) is required for development. Install dependencies with `pnpm install` (run `corepack enable`
-to auto-install [pnpm](https://pnpm.io/)). Commands for this project are documented with [Task](https://taskfile.dev/).
-
-List all project commands with `pnpm task`. If Task is installed globally, run `task`.
+- Install [Node](https://nodejs.org/) version given in [`.nvmrc`](./.nvmrc).
+- Install dependencies with `pnpm install` (run `corepack enable` to auto-install [pnpm](https://pnpm.io/))
+- List all project commands with `pnpm task`. If Task is installed globally, you can just run `task`.
 
 # Guidelines
 

@@ -27,15 +27,23 @@ compile-step, and is **loaded with features**:
 Best of all, **if you know JavaScript, you already know how to use Prim+RPC**. If you want access to a function, just
 call it: less setup, easier access, quicker development of your API.
 
-Focus less on message transport and more on the message being sent, **with minimal setup**, using Prim+RPC:
-
-**[📖 Read the Docs](https://prim.doseofted.me/) ∙ [💡 Try an Example](https://prim.doseofted.me/docs/examples) ∙
-[⚙️ Setup in Project](https://prim.doseofted.me/docs/setup#installation) ∙ [🧑‍💻 Follow Author](https://doseofted.me/)**
-
 <!-- prettier-ignore-start -->
 > **Note**
 > Prim+RPC is in early stages and is marching towards a [stable release](#release-plan). Support Prim+RPC by
 > [starring the repository](https://github.com/doseofted/prim-rpc), sharing with others, and following for updates.
+<!-- prettier-ignore-end -->
+
+<!-- prettier-ignore-start -->
+
+---
+
+Focus less on message transport and more on the message being sent, **with minimal setup**, using Prim+RPC:
+
+
+**[📖 Read the Docs](https://prim.doseofted.me/) ∙ [💡 Try an Example](https://prim.doseofted.me/docs/examples) ∙ [⚙️ Setup in Project](https://prim.doseofted.me/docs/setup#installation) ∙ [🧑‍💻 Follow Author](https://doseofted.me/)**
+
+---
+
 <!-- prettier-ignore-end -->
 
 ## Contributions
