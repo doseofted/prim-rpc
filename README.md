@@ -56,17 +56,17 @@ to use the library, please see the [Documentation](https://prim.doseofted.me/).
 <!-- prettier-ignore-start -->
 > **Warning**
 > Prim+RPC is in **alpha** and it may be unstable. Keep up-to-date with the
-> [latest releases](https://github.com/doseofted/prim-rpc/releases), report any [found security issues](./SECURITY.md),
-> and [participate in discussions](https://github.com/doseofted/prim-rpc/discussions) to help shape the future of the
+> [latest releases](https://github.com/doseofted/prim-rpc/releases), report any
+> [found security issues](https://github.com/doseofted/prim-rpc/security/advisories/new), and
+> [participate in discussions](https://github.com/doseofted/prim-rpc/discussions) to help shape the future of the
 > project!
 <!-- prettier-ignore-end -->
 
 Prim+RPC is planned to become stable by the end of 2023 (and is on track to be stable much sooner than that).
 
-Prim+RPC Core (the framework-agnostic core of the project) will become stable first but will be released once the
-default plugins are stable (since usage depends on them). Lastly, Prim+RPC's optional tooling (such as documentation
-generation) will become stable. At this point, the alpha tag is planned to be removed. Once I am using Prim+RPC in
-production, a v1.0 will be released.
+Prim+RPC Core, the framework-agnostic core of the project, will become stable first and will be released once the
+default plugins are stable. Lastly, Prim+RPC's optional tooling (such as documentation generation) will become stable.
+At this point, the alpha tag is planned to be removed. Once I am using Prim+RPC in production, a v1.0 will be released.
 
 ## Licenses
 
