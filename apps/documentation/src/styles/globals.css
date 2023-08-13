@@ -7,9 +7,13 @@
 	background-color: #6d53ff70;
 }
 
-html { font-size: 14px; }
+html {
+	font-size: 14px;
+}
 @media (min-width: theme("screens.xl")) {
-	html { font-size: 16px; }
+	html {
+		font-size: 16px;
+	}
 }
 
 /** Recommended from Lenis docs https://github.com/studio-freight/lenis */
@@ -38,7 +42,7 @@ html { font-size: 14px; }
 .mockup-code::before {
 	opacity: 0.2;
 	box-shadow:
-		1.4em 0 0 theme("colors.prim.space"), 
+		1.4em 0 0 theme("colors.prim.space"),
 		2.8em 0 0 theme("colors.prim.space"),
 		4.2em 0 0 theme("colors.prim.space");
 }
@@ -51,7 +55,7 @@ html { font-size: 14px; }
 .prose h1:has(code),
 .prose h2:has(code),
 .prose h3:has(code) {
-	background-color: #2D0D6011;
+	background-color: #2d0d6011;
 	padding: 0.5rem 0;
 	border-radius: 0.35rem;
 	margin-bottom: 0;
@@ -74,7 +78,7 @@ html { font-size: 14px; }
 /* stylelint-disable-next-line no-descending-specificity */
 .prose :where(h1, h2, h3) + table th,
 .prose :where(h1, h2, h3) + div > table th {
-	background-color: #2D0D6011;
+	background-color: #2d0d6011;
 	border-radius: 0;
 }
 
@@ -138,7 +142,7 @@ html { font-size: 14px; }
 }
 .ch-editor-tab[data-active="true"]::before {
 	width: calc(100% - 12px);
-	background-color: #6D53FF;
+	background-color: #6d53ff;
 }
 /* Make marked lines of code use a color from theme of website */
 .ch-code-multiline-mark-border {

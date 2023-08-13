@@ -8,10 +8,11 @@
 		},
 		"testing": {
 			"dependsOn": [],
-			"cache": false
+			"cache": false,
+			"persistent": true
 		},
 		"lint": {
-			"dependsOn": ["^build"]
+			"dependsOn": []
 		},
 		"check": {
 			"dependsOn": ["^build"]
@@ -22,7 +23,8 @@
 		},
 		"dev": {
 			"dependsOn": ["^build"],
-			"cache": false
+			"cache": false,
+			"persistent": true
 		},
 		"lint-style": {
 			"dependsOn": []

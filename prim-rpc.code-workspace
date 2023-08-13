@@ -31,12 +31,9 @@
 	],
 	"settings": {
 		"editor.rulers": [80, 120],
-		"editor.tabSize": 2,
+		"editor.wordWrapColumn": 120,
 		"editor.renderWhitespace": "selection",
 		"editor.detectIndentation": true,
-		"editor.insertSpaces": false,
-		"editor.wordWrapColumn": 120,
-		"editor.defaultFormatter": "esbenp.prettier-vscode",
 		"editor.codeActionsOnSave": {
 			"source.fixAll": true
 		},
@@ -47,25 +44,10 @@
 		"stylelint.validate": ["css", "less", "postcss", "scss"],
 		"eslint.validate": ["javascript", "javascriptreact", "typescript", "typescriptreact"],
 		"yaml.schemas": {
-			"https://raw.githubusercontent.com/compose-spec/compose-spec/master/schema/compose-spec.json": "compose.*.yml",
 			"https://json.schemastore.org/taskfile.json": "Taskfile.*.yml"
 		},
 		"files.associations": {
 			"*.Corefile": "caddyfile"
-		},
-		"peacock.color": "#57b0ca",
-		"peacock.affectStatusAndTitleBorders": true,
-		"peacock.affectTitleBar": false,
-		"peacock.affectActivityBar": false,
-		"peacock.showColorInStatusBar": false,
-		"workbench.colorCustomizations": {
-			"sash.hoverBorder": "#7ec2d6",
-			"statusBar.background": "#57b0ca",
-			"statusBar.border": "#57b0ca",
-			"statusBar.foreground": "#15202b",
-			"statusBarItem.hoverBackground": "#3999b5",
-			"statusBarItem.remoteBackground": "#57b0ca",
-			"statusBarItem.remoteForeground": "#15202b"
 		},
 		"cSpell.words": [
 			"composables",
@@ -80,16 +62,33 @@
 		],
 		"cSpell.enableFiletypes": ["dockerfile", "mdx"],
 		"css.lint.unknownAtRules": "ignore",
-		"typescript.tsdk": "🌳 Monorepo/node_modules/typescript/lib",
+		"editor.defaultFormatter": "esbenp.prettier-vscode",
 		"[typescript]": {
 			"editor.defaultFormatter": "esbenp.prettier-vscode"
+		},
+		"[css]": {
+			"editor.defaultFormatter": "esbenp.prettier-vscode"
+		},
+		"peacock.color": "#57b0ca",
+		"peacock.remoteColor": "#57b0ca",
+		"peacock.affectStatusAndTitleBorders": true,
+		"peacock.affectTitleBar": false,
+		"peacock.affectActivityBar": false,
+		"peacock.showColorInStatusBar": false,
+		"workbench.colorCustomizations": {
+			"sash.hoverBorder": "#7ec2d6",
+			"statusBar.background": "#57b0ca",
+			"statusBar.border": "#57b0ca",
+			"statusBar.foreground": "#15202b",
+			"statusBarItem.hoverBackground": "#3999b5",
+			"statusBarItem.remoteBackground": "#57b0ca",
+			"statusBarItem.remoteForeground": "#15202b"
 		}
 	},
 	"extensions": {
 		"recommendations": [
 			"redhat.vscode-yaml",
 			"matthewpi.caddyfile-support",
-			"ms-azuretools.vscode-docker",
 			"dbaeumer.vscode-eslint",
 			"esbenp.prettier-vscode",
 			"stylelint.vscode-stylelint",

@@ -3,10 +3,46 @@ version: "3"
 dotenv:
   - ".env"
 
-includes:
-  dev: ./misc/Taskfile.dev.yml
-
 tasks:
   default:
     cmds:
       - "task --list"
+
+  build:
+    desc: "Build all parts of the project"
+    cmds:
+      - "pnpm turbo build"
+
+  test:
+    desc: "Run all project tests"
+    cmds:
+      - "pnpm turbo build"
+
+  changeset:
+    desc: "Add a changeset to a commit"
+    cmds:
+      - "pnpm changeset {{.CLI_ARGS}}"
+
+  lint:check:
+    desc: "Check for linting errors in project (ran prior to lint:fix task)"
+    cmds:
+      - cmd: "pnpm prettier . --check"
+        ignore_error: true
+      - cmd: "pnpm turbo run lint"
+        ignore_error: true
+
+  lint:fix:
+    desc: "Lint project with ESLint and format with Prettier"
+    cmds:
+      - "pnpm prettier . --write"
+      - "pnpm turbo run lint -- --fix"
+
+  start:docs:
+    desc: "Start the documentation server in development mode"
+    cmds:
+      - "pnpm --filter=./apps/documentation dev"
+
+  start:example:
+    desc: "Start the reference project to play with Prim+RPC on a server"
+    cmds:
+      - "pnpm --filter=./apps/example dev"

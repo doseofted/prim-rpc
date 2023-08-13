@@ -21,3 +21,5 @@ node_modules
 .task/*
 # Don't need to commit JavaScript-specific, built, distributable files
 dist
+# The .pnpm-store folder is usually in a system-specific location but just in case:
+.pnpm-store

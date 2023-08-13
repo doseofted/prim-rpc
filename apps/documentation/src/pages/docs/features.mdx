@@ -277,7 +277,7 @@ interface FormInputs {
 }
 
 /** TypeScript/server utility to ensure given argument is of type T */
-const server = <T>(given: unknown): given is T => typeof window === "undefined"
+const server = <T,>(given: unknown): given is T => typeof window === "undefined"
 
 /** Submit a contact form */
 export function submitContactForm(form: HTMLFormElement | FormData): string

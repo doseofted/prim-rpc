@@ -22,14 +22,16 @@ jobs:
           # NOTE: don't use cache for publishing (install needs to be clean)
       - name: Install
         run: pnpm install --frozen-lockfile
+      - name: Lint
+        run: pnpm turbo lint
       - name: Build
-        run: pnpm task dev:build
+        run: pnpm turbo build
       - name: Test
-        run: pnpm task dev:test
+        run: pnpm turbo test
       - name: Release
         uses: changesets/action@v1
         with:
-          publish: pnpm task dev:changeset:publish
+          publish: pnpm changeset publish
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           NPM_TOKEN: ${{ secrets.NPM_TOKEN }}

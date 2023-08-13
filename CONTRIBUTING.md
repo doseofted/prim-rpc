@@ -25,7 +25,7 @@ the project itself.
 [Node](https://nodejs.org/) is required for development. Install dependencies with `pnpm install` (run `corepack enable`
 to auto-install [pnpm](https://pnpm.io/)). Commands for this project are documented with [Task](https://taskfile.dev/).
 
-List all project commands with `pnpm task`.
+List all project commands with `pnpm task`. If Task is installed globally, run `task`.
 
 # Guidelines
 

@@ -1,6 +1,7 @@
-**/dist
-**/.task
-**/.turbo
-**/.next
-/data
+**/dist/
+**/.task/
+**/.turbo/
+**/.next/
+/data/
 pnpm-*.yaml
+**/.changeset/

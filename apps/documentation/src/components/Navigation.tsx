@@ -31,7 +31,7 @@ export function Navigation(props: NavigationProps) {
 	const [navigated, setNavigated] = useSessionStorage("navigated", false)
 	useEffect(() => {
 		setNavigated(true)
-	}, [router.pathname])
+	}, [router.pathname, setNavigated])
 	return (
 		<div {...attrs} className={[attrs.className, "flex justify-between items-center gap-8"].join(" ")}>
 			<div className="inline-block">

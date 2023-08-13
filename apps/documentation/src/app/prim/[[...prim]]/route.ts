@@ -3,6 +3,9 @@ import { defineNextjsAppPrimHandler } from "@doseofted/prim-rpc-plugins/nextjs"
 import * as moduleAll from "@doseofted/prim-example"
 import jsonHandler from "superjson"
 
-const module = process.env.NODE_ENV === "development" ? moduleAll : { greetings: moduleAll.greetings }
-const prim = createPrimServer({ module, jsonHandler })
+const prim = createPrimServer({
+	module: process.env.NODE_ENV === "development" ? moduleAll : { greetings: moduleAll.greetings },
+	jsonHandler,
+})
+
 export const { GET, POST } = defineNextjsAppPrimHandler({ prim })
