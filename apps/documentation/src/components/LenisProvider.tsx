@@ -43,6 +43,6 @@ export function LenisProvider({ children, enabled = true }: LenisProviderProps) 
 		return () => {
 			lenis?.destroy()
 		}
-	}, [])
+	}, [enabled])
 	return <LenisContext.Provider value={lenisInstance}>{children}</LenisContext.Provider>
 }

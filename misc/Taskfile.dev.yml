@@ -87,8 +87,8 @@ tasks:
       # Remove TurboRepo cache
       - task: clean-turbo
       # Remove Next.js cache
-      - "rm -fr apps/frontend/.next"
-      - "rm -fr apps/frontend/out"
+      - "rm -fr apps/documentation/.next"
+      - "rm -fr apps/documentation/out"
       # Remove Task cache
       - "rm -fr .task"
       # Task doesn't run as root and it could be dangerous to remove project data, so this will be a manual step

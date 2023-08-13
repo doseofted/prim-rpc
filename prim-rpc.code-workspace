@@ -17,20 +17,12 @@
 			"path": "./libs/tooling"
 		},
 		{
-			"name": "☁️ Reverse Proxy",
-			"path": "./proxy"
-		},
-		{
-			"name": "🌐 Website",
-			"path": "./apps/frontend"
-		},
-		{
 			"name": "🌐 Documentation",
-			"path": "./docs"
+			"path": "./apps/documentation"
 		},
 		{
 			"name": "📗 Example Server",
-			"path": "./apps/backend"
+			"path": "./apps/example"
 		},
 		{
 			"name": "📗 Example Module",

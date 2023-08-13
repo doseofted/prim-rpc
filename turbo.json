@@ -20,10 +20,6 @@
 			"dependsOn": ["^build"],
 			"outputs": ["dist/**", ".next/**", "!.next/cache/**"]
 		},
-		"watch": {
-			"dependsOn": ["^build"],
-			"cache": false
-		},
 		"dev": {
 			"dependsOn": ["^build"],
 			"cache": false

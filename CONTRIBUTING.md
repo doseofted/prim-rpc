@@ -12,6 +12,15 @@ of the project are welcome!
 
 This guide is specific to project development and changes.
 
+## Setup
+
+See the [Documentation](https://prim.doseofted.me/) for usage instructions. These instructions refer to development of
+the project itself.
+
+[Node](https://nodejs.org/) is required for development. Install dependencies with `pnpm install` (run `corepack enable`
+to auto-install pnpm). Commands for this project are documented with [Task](https://taskfile.dev/). List all commands
+with `pnpm task`.
+
 # Rules
 
 - Follow the [Code of Conduct](./CODE_OF_CONDUCT.md)

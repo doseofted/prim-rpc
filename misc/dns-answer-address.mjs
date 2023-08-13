@@ -1,8 +1,6 @@
 #!/usr/bin/env zx
-import { $, argv, echo } from "zx"
+import { argv, echo } from "zx"
 import { networkInterfaces } from "node:os"
-
-$.silent = true
 
 /**
  * This is intended to be used with `task dev:dns` of this project.
