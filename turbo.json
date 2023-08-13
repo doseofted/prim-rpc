@@ -8,10 +8,11 @@
 		},
 		"testing": {
 			"dependsOn": [],
-			"cache": false
+			"cache": false,
+			"persistent": true
 		},
 		"lint": {
-			"dependsOn": ["^build"]
+			"dependsOn": []
 		},
 		"check": {
 			"dependsOn": ["^build"]
@@ -20,13 +21,10 @@
 			"dependsOn": ["^build"],
 			"outputs": ["dist/**", ".next/**", "!.next/cache/**"]
 		},
-		"watch": {
-			"dependsOn": ["^build"],
-			"cache": false
-		},
 		"dev": {
 			"dependsOn": ["^build"],
-			"cache": false
+			"cache": false,
+			"persistent": true
 		},
 		"lint-style": {
 			"dependsOn": []

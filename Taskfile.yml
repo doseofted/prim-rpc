@@ -1,57 +1,73 @@
-# https://taskfile.dev
-version: 3
+version: "3"
 
 dotenv:
   - ".env"
-
-includes:
-  # Project-wide includes
-  dev: ./misc/Taskfile.dev.yml
-  docker: ./misc/Taskfile.docker.yml
-  compose: ./misc/Taskfile.common.yml
-
-  # Environment-specific Docker Compose configuration
-  compose:dev: &base-compose
-    taskfile: ./misc/Taskfile.compose.yml
-    optional: true
-    vars:
-      COMPOSE_FILE: "compose.yml:compose.dev.yml:misc/compose.sync.yml"
-      CHOSEN_ENV: "development"
-      CHOSEN_PREFIX: "dev"
-  compose:prod:
-    <<: *base-compose
-    vars:
-      COMPOSE_FILE: "compose.yml:compose.prod.yml"
-      CHOSEN_ENV: "production"
-      CHOSEN_PREFIX: "prod"
-  compose:staging:
-    <<: *base-compose
-    vars:
-      COMPOSE_FILE: "compose.yml:compose.prod.yml:compose.staging.yml"
-      CHOSEN_ENV: "staging"
-      CHOSEN_PREFIX: "staging"
-  compose:live:
-    <<: *base-compose
-    vars:
-      COMPOSE_FILE: "compose.yml:compose.live.yml"
-      CHOSEN_ENV: "live"
-      CHOSEN_PREFIX: "live"
-
-  # Sub-project-specific includes
-  backend:
-    taskfile: ./apps/backend/Taskfile.yml
-    dir: ./apps/backend
-    optional: true
-  frontend:
-    taskfile: ./apps/frontend/Taskfile.yml
-    dir: ./apps/frontend
-    optional: true
-  proxy:
-    taskfile: ./proxy/Taskfile.yml
-    dir: ./proxy
-    optional: true
 
 tasks:
   default:
     cmds:
       - "task --list"
+
+  setup:node:
+    desc: "Set the version of Node using pnpm, as specified in project's .nvmrc"
+    vars:
+      given_node_version:
+        sh: "cat .nvmrc"
+    cmds:
+      - "pnpm env use --global {{.given_node_version}}"
+
+  setup:
+    desc: "Set up the project for development"
+    cmds:
+      - "pnpm install"
+      - task: build
+
+  cleanup:
+    desc: "Remove various temporary files and directories created within project, for a clean run"
+    ignore_error: true
+    cmds:
+      - "find . -name node_modules -type d -prune -exec rm -fr {} +"
+      - 'find . -name dist -not -path "*/shiki/dist" -type d -prune -exec rm -fr {} +'
+      - "find . -name .turbo -type d -prune -exec rm -fr {} +"
+      - "rm -r ./apps/documentation/.next/"
+      - "rm -r ./apps/documentation/out/"
+      - "rm -fr .task"
+
+  build:
+    desc: "Build all parts of the project"
+    cmds:
+      - "pnpm turbo build"
+
+  test:
+    desc: "Run all project tests"
+    cmds:
+      - "pnpm turbo build"
+
+  changeset:
+    desc: "Add a changeset to a commit"
+    cmds:
+      - "pnpm changeset {{.CLI_ARGS}}"
+
+  lint:check:
+    desc: "Check for linting errors in project (ran prior to lint:fix task)"
+    cmds:
+      - cmd: "pnpm prettier . --check"
+        ignore_error: true
+      - cmd: "pnpm turbo run lint"
+        ignore_error: true
+
+  lint:fix:
+    desc: "Lint project with ESLint and format with Prettier"
+    cmds:
+      - "pnpm prettier . --write"
+      - "pnpm turbo run lint -- --fix"
+
+  start:docs:
+    desc: "Start the documentation server in development mode"
+    cmds:
+      - "pnpm --filter=./apps/documentation dev"
+
+  start:example:
+    desc: "Start the reference project to play with Prim+RPC on a server"
+    cmds:
+      - "pnpm --filter=./apps/example dev"

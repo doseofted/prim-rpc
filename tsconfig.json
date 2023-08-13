@@ -4,6 +4,7 @@
 		"module": "ESNext",
 		"moduleResolution": "Bundler",
 		"esModuleInterop": true,
-		"isolatedModules": true
+		"isolatedModules": true,
+		"skipLibCheck": true
 	}
 }

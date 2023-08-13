@@ -1,10 +1,9 @@
 // @ts-check
 import { defineConfig } from "tsup"
 
-export default defineConfig(options => ({
-	...options,
+export default defineConfig({
 	entry: [
-		// TODO: entries need to separated into their own packages since packageJson.exports won't be a useful setting any time soon
+		// TODO: entries need to separated into their own packages in the future so they can be versioned separately
 		"src/server/fastify.ts",
 		"src/server/express.ts",
 		"src/server/h3.ts",
@@ -18,7 +17,7 @@ export default defineConfig(options => ({
 		"src/server/hono.ts",
 	],
 	target: "es2020",
-	dts: true,
 	format: ["esm"],
+	dts: true,
 	clean: true,
-}))
+})

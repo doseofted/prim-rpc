@@ -28,7 +28,7 @@
 		"url": "https://github.com/doseofted/prim-rpc/issues"
 	},
 	"scripts": {
-		"watch": "tsup --watch --config build.config.js",
+		"dev": "tsup --watch --config build.config.js",
 		"build": "tsup --config build.config.js",
 		"check": "tsc --noEmit",
 		"test": "vitest run",
