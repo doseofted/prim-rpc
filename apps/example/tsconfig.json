@@ -1,6 +1,6 @@
 {
 	"compilerOptions": {
-		"lib": ["ESNext"]
+		"lib": ["DOM", "ESNext"]
 	},
 	"extends": "../../tsconfig.json",
 	"include": ["src/**/*"]
