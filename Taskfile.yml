@@ -22,6 +22,17 @@ tasks:
       - "pnpm install"
       - task: build
 
+  cleanup:
+    desc: "Remove various temporary files and directories created within project, for a clean run"
+    ignore_error: true
+    cmds:
+      - "find . -name node_modules -type d -prune -exec rm -fr {} +"
+      - 'find . -name dist -not -path "*/shiki/dist" -type d -prune -exec rm -fr {} +'
+      - "find . -name .turbo -type d -prune -exec rm -fr {} +"
+      - "rm -r ./apps/documentation/.next/"
+      - "rm -r ./apps/documentation/out/"
+      - "rm -fr .task"
+
   build:
     desc: "Build all parts of the project"
     cmds:
