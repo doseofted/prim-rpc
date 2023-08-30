@@ -64,6 +64,7 @@
 	"files": [
 		"dist",
 		"NOTICE.md",
-		"README.png"
+		"README.png",
+		"CHANGELOG.md"
 	]
 }

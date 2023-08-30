@@ -18,6 +18,56 @@ compatible they must use the same type of transport (given in **Transport Type**
 
 ## Table of Contents
 
+## Astro
+
+| For                                         | Plugin Type    | Transport Type | File Support |
+| ------------------------------------------- | -------------- | -------------- | ------------ |
+| [Astro](https://github.com/withastro/astro) | Method handler | HTTP           | `File`       |
+
+Prim+RPC supports Astro in SSR mode. It supports both Astro 2 and 3.
+
+You can configure Astro with Prim+RPC like so (`[...prim]` in filename represents a catch-all route):
+
+```typescript src/pages/prim/[...prim].ts
+import { createPrimServer } from "@doseofted/prim-rpc"
+import { defineAstroPrimHandler } from "@doseofted/prim-rpc-plugins/astro"
+import module from "./my-example-module"
+
+const prim = createPrimServer({ module })
+
+// Astro 3.0
+export const { GET, POST } = defineAstroPrimHandler({ prim })
+// Astro 2.0 (exported method names are lowercase)
+export const { GET: get, POST: post } = defineAstroPrimHandler({ prim })
+```
+
+The `.contextTransform` option of the plugin can be used to set the `this` value inside of functions used with Prim+RPC.
+
+On the client-side, you can use the Prim+RPC client with a compatible method plugin. Since the client could be used
+either server or client side, you may conditionally set the URL and module depending on the environment, like so:
+
+```typescript
+import { createMethodPlugin } from "@doseofted/prim-rpc-plugins/browser"
+
+// We can import the module directly server-side (module is tree-shaken from client-side bundle)
+const module = import.meta.env.SSR ? import("./my-example-module") : null
+// And we only need the endpoint on the client-side where module is not available
+const endpoint = import.meta.env.SSR ? "" : "/prim"
+
+const client = createPrimClient({
+	module,
+	endpoint,
+	methodPlugin: createMethodPlugin(),
+})
+```
+
+<Alert icon="carbon:warning" type="alert-warning">
+
+Tree-shaking server-side code with `import.meta.env.SSR` condition works in Astro. If you are using this plugin outside
+of Astro, you'll need to ensure that conditional code is tree-shaken properly.
+
+</Alert>
+
 ## Hono
 
 | For                                    | Plugin Type    | Transport Type | File Support |
@@ -172,12 +222,24 @@ either server or client side, you may conditionally set the URL depending on the
 ```typescript
 import { createMethodPlugin } from "@doseofted/prim-rpc-plugins/browser"
 
-const endpoint = typeof window === "undefined" ? "http://localhost:3000/prim" : "/prim"
+// We can import the module directly server-side (module is tree-shaken from client-side bundle)
+const module = process.server ? import("./my-example-module") : null
+// And we only need the endpoint on the client-side where module is not available
+const endpoint = process.server ? "" : "/prim"
+
 const client = createPrimClient({
+	module,
 	endpoint,
 	methodPlugin: createMethodPlugin(),
 })
 ```
+
+<Alert icon="carbon:warning" type="alert-warning">
+
+Tree-shaking server-side code with `process.server` condition works in Nuxt 3. If you are using this plugin outside of
+Nuxt 3, you'll need to ensure that conditional code is tree-shaken properly.
+
+</Alert>
 
 ## Next.js
 
@@ -206,12 +268,24 @@ either server or client side, you may conditionally set the URL depending on the
 ```typescript
 import { createMethodPlugin } from "@doseofted/prim-rpc-plugins/browser"
 
-const endpoint = typeof window === "undefined" ? "http://localhost:3000/prim" : "/prim"
+// We can import the module directly server-side (module is tree-shaken from client-side bundle)
+const module = typeof window === "undefined" ? import("./my-example-module") : null
+// And we only need the endpoint on the client-side where module is not available
+const endpoint = typeof window === "undefined" ? "" : "/prim"
+
 const client = createPrimClient({
+	module,
 	endpoint,
 	methodPlugin: createMethodPlugin(),
 })
 ```
+
+<Alert icon="carbon:warning" type="alert-warning">
+
+Tree-shaking server-side code by checking `typeof window` condition works in Next.js. If you are using this plugin
+outside of Next.js, you'll need to ensure that conditional code is tree-shaken properly.
+
+</Alert>
 
 ## Node / HTTP
 
