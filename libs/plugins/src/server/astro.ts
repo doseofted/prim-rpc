@@ -21,11 +21,16 @@ export function defineAstroPrimHandler(options: PrimAstroPluginOptions) {
 		const method = request.method
 		if (requestType.startsWith("multipart/form-data")) {
 			const FileObj = typeof File === "undefined" ? (await import("node:buffer")).File : File
+			// NOTE: Astro uses Node's File instead of built-in File when using Node
+			const FileNode =
+				typeof process === "object" && "env" in process && typeof process.env === "object" && process.env.NODE !== ""
+					? (await import("node:buffer")).File
+					: () => null
 			const formData = await request.formData()
 			formData.forEach((value, key) => {
 				if (key === "rpc") {
 					body = value.toString()
-				} else if (key.startsWith("_bin_") && value instanceof FileObj) {
+				} else if (key.startsWith("_bin_") && (value instanceof FileObj || value instanceof FileNode)) {
 					blobs[key] = value
 				}
 			})
