@@ -1,5 +1,17 @@
 # @doseofted/prim-documentation-website
 
+## 0.1.0-alpha.22
+
+### Patch Changes
+
+- ab6373f: Upgraded project lockfile
+- Updated dependencies [ab6373f]
+- Updated dependencies [780acf1]
+  - @doseofted/prim-example@0.1.0-alpha.3
+  - @doseofted/prim-rpc-plugins@0.1.0-alpha.14
+  - @doseofted/prim-rpc-tooling@0.1.0-alpha.7
+  - @doseofted/prim-rpc@0.1.0-alpha.16
+
 ## 0.1.0-alpha.21
 
 ### Patch Changes

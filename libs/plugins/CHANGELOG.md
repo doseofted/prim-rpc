@@ -1,5 +1,12 @@
 # @doseofted/prim-rpc-plugins
 
+## 0.1.0-alpha.14
+
+### Patch Changes
+
+- ab6373f: Upgraded project lockfile
+- 780acf1: Added plugin to support Astro in SSR mode
+
 ## 0.1.0-alpha.13
 
 ### Patch Changes
