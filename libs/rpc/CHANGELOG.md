@@ -1,5 +1,11 @@
 # @doseofted/prim-rpc
 
+## 0.1.0-alpha.16
+
+### Patch Changes
+
+- ab6373f: Upgraded project lockfile
+
 ## 0.1.0-alpha.15
 
 ### Patch Changes

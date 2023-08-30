@@ -1,5 +1,11 @@
 # @doseofted/prim-rpc-tooling
 
+## 0.1.0-alpha.7
+
+### Patch Changes
+
+- ab6373f: Upgraded project lockfile
+
 ## 0.1.0-alpha.6
 
 ### Patch Changes
