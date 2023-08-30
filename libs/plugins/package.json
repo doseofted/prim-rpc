@@ -160,7 +160,8 @@
 	},
 	"files": [
 		"dist",
-		"NOTICE.md"
+		"NOTICE.md",
+		"CHANGELOG.md"
 	],
 	"dependencies": {
 		"mitt": "^3.0.1",
