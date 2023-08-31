@@ -73,8 +73,8 @@ At this point, the alpha tag is planned to be removed. Once I am using Prim+RPC 
 This project consists of three parts: Code, Documentation, and Assets:
 
 **Code**: The Prim+RPC code libraries (RPC core, plugins, and tooling) are licensed under the
-[Apache 2.0 license](./LICENSE-CODE.txt). You may find library source code in the [`/libs`](./libs/) folder of this
-project. Assets, which may appear alongside Code, are excluded from this license.
+[Apache 2.0 license](./LICENSE.txt). You may find library source code in the [`/libs`](./libs/) folder of this project.
+Assets, which may appear alongside Code, are excluded from this license.
 
 **Documentation**: The documentation website and text are [proprietary](./LICENSE-DOCS.md). You may find documentation
 in the [`/apps`](./apps/) folder of this project. Unauthorized usage of Documentation outside of fair use is strictly
