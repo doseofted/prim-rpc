@@ -2,7 +2,7 @@
 	"name": "@doseofted/prim-example-server",
 	"version": "0.1.0-alpha.22",
 	"description": "An example backend making use of Prim+RPC.",
-	"license": "MIT",
+	"license": "UNLICENSED",
 	"private": true,
 	"author": {
 		"name": "Ted Klingenberg",

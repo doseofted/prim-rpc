@@ -1,3 +1,7 @@
+// Part of the Prim+RPC project ( https://prim.doseofted.me/ )
+// Copyright 2023 Ted Klingenberg
+// SPDX-License-Identifier: Apache-2.0
+
 /**
  * @param prefix - Prefix of console log ran by closure.
  * @returns Closure that logs your message (it's even prefixed)

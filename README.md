@@ -70,6 +70,16 @@ At this point, the alpha tag is planned to be removed. Once I am using Prim+RPC 
 
 ## Licenses
 
-The Prim+RPC core library, plugins, and tooling are licensed under the
-[Apache 2.0 license](https://spdx.org/licenses/Apache-2.0.html). The documentation website is proprietary. Please refer
-to [Licenses](./LICENSE.md).
+This project consists of three parts: Code, Documentation, and Assets:
+
+**Code**: The Prim+RPC code libraries (RPC core, plugins, and tooling) are licensed under the
+[Apache 2.0 license](./LICENSE-CODE.txt). You may find library source code in the [`/libs`](./libs/) folder of this
+project. Assets, which may appear alongside Code, are excluded from this license.
+
+**Documentation**: The documentation website and text are [proprietary](./LICENSE-DOCS.md). You may find documentation
+in the [`/apps`](./apps/) folder of this project. Unauthorized usage of Documentation outside of fair use is strictly
+prohibited.
+
+**Assets**: The "Prim+RPC" name and logo as well as the "Dose of Ted" name and logo are
+[proprietary](./LICENSE-ASSETS.md). Assets are excluded from all licenses, regardless of where they are located in the
+project. Unauthorized usage of Assets outside of fair use is strictly prohibited.
