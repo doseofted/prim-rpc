@@ -1,7 +1,9 @@
 [![Prim+RPC. Pictured are two very short JavaScript files: a simple function on the server-side and a call to that function on the client-side. Tagline: "Backend, meet Frontend"](./.github/docs-screenshot.png)](https://prim.doseofted.me/)
 
-[![npm](https://img.shields.io/npm/v/@doseofted/prim-rpc)](https://www.npmjs.com/package/@doseofted/prim-rpc)
-[![npm bundle size](https://img.shields.io/bundlephobia/minzip/@doseofted/prim-rpc/latest)](https://bundlephobia.com/package/@doseofted/prim-rpc@latest)
+[![npm](https://img.shields.io/npm/v/@doseofted/prim-rpc?color=6D53FF&labelColor=2D0D60)](https://www.npmjs.com/package/@doseofted/prim-rpc)
+[![npm license](https://img.shields.io/npm/l/%40doseofted%2Fprim-rpc?color=399EEC&labelColor=2D0D60)](https://spdx.org/licenses/Apache-2.0.html)
+[![npm bundle size](https://img.shields.io/bundlephobia/minzip/@doseofted/prim-rpc/latest?color=EB84FF&labelColor=2D0D60)](https://bundlephobia.com/package/@doseofted/prim-rpc@latest)
+[^1]
 
 **Prim+RPC is a bridge between JavaScript environments.** Call functions on the server as if they exist on the client,
 without the wrappers. It's just JavaScript. You could bridge:
@@ -83,3 +85,7 @@ prohibited.
 **Assets**: The "Prim+RPC" name and logo as well as the "Dose of Ted" name and logo are
 [proprietary](./LICENSE-ASSETS.md). Assets are excluded from all licenses, regardless of where they are located in the
 project. Unauthorized usage of Assets outside of fair use is strictly prohibited.
+
+[^1]:
+    These badges report stats for [`@doseofted/prim-rpc`](https://www.npmjs.com/package/@doseofted/prim-rpc) on the npm
+    registry.
