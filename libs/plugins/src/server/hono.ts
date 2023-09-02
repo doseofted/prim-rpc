@@ -2,7 +2,7 @@
 // Copyright 2023 Ted Klingenberg
 // SPDX-License-Identifier: Apache-2.0
 
-import type { PrimServerEvents, PrimServerMethodHandler } from "@doseofted/prim-rpc"
+import type { BlobRecords, PrimServerEvents, PrimServerMethodHandler } from "@doseofted/prim-rpc"
 import type { Hono, Context, MiddlewareHandler } from "hono"
 
 interface SharedHonoOptions {
@@ -22,7 +22,7 @@ export function honoPrimRpc(options: PrimHonoPluginOptions) {
 		const { pathname, search } = new URL(req.url)
 		const url = pathname + search
 		let body: string
-		const blobs: Record<string, unknown> = {}
+		const blobs: BlobRecords = {}
 		const method = req.method
 		if (!url.startsWith(prim.options.prefix ?? "/")) {
 			return next()
@@ -42,7 +42,7 @@ export function honoPrimRpc(options: PrimHonoPluginOptions) {
 			body = await req.text()
 		}
 		const server = prim.server()
-		const response = await server.call({ body, url, method }, blobs, contextTransform(context))
+		const response = await server.call({ body, url, method, blobs }, contextTransform(context))
 		return new Response(response.body, {
 			headers: response.headers,
 			status: response.status,

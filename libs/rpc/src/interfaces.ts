@@ -151,7 +151,7 @@ export interface JsonHandler {
 }
 // type JsonHandlerOptional  = Partial<JsonHandler>
 /** The record key is a string prefixed with `_bin_` and the value is the Blob */
-export type BlobRecords = Record<string, Blob | Buffer>
+export type BlobRecords = Record<string, Blob | File | Buffer>
 export type PrimClientMethodPlugin<J = JsonHandler> = (
 	endpoint: string,
 	jsonBody: RpcCall | RpcCall[],
@@ -337,6 +337,8 @@ export interface CommonServerSimpleGivenOptions {
 	method?: string
 	/** The body of the request as a string */
 	body?: string
+	/** Blobs consist of binary data extracted from the body (comparable to and possibly created from form-data) */
+	blobs?: BlobRecords
 }
 
 export interface CommonServerResponseOptions {
@@ -346,6 +348,8 @@ export interface CommonServerResponseOptions {
 	headers: { [header: string]: string }
 	/** Body of result, as a string */
 	body: string
+	/** Blobs consist of binary data extracted from the response (in case response body cannot contain binary data) */
+	blobs?: BlobRecords
 }
 // !SECTION
 
@@ -424,11 +428,7 @@ export interface PrimServerActionsBase<Context = unknown> {
 	 * Step 2: Using the result of `.prepareCall()`, use the RPC to get a result from Prim.
 	 * See `.prepareSend()` for next step.
 	 */
-	prepareRpc: (
-		given: RpcCall | RpcCall[],
-		blobs?: Record<string, unknown> | null,
-		context?: Context
-	) => Promise<RpcAnswer | RpcAnswer[]>
+	prepareRpc: (given: RpcCall | RpcCall[], context?: Context) => Promise<RpcAnswer | RpcAnswer[]>
 	/**
 	 * Step 3: Using the result of `.rpc()`, prepare the result to be sent with the server framework.
 	 */
@@ -445,11 +445,7 @@ export interface PrimServerActionsExtended<Context = unknown> extends PrimServer
 	 *
 	 * This calls, in order, `.prepareCall()`, `.rpc()`, and `.prepareSend()`
 	 */
-	call: (
-		given: CommonServerSimpleGivenOptions,
-		blobs?: Record<string, unknown> | null,
-		context?: Context
-	) => Promise<CommonServerResponseOptions>
+	call: (given: CommonServerSimpleGivenOptions, context?: Context) => Promise<CommonServerResponseOptions>
 }
 
 export interface PrimServerEvents {

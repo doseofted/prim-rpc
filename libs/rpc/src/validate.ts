@@ -1,4 +1,5 @@
 import type {
+	BlobRecords,
 	CommonServerResponseOptions,
 	CommonServerSimpleGivenOptions,
 	RpcAnswer,
@@ -21,7 +22,9 @@ export const PrimRpcSpecific = Symbol("primRpc")
 function checkRpcBase<T extends RpcBase>(given: unknown) {
 	const givenRpc = typeof given === "object" && given !== null && given
 	if (!givenRpc) {
-		throw { error: "Invalid RPC" }
+		const err = { error: "Invalid RPC" }
+		Object.defineProperty(err, "primRpc", { value: PrimRpcSpecific, enumerable: false, writable: false })
+		throw err
 	}
 	const id =
 		"id" in givenRpc
@@ -118,6 +121,10 @@ export function checkHttpLikeRequest(given: unknown) {
 	if (!toCall.url && !toCall.body) {
 		throw { error: "Either a URL or body must be given" }
 	}
+	const blobs = "blobs" in givenObject && typeof givenObject.blobs === "object" && givenObject.blobs
+	if (blobs) {
+		toCall.blobs = blobs as BlobRecords
+	}
 	const method = "method" in givenObject && typeof givenObject.method === "string" && givenObject.method
 	// const validGET = method === "GET" && toCall.url
 	// const validPOST = method === "POST" && toCall.body
@@ -164,7 +171,26 @@ export function checkHttpLikeResponse(given: unknown): CommonServerResponseOptio
 	} else {
 		throw { error: "Response status was not set" }
 	}
+	const blobs = "blobs" in givenObject && typeof givenObject.blobs === "object" && givenObject.blobs
+	if (blobs) {
+		toRespond.blobs = blobs as BlobRecords
+	}
 	return toRespond as CommonServerResponseOptions
+}
+
+/**
+ * Validate functions use symbols (top-level only) for internal usage but these
+ * aren't needed for any returned values.
+ */
+export function stripSymbols<T = unknown>(given: T) {
+	if (typeof given === "object") {
+		for (const [key, value] of Object.entries(given)) {
+			if (typeof value === "symbol") {
+				delete given[key]
+			}
+		}
+	}
+	return given
 }
 
 // !SECTION

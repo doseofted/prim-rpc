@@ -2,7 +2,7 @@
 // Copyright 2023 Ted Klingenberg
 // SPDX-License-Identifier: Apache-2.0
 
-import type { PrimServerMethodHandler, PrimServerEvents } from "@doseofted/prim-rpc"
+import type { PrimServerMethodHandler, PrimServerEvents, BlobRecords } from "@doseofted/prim-rpc"
 import {
 	defineEventHandler,
 	readRawBody,
@@ -26,7 +26,7 @@ interface PrimH3PluginOptions extends SharedH3Options {
 export function defineH3PrimHandler(options: PrimH3PluginOptions) {
 	const { prim, contextTransform = event => ({ context: "h3", event }) } = options
 	let body: string
-	const blobs: { [identifier: string]: unknown } = {}
+	const blobs: BlobRecords = {}
 	return defineEventHandler(async event => {
 		const givenPath = event.node.req.url
 		if (!givenPath.startsWith(prim.options.prefix)) {
@@ -44,13 +44,13 @@ export function defineH3PrimHandler(options: PrimH3PluginOptions) {
 				} else if (typeof part.filename === "string" && part.name.startsWith("_bin_")) {
 					const FileObj = typeof File === "undefined" ? (await import("node:buffer")).File : File
 					const file = new FileObj([part.data], part.filename, { type: part.type })
-					blobs[part.name] = file
+					blobs[part.name] = file as File // it may be node:buffer.File, but BlobRecords expects native File
 				}
 			}
 		} else if (method === "POST") {
 			body = await readRawBody(event)
 		}
-		const result = await prim.server().call({ body, method, url }, blobs, context)
+		const result = await prim.server().call({ body, method, url, blobs }, context)
 		setResponseStatus(event, result.status)
 		setResponseHeaders(event, result.headers)
 		return result.body

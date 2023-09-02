@@ -62,7 +62,7 @@ export const createMethodHandler = (options: MethodTestingOptions): PrimServerMe
 			const httpServer = mitt<HttpRequest>()
 			httpServer.on("request", async ({ body, blobs }) => {
 				const { call } = server()
-				const response = await call({ body: String(body) }, blobs, context)
+				const response = await call({ body: String(body), blobs }, context)
 				httpServer.emit("response", response.body)
 			})
 			httpConnection.emit(`res:${reqId.replace(/^req:/, "")}`, httpServer)

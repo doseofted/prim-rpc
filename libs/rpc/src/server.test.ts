@@ -202,8 +202,7 @@ describe("Prim Server can handle invalid requests", () => {
 		const body = '{ "method": "sayHello", "id": 1 ]'
 		const response = await server.call({ method: "POST", body })
 		const result = JSON.parse(response.body) as RpcAnswer
-		// thrown unknown error because container request was invalid
-		expect(result).toEqual({ error: "Unknown RPC error" })
+		expect(result).toEqual({ error: "Invalid RPC" })
 	})
 	// TODO: "Invalid method name" may not be the correct error (this may be related to testing plugin, need to check)
 	// test("with wrong HTTP method and body/url given (GET)", async () => {
@@ -235,7 +234,7 @@ describe("Prim Server can understand its given context", () => {
 		const server = prim.server()
 		const call: RpcCall = { method: "whatIsThis", id: 1 }
 		const body = JSON.stringify(call)
-		const response = await server.call({ method: "POST", body }, undefined, { context: "ted" })
+		const response = await server.call({ method: "POST", body }, { context: "ted" })
 		const result = JSON.parse(response.body) as RpcAnswer
 		expect(result).toEqual({ result: { this: true }, id: 1 })
 	})

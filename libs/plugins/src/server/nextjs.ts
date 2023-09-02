@@ -1,5 +1,4 @@
-import type { PrimServerEvents } from "@doseofted/prim-rpc"
-import { File } from "node:buffer"
+import type { BlobRecords, PrimServerEvents } from "@doseofted/prim-rpc"
 // import type { NextApiRequest, NextApiResponse } from "next"
 
 interface SharedNextjsOptions {
@@ -15,7 +14,7 @@ export function defineNextjsAppPrimHandler(options: PrimNextjsAppPluginOptions) 
 	const { prim, headers = {}, contextTransform = request => ({ context: "nextjs-app", request }) } = options
 	async function handler(request: Request) {
 		let body: string
-		const blobs: { [identifier: string]: unknown } = {}
+		const blobs: BlobRecords = {}
 		const parts = new URL(request.url)
 		const url = parts.pathname + parts.search
 		if (!url.startsWith(prim.options.prefix)) {
@@ -37,7 +36,7 @@ export function defineNextjsAppPrimHandler(options: PrimNextjsAppPluginOptions) 
 		} else if (method === "POST") {
 			body = await request.text()
 		}
-		const result = await prim.server().call({ body, method, url }, blobs, context)
+		const result = await prim.server().call({ body, method, url, blobs }, context)
 		return new Response(result.body, {
 			headers: { ...result.headers, ...headers },
 			status: result.status,

@@ -1,4 +1,4 @@
-import type { PrimServerEvents } from "@doseofted/prim-rpc"
+import type { BlobRecords, PrimServerEvents } from "@doseofted/prim-rpc"
 import type { APIRoute, APIContext, Props } from "astro"
 
 interface PrimAstroPluginOptions {
@@ -12,7 +12,7 @@ export function defineAstroPrimHandler(options: PrimAstroPluginOptions) {
 	const handler: APIRoute = async ctx => {
 		const { request, url: urlFull } = ctx
 		let body: string
-		const blobs: { [identifier: string]: unknown } = {}
+		const blobs: BlobRecords = {}
 		const url = urlFull.pathname + urlFull.search
 		if (!url.startsWith(prim.options.prefix)) {
 			return
@@ -37,7 +37,7 @@ export function defineAstroPrimHandler(options: PrimAstroPluginOptions) {
 		} else if (method === "POST") {
 			body = await request.text()
 		}
-		const result = await prim.server().call({ body, method, url }, blobs, contextTransform(ctx))
+		const result = await prim.server().call({ body, method, url, blobs }, contextTransform(ctx))
 		return new Response(result.body, {
 			headers: { ...result.headers, ...headers },
 			status: result.status,

@@ -284,6 +284,16 @@ export function uploadTheThing(file: File | import("node:buffer").File) {
 uploadTheThing.rpc = true
 
 /**
+ * Given a string of text, place that text in a file.
+ * This is best suited for the server because of how intensive the conversion process can become.
+ */
+export async function makeItATextFile(text: string) {
+	const { File } = await import("node:buffer")
+	return new File([text], "text.txt", { type: "text/plain" })
+}
+makeItATextFile.rpc = true
+
+/**
  * Make an introduction.
  *
  * @param x Introducee 1

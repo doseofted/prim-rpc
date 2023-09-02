@@ -2,7 +2,7 @@
 // Copyright 2023 Ted Klingenberg
 // SPDX-License-Identifier: Apache-2.0
 
-import type { PrimServerMethodHandler, PrimServerEvents } from "@doseofted/prim-rpc"
+import type { PrimServerMethodHandler, PrimServerEvents, BlobRecords } from "@doseofted/prim-rpc"
 import type * as Express from "express"
 import type Multer from "multer"
 
@@ -41,7 +41,7 @@ export const expressPrimRpc = (options: PrimExpressPluginOptions) => {
 			}
 			const { method, originalUrl: url } = req
 			let bodyForm: string, bodyChunked: string
-			const blobs: { [identifier: string]: unknown } = {}
+			const blobs: BlobRecords = {}
 			// TODO: test integration with Multer
 			if (req.files) {
 				// NOTE: multer manipulates the body if it's used as well as adding files to a ".files" object
@@ -53,7 +53,7 @@ export const expressPrimRpc = (options: PrimExpressPluginOptions) => {
 					if (fieldName.startsWith("_bin_")) {
 						const FileObj = typeof File === "undefined" ? (await import("node:buffer")).File : File
 						const file = new FileObj([given.buffer], given.originalname, { type: given.mimetype })
-						blobs[fieldName] = file
+						blobs[fieldName] = file as File // it may be node:buffer.File, but BlobRecords expects native File
 					}
 				}
 			} else {
@@ -71,7 +71,7 @@ export const expressPrimRpc = (options: PrimExpressPluginOptions) => {
 			}
 			const body = bodyForm ?? bodyChunked
 			const context = contextTransform(req, res)
-			const response = await prim.server().call({ method, url, body }, blobs, context)
+			const response = await prim.server().call({ method, url, body, blobs }, context)
 			res.status(response.status)
 			for (const [headerName, headerValue] of Object.entries(response.headers)) {
 				res.header(headerName, headerValue)

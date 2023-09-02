@@ -2,7 +2,7 @@
 // Copyright 2023 Ted Klingenberg
 // SPDX-License-Identifier: Apache-2.0
 
-import type { PrimServerMethodHandler, PrimServerEvents } from "@doseofted/prim-rpc"
+import type { PrimServerMethodHandler, PrimServerEvents, BlobRecords } from "@doseofted/prim-rpc"
 import type { FastifyPluginAsync, FastifyInstance, FastifyError, FastifyRequest, FastifyReply } from "fastify"
 import type FastifyMultipartPlugin from "@fastify/multipart"
 /** The default Prim context when used with Fastify. Overridden with `contextTransform` option. */
@@ -64,7 +64,7 @@ export const fastifyPrimRpc: FastifyPluginAsync<PrimFastifyPluginOptions> = asyn
 		url: prim.options.prefix,
 		handler: async (request, reply) => {
 			// TODO: read RPC for `_bin_` references and call `request.files()` only when needed
-			const blobs: { [identifier: string]: unknown } = {}
+			const blobs: BlobRecords = {}
 			let bodyForm: string
 			if (multipartPlugin && request.isMultipart()) {
 				const parts = request.parts({
@@ -83,7 +83,7 @@ export const fastifyPrimRpc: FastifyPluginAsync<PrimFastifyPluginOptions> = asyn
 						if (fileBuffer.length > 0) {
 							const FileObj = typeof File === "undefined" ? (await import("node:buffer")).File : File
 							const file = new FileObj(fileBuffer, part.filename, { type: part.mimetype })
-							blobs[part.fieldname] = file
+							blobs[part.fieldname] = file as File // it may be node:buffer.File, but BlobRecords expects native File
 						}
 					}
 				}
@@ -95,7 +95,7 @@ export const fastifyPrimRpc: FastifyPluginAsync<PrimFastifyPluginOptions> = asyn
 			} = request
 			const body = bodyForm ?? bodyReq
 			const context = contextTransform(request, reply)
-			const response = await prim.server().call({ method, url, body }, blobs, context)
+			const response = await prim.server().call({ method, url, body, blobs }, context)
 			// if (response.headers["content-type"] === "application/octet-stream") {
 			// 	void reply.status(response.status).headers(response.headers).send(Buffer.from(response.body))
 			// }
@@ -112,7 +112,7 @@ export const fastifyPrimRpc: FastifyPluginAsync<PrimFastifyPluginOptions> = asyn
 				raw: { url },
 			} = request
 			const context = contextTransform(request, reply)
-			const response = await prim.server().call({ method, url, body }, null, context)
+			const response = await prim.server().call({ method, url, body }, context)
 			// if (response.headers["content-type"] === "application/octet-stream") {
 			// 	void reply.status(response.status).headers(response.headers).send(Buffer.from(response.body))
 			// }
