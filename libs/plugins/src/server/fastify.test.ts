@@ -158,7 +158,7 @@ describe("Fastify plugin can support files", async () => {
 	const file = new File([fileContents], fileName)
 	formData.append("_bin_cool", await fileContents.text(), fileName)
 	const expected = { id: 1, result: module.uploadTheThing(file) }
-	test("given a text file", async () => {
+	test("upload a file", async () => {
 		const response = await request(fastify.server)
 			.post("/prim")
 			.send(formData.getBuffer())
@@ -168,4 +168,18 @@ describe("Fastify plugin can support files", async () => {
 		expect(response.status).toEqual(200)
 		expect(response.body).toEqual(expected)
 	})
+
+	// test("download a file", async () => {
+	// 	const response = await request(fastify.server)
+	// 		.post("/prim")
+	// 		.send({
+	// 			method: "makeItATextFile",
+	// 			args: "Hello!",
+	// 			id: 1,
+	// 		})
+	// 		.set("accept", "application/json")
+	// 	expect(response.headers["content-type"]).toContain("multipart/form-data")
+	// 	expect(response.status).toEqual(200)
+	// 	// expect(response.body).toEqual(expected)
+	// })
 })

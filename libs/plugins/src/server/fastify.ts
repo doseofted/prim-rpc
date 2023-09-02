@@ -5,11 +5,14 @@
 import type { PrimServerMethodHandler, PrimServerEvents, BlobRecords } from "@doseofted/prim-rpc"
 import type { FastifyPluginAsync, FastifyInstance, FastifyError, FastifyRequest, FastifyReply } from "fastify"
 import type FastifyMultipartPlugin from "@fastify/multipart"
+import { File as FileNode, Buffer } from "node:buffer" // unlike other servers, Fastify only works with Node so we can import this safely
+import type FormData from "form-data"
 /** The default Prim context when used with Fastify. Overridden with `contextTransform` option. */
 export type PrimFastifyContext = { context: "fastify"; request: FastifyRequest; reply: FastifyReply }
 
 interface SharedFastifyOptions {
 	multipartPlugin?: typeof FastifyMultipartPlugin
+	formDataObject?: typeof FormData
 	fileSizeLimitBytes?: number
 	contextTransform?: (req: FastifyRequest, res: FastifyReply) => unknown
 }
@@ -29,6 +32,7 @@ export const fastifyPrimRpc: FastifyPluginAsync<PrimFastifyPluginOptions> = asyn
 	const {
 		prim,
 		multipartPlugin,
+		formDataObject: FormData,
 		fileSizeLimitBytes: fileSize,
 		contextTransform = (request, reply) => ({ context: "fastify", request, reply }),
 	} = options
@@ -81,9 +85,8 @@ export const fastifyPrimRpc: FastifyPluginAsync<PrimFastifyPluginOptions> = asyn
 							part.file.on("end", () => resolve(chunks))
 						})
 						if (fileBuffer.length > 0) {
-							const FileObj = typeof File === "undefined" ? (await import("node:buffer")).File : File
-							const file = new FileObj(fileBuffer, part.filename, { type: part.mimetype })
-							blobs[part.fieldname] = file as File // it may be node:buffer.File, but BlobRecords expects native File
+							const file = new FileNode(fileBuffer, part.filename, { type: part.mimetype })
+							blobs[part.fieldname] = file as unknown as File // it may be node:buffer.File, but BlobRecords expects native File
 						}
 					}
 				}
@@ -96,6 +99,27 @@ export const fastifyPrimRpc: FastifyPluginAsync<PrimFastifyPluginOptions> = asyn
 			const body = bodyForm ?? bodyReq
 			const context = contextTransform(request, reply)
 			const response = await prim.server().call({ method, url, body, blobs }, context)
+			const blobEntries = Object.entries(response.blobs)
+			// FIXME: if only a single file is given, the file itself should be returned (not FormData)
+			if (blobEntries.length > 0 && FormData) {
+				const formResponse = new FormData()
+				formResponse.append("rpc", response.body)
+				for (const [blobKey, blobValue] of blobEntries) {
+					const asBuffer = blobValue instanceof Blob ? blobValue.arrayBuffer() : blobValue
+					formResponse.append(
+						blobKey,
+						Buffer.from(await asBuffer),
+						blobValue instanceof FileNode ? blobValue.name : undefined
+					)
+				}
+				if ("getBuffer" in formResponse) {
+					void reply
+						.status(response.status)
+						.headers({ ...response.headers, ...formResponse.getHeaders() })
+						.send(formResponse.getBuffer())
+				}
+				return
+			}
 			// if (response.headers["content-type"] === "application/octet-stream") {
 			// 	void reply.status(response.status).headers(response.headers).send(Buffer.from(response.body))
 			// }

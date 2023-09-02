@@ -32,6 +32,7 @@
 		"@fastify/cors": "^8.3.0",
 		"@fastify/multipart": "^7.7.3",
 		"fastify": "^4.21.0",
+		"form-data": "^4.0.0",
 		"superjson": "^1.13.1",
 		"tsx": "^3.12.7",
 		"ws": "^8.13.0"
