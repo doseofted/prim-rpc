@@ -12,6 +12,7 @@ import type { FastifyPluginAsync, FastifyInstance, FastifyError, FastifyRequest,
 import type FastifyMultipartPlugin from "@fastify/multipart"
 import { File as FileNode, Buffer } from "node:buffer" // unlike other servers, Fastify only works with Node so we can import this safely
 import type FormData from "form-data"
+import type { AppendOptions } from "form-data"
 /** The default Prim context when used with Fastify. Overridden with `contextTransform` option. */
 export type PrimFastifyContext = { context: "fastify"; request: FastifyRequest; reply: FastifyReply }
 
@@ -73,18 +74,27 @@ export const fastifyPrimRpc: FastifyPluginAsync<PrimFastifyPluginOptions> = asyn
 		const hasBinary = ["application/octet-stream", "multipart/form-data"].includes(response.headers["content-type"])
 		const blobEntries = Object.entries(response.blobs)
 		const suggested = response.headers["content-type"] === "application/octet-stream" ? "file" : "form"
-		let file: Buffer | null = null
+		let fileBuff: Buffer | null = null
+		let fileName = ""
+		let fileType = "application/octet-stream"
 		if (hasBinary && MyFormData) {
 			const formResponse = new MyFormData()
 			formResponse.append("rpc", response.body)
 			for (const [blobKey, blobValue] of blobEntries) {
 				const asBuffer = blobValue instanceof Blob ? await blobValue.arrayBuffer() : blobValue
 				const fileBuffer = Buffer.from(asBuffer)
-				formResponse.append(blobKey, fileBuffer, blobValue instanceof FileNode ? blobValue.name : undefined)
-				if (!file) {
-					file = fileBuffer
+				const options: AppendOptions = {
+					filename: blobValue instanceof FileNode ? blobValue.name : "",
+					contentType: blobValue instanceof FileNode ? blobValue.type : "",
+				}
+				formResponse.append(blobKey, fileBuffer, options)
+				if (!fileBuff) {
+					fileBuff = fileBuffer
+					fileName = options.filename
+					fileType = options.contentType
 				}
 			}
+			const file = { buffer: fileBuff, name: fileName, type: fileType }
 			return { form: formResponse, file, suggested: suggested } as const
 		}
 		return { suggested: "none" } as const
@@ -149,10 +159,17 @@ export const fastifyPrimRpc: FastifyPluginAsync<PrimFastifyPluginOptions> = asyn
 			const context = contextTransform(request, reply)
 			const response = await prim.server().call({ method, url, body }, context)
 			const { file, form, suggested } = await binaryToFormData(response, FormData)
-			if (suggested === "file") {
-				void reply.status(response.status).headers(response.headers).send(file)
+			if (suggested === "file" && file) {
+				void reply
+					.status(response.status)
+					.headers({
+						...response.headers,
+						"content-disposition": `inline; filename="${file.name}"`,
+						"content-type": file.type ?? response.headers["content-type"],
+					})
+					.send(file.buffer)
 				return
-			} else if (suggested === "form" && "getBuffer" in form) {
+			} else if (suggested === "form" && form && "getBuffer" in form) {
 				void reply
 					.status(response.status)
 					.headers({ ...response.headers, ...form.getHeaders() })
