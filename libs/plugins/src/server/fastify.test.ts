@@ -132,7 +132,7 @@ describe("Fastify plugin can support binary data", async () => {
 	const fastify = Fastify()
 	createPrimServer({
 		module,
-		methodHandler: createMethodHandler({ fastify, multipartPlugin, formDataObject: FormData }),
+		methodHandler: createMethodHandler({ fastify, multipartPlugin, formDataHandler: FormData }),
 	})
 	beforeEach(async () => {
 		await fastify.ready()

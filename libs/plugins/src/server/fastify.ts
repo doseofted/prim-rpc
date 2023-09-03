@@ -17,8 +17,8 @@ import type { AppendOptions } from "form-data"
 export type PrimFastifyContext = { context: "fastify"; request: FastifyRequest; reply: FastifyReply }
 
 interface SharedFastifyOptions {
+	formDataHandler?: typeof FormData
 	multipartPlugin?: typeof FastifyMultipartPlugin
-	formDataObject?: typeof FormData
 	fileSizeLimitBytes?: number
 	contextTransform?: (req: FastifyRequest, res: FastifyReply) => unknown
 }
@@ -38,7 +38,7 @@ export const fastifyPrimRpc: FastifyPluginAsync<PrimFastifyPluginOptions> = asyn
 	const {
 		prim,
 		multipartPlugin,
-		formDataObject: FormData,
+		formDataHandler: FormData,
 		fileSizeLimitBytes: fileSize,
 		contextTransform = (request, reply) => ({ context: "fastify", request, reply }),
 	} = options
