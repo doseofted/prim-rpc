@@ -1,7 +1,7 @@
 import Fastify from "fastify"
+import Cors from "@fastify/cors"
 import multipartPlugin from "@fastify/multipart"
 import formDataObject from "form-data"
-import Cors from "@fastify/cors"
 import { WebSocketServer } from "ws"
 import superjson from "superjson"
 import { createPrimServer } from "@doseofted/prim-rpc"
@@ -22,6 +22,7 @@ const methodHandler = createMethodHandler({
 const wss = new WebSocketServer({ server: fastify.server })
 const callbackHandler = createCallbackHandler({ wss })
 
+// Optionally set up JSON handler
 const useCustomJsonHandler = false
 const jsonHandler = useCustomJsonHandler ? superjson : JSON
 

@@ -341,6 +341,9 @@ export interface CommonServerSimpleGivenOptions {
 	blobs?: BlobRecords
 }
 
+/**
+ * Common response options for servers.
+ */
 export interface CommonServerResponseOptions {
 	/** HTTP status code */
 	status: number

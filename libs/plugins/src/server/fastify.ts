@@ -2,7 +2,12 @@
 // Copyright 2023 Ted Klingenberg
 // SPDX-License-Identifier: Apache-2.0
 
-import type { PrimServerMethodHandler, PrimServerEvents, BlobRecords } from "@doseofted/prim-rpc"
+import type {
+	PrimServerMethodHandler,
+	PrimServerEvents,
+	BlobRecords,
+	CommonServerResponseOptions,
+} from "@doseofted/prim-rpc"
 import type { FastifyPluginAsync, FastifyInstance, FastifyError, FastifyRequest, FastifyReply } from "fastify"
 import type FastifyMultipartPlugin from "@fastify/multipart"
 import { File as FileNode, Buffer } from "node:buffer" // unlike other servers, Fastify only works with Node so we can import this safely
@@ -63,6 +68,27 @@ export const fastifyPrimRpc: FastifyPluginAsync<PrimFastifyPluginOptions> = asyn
 			done(error, undefined)
 		}
 	})
+	async function binaryToFormData(response: CommonServerResponseOptions, MyFormData: typeof FormData) {
+		// NOTE: "content-type" is determined by Prim RPC server: octet-stream is given for single file returned directly otherwise multipart
+		const hasBinary = ["application/octet-stream", "multipart/form-data"].includes(response.headers["content-type"])
+		const blobEntries = Object.entries(response.blobs)
+		const suggested = response.headers["content-type"] === "application/octet-stream" ? "file" : "form"
+		let file: Buffer | null = null
+		if (hasBinary && MyFormData) {
+			const formResponse = new MyFormData()
+			formResponse.append("rpc", response.body)
+			for (const [blobKey, blobValue] of blobEntries) {
+				const asBuffer = blobValue instanceof Blob ? await blobValue.arrayBuffer() : blobValue
+				const fileBuffer = Buffer.from(asBuffer)
+				formResponse.append(blobKey, fileBuffer, blobValue instanceof FileNode ? blobValue.name : undefined)
+				if (!file) {
+					file = fileBuffer
+				}
+			}
+			return { form: formResponse, file, suggested: suggested } as const
+		}
+		return { suggested: "none" } as const
+	}
 	fastify.route<{ Body: string }>({
 		method: ["GET", "POST"],
 		url: prim.options.prefix,
@@ -99,30 +125,15 @@ export const fastifyPrimRpc: FastifyPluginAsync<PrimFastifyPluginOptions> = asyn
 			const body = bodyForm ?? bodyReq
 			const context = contextTransform(request, reply)
 			const response = await prim.server().call({ method, url, body, blobs }, context)
-			const blobEntries = Object.entries(response.blobs)
-			// FIXME: if only a single file is given, the file itself should be returned (not FormData)
-			if (blobEntries.length > 0 && FormData) {
-				const formResponse = new FormData()
-				formResponse.append("rpc", response.body)
-				for (const [blobKey, blobValue] of blobEntries) {
-					const asBuffer = blobValue instanceof Blob ? blobValue.arrayBuffer() : blobValue
-					formResponse.append(
-						blobKey,
-						Buffer.from(await asBuffer),
-						blobValue instanceof FileNode ? blobValue.name : undefined
-					)
-				}
-				if ("getBuffer" in formResponse) {
-					void reply
-						.status(response.status)
-						.headers({ ...response.headers, ...formResponse.getHeaders() })
-						.send(formResponse.getBuffer())
-				}
+			// NOTE: in POST requests, a single file result is not returned directly (it remains part of form data)
+			const { form } = await binaryToFormData(response, FormData)
+			if (typeof form === "object" && "getBuffer" in form) {
+				void reply
+					.status(response.status)
+					.headers({ ...response.headers, ...form.getHeaders() })
+					.send(form.getBuffer())
 				return
 			}
-			// if (response.headers["content-type"] === "application/octet-stream") {
-			// 	void reply.status(response.status).headers(response.headers).send(Buffer.from(response.body))
-			// }
 			void reply.status(response.status).headers(response.headers).send(response.body)
 		},
 	})
@@ -137,9 +148,17 @@ export const fastifyPrimRpc: FastifyPluginAsync<PrimFastifyPluginOptions> = asyn
 			} = request
 			const context = contextTransform(request, reply)
 			const response = await prim.server().call({ method, url, body }, context)
-			// if (response.headers["content-type"] === "application/octet-stream") {
-			// 	void reply.status(response.status).headers(response.headers).send(Buffer.from(response.body))
-			// }
+			const { file, form, suggested } = await binaryToFormData(response, FormData)
+			if (suggested === "file") {
+				void reply.status(response.status).headers(response.headers).send(file)
+				return
+			} else if (suggested === "form" && "getBuffer" in form) {
+				void reply
+					.status(response.status)
+					.headers({ ...response.headers, ...form.getHeaders() })
+					.send(form.getBuffer())
+				return
+			}
 			void reply.status(response.status).headers(response.headers).send(response.body)
 		},
 	})

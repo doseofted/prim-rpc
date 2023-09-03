@@ -75,7 +75,7 @@ function createServerActions(
 				const possibleCalls = Array.isArray(prepared) ? checkRpcCall(prepared) : [checkRpcCall(prepared)]
 				if (Object.entries(blobs || {}).length > 0) {
 					for (const toCall of possibleCalls) {
-						toCall.args = mergeBlobLikeWithGiven(toCall.args, blobs) as unknown[]
+						toCall.args = toCall.args.map(arg => mergeBlobLikeWithGiven(arg, blobs))
 					}
 				}
 				return Array.isArray(prepared) ? possibleCalls : possibleCalls[0]
@@ -257,7 +257,16 @@ function createServerActions(
 		})
 		const body = jsonHandler.stringify(Array.isArray(given) ? givenOnly : givenOnly[0]) as string
 		// NOTE: body length is generally handled by server framework, I think
-		const headers = { "content-type": jsonHandler.mediaType ?? "application/json" }
+		const blobCount = Object.keys(blobs).length
+		// these mime types are just base suggestions to be overridden by chosen plugin, if applicable
+		const singleFileResult =
+			blobCount === 1 && !Array.isArray(given) && typeof given.result === "string" && given.result.startsWith("_bin_")
+		const contentType = singleFileResult
+			? "application/octet-stream"
+			: blobCount > 1
+			? "multipart/form-data"
+			: jsonHandler.mediaType ?? "application/json"
+		const headers = { "content-type": contentType }
 		const answers = Array.isArray(given) ? given : [given]
 		const statuses = answers.map(answer => ("error" in answer ? 500 : "result" in answer ? 200 : 400))
 		const notOkay = statuses.filter(stat => stat !== 200)
