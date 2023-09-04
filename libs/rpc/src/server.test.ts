@@ -38,6 +38,7 @@ describe("Prim Server can call methods with local module", () => {
 			query: { greeting: "Salut", name: "Ted" },
 		})
 		const response = await server.call({ method: "GET", url })
+		// eslint-disable-next-line @typescript-eslint/no-unsafe-argument
 		const result = JSON.parse(response.body) as RpcAnswer
 		expect(result).toEqual({ result: "Salut Ted!" })
 	})
@@ -50,6 +51,7 @@ describe("Prim Server can call methods with local module", () => {
 		}
 		const body = JSON.stringify(call)
 		const response = await server.call({ method: "POST", body })
+		// eslint-disable-next-line @typescript-eslint/no-unsafe-argument
 		const result = JSON.parse(response.body) as RpcAnswer
 		expect(result).toEqual({ result: "Hola Ted!", id: 1 })
 	})
@@ -64,6 +66,7 @@ describe("Prim Server can call methods with dynamically imported module", () => 
 			query: { greeting: "Salut", name: "Ted" },
 		})
 		const response = await server.call({ method: "GET", url })
+		// eslint-disable-next-line @typescript-eslint/no-unsafe-argument
 		const result = JSON.parse(response.body) as RpcAnswer
 		expect(result).toEqual({ result: "Salut Ted!" })
 	})
@@ -77,6 +80,7 @@ describe("Prim Server can call methods with dynamically imported module", () => 
 		}
 		const body = JSON.stringify(call)
 		const response = await server.call({ method: "POST", body })
+		// eslint-disable-next-line @typescript-eslint/no-unsafe-argument
 		const result = JSON.parse(response.body) as RpcAnswer
 		expect(result).toEqual({ result: "Hola Ted!", id: 1 })
 	})
@@ -86,6 +90,7 @@ describe("Prim Server can call methods with dynamically imported module", () => 
 async function handlePost(server: PrimServerActionsExtended, call: RpcCall): Promise<RpcAnswer> {
 	const body = JSON.stringify(call)
 	const response = await server.call({ method: "POST", body })
+	// eslint-disable-next-line @typescript-eslint/no-unsafe-argument
 	const result = JSON.parse(response.body) as RpcAnswer
 	return result
 }
@@ -178,6 +183,7 @@ test("Prim Server can call remote methods (without module directly)", async () =
 	}
 	const body = JSON.stringify(call)
 	const response = await server.call({ method: "POST", body })
+	// eslint-disable-next-line @typescript-eslint/no-unsafe-argument
 	const result = JSON.parse(response.body) as RpcAnswer
 	expect(result).toEqual({ result: "Hellooo Ted!", id: 1 })
 })
@@ -194,6 +200,7 @@ describe("Prim Server can handle invalid requests", () => {
 		}
 		const body = JSON.stringify(call)
 		const response = await server.call({ method: "POST", body })
+		// eslint-disable-next-line @typescript-eslint/no-unsafe-argument
 		const result = JSON.parse(response.body) as RpcAnswer
 		expect(result).toEqual({ error: "Invalid method name", id: 1 })
 	})
@@ -201,6 +208,7 @@ describe("Prim Server can handle invalid requests", () => {
 		const server = prim.server()
 		const body = '{ "method": "sayHello", "id": 1 ]'
 		const response = await server.call({ method: "POST", body })
+		// eslint-disable-next-line @typescript-eslint/no-unsafe-argument
 		const result = JSON.parse(response.body) as RpcAnswer
 		expect(result).toEqual({ error: "Invalid RPC" })
 	})
@@ -235,6 +243,7 @@ describe("Prim Server can understand its given context", () => {
 		const call: RpcCall = { method: "whatIsThis", id: 1 }
 		const body = JSON.stringify(call)
 		const response = await server.call({ method: "POST", body }, { context: "ted" })
+		// eslint-disable-next-line @typescript-eslint/no-unsafe-argument
 		const result = JSON.parse(response.body) as RpcAnswer
 		expect(result).toEqual({ result: { this: true }, id: 1 })
 	})
