@@ -13,6 +13,7 @@ import type * as exampleClient from "@doseofted/prim-example"
 import * as exampleServer from "@doseofted/prim-example"
 import jsonHandler from "superjson"
 import { createPrimTestingPlugins } from "./testing"
+import { File } from "node:buffer"
 
 const module = exampleServer
 type IModule = typeof exampleClient
@@ -160,6 +161,43 @@ describe("Prim Client can call deeply nested methods", () => {
 		const expected = module.testLevel2.testLevel1.sayHello(args)
 		const result = await prim.testLevel2.testLevel1.sayHello(args)
 		expect(result).toEqual(expected)
+	})
+})
+
+describe("Prim Client can handle binary data", () => {
+	test("with local source, download", async () => {
+		const prim = createPrimClient({ module })
+		const args = ["Hi Ted!"] as const
+		const expected = await module.makeItATextFile(...args)
+		const result = await prim.makeItATextFile(...args)
+		expect(result).toBeInstanceOf(File)
+		void expect(result.text()).resolves.toEqual(await expected.text())
+	})
+	test("with remote source, download", async () => {
+		const { callbackPlugin, methodPlugin, callbackHandler, methodHandler } = createPrimTestingPlugins()
+		createPrimServer({ module, callbackHandler, methodHandler })
+		const prim = createPrimClient<IModule>({ callbackPlugin, methodPlugin })
+		const args = ["Hi Ted!"] as const
+		const expected = await module.makeItATextFile(...args)
+		const result = await prim.makeItATextFile(...args)
+		expect(result).toBeInstanceOf(File)
+		void expect(result.text()).resolves.toEqual(await expected.text())
+	})
+	test("with local source, upload", async () => {
+		const prim = createPrimClient({ module })
+		const args = [new File(["Hi Ted!"], "test.txt")] as const
+		const expected = module.uploadTheThing(...args)
+		const result = await prim.uploadTheThing(...args)
+		void expect(result).toMatchObject(expected)
+	})
+	test("with remote source, upload", async () => {
+		const { callbackPlugin, methodPlugin, callbackHandler, methodHandler } = createPrimTestingPlugins()
+		createPrimServer({ module, callbackHandler, methodHandler })
+		const prim = createPrimClient<IModule>({ callbackPlugin, methodPlugin })
+		const args = [new File(["Hi Ted!"], "test.txt")] as const
+		const expected = module.uploadTheThing(...args)
+		const result = await prim.uploadTheThing(...args)
+		void expect(result).toMatchObject(expected)
 	})
 })
 

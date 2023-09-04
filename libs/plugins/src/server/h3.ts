@@ -53,6 +53,7 @@ export function defineH3PrimHandler(options: PrimH3PluginOptions) {
 		const result = await prim.server().call({ body, method, url, blobs }, context)
 		setResponseStatus(event, result.status)
 		setResponseHeaders(event, result.headers)
+		// eslint-disable-next-line @typescript-eslint/no-unsafe-return
 		return result.body
 	})
 }

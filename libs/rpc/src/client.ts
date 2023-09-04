@@ -20,7 +20,7 @@ import getProperty from "just-safe-get"
 import removeFromArray from "just-remove"
 import { deserializeError } from "serialize-error"
 import { createPrimOptions, primMajorVersion, useVersionInRpc } from "./options"
-import { handlePossibleBlobs } from "./blobs"
+import { handlePossibleBlobs, mergeBlobLikeWithGiven } from "./blobs"
 import { PromiseResolveStatus } from "./interfaces"
 import type {
 	PromisifiedModule,
@@ -242,15 +242,20 @@ export function createPrimClient<
 			const rpcCallOrCalls = rpcCallList.length === 1 ? rpcCallList[0] : rpcCallList
 			configured
 				.methodPlugin(endpoint, rpcCallOrCalls, jsonHandler, blobs)
-				.then(answers => {
+				.then(answersAll => {
+					// FIXME: server should be given location of blob in object for optimized merging
+					// for example, a file using key _bin_hello123.file.test would merge with RPC at .file.test path
+					const { result: answers, blobs: givenBlobs } = answersAll
 					// return either the single result or the batched results to caller
 					if (Array.isArray(answers)) {
 						answers.forEach(answer => {
-							httpEvent.emit("response", answer)
+							const answerMerged = mergeBlobLikeWithGiven(answer, givenBlobs)
+							httpEvent.emit("response", answerMerged)
 						})
 					} else {
 						const answer = answers
-						httpEvent.emit("response", answer)
+						const answerMerged = mergeBlobLikeWithGiven(answer, givenBlobs)
+						httpEvent.emit("response", answerMerged)
 					}
 				})
 				.catch((errors: RpcAnswer[]) => {

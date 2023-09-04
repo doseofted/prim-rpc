@@ -104,8 +104,8 @@ export function checkRpcResult<T = unknown, V = T extends unknown[] ? RpcAnswer[
 // !SECTION
 
 // SECTION: Validation of HTTP-like arguments/response
-export function checkHttpLikeRequest(given: unknown) {
-	const toCall: Partial<CommonServerSimpleGivenOptions> = {}
+export function checkHttpLikeRequest(given: unknown, binary = false) {
+	const toCall: Partial<CommonServerSimpleGivenOptions<typeof binary>> = {}
 	const givenObject = typeof given === "object" && given !== null && given
 	if (!givenObject) {
 		throw { error: "Invalid request made by method/callback handler" }
@@ -114,7 +114,11 @@ export function checkHttpLikeRequest(given: unknown) {
 	if (url) {
 		toCall.url = url
 	}
-	const body = "body" in givenObject && typeof givenObject.body === "string" && givenObject.body
+	// binary body today is expected to be further processed by JSON handler
+	const body =
+		"body" in givenObject &&
+		typeof givenObject.body === (binary ? "object" : "string") &&
+		(givenObject.body as string | object)
 	if (body) {
 		toCall.body = body
 	}
@@ -140,13 +144,16 @@ export function checkHttpLikeRequest(given: unknown) {
 	return toCall as CommonServerSimpleGivenOptions
 }
 
-export function checkHttpLikeResponse(given: unknown): CommonServerResponseOptions {
-	const toRespond: Partial<CommonServerResponseOptions> = {}
+export function checkHttpLikeResponse(given: unknown, binary = false): CommonServerResponseOptions {
+	const toRespond: Partial<CommonServerResponseOptions<typeof binary>> = {}
 	const givenObject = typeof given === "object" && given !== null && given
 	if (!givenObject) {
 		throw { error: "Internal error while transforming response" }
 	}
-	const body = "body" in givenObject && typeof givenObject.body === "string" && givenObject.body
+	const body =
+		"body" in givenObject &&
+		typeof givenObject.body === (binary ? "object" : "string") &&
+		(givenObject.body as string | object)
 	if (body) {
 		toRespond.body = body
 	} else {

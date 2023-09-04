@@ -43,6 +43,7 @@ export function honoPrimRpc(options: PrimHonoPluginOptions) {
 		}
 		const server = prim.server()
 		const response = await server.call({ body, url, method, blobs }, contextTransform(context))
+		// eslint-disable-next-line @typescript-eslint/no-unsafe-argument
 		return new Response(response.body, {
 			headers: response.headers,
 			status: response.status,

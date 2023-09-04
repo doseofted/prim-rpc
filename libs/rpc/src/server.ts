@@ -67,8 +67,10 @@ function createServerActions(
 	const { jsonHandler, prefix: serverPrefix, handleError } = serverOptions
 	const prepareCall = (given: CommonServerSimpleGivenOptions = {}): RpcCall | RpcCall[] => {
 		try {
-			const givenReq = checkHttpLikeRequest(given)
+			const givenReq = checkHttpLikeRequest(given, jsonHandler?.binary)
+			// eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
 			const { body, method, url: possibleUrl, blobs } = givenReq
+			// eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
 			const providedBody = method === "POST" && body
 			if (providedBody) {
 				const prepared = jsonHandler.parse(givenReq.body) as RpcCall | RpcCall[]
@@ -133,7 +135,8 @@ function createServerActions(
 			const { client, socketEvent: event, configured } = instance ?? createPrimInstance(serverOptions)
 			const callList = Array.isArray(calls) ? calls : [calls]
 			const answeringCalls = callList.map(async (givenUnchecked): Promise<RpcAnswer> => {
-				const { method, args, id } = checkRpcCall(givenUnchecked)
+				const { method, args /* : argsGiven */, id } = checkRpcCall(givenUnchecked)
+				// const args = Object.entries(blobs || {}).length > 0 ? argsGiven.map(arg => mergeBlobLikeWithGiven(arg, blobs)) : argsGiven
 				if (method === "_error_") {
 					throw args[0] // from internal prepareCall step
 				}
@@ -274,7 +277,7 @@ function createServerActions(
 		// NOTE: return 200:okay, 400:missing, 500:error if any call has that status
 		const status = notOkay.length > 0 ? (errored.length > 0 ? 500 : 400) : 200
 		try {
-			return checkHttpLikeResponse({ body, headers, status, blobs })
+			return checkHttpLikeResponse({ body, headers, status, blobs }, jsonHandler?.binary)
 		} catch (error: unknown) {
 			if (typeof error === "object" && error !== null && "primRpc" in error && error.primRpc === PrimRpcSpecific) {
 				return { body: jsonHandler.stringify(error) as string, headers: {}, status: 500 }
@@ -320,12 +323,16 @@ function createSocketEvents(serverOptions: PrimServerOptions): PrimServerSocketE
 			// FIXME: don't stop listening to other responses when new call is made)
 			event.off("response")
 			event.on("response", data => {
+				// FIXME: in the future, binary data should also become supported in callback handlers (also, no type cast will be needed)
+				// eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
 				const { body } = prepareSend(data)
+				// eslint-disable-next-line @typescript-eslint/no-unsafe-argument
 				send(body)
 			})
 			const preparedArgs = prepareCall({ body })
 			const result = await prepareRpcBase(preparedArgs, context)
 			const preparedResult = prepareSend(result)
+			// eslint-disable-next-line @typescript-eslint/no-unsafe-argument
 			send(preparedResult.body)
 		}
 		const rpc = async (body: RpcCall | RpcCall[], send: PrimServerSocketAnswerRpc, context?: unknown) => {

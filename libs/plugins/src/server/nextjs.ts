@@ -37,6 +37,7 @@ export function defineNextjsAppPrimHandler(options: PrimNextjsAppPluginOptions) 
 			body = await request.text()
 		}
 		const result = await prim.server().call({ body, method, url, blobs }, context)
+		// eslint-disable-next-line @typescript-eslint/no-unsafe-argument
 		return new Response(result.body, {
 			headers: { ...result.headers, ...headers },
 			status: result.status,

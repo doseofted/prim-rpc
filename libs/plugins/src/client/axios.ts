@@ -18,7 +18,7 @@ export const createMethodPlugin = (client: AxiosInstance) => {
 		})
 		const responseStr = data as string
 		const result = jsonHandler.parse(responseStr) as RpcAnswer | RpcAnswer[]
-		return result
+		return { result }
 	}
 	return methodPlugin
 }

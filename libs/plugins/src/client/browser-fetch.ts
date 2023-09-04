@@ -2,7 +2,7 @@
 // Copyright 2023 Ted Klingenberg
 // SPDX-License-Identifier: Apache-2.0
 
-import type { PrimClientMethodPlugin, RpcAnswer } from "@doseofted/prim-rpc"
+import type { BlobRecords, PrimClientMethodPlugin, RpcAnswer } from "@doseofted/prim-rpc"
 
 // TODO: test this plugin
 
@@ -38,12 +38,26 @@ export const createMethodPlugin = (options: MethodFetchOptions = {}) => {
 				body: jsonHandler.stringify(jsonBody),
 			}
 		}
-		const result = await fetch(endpoint, {
+		const fetchResult = await fetch(endpoint, {
 			...fetchOptions,
 			credentials: options.credentials,
 		})
-		const isBinaryLike = result.headers.get("content-type") === "application/octet-stream"
-		return jsonHandler.parse(await (isBinaryLike ? result.blob() : result.text())) as RpcAnswer | RpcAnswer[]
+		const resultContentType = fetchResult.headers.get("content-type")
+		if (resultContentType.startsWith("multipart/form-data")) {
+			const formData = await fetchResult.formData()
+			const resultBlobs: BlobRecords = {}
+			const result = jsonHandler.parse(formData.get("rpc")) as RpcAnswer | RpcAnswer[]
+			formData.delete("rpc")
+			formData.forEach((val, key) => {
+				resultBlobs[key] = val as Blob
+			})
+			return { result, blobs: resultBlobs }
+		}
+		const isBinaryLike = !!(resultContentType === jsonHandler.mediaType && jsonHandler.binary)
+		const result = jsonHandler.parse(await (isBinaryLike ? fetchResult.blob() : fetchResult.text())) as
+			| RpcAnswer
+			| RpcAnswer[]
+		return { result }
 	}
 	return methodPlugin
 }

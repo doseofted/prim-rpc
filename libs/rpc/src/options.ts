@@ -34,15 +34,17 @@ const createBaseClientOptions = (server = false): PrimOptions => ({
 	clientBatchTime: 0,
 	// allow options of using a different JSON parsing/conversion library (for instance, "superjson")
 	// NOTE: JSON properties are not enumerable so create an object with enumerable properties referencing JSON methods
-	jsonHandler: { stringify: JSON.stringify, parse: destr },
+	jsonHandler: { stringify: JSON.stringify, parse: destr, binary: false, mediaType: "application/json" },
 	// `client()` is intended to be overridden so as not to force any one HTTP framework but default is fine for most cases
 	// eslint-disable-next-line @typescript-eslint/require-await -- Type definitions expects async function (even if not needed here)
 	methodPlugin: async (_endpoint, jsonBody) => {
 		const error = `Prim-RPC's method plugin was not provided (${server ? "server" : "client"})`
 		if (Array.isArray(jsonBody)) {
-			return jsonBody.map(({ id }) => ({ id, error }))
+			const result = jsonBody.map(({ id }) => ({ id, error }))
+			return { result }
 		}
-		return { error, id: jsonBody.id }
+		const result = { error, id: jsonBody.id }
+		return { result }
 	},
 	// same with socket, usually the default WebSocket client is fine but the choice to change should be given
 	callbackPlugin: (_endpoint, { response }) => {
