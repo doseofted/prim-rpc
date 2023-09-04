@@ -8,12 +8,13 @@
 /* eslint-disable @typescript-eslint/no-unsafe-return -- Test the unexpected */
 
 import { describe, test, expect } from "vitest"
-import { createPrimClient, createPrimServer } from "."
+import { JsonHandler, createPrimClient, createPrimServer } from "."
 import type * as exampleClient from "@doseofted/prim-example"
 import * as exampleServer from "@doseofted/prim-example"
 import jsonHandler from "superjson"
 import { createPrimTestingPlugins } from "./testing"
 import { File } from "node:buffer"
+import { encode as msgPack, decode as msgUnpack } from "@msgpack/msgpack"
 
 const module = exampleServer
 type IModule = typeof exampleClient
@@ -132,17 +133,38 @@ test("Prim Client can call allowed methods on methods", async () => {
 	expect(result).toEqual(expected)
 })
 
-test("Prim Client can use alternative JSON handler", async () => {
-	const { callbackPlugin, methodPlugin, callbackHandler, methodHandler } = createPrimTestingPlugins()
-	// JSON handler is only useful with remote source (no local source test needed)
-	const commonOptions = { jsonHandler }
-	createPrimServer({ ...commonOptions, module, callbackHandler, methodHandler })
-	const prim = createPrimClient<IModule>({ ...commonOptions, callbackPlugin, methodPlugin })
-	const date = new Date()
-	const expected = module.whatIsDayAfter(date)
-	const result = await prim.whatIsDayAfter(date)
-	expect(result).toEqual(expected)
-	expect(result).toBeInstanceOf(Date)
+/** An example using msgpack */
+const binaryJsonHandler: JsonHandler = {
+	stringify: msgPack,
+	parse: msgUnpack,
+	binary: true,
+	mediaType: "application/octet-stream",
+}
+
+// JSON handler is only useful with remote source (no local source test needed)
+describe("Prim Client can use alternative JSON handler", () => {
+	test("string (actual JSON)", async () => {
+		const { callbackPlugin, methodPlugin, callbackHandler, methodHandler } = createPrimTestingPlugins()
+		const commonOptions = { jsonHandler }
+		createPrimServer({ ...commonOptions, module, callbackHandler, methodHandler })
+		const prim = createPrimClient<IModule>({ ...commonOptions, callbackPlugin, methodPlugin })
+		const date = new Date()
+		const expected = module.whatIsDayAfter(date)
+		const result = await prim.whatIsDayAfter(date)
+		expect(result).toEqual(expected)
+		expect(result).toBeInstanceOf(Date)
+	})
+	test("binary (not JSON)", async () => {
+		const { callbackPlugin, methodPlugin, callbackHandler, methodHandler } = createPrimTestingPlugins()
+		const commonOptions = { jsonHandler: binaryJsonHandler, handleBlobs: false }
+		createPrimServer({ ...commonOptions, module, callbackHandler, methodHandler })
+		const prim = createPrimClient<IModule>({ ...commonOptions, callbackPlugin, methodPlugin })
+		const date = new Date()
+		const expected = module.whatIsDayAfter(date)
+		const result = await prim.whatIsDayAfter(date)
+		expect(result).toEqual(expected)
+		expect(result).toBeInstanceOf(Date)
+	})
 })
 
 describe("Prim Client can call deeply nested methods", () => {
@@ -199,6 +221,22 @@ describe("Prim Client can handle binary data", () => {
 		const result = await prim.uploadTheThing(...args)
 		void expect(result).toMatchObject(expected)
 	})
+
+	// FIXME: It seems most msgpack implementations in JavaScript don't support Blob/File because conversion is async
+	// I'll need some sort of preprocessing step, the synchronous value being given to the JSON handler
+
+	// test("with remote source, upload, binary handler", async () => {
+	// 	const { callbackPlugin, methodPlugin, callbackHandler, methodHandler } = createPrimTestingPlugins()
+	// 	const jsonHandler = binaryJsonHandler
+	// 	const commonOptions = { jsonHandler, handleBlobs: true }
+	// 	// TODO: handleBlobs option is no longer needed (now that .binary option is supposed to be given on handler)
+	// 	createPrimServer({ ...commonOptions, module, callbackHandler, methodHandler })
+	// 	const prim = createPrimClient<IModule>({ ...commonOptions, callbackPlugin, methodPlugin })
+	// 	const args = [new File(["Hi Ted!"], "test.txt")] as const
+	// 	const expected = module.uploadTheThing(...args)
+	// 	const result = await prim.uploadTheThing(...args)
+	// 	void expect(result).toMatchObject(expected)
+	// })
 })
 
 describe("Prim Client can throw errors", () => {

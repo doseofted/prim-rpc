@@ -9,8 +9,11 @@ import { serializeError } from "serialize-error"
 import { createPrimOptions, primMajorVersion, useVersionInRpc } from "./options"
 import { createPrimClient } from "./client"
 import { handlePossibleBlobs, mergeBlobLikeWithGiven } from "./blobs"
-import type { AnyFunction, BlobRecords, JsonHandler } from "./interfaces"
+import { PrimRpcSpecific, checkHttpLikeRequest, checkHttpLikeResponse, checkRpcCall, checkRpcResult } from "./validate"
 import type {
+	AnyFunction,
+	BlobRecords,
+	JsonHandler,
 	CommonServerSimpleGivenOptions,
 	CommonServerResponseOptions,
 	PrimServerOptions,
@@ -25,7 +28,6 @@ import type {
 	PrimServer,
 	PrimServerSocketAnswerRpc,
 } from "./interfaces"
-import { PrimRpcSpecific, checkHttpLikeRequest, checkHttpLikeResponse, checkRpcCall, checkRpcResult } from "./validate"
 
 /**
  *
@@ -64,7 +66,7 @@ function createServerActions(
 	serverOptions: PrimServerOptions,
 	instance?: ReturnType<typeof createPrimInstance>
 ): PrimServerActionsBase {
-	const { jsonHandler, prefix: serverPrefix, handleError } = serverOptions
+	const { jsonHandler, prefix: serverPrefix, handleError, handleBlobs } = serverOptions
 	const prepareCall = (given: CommonServerSimpleGivenOptions = {}): RpcCall | RpcCall[] => {
 		try {
 			const givenReq = checkHttpLikeRequest(given, jsonHandler?.binary)
@@ -75,7 +77,7 @@ function createServerActions(
 			if (providedBody) {
 				const prepared = jsonHandler.parse(givenReq.body) as RpcCall | RpcCall[]
 				const possibleCalls = Array.isArray(prepared) ? checkRpcCall(prepared) : [checkRpcCall(prepared)]
-				if (Object.entries(blobs || {}).length > 0) {
+				if (handleBlobs && !jsonHandler?.binary && Object.entries(blobs || {}).length > 0) {
 					for (const toCall of possibleCalls) {
 						toCall.args = toCall.args.map(arg => mergeBlobLikeWithGiven(arg, blobs))
 					}
@@ -253,22 +255,32 @@ function createServerActions(
 	}
 	const prepareSend = (given: RpcAnswer | RpcAnswer[]): CommonServerResponseOptions => {
 		let blobs: BlobRecords = {}
-		const givenSeparated = Array.isArray(given) ? given.map(g => handlePossibleBlobs(g)) : [handlePossibleBlobs(given)]
-		const givenOnly = givenSeparated.map(([given, newBlobs]) => {
-			blobs = { ...blobs, ...newBlobs }
-			return given
-		})
+		const givenOnly = (separationNeeded => {
+			if (separationNeeded) {
+				const givenSeparated = Array.isArray(given)
+					? given.map(g => handlePossibleBlobs(g))
+					: [handlePossibleBlobs(given)]
+				const givenOnly = givenSeparated.map(([given, newBlobs]) => {
+					blobs = { ...blobs, ...newBlobs }
+					return given
+				})
+				return givenOnly
+			} else {
+				return [given]
+			}
+		})(handleBlobs || !jsonHandler?.binary)
 		const body = jsonHandler.stringify(Array.isArray(given) ? givenOnly : givenOnly[0]) as string
 		// NOTE: body length is generally handled by server framework, I think
 		const blobCount = Object.keys(blobs).length
 		// these mime types are just base suggestions to be overridden by chosen plugin, if applicable
 		const singleFileResult =
 			blobCount === 1 && !Array.isArray(given) && typeof given.result === "string" && given.result.startsWith("_bin_")
-		const contentType = singleFileResult
+		let contentType = singleFileResult
 			? "application/octet-stream"
 			: blobCount > 1
 			? "multipart/form-data"
 			: jsonHandler.mediaType ?? "application/json"
+		contentType = jsonHandler?.binary ? "application/octet-stream" : contentType
 		const headers = { "content-type": contentType }
 		const answers = Array.isArray(given) ? given : [given]
 		const statuses = answers.map(answer => ("error" in answer ? 500 : "result" in answer ? 200 : 400))

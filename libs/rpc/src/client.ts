@@ -98,7 +98,7 @@ export function createPrimClient<
 					let callbacksWereGiven = false
 					const blobs: BlobRecords = {}
 					const args = givenArgs.map(arg => {
-						if (configured.handleBlobs) {
+						if (configured.handleBlobs || !configured.jsonHandler?.binary) {
 							const [replacedArg, newBlobs, givenFromFormElement] = handlePossibleBlobs(arg)
 							const blobEntries = Object.entries(newBlobs)
 							for (const [key, val] of blobEntries) {
@@ -245,16 +245,17 @@ export function createPrimClient<
 				.then(answersAll => {
 					// FIXME: server should be given location of blob in object for optimized merging
 					// for example, a file using key _bin_hello123.file.test would merge with RPC at .file.test path
-					const { result: answers, blobs: givenBlobs } = answersAll
+					const { result: answers, blobs: givenBlobs = {} } = answersAll
+					const mergeNeeded = configured.handleBlobs || !jsonHandler?.binary
 					// return either the single result or the batched results to caller
 					if (Array.isArray(answers)) {
 						answers.forEach(answer => {
-							const answerMerged = mergeBlobLikeWithGiven(answer, givenBlobs)
+							const answerMerged = mergeNeeded ? mergeBlobLikeWithGiven(answer, givenBlobs) : answer
 							httpEvent.emit("response", answerMerged)
 						})
 					} else {
 						const answer = answers
-						const answerMerged = mergeBlobLikeWithGiven(answer, givenBlobs)
+						const answerMerged = mergeNeeded ? mergeBlobLikeWithGiven(answer, givenBlobs) : answer
 						httpEvent.emit("response", answerMerged)
 					}
 				})

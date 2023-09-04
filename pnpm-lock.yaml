@@ -71,7 +71,7 @@ importers:
         version: 5.1.6
       vite:
         specifier: ^4.4.9
-        version: 4.4.9(@types/node@18.17.4)(sass@1.65.1)
+        version: 4.4.9(@types/node@18.17.3)(sass@1.65.1)
       vitest:
         specifier: ^0.34.1
         version: 0.34.1(@vitest/ui@0.34.1)(jsdom@22.1.0)(sass@1.65.1)
@@ -421,6 +421,9 @@ importers:
       '@doseofted/prim-example':
         specifier: workspace:*
         version: link:../example
+      '@msgpack/msgpack':
+        specifier: 3.0.0-beta2
+        version: 3.0.0-beta2
       '@types/lodash-es':
         specifier: ^4.17.8
         version: 4.17.8
@@ -1930,6 +1933,11 @@ packages:
       '@types/react': 18.2.20
       react: 18.2.0
     dev: false
+
+  /@msgpack/msgpack@3.0.0-beta2:
+    resolution: {integrity: sha512-y+l1PNV0XDyY8sM3YtuMLK5vE3/hkfId+Do8pLo/OPxfxuFAUwcGz3oiiUuV46/aBpwTzZ+mRWVMtlSKbradhw==}
+    engines: {node: '>= 14'}
+    dev: true
 
   /@next/env@13.4.13:
     resolution: {integrity: sha512-fwz2QgVg08v7ZL7KmbQBLF2PubR/6zQdKBgmHEl3BCyWTEDsAQEijjw2gbFhI1tcKfLdOOJUXntz5vZ4S0Polg==}

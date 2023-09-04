@@ -64,8 +64,8 @@ export const createMethodHandler = (options: MethodTestingOptions): PrimServerMe
 			}
 			const httpServer = mitt<HttpRequest>()
 			httpServer.on("request", async ({ body, blobs }) => {
-				const { call } = server()
-				const response = await call({ body: body, blobs }, context)
+				const primServer = server()
+				const response = await primServer.call({ body, blobs, method: "POST" }, context)
 				// eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
 				httpServer.emit("response", { body: response.body, blobs: response.blobs })
 			})
