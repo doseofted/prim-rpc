@@ -60,6 +60,7 @@ export function createPrimClient<
 	const methodPluginGiven = typeof options?.methodPlugin !== "undefined"
 	const callbackPluginGiven = typeof options?.callbackPlugin !== "undefined"
 	const configured = createPrimOptions(options as unknown as PrimOptions)
+	const binaryHandlingNeeded = configured.handleBlobs || !configured.jsonHandler?.binary
 	const givenModulePromise = (typeof configured.module === "function" ? configured.module() : configured.module) as
 		| ModuleType
 		| Promise<ModuleType>
@@ -98,7 +99,7 @@ export function createPrimClient<
 					let callbacksWereGiven = false
 					const blobs: BlobRecords = {}
 					const args = givenArgs.map(arg => {
-						if (configured.handleBlobs || !configured.jsonHandler?.binary) {
+						if (binaryHandlingNeeded) {
 							const [replacedArg, newBlobs, givenFromFormElement] = handlePossibleBlobs(arg)
 							const blobEntries = Object.entries(newBlobs)
 							for (const [key, val] of blobEntries) {
@@ -246,16 +247,15 @@ export function createPrimClient<
 					// FIXME: server should be given location of blob in object for optimized merging
 					// for example, a file using key _bin_hello123.file.test would merge with RPC at .file.test path
 					const { result: answers, blobs: givenBlobs = {} } = answersAll
-					const mergeNeeded = configured.handleBlobs || !jsonHandler?.binary
 					// return either the single result or the batched results to caller
 					if (Array.isArray(answers)) {
 						answers.forEach(answer => {
-							const answerMerged = mergeNeeded ? mergeBlobLikeWithGiven(answer, givenBlobs) : answer
+							const answerMerged = binaryHandlingNeeded ? mergeBlobLikeWithGiven(answer, givenBlobs) : answer
 							httpEvent.emit("response", answerMerged)
 						})
 					} else {
 						const answer = answers
-						const answerMerged = mergeNeeded ? mergeBlobLikeWithGiven(answer, givenBlobs) : answer
+						const answerMerged = binaryHandlingNeeded ? mergeBlobLikeWithGiven(answer, givenBlobs) : answer
 						httpEvent.emit("response", answerMerged)
 					}
 				})

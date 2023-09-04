@@ -67,6 +67,7 @@ function createServerActions(
 	instance?: ReturnType<typeof createPrimInstance>
 ): PrimServerActionsBase {
 	const { jsonHandler, prefix: serverPrefix, handleError, handleBlobs } = serverOptions
+	const binaryHandlingNeeded = handleBlobs || !jsonHandler?.binary
 	const prepareCall = (given: CommonServerSimpleGivenOptions = {}): RpcCall | RpcCall[] => {
 		try {
 			const givenReq = checkHttpLikeRequest(given, jsonHandler?.binary)
@@ -77,7 +78,7 @@ function createServerActions(
 			if (providedBody) {
 				const prepared = jsonHandler.parse(givenReq.body) as RpcCall | RpcCall[]
 				const possibleCalls = Array.isArray(prepared) ? checkRpcCall(prepared) : [checkRpcCall(prepared)]
-				if (handleBlobs && !jsonHandler?.binary && Object.entries(blobs || {}).length > 0) {
+				if (binaryHandlingNeeded && Object.entries(blobs || {}).length > 0) {
 					for (const toCall of possibleCalls) {
 						toCall.args = toCall.args.map(arg => mergeBlobLikeWithGiven(arg, blobs))
 					}
@@ -268,7 +269,7 @@ function createServerActions(
 			} else {
 				return [given]
 			}
-		})(handleBlobs || !jsonHandler?.binary)
+		})(binaryHandlingNeeded)
 		const body = jsonHandler.stringify(Array.isArray(given) ? givenOnly : givenOnly[0]) as string
 		// NOTE: body length is generally handled by server framework, I think
 		const blobCount = Object.keys(blobs).length
