@@ -42,6 +42,7 @@ export const fastifyPrimRpc: FastifyPluginAsync<PrimFastifyPluginOptions> = asyn
 		fileSizeLimitBytes: fileSize,
 		contextTransform = (request, reply) => ({ context: "fastify", request, reply }),
 	} = options
+	const { jsonHandler } = prim.options
 	if (multipartPlugin) {
 		await fastify.register(multipartPlugin)
 	}
@@ -69,6 +70,16 @@ export const fastifyPrimRpc: FastifyPluginAsync<PrimFastifyPluginOptions> = asyn
 			done(error, undefined)
 		}
 	})
+	/* fastify.addContentTypeParser("application/octet-stream", { parseAs: "buffer" }, (_req, body, done) => {
+		try {
+			done(null, body)
+		} catch (e) {
+			// eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
+			const error: FastifyError = e
+			error.statusCode = 500
+			done(error, undefined)
+		}
+	}) */
 	async function binaryToFormData(response: CommonServerResponseOptions, MyFormData: typeof FormData) {
 		// NOTE: "content-type" is determined by Prim RPC server: octet-stream is given for single file returned directly otherwise multipart
 		const hasBinary = ["application/octet-stream", "multipart/form-data"].includes(response.headers["content-type"])
@@ -79,7 +90,13 @@ export const fastifyPrimRpc: FastifyPluginAsync<PrimFastifyPluginOptions> = asyn
 		let fileType = "application/octet-stream"
 		if (hasBinary && MyFormData) {
 			const formResponse = new MyFormData()
-			formResponse.append("rpc", response.body)
+			// eslint-disable-next-line @typescript-eslint/no-unsafe-argument
+			if (jsonHandler.binary) {
+				// eslint-disable-next-line @typescript-eslint/no-unsafe-argument
+				formResponse.append("rpc", Buffer.from(response.body))
+			} else {
+				formResponse.append("rpc", response.body)
+			}
 			for (const [blobKey, blobValue] of blobEntries) {
 				const asBuffer = blobValue instanceof Blob ? await blobValue.arrayBuffer() : blobValue
 				const fileBuffer = Buffer.from(asBuffer)
@@ -105,14 +122,18 @@ export const fastifyPrimRpc: FastifyPluginAsync<PrimFastifyPluginOptions> = asyn
 		handler: async (request, reply) => {
 			// TODO: read RPC for `_bin_` references and call `request.files()` only when needed
 			const blobs: BlobRecords = {}
-			let bodyForm: string
+			let bodyForm: string | Buffer
 			if (multipartPlugin && request.isMultipart()) {
 				const parts = request.parts({
 					limits: { fileSize },
 				})
 				for await (const part of parts) {
-					if (!("file" in part) && part.fieldname === "rpc") {
-						bodyForm = part.value as string
+					if (part.fieldname === "rpc") {
+						if (part.type !== "file") {
+							bodyForm = part.value as string
+						} else {
+							bodyForm = await part.toBuffer()
+						}
 					} else if ("file" in part && part.fieldname.startsWith("_bin_")) {
 						const fileBuffer = await new Promise<Buffer[]>(resolve => {
 							const chunks: Buffer[] = []
@@ -137,7 +158,8 @@ export const fastifyPrimRpc: FastifyPluginAsync<PrimFastifyPluginOptions> = asyn
 			const response = await prim.server().call({ method, url, body, blobs }, context)
 			// NOTE: in POST requests, a single file result is not returned directly (it remains part of form data)
 			const { form } = await binaryToFormData(response, FormData)
-			if (typeof form === "object" && "getBuffer" in form) {
+			const blobCount = Object.keys(response.blobs).length
+			if (typeof form === "object" && "getBuffer" in form && blobCount > 0) {
 				void reply
 					.status(response.status)
 					.headers({ ...response.headers, ...form.getHeaders() })

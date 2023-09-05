@@ -4,8 +4,6 @@
 
 import type { BlobRecords, PrimClientMethodPlugin, RpcAnswer } from "@doseofted/prim-rpc"
 
-// TODO: test this plugin
-
 interface MethodFetchOptions {
 	headers?: Headers | Record<string, string>
 	credentials?: RequestCredentials
@@ -16,11 +14,13 @@ export const createMethodPlugin = (options: MethodFetchOptions = {}) => {
 		const { headers: headersOverride = {} } = options
 		let fetchOptions: RequestInit = {}
 		const blobList = Object.entries(blobs)
-		if (blobList.length > 0) {
+		if (blobList.length > 0 || jsonHandler.binary) {
 			// send as form data if blobs is given (empty if not configured)
 			const data = new FormData()
+			// eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
+			const bodyStringish = jsonHandler.stringify(jsonBody)
 			// eslint-disable-next-line @typescript-eslint/no-unsafe-argument
-			data.append("rpc", jsonHandler.stringify(jsonBody))
+			data.append("rpc", jsonHandler.binary ? new Blob([bodyStringish]) : bodyStringish)
 			for (const [key, blob] of blobList) {
 				data.append(key, blob as Blob)
 			}

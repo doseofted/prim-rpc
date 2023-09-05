@@ -256,6 +256,9 @@ importers:
       '@fastify/multipart':
         specifier: ^7.7.3
         version: 7.7.3
+      '@msgpack/msgpack':
+        specifier: 3.0.0-beta2
+        version: 3.0.0-beta2
       fastify:
         specifier: ^4.21.0
         version: 4.21.0
@@ -309,6 +312,9 @@ importers:
       '@hono/node-server':
         specifier: ^1.1.1
         version: 1.1.1
+      '@msgpack/msgpack':
+        specifier: 3.0.0-beta2
+        version: 3.0.0-beta2
       '@types/express':
         specifier: ^4.17.17
         version: 4.17.17
@@ -1937,7 +1943,6 @@ packages:
   /@msgpack/msgpack@3.0.0-beta2:
     resolution: {integrity: sha512-y+l1PNV0XDyY8sM3YtuMLK5vE3/hkfId+Do8pLo/OPxfxuFAUwcGz3oiiUuV46/aBpwTzZ+mRWVMtlSKbradhw==}
     engines: {node: '>= 14'}
-    dev: true
 
   /@next/env@13.4.13:
     resolution: {integrity: sha512-fwz2QgVg08v7ZL7KmbQBLF2PubR/6zQdKBgmHEl3BCyWTEDsAQEijjw2gbFhI1tcKfLdOOJUXntz5vZ4S0Polg==}
