@@ -33,24 +33,24 @@ beforeAll(async () => {
 })
 
 describe("Client can make requests", () => {
-	test("successful, simple", async () => {
+	test("successful, simple", () => {
 		const methodPlugin = createMethodPlugin()
 		const client = createPrimClient<IModule>({ endpoint, methodPlugin })
 		const args: Parameters<IModule["sayHelloAlternative"]> = ["Hi", "Ted"]
 		const expected = module.sayHelloAlternative(...args)
-		const result = await client.sayHelloAlternative(...args)
-		expect(result).toBe(expected)
+		const result = client.sayHelloAlternative(...args)
+		void expect(result).resolves.toBe(expected)
 	})
 })
 
 describe("Client can handle binary data", () => {
-	test("upload a file", async () => {
+	test("upload a file", () => {
 		const methodPlugin = createMethodPlugin()
 		const client = createPrimClient<IModule>({ endpoint, methodPlugin })
 		const args = [new File(["hello"], "hello.txt")] as const
 		const expected = module.uploadTheThing(...args)
-		const result = await client.uploadTheThing(...args)
-		expect(result).toMatchObject(expected)
+		const result = client.uploadTheThing(...args)
+		void expect(result).resolves.toMatchObject(expected)
 	})
 
 	test("download a file", async () => {

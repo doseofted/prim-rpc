@@ -46,19 +46,6 @@ export const fastifyPrimRpc: FastifyPluginAsync<PrimFastifyPluginOptions> = asyn
 	if (multipartPlugin) {
 		await fastify.register(multipartPlugin)
 	}
-	// LINK https://github.com/fastify/fastify/issues/534
-	/* fastify.addContentTypeParser("application/octet-stream", (req, payload, done) => {
-		let data: Buffer
-		payload.on("data", chunk => {
-			data = Buffer.concat([data, chunk].filter(given => given))
-		})
-		payload.on("error", () => {
-			done(new Error("Buffer could not be read"))
-		})
-		payload.on("end", () => {
-			done(null, data)
-		})
-	}) */
 	// LINK https://github.com/fastify/help/issues/158#issuecomment-1086190754
 	fastify.addContentTypeParser("application/json", { parseAs: "string" }, (_req, body, done) => {
 		try {
@@ -70,16 +57,6 @@ export const fastifyPrimRpc: FastifyPluginAsync<PrimFastifyPluginOptions> = asyn
 			done(error, undefined)
 		}
 	})
-	/* fastify.addContentTypeParser("application/octet-stream", { parseAs: "buffer" }, (_req, body, done) => {
-		try {
-			done(null, body)
-		} catch (e) {
-			// eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
-			const error: FastifyError = e
-			error.statusCode = 500
-			done(error, undefined)
-		}
-	}) */
 	async function binaryToFormData(response: CommonServerResponseOptions, MyFormData: typeof FormData) {
 		// NOTE: "content-type" is determined by Prim RPC server: octet-stream is given for single file returned directly otherwise multipart
 		const hasBinary = ["application/octet-stream", "multipart/form-data"].includes(response.headers["content-type"])
