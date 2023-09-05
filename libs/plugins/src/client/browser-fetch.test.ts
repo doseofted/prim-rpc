@@ -70,16 +70,15 @@ describe("Client can use alternative JSON handlers", () => {
 			name: "string (actual JSON)",
 			handler: { stringify: superjson.stringify, parse: superjson.parse },
 		},
-		// FIXME: fix ability to use alternative JSON handler
-		// {
-		// 	name: "binary (not JSON)",
-		// 	handler: {
-		// 		stringify: msgPack,
-		// 		parse: msgUnpack,
-		// 		binary: true,
-		// 		mediaType: "application/octet-stream",
-		// 	},
-		// },
+		{
+			name: "binary (not JSON)",
+			handler: {
+				stringify: msgPack,
+				parse: msgUnpack,
+				binary: true,
+				mediaType: "application/octet-stream",
+			},
+		},
 	])("$name", async ({ handler: jsonHandler }) => {
 		const fastify = Fastify()
 		const methodHandler = createMethodHandler({ fastify, multipartPlugin, formDataHandler: FormData })

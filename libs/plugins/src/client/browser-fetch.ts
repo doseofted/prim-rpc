@@ -54,7 +54,7 @@ export const createMethodPlugin = (options: MethodFetchOptions = {}) => {
 			return { result, blobs: resultBlobs }
 		}
 		const isBinaryLike = !!(resultContentType === jsonHandler.mediaType && jsonHandler.binary)
-		const result = jsonHandler.parse(await (isBinaryLike ? fetchResult.blob() : fetchResult.text())) as
+		const result = jsonHandler.parse(await (isBinaryLike ? fetchResult.arrayBuffer() : fetchResult.text())) as
 			| RpcAnswer
 			| RpcAnswer[]
 		return { result }

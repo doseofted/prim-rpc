@@ -166,7 +166,8 @@ export const fastifyPrimRpc: FastifyPluginAsync<PrimFastifyPluginOptions> = asyn
 					.send(form.getBuffer())
 				return
 			}
-			void reply.status(response.status).headers(response.headers).send(response.body)
+			// eslint-disable-next-line @typescript-eslint/no-unsafe-argument
+			void reply.status(response.status).headers(response.headers).send(Buffer.from(response.body))
 		},
 	})
 	fastify.route<{ Body: string }>({
