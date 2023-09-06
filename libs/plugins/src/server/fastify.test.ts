@@ -5,7 +5,7 @@
 /* eslint-disable @typescript-eslint/no-unsafe-member-access -- `request` doesn't have full type definitions */
 
 import { readFileSync } from "node:fs"
-import { describe, test, beforeEach, afterEach, expect } from "vitest"
+import { describe, test, beforeEach, expect } from "vitest"
 import request from "superwstest"
 import * as module from "@doseofted/prim-example"
 import Fastify from "fastify"
@@ -24,14 +24,10 @@ describe("Fastify plugin is functional as Prim Plugin", () => {
 	})
 	beforeEach(async () => {
 		await fastify.ready()
-		await new Promise(resolve => {
-			fastify.server.listen(0, "localhost", () => {
-				resolve(true)
-			})
+		await new Promise<void>(resolve => {
+			fastify.server.listen(0, "localhost", resolve)
 		})
-	})
-	afterEach(() => {
-		fastify.server.close()
+		return () => fastify.server.close()
 	})
 	const args = { greeting: "What's up", name: "Ted" }
 	const expected = { id: 1, result: module.sayHello(args) }
@@ -58,14 +54,10 @@ describe("Fastify plugin is functional as Fastify plugin", async () => {
 	await fastify.register(fastifyPrimRpc, { prim })
 	beforeEach(async () => {
 		await fastify.ready()
-		await new Promise(resolve => {
-			fastify.server.listen(0, "localhost", () => {
-				resolve(true)
-			})
+		await new Promise<void>(resolve => {
+			fastify.server.listen(0, "localhost", resolve)
 		})
-	})
-	afterEach(() => {
-		fastify.server.close()
+		return () => fastify.server.close()
 	})
 	const args = { greeting: "What's up", name: "Ted" }
 	const expected = { id: 1, result: module.sayHello(args) }
@@ -92,14 +84,10 @@ describe("Fastify plugin works with over GET/POST", () => {
 	})
 	beforeEach(async () => {
 		await fastify.ready()
-		await new Promise(resolve => {
-			fastify.server.listen(0, "localhost", () => {
-				resolve(true)
-			})
+		await new Promise<void>(resolve => {
+			fastify.server.listen(0, "localhost", resolve)
 		})
-	})
-	afterEach(() => {
-		fastify.server.close()
+		return () => fastify.server.close()
 	})
 	const args = { greeting: "What's up", name: "Ted" }
 	const expected = { id: 1, result: module.sayHello(args) }
@@ -128,7 +116,7 @@ describe("Fastify plugin works with over GET/POST", () => {
 	})
 })
 
-describe("Fastify plugin can support binary data", async () => {
+describe("Fastify plugin can support binary data", () => {
 	const fastify = Fastify()
 	createPrimServer({
 		module,
@@ -136,30 +124,26 @@ describe("Fastify plugin can support binary data", async () => {
 	})
 	beforeEach(async () => {
 		await fastify.ready()
-		await new Promise(resolve => {
-			fastify.server.listen(0, "localhost", () => {
-				resolve(true)
-			})
+		await new Promise<void>(resolve => {
+			fastify.server.listen(0, "localhost", resolve)
 		})
+		return () => fastify.server.close()
 	})
-	afterEach(() => {
-		fastify.server.close()
-	})
-	const formData = new FormData()
-	formData.append(
-		"rpc",
-		JSON.stringify({
-			method: "uploadTheThing",
-			args: ["_bin_cool"],
-			id: 1,
-		})
-	)
-	const fileName = "hi.txt"
-	const fileContents = new Blob(["hello"], { type: "text/plain" })
-	const file = new File([fileContents], fileName)
-	formData.append("_bin_cool", await fileContents.text(), fileName)
-	const expected = { id: 1, result: module.uploadTheThing(file) }
 	test("upload a file", async () => {
+		const formData = new FormData()
+		formData.append(
+			"rpc",
+			JSON.stringify({
+				method: "uploadTheThing",
+				args: ["_bin_cool"],
+				id: 1,
+			})
+		)
+		const fileName = "hi.txt"
+		const fileContents = new Blob(["hello"], { type: "text/plain" })
+		const file = new File([fileContents], fileName)
+		formData.append("_bin_cool", await fileContents.text(), fileName)
+		const expected = { id: 1, result: module.uploadTheThing(file) }
 		const response = await request(fastify.server)
 			.post("/prim")
 			.send(formData.getBuffer())

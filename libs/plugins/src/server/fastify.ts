@@ -67,7 +67,6 @@ export const fastifyPrimRpc: FastifyPluginAsync<PrimFastifyPluginOptions> = asyn
 		let fileType = "application/octet-stream"
 		if (hasBinary && MyFormData) {
 			const formResponse = new MyFormData()
-			// eslint-disable-next-line @typescript-eslint/no-unsafe-argument
 			if (jsonHandler.binary) {
 				// eslint-disable-next-line @typescript-eslint/no-unsafe-argument
 				formResponse.append("rpc", Buffer.from(response.body))
