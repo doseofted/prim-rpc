@@ -99,8 +99,8 @@ export function defineH3PrimHandler(options: PrimH3PluginOptions) {
 		}
 		setResponseStatus(event, result.status)
 		setResponseHeaders(event, result.headers)
-		// eslint-disable-next-line @typescript-eslint/no-unsafe-return
-		return result.body
+		// eslint-disable-next-line @typescript-eslint/no-unsafe-argument
+		return Buffer.from(result.body)
 	})
 }
 

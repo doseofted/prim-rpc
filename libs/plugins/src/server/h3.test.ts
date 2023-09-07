@@ -7,7 +7,7 @@
 import { describe, test, beforeEach, expect } from "vitest"
 import request from "superwstest"
 import * as module from "@doseofted/prim-example"
-import { RpcAnswer, createPrimServer } from "@doseofted/prim-rpc"
+import { JsonHandler, RpcAnswer, createPrimServer } from "@doseofted/prim-rpc"
 import { createMethodHandler, defineH3PrimHandler } from "./h3"
 import { createApp, toNodeListener } from "h3"
 import { createServer } from "node:http"
@@ -15,6 +15,8 @@ import queryString from "query-string"
 import FormData from "form-data"
 import { Blob, File } from "node:buffer"
 import { readFileSync } from "node:fs"
+import superjson from "superjson"
+import { encode as msgPack, decode as msgUnpack } from "@msgpack/msgpack"
 
 describe("H3 plugin is functional as Prim Plugin", () => {
 	const app = createApp()
@@ -183,5 +185,119 @@ describe("H3 plugin can support binary data", () => {
 		// NOTE: if given file that wasn't text/plain, this would be a Buffer
 		// expect(response.body).toBeInstanceOf(Buffer)
 		// expect(response.body instanceof Buffer ? response.body.toString("utf-8") : "").toBe("Hello!")
+	})
+})
+
+describe("H3 plugin can support alternative JSON handler", () => {
+	test("with string serialization", async () => {
+		const app = createApp()
+		const server = createServer(toNodeListener(app))
+		const methodHandler = createMethodHandler({ app })
+		createPrimServer({ module, methodHandler, jsonHandler: superjson })
+		server.listen(0)
+
+		const today = new Date()
+		const expected = module.whatIsDayAfter(today)
+		const response = await request(server)
+			.post("/prim")
+			.send(
+				superjson.serialize({
+					method: "whatIsDayAfter",
+					args: today,
+					id: 1,
+				})
+			)
+			.set("accept", "application/json")
+		expect(response.headers["content-type"]).toContain("application/json")
+		expect(response.status).toEqual(200)
+		// eslint-disable-next-line @typescript-eslint/no-unsafe-argument
+		const { result }: RpcAnswer = superjson.deserialize(response.body)
+		expect(result).toBeInstanceOf(Date)
+		expect(result.valueOf()).toEqual(expected.valueOf())
+
+		server.close()
+	})
+
+	test("with binary serialization", async () => {
+		const app = createApp()
+		const server = createServer(toNodeListener(app))
+		const methodHandler = createMethodHandler({ app })
+		const jsonHandler: JsonHandler = {
+			parse: msgUnpack,
+			stringify: msgPack,
+			binary: true,
+			mediaType: "application/octet-stream",
+		}
+		createPrimServer({ module, methodHandler, jsonHandler })
+		server.listen(0)
+
+		const today = new Date()
+		const expected = module.whatIsDayAfter(today)
+		const formData = new FormData()
+		formData.append(
+			"rpc",
+			Buffer.from(
+				msgPack({
+					method: "whatIsDayAfter",
+					args: today,
+					id: 1,
+				})
+			)
+		)
+		const response = await request(server)
+			.post("/prim")
+			.send(formData.getBuffer())
+			.set("content-type", `multipart/form-data; boundary=${formData.getBoundary()}`)
+			.set("accept", "application/octet-stream")
+		expect(response.headers["content-type"]).toContain("application/octet-stream")
+		expect(response.status).toEqual(200)
+		// eslint-disable-next-line @typescript-eslint/no-unsafe-argument
+		const { result }: RpcAnswer = msgUnpack(response.body)
+		expect(result).toBeInstanceOf(Date)
+		expect(result.valueOf()).toEqual(expected.valueOf())
+
+		server.close()
+	})
+
+	test("with binary serialization and file handling", async () => {
+		const app = createApp()
+		const server = createServer(toNodeListener(app))
+		const methodHandler = createMethodHandler({ app, formDataHandler: FormData })
+		const jsonHandler: JsonHandler = {
+			parse: msgUnpack,
+			stringify: msgPack,
+			binary: true,
+			mediaType: "application/octet-stream",
+		}
+		createPrimServer({ module, methodHandler, jsonHandler })
+		server.listen(0)
+
+		const formData = new FormData()
+		formData.append(
+			"rpc",
+			Buffer.from(
+				msgPack({
+					method: "uploadTheThing",
+					args: ["_bin_cool"],
+					id: 1,
+				})
+			)
+		)
+		const fileName = "hi.txt"
+		const fileContents = new Blob(["hello"], { type: "text/plain" })
+		const file = new File([fileContents], fileName)
+		formData.append("_bin_cool", await fileContents.text(), fileName)
+		const expected = { id: 1, result: module.uploadTheThing(file) }
+		const response = await request(server)
+			.post("/prim")
+			.send(formData.getBuffer())
+			.set("content-type", `multipart/form-data; boundary=${formData.getBoundary()}`)
+			.set("accept", "application/octet-stream")
+		expect(response.headers["content-type"]).toContain("application/octet-stream")
+		expect(response.status).toEqual(200)
+		// eslint-disable-next-line @typescript-eslint/no-unsafe-argument
+		const result = msgUnpack(response.body)
+		expect(result).toEqual(expected)
+		server.close()
 	})
 })

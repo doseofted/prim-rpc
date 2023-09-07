@@ -101,20 +101,22 @@ You may also register the Hono middleware yourself by importing `honoPrimRpc` an
 | --------------------------------------------- | -------------- | -------------- | ------------ |
 | [Fastify](https://github.com/fastify/fastify) | Method handler | HTTP           | `File`       |
 
-You can configure Fastify with Prim+RPC like so (note that the multipart plugin is optional and used for uploading
-files):
+You can configure Fastify with Prim+RPC like so (note that both the `multipartPlugin` and `formDataHandler` options are
+completely optional and useful for for uploading files or supporting binary in JSON-like body):
 
 ```typescript
 import { createPrimServer } from "@doseofted/prim-rpc"
 import { createMethodHandler } from "@doseofted/prim-rpc-plugins/fastify"
 import Fastify from "fastify"
 import multipartPlugin from "@fastify/multipart"
+import formDataHandler from "form-data"
 import module from "./my-example-module"
 
 const fastify = Fastify()
 const methodHandler = createMethodHandler({
 	fastify,
 	multipartPlugin,
+	formDataHandler,
 })
 
 createPrimServer({ module, methodHandler })
@@ -130,20 +132,22 @@ the function's `this` context.
 | ----------------------------------------------- | -------------- | -------------- | ------------ |
 | [Express](https://github.com/expressjs/express) | Method handler | HTTP           | `File`       |
 
-You can configure Express with Prim+RPC like so (note that the multipart plugin is optional and used for uploading
-files):
+You can configure Express with Prim+RPC like so (note that both the `multipartPlugin` and `formDataHandler` options are
+completely optional and useful for for uploading files or supporting binary in JSON-like body):
 
 ```typescript
 import { createPrimServer } from "@doseofted/prim-rpc"
 import { createMethodHandler } from "@doseofted/prim-rpc-plugins/express"
 import express from "express"
-import multipartPlugin from "multer"
+import multipartPlugin from "formidable"
+import formDataHandler from "form-data"
 import module from "./my-example-module"
 
 const app = express()
 const methodHandler = createMethodHandler({
 	app,
 	multipartPlugin,
+	formDataHandler,
 })
 
 createPrimServer({ module, methodHandler })
@@ -185,11 +189,13 @@ the function's `this` context. The callback handler can be used with the method 
 Prim+RPC can be used with H3 and frameworks built upon H3 such as Nitro and Nuxt 3. Setup steps vary depending on which
 framework you are using.
 
-You can configure H3 with Prim+RPC like so:
+You can configure H3 with Prim+RPC like so (note that `formDataHandler` is optional and is only used for sending files
+back to the client):
 
 ```typescript
 import { createPrimServer } from "@doseofted/prim-rpc"
 import { createMethodHandler } from "@doseofted/prim-rpc-plugins/h3"
+import formDataHandler from "form-data"
 import { createApp, toNodeListener } from "h3"
 import { createServer } from "node:http"
 import module from "./my-example-module"
@@ -197,7 +203,7 @@ import module from "./my-example-module"
 const app = createApp()
 const server = createServer(toNodeListener(app))
 
-const methodHandler = createMethodHandler({ app })
+const methodHandler = createMethodHandler({ app, formDataHandler })
 createPrimServer({ module, methodHandler })
 
 server.listen(1234)

@@ -19,8 +19,11 @@ export const createMethodPlugin = (options: MethodFetchOptions = {}) => {
 			const data = new FormData()
 			// eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
 			const bodyStringish = jsonHandler.stringify(jsonBody)
-			// eslint-disable-next-line @typescript-eslint/no-unsafe-argument
-			data.append("rpc", jsonHandler.binary ? new Blob([bodyStringish]) : bodyStringish)
+			data.append(
+				"rpc",
+				// eslint-disable-next-line @typescript-eslint/no-unsafe-argument
+				jsonHandler.binary ? new Blob([bodyStringish], { type: jsonHandler.mediaType }) : bodyStringish
+			)
 			for (const [key, blob] of blobList) {
 				data.append(key, blob as Blob)
 			}
