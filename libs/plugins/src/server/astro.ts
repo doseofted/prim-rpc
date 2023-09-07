@@ -4,6 +4,7 @@
 
 import type { BlobRecords, PrimServerEvents } from "@doseofted/prim-rpc"
 import type { APIRoute, APIContext, Props } from "astro"
+import { type FileForEnvType, useFileForEnv } from "../utils/isomorphic"
 
 interface PrimAstroPluginOptions {
 	prim: PrimServerEvents
@@ -11,9 +12,12 @@ interface PrimAstroPluginOptions {
 	contextTransform?: (request: APIContext<Props>) => { context: "astro"; request: Request }
 }
 
+let FileForEnv: FileForEnvType
+
 export function defineAstroPrimHandler(options: PrimAstroPluginOptions) {
 	const { prim, headers = {}, contextTransform = request => ({ context: "astro", request }) } = options
 	const handler: APIRoute = async ctx => {
+		FileForEnv ??= await useFileForEnv()
 		const { request, url: urlFull } = ctx
 		let body: string
 		const blobs: BlobRecords = {}
@@ -24,17 +28,11 @@ export function defineAstroPrimHandler(options: PrimAstroPluginOptions) {
 		const requestType = request.headers.get("content-type") ?? ""
 		const method = request.method
 		if (requestType.startsWith("multipart/form-data")) {
-			const FileObj = typeof File === "undefined" ? (await import("node:buffer")).File : File
-			// NOTE: Astro uses Node's File instead of built-in File when using Node
-			const FileNode =
-				typeof process === "object" && "env" in process && typeof process.env === "object" && process.env.NODE !== ""
-					? (await import("node:buffer")).File
-					: () => null
 			const formData = await request.formData()
 			formData.forEach((value, key) => {
 				if (key === "rpc") {
 					body = value.toString()
-				} else if (key.startsWith("_bin_") && (value instanceof FileObj || value instanceof FileNode)) {
+				} else if (key.startsWith("_bin_") && value instanceof FileForEnv) {
 					blobs[key] = value
 				}
 			})

@@ -17,6 +17,7 @@ import {
 	H3Event,
 	getRequestURL,
 } from "h3"
+import { type FileForEnvType, useFileForEnv } from "../utils/isomorphic"
 
 interface SharedH3Options {
 	formDataHandler?: typeof FormData
@@ -27,10 +28,13 @@ interface PrimH3PluginOptions extends SharedH3Options {
 	prim: PrimServerEvents
 }
 
+let FileForEnv: FileForEnvType
+
 export function defineH3PrimHandler(options: PrimH3PluginOptions) {
 	const { prim, contextTransform = event => ({ context: "h3", event }), formDataHandler: MyFormData } = options
 	const { jsonHandler } = prim.options
 	return defineEventHandler(async event => {
+		FileForEnv ??= await useFileForEnv()
 		let body: string | Buffer
 		const blobs: BlobRecords = {}
 		const givenPath = event.node.req.url
@@ -42,14 +46,13 @@ export function defineH3PrimHandler(options: PrimH3PluginOptions) {
 		const urlGiven = getRequestURL(event)
 		const url = urlGiven.pathname + urlGiven.search
 		const context = contextTransform(event)
-		const FileObj = typeof File === "undefined" ? (await import("node:buffer")).File : File
 		if (requestType.startsWith("multipart/form-data")) {
 			const parts = await readMultipartFormData(event)
 			for (const part of parts) {
 				if (part.name === "rpc") {
 					body = jsonHandler.binary ? part.data : part.data.toString("utf-8")
 				} else if (typeof part.filename === "string" && part.name.startsWith("_bin_")) {
-					const file = new FileObj([part.data], part.filename, { type: part.type })
+					const file = new FileForEnv([part.data], part.filename, { type: part.type })
 					blobs[part.name] = file as File // it may be node:buffer.File, but BlobRecords expects native File
 				}
 			}
@@ -73,8 +76,8 @@ export function defineH3PrimHandler(options: PrimH3PluginOptions) {
 				const asBuffer = blobValue instanceof Blob ? await blobValue.arrayBuffer() : blobValue
 				const fileBuffer = Buffer.from(asBuffer)
 				const options: AppendOptions = {
-					filename: blobValue instanceof FileObj ? blobValue.name : "",
-					contentType: blobValue instanceof FileObj ? blobValue.type : "",
+					filename: blobValue instanceof FileForEnv ? blobValue.name : "",
+					contentType: blobValue instanceof FileForEnv ? blobValue.type : "",
 				}
 				formResponse.append(blobKey, fileBuffer, options)
 				if (!fileDetails.buffer) {

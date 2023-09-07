@@ -10,9 +10,10 @@ import type {
 } from "@doseofted/prim-rpc"
 import type { FastifyPluginAsync, FastifyInstance, FastifyError, FastifyRequest, FastifyReply } from "fastify"
 import type FastifyMultipartPlugin from "@fastify/multipart"
-import { File as FileNode, Buffer } from "node:buffer" // unlike other servers, Fastify only works with Node so we can import this safely
+import { Buffer } from "node:buffer" // unlike other servers, Fastify only works with Node so we can import this safely
 import type FormData from "form-data"
 import type { AppendOptions } from "form-data"
+import { type FileForEnvType, useFileForEnv } from "../utils/isomorphic"
 /** The default Prim context when used with Fastify. Overridden with `contextTransform` option. */
 export type PrimFastifyContext = { context: "fastify"; request: FastifyRequest; reply: FastifyReply }
 
@@ -26,6 +27,9 @@ interface SharedFastifyOptions {
 interface PrimFastifyPluginOptions extends SharedFastifyOptions {
 	prim: PrimServerEvents
 }
+
+let FileForEnv: FileForEnvType
+
 /**
  * A Fastify plugin used to register Prim with the server.
  *
@@ -35,6 +39,7 @@ interface PrimFastifyPluginOptions extends SharedFastifyOptions {
  * To let Prim handle registration with Fastify, try importing `createMethodHandler` instead.
  */
 export const fastifyPrimRpc: FastifyPluginAsync<PrimFastifyPluginOptions> = async (fastify, options) => {
+	FileForEnv ??= await useFileForEnv()
 	const {
 		prim,
 		multipartPlugin,
@@ -77,8 +82,8 @@ export const fastifyPrimRpc: FastifyPluginAsync<PrimFastifyPluginOptions> = asyn
 				const asBuffer = blobValue instanceof Blob ? await blobValue.arrayBuffer() : blobValue
 				const fileBuffer = Buffer.from(asBuffer)
 				const options: AppendOptions = {
-					filename: blobValue instanceof FileNode ? blobValue.name : "",
-					contentType: blobValue instanceof FileNode ? blobValue.type : "",
+					filename: blobValue instanceof FileForEnv ? blobValue.name : "",
+					contentType: blobValue instanceof FileForEnv ? blobValue.type : "",
 				}
 				formResponse.append(blobKey, fileBuffer, options)
 				if (!fileBuff) {
@@ -118,7 +123,7 @@ export const fastifyPrimRpc: FastifyPluginAsync<PrimFastifyPluginOptions> = asyn
 							part.file.on("end", () => resolve(chunks))
 						})
 						if (fileBuffer.length > 0) {
-							const file = new FileNode(fileBuffer, part.filename, { type: part.mimetype })
+							const file = new FileForEnv(fileBuffer, part.filename, { type: part.mimetype })
 							blobs[part.fieldname] = file as unknown as File // it may be node:buffer.File, but BlobRecords expects native File
 						}
 					}

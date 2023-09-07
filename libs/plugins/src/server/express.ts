@@ -7,8 +7,8 @@ import type * as Express from "express"
 import type formidableType from "formidable"
 import type FormData from "form-data"
 import { Writable } from "node:stream"
-import { File as NodeFile } from "node:buffer"
 import { AppendOptions } from "form-data"
+import { type FileForEnvType, useFileForEnv } from "../utils/isomorphic"
 
 /** The default Prim context when used with Express. Overridden with `contextTransform` option. */
 export type PrimExpressContext = { context: "express"; req: Express.Request; res: Express.Response }
@@ -23,6 +23,9 @@ interface SharedExpressOptions {
 interface PrimExpressPluginOptions extends SharedExpressOptions {
 	prim: PrimServerEvents
 }
+
+let FileForEnv: FileForEnvType
+
 /**
  * An Express plugin used to register Prim with the server.
  *
@@ -41,6 +44,7 @@ export const expressPrimRpc = (options: PrimExpressPluginOptions) => {
 	} = options
 	const { jsonHandler } = prim.options
 	const handler = async (req: Express.Request, res: Express.Response, next: Express.NextFunction) => {
+		FileForEnv ??= await useFileForEnv()
 		try {
 			if (!req.path.startsWith(prim.options.prefix)) {
 				next()
@@ -92,7 +96,7 @@ export const expressPrimRpc = (options: PrimExpressPluginOptions) => {
 								const givenValue = value[0]
 								const given = resolvedFiles[0]
 								const file = givenValue.originalFilename
-									? new NodeFile([given], givenValue.originalFilename)
+									? new FileForEnv([given], givenValue.originalFilename)
 									: new Blob([given])
 								blobs[fieldname] = file as File | Blob
 							}
