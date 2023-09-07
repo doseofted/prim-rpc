@@ -17,11 +17,12 @@ interface PrimHonoPluginOptions extends SharedHonoOptions {
 
 export function honoPrimRpc(options: PrimHonoPluginOptions) {
 	const { prim, contextTransform = ctx => ({ context: "hono", ctx }) } = options
+	const { jsonHandler } = prim.options
 	const middleware: MiddlewareHandler = async (context, next) => {
 		const { req } = context
 		const { pathname, search } = new URL(req.url)
 		const url = pathname + search
-		let body: string
+		let body: string | ArrayBuffer
 		const blobs: BlobRecords = {}
 		const method = req.method
 		if (!url.startsWith(prim.options.prefix ?? "/")) {
@@ -30,23 +31,53 @@ export function honoPrimRpc(options: PrimHonoPluginOptions) {
 		const requestType = req.headers.get("content-type") ?? ""
 		if (requestType.startsWith("multipart/form-data")) {
 			const formData = await req.formData()
-			const BlobObj = typeof Blob === "undefined" ? (await import("node:buffer")).Blob : Blob
-			formData.forEach((value, key) => {
+			for (const [key, value] of formData) {
 				if (key === "rpc") {
-					body = value.toString()
-				} else if (key.startsWith("_bin_") && value instanceof BlobObj) {
+					body = value instanceof Blob && jsonHandler.binary ? await value.arrayBuffer() : value.toString()
+				} else if (key.startsWith("_bin_") && value instanceof Blob) {
 					blobs[key] = value
 				}
-			})
+			}
 		} else if (method === "POST") {
 			body = await req.text()
 		}
 		const server = prim.server()
-		const response = await server.call({ body, url, method, blobs }, contextTransform(context))
+		const result = await server.call({ body, url, method, blobs }, contextTransform(context))
+		const hasBinary = ["application/octet-stream", "multipart/form-data"].includes(result.headers["content-type"])
+		let firstFile = { name: "", blob: null as Blob | null, type: "application/octet-stream" }
+		const blobEntries = Object.entries(result.blobs)
+		if (hasBinary) {
+			const formData = new FormData()
+			// eslint-disable-next-line @typescript-eslint/no-unsafe-argument
+			formData.append("rpc", result.body)
+			for (const [key, value] of blobEntries) {
+				formData.append(key, value as Blob)
+				if (!firstFile.blob) {
+					const blob = value as Blob
+					firstFile = { name: blob.name, blob, type: blob.type }
+				}
+			}
+			if (method === "POST" && blobEntries.length > 0) {
+				delete result.headers["content-type"] // NOTE: Response will handle this
+				return new Response(formData, {
+					headers: result.headers,
+					status: result.status,
+				})
+			} else if (method === "GET" && blobEntries.length === 1) {
+				return new Response(firstFile.blob, {
+					headers: {
+						...result.headers,
+						"content-disposition": `inline; filename="${firstFile.name}"`,
+						"content-type": firstFile.type,
+					},
+					status: result.status,
+				})
+			}
+		}
 		// eslint-disable-next-line @typescript-eslint/no-unsafe-argument
-		return new Response(response.body, {
-			headers: response.headers,
-			status: response.status,
+		return new Response(result.body, {
+			headers: result.headers,
+			status: result.status,
 		})
 	}
 	return middleware
