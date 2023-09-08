@@ -18,10 +18,9 @@ interface MethodWsOptions {
  * wih a method handler plugin but you may also use it by itself if you only need to support WebSocket.
  */
 export const createCallbackHandler = (options: MethodWsOptions): PrimServerCallbackHandler => {
-	const { wss: webSocketServer, contextTransform = req => ({ context: "ws", req }) } = options
+	const { wss: webSocketServer, contextTransform = _req => undefined } = options
 	return prim => {
 		webSocketServer.on("connection", (ws, req) => {
-			const context = contextTransform(req)
 			const { ended, call } = prim.connected()
 			ws.on("close", () => {
 				ended()
@@ -35,7 +34,7 @@ export const createCallbackHandler = (options: MethodWsOptions): PrimServerCallb
 					data => {
 						ws.send(data)
 					},
-					context
+					contextTransform(req)
 				)
 			})
 		})

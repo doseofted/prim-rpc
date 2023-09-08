@@ -8,7 +8,6 @@ import { AppendOptions } from "form-data"
 import {
 	defineEventHandler,
 	readRawBody,
-	getMethod,
 	setResponseHeaders,
 	getHeader,
 	setResponseStatus,
@@ -31,7 +30,7 @@ interface PrimH3PluginOptions extends SharedH3Options {
 let FileForEnv: FileForEnvType
 
 export function defineH3PrimHandler(options: PrimH3PluginOptions) {
-	const { prim, contextTransform = event => ({ context: "h3", event }), formDataHandler: MyFormData } = options
+	const { prim, contextTransform = _event => undefined, formDataHandler: MyFormData } = options
 	const { jsonHandler } = prim.options
 	return defineEventHandler(async event => {
 		FileForEnv ??= await useFileForEnv()
@@ -42,10 +41,9 @@ export function defineH3PrimHandler(options: PrimH3PluginOptions) {
 			return
 		}
 		const requestType = getHeader(event, "content-type") ?? ""
-		const method = getMethod(event)
+		const method = event.method
 		const urlGiven = getRequestURL(event)
 		const url = urlGiven.pathname + urlGiven.search
-		const context = contextTransform(event)
 		if (requestType.startsWith("multipart/form-data")) {
 			const parts = await readMultipartFormData(event)
 			for (const part of parts) {
@@ -59,7 +57,7 @@ export function defineH3PrimHandler(options: PrimH3PluginOptions) {
 		} else if (method === "POST") {
 			body = await readRawBody(event, jsonHandler.binary ? false : "utf-8")
 		}
-		const result = await prim.server().call({ body, method, url, blobs }, context)
+		const result = await prim.server().call({ body, method, url, blobs }, contextTransform(event))
 		const hasBinary = ["application/octet-stream", "multipart/form-data"].includes(result.headers["content-type"])
 		const blobEntries = Object.entries(result.blobs)
 		const suggested = result.headers["content-type"] === "application/octet-stream" ? "file" : "form"

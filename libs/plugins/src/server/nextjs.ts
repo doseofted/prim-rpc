@@ -14,7 +14,7 @@ interface PrimNextjsAppPluginOptions extends SharedNextjsOptions {
 }
 
 export function defineNextjsAppPrimHandler(options: PrimNextjsAppPluginOptions) {
-	const { prim, contextTransform = request => ({ context: "nextjs-app", request }) } = options
+	const { prim, contextTransform = _request => undefined } = options
 	const { jsonHandler } = prim.options
 	async function handler(request: Request) {
 		let body: string | ArrayBuffer
@@ -26,7 +26,6 @@ export function defineNextjsAppPrimHandler(options: PrimNextjsAppPluginOptions) 
 		}
 		const requestType = request.headers.get("content-type") ?? ""
 		const method = request.method
-		const context = contextTransform(request)
 		if (requestType.startsWith("multipart/form-data")) {
 			const formData = await request.formData()
 			for (const [key, value] of formData) {
@@ -39,7 +38,7 @@ export function defineNextjsAppPrimHandler(options: PrimNextjsAppPluginOptions) 
 		} else if (method === "POST") {
 			body = await request.text()
 		}
-		const result = await prim.server().call({ body, method, url, blobs }, context)
+		const result = await prim.server().call({ body, method, url, blobs }, contextTransform(request))
 		const hasBinary = ["application/octet-stream", "multipart/form-data"].includes(result.headers["content-type"])
 		let firstFile = { name: "", blob: null as Blob | null, type: "application/octet-stream" }
 		const blobEntries = Object.entries(result.blobs)

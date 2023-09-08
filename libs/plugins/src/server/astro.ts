@@ -11,7 +11,7 @@ interface PrimAstroPluginOptions {
 }
 
 export function defineAstroPrimHandler(options: PrimAstroPluginOptions) {
-	const { prim, contextTransform = request => ({ context: "astro", request }) } = options
+	const { prim, contextTransform = _request => undefined } = options
 	const { jsonHandler } = prim.options
 	const handler: APIRoute = async ctx => {
 		const { request, url: urlFull } = ctx

@@ -155,9 +155,9 @@ By default, Prim+RPC uses the native `JSON` object for serializing JSON and
 avoids prototype pollution). This is considered the default JSON handler.
 
 Since Prim+RPC messages are JSON, the default JSON handler is used with special handling of callbacks, files, and Error
-objects. However, this is subject to the limitations of the default JSON handler. This means that other types of data
-will need to be serialized to a string and will not automatically convert back to the same type on the server. If the
-data type passed to Prim+RPC is not something that can be serialized then it may not be sent at all.
+objects. However, this is subject to the limitations of the default JSON handler unless overridden. This means that
+other types of data will need to be serialized to a string and will not automatically convert back to the same type on
+the server. If the data type passed to Prim+RPC is not something that can be serialized then it may not be sent at all.
 
 However, you can change the JSON serialization library used to extend the number of types that can be serialized and add
 more. This way your types from the client that you pass to the server will be preserved on the server without having to
@@ -250,20 +250,6 @@ export function doSomething(askApproval: (status: string) => Promise<boolean>) {
 
 I believe that this can be solved but there may be an additional limitation needed so that a callback cannot return yet
 another function (otherwise this is another problem that needs to be solved).
-
-### Files Cannot Be Sent as Response to RPC Yet
-
-Today, Prim+RPC can handle file uploads to the server but cannot return a file from the server back to the client. To be
-clear, you can return a URL to the client over RPC that points to a file (this is typical with many server-side APIs)
-but you cannot return the binary contents of that file back to the function yet.
-
-```ts
-// NOTE: DOES NOT WORK
-export function createCalendarEvent(date: Date) {
-	const calendarInviteFile: Buffer = createICSFile()
-	return calendarInviteFile
-}
-```
 
 ### Callbacks and Files Can't Be Used At Same Time
 

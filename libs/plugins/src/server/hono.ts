@@ -16,7 +16,7 @@ interface PrimHonoPluginOptions extends SharedHonoOptions {
 }
 
 export function honoPrimRpc(options: PrimHonoPluginOptions) {
-	const { prim, contextTransform = ctx => ({ context: "hono", ctx }) } = options
+	const { prim, contextTransform = _ctx => undefined } = options
 	const { jsonHandler } = prim.options
 	const middleware: MiddlewareHandler = async (context, next) => {
 		const { req } = context

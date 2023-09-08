@@ -45,7 +45,7 @@ export const fastifyPrimRpc: FastifyPluginAsync<PrimFastifyPluginOptions> = asyn
 		multipartPlugin,
 		formDataHandler: FormData,
 		fileSizeLimitBytes: fileSize,
-		contextTransform = (request, reply) => ({ context: "fastify", request, reply }),
+		contextTransform = (_request, _reply) => undefined,
 	} = options
 	const { jsonHandler } = prim.options
 	if (multipartPlugin) {
@@ -135,8 +135,7 @@ export const fastifyPrimRpc: FastifyPluginAsync<PrimFastifyPluginOptions> = asyn
 				raw: { url },
 			} = request
 			const body = bodyForm ?? bodyReq
-			const context = contextTransform(request, reply)
-			const response = await prim.server().call({ method, url, body, blobs }, context)
+			const response = await prim.server().call({ method, url, body, blobs }, contextTransform(request, reply))
 			// NOTE: in POST requests, a single file result is not returned directly (it remains part of form data)
 			const { form } = await binaryToFormData(response, FormData)
 			const blobCount = Object.keys(response.blobs).length
@@ -160,8 +159,7 @@ export const fastifyPrimRpc: FastifyPluginAsync<PrimFastifyPluginOptions> = asyn
 				method,
 				raw: { url },
 			} = request
-			const context = contextTransform(request, reply)
-			const response = await prim.server().call({ method, url, body }, context)
+			const response = await prim.server().call({ method, url, body }, contextTransform(request, reply))
 			const { file, form, suggested } = await binaryToFormData(response, FormData)
 			if (suggested === "file" && file) {
 				void reply

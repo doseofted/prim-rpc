@@ -40,7 +40,7 @@ export const expressPrimRpc = (options: PrimExpressPluginOptions) => {
 		multipartPlugin,
 		formDataHandler: MyFormData,
 		fileSizeLimitBytes,
-		contextTransform = (req, res) => ({ context: "express", req, res }),
+		contextTransform = (_req, _res) => undefined,
 	} = options
 	const { jsonHandler } = prim.options
 	const handler = async (req: Express.Request, res: Express.Response, next: Express.NextFunction) => {
@@ -118,8 +118,7 @@ export const expressPrimRpc = (options: PrimExpressPluginOptions) => {
 				})
 			}
 			const body = bodyForm ?? bodyChunked
-			const context = contextTransform(req, res)
-			const result = await prim.server().call({ method, url, body, blobs }, context)
+			const result = await prim.server().call({ method, url, body, blobs }, contextTransform(req, res))
 			const hasBinary = ["application/octet-stream", "multipart/form-data"].includes(result.headers["content-type"])
 			const blobEntries = Object.entries(result.blobs)
 			const suggested = result.headers["content-type"] === "application/octet-stream" ? "file" : "form"

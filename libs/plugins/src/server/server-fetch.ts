@@ -10,7 +10,7 @@ interface PrimRequestOptions {
 }
 
 export function primFetch(options: PrimRequestOptions) {
-	const { prim, contextTransform = request => ({ type: "Request", request }) } = options
+	const { prim, contextTransform = _request => undefined } = options
 	const { prefix = "/", jsonHandler } = prim.options
 	return async (request: Request) => {
 		const { method } = request
