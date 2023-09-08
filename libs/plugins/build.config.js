@@ -12,6 +12,7 @@ export default defineConfig({
 		"src/server/astro.ts",
 		"src/server/fastify.ts",
 		"src/server/express.ts",
+		"src/server/server-fetch.ts",
 		"src/server/h3.ts",
 		"src/server/ws.ts",
 		"src/client/axios.ts",
