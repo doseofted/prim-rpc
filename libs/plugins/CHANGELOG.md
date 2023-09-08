@@ -1,5 +1,12 @@
 # @doseofted/prim-rpc-plugins
 
+## 0.1.0-alpha.16
+
+### Patch Changes
+
+- 2c7dc01: Context is now undefined by default but can be given in individual handler options
+- d05a96e: Added generic fetch/requests handler for modern runtimes like Bun/Deno
+
 ## 0.1.0-alpha.15
 
 ### Patch Changes
