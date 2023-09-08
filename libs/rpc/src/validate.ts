@@ -1,4 +1,5 @@
 import type {
+	BlobRecords,
 	CommonServerResponseOptions,
 	CommonServerSimpleGivenOptions,
 	RpcAnswer,
@@ -21,7 +22,9 @@ export const PrimRpcSpecific = Symbol("primRpc")
 function checkRpcBase<T extends RpcBase>(given: unknown) {
 	const givenRpc = typeof given === "object" && given !== null && given
 	if (!givenRpc) {
-		throw { error: "Invalid RPC" }
+		const err = { error: "Invalid RPC" }
+		Object.defineProperty(err, "primRpc", { value: PrimRpcSpecific, enumerable: false, writable: false })
+		throw err
 	}
 	const id =
 		"id" in givenRpc
@@ -101,8 +104,8 @@ export function checkRpcResult<T = unknown, V = T extends unknown[] ? RpcAnswer[
 // !SECTION
 
 // SECTION: Validation of HTTP-like arguments/response
-export function checkHttpLikeRequest(given: unknown) {
-	const toCall: Partial<CommonServerSimpleGivenOptions> = {}
+export function checkHttpLikeRequest(given: unknown, binary = false) {
+	const toCall: Partial<CommonServerSimpleGivenOptions<typeof binary>> = {}
 	const givenObject = typeof given === "object" && given !== null && given
 	if (!givenObject) {
 		throw { error: "Invalid request made by method/callback handler" }
@@ -111,12 +114,20 @@ export function checkHttpLikeRequest(given: unknown) {
 	if (url) {
 		toCall.url = url
 	}
-	const body = "body" in givenObject && typeof givenObject.body === "string" && givenObject.body
+	// binary body today is expected to be further processed by JSON handler
+	const body =
+		"body" in givenObject &&
+		typeof givenObject.body === (binary ? "object" : "string") &&
+		(givenObject.body as string | object)
 	if (body) {
 		toCall.body = body
 	}
 	if (!toCall.url && !toCall.body) {
 		throw { error: "Either a URL or body must be given" }
+	}
+	const blobs = "blobs" in givenObject && typeof givenObject.blobs === "object" && givenObject.blobs
+	if (blobs) {
+		toCall.blobs = blobs as BlobRecords
 	}
 	const method = "method" in givenObject && typeof givenObject.method === "string" && givenObject.method
 	// const validGET = method === "GET" && toCall.url
@@ -133,13 +144,16 @@ export function checkHttpLikeRequest(given: unknown) {
 	return toCall as CommonServerSimpleGivenOptions
 }
 
-export function checkHttpLikeResponse(given: unknown): CommonServerResponseOptions {
-	const toRespond: Partial<CommonServerResponseOptions> = {}
+export function checkHttpLikeResponse(given: unknown, binary = false): CommonServerResponseOptions {
+	const toRespond: Partial<CommonServerResponseOptions<typeof binary>> = {}
 	const givenObject = typeof given === "object" && given !== null && given
 	if (!givenObject) {
 		throw { error: "Internal error while transforming response" }
 	}
-	const body = "body" in givenObject && typeof givenObject.body === "string" && givenObject.body
+	const body =
+		"body" in givenObject &&
+		typeof givenObject.body === (binary ? "object" : "string") &&
+		(givenObject.body as string | object)
 	if (body) {
 		toRespond.body = body
 	} else {
@@ -164,7 +178,26 @@ export function checkHttpLikeResponse(given: unknown): CommonServerResponseOptio
 	} else {
 		throw { error: "Response status was not set" }
 	}
+	const blobs = "blobs" in givenObject && typeof givenObject.blobs === "object" && givenObject.blobs
+	if (blobs) {
+		toRespond.blobs = blobs as BlobRecords
+	}
 	return toRespond as CommonServerResponseOptions
+}
+
+/**
+ * Validate functions use symbols (top-level only) for internal usage but these
+ * aren't needed for any returned values.
+ */
+export function stripSymbols<T = unknown>(given: T) {
+	if (typeof given === "object") {
+		for (const [key, value] of Object.entries(given)) {
+			if (typeof value === "symbol") {
+				delete given[key]
+			}
+		}
+	}
+	return given
 }
 
 // !SECTION

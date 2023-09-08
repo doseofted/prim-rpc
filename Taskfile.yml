@@ -41,7 +41,7 @@ tasks:
   test:
     desc: "Run all project tests"
     cmds:
-      - "pnpm turbo build"
+      - "pnpm turbo test"
 
   changeset:
     desc: "Add a changeset to a commit"

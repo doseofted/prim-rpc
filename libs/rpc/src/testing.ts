@@ -23,7 +23,10 @@ type ConnectedEvent = Emitter<{ messageClient: string; messageServer: string; en
 /** Represents a request over HTTP (after connection is made) to upgrade to a WS connection */
 type WsRequest = { connect: undefined; connected: ConnectedEvent }
 /** Represent an HTTP request (after initial connection is made) */
-type HttpRequest = { request: { body: string; blobs?: BlobRecords }; response: string }
+type HttpRequest = {
+	request: { body: string | object; blobs?: BlobRecords }
+	response: { body: string | object; blobs?: BlobRecords }
+}
 
 // NOTE: Instead of directly sharing event emitters for `wsServer` and `httpServer` between server/client plugins for
 // Prim RPC, a "connection" emitter is used to send a request ID from the client to the server which creates a unique
@@ -61,9 +64,10 @@ export const createMethodHandler = (options: MethodTestingOptions): PrimServerMe
 			}
 			const httpServer = mitt<HttpRequest>()
 			httpServer.on("request", async ({ body, blobs }) => {
-				const { call } = server()
-				const response = await call({ body: String(body) }, blobs, context)
-				httpServer.emit("response", response.body)
+				const primServer = server()
+				const response = await primServer.call({ body, blobs, method: "POST" }, context)
+				// eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
+				httpServer.emit("response", { body: response.body, blobs: response.blobs })
 			})
 			httpConnection.emit(`res:${reqId.replace(/^req:/, "")}`, httpServer)
 		})
@@ -115,9 +119,11 @@ export function createMethodPlugin({ httpConnection }: PrimClientOptions) {
 			httpConnection.on(`res:${reqId}`, httpServer => {
 				// eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
 				const body = jsonHandler.stringify(bodyRpc)
-				httpServer.on("response", body => {
-					// eslint-disable-next-line @typescript-eslint/no-unsafe-argument
-					resolve(jsonHandler.parse(body))
+				httpServer.on("response", ({ body, blobs }) => {
+					// eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
+					const result = jsonHandler.parse(body)
+					// eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
+					resolve({ result, blobs })
 				})
 				// eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
 				httpServer.emit("request", { body, blobs })

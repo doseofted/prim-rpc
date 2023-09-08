@@ -8,9 +8,12 @@ import queryString from "query-string"
 import { serializeError } from "serialize-error"
 import { createPrimOptions, primMajorVersion, useVersionInRpc } from "./options"
 import { createPrimClient } from "./client"
-import { mergeBlobLikeWithGiven } from "./blobs"
-import type { AnyFunction, JsonHandler } from "./interfaces"
+import { handlePossibleBlobs, mergeBlobLikeWithGiven } from "./blobs"
+import { PrimRpcSpecific, checkHttpLikeRequest, checkHttpLikeResponse, checkRpcCall, checkRpcResult } from "./validate"
 import type {
+	AnyFunction,
+	BlobRecords,
+	JsonHandler,
 	CommonServerSimpleGivenOptions,
 	CommonServerResponseOptions,
 	PrimServerOptions,
@@ -25,7 +28,6 @@ import type {
 	PrimServer,
 	PrimServerSocketAnswerRpc,
 } from "./interfaces"
-import { PrimRpcSpecific, checkHttpLikeRequest, checkHttpLikeResponse, checkRpcCall, checkRpcResult } from "./validate"
 
 /**
  *
@@ -64,15 +66,24 @@ function createServerActions(
 	serverOptions: PrimServerOptions,
 	instance?: ReturnType<typeof createPrimInstance>
 ): PrimServerActionsBase {
-	const { jsonHandler, prefix: serverPrefix, handleError } = serverOptions
+	const { jsonHandler, prefix: serverPrefix, handleError, handleBlobs } = serverOptions
+	const binaryHandlingNeeded = handleBlobs || !jsonHandler?.binary
 	const prepareCall = (given: CommonServerSimpleGivenOptions = {}): RpcCall | RpcCall[] => {
 		try {
-			const givenReq = checkHttpLikeRequest(given)
-			const { body, method, url: possibleUrl } = givenReq
+			const givenReq = checkHttpLikeRequest(given, jsonHandler?.binary)
+			// eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
+			const { body, method, url: possibleUrl, blobs } = givenReq
+			// eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
 			const providedBody = method === "POST" && body
 			if (providedBody) {
 				const prepared = jsonHandler.parse(givenReq.body) as RpcCall | RpcCall[]
-				return prepared
+				const possibleCalls = Array.isArray(prepared) ? checkRpcCall(prepared) : [checkRpcCall(prepared)]
+				if (binaryHandlingNeeded && Object.entries(blobs || {}).length > 0) {
+					for (const toCall of possibleCalls) {
+						toCall.args = toCall.args.map(arg => mergeBlobLikeWithGiven(arg, blobs))
+					}
+				}
+				return Array.isArray(prepared) ? possibleCalls : possibleCalls[0]
 			}
 			const providedUrl = method === "GET" && possibleUrl
 			if (providedUrl) {
@@ -101,26 +112,37 @@ function createServerActions(
 					positional.length > 0 && positional.length === entries.length ? positional : entries.length === 0 ? [] : query
 				let method = url.replace(RegExp("^" + serverPrefix + "\\/?"), "")
 				method = method !== "" ? method : "default"
-				return { id, method, args }
+				return checkRpcCall({ id, method, args })
 			}
 			throw { error: "Response can not be generated from request" }
 		} catch (error) {
+			// eslint-disable-next-line @typescript-eslint/no-unsafe-member-access
+			if (typeof error === "object" && "primRpc" in error && error.primRpc === PrimRpcSpecific) {
+				// FIXME: errors aren't expected to be thrown here but is needed for next step
+				// use same pattern from Prim RPC client to handle special objects
+				const internalError: RpcCall = { method: "_error_", args: error }
+				return internalError
+			}
 			// RPC call is purposefully invalid to trigger invalid RPC error in next step
 			return { method: "" }
 		}
 	}
 	const prepareRpc = async (
 		calls: RpcCall | RpcCall[],
-		blobs: Record<string, unknown> = {},
 		context?: unknown,
 		cbResults?: (a: RpcAnswer) => void
 	): Promise<RpcAnswer | RpcAnswer[]> => {
+		// FIXME: checkRpcCall is called twice (once in prepareCall and once here) and this could be optimized
 		// NOTE: new Prim client should be created on each request so callback results are not shared
 		try {
 			const { client, socketEvent: event, configured } = instance ?? createPrimInstance(serverOptions)
 			const callList = Array.isArray(calls) ? calls : [calls]
 			const answeringCalls = callList.map(async (givenUnchecked): Promise<RpcAnswer> => {
-				const { method, args, id } = checkRpcCall(givenUnchecked)
+				const { method, args /* : argsGiven */, id } = checkRpcCall(givenUnchecked)
+				// const args = Object.entries(blobs || {}).length > 0 ? argsGiven.map(arg => mergeBlobLikeWithGiven(arg, blobs)) : argsGiven
+				if (method === "_error_") {
+					throw args[0] // from internal prepareCall step
+				}
 				const rpcVersion: Partial<RpcAnswer> = useVersionInRpc ? { prim: primMajorVersion } : {}
 				const rpcBase: Partial<RpcAnswer> = { ...rpcVersion, id }
 				try {
@@ -183,8 +205,6 @@ function createServerActions(
 							}
 						}
 					}
-					const argsForCall =
-						Object.entries(blobs || {}).length > 0 ? args.map(arg => mergeBlobLikeWithGiven(arg, blobs)) : args
 					// NOTE: use `targetRemote` below even if target is local to allow callbacks to be used with server
 					// (server and client share event handlers on `.internal` option that allows for usage of callbacks)
 					if (givenModule && targetLocal) {
@@ -195,7 +215,7 @@ function createServerActions(
 						}
 						// call module with `client` if not provided directly to server (checks already ran on module, if provided)
 						const targetRemote = getProperty(client, methodExpanded) as AnyFunction & { rpc?: boolean }
-						const result = (await Reflect.apply(targetRemote, context, argsForCall)) as unknown
+						const result = (await Reflect.apply(targetRemote, context, args)) as unknown
 						return { ...rpcBase, result }
 					} else {
 						// If either the module wasn't provided or target doesn't exist (even if module does), send a request using
@@ -207,7 +227,7 @@ function createServerActions(
 							limitedEvent.on("response", cbResults)
 						}
 						const targetRemote = getProperty(limitedClient, methodExpanded) as AnyFunction & { rpc?: boolean }
-						const result = (await Reflect.apply(targetRemote, context, argsForCall)) as unknown
+						const result = (await Reflect.apply(targetRemote, context, args)) as unknown
 						return { ...rpcBase, result }
 					}
 					// TODO: today, result must be supported by JSON handler but consider supporting returned functions
@@ -235,9 +255,34 @@ function createServerActions(
 		}
 	}
 	const prepareSend = (given: RpcAnswer | RpcAnswer[]): CommonServerResponseOptions => {
-		const body = jsonHandler.stringify(given) as string
+		let blobs: BlobRecords = {}
+		const givenOnly = (separationNeeded => {
+			if (separationNeeded) {
+				const givenSeparated = Array.isArray(given)
+					? given.map(g => handlePossibleBlobs(g))
+					: [handlePossibleBlobs(given)]
+				const givenOnly = givenSeparated.map(([given, newBlobs]) => {
+					blobs = { ...blobs, ...newBlobs }
+					return given
+				})
+				return givenOnly
+			} else {
+				return [given]
+			}
+		})(binaryHandlingNeeded)
+		const body = jsonHandler.stringify(Array.isArray(given) ? givenOnly : givenOnly[0]) as string
 		// NOTE: body length is generally handled by server framework, I think
-		const headers = { "content-type": jsonHandler.mediaType ?? "application/json" }
+		const blobCount = Object.keys(blobs).length
+		// these mime types are just base suggestions to be overridden by chosen plugin, if applicable
+		const singleFileResult =
+			blobCount === 1 && !Array.isArray(given) && typeof given.result === "string" && given.result.startsWith("_bin_")
+		let contentType = singleFileResult
+			? "application/octet-stream"
+			: blobCount > 1
+			? "multipart/form-data"
+			: jsonHandler.mediaType ?? "application/json"
+		contentType = jsonHandler?.binary ? "application/octet-stream" : contentType
+		const headers = { "content-type": contentType }
 		const answers = Array.isArray(given) ? given : [given]
 		const statuses = answers.map(answer => ("error" in answer ? 500 : "result" in answer ? 200 : 400))
 		const notOkay = statuses.filter(stat => stat !== 200)
@@ -245,7 +290,7 @@ function createServerActions(
 		// NOTE: return 200:okay, 400:missing, 500:error if any call has that status
 		const status = notOkay.length > 0 ? (errored.length > 0 ? 500 : 400) : 200
 		try {
-			return checkHttpLikeResponse({ body, headers, status })
+			return checkHttpLikeResponse({ body, headers, status, blobs }, jsonHandler?.binary)
 		} catch (error: unknown) {
 			if (typeof error === "object" && error !== null && "primRpc" in error && error.primRpc === PrimRpcSpecific) {
 				return { body: jsonHandler.stringify(error) as string, headers: {}, status: 500 }
@@ -263,11 +308,10 @@ function createServerEvents(serverOptions: PrimServerOptions): PrimServerEvents 
 		const { prepareCall, prepareRpc, prepareSend } = createServerActions(serverOptions)
 		const call = async (
 			given: CommonServerSimpleGivenOptions,
-			blobs: Record<string, unknown> = {},
 			context?: unknown
 		): Promise<CommonServerResponseOptions> => {
 			const preparedArgs = prepareCall(given)
-			const result = await prepareRpc(preparedArgs, blobs, context)
+			const result = await prepareRpc(preparedArgs, context)
 			const preparedResult = prepareSend(result)
 			return preparedResult
 		}
@@ -292,12 +336,16 @@ function createSocketEvents(serverOptions: PrimServerOptions): PrimServerSocketE
 			// FIXME: don't stop listening to other responses when new call is made)
 			event.off("response")
 			event.on("response", data => {
+				// FIXME: in the future, binary data should also become supported in callback handlers (also, no type cast will be needed)
+				// eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
 				const { body } = prepareSend(data)
+				// eslint-disable-next-line @typescript-eslint/no-unsafe-argument
 				send(body)
 			})
 			const preparedArgs = prepareCall({ body })
-			const result = await prepareRpcBase(preparedArgs, null, context)
+			const result = await prepareRpcBase(preparedArgs, context)
 			const preparedResult = prepareSend(result)
+			// eslint-disable-next-line @typescript-eslint/no-unsafe-argument
 			send(preparedResult.body)
 		}
 		const rpc = async (body: RpcCall | RpcCall[], send: PrimServerSocketAnswerRpc, context?: unknown) => {
@@ -307,7 +355,7 @@ function createSocketEvents(serverOptions: PrimServerOptions): PrimServerSocketE
 			event.on("response", data => {
 				send(data)
 			})
-			const result = await prepareRpcBase(body, null, context)
+			const result = await prepareRpcBase(body, context)
 			send(result)
 		}
 		// TODO: return `prepare...()` functions below, in event that something more than `call()` is needed

@@ -13,7 +13,6 @@ export interface RpcBase {
 
 export interface RpcCall<Method = string, Args = unknown> extends RpcBase {
 	method: Method
-	// FIXME: rename this to "args" since this refers to values given to method
 	args?: Args
 }
 
@@ -147,17 +146,19 @@ export interface JsonHandler {
 	stringify: (value: any) => any
 	// eslint-disable-next-line @typescript-eslint/no-explicit-any
 	parse: (text: any) => any
-	mediaType?: string
+	// eslint-disable-next-line @typescript-eslint/ban-types -- string&{} hack may not be needed in TypeScript 5.3
+	mediaType?: "application/json" | (string & {})
+	binary?: boolean
 }
 // type JsonHandlerOptional  = Partial<JsonHandler>
 /** The record key is a string prefixed with `_bin_` and the value is the Blob */
-export type BlobRecords = Record<string, Blob | Buffer>
+export type BlobRecords = Record<string, Blob | File | Buffer>
 export type PrimClientMethodPlugin<J = JsonHandler> = (
 	endpoint: string,
 	jsonBody: RpcCall | RpcCall[],
 	jsonHandler: J,
 	blobs?: BlobRecords
-) => Promise<RpcAnswer | RpcAnswer[]>
+) => Promise<{ result: RpcAnswer | RpcAnswer[]; blobs?: BlobRecords }>
 export type PrimClientCallbackPlugin<J = JsonHandler> = (
 	endpoint: string,
 	events: PrimWebSocketFunctionEvents,
@@ -330,22 +331,37 @@ export interface PrimOptions<M extends PossibleModule = object, J extends JsonHa
  * For GET requests, `.url` and `.method` will be used.
  * For POST requests, `.body` will be used.
  */
-export interface CommonServerSimpleGivenOptions {
+export interface CommonServerSimpleGivenOptions<Binary extends true | false = boolean> {
 	/** Generally the the full URL, including protocol, host, path, and query */
 	url?: string
 	/** HTTP method */
 	method?: string
-	/** The body of the request as a string */
-	body?: string
+	/**
+	 * The body of the request as a string when using default JSON handler.
+	 * If a binary JSON handler is used, the body type will be solely determined by the JSON handler.
+	 */
+	// eslint-disable-next-line @typescript-eslint/no-explicit-any
+	body?: Binary extends false ? string : any
+	/** Blobs consist of binary data extracted from the body (comparable to and possibly created from form-data) */
+	blobs?: BlobRecords
 }
 
-export interface CommonServerResponseOptions {
+/**
+ * Common response options for servers.
+ */
+export interface CommonServerResponseOptions<Binary extends true | false = boolean> {
 	/** HTTP status code */
 	status: number
 	/** Headers, as generally formatted for most Node servers */
 	headers: { [header: string]: string }
-	/** Body of result, as a string */
-	body: string
+	/**
+	 * Body of result, as a string when using default JSON handler.
+	 * If a binary JSON handler is used, the body type will be solely determined by the JSON handler.
+	 */
+	// eslint-disable-next-line @typescript-eslint/no-explicit-any
+	body: Binary extends false ? string : any
+	/** Blobs consist of binary data extracted from the response (in case response body cannot contain binary data) */
+	blobs?: BlobRecords
 }
 // !SECTION
 
@@ -424,11 +440,7 @@ export interface PrimServerActionsBase<Context = unknown> {
 	 * Step 2: Using the result of `.prepareCall()`, use the RPC to get a result from Prim.
 	 * See `.prepareSend()` for next step.
 	 */
-	prepareRpc: (
-		given: RpcCall | RpcCall[],
-		blobs?: Record<string, unknown> | null,
-		context?: Context
-	) => Promise<RpcAnswer | RpcAnswer[]>
+	prepareRpc: (given: RpcCall | RpcCall[], context?: Context) => Promise<RpcAnswer | RpcAnswer[]>
 	/**
 	 * Step 3: Using the result of `.rpc()`, prepare the result to be sent with the server framework.
 	 */
@@ -445,11 +457,7 @@ export interface PrimServerActionsExtended<Context = unknown> extends PrimServer
 	 *
 	 * This calls, in order, `.prepareCall()`, `.rpc()`, and `.prepareSend()`
 	 */
-	call: (
-		given: CommonServerSimpleGivenOptions,
-		blobs?: Record<string, unknown> | null,
-		context?: Context
-	) => Promise<CommonServerResponseOptions>
+	call: (given: CommonServerSimpleGivenOptions, context?: Context) => Promise<CommonServerResponseOptions>
 }
 
 export interface PrimServerEvents {

@@ -17,7 +17,7 @@ without the wrappers. It's just JavaScript. You could bridge:
 Prim+RPC is framework-agnostic (bring your own server _and_ client tools), fully-typed, lightweight, doesn't require a
 compile-step, and is **loaded with features**:
 
-- File uploads
+- File handling
 - Callback support
 - Custom serialization
 - Error handling

@@ -8,11 +8,13 @@
 /* eslint-disable @typescript-eslint/no-unsafe-return -- Test the unexpected */
 
 import { describe, test, expect } from "vitest"
-import { createPrimClient, createPrimServer } from "."
+import { JsonHandler, createPrimClient, createPrimServer } from "."
 import type * as exampleClient from "@doseofted/prim-example"
 import * as exampleServer from "@doseofted/prim-example"
 import jsonHandler from "superjson"
 import { createPrimTestingPlugins } from "./testing"
+import { File } from "node:buffer"
+import { encode as msgPack, decode as msgUnpack } from "@msgpack/msgpack"
 
 const module = exampleServer
 type IModule = typeof exampleClient
@@ -131,17 +133,38 @@ test("Prim Client can call allowed methods on methods", async () => {
 	expect(result).toEqual(expected)
 })
 
-test("Prim Client can use alternative JSON handler", async () => {
-	const { callbackPlugin, methodPlugin, callbackHandler, methodHandler } = createPrimTestingPlugins()
-	// JSON handler is only useful with remote source (no local source test needed)
-	const commonOptions = { jsonHandler }
-	createPrimServer({ ...commonOptions, module, callbackHandler, methodHandler })
-	const prim = createPrimClient<IModule>({ ...commonOptions, callbackPlugin, methodPlugin })
-	const date = new Date()
-	const expected = module.whatIsDayAfter(date)
-	const result = await prim.whatIsDayAfter(date)
-	expect(result).toEqual(expected)
-	expect(result).toBeInstanceOf(Date)
+/** An example using msgpack */
+const binaryJsonHandler: JsonHandler = {
+	stringify: msgPack,
+	parse: msgUnpack,
+	binary: true,
+	mediaType: "application/octet-stream",
+}
+
+// JSON handler is only useful with remote source (no local source test needed)
+describe("Prim Client can use alternative JSON handler", () => {
+	test("string (actual JSON)", async () => {
+		const { callbackPlugin, methodPlugin, callbackHandler, methodHandler } = createPrimTestingPlugins()
+		const commonOptions = { jsonHandler }
+		createPrimServer({ ...commonOptions, module, callbackHandler, methodHandler })
+		const prim = createPrimClient<IModule>({ ...commonOptions, callbackPlugin, methodPlugin })
+		const date = new Date()
+		const expected = module.whatIsDayAfter(date)
+		const result = await prim.whatIsDayAfter(date)
+		expect(result).toEqual(expected)
+		expect(result).toBeInstanceOf(Date)
+	})
+	test("binary (not JSON)", async () => {
+		const { callbackPlugin, methodPlugin, callbackHandler, methodHandler } = createPrimTestingPlugins()
+		const commonOptions = { jsonHandler: binaryJsonHandler, handleBlobs: false }
+		createPrimServer({ ...commonOptions, module, callbackHandler, methodHandler })
+		const prim = createPrimClient<IModule>({ ...commonOptions, callbackPlugin, methodPlugin })
+		const date = new Date()
+		const expected = module.whatIsDayAfter(date)
+		const result = await prim.whatIsDayAfter(date)
+		expect(result).toEqual(expected)
+		expect(result).toBeInstanceOf(Date)
+	})
 })
 
 describe("Prim Client can call deeply nested methods", () => {
@@ -160,6 +183,60 @@ describe("Prim Client can call deeply nested methods", () => {
 		const expected = module.testLevel2.testLevel1.sayHello(args)
 		const result = await prim.testLevel2.testLevel1.sayHello(args)
 		expect(result).toEqual(expected)
+	})
+})
+
+describe("Prim Client can handle binary data", () => {
+	test("with local source, download", async () => {
+		const prim = createPrimClient({ module })
+		const args = ["Hi Ted!"] as const
+		const expected = await module.makeItATextFile(...args)
+		const result = await prim.makeItATextFile(...args)
+		expect(result).toBeInstanceOf(File)
+		void expect(result.text()).resolves.toEqual(await expected.text())
+	})
+	test("with remote source, download", async () => {
+		const { callbackPlugin, methodPlugin, callbackHandler, methodHandler } = createPrimTestingPlugins()
+		createPrimServer({ module, callbackHandler, methodHandler })
+		const prim = createPrimClient<IModule>({ callbackPlugin, methodPlugin })
+		const args = ["Hi Ted!"] as const
+		const expected = await module.makeItATextFile(...args)
+		const result = await prim.makeItATextFile(...args)
+		expect(result).toBeInstanceOf(File)
+		void expect(result.text()).resolves.toEqual(await expected.text())
+	})
+	test("with local source, upload", async () => {
+		const prim = createPrimClient({ module })
+		const args = [new File(["Hi Ted!"], "test.txt")] as const
+		const expected = module.uploadTheThing(...args)
+		const result = await prim.uploadTheThing(...args)
+		void expect(result).toMatchObject(expected)
+	})
+	test("with remote source, upload", async () => {
+		const { callbackPlugin, methodPlugin, callbackHandler, methodHandler } = createPrimTestingPlugins()
+		createPrimServer({ module, callbackHandler, methodHandler })
+		const prim = createPrimClient<IModule>({ callbackPlugin, methodPlugin })
+		const args = [new File(["Hi Ted!"], "test.txt")] as const
+		const expected = module.uploadTheThing(...args)
+		const result = await prim.uploadTheThing(...args)
+		void expect(result).toMatchObject(expected)
+	})
+
+	// NOTE: while a binary handler is used in the following tests, it's not used for the File/Blob because their methods
+	// are asynchronous and most JSON handlers don't support this option (they're synchronous like default JSON), but it
+	// is important that Files/Blobs can still be used and extracted from JSON with a binary handler, so I'll test it.
+
+	test("with remote source, upload and binary handler", async () => {
+		const { callbackPlugin, methodPlugin, callbackHandler, methodHandler } = createPrimTestingPlugins()
+		const jsonHandler = binaryJsonHandler
+		// NOTE: File/Blobs are still extracted from JSON
+		const commonOptions = { jsonHandler, handleBlobs: true }
+		createPrimServer({ ...commonOptions, module, callbackHandler, methodHandler })
+		const prim = createPrimClient<IModule>({ ...commonOptions, callbackPlugin, methodPlugin })
+		const args = [new File(["Hi Ted!"], "test.txt")] as const
+		const expected = module.uploadTheThing(...args)
+		const result = await prim.uploadTheThing(...args)
+		void expect(result).toMatchObject(expected)
 	})
 })
 

@@ -50,6 +50,7 @@
 	},
 	"devDependencies": {
 		"@doseofted/prim-example": "workspace:*",
+		"@msgpack/msgpack": "3.0.0-beta2",
 		"@types/lodash-es": "^4.17.8",
 		"@types/node": "^18.17.3",
 		"superjson": "^1.13.1"

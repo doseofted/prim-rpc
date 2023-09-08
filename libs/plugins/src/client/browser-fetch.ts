@@ -2,9 +2,7 @@
 // Copyright 2023 Ted Klingenberg
 // SPDX-License-Identifier: Apache-2.0
 
-import type { PrimClientMethodPlugin, RpcAnswer } from "@doseofted/prim-rpc"
-
-// TODO: test this plugin
+import type { BlobRecords, PrimClientMethodPlugin, RpcAnswer } from "@doseofted/prim-rpc"
 
 interface MethodFetchOptions {
 	headers?: Headers | Record<string, string>
@@ -16,11 +14,16 @@ export const createMethodPlugin = (options: MethodFetchOptions = {}) => {
 		const { headers: headersOverride = {} } = options
 		let fetchOptions: RequestInit = {}
 		const blobList = Object.entries(blobs)
-		if (blobList.length > 0) {
+		if (blobList.length > 0 || jsonHandler.binary) {
 			// send as form data if blobs is given (empty if not configured)
 			const data = new FormData()
-			// eslint-disable-next-line @typescript-eslint/no-unsafe-argument
-			data.append("rpc", jsonHandler.stringify(jsonBody))
+			// eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
+			const bodyStringish = jsonHandler.stringify(jsonBody)
+			data.append(
+				"rpc",
+				// eslint-disable-next-line @typescript-eslint/no-unsafe-argument
+				jsonHandler.binary ? new Blob([bodyStringish], { type: jsonHandler.mediaType }) : bodyStringish
+			)
 			for (const [key, blob] of blobList) {
 				data.append(key, blob as Blob)
 			}
@@ -38,12 +41,26 @@ export const createMethodPlugin = (options: MethodFetchOptions = {}) => {
 				body: jsonHandler.stringify(jsonBody),
 			}
 		}
-		const result = await fetch(endpoint, {
+		const fetchResult = await fetch(endpoint, {
 			...fetchOptions,
 			credentials: options.credentials,
 		})
-		const isBinaryLike = result.headers.get("content-type") === "application/octet-stream"
-		return jsonHandler.parse(await (isBinaryLike ? result.blob() : result.text())) as RpcAnswer | RpcAnswer[]
+		const resultContentType = fetchResult.headers.get("content-type")
+		if (resultContentType.startsWith("multipart/form-data")) {
+			const formData = await fetchResult.formData()
+			const resultBlobs: BlobRecords = {}
+			const result = jsonHandler.parse(formData.get("rpc")) as RpcAnswer | RpcAnswer[]
+			formData.delete("rpc")
+			formData.forEach((val, key) => {
+				resultBlobs[key] = val as Blob
+			})
+			return { result, blobs: resultBlobs }
+		}
+		const isBinaryLike = !!(resultContentType === jsonHandler.mediaType && jsonHandler.binary)
+		const result = jsonHandler.parse(await (isBinaryLike ? fetchResult.arrayBuffer() : fetchResult.text())) as
+			| RpcAnswer
+			| RpcAnswer[]
+		return { result }
 	}
 	return methodPlugin
 }

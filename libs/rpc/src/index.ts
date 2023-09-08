@@ -28,4 +28,7 @@ export type {
 	// other potentially useful utilities
 	AnyFunction,
 	RpcModule,
+	// Miscellaneous options unlikely to be used but still possible
+	CommonServerResponseOptions,
+	CommonServerSimpleGivenOptions,
 } from "./interfaces"

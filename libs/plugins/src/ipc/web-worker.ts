@@ -25,6 +25,7 @@ export const jsonHandler: JsonHandler = {
 	parse: given => given,
 	// eslint-disable-next-line @typescript-eslint/no-unsafe-return
 	stringify: given => given,
+	binary: true, // structured cloning is used with this handler
 }
 
 interface SharedWebWorkerOptions {
@@ -97,9 +98,9 @@ export const createMethodPlugin = (options: MethodPluginWebWorkerOptions) => {
 		new Promise(resolve => {
 			const id = nanoid()
 			transport.on(`method:connected:${id}`, () => {
-				transport.on(`response:${id}`, result => {
-					// eslint-disable-next-line @typescript-eslint/no-unsafe-argument
-					resolve(jsonHandler.parse(result))
+				transport.on(`response:${id}`, ({ result: resultGiven, blobs }) => {
+					const result = jsonHandler.parse(resultGiven) as RpcAnswer | RpcAnswer[]
+					resolve({ result, blobs })
 				})
 				// eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
 				transport.send(`request:${id}`, { rpc: jsonHandler.stringify(message), blobs })
@@ -113,13 +114,17 @@ interface MethodHandlerWebWorkerOptions extends SharedWebWorkerOptions {}
 export const createMethodHandler = (options: MethodHandlerWebWorkerOptions) => {
 	const transport = setupMessageTransport(options)
 	const methodHandler: PrimServerMethodHandler = prim => {
-		const jsonHandler = prim.options.jsonHandler
 		transport.on("method:connect", id => {
 			transport.on(`request:${id}`, async ({ rpc, blobs }) => {
-				// eslint-disable-next-line @typescript-eslint/no-unsafe-argument
-				const result = await prim.server().prepareRpc(jsonHandler.parse(rpc), blobs)
-				// eslint-disable-next-line @typescript-eslint/no-unsafe-argument
-				transport.send(`response:${id}`, jsonHandler.stringify(result))
+				const primServer = prim.server()
+				// eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
+				const { body: resultGiven, blobs: blobsGiven } = await primServer.call({
+					method: "POST",
+					body: rpc as string,
+					blobs,
+				})
+				// eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
+				transport.send(`response:${id}`, { result: resultGiven, blobs: blobsGiven })
 			})
 			transport.send(`method:connected:${id}`, null)
 		})
@@ -144,7 +149,7 @@ type MethodEvents = {
 	[request: `request:${string}`]: { rpc: RpcCall | RpcCall[] | string; blobs?: BlobRecords }
 	// NOTE: once binary results can be sent back using blob handlers, blobs should be added to interface below
 	// (also note that blob handler isn't needed with structured cloning)
-	[response: `response:${string}`]: RpcAnswer | RpcAnswer[] | string
+	[response: `response:${string}`]: { result: RpcAnswer | RpcAnswer[] | string; blobs?: BlobRecords }
 }
 
 type PrimEventDetail = CallbackEvents & MethodEvents

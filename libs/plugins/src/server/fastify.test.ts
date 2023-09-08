@@ -4,12 +4,13 @@
 
 /* eslint-disable @typescript-eslint/no-unsafe-member-access -- `request` doesn't have full type definitions */
 
-import { describe, test, beforeEach, afterEach, expect } from "vitest"
+import { readFileSync } from "node:fs"
+import { describe, test, beforeEach, expect } from "vitest"
 import request from "superwstest"
 import * as module from "@doseofted/prim-example"
 import Fastify from "fastify"
 import multipartPlugin from "@fastify/multipart"
-import { createPrimServer } from "@doseofted/prim-rpc"
+import { RpcAnswer, createPrimServer } from "@doseofted/prim-rpc"
 import { createMethodHandler, fastifyPrimRpc } from "./fastify"
 import queryString from "query-string"
 import FormData from "form-data"
@@ -23,14 +24,10 @@ describe("Fastify plugin is functional as Prim Plugin", () => {
 	})
 	beforeEach(async () => {
 		await fastify.ready()
-		await new Promise(resolve => {
-			fastify.server.listen(0, "localhost", () => {
-				resolve(true)
-			})
+		await new Promise<void>(resolve => {
+			fastify.server.listen(0, "localhost", resolve)
 		})
-	})
-	afterEach(() => {
-		fastify.server.close()
+		return () => fastify.server.close()
 	})
 	const args = { greeting: "What's up", name: "Ted" }
 	const expected = { id: 1, result: module.sayHello(args) }
@@ -57,14 +54,10 @@ describe("Fastify plugin is functional as Fastify plugin", async () => {
 	await fastify.register(fastifyPrimRpc, { prim })
 	beforeEach(async () => {
 		await fastify.ready()
-		await new Promise(resolve => {
-			fastify.server.listen(0, "localhost", () => {
-				resolve(true)
-			})
+		await new Promise<void>(resolve => {
+			fastify.server.listen(0, "localhost", resolve)
 		})
-	})
-	afterEach(() => {
-		fastify.server.close()
+		return () => fastify.server.close()
 	})
 	const args = { greeting: "What's up", name: "Ted" }
 	const expected = { id: 1, result: module.sayHello(args) }
@@ -91,14 +84,10 @@ describe("Fastify plugin works with over GET/POST", () => {
 	})
 	beforeEach(async () => {
 		await fastify.ready()
-		await new Promise(resolve => {
-			fastify.server.listen(0, "localhost", () => {
-				resolve(true)
-			})
+		await new Promise<void>(resolve => {
+			fastify.server.listen(0, "localhost", resolve)
 		})
-	})
-	afterEach(() => {
-		fastify.server.close()
+		return () => fastify.server.close()
 	})
 	const args = { greeting: "What's up", name: "Ted" }
 	const expected = { id: 1, result: module.sayHello(args) }
@@ -127,38 +116,34 @@ describe("Fastify plugin works with over GET/POST", () => {
 	})
 })
 
-describe("Fastify plugin can support files", async () => {
+describe("Fastify plugin can support binary data", () => {
 	const fastify = Fastify()
 	createPrimServer({
 		module,
-		methodHandler: createMethodHandler({ fastify, multipartPlugin }),
+		methodHandler: createMethodHandler({ fastify, multipartPlugin, formDataHandler: FormData }),
 	})
 	beforeEach(async () => {
 		await fastify.ready()
-		await new Promise(resolve => {
-			fastify.server.listen(0, "localhost", () => {
-				resolve(true)
+		await new Promise<void>(resolve => {
+			fastify.server.listen(0, "localhost", resolve)
+		})
+		return () => fastify.server.close()
+	})
+	test("upload a file", async () => {
+		const formData = new FormData()
+		formData.append(
+			"rpc",
+			JSON.stringify({
+				method: "uploadTheThing",
+				args: ["_bin_cool"],
+				id: 1,
 			})
-		})
-	})
-	afterEach(() => {
-		fastify.server.close()
-	})
-	const formData = new FormData()
-	formData.append(
-		"rpc",
-		JSON.stringify({
-			method: "uploadTheThing",
-			args: ["_bin_cool"],
-			id: 1,
-		})
-	)
-	const fileName = "hi.txt"
-	const fileContents = new Blob(["hello"], { type: "text/plain" })
-	const file = new File([fileContents], fileName)
-	formData.append("_bin_cool", await fileContents.text(), fileName)
-	const expected = { id: 1, result: module.uploadTheThing(file) }
-	test("given a text file", async () => {
+		)
+		const fileName = "hi.txt"
+		const fileContents = new Blob(["hello"], { type: "text/plain" })
+		const file = new File([fileContents], fileName)
+		formData.append("_bin_cool", await fileContents.text(), fileName)
+		const expected = { id: 1, result: module.uploadTheThing(file) }
 		const response = await request(fastify.server)
 			.post("/prim")
 			.send(formData.getBuffer())
@@ -167,5 +152,50 @@ describe("Fastify plugin can support files", async () => {
 		expect(response.headers["content-type"]).toContain("application/json")
 		expect(response.status).toEqual(200)
 		expect(response.body).toEqual(expected)
+	})
+
+	test("download a file over POST", async () => {
+		const response = await request(fastify.server)
+			.post("/prim")
+			.send({
+				method: "makeItATextFile",
+				args: "Hello!",
+				id: 1,
+			})
+			.set("content-type", "application/json")
+			.set("accept", "multipart/form-data")
+		expect(response.headers["content-type"]).toContain("multipart/form-data")
+		const resultRpc = (
+			typeof response.body === "object" && "rpc" in response.body ? JSON.parse(response.body.rpc as string) : null
+		) as RpcAnswer | null
+		expect(resultRpc).not.toBeNull()
+		const binaryIdentifier = typeof resultRpc?.result === "string" ? resultRpc.result : ""
+		expect(binaryIdentifier.startsWith("_bin_")).toBe(true)
+		// eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
+		const fileGiven = response.files[binaryIdentifier]
+		expect(fileGiven.originalFilename).toBe("text.txt")
+		expect(fileGiven.mimetype).toBe("text/plain")
+		const fileContents = readFileSync(fileGiven.filepath as string, { encoding: "utf-8" })
+		expect(fileContents).toBe("Hello!")
+		expect(response.status).toEqual(200)
+	})
+
+	test("download a file directly over GET", async () => {
+		const response = await request(fastify.server)
+			.get(
+				queryString.stringifyUrl({
+					url: "/prim/makeItATextFile",
+					query: { "0": "Hello!", "-": 1 },
+				})
+			)
+			.set("content-type", "application/json")
+			.set("accept", "text/plain")
+		expect(response.headers["content-type"]).toContain("text/plain")
+		expect(response.headers["content-disposition"]).toContain(`filename="text.txt"`)
+		expect(response.status).toEqual(200)
+		expect(response.text).toBe("Hello!")
+		// NOTE: if given file that wasn't text/plain, this would be a Buffer
+		// expect(response.body).toBeInstanceOf(Buffer)
+		// expect(response.body instanceof Buffer ? response.body.toString("utf-8") : "").toBe("Hello!")
 	})
 })

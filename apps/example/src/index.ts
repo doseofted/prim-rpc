@@ -1,37 +1,42 @@
 import Fastify from "fastify"
-import multipartPlugin from "@fastify/multipart"
 import Cors from "@fastify/cors"
+import multipartPlugin from "@fastify/multipart"
+import formDataHandler from "form-data"
 import { WebSocketServer } from "ws"
-import jsonHandler from "superjson"
+import superjson from "superjson"
+import { encode, decode } from "@msgpack/msgpack"
 import { createPrimServer } from "@doseofted/prim-rpc"
 import { createMethodHandler } from "@doseofted/prim-rpc-plugins/fastify"
 import { createCallbackHandler } from "@doseofted/prim-rpc-plugins/ws"
 import * as module from "@doseofted/prim-example"
 
-const { sayHello } = module
-// if server is hosted publicly / in production, limit the functions that are allowed to run
-// (since example module's purpose is just for testing)
-const filteredModule = process.env.NODE_ENV === "development" ? module : { sayHello }
-
-/** Flag to determine if project is running locally or in a container */
-const contained = JSON.parse(process.env.CONTAINED ?? "false") === true
-
 // Setup Fastify (HTTP server)
 const fastify = Fastify({ trustProxy: true, logger: true })
-await fastify.register(Cors, { origin: contained ? `https://${process.env.WEBSITE_HOST}` : "http://localhost:3000" })
-// Setup WS-Server (WebSocket server)
-const wss = new WebSocketServer({ server: fastify.server })
-
+await fastify.register(Cors)
 const methodHandler = createMethodHandler({
 	fastify,
 	multipartPlugin,
+	formDataHandler,
 })
+
+// Setup WS-Server (WebSocket server)
+const wss = new WebSocketServer({ server: fastify.server })
 const callbackHandler = createCallbackHandler({ wss })
+
+// Optionally set up JSON handler
+const useCustomJsonHandler: keyof typeof jsonOptions = "none"
+const jsonOptions = {
+	advanced: superjson,
+	binary: { mediaType: "application/octet-stream", stringify: encode, parse: decode, binary: true },
+	none: JSON,
+}
+const jsonHandler = jsonOptions[useCustomJsonHandler]
+
 // Setup Prim Server, configured with chosen HTTP/WS server
 createPrimServer({
 	prefix: "/prim",
 	jsonHandler,
-	module: filteredModule,
+	module,
 	methodHandler,
 	callbackHandler,
 	allowList: { startCase: true },
@@ -40,8 +45,7 @@ createPrimServer({
 
 // Start listening for requests to server
 try {
-	const host = contained ? "::" : "localhost"
-	await fastify.listen({ host, port: 3001 })
+	await fastify.listen({ host: "::", port: 3001 })
 } catch (err) {
 	if (err) {
 		fastify.log.error(err)
