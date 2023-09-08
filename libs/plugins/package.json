@@ -111,6 +111,7 @@
 		"./browser-websocket": "./dist/client/browser-websocket.js",
 		"./astro": "./dist/server/astro.js",
 		"./fastify": "./dist/server/fastify.js",
+		"./server-fetch": "./dist/server/server-fetch.js",
 		"./express": "./dist/server/express.js",
 		"./h3": "./dist/server/h3.js",
 		"./ws": "./dist/server/ws.js",
@@ -138,6 +139,9 @@
 			],
 			"fastify": [
 				"dist/server/fastify.d.ts"
+			],
+			"server-fetch": [
+				"dist/server/server-fetch.d.ts"
 			],
 			"express": [
 				"dist/server/express.d.ts"
