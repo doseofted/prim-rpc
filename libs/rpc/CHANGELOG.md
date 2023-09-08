@@ -1,5 +1,12 @@
 # @doseofted/prim-rpc
 
+## 0.1.0-alpha.17
+
+### Patch Changes
+
+- bf3a720: RPC result can now contain binary data with default JSON handler
+- f99c269: Binary JSON handler is now supported (.parse and .stringify can utilize binary data)
+
 ## 0.1.0-alpha.16
 
 ### Patch Changes
