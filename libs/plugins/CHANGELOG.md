@@ -1,5 +1,17 @@
 # @doseofted/prim-rpc-plugins
 
+## 0.1.0-alpha.15
+
+### Patch Changes
+
+- 2aad319: Next.js handler now supports files in RPC result
+- 61b77b1: Hono handler now supports files contained in RPC result
+- 79a7ee3: Express handler now supports files in RPC result, now using formidable as multipart plugin
+- 3fbc99c: Astro handler now supports files in RPC result
+- bf3a720: Fastify handler now supports sending back files as part of RPC result
+- 36e16f7: H3 handler now supports files in RPC result
+- bf3a720: Browser fetch plugin can now handle binary RPC result
+
 ## 0.1.0-alpha.14
 
 ### Patch Changes
