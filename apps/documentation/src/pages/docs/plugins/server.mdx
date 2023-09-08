@@ -18,6 +18,48 @@ compatible they must use the same type of transport (given in **Transport Type**
 
 ## Table of Contents
 
+## Fetch API (Bun / Deno)
+
+| For                                                                                                                               | Plugin Type    | Transport Type | File Support |
+| --------------------------------------------------------------------------------------------------------------------------------- | -------------- | -------------- | ------------ |
+| [Fetch API](https://github.com/wintercg/fetch) ([Bun](https://github.com/oven-sh/bun) / [Deno](https://github.com/denoland/deno)) | Method handler | HTTP           | `File`       |
+
+Prim+RPC supports the Fetch API used in Bun and Deno. The plugin accepts a standard `Request` and returns a standard
+`Response`.
+
+You can configure the handler in the following ways (depending on your environment). In Bun:
+
+```typescript index.ts
+import { createPrimServer } from "@doseofted/prim-rpc"
+import { primFetch } from "@doseofted/prim-rpc-plugins/server-fetch"
+import module from "./my-example-module"
+
+const prim = createPrimServer({ module })
+
+// Using generic default fetch export
+export default primFetch({ prim })
+
+// Or otherwise:
+Bun.serve({
+	fetch: primFetch({ prim }),
+})
+```
+
+In Deno:
+
+```typescript index.ts
+// NOTE: specify version, not latest, this is only an example
+import { createPrimServer } from "npm:@doseofted/prim-rpc@latest"
+import { primFetch } from "npm:@doseofted/prim-rpc-plugins/server-fetch@latest"
+import module from "./my-example-module"
+
+const prim = createPrimServer({ module })
+
+Deno.serve(primFetch({ prim }))
+```
+
+The `.contextTransform` option of the plugin can be used to set the `this` value inside of functions used with Prim+RPC.
+
 ## Astro
 
 | For                                         | Plugin Type    | Transport Type | File Support |
