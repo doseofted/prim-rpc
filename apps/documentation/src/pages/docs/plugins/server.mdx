@@ -50,7 +50,7 @@ In Deno:
 ```typescript index.ts
 // NOTE: specify version, not latest, this is only an example
 import { createPrimServer } from "npm:@doseofted/prim-rpc@latest"
-import { primFetch } from "npm:@doseofted/prim-rpc-plugins/server-fetch@latest"
+import { primFetch } from "npm:@doseofted/prim-rpc-plugins@latest/server-fetch"
 import module from "./my-example-module"
 
 const prim = createPrimServer({ module })
