@@ -1,6 +1,6 @@
 {
 	"name": "@doseofted/prim-monorepo",
-	"packageManager": "pnpm@8.6.12",
+	"packageManager": "pnpm@8.7.4",
 	"description": "Monorepo that houses Prim+RPC projects",
 	"type": "module",
 	"license": "UNLICENSED",
@@ -14,29 +14,29 @@
 		"start": "task"
 	},
 	"dependencies": {
-		"@go-task/cli": "3.28.0",
+		"@go-task/cli": "3.29.1",
 		"zx": "^7.2.3"
 	},
 	"devDependencies": {
 		"@changesets/cli": "^2.26.2",
 		"@types/eslint": "^8.44.2",
-		"@typescript-eslint/eslint-plugin": "^6.3.0",
-		"@typescript-eslint/parser": "^6.3.0",
-		"@vitest/ui": "^0.34.1",
+		"@typescript-eslint/eslint-plugin": "^6.6.0",
+		"@typescript-eslint/parser": "^6.6.0",
+		"@vitest/ui": "^0.34.3",
 		"chokidar": "^3.5.3",
-		"eslint": "^8.47.0",
+		"eslint": "^8.48.0",
 		"eslint-config-prettier": "^9.0.0",
 		"jsdom": "^22.1.0",
-		"postcss": "^8.4.27",
-		"prettier": "^3.0.1",
-		"sass": "^1.65.1",
-		"stylelint": "^15.10.2",
+		"postcss": "^8.4.29",
+		"prettier": "^3.0.3",
+		"sass": "^1.66.1",
+		"stylelint": "^15.10.3",
 		"stylelint-config-recommended": "^13.0.0",
 		"tsup": "^7.2.0",
-		"turbo": "^1.10.12",
-		"typedoc": "^0.24.8",
-		"typescript": "5.1.6",
+		"turbo": "^1.10.13",
+		"typedoc": "^0.25.1",
+		"typescript": "5.2.2",
 		"vite": "^4.4.9",
-		"vitest": "^0.34.1"
+		"vitest": "^0.34.3"
 	}
 }
