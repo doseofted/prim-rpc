@@ -16,7 +16,7 @@ const siteName = "Prim+RPC"
 const image = `${Astro.site}/social.png`
 ---
 
-<html lang="en" data-theme="prim">
+<html lang="en" data-theme="prim" class="bg-prim-space">
 	<head>
 		<meta charset="utf-8" />
 		<meta name="viewport" content="width=device-width" />
@@ -27,6 +27,7 @@ const image = `${Astro.site}/social.png`
 		<SEO
 			title={title}
 			titleTemplate={`%s | ${siteName}`}
+			titleDefault={siteName}
 			description={description}
 			twitter={{ creator: "@doseofted", card: "summary_large_image" }}
 			openGraph={{
