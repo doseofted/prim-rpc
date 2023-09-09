@@ -1,0 +1,64 @@
+---
+import "@fontsource-variable/plus-jakarta-sans"
+import "@fontsource-variable/montserrat"
+import "@fontsource-variable/fira-code"
+import { SEO } from "astro-seo"
+import Columns from "@/components/Columns.astro"
+import Navigation from "@/components/Navigation.astro"
+import { ViewTransitions } from "astro:transitions"
+
+interface Props {
+	title?: string
+	description?: string
+}
+const { title = "", description } = Astro.props
+const siteName = "Prim+RPC"
+const image = `${Astro.site}/social.png`
+---
+
+<html lang="en" data-theme="prim">
+	<head>
+		<meta charset="utf-8" />
+		<meta name="viewport" content="width=device-width" />
+		<link rel="icon" href="/placeholder.png" sizes="192x192" type="image/png" />
+		<link rel="apple-touch-icon" href="/placeholder.png" />
+		<link rel="sitemap" href="/sitemap-index.xml" />
+		<ViewTransitions />
+		<SEO
+			title={title}
+			titleTemplate={`%s | ${siteName}`}
+			description={description}
+			twitter={{ creator: "@doseofted", card: "summary_large_image" }}
+			openGraph={{
+				basic: {
+					type: "website",
+					title,
+					image,
+				},
+				image: {
+					alt: 'Two very short JavaScript files: a simple function on the server-side and a call to that function on the client-side. Tagline: "Backend, meet Frontend"',
+					width: 1200,
+					height: 630,
+					type: "image/png",
+				},
+				optional: {
+					description,
+					siteName,
+				},
+			}}
+		/>
+		<script
+			async
+			src="https://stat.doseofted.me/tracker.js"
+			data-ackee-server="https://stat.doseofted.me"
+			data-ackee-domain-id="2954615f-b53a-4199-9109-b83d9ee12b04"></script>
+	</head>
+	<body class="font-sans bg-prim-space min-h-[100svh]">
+		<Columns className="container mx-auto min-h-[100svh]">
+			<div class="col-span-6 lg:col-span-12">
+				<Navigation />
+			</div>
+			<slot />
+		</Columns>
+	</body>
+</html>

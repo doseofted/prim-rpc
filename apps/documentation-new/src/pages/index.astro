@@ -1,0 +1,64 @@
+---
+import { Code } from "astro/components"
+import Layout from "@/layouts/Default.astro"
+import { IntroText } from "@/components/IntroText.tsx"
+import { client } from "@/client"
+const greeting = await client.greetings()
+
+const serverCodeSnippet = `// on server:
+export function sayHello (x, y) {
+  return \`\${x}, meet \${y}.\`
+}
+sayHello.rpc = true`
+
+const clientCodeSnippet = `// on client:
+const hello = await sayHello(
+  "Backend", "Frontend"
+)
+console.log(hello)`
+const snippets = [serverCodeSnippet, clientCodeSnippet]
+---
+
+<Layout>
+	<div class="min-h-[calc(100svh-5rem)] grid grid-cols-6 lg:grid-cols-12 grid-rows-[1fr_auto] gap-x-4">
+		<div class="col-span-6 lg:col-span-12 flex gap-4 items-center justify-center">
+			{
+				snippets.map((snippet, index) => (
+					<div
+						class:list={index === 0 ? "translate-y-8" : "-translate-y-8"}
+						class="mockup-code w-96 relative text-left text-sm bg-white/70 border border-white/60 backdrop-blur-lg">
+						<div class="bg-prim-space mx-3 -mb-2 p-2 rounded-lg">
+							<Code code={snippet} lang="typescript" theme="material-theme-palenight" />
+						</div>
+					</div>
+				))
+			}
+		</div>
+		<div class="col-span-6 lg:col-span-12">
+			<p
+				class="font-title text-[2.3rem] sm:text-[3rem] lg:text-[5.5rem] font-semibold text-white uppercase text-right leading-none overflow-hidden">
+				<IntroText
+					client:load
+					delay={1.3}
+					stagger={0.9}
+					text={greeting.split(", ").map((text, i, g) => (i !== g.length - 1 ? text + ", " : text))}
+				/>
+			</p>
+		</div>
+	</div>
+	<div class="grid grid-cols-6 lg:grid-cols-12 gap-x-4">
+		<div class="col-span-6 lg:col-span-12">
+			<div class="relative py-8 container mx-auto grid grid-cols-12 px-4 gap-4">
+				<div class="col-span-12 lg:col-span-6 text-white space-y-4">
+					<p class="font-title text-xl sm:text-2xl lg:text-4xl font-semibold uppercase leading-none">
+						RPC for the Rest&nbsp;of&nbsp;Us.
+					</p>
+					<p class="text-sm lg:text-base">
+						Prim+RPC bridges incompatible JavaScript environments. Call a JavaScript function on the server remotely as
+						if it was defined on the client itself.
+					</p>
+				</div>
+			</div>
+		</div>
+	</div>
+</Layout>

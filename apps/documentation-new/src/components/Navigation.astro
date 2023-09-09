@@ -1,0 +1,24 @@
+---
+import Prim from "@/components/Prim.astro"
+
+interface Props {
+	empty: boolean
+}
+const { empty } = Astro.props
+---
+
+<nav class="container mx-auto h-20 flex justify-between">
+	{
+		!empty && (
+			<>
+				<div class="text-white flex items-center">
+					<Prim>RPC</Prim>
+				</div>
+				<div class="bg-white/70 p-4 px-8 flex gap-4 items-center">
+					<a href="/test">Navigation</a>
+					<a href="/what">Docs</a>
+				</div>
+			</>
+		)
+	}
+</nav>

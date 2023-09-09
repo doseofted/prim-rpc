@@ -17,8 +17,12 @@
 			"path": "./libs/tooling"
 		},
 		{
-			"name": "🌐 Documentation",
+			"name": "🌐 Old Documentation",
 			"path": "./apps/documentation"
+		},
+		{
+			"name": "🌐 New Documentation",
+			"path": "./apps/documentation-new"
 		},
 		{
 			"name": "📗 Example Server",
@@ -88,11 +92,11 @@
 	"extensions": {
 		"recommendations": [
 			"redhat.vscode-yaml",
-			"matthewpi.caddyfile-support",
 			"dbaeumer.vscode-eslint",
 			"esbenp.prettier-vscode",
 			"stylelint.vscode-stylelint",
-			"irongeek.vscode-env",
+			"astro-build.astro-vscode",
+			"unifiedjs.vscode-mdx",
 			"streetsidesoftware.code-spell-checker"
 		]
 	}

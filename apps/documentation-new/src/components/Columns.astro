@@ -1,0 +1,28 @@
+---
+interface Props {
+	placeholder?: boolean
+	className: string
+}
+const { className } = Astro.props
+const column12 = Array.from(Array(12).keys())
+---
+
+<div class:list={[className, "grid grid-cols-1 grid-rows-1"]}>
+	<div
+		class:list={[
+			"relative z-10 col-span-full row-span-full",
+			"mix-blend-overlay border-x-white/30 border-x grid grid-cols-6 lg:grid-cols-12 gap-x-4 px-4",
+		]}>
+		{
+			column12.map(i => (
+				<div
+					class:list={["border-x-white/30 row-start-1 border-x col-span-1", i >= 6 ? "hidden lg:block" : ""]}
+					style={`grid-column-start: ${i + 1}`}
+				/>
+			))
+		}
+	</div>
+	<div class:list={["relative z-20 col-span-full row-span-full", "px-4 border-transparent border-x"]}>
+		<slot />
+	</div>
+</div>

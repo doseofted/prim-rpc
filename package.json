@@ -29,6 +29,7 @@
 		"jsdom": "^22.1.0",
 		"postcss": "^8.4.29",
 		"prettier": "^3.0.3",
+		"prettier-plugin-astro": "^0.12.0",
 		"sass": "^1.66.1",
 		"stylelint": "^15.10.3",
 		"stylelint-config-recommended": "^13.0.0",

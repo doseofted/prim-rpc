@@ -69,8 +69,9 @@ export default function Home({ greeting }: Props) {
 				"Prim+RPC can bridge any gap between two JavaScript environments: not just HTTP. Bridge processes, Web Workers, and more.",
 		},
 		{
-			title: "Upload Files",
-			details: "You can upload a file in Prim+RPC by simply passing a file as an argument to your function.",
+			title: "Upload and Download Files",
+			details:
+				"You can send and receive multiple files within a single function call without special handling. They work just like any other standard object in JavaScript.",
 		},
 		{
 			title: "Use Your Callbacks",

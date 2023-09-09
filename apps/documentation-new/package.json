@@ -1,0 +1,63 @@
+{
+	"name": "@doseofted/prim-documentation-website-new",
+	"version": "0.1.0-alpha.24",
+	"license": "UNLICENSED",
+	"private": true,
+	"author": {
+		"name": "Ted Klingenberg",
+		"email": "ted@doseofted.com",
+		"url": "https://doseofted.me/"
+	},
+	"contributors": [],
+	"repository": {
+		"type": "git",
+		"url": "https://github.com/doseofted/prim-rpc.git",
+		"directory": "apps/documentation"
+	},
+	"homepage": "https://prim.doseofted.me/",
+	"keywords": [
+		"api",
+		"json",
+		"ipc",
+		"rpc"
+	],
+	"bugs": {
+		"url": "https://github.com/doseofted/prim-rpc/issues"
+	},
+	"scripts": {
+		"dev": "astro dev",
+		"start": "astro dev",
+		"build": "astro build",
+		"preview": "astro preview",
+		"astro": "astro",
+		"check": "tsc --noEmit",
+		"lint": "eslint ."
+	},
+	"type": "module",
+	"devDependencies": {
+		"@astrojs/mdx": "^1.0.3",
+		"@astrojs/react": "^3.0.2",
+		"@astrojs/sitemap": "^3.0.0",
+		"@astrojs/tailwind": "^5.0.0",
+		"@astrojs/vercel": "^4.0.5",
+		"@doseofted/prim-example": "workspace:*",
+		"@doseofted/prim-rpc": "workspace:*",
+		"@doseofted/prim-rpc-plugins": "workspace:*",
+		"@doseofted/prim-rpc-tooling": "workspace:*",
+		"@fontsource-variable/fira-code": "^5.0.8",
+		"@fontsource-variable/montserrat": "^5.0.9",
+		"@fontsource-variable/plus-jakarta-sans": "^5.0.9",
+		"@tailwindcss/typography": "^0.5.10",
+		"@types/react": "^18.0.21",
+		"@types/react-dom": "^18.0.6",
+		"astro": "^3.0.12",
+		"astro-seo": "^0.8.0",
+		"daisyui": "^3.7.3",
+		"framer-motion": "^10.16.4",
+		"react": "^18.0.0",
+		"react-dom": "^18.0.0",
+		"remark-toc": "^8.0.1",
+		"tailwindcss": "^3.0.24",
+		"zod": "^3.22.2"
+	}
+}

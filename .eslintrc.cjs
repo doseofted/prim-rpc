@@ -13,7 +13,7 @@ module.exports = {
 	},
 	overrides: [
 		{
-			files: ["*.js"],
+			files: ["*.js", "*.cjs"],
 			extends: ["plugin:@typescript-eslint/disable-type-checked"],
 		},
 	],
