@@ -10,12 +10,18 @@ import { ViewTransitions } from "astro:transitions"
 interface Props {
 	title?: string
 	description?: string
+	className?: string
 }
-const { title = "", description } = Astro.props
+const { title = "", description, className } = Astro.props
 
 const siteName = "Prim+RPC"
 const image = `${Astro.site}/social.png`
 ---
+
+<script>
+	import { $navigationHappened } from "@/utils/store"
+	document.addEventListener("astro:page-load", () => $navigationHappened.set(true), { once: true })
+</script>
 
 <html lang="en" data-theme="prim" class="bg-prim-space">
 	<head>
@@ -55,9 +61,9 @@ const image = `${Astro.site}/social.png`
 			data-ackee-server="https://stat.doseofted.me"
 			data-ackee-domain-id="2954615f-b53a-4199-9109-b83d9ee12b04"></script>
 	</head>
-	<body class="font-sans bg-prim-space min-h-[100svh]">
+	<body class="font-sans bg-prim-space min-h-[100svh]" class:list={className}>
 		<Columns className="container mx-auto min-h-[100svh]">
-			<div class="col-span-6 lg:col-span-12 pt-6">
+			<div class="prim-navigation col-span-6 lg:col-span-12 pt-6">
 				<Navigation />
 			</div>
 			<slot />

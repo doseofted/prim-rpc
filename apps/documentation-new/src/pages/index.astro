@@ -1,7 +1,7 @@
 ---
 import { Code } from "astro/components"
 import Layout from "@/layouts/Default.astro"
-import { IntroText } from "@/components/IntroText.react"
+import { HomepageIntro } from "@/components/IntroText.react"
 import { client } from "@/client"
 
 const greeting = await client.greetings()
@@ -9,17 +9,17 @@ const greeting = await client.greetings()
 const serverCodeSnippet = `
 // define on server:
 export const sayHello = (x, y) => \`\${x}, meet \${y}.\`
-sayHello.rpc = true`
-
+sayHello.rpc = true
+`
 const clientCodeSnippet = `
 // call on client:
 const hello = await sayHello("Backend", "Frontend")
-console.log(hello)`
-
+console.log(hello)
+`
 const snippets = [serverCodeSnippet, clientCodeSnippet].map(snippet => snippet.trim())
 ---
 
-<Layout>
+<Layout className="homepage-intro">
 	<!-- Fancy home introduction -->
 	<div class="min-h-[calc(100svh-6.5rem)] grid grid-cols-6 lg:grid-cols-12 grid-rows-[1fr_auto]">
 		<div class="col-span-6 lg:col-span-12 flex flex-col gap-8 items-center justify-center">
@@ -41,7 +41,7 @@ const snippets = [serverCodeSnippet, clientCodeSnippet].map(snippet => snippet.t
 		<div class="col-span-6 lg:col-span-12 pb-12">
 			<p
 				class="font-title text-[2.3rem] sm:text-[3rem] lg:text-[5.5rem] font-semibold text-white uppercase text-right leading-none overflow-hidden">
-				<IntroText client:load delay={0.3} stagger={0.9} text={greeting.split("\n")} />
+				<HomepageIntro client:load text={greeting.split("\n")} />
 			</p>
 		</div>
 	</div>
@@ -62,30 +62,47 @@ const snippets = [serverCodeSnippet, clientCodeSnippet].map(snippet => snippet.t
 <script src="@/utils/lenis"></script>
 
 <script>
+	import { $navigationHappened } from "@/utils/store"
 	import { animate, stagger } from "motion"
 
-	function introAnimation(start = 1.8) {
+	const startDefault = 1.8
+	function introAnimation(start = startDefault) {
 		const codeSnippets = document.querySelectorAll(".homepage-snippets")
-		animate(
-			codeSnippets,
-			{
-				y: ["3rem", "0rem"],
-				x: "auto",
-				opacity: [0, 1],
-			},
-			{ delay: stagger(0.2, { start, from: "last" }), duration: 0.9 }
-		)
+		const navigationElem = document.querySelectorAll(".prim-navigation")
+		const slideIn = {
+			y: ["3rem", "0rem"],
+			opacity: [0, 1],
+		}
+		animate(codeSnippets, slideIn, { delay: stagger(0.2, { start, from: "last" }), duration: 0.9 })
+		// navigation only needs to be animated on first load
+		if (start === startDefault) {
+			animate(navigationElem, slideIn, { delay: start + 0.4, duration: 0.9 })
+		} else {
+			document.body.classList.remove("homepage-intro")
+		}
 	}
-	document.addEventListener("astro:after-swap", () => introAnimation(0))
-	introAnimation()
+	document.addEventListener("astro:after-swap", () => {
+		if (location.pathname !== "/") return
+		introAnimation(0)
+	})
+	introAnimation($navigationHappened.value ? 0 : startDefault)
 </script>
 
 <style is:global>
+	/* These elements are animated and should be moved to starting positions */
+	body.homepage-intro {
+		.prim-navigation {
+			opacity: 0;
+		}
+	}
+
+	/* Use theme color for code background */
 	.code-without-bg pre {
 		background-color: transparent !important;
 		padding: theme("padding.3") theme("padding.5");
 	}
 
+	/* Theme psuedo elements to match website */
 	.mockup-code {
 		&::before {
 			box-shadow:

@@ -1,9 +1,5 @@
 import Lenis from "@studio-freight/lenis"
-
-/** https://easings.net/#easeOutExpo */
-function easeOutExpo(x: number): number {
-	return x === 1 ? 1 : 1 - Math.pow(2, -10 * x)
-}
+import { easeOutExpo } from "./easings"
 
 const lenis = new Lenis({
 	duration: 1,
