@@ -9,13 +9,13 @@ const greeting = await client.greetings()
 const serverCodeSnippet = `
 // define on server:
 export const sayHello = (x, y) => \`\${x}, meet \${y}.\`
-sayHello.rpc = true
-`
+sayHello.rpc = true`
 
 const clientCodeSnippet = `
 // call on client:
 const hello = await sayHello("Backend", "Frontend")
 console.log(hello)`
+
 const snippets = [serverCodeSnippet, clientCodeSnippet].map(snippet => snippet.trim())
 ---
 
@@ -26,11 +26,12 @@ const snippets = [serverCodeSnippet, clientCodeSnippet].map(snippet => snippet.t
 			{
 				snippets.map((snippet, index) => (
 					<div
-						class:list={index === 0 ? "md:translate-x-16 lg:translate-x-32" : "md:-translate-x-16 lg:-translate-x-32"}
-						class="mockup-code text-sm bg-white/70 pb-4 w-full max-w-lg">
-						<div class="px-4">
-							<div class="rounded-lg overflow-hidden bg-prim-space code-without-bg">
-								<Code code={snippet} lang="typescript" theme="material-theme-palenight" />
+						class:list={index === 0 ? "md:translate-x-16 lg:translate-x-32" : "md:-translate-x-16 lg:-translate-x-32"}>
+						<div class="homepage-snippets opacity-0 mockup-code text-sm bg-white/70 pb-4 w-full max-w-lg">
+							<div class="px-4">
+								<div class="rounded-lg overflow-hidden bg-prim-space code-without-bg">
+									<Code code={snippet} lang="typescript" theme="material-theme-palenight" />
+								</div>
 							</div>
 						</div>
 					</div>
@@ -45,22 +46,39 @@ const snippets = [serverCodeSnippet, clientCodeSnippet].map(snippet => snippet.t
 		</div>
 	</div>
 	<!-- Below the fold -->
-	<div class="grid grid-cols-6 lg:grid-cols-12 gap-x-4">
-		<div class="col-span-6 lg:col-span-12">
-			<div class="relative py-8 container mx-auto grid grid-cols-12 px-4 gap-4">
-				<div class="col-span-12 lg:col-span-6 text-white space-y-4">
-					<p class="font-title text-xl sm:text-2xl lg:text-4xl font-semibold uppercase leading-none">
-						RPC for the Rest&nbsp;of&nbsp;Us.
-					</p>
-					<p class="text-sm lg:text-base">
-						Prim+RPC bridges incompatible JavaScript environments. Call a JavaScript function on the server remotely as
-						if it was defined on the client itself.
-					</p>
-				</div>
-			</div>
+	<div class="grid grid-cols-6 lg:grid-cols-12 py-8">
+		<div class="col-span-12 lg:col-span-6 text-white space-y-4">
+			<p class="font-title text-xl sm:text-2xl lg:text-4xl font-semibold uppercase leading-none">
+				RPC for the Rest&nbsp;of&nbsp;Us.
+			</p>
+			<p class="text-sm lg:text-base">
+				Prim+RPC bridges incompatible JavaScript environments. Call a JavaScript function on the server remotely as if
+				it was defined on the client itself.
+			</p>
 		</div>
 	</div>
 </Layout>
+
+<script src="@/utils/lenis"></script>
+
+<script>
+	import { animate, stagger } from "motion"
+
+	function introAnimation(start = 1.8) {
+		const codeSnippets = document.querySelectorAll(".homepage-snippets")
+		animate(
+			codeSnippets,
+			{
+				y: ["3rem", "0rem"],
+				x: "auto",
+				opacity: [0, 1],
+			},
+			{ delay: stagger(0.2, { start, from: "last" }), duration: 0.9 }
+		)
+	}
+	document.addEventListener("astro:after-swap", () => introAnimation(0))
+	introAnimation()
+</script>
 
 <style is:global>
 	.code-without-bg pre {
@@ -68,14 +86,16 @@ const snippets = [serverCodeSnippet, clientCodeSnippet].map(snippet => snippet.t
 		padding: theme("padding.3") theme("padding.5");
 	}
 
-	.mockup-code pre::before {
-		content: none !important;
-	}
+	.mockup-code {
+		&::before {
+			box-shadow:
+				1.4em 0 0 theme("colors.prim.space"),
+				2.8em 0 0 theme("colors.prim.space"),
+				4.2em 0 0 theme("colors.prim.space") !important;
+		}
 
-	.mockup-code::before {
-		box-shadow:
-			1.4em 0 0 theme("colors.prim.space"),
-			2.8em 0 0 theme("colors.prim.space"),
-			4.2em 0 0 theme("colors.prim.space") !important;
+		pre::before {
+			content: none !important;
+		}
 	}
 </style>

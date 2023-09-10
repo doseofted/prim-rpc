@@ -13,9 +13,3 @@ export function greetings(x?: string, y?: string) {
 	return `${x},\nmeet ${y}.`
 }
 greetings.rpc = true
-
-function defaultFunction() {
-	return "Hello from Prim+RPC!"
-}
-defaultFunction.rpc = true
-export default defaultFunction

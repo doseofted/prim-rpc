@@ -280,6 +280,12 @@ importers:
       '@fontsource-variable/plus-jakarta-sans':
         specifier: ^5.0.9
         version: 5.0.9
+      '@nanostores/react':
+        specifier: ^0.7.1
+        version: 0.7.1(nanostores@0.9.3)(react@18.2.0)
+      '@studio-freight/lenis':
+        specifier: ^1.0.22
+        version: 1.0.22
       '@tailwindcss/typography':
         specifier: ^0.5.10
         version: 0.5.10(tailwindcss@3.3.3)
@@ -304,6 +310,9 @@ importers:
       motion:
         specifier: ^10.16.2
         version: 10.16.2
+      nanostores:
+        specifier: ^0.9.3
+        version: 0.9.3
       react:
         specifier: ^18.0.0
         version: 18.2.0
@@ -2056,6 +2065,17 @@ packages:
     resolution: {integrity: sha512-y+l1PNV0XDyY8sM3YtuMLK5vE3/hkfId+Do8pLo/OPxfxuFAUwcGz3oiiUuV46/aBpwTzZ+mRWVMtlSKbradhw==}
     engines: {node: '>= 14'}
 
+  /@nanostores/react@0.7.1(nanostores@0.9.3)(react@18.2.0):
+    resolution: {integrity: sha512-EXQg9N4MdI4eJQz/AZLIx3hxQ6BuBmV4Q55bCd5YCSgEOAW7tGTsIZxpRXxvxLXzflNvHTBvfrDNY38TlSVBkQ==}
+    engines: {node: ^16.0.0 || ^18.0.0 || >=20.0.0}
+    peerDependencies:
+      nanostores: ^0.9.0
+      react: '>=18.0.0'
+    dependencies:
+      nanostores: 0.9.3
+      react: 18.2.0
+    dev: true
+
   /@next/env@13.4.19:
     resolution: {integrity: sha512-FsAT5x0jF2kkhNkKkukhsyYOrRqtSxrEhfliniIq0bwWbuXLgyt3Gv0Ml+b91XwjwArmuP7NxCiGd++GGKdNMQ==}
 
@@ -2594,7 +2614,6 @@ packages:
 
   /@studio-freight/lenis@1.0.22:
     resolution: {integrity: sha512-CU4VT2rZjrpp4bSqpIYe+qA4vK0yZeIl2lM0tcU5mX5k03smhCAAiDiLjgXJ1mrU9za6cU0O8C69zTOVbSBpwg==}
-    dev: false
 
   /@swc/helpers@0.5.1:
     resolution: {integrity: sha512-sJ902EfIzn1Fa+qYmjdQqh8tPsoxyBz+8yBKC2HKUxyezKJFwPGOn7pv4WY6QuQW//ySQi5lJjA/ZT9sNWWNTg==}
@@ -7935,6 +7954,11 @@ packages:
     engines: {node: ^14 || ^16 || >=18}
     hasBin: true
     dev: false
+
+  /nanostores@0.9.3:
+    resolution: {integrity: sha512-KobZjcVyNndNrb5DAjfs0WG0lRcZu5Q1BOrfTOxokFLi25zFrWPjg+joXC6kuDqNfSt9fQwppyjUBkRPtsL+8w==}
+    engines: {node: ^16.0.0 || ^18.0.0 || >=20.0.0}
+    dev: true
 
   /napi-build-utils@1.0.2:
     resolution: {integrity: sha512-ONmRUqK7zj7DWX0D9ADe03wbwOBZxNAfF20PlGfCWQcD3+/MakShIHrMqx9YwPTfxDdF1zLeL+RGZiR9kGMLdg==}

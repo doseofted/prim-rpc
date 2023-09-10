@@ -2,3 +2,4 @@ packages:
   - "libs/**"
   - "apps/**"
   - "!apps/documentation/.next/types/**"
+  - "!apps/documentation-new/.vercel/**"
