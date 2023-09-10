@@ -1,3 +1,4 @@
+// @ts-check
 import { defineConfig } from "astro/config"
 import tailwind from "@astrojs/tailwind"
 import react from "@astrojs/react"
@@ -12,13 +13,22 @@ export default defineConfig({
 	markdown: {
 		shikiConfig: {
 			theme: "material-theme-palenight",
+			// eslint-disable-next-line @typescript-eslint/ban-ts-comment
+			// @ts-ignore
 			langs: ["typescript", "javascript", "jsx", "tsx", "shellscript"],
 			wrap: false,
 		},
 		syntaxHighlight: "shiki",
 		remarkPlugins: [remarkToc],
 	},
-	integrations: [tailwind(), react(), mdx(), sitemap()],
+	integrations: [
+		tailwind(),
+		react({
+			include: "src/**/*.react.tsx",
+		}),
+		mdx(),
+		sitemap(),
+	],
 	output: "hybrid",
 	adapter: vercel({
 		functionPerRoute: false,

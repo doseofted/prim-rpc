@@ -12,6 +12,7 @@ interface Props {
 	description?: string
 }
 const { title = "", description } = Astro.props
+
 const siteName = "Prim+RPC"
 const image = `${Astro.site}/social.png`
 ---
@@ -56,7 +57,7 @@ const image = `${Astro.site}/social.png`
 	</head>
 	<body class="font-sans bg-prim-space min-h-[100svh]">
 		<Columns className="container mx-auto min-h-[100svh]">
-			<div class="col-span-6 lg:col-span-12">
+			<div transition:name="navigation" class="col-span-6 lg:col-span-12 pt-6">
 				<Navigation />
 			</div>
 			<slot />
