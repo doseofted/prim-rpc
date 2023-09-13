@@ -122,6 +122,10 @@ export class LightEvents {
 			for (const lightElem of lightElements) {
 				this.#elements.add(lightElem as HTMLElement)
 			}
+			if (lightElements.length === 0) {
+				// update is needed to remove any previous elements
+				this.elementUpdates()
+			}
 			return lightElements.length
 		}
 

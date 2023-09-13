@@ -1,6 +1,6 @@
 <!-- This element is a just a test to see if elements are tracked correctly -->
 <div class="fixed pointer-events-none w-full h-full">
-	<canvas id="hello" class="w-full h-full"></canvas>
+	<canvas transition:persist id="hello" class="w-full h-full"></canvas>
 	<div class="absolute inset-0 w-full h-full backdrop-blur-xl backdrop-saturate-150 bg-transparent"></div>
 </div>
 
@@ -27,7 +27,7 @@
 			const gradientColor = form.gradient([colorStart, colorEnd])
 			const gradientShape = gradientColor(
 				Circle.fromCenter(centerPt, (size * easeOut(clamp(0, 1, brightness - 1))) / 2),
-				Circle.fromCenter(centerPt, size + 0.01)
+				Circle.fromCenter(centerPt, size)
 			)
 			const circle = Circle.fromCenter(centerPt, size)
 			form.fill(gradientShape).stroke(false).circle(circle)
