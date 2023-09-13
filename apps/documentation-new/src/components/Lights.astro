@@ -34,20 +34,20 @@
 		}
 	})
 	export const defaultColors = ["#f0A3FF", "#f0A3FF", "#6D53FF", "#1D0049", "#0069BA", "#5BB8FF", "#4AEDFF"]
-	// setTimeout(() => {
-	// 	for (const light of lights) {
-	// 		light.size = 400
-	// 		light.color = defaultColors[Math.floor(Math.random() * defaultColors.length)]
-	// 		setInterval(
-	// 			() => {
-	// 				light.offset = [
-	// 					(light.offset[0] + (Math.random() - 0.5) * 30) % window.innerWidth,
-	// 					(light.offset[1] + (Math.random() - 0.5) * 30) % window.innerHeight,
-	// 				]
-	// 			},
-	// 			500 + Math.random() * 1000
-	// 		)
-	// 	}
-	// }, 500)
+	setTimeout(() => {
+		for (const light of lights) {
+			light.size = 350
+			light.color = defaultColors[Math.floor(Math.random() * defaultColors.length)]
+			setInterval(
+				() => {
+					light.offset = [
+						(light.offset[0] + (Math.random() - 0.5) * 700) % window.innerWidth,
+						(light.offset[1] + (Math.random() - 0.5) * 700) % window.innerHeight,
+					]
+				},
+				500 + Math.random() * 1000
+			)
+		}
+	}, 500)
 	space.play()
 </script>

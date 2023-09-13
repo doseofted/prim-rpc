@@ -48,6 +48,13 @@ export class Light implements LightProperties {
 		this.#center = value
 	}
 
+	#motionProps: ValueAnimationTransition<number | string> = {
+		type: "spring",
+		damping: 100,
+		mass: 70,
+		stiffness: 50,
+	}
+
 	#x
 	#y
 	set offset([x, y]: [x: number, y: number]) {
@@ -57,19 +64,12 @@ export class Light implements LightProperties {
 		] as const) {
 			const diff = given !== current.get()
 			if (diff) {
-				void animate(current, given, { type: "spring" })
+				void animate(current, given, this.#motionProps)
 			}
 		}
 	}
 	get offset() {
 		return [this.center[0] + this.#x.get(), this.center[1] + this.#y.get()]
-	}
-
-	#motionProps: ValueAnimationTransition<number | string> = {
-		type: "spring",
-		// stiffness: 150,
-		// damping: 50,
-		// mass: 10,
 	}
 
 	#brightness
