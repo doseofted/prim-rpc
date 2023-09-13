@@ -55,6 +55,7 @@
 		"astro": "^3.0.12",
 		"astro-seo": "^0.8.0",
 		"color2k": "^2.0.2",
+		"consola": "^3.2.3",
 		"daisyui": "^3.7.3",
 		"defu": "^6.1.2",
 		"framer-motion": "^10.16.4",

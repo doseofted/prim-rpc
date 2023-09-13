@@ -304,6 +304,9 @@ importers:
       color2k:
         specifier: ^2.0.2
         version: 2.0.2
+      consola:
+        specifier: ^3.2.3
+        version: 3.2.3
       daisyui:
         specifier: ^3.7.3
         version: 3.7.3
