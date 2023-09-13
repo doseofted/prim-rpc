@@ -1,0 +1,53 @@
+<!-- This element is a just a test to see if elements are tracked correctly -->
+<div class="fixed pointer-events-none w-full h-full">
+	<canvas id="hello" class="w-full h-full"></canvas>
+	<div class="absolute inset-0 w-full h-full backdrop-blur-xl backdrop-saturate-150 bg-transparent"></div>
+</div>
+
+<script>
+	import { LightEvents } from "@/utils/lights"
+	import { CanvasSpace, Circle, Pt } from "pts"
+	import { lighten, transparentize } from "color2k"
+	import { easeIn, easeOut, clamp } from "popmotion"
+
+	const lights = new LightEvents()
+
+	const space = new CanvasSpace("#hello").setup({ resize: true, retina: false })
+	const form = space.getForm()
+	space.add(() => {
+		form.composite("screen")
+		for (const light of lights) {
+			const { brightness, color, size, offset } = light
+			const centerPt = new Pt(offset)
+			const colorStart = transparentize(
+				lighten(color, (clamp(1.5, 2, brightness) - 1.5) * 2),
+				easeIn(clamp(0, 1, 1 - brightness))
+			)
+			const colorEnd = transparentize(colorStart, 1)
+			const gradientColor = form.gradient([colorStart, colorEnd])
+			const gradientShape = gradientColor(
+				Circle.fromCenter(centerPt, (size * easeOut(clamp(0, 1, brightness - 1))) / 2),
+				Circle.fromCenter(centerPt, size + 0.01)
+			)
+			const circle = Circle.fromCenter(centerPt, size)
+			form.fill(gradientShape).stroke(false).circle(circle)
+		}
+	})
+	export const defaultColors = ["#f0A3FF", "#f0A3FF", "#6D53FF", "#1D0049", "#0069BA", "#5BB8FF", "#4AEDFF"]
+	setTimeout(() => {
+		for (const light of lights) {
+			light.size = 400
+			light.color = defaultColors[Math.floor(Math.random() * defaultColors.length)]
+			setInterval(
+				() => {
+					light.offset = [
+						(light.offset[0] + (Math.random() - 0.5) * 30) % window.innerWidth,
+						(light.offset[1] + (Math.random() - 0.5) * 30) % window.innerHeight,
+					]
+				},
+				500 + Math.random() * 1000
+			)
+		}
+	}, 500)
+	space.play()
+</script>

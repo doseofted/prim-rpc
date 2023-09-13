@@ -2,9 +2,9 @@
 import Prim from "@/components/Prim.astro"
 
 interface Props {
-	empty: boolean
+	empty?: boolean
 }
-const { empty } = Astro.props
+const { empty = false } = Astro.props
 ---
 
 <nav class="container mx-auto h-20 flex justify-between">

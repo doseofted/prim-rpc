@@ -1,6 +1,6 @@
 import React, { useEffect } from "react"
 import { animate, stagger } from "motion"
-import { easeOutExpo } from "@/utils/easings"
+import { easeOutExpo as easing } from "@/utils/easings"
 import { $navigationHappened } from "@/utils/store"
 
 interface IntroTextProps {
@@ -11,18 +11,18 @@ interface IntroTextProps {
 	duration?: number
 }
 export function IntroText(props: IntroTextProps) {
-	const { text, stagger: staggerChildren = 0.5, delay: delayChildren = 0.5, duration = 0.6 } = props
+	const { text, stagger: staggerAmount = 0.5, delay: start = 0.5, duration = 0.6 } = props
 	const textLines = typeof text === "string" ? [text] : text
 	const elements: (HTMLSpanElement | null)[] = []
 	useEffect(() => {
-		animate(
-			elements.filter((e): e is HTMLSpanElement => !!e),
-			{
-				y: ["100%", "0%"],
-				opacity: [0.3, 1],
-			},
-			{ duration, delay: stagger(staggerChildren, { start: delayChildren }), easing: easeOutExpo }
-		)
+		const elementsOnly = elements.filter((e): e is HTMLSpanElement => !!e)
+		const keyframes = {
+			y: ["100%", "0%"],
+			opacity: [0.3, 1],
+		}
+		const options = { duration, delay: stagger(staggerAmount, { start }), easing }
+		const animated = animate(elementsOnly, keyframes, options)
+		return () => animated.stop()
 	}, [])
 	return (
 		<>
@@ -45,7 +45,7 @@ export function HomepageIntro(props: IntroTextProps) {
 		...props,
 		delay: 0,
 		duration: 0.9,
-		stagger: $navigationHappened.value ? 0.3 : 0.8,
+		stagger: $navigationHappened.value ? 0.2 : 0.8,
 	}
 	return <IntroText {...homeProps} />
 }

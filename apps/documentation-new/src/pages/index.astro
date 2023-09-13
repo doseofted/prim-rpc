@@ -3,6 +3,7 @@ import { Code } from "astro/components"
 import Layout from "@/layouts/Default.astro"
 import { HomepageIntro } from "@/components/IntroText.react"
 import { client } from "@/client"
+import Lights from "@/components/Lights.astro"
 
 const greeting = await client.greetings()
 
@@ -26,11 +27,15 @@ const snippets = [serverCodeSnippet, clientCodeSnippet].map(snippet => snippet.t
 			{
 				snippets.map((snippet, index) => (
 					<div
-						class:list={index === 0 ? "md:translate-x-16 lg:translate-x-32" : "md:-translate-x-16 lg:-translate-x-32"}>
-						<div class="homepage-snippets opacity-0 mockup-code text-sm bg-white/70 pb-4 w-full max-w-lg">
-							<div class="px-4">
-								<div class="rounded-lg overflow-hidden bg-prim-space code-without-bg">
-									<Code code={snippet} lang="typescript" theme="material-theme-palenight" />
+						class:list={[
+							index === 0 ? "md:translate-x-16 lg:translate-x-32" : "md:-translate-x-16 lg:-translate-x-32",
+						]}>
+						<div data-light="0" class="homepage-snippets opacity-0">
+							<div class="mockup-code text-sm bg-white/70 pb-4 w-full max-w-lg">
+								<div class="px-4">
+									<div class="rounded-lg overflow-hidden bg-prim-space code-without-bg">
+										<Code code={snippet} lang="typescript" theme="material-theme-palenight" />
+									</div>
 								</div>
 							</div>
 						</div>
@@ -67,8 +72,8 @@ const snippets = [serverCodeSnippet, clientCodeSnippet].map(snippet => snippet.t
 
 	const startDefault = 1.8
 	function introAnimation(start = startDefault) {
-		const codeSnippets = document.querySelectorAll(".homepage-snippets")
-		const navigationElem = document.querySelectorAll(".prim-navigation")
+		const codeSnippets = document.querySelectorAll<HTMLElement>(".homepage-snippets")
+		const navigationElem = document.querySelectorAll<HTMLElement>(".prim-navigation")
 		const slideIn = {
 			y: ["3rem", "0rem"],
 			opacity: [0, 1],
@@ -80,6 +85,11 @@ const snippets = [serverCodeSnippet, clientCodeSnippet].map(snippet => snippet.t
 		} else {
 			document.body.classList.remove("homepage-intro")
 		}
+		setTimeout(() => {
+			for (const snippet of codeSnippets) {
+				snippet.setAttribute("data-light", "5")
+			}
+		}, 1300)
 	}
 	document.addEventListener("astro:after-swap", () => {
 		if (location.pathname !== "/") return

@@ -6,13 +6,15 @@ import { SEO } from "astro-seo"
 import Columns from "@/components/Columns.astro"
 import Navigation from "@/components/Navigation.astro"
 import { ViewTransitions } from "astro:transitions"
+import Lights from "@/components/Lights.astro"
 
 interface Props {
 	title?: string
 	description?: string
+	fullscreen?: boolean
 	className?: string
 }
-const { title = "", description, className } = Astro.props
+const { title = "", fullscreen, description, className } = Astro.props
 
 const siteName = "Prim+RPC"
 const image = `${Astro.site}/social.png`
@@ -62,11 +64,20 @@ const image = `${Astro.site}/social.png`
 			data-ackee-domain-id="2954615f-b53a-4199-9109-b83d9ee12b04"></script>
 	</head>
 	<body class="font-sans bg-prim-space min-h-[100svh]" class:list={className}>
-		<Columns className="container mx-auto min-h-[100svh]">
-			<div class="prim-navigation col-span-6 lg:col-span-12 pt-6">
-				<Navigation />
-			</div>
-			<slot />
-		</Columns>
+		<div class="fixed inset-0">
+			<Lights />
+		</div>
+		{
+			!fullscreen ? (
+				<Columns className="container mx-auto min-h-[100svh]">
+					<div class="prim-navigation col-span-6 lg:col-span-12 pt-6">
+						<Navigation />
+					</div>
+					<slot />
+				</Columns>
+			) : (
+				<slot />
+			)
+		}
 	</body>
 </html>

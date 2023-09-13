@@ -1,7 +1,7 @@
 import Lenis from "@studio-freight/lenis"
 import { easeOutExpo } from "./easings"
 
-const lenis = new Lenis({
+export const lenis = new Lenis({
 	duration: 1,
 	easing: easeOutExpo,
 	orientation: "vertical",

@@ -2,6 +2,24 @@
 import Layout from "@/layouts/Default.astro"
 ---
 
-<Layout>
-	<p>Hi!</p>
+<Layout fullscreen>
+	<div class="w-full h-screen flex justify-center items-center flex-wrap">
+		{
+			Array.from(Array(80).keys()).map(() => (
+				<div
+					data-light={1 + Math.floor(Math.random() * 4)}
+					class="m-8 text-black z-50 relative w-32 h-32 flex items-center justify-center">
+					<p>This is a test only.</p>
+				</div>
+			))
+		}
+	</div>
 </Layout>
+
+<script>
+	// const mouse = document.getElementById("mouse") as HTMLElement
+	// document.addEventListener("mousemove", e => {
+	// 	mouse.style.left = CSS.px(e.x).toString()
+	// 	mouse.style.top = CSS.px(e.y).toString()
+	// })
+</script>
