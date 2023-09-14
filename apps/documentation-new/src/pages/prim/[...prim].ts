@@ -2,6 +2,8 @@ import { createPrimServer } from "@doseofted/prim-rpc"
 import { defineAstroPrimHandler } from "@doseofted/prim-rpc-plugins/astro"
 import * as module from "@/server"
 
+// export function getStaticPaths() { return [] }
+
 export const prerender = false
 
 const prim = createPrimServer({ module })

@@ -1,14 +1,15 @@
 import defu from "defu"
-import { Light } from "."
+import { Light } from "./Light"
+import { easeOut } from "framer-motion/dom"
 
-type ValueRange<T> = [min: T, max: T]
+type NumericalValueRange<T> = [min: T, max: T]
 
 interface LightGroupOptions {
 	count: number
 	colors: string[]
-	brightness: ValueRange<number>
-	size: ValueRange<number>
-	offset: ValueRange<[number, number]>
+	brightness: NumericalValueRange<number>
+	size: NumericalValueRange<number>
+	offset: NumericalValueRange<[number, number]>
 }
 
 export class LightGroup {
@@ -26,10 +27,7 @@ export class LightGroup {
 			],
 		})
 		this.lights = Array.from(Array(options.count), () => {
-			if (!options.colors) {
-				return
-			}
-			const color = options.colors[Math.floor(Math.random() * options.colors.length)]
+			const color = options.colors?.[Math.floor(Math.random() * options.colors.length)] ?? "#ffffff"
 			return new Light({
 				color,
 			})

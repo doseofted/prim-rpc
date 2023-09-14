@@ -1,11 +1,27 @@
 import { Light, LightState } from "./Light"
-import { LightSet } from "./LightSet"
+import { ElementSet } from "./ElementSet"
 import { createConsola } from "consola"
 
 const console = createConsola({ level: 5 }).withTag("LightEvents")
 
-export class LightEvents {
-	#elements = new LightSet()
+/**
+ * Manages all lights on on a page, created by assigning `data-light` attributes to elements.
+ * `LightElements` is initialized once for the entire page and changes to the page are monitored.
+ * This class sets up light properties but must be displayed by a `LightCanvas` instance on the page.
+ *
+ * Place a light behind an element like so: `<div data-light="1" />`. This will create a single light
+ * with given properties. If more than one light is given, additional lights will have variations
+ * in offset, size, and brightness to create a colorful glow effect with given color choices.
+ *
+ * Properties available (only applies when `data-light` is set):
+ *
+ * - `data-light={number: >=0}` - number of lights to create at center of given element.
+ * - `data-color={string: hex}` - color of light, can be any valid CSS color value
+ * - `data-size={number: 0-100}` - size of light, unit-less but generally interpreted as percent of screen
+ * - `data-brightness={number: 0-2}` - brightness of light: 0 is transparent, 1 utilizes given color, 2 is white
+ */
+export class LightElements {
+	#elements = new ElementSet()
 
 	scrollEvent() {
 		console.debug("scroll update happened")

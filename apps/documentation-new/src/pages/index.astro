@@ -3,7 +3,6 @@ import { Code } from "astro/components"
 import Layout from "@/layouts/Default.astro"
 import { HomepageIntro } from "@/components/IntroText.react"
 import { client } from "@/client"
-import Lights from "@/components/Lights.astro"
 
 const greeting = await client.greetings()
 
@@ -63,8 +62,6 @@ const snippets = [serverCodeSnippet, clientCodeSnippet].map(snippet => snippet.t
 		</div>
 	</div>
 </Layout>
-
-<script src="@/utils/lenis"></script>
 
 <script>
 	import { $navigationHappened } from "@/utils/store"

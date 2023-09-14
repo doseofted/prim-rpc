@@ -3,7 +3,7 @@ import { createConsola } from "consola"
 
 const console = createConsola({ level: 5 }).withTag("LightSet")
 
-export class LightSet extends Set<HTMLElement> {
+export class ElementSet extends Set<HTMLElement> {
 	constructor() {
 		super()
 	}

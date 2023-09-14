@@ -20,6 +20,7 @@ const siteName = "Prim+RPC"
 const image = `${Astro.site}/social.png`
 ---
 
+<script src="@/utils/lenis"></script>
 <script>
 	import { $navigationHappened } from "@/utils/store"
 	document.addEventListener("astro:page-load", () => $navigationHappened.set(true), { once: true })
@@ -69,7 +70,7 @@ const image = `${Astro.site}/social.png`
 		</div>
 		{
 			!fullscreen ? (
-				<Columns className="container mx-auto min-h-[100svh]">
+				<Columns className="relative container mx-auto min-h-[100svh]">
 					<div class="prim-navigation col-span-6 lg:col-span-12 pt-6">
 						<Navigation />
 					</div>

@@ -1,19 +1,26 @@
 ---
 import Layout from "@/layouts/Default.astro"
+const items = Array.from(Array(60).keys())
 ---
 
 <Layout fullscreen>
 	<div class="w-full h-screen flex justify-center items-center flex-wrap">
 		{
-			Array.from(Array(80).keys()).map(() => (
+			items.map(() => (
 				<div
-					data-light={1 + Math.floor(Math.random() * 4)}
+					data-light={1 + Math.floor(Math.random() * 3)}
 					class="m-8 text-black z-50 relative w-32 h-32 flex items-center justify-center">
 					<p>This is a test only.</p>
 				</div>
 			))
 		}
 	</div>
+
+	<!-- <div class="relative w-full h-screen grid place-items-center">
+		<div data-light="1">
+			<p>hi</p>
+		</div>
+	</div> -->
 </Layout>
 
 <script>
