@@ -1,7 +1,7 @@
 import mitt from "mitt"
 import { createConsola } from "consola"
 
-const console = createConsola({ level: 5 }).withTag("LightSet")
+const console = createConsola({ level: 5 }).withTag("ElementSet")
 
 export class ElementSet extends Set<HTMLElement> {
 	constructor() {
@@ -41,7 +41,10 @@ export class ElementSet extends Set<HTMLElement> {
 				this.applyUpdates()
 			}
 		})
-		mutations.observe(elem, { attributes: true, attributeFilter: ["data-light"] })
+		mutations.observe(elem, {
+			attributes: true,
+			attributeFilter: ["data-light", "data-brightness", "data-color", "data-size"],
+		})
 		this.#mapped.set(elem, mutations)
 		// track element position
 	}
@@ -56,7 +59,7 @@ export class ElementSet extends Set<HTMLElement> {
 		super.add(elem)
 		if (this.size > size) {
 			this.#addListeners(elem)
-			console.debug("Element added to LightSet", this.size)
+			console.debug("Element added to ElementSet", this.size)
 			this.applyUpdates()
 		}
 		return this
@@ -67,7 +70,7 @@ export class ElementSet extends Set<HTMLElement> {
 		const deleted = super.delete(elem)
 		if (this.size < size) {
 			this.#removeListeners(elem)
-			console.debug("Element remove from LightSet", this.size)
+			console.debug("Element removed from ElementSet", this.size)
 		}
 		this.applyUpdates()
 		return deleted
@@ -78,7 +81,7 @@ export class ElementSet extends Set<HTMLElement> {
 		for (const elem of this) {
 			this.#removeListeners(elem)
 		}
-		console.debug("All elements cleared from LightSet", this.size)
+		console.debug("All elements cleared from ElementSet", this.size)
 		this.applyUpdates()
 	}
 }

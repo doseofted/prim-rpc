@@ -6,7 +6,7 @@ import type { LightElements } from "./LightElements"
 /**
  * Place Lights on a canvas.
  *
- * **Note:** the canvas should be fixed to and fill the entire screen.
+ * **Note:** the canvas should be fixed to and fill the entire viewport.
  */
 export function createLightCanvas(lights: LightElements, canvas: HTMLCanvasElement | string) {
 	const possibleCanvas = typeof canvas === "string" ? document.querySelector(canvas) : canvas

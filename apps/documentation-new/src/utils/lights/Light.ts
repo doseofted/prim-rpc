@@ -111,7 +111,7 @@ export class Light implements LightProperties {
 		return this.#state
 	}
 	changeState(state: LightStatesSet) {
-		if (this.#state === LightState.Destroyed) return
+		if ([LightState.Destroying, LightState.Destroyed].includes(this.#state)) return
 		this.#state = state
 		console.debug("light state:", this.#state)
 		switch (this.#state) {
@@ -137,7 +137,6 @@ export class Light implements LightProperties {
 				this.brightness = 0
 				this.#brightness.on("animationComplete", () => {
 					this.#state = LightState.Destroyed
-					this.#brightness.clearListeners()
 					console.debug("updated light state:", this.#state)
 				})
 				break

@@ -21,6 +21,7 @@ const image = `${Astro.site}/social.png`
 ---
 
 <script src="@/utils/lenis"></script>
+
 <script>
 	import { $navigationHappened } from "@/utils/store"
 	document.addEventListener("astro:page-load", () => $navigationHappened.set(true), { once: true })
@@ -77,7 +78,9 @@ const image = `${Astro.site}/social.png`
 					<slot />
 				</Columns>
 			) : (
-				<slot />
+				<div class="relative">
+					<slot />
+				</div>
 			)
 		}
 	</body>

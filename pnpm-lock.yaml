@@ -289,6 +289,9 @@ importers:
       '@tailwindcss/typography':
         specifier: ^0.5.10
         version: 0.5.10(tailwindcss@3.3.3)
+      '@tweakpane/core':
+        specifier: ^2.0.1
+        version: 2.0.1
       '@types/react':
         specifier: ^18.0.21
         version: 18.2.21
@@ -346,6 +349,9 @@ importers:
       tailwindcss:
         specifier: ^3.0.24
         version: 3.3.3
+      tweakpane:
+        specifier: ^4.0.1
+        version: 4.0.1
       zod:
         specifier: ^3.22.2
         version: 3.22.2
@@ -2668,6 +2674,10 @@ packages:
   /@tootallnate/once@2.0.0:
     resolution: {integrity: sha512-XCuKFP5PS55gnMVu3dty8KPatLqUoy/ZYzDzAGCQ8JNFCkLXzmI7vNHCR+XpbZaMWQK/vQubr7PkYq8g470J/A==}
     engines: {node: '>= 10'}
+    dev: true
+
+  /@tweakpane/core@2.0.1:
+    resolution: {integrity: sha512-iJNrLrLffQR0I8mWgAWcMVO9ZPNdNeXZl66WNT+Op5L9FW7BSF6lwG3izR6Ki9CaI3HzIownwjzYS5xWUaokTA==}
     dev: true
 
   /@types/acorn@4.0.6:
@@ -10730,6 +10740,10 @@ packages:
       turbo-linux-arm64: 1.10.13
       turbo-windows-64: 1.10.13
       turbo-windows-arm64: 1.10.13
+    dev: true
+
+  /tweakpane@4.0.1:
+    resolution: {integrity: sha512-1JmmGbF4h2zuFbpN1XfIWcV0kLbBUgSXpR1QtW19vJFx44asnCrufRSvd69OItOFMEWgbVtoiWM2uDPUEUKcMQ==}
     dev: true
 
   /type-check@0.4.0:

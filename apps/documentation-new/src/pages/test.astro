@@ -1,6 +1,6 @@
 ---
 import Layout from "@/layouts/Default.astro"
-const items = Array.from(Array(60).keys())
+const items = Array.from(Array(1).keys())
 ---
 
 <Layout fullscreen>
@@ -9,12 +9,13 @@ const items = Array.from(Array(60).keys())
 			items.map(() => (
 				<div
 					data-light={1 + Math.floor(Math.random() * 3)}
-					class="m-8 text-black z-50 relative w-32 h-32 flex items-center justify-center">
+					class="test-page-item m-8 text-black z-50 relative w-32 h-32 flex items-center justify-center">
 					<p>This is a test only.</p>
 				</div>
 			))
 		}
 	</div>
+	<div class="test-controls fixed z-50 top-0 right-0"></div>
 
 	<!-- <div class="relative w-full h-screen grid place-items-center">
 		<div data-light="1">
@@ -24,6 +25,39 @@ const items = Array.from(Array(60).keys())
 </Layout>
 
 <script>
+	import { Pane } from "tweakpane"
+
+	function defineParams<T extends Record<string, unknown>>(given: T, setCb: (key: string, value: unknown) => void) {
+		const proxiedParams = new Proxy(given, {
+			set: (target: Record<string, unknown>, key: string, value) => {
+				target[key] = value
+				setCb(key, value)
+				return true
+			},
+		})
+		return proxiedParams as T
+	}
+
+	const params = defineParams(
+		{
+			light: 1,
+			color: "#fff",
+			size: 100,
+			brightness: 1,
+		},
+		(key, value) => {
+			for (const element of document.querySelectorAll<HTMLElement>(".test-page-item")) {
+				element.dataset[key] = String(value)
+			}
+		}
+	)
+
+	const pane = new Pane({ container: document.querySelector<HTMLElement>(".test-controls") ?? undefined })
+	pane.addBinding(params, "light", { min: 0, max: 10, step: 1 })
+	pane.addBinding(params, "color")
+	pane.addBinding(params, "size", { min: 0, max: 1000, step: 1 })
+	pane.addBinding(params, "brightness", { min: 0, max: 2, step: 0.01 })
+
 	// const mouse = document.getElementById("mouse") as HTMLElement
 	// document.addEventListener("mousemove", e => {
 	// 	mouse.style.left = CSS.px(e.x).toString()

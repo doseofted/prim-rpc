@@ -51,8 +51,11 @@ export class LightElements {
 	#listCached: Light[] = []
 	get all() {
 		if (this.#listNeedsUpdate) {
-			console.debug("Creating list of all lights")
 			this.#listCached = Array.from(this.#lights.values()).flat()
+			console.debug(
+				"Caching list of all lights",
+				this.#listCached.map(a => a.state)
+			)
 			this.#listNeedsUpdate = false
 		}
 		// console.debug("Returning previous list of all lights")
@@ -67,30 +70,48 @@ export class LightElements {
 		return this.all.length
 	}
 
+	#getElementProperties(element: HTMLElement) {
+		const count = element.dataset.light ? parseInt(element.dataset.light) : undefined
+		const color = element.dataset.color ? element.dataset.color : undefined
+		const size = element.dataset.size ? parseFloat(element.dataset.size) : undefined
+		const brightness = element.dataset.brightness ? parseFloat(element.dataset.brightness) : undefined
+		const options = { count, color, size, brightness }
+		for (const [key, val] of Object.entries(options)) {
+			if (typeof val === "undefined" || val === null) {
+				delete options[key as keyof typeof options]
+			}
+		}
+		return options
+	}
+
 	elementUpdates() {
 		for (const element of this.#elements) {
-			const count = element.dataset.light ? parseInt(element.dataset.light, 10) : 0
+			const options = this.#getElementProperties(element)
+			const { count = 0 } = options
 			const lights = this.#lights.get(element)
 			const { left, width, top, height } = element.getBoundingClientRect()
 			const center = [left + width / 2, top + height / 2] as [number, number]
 			const removeAllLights = !document.contains(element)
 			if (lights && Array.isArray(lights)) {
-				const newCount = count - lights.length
-				if (count > lights.length) {
+				const activeLights = lights.filter(
+					({ state }) => ![LightState.Destroying, LightState.Destroyed].includes(state)
+				)
+				const newCount = count - activeLights.length
+				if (count > activeLights.length) {
 					const newLights = Array.from(Array(newCount)).map(() => new Light({ center }))
 					lights.push(...newLights)
 					console.debug("adding lights", newCount, newLights)
 					this.#listNeedsUpdate = true
-				} else if (count < lights.length) {
+				} else if (count < activeLights.length) {
 					const removed = Math.abs(newCount)
 					console.debug("marking lights for removal", removed)
 					// NOTE: lights are not removed immediately, but instead are marked for removal
 					for (const index of Array.from(Array(removed).keys())) {
-						lights[index].changeState(LightState.Destroying)
+						activeLights[index].changeState(LightState.Destroying)
 					}
 				} else if (removeAllLights) {
 					console.debug("marking all lights for removal", lights.length)
-					for (const light of lights) {
+					for (const light of activeLights) {
 						light.changeState(LightState.Destroying)
 					}
 					this.#elements.delete(element)
@@ -110,8 +131,10 @@ export class LightElements {
 					this.#listNeedsUpdate = true
 				}
 				for (const light of lights) {
-					light.center = center
-					// TODO: other properties
+					if (!removeAllLights) light.center = center
+					if (options.brightness) light.brightness = options.brightness
+					if (options.color) light.color = options.color
+					if (options.size) light.size = options.size
 				}
 				continue
 			}
