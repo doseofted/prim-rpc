@@ -1,5 +1,5 @@
 import { animate, motionValue } from "framer-motion/dom"
-import { type ValueAnimationTransition } from "framer-motion"
+import { type AnimationPlaybackControls, type ValueAnimationTransition } from "framer-motion"
 import { defu } from "defu"
 import { createConsola } from "consola"
 
@@ -73,8 +73,12 @@ export class Light implements LightProperties {
 	}
 
 	#brightness
+	#brightnessAnim: AnimationPlaybackControls | undefined
 	set brightness(value: number) {
-		void animate(this.#brightness, value, this.#motionProps)
+		// brightness partly determines state, if being destroyed then don't update
+		if (this.beingDestroyed) return
+		// this.#brightnessAnim?.stop()
+		this.#brightnessAnim = animate(this.#brightness, value, this.#motionProps)
 	}
 	get brightness() {
 		return this.#brightness.get()
@@ -110,14 +114,17 @@ export class Light implements LightProperties {
 	public get state() {
 		return this.#state
 	}
+	get beingDestroyed() {
+		return [LightState.Destroying, LightState.Destroyed].includes(this.#state)
+	}
 	changeState(state: LightStatesSet) {
-		if ([LightState.Destroying, LightState.Destroyed].includes(this.#state)) return
-		this.#state = state
-		console.debug("light state:", this.#state)
-		switch (this.#state) {
+		if (this.beingDestroyed) return
+		// this.#brightness.clearListeners() // interrupt previous transition
+		switch (state) {
 			case LightState.Deactivating: {
 				this.brightness = 0
 				this.#brightness.on("animationComplete", () => {
+					if (this.#state !== LightState.Deactivating) return
 					this.#state = LightState.Inactive
 					this.#brightness.clearListeners()
 					console.debug("updated light state:", this.#state)
@@ -127,6 +134,7 @@ export class Light implements LightProperties {
 			case LightState.Activating: {
 				this.brightness = this.targets.brightness
 				this.#brightness.on("animationComplete", () => {
+					if (this.#state !== LightState.Activating) return
 					this.#state = LightState.Active
 					this.#brightness.clearListeners()
 					console.debug("updated light state:", this.#state)
@@ -134,9 +142,12 @@ export class Light implements LightProperties {
 				break
 			}
 			case LightState.Destroying: {
+				// brightness can only be updated when not destroyed, so update first
 				this.brightness = 0
 				this.#brightness.on("animationComplete", () => {
+					if (this.#state !== LightState.Destroying) return
 					this.#state = LightState.Destroyed
+					this.#brightness.clearListeners()
 					console.debug("updated light state:", this.#state)
 				})
 				break
@@ -144,6 +155,8 @@ export class Light implements LightProperties {
 			default:
 				break
 		}
+		this.#state = state
+		console.debug("light state:", this.#state)
 	}
 
 	constructor(targets: Partial<LightProperties> = {}, activate = true) {

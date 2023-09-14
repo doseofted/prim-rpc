@@ -52,10 +52,7 @@ export class LightElements {
 	get all() {
 		if (this.#listNeedsUpdate) {
 			this.#listCached = Array.from(this.#lights.values()).flat()
-			console.debug(
-				"Caching list of all lights",
-				this.#listCached.map(a => a.state)
-			)
+			console.debug("Caching list of all lights", this.#listCached.length)
 			this.#listNeedsUpdate = false
 		}
 		// console.debug("Returning previous list of all lights")
@@ -85,9 +82,9 @@ export class LightElements {
 	}
 
 	elementUpdates() {
+		console.debug("element was updated, running updates")
 		for (const element of this.#elements) {
-			const options = this.#getElementProperties(element)
-			const { count = 0 } = options
+			const { count = 0, ...options } = this.#getElementProperties(element)
 			const lights = this.#lights.get(element)
 			const { left, width, top, height } = element.getBoundingClientRect()
 			const center = [left + width / 2, top + height / 2] as [number, number]
@@ -132,6 +129,7 @@ export class LightElements {
 				}
 				for (const light of lights) {
 					if (!removeAllLights) light.center = center
+					// light.updateTargets(options)
 					if (options.brightness) light.brightness = options.brightness
 					if (options.color) light.color = options.color
 					if (options.size) light.size = options.size
@@ -140,7 +138,7 @@ export class LightElements {
 			}
 			this.#lights.set(
 				element,
-				Array.from(Array(count)).map(() => new Light({ center }))
+				Array.from(Array(count)).map(() => new Light({ center, ...options }))
 			)
 			this.#listNeedsUpdate = true
 			console.debug("initializing lights for element", count)

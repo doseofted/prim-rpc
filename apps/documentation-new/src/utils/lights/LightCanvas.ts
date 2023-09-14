@@ -22,14 +22,15 @@ export function createLightCanvas(lights: LightElements, canvas: HTMLCanvasEleme
 		for (const light of lights) {
 			const { brightness, color, size, offset } = light
 			const centerPt = new Pt(offset)
+			const lightStart = 1.5 // point at which `lighten()` starts
 			const colorStart = transparentize(
-				lighten(color, (clamp(1.5, 2, brightness) - 1.5) * 2),
-				easeIn(clamp(0, 1, 1 - brightness))
+				lighten(color, easeIn((clamp(lightStart, 2, brightness) - lightStart) * 2)),
+				easeOut(clamp(0, 1, 1 - brightness))
 			)
 			const colorEnd = transparentize(colorStart, 1)
 			const gradientColor = form.gradient([colorStart, colorEnd])
 			const gradientShape = gradientColor(
-				Circle.fromCenter(centerPt, (size * easeOut(clamp(0, 1, brightness - 1))) / 2),
+				Circle.fromCenter(centerPt, (size * easeIn(clamp(0, 1, brightness - 1))) / 2),
 				Circle.fromCenter(centerPt, size)
 			)
 			const circle = Circle.fromCenter(centerPt, size)
