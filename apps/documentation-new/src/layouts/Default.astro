@@ -72,7 +72,7 @@ const image = `${Astro.site}/social.png`
 		{
 			!fullscreen ? (
 				<Columns className="relative container mx-auto min-h-[100svh]">
-					<div class="prim-navigation col-span-6 lg:col-span-12 pt-6">
+					<div transition:persist="logo" class="prim-navigation col-span-6 lg:col-span-12 pt-6">
 						<Navigation />
 					</div>
 					<slot />

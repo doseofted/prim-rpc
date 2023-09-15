@@ -1,5 +1,5 @@
 import { animate, motionValue } from "framer-motion/dom"
-import { type AnimationPlaybackControls, type ValueAnimationTransition } from "framer-motion"
+import { type ValueAnimationTransition } from "framer-motion"
 import { defu } from "defu"
 import { createConsola } from "consola"
 
@@ -73,12 +73,10 @@ export class Light implements LightProperties {
 	}
 
 	#brightness
-	#brightnessAnim: AnimationPlaybackControls | undefined
 	set brightness(value: number) {
 		// brightness partly determines state, if being destroyed then don't update
 		if (this.beingDestroyed) return
-		// this.#brightnessAnim?.stop()
-		this.#brightnessAnim = animate(this.#brightness, value, this.#motionProps)
+		void animate(this.#brightness, value, this.#motionProps)
 	}
 	get brightness() {
 		return this.#brightness.get()
