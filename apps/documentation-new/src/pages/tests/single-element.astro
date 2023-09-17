@@ -16,9 +16,9 @@ import Layout from "@/layouts/Default.astro"
 	const params = watchGiven(
 		{
 			light: 1,
-			color: "#fff",
-			size: 600,
-			brightness: 1,
+			// color: "#fff",
+			// size: 600,
+			// brightness: 1,
 		},
 		function updateElements(key: string, value: unknown) {
 			for (const element of document.querySelectorAll<HTMLElement>(".test-page-item")) {
@@ -31,8 +31,8 @@ import Layout from "@/layouts/Default.astro"
 		title: "Single Element",
 		container: document.querySelector<HTMLElement>(".test-controls") ?? undefined,
 	})
-	pane.addBinding(params, "light", { min: 0, max: 10, step: 1 })
-	pane.addBinding(params, "color")
-	pane.addBinding(params, "size", { min: 0, max: 1000, step: 1 })
-	pane.addBinding(params, "brightness", { min: 0, max: 2, step: 0.01 })
+	pane.addBinding(params, "light", { min: 0, max: 100, step: 1 })
+	// pane.addBinding(params, "color")
+	// pane.addBinding(params, "size", { min: 0, max: 1000, step: 1 })
+	// pane.addBinding(params, "brightness", { min: 0, max: 2, step: 0.01 })
 </script>

@@ -4,8 +4,11 @@ import { createConsola } from "consola"
 const console = createConsola({ level: 5 }).withTag("ElementSet")
 
 export class ElementSet extends Set<HTMLElement> {
-	constructor() {
+	#watchAttributes: string[]
+
+	constructor(watchAttributes: string[] = []) {
 		super()
+		this.#watchAttributes = watchAttributes
 	}
 
 	#events = mitt<{ update: undefined }>()
@@ -43,7 +46,7 @@ export class ElementSet extends Set<HTMLElement> {
 		})
 		mutations.observe(elem, {
 			attributes: true,
-			attributeFilter: ["data-light", "data-brightness", "data-color", "data-size"],
+			attributeFilter: this.#watchAttributes,
 		})
 		this.#mapped.set(elem, mutations)
 		// track element position

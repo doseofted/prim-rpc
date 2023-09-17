@@ -1,6 +1,8 @@
-import { Light, LightState } from "./Light"
-import { ElementSet } from "./ElementSet"
 import { createConsola } from "consola"
+import { clamp } from "framer-motion/dom"
+import { ElementSet } from "./ElementSet"
+import { Light } from "./Light"
+import { LightGroup } from "./LightGroup"
 
 const console = createConsola({ level: 5 }).withTag("LightEvents")
 
@@ -15,13 +17,14 @@ const console = createConsola({ level: 5 }).withTag("LightEvents")
  *
  * Properties available (only applies when `data-light` is set):
  *
- * - `data-light={number: >=0}` - number of lights to create at center of given element.
- * - `data-color={string: hex}` - color of light, can be any valid CSS color value
- * - `data-size={number: 0-100}` - size of light, unit-less but generally interpreted as percent of screen
- * - `data-brightness={number: 0-2}` - brightness of light: 0 is transparent, 1 utilizes given color, 2 is white
+ * - `data-light={>=0}` - number of lights to create at center of given element
+ * - `data-colors={#123456}` - possible colors of light(s), comma separated list of color values (hexadecimal)
+ * - `data-size={0,100}` - min/max size of light, unit-less but generally interpreted as percent of screen (0-100)
+ * - `data-offset={0,100}` - min/max absolute offset radius of light from center of element
+ * - `data-brightness={0-2,0-2}` - min/max brightness of light: 0 is transparent, 1 utilizes given color, 2 is white
  */
 export class LightElements {
-	#elements = new ElementSet()
+	#elements = new ElementSet(["data-light", "data-colors", "data-size", "data-offset", "brightness"])
 
 	scrollEvent() {
 		console.debug("scroll update happened")
@@ -45,13 +48,13 @@ export class LightElements {
 
 	#mutationObserver: MutationObserver
 
-	#lights = new Map<HTMLElement, Light[]>()
+	#lights = new Map<HTMLElement, LightGroup>()
 
 	#listNeedsUpdate = false
 	#listCached: Light[] = []
 	get all() {
 		if (this.#listNeedsUpdate) {
-			this.#listCached = Array.from(this.#lights.values()).flat()
+			this.#listCached = Array.from(this.#lights.values()).flatMap(({ lights }) => lights)
 			console.debug("Caching list of all lights", this.#listCached.length)
 			this.#listNeedsUpdate = false
 		}
@@ -67,81 +70,57 @@ export class LightElements {
 		return this.all.length
 	}
 
+	utils = {
+		parseCommaDelimited<T = string>(str: string | undefined, mapFn: (str: string) => T = s => s as unknown as T) {
+			return typeof str === "string" ? str.split(",").map(mapFn) : str
+		},
+	}
+
 	#getElementProperties(element: HTMLElement) {
-		const count = element.dataset.light ? parseInt(element.dataset.light) : undefined
-		const color = element.dataset.color ? element.dataset.color : undefined
-		const size = element.dataset.size ? parseFloat(element.dataset.size) : undefined
-		const brightness = element.dataset.brightness ? parseFloat(element.dataset.brightness) : undefined
-		const options = { count, color, size, brightness }
+		const count = element.dataset.light ? clamp(0, Infinity, parseInt(element.dataset.light)) : undefined
+		const colors = this.utils.parseCommaDelimited(element.dataset.color)
+		const possibleSize = element.dataset.size ? element.dataset.size.split(",").map(parseFloat) : undefined
+		const size = possibleSize?.length === 2 ? (possibleSize as [number, number]) : undefined
+		const possibleOffset = element.dataset.offset ? element.dataset.offset.split(",").map(parseInt) : undefined
+		const offset = possibleOffset?.length === 2 ? (possibleOffset as [number, number]) : undefined
+		const possibleBrightness = element.dataset.brightness
+			? element.dataset.brightness.split(",").map(b => clamp(0, 2, parseFloat(b)))
+			: undefined
+		const brightness = possibleBrightness?.length === 2 ? (possibleBrightness as [number, number]) : undefined
+		const options = { count, colors, size, offset, brightness }
 		for (const [key, val] of Object.entries(options)) {
 			if (typeof val === "undefined" || val === null) {
 				delete options[key as keyof typeof options]
 			}
 		}
+		console.debug("element options", options)
 		return options
 	}
 
 	elementUpdates() {
-		console.debug("element was updated, running updates")
+		console.debug("element was updated, running updates", this.#elements.size)
 		for (const element of this.#elements) {
-			const { count = 0, ...options } = this.#getElementProperties(element)
+			const elementOptions = this.#getElementProperties(element)
+			const { count = 0 } = elementOptions
 			const lights = this.#lights.get(element)
 			const { left, width, top, height } = element.getBoundingClientRect()
 			const center = [left + width / 2, top + height / 2] as [number, number]
 			const removeAllLights = !document.contains(element)
-			if (lights && Array.isArray(lights)) {
-				const activeLights = lights.filter(
-					({ state }) => ![LightState.Destroying, LightState.Destroyed].includes(state)
-				)
-				const newCount = count - activeLights.length
-				if (count > activeLights.length) {
-					const newLights = Array.from(Array(newCount)).map(() => new Light({ center }))
-					lights.push(...newLights)
-					console.debug("adding lights", newCount, newLights)
-					this.#listNeedsUpdate = true
-				} else if (count < activeLights.length) {
-					const removed = Math.abs(newCount)
-					console.debug("marking lights for removal", removed)
-					// NOTE: lights are not removed immediately, but instead are marked for removal
-					for (const index of Array.from(Array(removed).keys())) {
-						activeLights[index].changeState(LightState.Destroying)
-					}
-				} else if (removeAllLights) {
-					console.debug("marking all lights for removal", lights.length)
-					for (const light of activeLights) {
-						light.changeState(LightState.Destroying)
-					}
-					this.#elements.delete(element)
+			if (lights) {
+				lights.updateRanges(elementOptions)
+				const countChanged = lights.setLightCount(count, { center }, removeAllLights)
+				this.#listNeedsUpdate = countChanged
+				if (removeAllLights) {
+					void lights.destroy()
 					this.#lights.delete(element)
-				}
-				// clean up of destroyed lights only happens on next update (ready for removal)
-				const readyToBeRemoved = lights
-					.map((light, index) => (light.state === LightState.Destroyed ? index : -1))
-					.filter(index => index !== -1)
-					.reverse()
-				for (const removeIndex of readyToBeRemoved) {
-					lights[removeIndex]?.destroy()
-					lights.splice(removeIndex, 1)
-				}
-				if (readyToBeRemoved.length > 0) {
-					console.debug("lights removed", readyToBeRemoved.length)
-					this.#listNeedsUpdate = true
-				}
-				for (const light of lights) {
-					if (!removeAllLights) light.center = center
-					// light.updateTargets(options)
-					if (options.brightness) light.brightness = options.brightness
-					if (options.color) light.color = options.color
-					if (options.size) light.size = options.size
+					this.#elements.delete(element)
 				}
 				continue
 			}
-			this.#lights.set(
-				element,
-				Array.from(Array(count)).map(() => new Light({ center, ...options }))
-			)
+			const newLightGroup = new LightGroup(elementOptions)
+			this.#lights.set(element, newLightGroup)
 			this.#listNeedsUpdate = true
-			console.debug("initializing lights for element", count)
+			console.debug("initializing new lights for element", newLightGroup.lights.length)
 		}
 	}
 	#elementUpdatesListener: typeof this.elementUpdates
@@ -154,8 +133,8 @@ export class LightElements {
 		this.#resizeListener = this.resizeEvent.bind(this)
 		window.addEventListener("resize", this.#resizeListener)
 
-		const addPossibleElements = () => {
-			const lightElements = document.querySelectorAll("[data-light]")
+		const addPossibleElements = (parent: HTMLElement | Document = document) => {
+			const lightElements = parent.querySelectorAll("[data-light]")
 			for (const lightElem of lightElements) {
 				this.#elements.add(lightElem as HTMLElement)
 			}
@@ -180,7 +159,12 @@ export class LightElements {
 		/** Determine if given `<div />` has "light" properties */
 		function isElementWithLight(node: Node): HTMLElement | false {
 			const elem = node.nodeType === 1 ? (node as HTMLElement) : null
-			return elem && elem.hasAttribute("data-light") ? elem : false
+			const isLightDirect = elem && elem.hasAttribute("data-light") ? elem : false
+			// it's possible that element mutated was not a light but children might be
+			if (!isLightDirect && elem) {
+				addPossibleElements(elem)
+			}
+			return isLightDirect
 		}
 
 		// detect changes to the document
