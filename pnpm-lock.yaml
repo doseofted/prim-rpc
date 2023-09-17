@@ -292,6 +292,9 @@ importers:
       '@tweakpane/core':
         specifier: ^2.0.1
         version: 2.0.1
+      '@tweakpane/plugin-essentials':
+        specifier: ^0.2.0
+        version: 0.2.0(tweakpane@4.0.1)
       '@types/react':
         specifier: ^18.0.21
         version: 18.2.21
@@ -2678,6 +2681,14 @@ packages:
 
   /@tweakpane/core@2.0.1:
     resolution: {integrity: sha512-iJNrLrLffQR0I8mWgAWcMVO9ZPNdNeXZl66WNT+Op5L9FW7BSF6lwG3izR6Ki9CaI3HzIownwjzYS5xWUaokTA==}
+    dev: true
+
+  /@tweakpane/plugin-essentials@0.2.0(tweakpane@4.0.1):
+    resolution: {integrity: sha512-/kO90nfm0y0CYJPUvoNrjXhjNoqr+RaoySIdJmy++pb5vrSHi/DXdxG/sPszUPZggDY9M31RTacnxXi6Dv7r8Q==}
+    peerDependencies:
+      tweakpane: ^4.0.0-beta.2
+    dependencies:
+      tweakpane: 4.0.1
     dev: true
 
   /@types/acorn@4.0.6:

@@ -50,8 +50,8 @@ export class Light implements LightProperties {
 
 	#motionProps: ValueAnimationTransition<number | string> = {
 		type: "spring",
-		damping: 100,
-		mass: 70,
+		damping: 50,
+		mass: 20,
 		stiffness: 50,
 	}
 
@@ -69,7 +69,7 @@ export class Light implements LightProperties {
 		}
 	}
 	get offset() {
-		return [this.center[0] + this.#x.get(), this.center[1] + this.#y.get()]
+		return [this.#x.get(), this.#y.get()]
 	}
 
 	#brightness

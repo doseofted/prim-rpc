@@ -71,7 +71,7 @@ export class LightGroup /* implements LightProperties */ {
 						const highestBrightness = this.ranges.brightness[1]
 						const baseBrightness = this.utils.randomDouble(...this.ranges.brightness)
 						const brightness = transform(index, [0, count], [baseBrightness, highestBrightness])
-						console.log(distance, brightness)
+						// console.log(distance, brightness)
 						light.brightness = brightness
 						const minSize = this.ranges.size[0]
 						const baseSize = this.utils.randomInt(...this.ranges.size)
@@ -103,9 +103,9 @@ export class LightGroup /* implements LightProperties */ {
 		this.ranges = defu<LightGroupOptions, LightGroupOptions[]>(defaultRanges, {
 			colors: ["#f0A3FF", "#f0A3FF", "#f0A3FF", "#6D53FF", "#1D0049", "#0069BA", "#5BB8FF", "#4AEDFF"],
 			brightness: [0.5, 1.5],
-			size: [300, 600],
+			size: [25, 50],
 			offset: 200,
-			interval: [3000, 5000],
+			interval: [1000, 1500],
 		})
 		this.setInterval()
 	}
