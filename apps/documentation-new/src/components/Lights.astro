@@ -1,28 +1,10 @@
 <div transition:persist="lights" class="fixed pointer-events-none w-full h-full">
 	<canvas id="lights" class="w-full h-full"></canvas>
-	<div class="absolute inset-0 w-full h-full backdrop-blur-xl backdrop-saturate-150 bg-transparent"></div>
+	<div class="absolute inset-0 w-full h-full backdrop-blur-lg backdrop-saturate-150 bg-transparent"></div>
 </div>
 
 <script>
 	import { lights, createLightCanvas } from "@/utils/lights"
 
 	createLightCanvas(lights, "#lights")
-
-	// just a test of animated lights, to be replaced
-	// export const defaultColors = ["#f0A3FF", "#f0A3FF", "#6D53FF", "#1D0049", "#0069BA", "#5BB8FF", "#4AEDFF"]
-	// setTimeout(() => {
-	// 	for (const light of lights) {
-	// 		light.size = 350
-	// 		light.color = defaultColors[Math.floor(Math.random() * defaultColors.length)]
-	// 		setInterval(
-	// 			() => {
-	// 				light.offset = [
-	// 					(light.offset[0] + (Math.random() - 0.5) * 700) % window.innerWidth,
-	// 					(light.offset[1] + (Math.random() - 0.5) * 700) % window.innerHeight,
-	// 				]
-	// 			},
-	// 			500 + Math.random() * 1000
-	// 		)
-	// 	}
-	// }, 500)
 </script>

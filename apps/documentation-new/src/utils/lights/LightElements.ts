@@ -20,7 +20,7 @@ const console = createConsola({ level: 5 }).withTag("LightEvents")
  * - `data-light={>=0}` - number of lights to create at center of given element
  * - `data-colors={#123456}` - possible colors of light(s), comma separated list of color values (hexadecimal)
  * - `data-size={0,100}` - min/max size of light, unit-less but generally interpreted as percent of screen (0-100)
- * - `data-offset={0,100}` - min/max absolute offset radius of light from center of element
+ * - `data-offset={100}` - max offset radius of light from center of element
  * - `data-brightness={0-2,0-2}` - min/max brightness of light: 0 is transparent, 1 utilizes given color, 2 is white
  */
 export class LightElements {
@@ -81,8 +81,7 @@ export class LightElements {
 		const colors = this.utils.parseCommaDelimited(element.dataset.color)
 		const possibleSize = element.dataset.size ? element.dataset.size.split(",").map(parseFloat) : undefined
 		const size = possibleSize?.length === 2 ? (possibleSize as [number, number]) : undefined
-		const possibleOffset = element.dataset.offset ? element.dataset.offset.split(",").map(parseInt) : undefined
-		const offset = possibleOffset?.length === 2 ? (possibleOffset as [number, number]) : undefined
+		const offset = element.dataset.offset ? parseInt(element.dataset.offset) : undefined
 		const possibleBrightness = element.dataset.brightness
 			? element.dataset.brightness.split(",").map(b => clamp(0, 2, parseFloat(b)))
 			: undefined

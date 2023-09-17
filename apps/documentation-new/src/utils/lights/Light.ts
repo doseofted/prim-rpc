@@ -157,7 +157,13 @@ export class Light implements LightProperties {
 		console.debug("light state:", this.#state)
 	}
 
+	#id: symbol
+	get id() {
+		return this.#id
+	}
+
 	constructor(targets: Partial<LightProperties> = {}, activate = true) {
+		this.#id = Symbol("light")
 		this.#targets = defu<LightProperties, LightProperties[]>(targets, {
 			center: [0, 0],
 			offset: [0, 0],
