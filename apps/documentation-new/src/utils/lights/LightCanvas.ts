@@ -2,9 +2,9 @@ import { CanvasSpace, Circle, Pt } from "pts"
 import { lighten, transparentize } from "color2k"
 import { easeIn, easeOut, clamp } from "framer-motion/dom"
 import type { LightElements } from "./LightElements"
-import { createConsola } from "consola"
+// import { createConsola } from "consola"
 
-const console = createConsola({ level: 5 }).withTag("LightCanvas")
+// const console = createConsola({ level: 5 }).withTag("LightCanvas")
 
 /**
  * Place Lights on a canvas.
@@ -23,6 +23,7 @@ export function createLightCanvas(lights: LightElements, canvas: HTMLCanvasEleme
 
 	space.add(() => {
 		form.composite("screen")
+		// console.log(lights.length)
 		// const screenSize = space.width // Math.min(space.width, space.height)
 		for (const light of lights) {
 			const { center, offset, brightness, color, size /* : sizeBase */ } = light

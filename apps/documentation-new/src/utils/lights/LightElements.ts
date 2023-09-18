@@ -62,6 +62,7 @@ export class LightElements {
 		return this.#listCached
 	}
 	[Symbol.iterator]() {
+		// console.log("iterating")
 		let index = -1
 		const next = () => ({ value: this.all[++index], done: !(index in this.all) })
 		return { next }
@@ -99,7 +100,7 @@ export class LightElements {
 				delete options[key as keyof typeof options]
 			}
 		}
-		console.debug("element options", options)
+		console.debug("element options", /* element, */ options)
 		return { options, bounds }
 	}
 
@@ -114,6 +115,7 @@ export class LightElements {
 				lights.updateRanges(options)
 				const countChanged = lights.setLightCount(count, bounds, removeAllLights)
 				this.#listNeedsUpdate = countChanged
+				// console.log({ countChanged, list: this.#listCached })
 				if (removeAllLights) {
 					void lights.destroy()
 					this.#lights.delete(element)
