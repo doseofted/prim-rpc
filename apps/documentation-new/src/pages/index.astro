@@ -29,7 +29,12 @@ const snippets = [serverCodeSnippet, clientCodeSnippet].map(snippet => snippet.t
 						class:list={[
 							index === 0 ? "md:translate-x-16 lg:translate-x-32" : "md:-translate-x-16 lg:-translate-x-32",
 						]}>
-						<div data-light="5" class="homepage-snippets opacity-0">
+						<div
+							data-light="10"
+							data-size="0.4,1"
+							data-offset="1.5,3"
+							data-brightness="0.5,1"
+							class="homepage-snippets opacity-0">
 							<div class="mockup-code text-sm bg-white/70 border border-white/70 pb-4 w-full max-w-lg">
 								<div class="px-4">
 									<div class="rounded-lg overflow-hidden bg-prim-space code-without-bg">
@@ -82,14 +87,6 @@ const snippets = [serverCodeSnippet, clientCodeSnippet].map(snippet => snippet.t
 		} else {
 			document.body.classList.remove("homepage-intro")
 		}
-		setTimeout(
-			() => {
-				for (const snippet of codeSnippets) {
-					snippet.setAttribute("data-light", "5")
-				}
-			},
-			start * 1000 + 500
-		)
 	}
 	document.addEventListener("astro:after-swap", () => {
 		if (location.pathname !== "/") return

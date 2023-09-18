@@ -11,7 +11,12 @@ const { empty = false } = Astro.props
 	{
 		!empty && (
 			<>
-				<div class="text-prim-space flex items-center" data-light="10">
+				<div
+					class="text-prim-space flex items-center"
+					data-light="15"
+					data-brightness="0.5,0.8"
+					data-size="0.5,1.8"
+					data-offset="2,4">
 					<Prim>RPC</Prim>
 				</div>
 				<div class="bg-white/70 p-4 px-8 flex gap-4 items-center">

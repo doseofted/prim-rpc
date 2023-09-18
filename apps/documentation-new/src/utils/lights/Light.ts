@@ -64,7 +64,7 @@ export class Light implements LightProperties {
 		] as const) {
 			const diff = given !== current.get()
 			if (diff) {
-				void animate(current, given, this.#motionProps)
+				void animate(current, given, { ...this.#motionProps, damping: 80 })
 			}
 		}
 	}
@@ -84,7 +84,7 @@ export class Light implements LightProperties {
 
 	#size
 	set size(value) {
-		void animate(this.#size, value, this.#motionProps)
+		void animate(this.#size, value, { ...this.#motionProps, damping: 150 })
 	}
 	get size() {
 		return this.#size.get()

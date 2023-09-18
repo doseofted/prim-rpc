@@ -5,7 +5,12 @@ import Layout from "@/layouts/Default.astro"
 <Layout fullscreen>
 	<div class="test-controls fixed z-50 top-0 right-0"></div>
 	<div class="w-full h-screen flex justify-center items-center flex-wrap">
-		<div class="test-page-item m-8 text-black z-50 relative w-32 h-32 flex items-center justify-center"></div>
+		<div
+			data-size="0.4,3"
+			data-offset="2,4"
+			data-brightness="0.5,1"
+			class="test-page-item m-8 text-black z-50 relative w-32 h-32 flex items-center justify-center">
+		</div>
 	</div>
 </Layout>
 
@@ -15,10 +20,7 @@ import Layout from "@/layouts/Default.astro"
 
 	const params = watchGiven(
 		{
-			light: 1,
-			// color: "#fff",
-			// size: 600,
-			// brightness: 1,
+			light: 10,
 		},
 		function updateElements(key: string, value: unknown) {
 			for (const element of document.querySelectorAll<HTMLElement>(".test-page-item")) {
@@ -32,7 +34,4 @@ import Layout from "@/layouts/Default.astro"
 		container: document.querySelector<HTMLElement>(".test-controls") ?? undefined,
 	})
 	pane.addBinding(params, "light", { min: 0, max: 100, step: 1 })
-	// pane.addBinding(params, "color")
-	// pane.addBinding(params, "size", { min: 0, max: 1000, step: 1 })
-	// pane.addBinding(params, "brightness", { min: 0, max: 2, step: 0.01 })
 </script>

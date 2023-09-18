@@ -19,8 +19,8 @@ const console = createConsola({ level: 5 }).withTag("LightEvents")
  *
  * - `data-light={>=0}` - number of lights to create at center of given element
  * - `data-colors={#123456}` - possible colors of light(s), comma separated list of color values (hexadecimal)
- * - `data-size={0,100}` - min/max size of light, unit-less but generally interpreted as percent of screen (0-100)
- * - `data-offset={100}` - max offset radius of light from center of element
+ * - `data-size={0-1,0-1}` - max size of light given, given as percentage of element size (width, height)
+ * - `data-offset={0-1,0-1}` - max offset of light from center of element, given as percentage of element dimensions (x, y)
  * - `data-brightness={0-2,0-2}` - min/max brightness of light: 0 is transparent, 1 utilizes given color, 2 is white
  */
 export class LightElements {
@@ -70,21 +70,28 @@ export class LightElements {
 		return this.all.length
 	}
 
-	utils = {
-		parseCommaDelimited<T = string>(str: string | undefined, mapFn: (str: string) => T = s => s as unknown as T) {
-			return typeof str === "string" ? str.split(",").map(mapFn) : str
+	#parse = {
+		dataset<T = string>(dataset: DOMStringMap, key: string, mapFn: (str: string) => T = s => s as unknown as T) {
+			return dataset[key] && typeof dataset[key] === "string" ? mapFn(dataset[key] as string) : undefined
+		},
+		csvData<T = string>(dataset: DOMStringMap, key: string, mapFn: (str: string) => T = s => s as unknown as T) {
+			return dataset[key] && typeof dataset[key] === "string"
+				? dataset[key]?.split(",").map(mapFn) ?? undefined
+				: undefined
 		},
 	}
 
 	#getElementProperties(element: HTMLElement) {
-		const count = element.dataset.light ? clamp(0, Infinity, parseInt(element.dataset.light)) : undefined
-		const colors = this.utils.parseCommaDelimited(element.dataset.color)
-		const possibleSize = element.dataset.size ? element.dataset.size.split(",").map(parseFloat) : undefined
-		const size = possibleSize?.length === 2 ? (possibleSize as [number, number]) : undefined
-		const offset = element.dataset.offset ? parseInt(element.dataset.offset) : undefined
-		const possibleBrightness = element.dataset.brightness
-			? element.dataset.brightness.split(",").map(b => clamp(0, 2, parseFloat(b)))
-			: undefined
+		const bounds = element.getBoundingClientRect()
+		const { dataset } = element
+		const count = this.#parse.dataset(dataset, "light", n => clamp(0, Infinity, parseInt(n)))
+		const colors = this.#parse.csvData(dataset, "color")
+		const sizeElem = [Math.min(bounds.width, bounds.height), Math.max(bounds.width, bounds.height)]
+		const sizeSuggest = this.#parse.csvData(dataset, "size", parseFloat) ?? [1, 1]
+		const size = [sizeElem[0] * sizeSuggest[0], sizeElem[1] * sizeSuggest[1]] as [number, number]
+		const offsetSuggest = this.#parse.csvData(dataset, "offset", parseFloat) ?? [1, 1]
+		const offset = [(bounds.width / 2) * offsetSuggest[0], (bounds.height / 2) * offsetSuggest[1]] as [number, number]
+		const possibleBrightness = this.#parse.csvData(dataset, "brightness", b => clamp(0, 2, parseFloat(b)))
 		const brightness = possibleBrightness?.length === 2 ? (possibleBrightness as [number, number]) : undefined
 		const options = { count, colors, size, offset, brightness }
 		for (const [key, val] of Object.entries(options)) {
@@ -93,21 +100,19 @@ export class LightElements {
 			}
 		}
 		console.debug("element options", options)
-		return options
+		return { options, bounds }
 	}
 
 	elementUpdates() {
 		console.debug("element was updated, running updates", this.#elements.size)
 		for (const element of this.#elements) {
-			const elementOptions = this.#getElementProperties(element)
-			const { count = 0 } = elementOptions
+			const { options, bounds } = this.#getElementProperties(element)
+			const { count = 0 } = options
 			const lights = this.#lights.get(element)
-			const { left, width, top, height } = element.getBoundingClientRect()
-			const center = [left + width / 2, top + height / 2] as [number, number]
 			const removeAllLights = !document.contains(element)
 			if (lights) {
-				lights.updateRanges(elementOptions)
-				const countChanged = lights.setLightCount(count, { center }, removeAllLights)
+				lights.updateRanges(options)
+				const countChanged = lights.setLightCount(count, bounds, removeAllLights)
 				this.#listNeedsUpdate = countChanged
 				if (removeAllLights) {
 					void lights.destroy()
@@ -116,7 +121,7 @@ export class LightElements {
 				}
 				continue
 			}
-			const newLightGroup = new LightGroup(elementOptions)
+			const newLightGroup = new LightGroup(options)
 			this.#lights.set(element, newLightGroup)
 			this.#listNeedsUpdate = true
 			console.debug("initializing new lights for element", newLightGroup.lights.length)

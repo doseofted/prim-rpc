@@ -9,24 +9,21 @@ type NumericalValueRange<T> = [min: T, max: T]
 interface LightGroupOptions {
 	colors: string[]
 	size: NumericalValueRange<number>
-	offset: number
+	offset: [xMax: number, yMax: number]
 	brightness: NumericalValueRange<number>
 	interval: NumericalValueRange<number>
 }
+
+// export type Coord = [x: number, y: number]
+// type Bounds = DOMRect & { center: Coord }
 
 /**
  * A light group contains multiple lights and is controlled by properties set on the group.
  * The other lights in the group are variations of the primary light and are used to
  * create a colorful glow effect.
  */
-export class LightGroup /* implements LightProperties */ {
+export class LightGroup {
 	ranges: LightGroupOptions
-
-	// brightness: number
-	// size: number
-	// color: string
-	// center: [x: number, y: number]
-	// offset: [x: number, y: number]
 
 	#lights: Light[] = []
 	get lights() {
@@ -54,18 +51,22 @@ export class LightGroup /* implements LightProperties */ {
 					const count = this.#lights.length
 					let index = 0
 					for (const light of this.#lights) {
-						const maxOffset = this.ranges.offset
+						const [xMax, yMax] = this.ranges.offset
+						const max = Math.max(xMax, yMax)
 						const angle = Math.random() * Math.PI * 2
 						// NOTE: since spring motion blends values with tight intervals, place offset at circle circumference,
 						// so that the offset jumps around more (but remains within offset bounds)
 						const offsetBase = [
-							(Math.cos(angle) * maxOffset) / 2, // this.utils.randomInt(0, maxOffset),
-							(Math.sin(angle) * maxOffset) / 2, // this.utils.randomInt(0, maxOffset),
+							(Math.cos(angle) * max) / 2, // this.utils.randomInt(0, max),
+							(Math.sin(angle) * max) / 2, // this.utils.randomInt(0, max),
 						]
-						const distance = Math.sqrt(offsetBase[0] ** 2 + offsetBase[1] ** 2)
+						// const distance = Math.sqrt(offsetBase[0] ** 2 + offsetBase[1] ** 2)
 						const easing = easeOut(transform(index, [0, count], [0.5, 1]))
 						const offset = offsetBase.map(o => o * easing) as [number, number]
-						// console.log("offset", easing, offsetBase[0], offset[0])
+						// const offsetBase = [xMax, yMax].map(max => this.utils.randomDouble(max * -1, max))
+						// const offset = offsetBase.map(max => transform(index, [0, count], [0, max])) as [number, number]
+						// NOTE: since spring motion blends values with tight intervals, place offset at circle circumference,
+						// so that the offset jumps around more (but remains within offset bounds)
 						light.offset = offset
 						// NOTE: since lights are additive, make lights closer to the center dimmer
 						const highestBrightness = this.ranges.brightness[1]
@@ -73,13 +74,11 @@ export class LightGroup /* implements LightProperties */ {
 						const brightness = transform(index, [0, count], [baseBrightness, highestBrightness])
 						// console.log(distance, brightness)
 						light.brightness = brightness
-						const minSize = this.ranges.size[0]
-						const baseSize = this.utils.randomInt(...this.ranges.size)
-						const size = transform(distance, [0, maxOffset], [baseSize, minSize])
+						const size = this.utils.randomInt(...this.ranges.size)
+						// const size = transform(distance, [0, maxOffset], [baseSize, minSize])
 						light.size = size
 						const randomColorChange = this.#intervalRunCount % transform(Math.random(), [0, 1], [10, 15])
 						if (!randomColorChange) {
-							// console.log("changing color", randomColorChange)
 							light.color = this.utils.randomArrayItem(this.ranges.colors)
 						}
 						index++
@@ -102,10 +101,10 @@ export class LightGroup /* implements LightProperties */ {
 	constructor(defaultRanges: Partial<LightGroupOptions>) {
 		this.ranges = defu<LightGroupOptions, LightGroupOptions[]>(defaultRanges, {
 			colors: ["#f0A3FF", "#f0A3FF", "#f0A3FF", "#6D53FF", "#1D0049", "#0069BA", "#5BB8FF", "#4AEDFF"],
-			brightness: [0.5, 1.5],
-			size: [25, 50],
-			offset: 200,
-			interval: [1000, 1500],
+			brightness: [0.9, 1.5],
+			size: [100, 300],
+			offset: [200, 200],
+			interval: [800, 2300],
 		})
 		this.setInterval()
 	}
@@ -114,13 +113,21 @@ export class LightGroup /* implements LightProperties */ {
 		Object.assign(this.ranges, ranges)
 	}
 
-	setLightCount(count: number, options: Pick<LightProperties, "center">, removalAll = false) {
+	#dimensions: DOMRect | undefined
+	get center(): [number, number] {
+		const { left = 0, width = 0, top = 0, height = 0 } = this.#dimensions ?? {}
+		return [left + width / 2, top + height / 2]
+	}
+
+	setLightCount(count: number, dimensions: DOMRect, removalAll = false) {
 		// NOTE: removalAll and count === 0 are not the same condition (even though they feel similar)
 		const previousListLength = this.#lights.length
 		const activeLights = this.#lights.filter(({ beingDestroyed }) => !beingDestroyed)
 		const newCount = count - activeLights.length
+		this.#dimensions = dimensions
+		const center = this.center
 		if (count > activeLights.length) {
-			const newLights = Array.from(Array(newCount)).map(() => new Light(this.#generateOptions(options)))
+			const newLights = Array.from(Array(newCount)).map(() => new Light(this.#generateOptions({ center })))
 			this.#lights.push(...newLights)
 			console.debug("adding lights", newCount, newLights)
 		} else if (count < activeLights.length) {
@@ -145,7 +152,7 @@ export class LightGroup /* implements LightProperties */ {
 			this.#lights.splice(removeIndex, 1)
 		}
 		for (const light of this.#lights) {
-			if (!removalAll) light.center = options.center
+			if (!removalAll) light.center = center
 		}
 		const listLengthChanged = previousListLength !== this.#lights.length
 		return listLengthChanged
