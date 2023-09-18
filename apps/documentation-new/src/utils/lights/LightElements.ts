@@ -100,7 +100,7 @@ export class LightElements {
 				delete options[key as keyof typeof options]
 			}
 		}
-		console.debug("element options", /* element, */ options)
+		console.debug(element, "options", options)
 		return { options, bounds }
 	}
 
@@ -110,17 +110,24 @@ export class LightElements {
 			const { options, bounds } = this.#getElementProperties(element)
 			const { count = 0 } = options
 			const lights = this.#lights.get(element)
+			console.debug("element lights:", lights)
 			const removeAllLights = !document.contains(element)
 			if (lights) {
 				lights.updateRanges(options)
-				const countChanged = lights.setLightCount(count, bounds, removeAllLights)
-				this.#listNeedsUpdate = countChanged
+				/* const countChanged = */ lights.setLightCount(count, bounds, removeAllLights)
+				this.#listNeedsUpdate = !removeAllLights
 				// console.log({ countChanged, list: this.#listCached })
 				if (removeAllLights) {
 					void lights.destroy()
-					this.#lights.delete(element)
+					// this.#lights.delete(element)
 					this.#elements.delete(element)
 				}
+				// const removeGroup = lights.lights
+				// 	.map(({ state }) => state === LightState.Destroyed)
+				// 	.reduce((a, b) => a && b, true)
+				// if (removeGroup) {
+				// 	this.#lights.delete(element)
+				// }
 				continue
 			}
 			const newLightGroup = new LightGroup(options)

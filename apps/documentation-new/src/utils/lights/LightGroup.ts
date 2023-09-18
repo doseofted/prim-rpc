@@ -42,10 +42,11 @@ export class LightGroup {
 
 	#interval: number | undefined
 	#intervalRunCount = 0
+	#firstRun = true
 	setInterval() {
 		clearInterval(this.#interval)
 		const base = this.ranges.interval[0]
-		this.#interval = window.setInterval(() => {
+		const animate = () => {
 			window.setTimeout(
 				() => {
 					const count = this.#lights.length
@@ -86,9 +87,12 @@ export class LightGroup {
 					// console.debug("---")
 					this.#intervalRunCount += 1
 				},
-				this.utils.randomInt(...this.ranges.interval) - base
+				!this.#firstRun ? this.utils.randomInt(...this.ranges.interval) - base : 0
 			)
-		}, base)
+			if (this.#firstRun) this.#firstRun = false
+		}
+		this.#interval = window.setInterval(animate, base)
+		animate()
 	}
 
 	destroy() {
@@ -126,8 +130,12 @@ export class LightGroup {
 		const newCount = count - activeLights.length
 		this.#dimensions = dimensions
 		const center = this.center
+		console.debug("setting light count", { count, newCount, activeLights, center })
 		if (count > activeLights.length) {
-			const newLights = Array.from(Array(newCount)).map(() => new Light(this.#generateOptions({ center })))
+			const newLights = Array.from(Array(newCount)).map(() => {
+				const generatedOptions = this.#generateOptions({ center })
+				return new Light(generatedOptions)
+			})
 			this.#lights.push(...newLights)
 			console.debug("adding lights", newCount, newLights)
 		} else if (count < activeLights.length) {
@@ -154,6 +162,7 @@ export class LightGroup {
 		for (const light of this.#lights) {
 			if (!removalAll) light.center = center
 		}
+		console.debug("lights change", previousListLength, this.#lights.length)
 		const listLengthChanged = previousListLength !== this.#lights.length
 		return listLengthChanged
 	}

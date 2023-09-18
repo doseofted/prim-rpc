@@ -2,24 +2,48 @@ import { CanvasSpace, Circle, Pt } from "pts"
 import { lighten, transparentize } from "color2k"
 import { easeIn, easeOut, clamp } from "framer-motion/dom"
 import type { LightElements } from "./LightElements"
-// import { createConsola } from "consola"
 
-// const console = createConsola({ level: 5 }).withTag("LightCanvas")
+const debug = false
+
+/**
+ * Given an HTML `<div />` element create structure needed to display lights properly.
+ *
+ * Given an HTML `<canvas />` element, return it as-is, assume pre-configured.
+ */
+function createDomStucture(parent: HTMLElement | string, debug = false) {
+	const possibleParent = typeof parent === "string" ? document.querySelector(parent) : parent
+	if (possibleParent instanceof HTMLCanvasElement) {
+		return possibleParent
+	}
+	const canvas = document.createElement("canvas")
+	canvas.style.position = "absolute"
+	canvas.style.inset = "0"
+	canvas.style.width = "100%"
+	canvas.style.height = "100%"
+	const blurLayer = document.createElement("div")
+	blurLayer.style.position = "absolute"
+	blurLayer.style.inset = "0"
+	blurLayer.style.width = "100%"
+	blurLayer.style.height = "100%"
+	blurLayer.style.backgroundColor = "transparent"
+	if (!debug) blurLayer.style.backdropFilter = "blur(16px) saturate(1.5)"
+	if (possibleParent instanceof HTMLElement) {
+		parent = possibleParent
+		parent.appendChild(canvas)
+		parent.appendChild(blurLayer)
+	}
+	return canvas
+}
 
 /**
  * Place Lights on a canvas.
  *
  * **Note:** the canvas should be fixed to and fill the entire viewport.
  */
-export function createLightCanvas(lights: LightElements, canvas: HTMLCanvasElement | string) {
-	const possibleCanvas = typeof canvas === "string" ? document.querySelector(canvas) : canvas
-	if (possibleCanvas instanceof HTMLCanvasElement) {
-		canvas = possibleCanvas
-	}
-
+export function createLightCanvas(lights: LightElements, parent: HTMLElement | string) {
+	const canvas = createDomStucture(parent, debug)
 	const space = new CanvasSpace(canvas).setup({ resize: true, retina: false })
 	const form = space.getForm()
-	const debug = false
 
 	space.add(() => {
 		form.composite("screen")

@@ -180,7 +180,7 @@ export class Light implements LightProperties {
 		this.#color = motionValue(this.targets.color)
 		// brightness will be animated to target value on state change
 		this.#brightness = motionValue(0)
-		this.brightness = this.targets.brightness
+		// this.brightness = this.targets.brightness
 		this.#state = LightState.Inactive
 		if (activate) {
 			this.changeState(LightState.Activating)

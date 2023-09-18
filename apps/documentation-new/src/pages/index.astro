@@ -23,7 +23,7 @@ const snippets = [serverCodeSnippet, clientCodeSnippet].map(snippet => snippet.t
 	<!-- Fancy home introduction -->
 	<div
 		class="min-h-[calc(100svh-6.5rem)] grid grid-cols-6 lg:grid-cols-12 grid-rows-[1fr_auto]"
-		data-light="5"
+		data-light="3"
 		data-offset="1.5,1.5"
 		data-brightness="0.1,0.3">
 		<div class="col-span-6 lg:col-span-12 flex flex-col gap-8 items-center justify-center">
@@ -34,15 +34,17 @@ const snippets = [serverCodeSnippet, clientCodeSnippet].map(snippet => snippet.t
 							index === 0 ? "md:translate-x-16 lg:translate-x-32" : "md:-translate-x-16 lg:-translate-x-32",
 						]}>
 						<div
-							data-light="10"
+							class="homepage-snippets-lights"
+							data-light="0"
 							data-size="0.4,1"
 							data-offset="1.5,3"
-							data-brightness="0.5,1"
-							class="homepage-snippets opacity-0">
-							<div class="mockup-code text-sm bg-white/70 border border-white/70 pb-4 w-full max-w-lg">
-								<div class="px-4">
-									<div class="rounded-lg overflow-hidden bg-prim-space code-without-bg">
-										<Code code={snippet} lang="typescript" theme="material-theme-palenight" />
+							data-brightness="0.5,1">
+							<div class="homepage-snippets opacity-0">
+								<div class="mockup-code text-sm bg-white/70 border border-white/70 pb-4 w-full max-w-lg">
+									<div class="px-4">
+										<div class="rounded-lg overflow-hidden bg-prim-space code-without-bg">
+											<Code code={snippet} lang="typescript" theme="material-theme-palenight" />
+										</div>
 									</div>
 								</div>
 							</div>
@@ -78,21 +80,25 @@ const snippets = [serverCodeSnippet, clientCodeSnippet].map(snippet => snippet.t
 
 	const startDefault = 1.8
 	function introAnimation(start = startDefault) {
+		const pageLogo = document.querySelector<HTMLElement>(".prim-logo-container")
 		const codeSnippets = document.querySelectorAll<HTMLElement>(".homepage-snippets")
+		const codeSnippetsLights = document.querySelectorAll<HTMLElement>(".homepage-snippets-lights")
 		const navigationElem = document.querySelectorAll<HTMLElement>(".prim-navigation")
 		const slideIn = {
 			y: ["3rem", "0rem"],
 			opacity: [0, 1],
 		}
-		// setTimeout(() => {
-		// 	console.log("setting lights")
-		// 	for (const snippet of codeSnippets) {
-		// 		snippet.setAttribute("data-light", "10")
-		// 	}
-		// }, start * 1000)
+		setTimeout(() => {
+			console.log("setting lights")
+			for (const snippet of codeSnippetsLights) {
+				snippet.setAttribute("data-light", "7")
+			}
+		}, start * 1000)
 		animate(codeSnippets, slideIn, { delay: stagger(0.2, { start, from: "last" }), duration: 0.9 })
 		// navigation only needs to be animated on first load
 		if (start === startDefault) {
+			pageLogo?.setAttribute("data-light", "0") // set to 0 initially until animated in
+			setTimeout(() => pageLogo?.setAttribute("data-light", "7"), (start + 0.8) * 1000)
 			animate(navigationElem, slideIn, { delay: start + 0.4, duration: 0.9 })
 		} else {
 			document.body.classList.remove("homepage-intro")
