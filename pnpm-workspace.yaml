@@ -1,5 +1,5 @@
 packages:
   - "libs/**"
   - "apps/**"
-  - "!apps/documentation/.next/types/**"
-  - "!apps/documentation-new/.vercel/**"
+  - "!apps/documentation-old/.next/types/**"
+  - "!apps/documentation/.vercel/**"
