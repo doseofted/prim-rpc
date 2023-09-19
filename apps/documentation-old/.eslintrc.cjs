@@ -1,8 +1,6 @@
 // @ts-check
 /** @type {import("eslint").ESLint.ConfigData} */
-const config = {
+module.exports = {
 	root: false,
-	overrides: [],
+	extends: ["next/core-web-vitals"],
 }
-
-module.exports = config

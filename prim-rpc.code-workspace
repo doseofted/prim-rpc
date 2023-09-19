@@ -17,12 +17,12 @@
 			"path": "./libs/tooling"
 		},
 		{
-			"name": "🌐 Old Documentation",
+			"name": "🌐 Documentation",
 			"path": "./apps/documentation"
 		},
 		{
-			"name": "🌐 New Documentation",
-			"path": "./apps/documentation-new"
+			"name": "🌐 Old Documentation",
+			"path": "./apps/documentation-old"
 		},
 		{
 			"name": "📗 Example Server",

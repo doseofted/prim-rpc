@@ -1,18 +1,15 @@
+// eslint-disable-next-line @typescript-eslint/no-var-requires
 const { fontFamily } = require("tailwindcss/defaultTheme")
 
 /** @type {import('tailwindcss').Config} */
 module.exports = {
-	content: [
-		"./src/pages/**/*.{js,ts,jsx,tsx,mdx}",
-		"./src/components/**/*.{js,ts,jsx,tsx,mdx}",
-		"./src/app/**/*.{js,ts,jsx,tsx,mdx}",
-	],
+	content: ["./src/**/*.{astro,html,js,jsx,md,mdx,svelte,ts,tsx,vue}"],
 	theme: {
 		extend: {
 			fontFamily: {
-				sans: ["var(--font-jakarta)", ...fontFamily.sans],
-				title: ["var(--font-montserrat)", ...fontFamily.sans],
-				mono: ["var(--font-fira)", ...fontFamily.mono],
+				sans: ["'Plus Jakarta Sans Variable'", ...fontFamily.sans],
+				title: ["Montserrat Variable", ...fontFamily.sans],
+				mono: ["'Fira Code Variable'", ...fontFamily.mono],
 			},
 			colors: {
 				prim: {
@@ -42,10 +39,5 @@ module.exports = {
 			},
 		],
 	},
-	plugins: [
-		require("daisyui"),
-		require("@tailwindcss/typography"),
-		require("@tailwindcss/aspect-ratio"),
-		require("@tailwindcss/forms"),
-	],
+	plugins: [require("daisyui"), require("@tailwindcss/typography")],
 }
