@@ -1,5 +1,6 @@
 ---
 import { Code } from "astro/components"
+import { Icon } from "astro-icon"
 import Layout from "@/layouts/Default.astro"
 import { HomepageIntro } from "@/components/IntroText.react"
 import { client } from "@/client"
@@ -17,6 +18,69 @@ const hello = await sayHello("Backend", "Frontend")
 console.log(hello)
 `
 const snippets = [serverCodeSnippet, clientCodeSnippet].map(snippet => snippet.trim())
+
+const features = [
+	{
+		title: "It's Just JavaScript",
+		details: "If you know JavaScript basics, you know how to use Prim+RPC.",
+	},
+	{
+		title: "No Type Guessing",
+		details: "Get full type definitions in your client using TypeScript or JSDoc.",
+	},
+	{
+		title: "Zero Client Generation",
+		details: "Calls are generated at runtime, skip the build step, if you want.",
+	},
+	{
+		title: "Bring Your Own Server",
+		details: "It's framework agnostic and includes lots of popular integrations.",
+	},
+	{
+		title: "Choose Your Client",
+		details: "Don't like the default method of sending requests? You can swap it out.",
+	},
+	{
+		title: "It's Transport-Agnostic",
+		details: "Bridge client/server, web workers, proceses and more. It's not just HTTP.",
+	},
+	{
+		title: "Handle Files",
+		details: "Files and Blobs are fully supported without all of the extra work.",
+	},
+	{
+		title: "Use Your Callbacks",
+		details: "Use callbacks between server and client: great for real-time events.",
+	},
+	{
+		title: "Advanced Types Supported",
+		details: "Use a custom JSON handler to support Dates, RegExps, Errors, and more.",
+	},
+	{
+		title: "Throw Errors",
+		details: "No error code mapping needed. Error on the server is an error on the client.",
+	},
+	{
+		title: "HTML Forms Supported",
+		details: "You don't even need to process forms. Supports all fields, including files.",
+	},
+	{
+		title: "Build a Public API",
+		details: "Build an API for usage inside your project and outside.",
+	},
+	{
+		title: "Batch RPCs",
+		details: "Multiple function calls are batched into single requests easily.",
+	},
+	{
+		title: "Share Only What's Allowed",
+		details: "Only the functions you explicitly export and mark as RPC are callable.",
+	},
+	{
+		title: "Generate Documentation",
+		details: "Build documentation of your functions directly from your existing TypeDoc.",
+	},
+]
 ---
 
 <Layout className="homepage-intro">
@@ -57,12 +121,15 @@ const snippets = [serverCodeSnippet, clientCodeSnippet].map(snippet => snippet.t
 			<p
 				class="font-title text-[2.3rem] sm:text-[3rem] lg:text-[5.5rem] font-semibold text-white uppercase text-right leading-none overflow-hidden">
 				<HomepageIntro client:load text={greeting.split("\n")} />
+				<div id="scroll-down-parent" class="opacity-0 flex justify-end">
+					<Icon id="scroll-down-indicator" className="w-6 h-6 text-white" name="carbon:chevron-down" />
+				</div>
 			</p>
 		</div>
 	</div>
 	<!-- Below the fold -->
-	<div class="grid grid-cols-6 lg:grid-cols-12 py-8">
-		<div class="col-span-12 lg:col-span-6 text-white space-y-4">
+	<div class="grid grid-cols-6 lg:grid-cols-12 gap-4 py-8">
+		<div class="col-span-12 lg:col-span-5 text-white space-y-4">
 			<p class="font-title text-xl sm:text-2xl lg:text-4xl font-semibold uppercase leading-none">
 				RPC for the Rest&nbsp;of&nbsp;Us.
 			</p>
@@ -72,6 +139,20 @@ const snippets = [serverCodeSnippet, clientCodeSnippet].map(snippet => snippet.t
 			</p>
 		</div>
 	</div>
+	<div class="grid grid-cols-6 lg:grid-cols-12 gap-4 py-8">
+		{
+			features.map(({ title, details }) => (
+				<div
+					data-light="1"
+					data-size="1,2"
+					data-brightness="0.5,0.7"
+					class="relative bg-white/70 rounded-lg border border-white/60 py-6 px-8 col-span-12 md:col-span-3 text-prim-space space-y-4">
+					<p class="font-bold">{title}</p>
+					<p class="text-sm lg:text-base">{details}</p>
+				</div>
+			))
+		}
+	</div>
 </Layout>
 
 <script>
@@ -80,25 +161,30 @@ const snippets = [serverCodeSnippet, clientCodeSnippet].map(snippet => snippet.t
 
 	const startDefault = 1.8
 	function introAnimation(start = startDefault) {
-		const pageLogo = document.querySelector<HTMLElement>(".prim-logo-container")
-		const codeSnippets = document.querySelectorAll<HTMLElement>(".homepage-snippets")
-		const codeSnippetsLights = document.querySelectorAll<HTMLElement>(".homepage-snippets-lights")
-		const navigationElem = document.querySelectorAll<HTMLElement>(".prim-navigation")
+		const scrollIndicatorParent = document.getElementById("scroll-down-parent") as HTMLElement
+		animate(scrollIndicatorParent, { opacity: [0, 1] }, { duration: 1, delay: start === startDefault ? 2.5 : 0 })
+		const scrollIndicator = document.getElementById("scroll-down-indicator") as HTMLElement
+		animate(scrollIndicator, { y: [0, 10, 0] }, { duration: 1.5, repeat: Infinity, easing: ["ease-out", "ease-in"] })
+
 		const slideIn = {
 			y: ["3rem", "0rem"],
 			opacity: [0, 1],
 		}
+		const codeSnippetsLights = document.querySelectorAll<HTMLElement>(".homepage-snippets-lights")
 		setTimeout(() => {
 			console.log("setting lights")
 			for (const snippet of codeSnippetsLights) {
 				snippet.setAttribute("data-light", "7")
 			}
 		}, start * 1000)
+		const codeSnippets = document.querySelectorAll<HTMLElement>(".homepage-snippets")
 		animate(codeSnippets, slideIn, { delay: stagger(0.2, { start, from: "last" }), duration: 0.9 })
 		// navigation only needs to be animated on first load
+		const pageLogo = document.querySelector<HTMLElement>(".prim-logo-container")
+		const navigationElem = document.querySelectorAll<HTMLElement>(".prim-navigation")
 		if (start === startDefault) {
 			pageLogo?.setAttribute("data-light", "0") // set to 0 initially until animated in
-			setTimeout(() => pageLogo?.setAttribute("data-light", "7"), (start + 0.8) * 1000)
+			setTimeout(() => pageLogo?.setAttribute("data-light", "7"), (start + 0.6) * 1000)
 			animate(navigationElem, slideIn, { delay: start + 0.4, duration: 0.9 })
 		} else {
 			document.body.classList.remove("homepage-intro")
