@@ -25,7 +25,7 @@ const clientCodeSnippet = stripIndent`
 	console.log(hello)
 `
 
-const snippetsFolder = path.join(path.parse(new URL(import.meta.url).pathname).dir, "../snippets")
+const snippetsFolder = path.join(process.cwd(), "src/snippets")
 const snippets = [serverCodeSnippet, clientCodeSnippet].map(snippet => snippet.trim())
 
 async function getExample(folder: string, filepath: string) {
