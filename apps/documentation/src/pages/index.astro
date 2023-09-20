@@ -25,46 +25,47 @@ const clientCodeSnippet = stripIndent`
 	console.log(hello)
 `
 
-const snippetsFolder = path.join(path.parse(new URL(import.meta.url).pathname).dir, "../snippets/features")
+const snippetsFolder = path.join(path.parse(new URL(import.meta.url).pathname).dir, "../snippets")
 const snippets = [serverCodeSnippet, clientCodeSnippet].map(snippet => snippet.trim())
 
-async function getExample(folder: string, filepath: string, layout = "col-span-1 row-span-1") {
+async function getExample(folder: string, filepath: string) {
 	const file = await readFile(path.join(snippetsFolder, folder, filepath), "utf-8")
-	return { file, filepath, layout }
+	return { file, filepath }
 }
+
+const steps = [
+	{
+		step: "Write your function",
+		details: "No magic involved: they're just plain JavaScript functions.",
+		code: await getExample("homepage", "server/module.ts"),
+	},
+	{
+		step: "Create the server",
+		details: "We'll use Bun here but pick your favorite.",
+		code: await getExample("homepage", "server/index.ts"),
+	},
+	{
+		step: "Create the client",
+		details: "We'll use the Fetch API but you can choose your own.",
+		code: await getExample("homepage", "client/prim.ts"),
+	},
+	{
+		step: "Call your function",
+		details: "Call server function from the client.",
+		code: await getExample("homepage", "client/index.ts"),
+	},
+]
 
 const features = [
 	{
 		title: "It's Just JavaScript",
 		icon: "ph:file-js-bold",
 		details: "If you know JavaScript basics, you know how to use Prim+RPC.",
-		examples: await Promise.all([
-			getExample("just-js", "server/module.ts"),
-			getExample("just-js", "server/index.ts"),
-			getExample("just-js", "client/index.ts"),
-			getExample("just-js", "client/client.ts"),
-		]),
-		serverName: "server/index.ts",
-		server: await readFile(path.join(snippetsFolder, "just-js/server/index.ts"), "utf-8"),
-		clientName: "client/index.ts",
-		client: await readFile(path.join(snippetsFolder, "just-js/client/index.ts"), "utf-8"),
 	},
 	{
 		title: "No Type Guessing",
 		icon: "ph:circle-wavy-question-bold",
 		details: "Get full type definitions in your client using TypeScript or JSDoc.",
-		server: stripIndent`
-			export function add (x: number, y: number) {
-				return x + y
-			}
-			add.rpc = true
-		`,
-		client: stripIndent`
-			const sum = await add(1, 2)
-			console.log(sum)
-
-			// 3
-		`,
 	},
 	{
 		title: "Zero Client Generation",
@@ -201,11 +202,49 @@ const features = [
 				.map((feature, index) => ({ feature, index }))
 				.slice(0, 6)
 				.map(({ feature, index }) => (
-					<button class="text-left col-span-6 lg:col-span-4 xl:col-span-3" onclick={`featureModal${index}.showModal()`}>
+					<div class="text-left col-span-6 lg:col-span-4 xl:col-span-3 h-full">
 						<FeatureCard {...feature} />
-					</button>
+					</div>
 				))
 		}
+	</div>
+
+	<div class="grid grid-cols-12 gap-4 py-8">
+		<div
+			class="col-span-8 xl:col-span-6 max-w-xl xl:max-w-2xl text-white space-y-4 flex flex-col items-center justify-center">
+			<p class="font-title text-xl sm:text-2xl lg:text-4xl font-semibold uppercase leading-none w-full">
+				It Works With That.
+			</p>
+			<p class="text-sm lg:text-base w-full">
+				Prim+RPC is designed to work with your existing tools. It's sole focus is to create and respond to RPC, not to
+				dicate what tools that you use to send it.
+			</p>
+		</div>
+		<div
+			class="col-span-12 grid grid-cols-1 lg:grid-cols-2 gap-4 bg-white/70 rounded-xl border border-white/60 p-4 text-prim-space">
+			{
+				steps.map(({ step, details, code }, index) => (
+					<div class="h-full flex flex-col space-y-4">
+						<div class="flex items-start gap-2">
+							<div class="avatar placeholder -top-0.5">
+								<div class="bg-prim-space text-white rounded-full w-8">
+									<span class="text-sm font-bold">{index + 1}</span>
+								</div>
+							</div>
+							<div>
+								<p class="font-bold text-base md:text-lg">
+									<span>{step}</span>
+								</p>
+								<p class="text-sm lg:text-base">{details}</p>
+							</div>
+						</div>
+						<CodeFile filename={code.filepath} overrideClass="flex-grow">
+							<Code {...codeTheme} code={code.file} />
+						</CodeFile>
+					</div>
+				))
+			}
+		</div>
 	</div>
 
 	<!-- Show even more features -->
@@ -225,51 +264,20 @@ const features = [
 				.map((feature, index) => ({ feature, index }))
 				.slice(6)
 				.map(({ feature, index }) => (
-					<button class="text-left col-span-6 lg:col-span-4 xl:col-span-3" onclick={`featureModal${index}.showModal()`}>
+					<div class="text-left col-span-6 lg:col-span-4 xl:col-span-3">
 						<FeatureCard {...feature} />
-					</button>
+					</div>
 				))
 		}
 	</div>
 
-	<!-- Feature expansions -->
-	{
-		features.map((feature, index) => (
-			<dialog id={`featureModal${index}`} class="modal bg-black/50 duration-500">
-				<div class="modal-box max-w-screen-lg bg-white/80 backdrop-blur-sm">
-					<form method="dialog">
-						<button class="btn btn-sm btn-circle btn-ghost absolute right-2 top-2">
-							<Icon name="ph:x-bold" class="w-4 h-4 inline-block" />
-						</button>
-					</form>
-					<div class="space-y-4">
-						<p class="font-title text-xl sm:text-2xl lg:text-4xl font-semibold leading-none w-full">{feature.title}</p>
-						<p class="text-sm lg:text-base w-full">{feature.details}</p>
-						<div class="grid grid-flow-col grid-cols-2 grid-rows-2 gap-4">
-							{feature.examples?.map(example => (
-								<div class:list={example.layout}>
-									<CodeFile filename={example.filepath} overrideClass="h-full">
-										<Code {...codeTheme} code={example.file} />
-									</CodeFile>
-								</div>
-							))}
-						</div>
-					</div>
-				</div>
-				<form method="dialog" class="modal-backdrop">
-					<button>Close</button>
-				</form>
-			</dialog>
-		))
-	}
-
-	<div class="grid grid-cols-12 gap-4 py-8">
-		<div class="col-span-12 text-white space-y-4 text-center">
+	<div class="grid grid-cols-12 gap-4 py-8 mb-20">
+		<div class="col-span-8 text-white space-y-4">
 			<p class="font-title text-xl sm:text-2xl lg:text-4xl font-semibold uppercase leading-none">
 				It&apos;s Available Now. Right Now.
 			</p>
 			<p class="text-sm lg:text-base w-full pb-2">Easy to setup, lots of features, and open source. Try it out!</p>
-			<div class="flex flex-wrap lg:flex-nowrap justify-center mx-auto gap-4">
+			<div class="flex flex-wrap lg:flex-nowrap justify-start gap-4">
 				<a href="/docs" class="btn glass hover:bg-neutral text-white">
 					<Icon class="w-6 h-6" name="ph:notebook-fill" />
 					 Get Started
@@ -289,7 +297,46 @@ const features = [
 				</a>
 			</div>
 		</div>
+		<div class="col-span-4 flex flex-col items-end justify-end text-white space-y-4">
+			<a href="https://doseofted.me/" target="_blank">
+				<img src="/prim-doseofted-attribution.png" width={361} height={150} alt="Dose of Ted" class="w-52 -mr-8" />
+			</a>
+			<div class="text-right">
+				<p class="text-white/80 text-xs drop-shadow-lg max-w-md leading-6">
+					<strong>
+						<a class="link" href="/"> Prim+RPC</a>
+					</strong>: a project by
+					<a class="link" href="https://doseofted.me/" target="_blank"> Ted Klingenberg</a>
+					<p class="text-white/80 text-xs drop-shadow-lg mb-4 max-w-md leading-6">
+						Anonymous analytics collected with
+						<a class="link" href="https://github.com/electerious/Ackee#readme" target="_blank"> Ackee</a>
+					</p>
+				</p>
+			</div>
+		</div>
 	</div>
+
+	<!-- Feature expansions -->
+	<!-- {
+		features.map((feature, index) => (
+			<dialog id={`featureModal${index}`} class="modal bg-black/50 duration-500">
+				<div class="modal-box max-w-screen-lg bg-white/80 backdrop-blur-sm">
+					<form method="dialog">
+						<button class="btn btn-sm btn-circle btn-ghost absolute right-2 top-2">
+							<Icon name="ph:x-bold" class="w-4 h-4 inline-block" />
+						</button>
+					</form>
+					<div class="space-y-4">
+						<p class="font-title text-xl sm:text-2xl lg:text-4xl font-semibold leading-none w-full">{feature.title}</p>
+						<p class="text-sm lg:text-base w-full">{feature.details}</p>
+					</div>
+				</div>
+				<form method="dialog" class="modal-backdrop">
+					<button>Close</button>
+				</form>
+			</dialog>
+		))
+	} -->
 </Layout>
 
 <script>
