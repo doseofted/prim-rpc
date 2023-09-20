@@ -6,6 +6,14 @@ import mdx from "@astrojs/mdx"
 import remarkToc from "remark-toc"
 import sitemap from "@astrojs/sitemap"
 import vercel from "@astrojs/vercel/serverless"
+import rehypePrettyCode from "rehype-pretty-code"
+
+/** @type {import('rehype-pretty-code').Options} */
+const rehypePrettyOptions = {
+	theme: "material-theme-palenight",
+	defaultLang: "typescript",
+	keepBackground: false,
+}
 
 // https://astro.build/config
 export default defineConfig({
@@ -18,8 +26,9 @@ export default defineConfig({
 			langs: ["typescript", "javascript", "jsx", "tsx", "shellscript"],
 			wrap: false,
 		},
-		syntaxHighlight: "shiki",
 		remarkPlugins: [remarkToc],
+		syntaxHighlight: false, // "shiki",
+		rehypePlugins: [[rehypePrettyCode, rehypePrettyOptions]],
 	},
 	integrations: [
 		tailwind(),

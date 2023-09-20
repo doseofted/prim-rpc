@@ -28,13 +28,13 @@ export class LightElements {
 
 	scrollEvent() {
 		console.debug("scroll update happened")
-		this.#elements.applyUpdates()
+		this.elementUpdates("scroll")
 	}
 	#scrollListener: typeof this.scrollEvent
 
 	resizeEvent() {
 		console.debug("resize update happened")
-		this.#elements.applyUpdates()
+		this.elementUpdates("resize")
 	}
 	#resizeListener: typeof this.resizeEvent
 
@@ -104,7 +104,7 @@ export class LightElements {
 		return { options, bounds }
 	}
 
-	elementUpdates() {
+	elementUpdates(updateType: "scroll" | "resize" | "mutation" | "unknown" = "unknown") {
 		console.debug("element was updated, running updates", this.#elements.size)
 		for (const element of this.#elements) {
 			const { options, bounds } = this.#getElementProperties(element)
@@ -114,8 +114,10 @@ export class LightElements {
 			const removeAllLights = !document.contains(element)
 			if (lights) {
 				lights.updateRanges(options)
-				/* const countChanged = */ lights.setLightCount(count, bounds, removeAllLights)
-				this.#listNeedsUpdate = !removeAllLights
+				// eslint-disable-next-line @typescript-eslint/no-unused-vars
+				const countChanged = lights.setLightCount(count, bounds, removeAllLights)
+				const externalEvent = updateType === "resize" || updateType === "scroll"
+				this.#listNeedsUpdate = !externalEvent && !removeAllLights
 				// console.log({ countChanged, list: this.#listCached })
 				if (removeAllLights) {
 					void lights.destroy()
@@ -139,7 +141,7 @@ export class LightElements {
 	#elementUpdatesListener: typeof this.elementUpdates
 
 	constructor() {
-		this.#elementUpdatesListener = this.elementUpdates.bind(this)
+		this.#elementUpdatesListener = () => this.elementUpdates("mutation")
 		this.#elements.onUpdates(this.#elementUpdatesListener)
 		this.#scrollListener = this.scrollEvent.bind(this)
 		document.addEventListener("scroll", this.#scrollListener)
@@ -151,7 +153,7 @@ export class LightElements {
 			for (const lightElem of lightElements) {
 				this.#elements.add(lightElem as HTMLElement)
 			}
-			this.elementUpdates()
+			this.elementUpdates("mutation")
 			return lightElements.length
 		}
 

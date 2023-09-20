@@ -3,16 +3,26 @@ layout: "@/layouts/Default.astro"
 test: Ted
 ---
 
-<div class="bg-white/50">
+<div class="bg-white mt-16 p-8 space-y-4">
 
 # Docs
 
 import TestMdx from "@/components/Test.mdx"
+import CodeFile from "@/components/Code/CodeFile.astro"
 
 This is a test. Hi {frontmatter.test}.
 
+<CodeFile filename="src/test.ts">
+
 ```typescript
 let ted = "someone"
+```
+
+</CodeFile>
+
+```typescript {1,2} showLineNumbers
+let a = 5
+let b = 4
 ```
 
 <TestMdx />

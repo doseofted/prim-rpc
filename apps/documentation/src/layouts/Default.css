@@ -1,0 +1,26 @@
+/* Override DaisyUI code wrapper/window component to match website colors */
+.mockup-code {
+	&::before {
+		box-shadow:
+			1.4em 0 0 theme("colors.prim.space"),
+			2.8em 0 0 theme("colors.prim.space"),
+			4.2em 0 0 theme("colors.prim.space") !important;
+	}
+
+	pre::before {
+		content: none !important;
+	}
+}
+
+[data-rehype-pretty-code-fragment] code,
+.site-code-style pre {
+	font-size: 0.8rem;
+	background-color: transparent !important;
+	padding: theme("padding.3") theme("padding.5");
+	background-color: theme("colors.prim.space") !important;
+	border-radius: theme("borderRadius.xl");
+}
+
+[data-rehype-pretty-code-fragment] pre {
+	padding: 0; /* Assign padding to code element instead */
+}

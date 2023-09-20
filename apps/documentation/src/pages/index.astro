@@ -1,84 +1,140 @@
 ---
+import { stripIndent } from "common-tags"
 import { Code } from "astro/components"
 import { Icon } from "astro-icon"
 import Layout from "@/layouts/Default.astro"
 import { HomepageIntro } from "@/components/IntroText.react"
 import { client } from "@/client"
+import FeatureCard from "@/components/FeatureCard.astro"
+import CodeFile from "@/components/Code/CodeFile.astro"
+import { readFile } from "node:fs/promises"
+import path from "node:path"
 
 const greeting = await client.greetings()
 
-const serverCodeSnippet = `
-// define on server:
-export const sayHello = (x, y) => \`\${x}, meet \${y}.\`
-sayHello.rpc = true
+const codeTheme = { lang: "typescript", theme: "material-theme-palenight" } as const
+
+const serverCodeSnippet = stripIndent`
+	// define on server:
+	export const sayHello = (x, y) => \`\${x}, meet \${y}.\`
+	sayHello.rpc = true
 `
-const clientCodeSnippet = `
-// call on client:
-const hello = await sayHello("Backend", "Frontend")
-console.log(hello)
+const clientCodeSnippet = stripIndent`
+	// call on client:
+	const hello = await sayHello("Backend", "Frontend")
+	console.log(hello)
 `
+
+const snippetsFolder = path.join(path.parse(new URL(import.meta.url).pathname).dir, "../snippets/features")
 const snippets = [serverCodeSnippet, clientCodeSnippet].map(snippet => snippet.trim())
+
+async function getExample(folder: string, filepath: string, layout = "col-span-1 row-span-1") {
+	const file = await readFile(path.join(snippetsFolder, folder, filepath), "utf-8")
+	return { file, filepath, layout }
+}
 
 const features = [
 	{
 		title: "It's Just JavaScript",
+		icon: "ph:file-js-bold",
 		details: "If you know JavaScript basics, you know how to use Prim+RPC.",
+		examples: await Promise.all([
+			getExample("just-js", "server/module.ts"),
+			getExample("just-js", "server/index.ts"),
+			getExample("just-js", "client/index.ts"),
+			getExample("just-js", "client/client.ts"),
+		]),
+		serverName: "server/index.ts",
+		server: await readFile(path.join(snippetsFolder, "just-js/server/index.ts"), "utf-8"),
+		clientName: "client/index.ts",
+		client: await readFile(path.join(snippetsFolder, "just-js/client/index.ts"), "utf-8"),
 	},
 	{
 		title: "No Type Guessing",
+		icon: "ph:circle-wavy-question-bold",
 		details: "Get full type definitions in your client using TypeScript or JSDoc.",
+		server: stripIndent`
+			export function add (x: number, y: number) {
+				return x + y
+			}
+			add.rpc = true
+		`,
+		client: stripIndent`
+			const sum = await add(1, 2)
+			console.log(sum)
+
+			// 3
+		`,
 	},
 	{
 		title: "Zero Client Generation",
+		icon: "ph:hourglass-low-bold",
 		details: "Calls are generated at runtime, skip the build step, if you want.",
 	},
 	{
 		title: "Bring Your Own Server",
+		icon: "ph:computer-tower-bold",
 		details: "It's framework agnostic and includes lots of popular integrations.",
 	},
 	{
 		title: "Choose Your Client",
-		details: "Don't like the default method of sending requests? You can swap it out.",
+		icon: "ph:laptop-bold",
+		details: "Don't like the default method of sending requests? Swap it out.",
 	},
 	{
-		title: "It's Transport-Agnostic",
+		title: "Transport-Agnostic",
+		icon: "ph:envelope-simple-open-bold",
 		details: "Bridge client/server, web workers, proceses and more. It's not just HTTP.",
 	},
 	{
 		title: "Handle Files",
+		icon: "ph:files-bold",
 		details: "Files and Blobs are fully supported without all of the extra work.",
 	},
 	{
-		title: "Use Your Callbacks",
+		title: "Use Callbacks",
+		icon: "ph:brackets-round-bold",
 		details: "Use callbacks between server and client: great for real-time events.",
 	},
 	{
 		title: "Advanced Types Supported",
+		icon: "ph:cursor-text-bold",
 		details: "Use a custom JSON handler to support Dates, RegExps, Errors, and more.",
 	},
 	{
 		title: "Throw Errors",
-		details: "No error code mapping needed. Error on the server is an error on the client.",
+		icon: "ph:x-circle-bold",
+		details: "No error code mapping needed. Errors on the server are errors on the client.",
 	},
 	{
-		title: "HTML Forms Supported",
-		details: "You don't even need to process forms. Supports all fields, including files.",
+		title: "Forms Supported",
+		icon: "ph:chat-teardrop-text-bold",
+		details: "You don't need to process HTML forms. Supports all fields, including files.",
 	},
 	{
 		title: "Build a Public API",
-		details: "Build an API for usage inside your project and outside.",
+		icon: "ph:cloud-bold",
+		details: "Build an API either for internal usage or to share with the world.",
 	},
 	{
 		title: "Batch RPCs",
+		icon: "ph:arrows-in-bold",
 		details: "Multiple function calls are batched into single requests easily.",
 	},
 	{
 		title: "Share Only What's Allowed",
+		icon: "ph:lock-bold",
 		details: "Only the functions you explicitly export and mark as RPC are callable.",
 	},
 	{
 		title: "Generate Documentation",
+		icon: "ph:notebook-bold",
 		details: "Build documentation of your functions directly from your existing TypeDoc.",
+	},
+	{
+		title: "Modular & Test Friendly",
+		icon: "ph:checks-bold",
+		details: "Function logic is separate from the transport, makes testing easy.",
 	},
 ]
 ---
@@ -106,8 +162,8 @@ const features = [
 							<div class="homepage-snippets opacity-0">
 								<div class="mockup-code text-sm bg-white/70 border border-white/70 pb-4 w-full max-w-lg">
 									<div class="px-4">
-										<div class="rounded-lg overflow-hidden bg-prim-space code-without-bg">
-											<Code code={snippet} lang="typescript" theme="material-theme-palenight" />
+										<div class="rounded-lg overflow-hidden bg-prim-space site-code-style">
+											<Code {...codeTheme} code={snippet} />
 										</div>
 									</div>
 								</div>
@@ -122,36 +178,117 @@ const features = [
 				class="font-title text-[2.3rem] sm:text-[3rem] lg:text-[5.5rem] font-semibold text-white uppercase text-right leading-none overflow-hidden">
 				<HomepageIntro client:load text={greeting.split("\n")} />
 				<div id="scroll-down-parent" class="opacity-0 flex justify-end">
-					<Icon id="scroll-down-indicator" className="w-6 h-6 text-white" name="carbon:chevron-down" />
+					<Icon id="scroll-down-indicator" className="w-6 h-6 text-white" name="ph:caret-down-bold" />
 				</div>
 			</p>
 		</div>
 	</div>
-	<!-- Below the fold -->
-	<div class="grid grid-cols-6 lg:grid-cols-12 gap-4 py-8">
-		<div class="col-span-12 lg:col-span-5 text-white space-y-4">
-			<p class="font-title text-xl sm:text-2xl lg:text-4xl font-semibold uppercase leading-none">
+
+	<!-- Introduce core features -->
+	<div class="grid grid-cols-12 gap-4 py-8">
+		<div
+			class="col-span-12 xl:col-span-6 max-w-xl xl:max-w-2xl text-white space-y-4 flex flex-col items-center justify-center">
+			<p class="font-title text-xl sm:text-2xl lg:text-4xl font-semibold uppercase leading-none w-full">
 				RPC for the Rest&nbsp;of&nbsp;Us.
 			</p>
-			<p class="text-sm lg:text-base">
-				Prim+RPC bridges incompatible JavaScript environments. Call a JavaScript function on the server remotely as if
-				it was defined on the client itself.
+			<p class="text-sm lg:text-base w-full">
+				Prim+RPC bridges incompatible environments in JavaScript. Call functions defined on the server as if they exist
+				on the client, without the setup, event mapping, or wrappers.
 			</p>
 		</div>
-	</div>
-	<div class="grid grid-cols-6 lg:grid-cols-12 gap-4 py-8">
 		{
-			features.map(({ title, details }) => (
-				<div
-					data-light="1"
-					data-size="1,2"
-					data-brightness="0.5,0.7"
-					class="relative bg-white/70 rounded-lg border border-white/60 py-6 px-8 col-span-12 md:col-span-3 text-prim-space space-y-4">
-					<p class="font-bold">{title}</p>
-					<p class="text-sm lg:text-base">{details}</p>
-				</div>
-			))
+			features
+				.map((feature, index) => ({ feature, index }))
+				.slice(0, 6)
+				.map(({ feature, index }) => (
+					<button class="text-left col-span-6 lg:col-span-4 xl:col-span-3" onclick={`featureModal${index}.showModal()`}>
+						<FeatureCard {...feature} />
+					</button>
+				))
 		}
+	</div>
+
+	<!-- Show even more features -->
+	<div class="grid grid-cols-12 gap-4 py-8">
+		<div
+			class="col-span-8 xl:col-span-6 max-w-xl xl:max-w-2xl text-white space-y-4 flex flex-col items-center justify-center">
+			<p class="font-title text-xl sm:text-2xl lg:text-4xl font-semibold uppercase leading-none w-full">
+				Oh, but that&apos;s not all.
+			</p>
+			<p class="text-sm lg:text-base w-full">
+				Prim+RPC does the heavy lifting so you can use JavaScript features between server and client, that would
+				otherwise be difficult.
+			</p>
+		</div>
+		{
+			features
+				.map((feature, index) => ({ feature, index }))
+				.slice(6)
+				.map(({ feature, index }) => (
+					<button class="text-left col-span-6 lg:col-span-4 xl:col-span-3" onclick={`featureModal${index}.showModal()`}>
+						<FeatureCard {...feature} />
+					</button>
+				))
+		}
+	</div>
+
+	<!-- Feature expansions -->
+	{
+		features.map((feature, index) => (
+			<dialog id={`featureModal${index}`} class="modal bg-black/50 duration-500">
+				<div class="modal-box max-w-screen-lg bg-white/80 backdrop-blur-sm">
+					<form method="dialog">
+						<button class="btn btn-sm btn-circle btn-ghost absolute right-2 top-2">
+							<Icon name="ph:x-bold" class="w-4 h-4 inline-block" />
+						</button>
+					</form>
+					<div class="space-y-4">
+						<p class="font-title text-xl sm:text-2xl lg:text-4xl font-semibold leading-none w-full">{feature.title}</p>
+						<p class="text-sm lg:text-base w-full">{feature.details}</p>
+						<div class="grid grid-flow-col grid-cols-2 grid-rows-2 gap-4">
+							{feature.examples?.map(example => (
+								<div class:list={example.layout}>
+									<CodeFile filename={example.filepath} overrideClass="h-full">
+										<Code {...codeTheme} code={example.file} />
+									</CodeFile>
+								</div>
+							))}
+						</div>
+					</div>
+				</div>
+				<form method="dialog" class="modal-backdrop">
+					<button>Close</button>
+				</form>
+			</dialog>
+		))
+	}
+
+	<div class="grid grid-cols-12 gap-4 py-8">
+		<div class="col-span-12 text-white space-y-4 text-center">
+			<p class="font-title text-xl sm:text-2xl lg:text-4xl font-semibold uppercase leading-none">
+				It&apos;s Available Now. Right Now.
+			</p>
+			<p class="text-sm lg:text-base w-full pb-2">Easy to setup, lots of features, and open source. Try it out!</p>
+			<div class="flex flex-wrap lg:flex-nowrap justify-center mx-auto gap-4">
+				<a href="/docs" class="btn glass hover:bg-neutral text-white">
+					<Icon class="w-6 h-6" name="ph:notebook-fill" />
+					 Get Started
+				</a>
+				<a href="/docs/examples" class="btn glass hover:bg-neutral text-white">
+					<Icon className="w-6 h-6" name="ph:terminal-window-fill" />
+					 Try An Example
+				</a>
+				<div class="w-full block lg:hidden"></div>
+				<a href="/docs/features" class="btn glass hover:bg-neutral text-white">
+					<Icon className="w-6 h-6" name="ph:lightbulb-fill" />
+					 Learn to Use
+				</a>
+				<a href="/docs/plugins/create" class="btn glass hover:bg-neutral text-white">
+					<Icon class="w-6 h-6" name="ph:plug-fill" />
+					 Plugins
+				</a>
+			</div>
+		</div>
 	</div>
 </Layout>
 
@@ -202,26 +339,6 @@ const features = [
 	body.homepage-intro {
 		.prim-navigation {
 			opacity: 0;
-		}
-	}
-
-	/* Use theme color for code background */
-	.code-without-bg pre {
-		background-color: transparent !important;
-		padding: theme("padding.3") theme("padding.5");
-	}
-
-	/* Theme psuedo elements to match website */
-	.mockup-code {
-		&::before {
-			box-shadow:
-				1.4em 0 0 theme("colors.prim.space"),
-				2.8em 0 0 theme("colors.prim.space"),
-				4.2em 0 0 theme("colors.prim.space") !important;
-		}
-
-		pre::before {
-			content: none !important;
 		}
 	}
 </style>

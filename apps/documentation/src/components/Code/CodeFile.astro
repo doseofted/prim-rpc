@@ -1,0 +1,31 @@
+---
+import { Icon } from "astro-icon"
+interface Props {
+	filename?: string
+	overrideClass?: string
+}
+const { filename, overrideClass } = Astro.props
+---
+
+<div class:list={["flex flex-col rounded-xl w-full overflow-hidden", overrideClass]}>
+	{
+		filename && (
+			<div class="bg-prim-space/90 text-sm breadcrumbs text-white border-b border-white/20 px-5">
+				<ul>
+					{filename.split("/").map((part, index, parts) => (
+						<li class="space-x-2">
+							<Icon
+								class="w-4 h-4 inline-block"
+								name={index !== parts.length - 1 ? "ph:folder-bold" : "ph:file-bold"}
+							/>
+							<span>{part}</span>
+						</li>
+					))}
+				</ul>
+			</div>
+		)
+	}
+	<div class="flex-grow bg-prim-space site-code-style">
+		<slot />
+	</div>
+</div>
