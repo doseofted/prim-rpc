@@ -9,6 +9,7 @@ import Navigation from "@/components/Navigation.astro"
 import Container from "@/components/Container.astro"
 import { ViewTransitions } from "astro:transitions"
 import Lights from "@/components/Lights.astro"
+import Footer from "@/components/Footer.astro"
 
 interface Props {
 	title?: string
@@ -81,8 +82,15 @@ const image = `${Astro.site}/social.png`
 						<div slot="after" class="h-24 bg-white/70 border-b border-white/70 z-10 relative" />
 					</Container>
 					<Container className="min-h-[calc(100svh-6rem)]">
+						<slot slot="before" name="before" />
 						<Columns className="min-h-[calc(100svh-6rem)]">
 							<slot />
+						</Columns>
+						<slot slot="after" name="after" />
+					</Container>
+					<Container>
+						<Columns>
+							<Footer />
 						</Columns>
 					</Container>
 				</>

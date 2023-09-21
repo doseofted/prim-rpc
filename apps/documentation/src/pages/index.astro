@@ -27,7 +27,7 @@ const clientCodeSnippet = stripIndent`
 `
 
 const snippetsFolder = path.join(process.cwd(), "src/snippets")
-const snippets = [serverCodeSnippet, clientCodeSnippet].map(snippet => snippet.trim())
+const snippets = [serverCodeSnippet, clientCodeSnippet]
 
 async function getExample(folder: string, filepath: string) {
 	const file = await readFile(path.join(snippetsFolder, folder, filepath), "utf-8")
@@ -277,7 +277,7 @@ const features = [
 		data-brightness="0.1,0.3"
 		data-size="0.5,0.6"
 		data-offset="1,1"
-		class="grid grid-cols-12 text-center justify-items-center gap-4 py-8 mt-20 mb-32">
+		class="grid grid-cols-12 text-center justify-items-center gap-4 py-8 mt-12 mb-20">
 		<div class="col-span-12 text-white space-y-4">
 			<p class="font-title text-xl sm:text-2xl lg:text-4xl font-semibold uppercase leading-none">
 				It&apos;s Available Now. Right Now.
@@ -303,24 +303,6 @@ const features = [
 				</a>
 			</div>
 		</div>
-	</div>
-
-	<div class="flex gap-4 justify-center items-center text-white mb-10">
-		<div class="text-right text-white/70 text-xs drop-shadow-lg max-w-md leading-6">
-			<p>
-				<strong>
-					<a class="link" href="/"> Prim+RPC</a>
-				</strong>: a project by
-				<a class="link" href="https://doseofted.me/" target="_blank"> Ted Klingenberg</a>
-			</p>
-			<p>
-				Anonymous analytics collected with
-				<a class="link" href="https://github.com/electerious/Ackee#readme" target="_blank"> Ackee</a>
-			</p>
-		</div>
-		<a href="https://doseofted.me/" target="_blank">
-			<img src="/prim-doseofted-attribution.png" width={361} height={150} alt="Dose of Ted" class="w-32" />
-		</a>
 	</div>
 
 	<!-- Feature expansions -->
