@@ -30,12 +30,14 @@ const navigation = [
 						<a
 							class="navigation-item relative px-4 pt-10 pb-2 h-full font-semibold uppercase text-sm flex justify-center items-center"
 							href={item.link}
-							target={item.link.startsWith("/") ? "_self" : "_blank"}>
+							target={item.link.startsWith("/") ? "_self" : "_blank"}
+							aria-label={item.text}>
 							{item.icon.startsWith("/") ? (
 								<img class="w-6 h-6 relative" src={item.icon} />
 							) : (
 								<Icon class="w-6 h-6 relative" name={item.icon} />
 							)}
+							<div class="lg:tooltip lg:tooltip-bottom !absolute inset-0 w-full h-full" data-tip={item.text} />
 						</a>
 					) : (
 						<a

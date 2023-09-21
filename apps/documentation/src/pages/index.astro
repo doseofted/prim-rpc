@@ -357,20 +357,20 @@ const features = [
 		const scrollIndicator = document.getElementById("scroll-down-indicator") as HTMLElement
 		animate(scrollIndicator, { y: [0, 10, 0] }, { duration: 1.5, repeat: Infinity, easing: ["ease-out", "ease-in"] })
 
-		// for (const featureCard of document.querySelectorAll<HTMLElement>(".feature-card")) {
-		// 	featureCard.style.opacity = "0"
-		// }
-		// inView(
-		// 	document.querySelectorAll(".feature-list"),
-		// 	info => {
-		// 		animate(
-		// 			info.target.querySelectorAll(".feature-card"),
-		// 			{ opacity: [0, 1], y: ["3rem", "0rem"] },
-		// 			{ duration: 0.9, delay: stagger(0.1) }
-		// 		)
-		// 	},
-		// 	{ amount: 0.2 }
-		// )
+		for (const featureCard of document.querySelectorAll<HTMLElement>(".feature-card")) {
+			featureCard.style.opacity = "0"
+		}
+		inView(
+			document.querySelectorAll(".feature-list"),
+			info => {
+				animate(
+					info.target.querySelectorAll(".feature-card"),
+					{ opacity: [0, 1] },
+					{ duration: 0.9, delay: stagger(0.1) }
+				)
+			},
+			{ amount: 0.2 }
+		)
 
 		const slideIn = {
 			y: ["3rem", "0rem"],

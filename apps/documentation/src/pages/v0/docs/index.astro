@@ -1,0 +1,25 @@
+---
+import Layout from "@/layouts/Default.astro"
+import { IntroText } from "@/components/IntroText.react"
+---
+
+<Layout className="homepage-intro">
+	<div class="grid grid-cols-12">
+		<div class="col-span-12 lg:col-span-11 h-[40vh] flex items-end justify-end">
+			<div data-light="5" data-brightness="0.1,0.4" data-size="1.5,2.5" data-offset="1,2">
+				<p
+					class="font-title text-[2.3rem] sm:text-[3rem] lg:text-[5.5rem] font-semibold text-white uppercase text-right leading-none overflow-hidden">
+					<IntroText client:load text="The Docs." />
+				</p>
+			</div>
+		</div>
+	</div>
+	<div class="grid grid-cols-6 lg:grid-cols-12 gap-x-4">
+		<div class="bg-white/70 rounded-l-xl -mr-4 pr-4 col-span-2">
+			<p>Menu</p>
+		</div>
+		<div class="bg-white -mr-4 pr-4 col-span-9">
+			<p>Content</p>
+		</div>
+	</div>
+</Layout>

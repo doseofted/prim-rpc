@@ -80,8 +80,8 @@ const image = `${Astro.site}/social.png`
 						</Columns>
 						<div slot="after" class="h-24 bg-white/70 border-b border-white/70 z-10 relative" />
 					</Container>
-					<Container>
-						<Columns className="min-h-[100svh-6rem]">
+					<Container className="min-h-[calc(100svh-6rem)]">
+						<Columns className="min-h-[calc(100svh-6rem)]">
 							<slot />
 						</Columns>
 					</Container>
