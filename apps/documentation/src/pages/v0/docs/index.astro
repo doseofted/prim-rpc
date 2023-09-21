@@ -1,14 +1,54 @@
 ---
 import Layout from "@/layouts/Default.astro"
 import { IntroText } from "@/components/IntroText.react"
+
+// NOTE: manual list probably to be replaced with Astro's generated collections
+const tableOfContents = [
+	{
+		name: "Library Usage",
+		sections: [
+			{ name: "Introduction", link: "/v0/docs" },
+			{ name: "Get Started", link: "/v0/docs/setup" },
+			{ name: "How to Use", link: "/v0/docs/features" },
+			{ name: "Examples", link: "/v0/docs/examples" },
+			{ name: "Security", link: "/v0/docs/security" },
+			{ name: "Limitations", link: "/v0/docs/limitations" },
+		],
+	},
+	{
+		name: "Reference",
+		sections: [
+			{ name: "Configuration", link: "/v0/docs/configuration" },
+			{ name: "RPC Structure", link: "/v0/docs/structure" },
+			{ name: "Additional Tools", link: "/v0/docs/tooling" },
+			{ name: "Comparisons", link: "/v0/docs/comparisons" },
+		],
+	},
+	{
+		name: "Integrations",
+		sections: [
+			{ name: "Server Plugins", link: "/v0/docs/server-plugins" },
+			{ name: "Client Plugins", link: "/v0/docs/client-plugins" },
+			{ name: "IPC Plugins", link: "/v0/docs/ipc-plugins" },
+			{ name: "Create Your Own", link: "/v0/docs/create-plugin" },
+		],
+	},
+]
 ---
 
-<Layout className="homepage-intro">
+<Layout title="Documentation" className="homepage-intro">
+	<!-- Side decorations -->
 	<div slot="after" class="relative h-full flex flex-col">
 		<div class="h-[40svh]"></div>
 		<div class="flex-grow bg-white -ml-px"></div>
 	</div>
+	<div slot="before" class="lg:hidden relative h-full flex flex-col">
+		<div class="h-[40svh]"></div>
+		<div class="flex-grow bg-white -mr-px"></div>
+	</div>
+
 	<div class="flex flex-col h-full">
+		<!-- Header decoration -->
 		<div class="grid grid-cols-12">
 			<div class="col-span-12 lg:col-span-11 h-[40svh] flex items-end justify-end">
 				<div data-light="5" data-brightness="0.1,0.4" data-size="1.5,2.5" data-offset="1,2">
@@ -19,14 +59,50 @@ import { IntroText } from "@/components/IntroText.react"
 				</div>
 			</div>
 		</div>
+
+		<!-- Page content -->
 		<div class="flex-grow grid grid-cols-6 lg:grid-cols-12 gap-x-4">
-			<div class="bg-white/70 rounded-l-xl -mr-4 pr-4 col-span-2">
-				<p>Menu</p>
+			<div class="bg-white/70 rounded-l-xl -ml-4 pl-4 -mr-4 pr-4 col-span-2">
+				<ul
+					class="menu menu-sm px-0 space-y-4 flex-nowrap py-4 sticky top-0 max-h-[100svh] overflow-auto"
+					data-lenis-prevent>
+					{
+						tableOfContents.map(({ name, sections }, sectionIndex) => (
+							<li class="space-y-2">
+								<span class="menu-title !text-black px-0 font-title font-semibold">{name}</span>
+								<ul class="content-section ml-0 px-0 !mt-0">
+									{sections.map(({ name, link }, index) => (
+										<li>
+											<a class={sectionIndex === 0 && index === 0 ? "active text-white" : ""} href={`/docs${link}`}>
+												{name}
+											</a>
+										</li>
+									))}
+								</ul>
+							</li>
+						))
+					}
+				</ul>
 			</div>
-			<div class="bg-white -mr-4 pr-4 col-span-10">
-				<p>Content</p>
-				<p>More content.</p>
+			<div class="bg-white -mr-4 pr-4 -ml-4 lg:ml-0 pl-4 lg:pl-0 col-span-10 grid grid-cols-10 gap-x-4 py-8">
+				<div class="lg:col-start-2 col-span-12 lg:col-span-8">
+					<div class="prose max-w-none">
+						<h1>Hi!</h1>
+						<h2>There</h2>
+						<h3>You</h3>
+						<p>Content</p>
+						<p class="text-right">More content.</p>
+						<div class="h-screen bg-prim-space/20"></div>
+					</div>
+				</div>
 			</div>
 		</div>
 	</div>
 </Layout>
+
+<style>
+	/* Remove thin line before each section provided from DaisyUI */
+	ul.content-section::before {
+		content: none;
+	}
+</style>
