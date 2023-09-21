@@ -54,6 +54,7 @@
 			"*.Corefile": "caddyfile"
 		},
 		"cSpell.words": [
+			"frontmatter",
 			"composables",
 			"defu",
 			"doseofted",

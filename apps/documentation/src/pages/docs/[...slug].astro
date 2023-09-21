@@ -1,36 +1,59 @@
 ---
 import Layout from "@/layouts/Default.astro"
 import { IntroText } from "@/components/IntroText.react"
+import { getCollection } from "astro:content"
+
+interface Props {
+	entry: Awaited<ReturnType<typeof getCollection<"docs">>>[number]
+	tableOfContents: {
+		name: string
+		sections: {
+			name: string
+			link: string
+		}[]
+	}[]
+}
+export async function getStaticPaths() {
+	const documentation = await getCollection("docs")
+	const tableOfContents = documentation.map(doc => ({ ...doc.data, slug: doc.slug }))
+	console.log({ tableOfContents })
+	return documentation.map(entry => {
+		const { slug } = entry
+		return { params: { slug }, props: { entry, tableOfContents } }
+	})
+}
+const { entry, tableOfContents: tableOfContentsNew } = Astro.props
+const { Content } = await entry.render()
 
 // NOTE: manual list probably to be replaced with Astro's generated collections
 const tableOfContents = [
 	{
 		name: "Library Usage",
 		sections: [
-			{ name: "Introduction", link: "/v0/docs" },
-			{ name: "Get Started", link: "/v0/docs/setup" },
-			{ name: "How to Use", link: "/v0/docs/features" },
-			{ name: "Examples", link: "/v0/docs/examples" },
-			{ name: "Security", link: "/v0/docs/security" },
-			{ name: "Limitations", link: "/v0/docs/limitations" },
+			{ name: "Introduction", link: "/docs/v0/usage" },
+			{ name: "Get Started", link: "/docs/v0/usage/setup" },
+			{ name: "How to Use", link: "/docs/v0/usage/features" },
+			{ name: "Examples", link: "/docs/v0/usage/examples" },
+			{ name: "Security", link: "/docs/v0/usage/security" },
+			{ name: "Limitations", link: "/docs/v0/usage/limitations" },
 		],
 	},
 	{
 		name: "Reference",
 		sections: [
-			{ name: "Configuration", link: "/v0/docs/configuration" },
-			{ name: "RPC Structure", link: "/v0/docs/structure" },
-			{ name: "Additional Tools", link: "/v0/docs/tooling" },
-			{ name: "Comparisons", link: "/v0/docs/comparisons" },
+			{ name: "Configuration", link: "/docs/v0/configuration" },
+			{ name: "RPC Structure", link: "/docs/v0/structure" },
+			{ name: "Additional Tools", link: "/docs/v0/tooling" },
+			{ name: "Comparisons", link: "/docs/v0/comparisons" },
 		],
 	},
 	{
 		name: "Integrations",
 		sections: [
-			{ name: "Server Plugins", link: "/v0/docs/server-plugins" },
-			{ name: "Client Plugins", link: "/v0/docs/client-plugins" },
-			{ name: "IPC Plugins", link: "/v0/docs/ipc-plugins" },
-			{ name: "Create Your Own", link: "/v0/docs/create-plugin" },
+			{ name: "Server Plugins", link: "/docs/v0/server-plugins" },
+			{ name: "Client Plugins", link: "/docs/v0/client-plugins" },
+			{ name: "IPC Plugins", link: "/docs/v0/ipc-plugins" },
+			{ name: "Create Your Own", link: "/docs/v0/create-plugin" },
 		],
 	},
 ]
@@ -53,6 +76,7 @@ const tableOfContents = [
 			<div class="col-span-12 lg:col-span-11 h-[40svh] flex items-end justify-end">
 				<div data-light="5" data-brightness="0.1,0.4" data-size="1.5,2.5" data-offset="1,2">
 					<p
+						transition:persist="docs-decoration"
 						class="font-title text-[2.3rem] sm:text-[3rem] lg:text-[5.5rem] font-semibold text-white uppercase text-right leading-none overflow-hidden">
 						<IntroText client:load text="The Docs." />
 					</p>
@@ -73,7 +97,7 @@ const tableOfContents = [
 								<ul class="content-section ml-0 px-0 !mt-0">
 									{sections.map(({ name, link }, index) => (
 										<li>
-											<a class={sectionIndex === 0 && index === 0 ? "active text-white" : ""} href={`/docs${link}`}>
+											<a class={sectionIndex === 0 && index === 0 ? "active text-white" : ""} href={link}>
 												{name}
 											</a>
 										</li>
@@ -87,12 +111,7 @@ const tableOfContents = [
 			<div class="bg-white -mr-4 pr-4 -ml-4 lg:ml-0 pl-4 lg:pl-0 col-span-10 grid grid-cols-10 gap-x-4 py-8">
 				<div class="lg:col-start-2 col-span-12 lg:col-span-8">
 					<div class="prose max-w-none">
-						<h1>Hi!</h1>
-						<h2>There</h2>
-						<h3>You</h3>
-						<p>Content</p>
-						<p class="text-right">More content.</p>
-						<div class="h-screen bg-prim-space/20"></div>
+						<Content />
 					</div>
 				</div>
 			</div>
