@@ -1,5 +1,5 @@
 ---
-import Icon from "astro-icon"
+import { Icon } from "astro-icon/components"
 import Prim from "@/components/Prim.astro"
 
 const navigation = [
@@ -7,8 +7,7 @@ const navigation = [
 	{ link: "/v0/api", text: "API" },
 	{ link: "/cms", text: "CMS" },
 	{ link: "https://doseofted.me/", text: "Dose of Ted", icon: "/prim-nav-doseofted-attribution.png" },
-	// FIXME: For some reason Threads icon is unavailable even though it exists in iconify package
-	// { link: "https://www.threads.net/@doseofted", text: "Threads", icon: "simple-icons:threads" },
+	{ link: "https://www.threads.net/@doseofted", text: "Threads", icon: "simple-icons:threads" },
 	{ link: "https://github.com/doseofted/prim-rpc", text: "GitHub", icon: "simple-icons:github" },
 ]
 ---

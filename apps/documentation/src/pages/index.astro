@@ -1,7 +1,7 @@
 ---
 import { stripIndent } from "common-tags"
 import { Code } from "astro/components"
-import { Icon } from "astro-icon"
+import { Icon } from "astro-icon/components"
 import Layout from "@/layouts/Default.astro"
 import { HomepageIntro } from "@/components/IntroText.react"
 import { client } from "@/client"
@@ -180,7 +180,7 @@ const features = [
 				class="font-title text-[2.3rem] sm:text-[3rem] lg:text-[5.5rem] font-semibold text-white uppercase text-right leading-none overflow-hidden">
 				<HomepageIntro client:load text={greeting.split("\n")} />
 				<div id="scroll-down-parent" class="opacity-0 flex justify-end">
-					<Icon id="scroll-down-indicator" className="w-6 h-6 text-white" name="ph:caret-down-bold" />
+					<Icon id="scroll-down-indicator" class="w-6 h-6 text-white" name="ph:caret-down-bold" />
 				</div>
 			</p>
 		</div>
@@ -289,12 +289,12 @@ const features = [
 					 Get Started
 				</a>
 				<a href="/docs/examples" class="btn glass hover:bg-neutral text-white">
-					<Icon className="w-6 h-6" name="ph:terminal-window-fill" />
+					<Icon class="w-6 h-6" name="ph:terminal-window-fill" />
 					 Try An Example
 				</a>
 				<div class="w-full block lg:hidden"></div>
 				<a href="/docs/features" class="btn glass hover:bg-neutral text-white">
-					<Icon className="w-6 h-6" name="ph:lightbulb-fill" />
+					<Icon class="w-6 h-6" name="ph:lightbulb-fill" />
 					 Learn to Use
 				</a>
 				<a href="/docs/plugins/create" class="btn glass hover:bg-neutral text-white">

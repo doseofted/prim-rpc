@@ -7,6 +7,7 @@ import remarkToc from "remark-toc"
 import sitemap from "@astrojs/sitemap"
 import vercel from "@astrojs/vercel/serverless"
 import rehypePrettyCode from "rehype-pretty-code"
+import icon from "astro-icon"
 
 /** @type {import('rehype-pretty-code').Options} */
 const rehypePrettyOptions = {
@@ -37,6 +38,12 @@ export default defineConfig({
 		}),
 		mdx(),
 		sitemap(),
+		icon({
+			include: {
+				ph: ["*"],
+				"simple-icons": ["*"],
+			},
+		}),
 	],
 	output: "hybrid",
 	adapter: vercel({
