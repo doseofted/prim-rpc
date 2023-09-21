@@ -49,7 +49,7 @@
 		"@fontsource-variable/montserrat": "^5.0.9",
 		"@fontsource-variable/plus-jakarta-sans": "^5.0.9",
 		"@iconify-json/ph": "^1.1.6",
-		"@iconify-json/simple-icons": "^1.1.69",
+		"@iconify-json/simple-icons": "^1.1.71",
 		"@nanostores/react": "^0.7.1",
 		"@studio-freight/lenis": "^1.0.22",
 		"@tailwindcss/typography": "^0.5.10",

@@ -1,39 +1,79 @@
 ---
+import Icon from "astro-icon"
 import Prim from "@/components/Prim.astro"
 
-interface Props {
-	empty?: boolean
-}
-const { empty = false } = Astro.props
-
 const navigation = [
-	{ link: "/tests/single-element", text: "Navigation" },
-	{ link: "/what", text: "Docs" },
+	{ link: "/v0/docs", text: "Docs" },
+	{ link: "/v0/api", text: "API" },
+	{ link: "/cms", text: "CMS" },
+	{ link: "https://doseofted.me/", text: "Dose of Ted", icon: "/prim-nav-doseofted-attribution.png" },
+	// FIXME: For some reason Threads icon is unavailable even though it exists in iconify package
+	// { link: "https://www.threads.net/@doseofted", text: "Threads", icon: "simple-icons:threads" },
+	{ link: "https://github.com/doseofted/prim-rpc", text: "GitHub", icon: "simple-icons:github" },
 ]
 ---
 
-<nav class="container mx-auto h-20 flex justify-between">
-	{
-		!empty && (
-			<>
-				<div
-					class="prim-logo-container text-prim-space flex items-center"
-					data-light="10"
-					data-brightness="0.5,1.5"
-					data-size="0.5,1.8"
-					data-offset="2,4">
-					<Prim>RPC</Prim>
-				</div>
-				<div class="bg-white/70 border-white/70 rounded-bl-xl flex items-center">
-					{navigation.map(item => (
+<nav class="-mx-4 h-24 flex justify-between">
+	<div
+		class="prim-logo-container text-prim-space flex items-center mt-8 px-4"
+		data-light="10"
+		data-brightness="0.5,1.5"
+		data-size="0.5,1.8"
+		data-offset="2,4">
+		<Prim>RPC</Prim>
+	</div>
+	<div class="bg-white/70 border-b border-white/70 relative right-[-1px] pr-4 pt-0 rounded-bl-xl flex items-center">
+		{
+			navigation.map(item => (
+				<>
+					{item.icon ? (
 						<a
-							class="px-6 py-2 h-full font-semibold uppercase text-sm flex justify-center items-center"
-							href={item.link}>
-							{item.text}
+							class="navigation-item relative px-4 pt-10 pb-2 h-full font-semibold uppercase text-sm flex justify-center items-center"
+							href={item.link}
+							target={item.link.startsWith("/") ? "_blank" : "_self"}>
+							{item.icon.startsWith("/") ? (
+								<img class="w-6 h-6 relative" src={item.icon} />
+							) : (
+								<Icon class="w-6 h-6 relative" name={item.icon} />
+							)}
 						</a>
-					))}
-				</div>
-			</>
-		)
-	}
+					) : (
+						<a
+							class="navigation-item relative z-10 px-6 pt-10 pb-2 h-full font-semibold uppercase text-sm flex justify-center items-center"
+							href={item.link}>
+							<span class="relative">{item.text}</span>
+						</a>
+					)}
+				</>
+			))
+		}
+	</div>
 </nav>
+
+<style>
+	.navigation-item {
+		transition: transform 300ms;
+
+		&::before {
+			content: "";
+			display: block;
+			position: absolute;
+			inset: 0;
+			background-color: transparent;
+			transition: all 300ms;
+			border-bottom-left-radius: theme("borderRadius.xl");
+			border-bottom-right-radius: theme("borderRadius.xl");
+		}
+
+		&:hover::before {
+			left: -6px;
+			right: -6px;
+			bottom: -4px;
+			background-color: #fff;
+		}
+
+		&:hover {
+			transform: scale(1.05);
+		}
+	}
+</style>

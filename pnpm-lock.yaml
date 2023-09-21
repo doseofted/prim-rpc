@@ -74,7 +74,7 @@ importers:
         version: 5.2.2
       vite:
         specifier: ^4.4.9
-        version: 4.4.9(@types/node@18.17.4)(sass@1.66.1)
+        version: 4.4.9(@types/node@18.17.14)(sass@1.66.1)
       vitest:
         specifier: ^0.34.3
         version: 0.34.3(@vitest/ui@0.34.3)(jsdom@22.1.0)(sass@1.66.1)
@@ -121,8 +121,8 @@ importers:
         specifier: ^1.1.6
         version: 1.1.6
       '@iconify-json/simple-icons':
-        specifier: ^1.1.69
-        version: 1.1.69
+        specifier: ^1.1.71
+        version: 1.1.71
       '@nanostores/react':
         specifier: ^0.7.1
         version: 0.7.1(nanostores@0.9.3)(react@18.2.0)
@@ -1915,6 +1915,12 @@ packages:
       '@iconify/types': 2.0.0
     dev: true
 
+  /@iconify-json/simple-icons@1.1.71:
+    resolution: {integrity: sha512-3WVgJTaWBUOvq4G99v3Qs46zqnOJGNVMMlKCw+p8/gfbVz9mEAiwiqfGr+mpraotuwvUuQoJMi4SyseO8qjYDQ==}
+    dependencies:
+      '@iconify/types': 2.0.0
+    dev: true
+
   /@iconify/react@4.1.1(react@18.2.0):
     resolution: {integrity: sha512-jed14EjvKjee8mc0eoscGxlg7mSQRkwQG3iX3cPBCO7UlOjz0DtlvTqxqEcHUJGh+z1VJ31Yhu5B9PxfO0zbdg==}
     peerDependencies:
@@ -3229,7 +3235,7 @@ packages:
       '@babel/plugin-transform-react-jsx-self': 7.22.5(@babel/core@7.22.15)
       '@babel/plugin-transform-react-jsx-source': 7.22.5(@babel/core@7.22.15)
       react-refresh: 0.14.0
-      vite: 4.4.9(@types/node@18.17.4)(sass@1.66.1)
+      vite: 4.4.9(@types/node@18.17.14)(sass@1.66.1)
     transitivePeerDependencies:
       - supports-color
     dev: true
@@ -3839,7 +3845,7 @@ packages:
       undici: 5.23.0
       unist-util-visit: 4.1.2
       vfile: 5.3.7
-      vite: 4.4.9(@types/node@18.17.4)(sass@1.66.1)
+      vite: 4.4.9(@types/node@18.17.14)(sass@1.66.1)
       vitefu: 0.2.4(vite@4.4.9)
       which-pm: 2.1.1
       yargs-parser: 21.1.1
@@ -11459,7 +11465,7 @@ packages:
       vite:
         optional: true
     dependencies:
-      vite: 4.4.9(@types/node@18.17.4)(sass@1.66.1)
+      vite: 4.4.9(@types/node@18.17.14)(sass@1.66.1)
     dev: true
 
   /vitest@0.34.3(@vitest/ui@0.34.3)(jsdom@22.1.0)(sass@1.66.1):

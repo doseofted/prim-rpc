@@ -6,6 +6,7 @@ import "@fontsource-variable/fira-code"
 import { SEO } from "astro-seo"
 import Columns from "@/components/Columns.astro"
 import Navigation from "@/components/Navigation.astro"
+import Container from "@/components/Container.astro"
 import { ViewTransitions } from "astro:transitions"
 import Lights from "@/components/Lights.astro"
 
@@ -72,12 +73,21 @@ const image = `${Astro.site}/social.png`
 		</div>
 		{
 			!fullscreen ? (
-				<Columns className="container mx-auto min-h-[100svh]">
-					<div transition:persist="logo" class="prim-navigation col-span-6 lg:col-span-12 pt-6">
-						<Navigation />
-					</div>
-					<slot />
-				</Columns>
+				<>
+					<Container>
+						<Columns className="h-24">
+							<div transition:persist="logo" class="prim-navigation col-span-6 lg:col-span-12">
+								<Navigation />
+							</div>
+						</Columns>
+						<div slot="after" class="h-24 bg-white/70 border-b border-white/70 z-10 relative" />
+					</Container>
+					<Container>
+						<Columns className="min-h-[100svh-6rem]">
+							<slot />
+						</Columns>
+					</Container>
+				</>
 			) : (
 				<div class="relative">
 					<slot />
