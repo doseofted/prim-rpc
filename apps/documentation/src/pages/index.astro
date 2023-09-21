@@ -148,7 +148,7 @@ const features = [
 		data-light="3"
 		data-offset="1.5,1.5"
 		data-brightness="0.1,0.3">
-		<div class="col-span-6 lg:col-span-12 flex flex-col gap-8 items-center justify-center">
+		<div class="col-span-6 lg:col-span-12 flex flex-col gap-8 py-4 items-center justify-center">
 			{
 				snippets.map((snippet, index) => (
 					<div
@@ -187,7 +187,7 @@ const features = [
 	</div>
 
 	<!-- Introduce core features -->
-	<div class="grid grid-cols-12 gap-4 py-8">
+	<div class="feature-list grid grid-cols-12 gap-4 py-8">
 		<div
 			class="col-span-12 xl:col-span-6 max-w-xl xl:max-w-2xl text-white space-y-4 flex flex-col items-center justify-center">
 			<p class="font-title text-xl sm:text-2xl lg:text-4xl font-semibold uppercase leading-none w-full">
@@ -203,7 +203,7 @@ const features = [
 				.map((feature, index) => ({ feature, index }))
 				.slice(0, 6)
 				.map(({ feature, index }) => (
-					<div class="text-left col-span-6 lg:col-span-4 xl:col-span-3 h-full">
+					<div class="feature-card text-left col-span-6 lg:col-span-4 xl:col-span-3 h-full">
 						<FeatureCard {...feature} />
 					</div>
 				))
@@ -222,10 +222,10 @@ const features = [
 			</p>
 		</div>
 		<div
-			class="col-span-12 grid grid-cols-1 lg:grid-cols-2 gap-4 bg-white/70 rounded-xl border border-white/60 p-4 text-prim-space">
+			class="feature-list col-span-12 grid grid-cols-1 lg:grid-cols-2 gap-4 bg-white/70 rounded-xl border border-white/60 p-4 text-prim-space">
 			{
 				steps.map(({ step, details, code }, index) => (
-					<div class="h-full flex flex-col space-y-4">
+					<div class="feature-card h-full flex flex-col space-y-4">
 						<div class="flex items-start gap-2">
 							<div class="avatar placeholder -top-0.5">
 								<div class="bg-prim-space text-white rounded-full w-8">
@@ -249,7 +249,7 @@ const features = [
 	</div>
 
 	<!-- Show even more features -->
-	<div class="grid grid-cols-12 gap-4 py-8">
+	<div class="feature-list grid grid-cols-12 gap-4 py-8">
 		<div
 			class="lg:row-start-2 col-span-8 xl:col-span-6 max-w-xl xl:max-w-2xl text-white space-y-4 flex flex-col items-center justify-center">
 			<p class="font-title text-xl sm:text-2xl lg:text-4xl font-semibold uppercase leading-none w-full">
@@ -265,7 +265,7 @@ const features = [
 				.map((feature, index) => ({ feature, index }))
 				.slice(6)
 				.map(({ feature, index }) => (
-					<div class="text-left col-span-6 lg:col-span-4 xl:col-span-3">
+					<div class="feature-card text-left col-span-6 lg:col-span-4 xl:col-span-3">
 						<FeatureCard {...feature} />
 					</div>
 				))
@@ -348,7 +348,7 @@ const features = [
 
 <script>
 	import { $navigationHappened } from "@/utils/store"
-	import { animate, stagger } from "motion"
+	import { animate, inView, stagger } from "motion"
 
 	const startDefault = 1.8
 	function introAnimation(start = startDefault) {
@@ -356,6 +356,21 @@ const features = [
 		animate(scrollIndicatorParent, { opacity: [0, 1] }, { duration: 1, delay: start === startDefault ? 2.5 : 0 })
 		const scrollIndicator = document.getElementById("scroll-down-indicator") as HTMLElement
 		animate(scrollIndicator, { y: [0, 10, 0] }, { duration: 1.5, repeat: Infinity, easing: ["ease-out", "ease-in"] })
+
+		// for (const featureCard of document.querySelectorAll<HTMLElement>(".feature-card")) {
+		// 	featureCard.style.opacity = "0"
+		// }
+		// inView(
+		// 	document.querySelectorAll(".feature-list"),
+		// 	info => {
+		// 		animate(
+		// 			info.target.querySelectorAll(".feature-card"),
+		// 			{ opacity: [0, 1], y: ["3rem", "0rem"] },
+		// 			{ duration: 0.9, delay: stagger(0.1) }
+		// 		)
+		// 	},
+		// 	{ amount: 0.2 }
+		// )
 
 		const slideIn = {
 			y: ["3rem", "0rem"],

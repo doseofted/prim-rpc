@@ -30,7 +30,7 @@ const navigation = [
 						<a
 							class="navigation-item relative px-4 pt-10 pb-2 h-full font-semibold uppercase text-sm flex justify-center items-center"
 							href={item.link}
-							target={item.link.startsWith("/") ? "_blank" : "_self"}>
+							target={item.link.startsWith("/") ? "_self" : "_blank"}>
 							{item.icon.startsWith("/") ? (
 								<img class="w-6 h-6 relative" src={item.icon} />
 							) : (
@@ -40,7 +40,8 @@ const navigation = [
 					) : (
 						<a
 							class="navigation-item relative z-10 px-6 pt-10 pb-2 h-full font-semibold uppercase text-sm flex justify-center items-center"
-							href={item.link}>
+							href={item.link}
+							target={item.link.startsWith("/") ? "_self" : "_blank"}>
 							<span class="relative">{item.text}</span>
 						</a>
 					)}
