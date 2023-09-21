@@ -9,6 +9,7 @@ import FeatureCard from "@/components/FeatureCard.astro"
 import CodeFile from "@/components/Code/CodeFile.astro"
 import { readFile } from "node:fs/promises"
 import path from "node:path"
+import process from "node:process"
 
 const greeting = await client.greetings()
 
@@ -41,17 +42,17 @@ const steps = [
 	},
 	{
 		step: "Create the server",
-		details: "We'll use Bun here but pick your favorite.",
+		details: "We'll use Bun's Fetch API here but pick your favorite runtime/framework.",
 		code: await getExample("homepage", "server/index.ts"),
 	},
 	{
 		step: "Create the client",
-		details: "We'll use the Fetch API but you can choose your own.",
+		details: "We'll use the browser's Fetch API but you can choose your own.",
 		code: await getExample("homepage", "client/prim.ts"),
 	},
 	{
 		step: "Call your function",
-		details: "Call server function from the client.",
+		details: "Don't think about how you call it. It's handled for you.",
 		code: await getExample("homepage", "client/index.ts"),
 	},
 ]
@@ -250,12 +251,12 @@ const features = [
 	<!-- Show even more features -->
 	<div class="grid grid-cols-12 gap-4 py-8">
 		<div
-			class="col-span-8 xl:col-span-6 max-w-xl xl:max-w-2xl text-white space-y-4 flex flex-col items-center justify-center">
+			class="lg:row-start-2 col-span-8 xl:col-span-6 max-w-xl xl:max-w-2xl text-white space-y-4 flex flex-col items-center justify-center">
 			<p class="font-title text-xl sm:text-2xl lg:text-4xl font-semibold uppercase leading-none w-full">
 				Oh, but that&apos;s not all.
 			</p>
 			<p class="text-sm lg:text-base w-full">
-				Prim+RPC does the heavy lifting so you can use JavaScript features between server and client, that would
+				Prim+RPC does the heavy lifting so you can use JavaScript features between server and client that would
 				otherwise be difficult.
 			</p>
 		</div>
@@ -271,13 +272,18 @@ const features = [
 		}
 	</div>
 
-	<div class="grid grid-cols-12 gap-4 py-8 mb-20">
-		<div class="col-span-8 text-white space-y-4">
+	<div
+		data-light="20"
+		data-brightness="0.1,0.3"
+		data-size="0.5,0.6"
+		data-offset="1,1"
+		class="grid grid-cols-12 text-center justify-items-center gap-4 py-8 my-20">
+		<div class="col-span-12 text-white space-y-4">
 			<p class="font-title text-xl sm:text-2xl lg:text-4xl font-semibold uppercase leading-none">
 				It&apos;s Available Now. Right Now.
 			</p>
 			<p class="text-sm lg:text-base w-full pb-2">Easy to setup, lots of features, and open source. Try it out!</p>
-			<div class="flex flex-wrap lg:flex-nowrap justify-start gap-4">
+			<div class="flex flex-wrap lg:flex-nowrap justify-center gap-4">
 				<a href="/docs" class="btn glass hover:bg-neutral text-white">
 					<Icon class="w-6 h-6" name="ph:notebook-fill" />
 					 Get Started
@@ -297,23 +303,24 @@ const features = [
 				</a>
 			</div>
 		</div>
-		<div class="col-span-4 flex flex-col items-end justify-end text-white space-y-4">
-			<a href="https://doseofted.me/" target="_blank">
-				<img src="/prim-doseofted-attribution.png" width={361} height={150} alt="Dose of Ted" class="w-52 -mr-8" />
-			</a>
-			<div class="text-right">
-				<p class="text-white/80 text-xs drop-shadow-lg max-w-md leading-6">
-					<strong>
-						<a class="link" href="/"> Prim+RPC</a>
-					</strong>: a project by
-					<a class="link" href="https://doseofted.me/" target="_blank"> Ted Klingenberg</a>
-					<p class="text-white/80 text-xs drop-shadow-lg mb-4 max-w-md leading-6">
-						Anonymous analytics collected with
-						<a class="link" href="https://github.com/electerious/Ackee#readme" target="_blank"> Ackee</a>
-					</p>
-				</p>
-			</div>
+	</div>
+
+	<div class="flex gap-4 justify-center items-center text-white mb-20">
+		<div class="text-right text-white/70 text-xs drop-shadow-lg max-w-md leading-6">
+			<p>
+				<strong>
+					<a class="link" href="/"> Prim+RPC</a>
+				</strong>: a project by
+				<a class="link" href="https://doseofted.me/" target="_blank"> Ted Klingenberg</a>
+			</p>
+			<p>
+				Anonymous analytics collected with
+				<a class="link" href="https://github.com/electerious/Ackee#readme" target="_blank"> Ackee</a>
+			</p>
 		</div>
+		<a href="https://doseofted.me/" target="_blank">
+			<img src="/prim-doseofted-attribution.png" width={361} height={150} alt="Dose of Ted" class="w-32" />
+		</a>
 	</div>
 
 	<!-- Feature expansions -->

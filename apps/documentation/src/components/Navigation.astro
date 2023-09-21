@@ -5,6 +5,11 @@ interface Props {
 	empty?: boolean
 }
 const { empty = false } = Astro.props
+
+const navigation = [
+	{ link: "/tests/single-element", text: "Navigation" },
+	{ link: "/what", text: "Docs" },
+]
 ---
 
 <nav class="container mx-auto h-20 flex justify-between">
@@ -19,9 +24,14 @@ const { empty = false } = Astro.props
 					data-offset="2,4">
 					<Prim>RPC</Prim>
 				</div>
-				<div class="bg-white/70 p-4 px-8 flex gap-4 items-center">
-					<a href="/tests/single-element">Navigation</a>
-					<a href="/what">Docs</a>
+				<div class="bg-white/70 border-white/70 rounded-bl-xl flex items-center">
+					{navigation.map(item => (
+						<a
+							class="px-6 py-2 h-full font-semibold uppercase text-sm flex justify-center items-center"
+							href={item.link}>
+							{item.text}
+						</a>
+					))}
 				</div>
 			</>
 		)
