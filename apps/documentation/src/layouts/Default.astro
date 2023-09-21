@@ -74,11 +74,9 @@ const image = `${Astro.site}/social.png`
 		{
 			!fullscreen ? (
 				<>
-					<Container>
+					<Container className="prim-navigation">
 						<Columns className="h-24">
-							<div transition:persist="logo" class="prim-navigation col-span-6 lg:col-span-12">
-								<Navigation />
-							</div>
+							<Navigation transition:persist="logo" />
 						</Columns>
 						<div slot="after" class="h-24 bg-white/70 border-b border-white/70 z-10 relative" />
 					</Container>

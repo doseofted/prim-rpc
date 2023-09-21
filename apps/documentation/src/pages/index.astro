@@ -363,7 +363,6 @@ const features = [
 		}
 		const codeSnippetsLights = document.querySelectorAll<HTMLElement>(".homepage-snippets-lights")
 		setTimeout(() => {
-			console.log("setting lights")
 			for (const snippet of codeSnippetsLights) {
 				snippet.setAttribute("data-light", "7")
 			}
@@ -376,7 +375,7 @@ const features = [
 		if (start === startDefault) {
 			pageLogo?.setAttribute("data-light", "0") // set to 0 initially until animated in
 			setTimeout(() => pageLogo?.setAttribute("data-light", "7"), (start + 0.6) * 1000)
-			animate(navigationElem, slideIn, { delay: start + 0.4, duration: 0.9 })
+			animate(navigationElem, { ...slideIn, y: ["-3rem", "0rem"] }, { delay: start + 0.4, duration: 0.9 })
 		} else {
 			document.body.classList.remove("homepage-intro")
 		}
