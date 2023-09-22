@@ -3,11 +3,13 @@ import { Icon } from "astro-icon/components"
 interface Props {
 	filename?: string
 	overrideClass?: string
+	/** "astro" is generally used in components, "rehype" always from mdx (the default) */
+	codeProvider?: "astro" | "rehype"
 }
-const { filename, overrideClass } = Astro.props
+const { filename, overrideClass, codeProvider = "rehype" } = Astro.props
 ---
 
-<div class:list={["flex flex-col rounded-xl w-full overflow-hidden", overrideClass]}>
+<div class:list={["not-prose flex flex-col rounded-xl w-full overflow-hidden", overrideClass]}>
 	{
 		filename && (
 			<div class="bg-prim-space/90 text-sm breadcrumbs text-white border-b border-white/20 px-5">
@@ -25,7 +27,9 @@ const { filename, overrideClass } = Astro.props
 			</div>
 		)
 	}
-	<div class="flex-grow bg-prim-space site-code-style">
+	<div
+		class="flex-grow bg-prim-space"
+		class:list={codeProvider === "astro" ? "site-code-style" : "text-sm py-3 px-5 rounded-b-xl"}>
 		<slot />
 	</div>
 </div>

@@ -49,4 +49,8 @@ export default defineConfig({
 	adapter: vercel({
 		functionPerRoute: false,
 	}),
+	// FIXME: add redirects for old website
+	redirects: {
+		// "/docs/latest/*": "/docs/v0/*",
+	},
 })

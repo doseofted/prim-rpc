@@ -239,7 +239,7 @@ const features = [
 								<p class="text-sm lg:text-base">{details}</p>
 							</div>
 						</div>
-						<CodeFile filename={code.filepath} overrideClass="flex-grow">
+						<CodeFile filename={code.filepath} codeProvider="astro" overrideClass="flex-grow">
 							<Code {...codeTheme} code={code.file} />
 						</CodeFile>
 					</div>

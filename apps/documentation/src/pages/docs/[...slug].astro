@@ -1,20 +1,20 @@
 ---
 import Documentation from "@/layouts/Documentation.astro"
 import { getCollection } from "astro:content"
+import { pathPartMapping } from "@/utils/path-mapping"
+import type { TableOfContents } from "@/utils/table-of-contents"
 
 interface Props {
 	entry: Awaited<ReturnType<typeof getCollection<"docs">>>[number]
-	tableOfContents: {
-		name: string
-		sections: {
-			name: string
-			link: string
-		}[]
-	}[]
+	tableOfContents: TableOfContents
 }
 export async function getStaticPaths() {
 	const documentation = await getCollection("docs")
-	const tableOfContents = documentation.map(doc => ({ ...doc.data, slug: doc.slug }))
+	const tableOfContents = documentation
+		.map(({ data, slug }) => ({ ...data, slug }))
+		.map(data => {
+			// data.slug.startsWith(Object.keys(pathPartMapping))
+		})
 	console.log({ tableOfContents })
 	return documentation.map(entry => {
 		const { slug } = entry
