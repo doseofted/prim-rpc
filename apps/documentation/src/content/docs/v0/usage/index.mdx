@@ -1,27 +1,43 @@
 ---
-title: Hello Documentation
+title: Introduction
 ---
 
 import CodeFile from "@/components/Code/CodeFile.astro"
 
 # {frontmatter.title}
 
-I'm Ted.
+## Table of Contents
 
-<CodeFile filename="index.ts">
+## What is It?
 
-```typescript showLineNumbers /abc/
-let abc = 5
-let b = 1
-console.log(abc)
+The goal of Prim+RPC is to make communication between server and client effortless: create a function on the server and
+call that function directly on the client, without any special framework considerations, as if that function exists on
+the same device. It is the RPC framework for JavaScript designed to be invisible, so that you can write the code that
+you want to write.
+
+Prim+RPC is the bridge between two separated JavaScript environments: web server and client, two browser tabs, web
+workers, or two totally separate processes. Prim+RPC handles the hard parts for you. Arguments you pass on the client
+are processed automatically so that the server receives them in the same format that you sent them. It can even support
+callbacks, files and blobs, and other advanced types like Maps/Sets. Return values and any thrown errors are also
+processed in the same way.
+
+Finally, Prim+RPC is designed to work with the tooling that you already use, without relying on complicated build steps
+or client generation. The core of the framework is very lightweight, with a heavy focus on RPC, and relies on plugins to
+communicate between your chosen server and client. You may write a plugin to work with your favorite frameworks or use
+one of the many plugins that are already available.
+
+## An Example
+
+Let's demonstrate with a simple example. Let's say that we have defined a function on the server that we want to share
+with the client.
+
+<CodeFile filename="server/greetings.ts">
+
+```typescript
+/** Our first function */
+export function hello(name = "world") {
+	return `Hello ${name}!`
+}
 ```
 
 </CodeFile>
-
-Hi
-
-## What?
-
-Wut?
-
-You said lorem. I said ipsum.

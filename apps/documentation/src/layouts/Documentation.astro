@@ -31,7 +31,7 @@ const { title = "", decorationText = "", description, tableOfContents = [] } = A
 	<div class="flex flex-col h-full">
 		<!-- Header decoration -->
 		<div class="grid grid-cols-12">
-			<div class="col-span-12 lg:col-span-11 h-[40svh] flex items-end justify-end">
+			<div class="col-span-12 lg:col-span-12 h-[40svh] flex items-end justify-end">
 				<div data-light={decorationText ? "5" : "0"} data-brightness="0.1,0.4" data-size="1.5,2.5" data-offset="1,2">
 					<p
 						transition:persist="docs-decoration"
@@ -67,7 +67,7 @@ const { title = "", decorationText = "", description, tableOfContents = [] } = A
 				</ul>
 			</div>
 			<div class="bg-white -mr-4 pr-4 -ml-4 lg:ml-0 pl-4 lg:pl-0 col-span-10 grid grid-cols-10 gap-x-4 py-8">
-				<div class="lg:col-start-2 col-span-12 lg:col-span-8">
+				<div class="lg:col-start-2 col-span-12 lg:col-span-6">
 					<div class="prose max-w-none">
 						<slot />
 					</div>
