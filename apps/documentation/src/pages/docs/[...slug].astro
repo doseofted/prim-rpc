@@ -1,64 +1,68 @@
 ---
 import Documentation from "@/layouts/Documentation.astro"
 import { getCollection } from "astro:content"
-import { pathPartMapping } from "@/utils/path-mapping"
-import type { TableOfContents as ToCType } from "@/utils/table-of-contents"
 import TableOfContents from "@/components/TableOfContents.astro"
+import safeSet from "just-safe-set"
+import safeGet from "just-safe-get"
+import { defu } from "defu"
+import type { TableOfContents as TableOfContentsType } from "@/utils/table-of-contents"
+
+type CollectionType = Awaited<ReturnType<typeof getCollection<"docs">>>[number]
+type CollectionTree<T extends Record<string, unknown>> = { [key: "$data" | string]: CollectionData<T> }
+type CollectionData<T extends Record<string, unknown>> = CollectionTree<T> & { $data: T & { slug: string } }
 
 interface Props {
-	entry: Awaited<ReturnType<typeof getCollection<"docs">>>[number]
-	tableOfContents: ToCType
+	entry: CollectionType
+	docContents: CollectionTree<CollectionType["data"]>
 }
 export async function getStaticPaths() {
 	const documentation = await getCollection("docs")
-	const tableOfContents = documentation
-		.map(({ data, slug }) => ({ ...data, slug }))
-		.map(data => {
-			// data.slug.startsWith(Object.keys(pathPartMapping))
-		})
+	let docContents: CollectionTree<CollectionType["data"]> = {}
+	const dataList = documentation.map(({ data, slug }, index) => ({ ...data, slug, order: data.order ?? index }))
+	for (const $data of dataList) {
+		const path = $data.slug.split("/").join(".")
+		const existing = safeGet(docContents, path) ?? {}
+		safeSet(docContents, path, defu({ $data }, existing))
+	}
 	return documentation.map(entry => {
 		const { slug } = entry
-		return { params: { slug }, props: { entry, tableOfContents } }
+		const params = { slug }
+		const props = { entry, docContents }
+		return { params, props }
 	})
 }
-const { entry, tableOfContents: tableOfContentsNew } = Astro.props
+
+const { entry, docContents } = Astro.props
 const { Content, headings } = await entry.render()
 
-// NOTE: manual list probably to be replaced with Astro's generated collections
-const tableOfContents = [
-	{
-		name: "Library Usage",
-		sections: [
-			{ name: "Introduction", link: "/docs/v0/usage" },
-			{ name: "Get Started", link: "/docs/v0/usage/setup" },
-			{ name: "How to Use", link: "/docs/v0/usage/features" },
-			{ name: "Examples", link: "/docs/v0/usage/examples" },
-			{ name: "Security", link: "/docs/v0/usage/security" },
-			{ name: "Limitations", link: "/docs/v0/usage/limitations" },
-		],
-	},
-	{
-		name: "Reference",
-		sections: [
-			{ name: "Configuration", link: "/docs/v0/configuration" },
-			{ name: "RPC Structure", link: "/docs/v0/structure" },
-			{ name: "Additional Tools", link: "/docs/v0/tooling" },
-			{ name: "Comparisons", link: "/docs/v0/comparisons" },
-		],
-	},
-	{
-		name: "Integrations",
-		sections: [
-			{ name: "Server Plugins", link: "/docs/v0/server-plugins" },
-			{ name: "Client Plugins", link: "/docs/v0/client-plugins" },
-			{ name: "IPC Plugins", link: "/docs/v0/ipc-plugins" },
-			{ name: "Create Your Own", link: "/docs/v0/create-plugin" },
-		],
-	},
-]
+const versionsAvailable = Object.keys(docContents)
+const version = Astro.params.slug?.split("/")?.[0]
+const versionContent = docContents[version ?? "v0"] as CollectionData<CollectionType["data"]>
+const sectionNames: Record<string, { name: string; order: number }> = {
+	usage: { name: "Library Usage", order: 1 },
+	reference: { name: "Reference", order: 2 },
+	integrations: { name: "Integrations", order: 3 },
+}
+const tableOfContents: TableOfContentsType = Object.entries(versionContent)
+	.filter(([key]) => key !== "$data")
+	.sort((a, b) => ((sectionNames[a[0]]?.order ?? 1) < (sectionNames[b[0]]?.order ?? 1) ? -1 : 1))
+	.map(([key, value]) => ({
+		name: sectionNames[key].name,
+		sections: Object.entries(value)
+			.filter(([key]) => key !== "$data")
+			.sort((a, b) => ((a[1].$data.order ?? 1) < (b[1].$data.order ?? 1) ? -1 : 1))
+			.map(([_, value]) => ({
+				name: value.$data.title,
+				link: `/docs/${value.$data.slug}`,
+			})),
+	}))
 ---
 
-<Documentation decorationText="The Docs." title={entry.data.title} tableOfContents={tableOfContents}>
+<Documentation
+	decorationText="The Docs."
+	title={entry.data.title}
+	tableOfContents={tableOfContents}
+	versions={versionsAvailable}>
 	<Content />
 	<TableOfContents headings={headings} slot="extra" />
 </Documentation>

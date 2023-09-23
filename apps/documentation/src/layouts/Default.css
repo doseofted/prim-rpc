@@ -1,3 +1,10 @@
+/* Lenis must be disabled if this is enabled */
+/* @media (prefers-reduced-motion: no-preference) {
+	html {
+		scroll-behavior: smooth;
+	}
+} */
+
 /* Override DaisyUI code wrapper/window component to match website colors */
 .mockup-code {
 	&::before {

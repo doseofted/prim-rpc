@@ -1,6 +1,6 @@
 export interface TableOfContentsSection {
 	name: string
-	link: string
+	link?: string
 	sections?: TableOfContentsSection[]
 }
 

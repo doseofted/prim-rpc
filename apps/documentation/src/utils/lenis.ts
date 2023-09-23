@@ -18,3 +18,17 @@ function raf(time: number) {
 	requestAnimationFrame(raf)
 }
 requestAnimationFrame(raf)
+
+function handleHashNavigation() {
+	for (const possibleLink of document.querySelectorAll<HTMLAnchorElement>('a[href*="#"]')) {
+		if (!possibleLink.hash.startsWith("#")) continue
+		possibleLink.addEventListener("click", function (event) {
+			event.preventDefault()
+			lenis.scrollTo(this.hash)
+			location.hash = this.hash
+		})
+	}
+}
+
+document.addEventListener("DOMContentLoaded", handleHashNavigation)
+document.addEventListener("astro:after-swap", handleHashNavigation)

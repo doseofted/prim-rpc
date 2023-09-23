@@ -1,21 +1,19 @@
 ---
 import Layout from "@/layouts/Default.astro"
+import { Icon } from "astro-icon/components"
 import { IntroText } from "@/components/IntroText.react"
+import type { TableOfContents } from "@/utils/table-of-contents"
 
 interface Props {
 	decorationText?: string
 	title?: string
 	description?: string
-	tableOfContents: {
-		name: string
-		sections: {
-			name: string
-			link: string
-		}[]
-	}[]
+	tableOfContents?: TableOfContents
+	versions?: string[]
 }
-const { title = "", decorationText = "", description, tableOfContents = [] } = Astro.props
+const { title = "", decorationText = "", description, tableOfContents = [], versions } = Astro.props
 const path = Astro.url.pathname
+const selectedVersion = versions?.find(v => v === (path.match(/\/docs\/(v\d+)/)?.[1] || "v0"))
 ---
 
 <Layout title={title} description={description}>
@@ -46,6 +44,29 @@ const path = Astro.url.pathname
 		<!-- Page content -->
 		<div class="flex-grow grid grid-cols-6 lg:grid-cols-12 gap-x-4">
 			<div class="bg-white/70 rounded-l-xl -ml-4 pl-4 -mr-4 pr-4 col-span-2">
+				<div class="pt-4">
+					<div class="dropdown dropdown-bottom w-full">
+						<label
+							tabindex="0"
+							class="btn btn-block glass bg-white/50 btn-xs flex justify-between normal-case"
+							onclick="versionSelection.focus()">
+							<span>{selectedVersion}</span>
+							<Icon name="ph:caret-down-bold" />
+						</label>
+						<ul
+							id="versionSelection"
+							tabindex="-1"
+							class="dropdown-content focus-within:dropdown-hover w-full z-[1] menu menu-sm p-1 shadow glass !bg-white/70 rounded-xl">
+							{
+								versions?.map(version => (
+									<li>
+										<a href={path.replace(/(\/docs\/)v\d+(.*)/, `$1${version}$2`)}>{version}</a>
+									</li>
+								))
+							}
+						</ul>
+					</div>
+				</div>
 				<ul
 					class="menu menu-sm px-0 space-y-4 flex-nowrap py-4 sticky top-0 max-h-[100svh] overflow-auto"
 					data-lenis-prevent>
@@ -54,7 +75,7 @@ const path = Astro.url.pathname
 							<li class="space-y-2">
 								<span class="menu-title !text-black px-0 font-title font-semibold">{name}</span>
 								<ul class="content-section ml-0 px-0 !mt-0">
-									{sections.map(({ name, link }, index) => (
+									{sections?.map(({ name, link }, index) => (
 										<li>
 											<a class={path === link ? "active text-white" : ""} href={link}>
 												{name}
