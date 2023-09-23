@@ -9,6 +9,14 @@ const documentationCollection = defineCollection({
 	}),
 })
 
+const pluginsCollection = defineCollection({
+	type: "content",
+	schema: z.object({
+		name: z.string(),
+	}),
+})
+
 export const collections = {
 	docs: documentationCollection,
+	plugins: pluginsCollection,
 }

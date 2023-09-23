@@ -1,0 +1,56 @@
+---
+import Documentation from "@/layouts/Documentation.astro"
+import { getCollection, getEntry } from "astro:content"
+import TableOfContents from "@/components/TableOfContents.astro"
+import {
+	documentationTableOfContentsTree,
+	createTableOfContentsFromTree,
+	type CollectionTree,
+	type CollectionType,
+} from "@/utils/table-of-contents"
+import { Debug } from "astro:components"
+
+export const prerender = false
+
+// interface Props {
+// 	version: string
+// 	tableOfContentsTree: CollectionTree<CollectionType["data"]>
+// }
+// export async function getStaticPaths() {
+// 	const documentation = await getCollection("docs")
+// 	const tableOfContentsTree = documentationTableOfContentsTree(documentation)
+// 	const versions = Object.keys(tableOfContentsTree)
+// 	return versions.map(version => {
+// 		const params = { version }
+// 		const props = { tableOfContentsTree, version }
+// 		return { params, props }
+// 	})
+// }
+// const { tableOfContentsTree, version } = Astro.props
+
+const documentation = await getCollection("docs")
+const tableOfContentsTree = documentationTableOfContentsTree(documentation)
+const docsSlug = `${Astro.params.version}/usage/setup`
+const entry = await getEntry("docs", docsSlug)
+const { Content, headings } = await entry!.render()
+const { versions, tableOfContents } = createTableOfContentsFromTree(tableOfContentsTree, docsSlug)
+
+function getPluginChoices(search: string) {
+	const searchParams = new URLSearchParams(search)
+	const server = searchParams.get("server")
+	const client = searchParams.get("client")
+	const json = searchParams.get("json")
+	return { server, client, json }
+}
+const options = getPluginChoices(Astro.url.search)
+---
+
+<Documentation
+	decorationText="The Docs."
+	title={entry?.data.title}
+	tableOfContents={tableOfContents}
+	versions={versions}>
+	<Content />
+	<Debug {options} />
+	<TableOfContents headings={headings} slot="extra" />
+</Documentation>

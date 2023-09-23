@@ -2,67 +2,38 @@
 import Documentation from "@/layouts/Documentation.astro"
 import { getCollection } from "astro:content"
 import TableOfContents from "@/components/TableOfContents.astro"
-import safeSet from "just-safe-set"
-import safeGet from "just-safe-get"
-import { defu } from "defu"
-import type { TableOfContents as TableOfContentsType } from "@/utils/table-of-contents"
-
-type CollectionType = Awaited<ReturnType<typeof getCollection<"docs">>>[number]
-type CollectionTree<T extends Record<string, unknown>> = { [key: "$data" | string]: CollectionData<T> }
-type CollectionData<T extends Record<string, unknown>> = CollectionTree<T> & { $data: T & { slug: string } }
+import {
+	documentationTableOfContentsTree,
+	createTableOfContentsFromTree,
+	type CollectionTree,
+	type CollectionType,
+} from "@/utils/table-of-contents"
 
 interface Props {
 	entry: CollectionType
-	docContents: CollectionTree<CollectionType["data"]>
+	tableOfContentsTree: CollectionTree<CollectionType["data"]>
 }
 export async function getStaticPaths() {
 	const documentation = await getCollection("docs")
-	let docContents: CollectionTree<CollectionType["data"]> = {}
-	const dataList = documentation.map(({ data, slug }, index) => ({ ...data, slug, order: data.order ?? index }))
-	for (const $data of dataList) {
-		const path = $data.slug.split("/").join(".")
-		const existing = safeGet(docContents, path) ?? {}
-		safeSet(docContents, path, defu({ $data }, existing))
-	}
+	const tableOfContentsTree = documentationTableOfContentsTree(documentation)
 	return documentation.map(entry => {
 		const { slug } = entry
 		const params = { slug }
-		const props = { entry, docContents }
+		const props = { entry, tableOfContentsTree }
 		return { params, props }
 	})
 }
 
-const { entry, docContents } = Astro.props
+const { entry, tableOfContentsTree } = Astro.props
 const { Content, headings } = await entry.render()
-
-const versionsAvailable = Object.keys(docContents)
-const version = Astro.params.slug?.split("/")?.[0]
-const versionContent = docContents[version ?? "v0"] as CollectionData<CollectionType["data"]>
-const sectionNames: Record<string, { name: string; order: number }> = {
-	usage: { name: "Library Usage", order: 1 },
-	reference: { name: "Reference", order: 2 },
-	integrations: { name: "Integrations", order: 3 },
-}
-const tableOfContents: TableOfContentsType = Object.entries(versionContent)
-	.filter(([key]) => key !== "$data")
-	.sort((a, b) => ((sectionNames[a[0]]?.order ?? 1) < (sectionNames[b[0]]?.order ?? 1) ? -1 : 1))
-	.map(([key, value]) => ({
-		name: sectionNames[key].name,
-		sections: Object.entries(value)
-			.filter(([key]) => key !== "$data")
-			.sort((a, b) => ((a[1].$data.order ?? 1) < (b[1].$data.order ?? 1) ? -1 : 1))
-			.map(([_, value]) => ({
-				name: value.$data.title,
-				link: `/docs/${value.$data.slug}`,
-			})),
-	}))
+const { versions, tableOfContents } = createTableOfContentsFromTree(tableOfContentsTree, Astro.params.slug)
 ---
 
 <Documentation
 	decorationText="The Docs."
 	title={entry.data.title}
 	tableOfContents={tableOfContents}
-	versions={versionsAvailable}>
+	versions={versions}>
 	<Content />
 	<TableOfContents headings={headings} slot="extra" />
 </Documentation>
