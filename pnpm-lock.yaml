@@ -117,6 +117,9 @@ importers:
       '@fontsource-variable/plus-jakarta-sans':
         specifier: ^5.0.9
         version: 5.0.9
+      '@formkit/auto-animate':
+        specifier: ^0.8.0
+        version: 0.8.0
       '@iconify-json/ph':
         specifier: ^1.1.6
         version: 1.1.6
@@ -1863,6 +1866,10 @@ packages:
 
   /@fontsource-variable/plus-jakarta-sans@5.0.9:
     resolution: {integrity: sha512-EtyJKXEJaVJXM3iDArV+7EihhA5LpQVWpyzDRG6kMUqbpGCCYXyhu3AwgyeOdps1PtpAh7etInshYjoVofzozQ==}
+    dev: true
+
+  /@formkit/auto-animate@0.8.0:
+    resolution: {integrity: sha512-G8f7489ka0mWyi+1IEZT+xgIwcpWtRMmE2x+IrVoQ+KM1cP6VDj/TbujZjwxdb0P8w8b16/qBfViRmydbYHwMw==}
     dev: true
 
   /@go-task/cli@3.29.1:

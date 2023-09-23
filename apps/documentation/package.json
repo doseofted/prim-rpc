@@ -48,6 +48,7 @@
 		"@fontsource-variable/fira-code": "^5.0.8",
 		"@fontsource-variable/montserrat": "^5.0.9",
 		"@fontsource-variable/plus-jakarta-sans": "^5.0.9",
+		"@formkit/auto-animate": "^0.8.0",
 		"@iconify-json/ph": "^1.1.6",
 		"@iconify-json/simple-icons": "^1.1.71",
 		"@nanostores/react": "^0.7.1",

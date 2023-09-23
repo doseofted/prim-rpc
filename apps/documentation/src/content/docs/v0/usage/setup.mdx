@@ -6,20 +6,16 @@ order: 2
 # {frontmatter.title}
 
 import { Icon } from "astro-icon/components"
+import CodeFile from "@/components/Code/CodeFile.astro"
 
 Let's learn how to set up Prim+RPC in your own project. In this guide, we'll choose Prim+RPC plugins for your favorite
-server and client frameworks. There are two categories of plugins: **method** plugins and **callback** plugins.
+server and client frameworks. There are two categories of plugins: **Method** Plugins and **Callback** Plugins. Method
+plugins handle function calls and callback plugins add support for callbacks on those functions. You can use callback
+plugins alongside method plugins: Prim+RPC knows when to use which plugin.
 
-Method plugins are simple: they handle a function call and send a single result. **Method plugins are required** as most
-of Prim+RPC's functionality relies on them.
-
-Callback plugins are optional and have the added ability handle callbacks given on a function, of which may fire
-multiple times. **Callback plugins are optional** and are only needed if you use callbacks on your functions. You can
-use callback plugins alongside method plugins: Prim+RPC knows when to use which plugin.
-
-Both types of plugins have versions intended for the server and for the client. Plugins used on the server are referred
-to as "handlers" rather than plugins to avoid confusion: a method **plugin on the client** has a corresponding method
-**handler on the server**, same with callbacks.
+Both types of plugins have versions intended for the server and for the client. **Plugins** are used on the client and
+**Handlers** are plugins used on the server. In other words, a method plugin on the client has a corresponding method
+handler (plugin) on the server, same with callbacks.
 
 This guide is interactive to help you pick the right plugins. Let's get started!
 
@@ -29,7 +25,7 @@ This guide is interactive to help you pick the right plugins. Let's get started!
 
 <div class="not-prose grid grid-cols-2 gap-4">
 	<a class="btn btn-block flex justify-between text-left" href="/">
-		<Icon class="w-6 h-6" name="simple-icons:deno" />
+		<Icon class="w-6 h-6" name="simple-icons:javascript" />
 		<span class="flex-grow">Fetch API</span>
 	</a>
 </div>
@@ -74,6 +70,84 @@ This guide is interactive to help you pick the right plugins. Let's get started!
 	</a>
 </div>
 
-## Choose Your Handler
+## Installation
 
-Custom JSON handler, optional
+The first step is to install Prim+RPC. You may find instructions for your package manager below.
+
+<CodeFile tabs={["npm", "yarn", "pnpm", "bun"]}>
+
+```zsh npm
+npm add @doseofted/prim-rpc @doseofted/prim-rpc-plugins @doseofted/prim-rpc-tooling
+```
+
+```zsh yarn
+yarn add @doseofted/prim-rpc @doseofted/prim-rpc-plugins @doseofted/prim-rpc-tooling
+```
+
+```zsh pnpm
+pnpm add @doseofted/prim-rpc @doseofted/prim-rpc-plugins @doseofted/prim-rpc-tooling
+```
+
+```zsh bun
+bun add @doseofted/prim-rpc @doseofted/prim-rpc-plugins @doseofted/prim-rpc-tooling
+```
+
+</CodeFile>
+
+You may also use Prim+RPC with Deno or from a CDN.
+
+<CodeFile>
+
+```typescript
+import { createPrimServer, createPrimClient } from "npm:@doseofted/prim-rpc@latest"
+// use available export in place of {PLUGIN_NAME} below
+import {
+	createMethodHandler,
+	createCallbackHandler,
+	createMethodPlugin,
+	createCallbackPlugin,
+} from "npm:@doseofted/prim-rpc-plugins@latest/{PLUGIN_NAME}"
+// the following import is only if you're using Prim+RPC tooling
+import "npm:@doseofted/prim-rpc-tooling@latest/{TOOL_NAME}"
+```
+
+```typescript
+import { createPrimServer, createPrimClient } from "https://esm.sh/@doseofted/prim-rpc@latest"
+// use available export in place of {PLUGIN_NAME} below
+import {
+	createMethodHandler,
+	createCallbackHandler,
+	createMethodPlugin,
+	createCallbackPlugin,
+} from "https://esm.sh/@doseofted/prim-rpc-plugins@latest/{PLUGIN_NAME}"
+// the following import is only if you're using Prim+RPC tooling
+import "https://esm.sh/@doseofted/prim-rpc-tooling@latest/{TOOL_NAME}"
+```
+
+```typescript
+import { createPrimServer, createPrimClient } from "https://esm.run/@doseofted/prim-rpc@latest"
+// use available export in place of {PLUGIN_NAME} below
+import {
+	createMethodHandler,
+	createCallbackHandler,
+	createMethodPlugin,
+	createCallbackPlugin,
+} from "https://esm.run/@doseofted/prim-rpc-plugins@latest/{PLUGIN_NAME}"
+// the following import is only if you're using Prim+RPC tooling
+import "https://esm.run/@doseofted/prim-rpc-tooling@latest/{TOOL_NAME}"
+```
+
+```typescript
+import { createPrimServer, createPrimClient } from "https://unpkg.com/@doseofted/prim-rpc@latest?module"
+// use available export in place of {PLUGIN_NAME} below (you may need to specify file path for plugins/tools)
+import {
+	createMethodHandler,
+	createCallbackHandler,
+	createMethodPlugin,
+	createCallbackPlugin,
+} from "https://unpkg.com/@doseofted/prim-rpc-plugins@latest/{PLUGIN_NAME}?module"
+// the following import is only if you're using Prim+RPC tooling
+import "https://unpkg.com/@doseofted/prim-rpc-tooling@latest/{TOOL_NAME}?module"
+```
+
+</CodeFile>
