@@ -34,7 +34,7 @@
 	[data-highlighted-chars] {
 		padding: 0.06rem 0.125rem;
 		margin: 0 -0.125rem;
-		border: 1px solid theme("colors.prim.info");
+		border: 1.5px solid theme("colors.prim.info");
 		background-color: theme("colors.prim.info/0.3");
 		width: 100%;
 		height: 100%;

@@ -15,14 +15,13 @@ export async function getStaticPaths() {
 		.map(data => {
 			// data.slug.startsWith(Object.keys(pathPartMapping))
 		})
-	console.log({ tableOfContents })
 	return documentation.map(entry => {
 		const { slug } = entry
 		return { params: { slug }, props: { entry, tableOfContents } }
 	})
 }
 const { entry, tableOfContents: tableOfContentsNew } = Astro.props
-const { Content } = await entry.render()
+const { Content, headings } = await entry.render()
 
 // NOTE: manual list probably to be replaced with Astro's generated collections
 const tableOfContents = [
@@ -60,4 +59,18 @@ const tableOfContents = [
 
 <Documentation decorationText="The Docs." title={entry.data.title} tableOfContents={tableOfContents}>
 	<Content />
+	<div slot="extra">
+		<ul class="menu menu-sm rounded-xl bg-base-200 -mx-4">
+			<li class="menu-title">On this page:</li>
+			{
+				headings.map(({ slug, text, depth }) => (
+					<>
+						<li>
+							<a href={slug}>{text}</a>
+						</li>
+					</>
+				))
+			}
+		</ul>
+	</div>
 </Documentation>

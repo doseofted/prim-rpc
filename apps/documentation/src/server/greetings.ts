@@ -13,9 +13,3 @@ export function greetings(x?: string, y?: string) {
 	return `${x},\nmeet ${y}.`
 }
 greetings.rpc = true
-
-/** Our first function */
-export function hello(name = "world") {
-	return `Hello ${name}!`
-}
-hello.rpc = true

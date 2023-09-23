@@ -66,11 +66,18 @@ const { title = "", decorationText = "", description, tableOfContents = [] } = A
 					}
 				</ul>
 			</div>
-			<div class="bg-white -mr-4 pr-4 -ml-4 lg:ml-0 pl-4 lg:pl-0 col-span-10 grid grid-cols-10 gap-x-4 py-8">
+
+			<div class="bg-white -mr-4 pr-4 -ml-4 lg:ml-0 pl-4 lg:pl-0 col-span-8 grid grid-cols-8 gap-x-4 py-8">
 				<div class="lg:col-start-2 col-span-12 lg:col-span-6">
 					<div class="prose max-w-none">
 						<slot />
 					</div>
+				</div>
+			</div>
+
+			<div class="col-span-2 bg-white -mr-4 pr-4">
+				<div class="sticky top-0 py-8">
+					<slot name="extra" />
 				</div>
 			</div>
 		</div>

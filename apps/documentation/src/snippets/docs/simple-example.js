@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-unused-vars */
 import { createPrimServer, createPrimClient, testing } from "@doseofted/prim-rpc"
 const plugins = testing.createPrimTestingPlugins()
 
@@ -8,7 +9,6 @@ sayHello.rpc = true
 
 const module = { sayHello }
 const { methodHandler, callbackHandler } = plugins
-// eslint-disable-next-line @typescript-eslint/no-unused-vars
 const server = createPrimServer({ module, methodHandler, callbackHandler })
 
 const { methodPlugin, callbackPlugin } = plugins

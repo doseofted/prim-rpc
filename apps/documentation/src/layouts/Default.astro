@@ -75,11 +75,11 @@ const image = `${Astro.site}/social.png`
 		{
 			!fullscreen ? (
 				<>
-					<Container className="prim-navigation">
+					<Container>
 						<Columns className="h-24">
 							<Navigation transition:persist="logo" />
 						</Columns>
-						<div slot="after" class="h-24 bg-white/70 border-b border-white/70 z-10 relative" />
+						<div slot="after" class="prim-navigation h-24 bg-white/70 border-b border-white/70 z-10 relative" />
 					</Container>
 					<Container className="min-h-[calc(100svh-6rem)]">
 						<slot slot="before" name="before" />

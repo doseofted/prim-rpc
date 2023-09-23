@@ -3,7 +3,6 @@ import { defineConfig } from "astro/config"
 import tailwind from "@astrojs/tailwind"
 import react from "@astrojs/react"
 import mdx from "@astrojs/mdx"
-import remarkToc from "remark-toc"
 import sitemap from "@astrojs/sitemap"
 import vercel from "@astrojs/vercel/serverless"
 import rehypePrettyCode from "rehype-pretty-code"
@@ -27,7 +26,7 @@ export default defineConfig({
 			langs: ["typescript", "javascript", "jsx", "tsx", "shellscript"],
 			wrap: false,
 		},
-		remarkPlugins: [remarkToc],
+		remarkPlugins: [],
 		syntaxHighlight: false, // "shiki",
 		rehypePlugins: [[rehypePrettyCode, rehypePrettyOptions]],
 	},
