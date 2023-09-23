@@ -5,4 +5,75 @@ order: 2
 
 # {frontmatter.title}
 
-Hi
+import { Icon } from "astro-icon/components"
+
+Let's learn how to set up Prim+RPC in your own project. In this guide, we'll choose Prim+RPC plugins for your favorite
+server and client frameworks. There are two categories of plugins: **method** plugins and **callback** plugins.
+
+Method plugins are simple: they handle a function call and send a single result. **Method plugins are required** as most
+of Prim+RPC's functionality relies on them.
+
+Callback plugins are optional and have the added ability handle callbacks given on a function, of which may fire
+multiple times. **Callback plugins are optional** and are only needed if you use callbacks on your functions. You can
+use callback plugins alongside method plugins: Prim+RPC knows when to use which plugin.
+
+Both types of plugins have versions intended for the server and for the client. Plugins used on the server are referred
+to as "handlers" rather than plugins to avoid confusion: a method **plugin on the client** has a corresponding method
+**handler on the server**, same with callbacks.
+
+This guide is interactive to help you pick the right plugins. Let's get started!
+
+## Choose Your Plugins
+
+**[Method Handler](#method-handler)**: send function results from the server, **required**.
+
+<div class="not-prose grid grid-cols-2 gap-4">
+	<a class="btn btn-block flex justify-between text-left" href="/">
+		<Icon class="w-6 h-6" name="simple-icons:deno" />
+		<span class="flex-grow">Fetch API</span>
+	</a>
+</div>
+
+**[Method Plugin](#method-plugin)**: handle function calls on the client, **required**.
+
+<div class="not-prose grid grid-cols-2 gap-4">
+	<a class="btn btn-block flex justify-between text-left" href="/">
+		<Icon class="w-6 h-6" name="simple-icons:javascript" />
+		<span class="flex-grow">Fetch API</span>
+	</a>
+</div>
+
+**[Callback Handler](#callback-handler)**: send callback arguments from the server, optional.
+
+<div class="not-prose grid grid-cols-2 gap-4">
+	<a class="btn btn-block flex justify-between text-left" href="/">
+		<Icon class="w-6 h-6" name="simple-icons:nodedotjs" />
+		<span class="flex-grow">WS (WebSocket)</span>
+	</a>
+</div>
+
+**[Callback Plugin](#callback-plugin)**: receive callback events on the client, optional.
+
+<div class="not-prose grid grid-cols-2 gap-4">
+	<a class="btn btn-block flex justify-between text-left" href="/">
+		<Icon class="w-6 h-6" name="simple-icons:javascript" />
+		<span class="flex-grow">WebSocket</span>
+	</a>
+</div>
+
+**[JSON Handler](#json-handler)**: support advanced types like Map/Set, optional.
+
+<div class="not-prose grid grid-cols-2 gap-4">
+	<a class="btn btn-block flex justify-between text-left" href="/">
+		<Icon class="w-6 h-6" name="simple-icons:javascript" />
+		<span class="flex-grow">JSON (default)</span>
+	</a>
+	<a class="btn btn-block flex justify-between text-left" href="/">
+		<Icon class="w-6 h-6" name="simple-icons:javascript" />
+		<span class="flex-grow">superjson</span>
+	</a>
+</div>
+
+## Choose Your Handler
+
+Custom JSON handler, optional

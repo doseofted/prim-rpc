@@ -21,12 +21,17 @@ requestAnimationFrame(raf)
 
 function handleHashNavigation() {
 	for (const possibleLink of document.querySelectorAll<HTMLAnchorElement>('a[href*="#"]')) {
-		if (!possibleLink.hash.startsWith("#")) continue
-		possibleLink.addEventListener("click", function (event) {
-			event.preventDefault()
-			lenis.scrollTo(this.hash)
-			location.hash = this.hash
-		})
+		try {
+			const possibleUrl = new URL(possibleLink.href)
+			if (!possibleUrl.hash) continue
+			possibleLink.addEventListener("click", function (event) {
+				if (location.pathname !== this.pathname || location.search !== this.search) return
+				event.preventDefault()
+				lenis.scrollTo(this.hash)
+				location.hash = this.hash
+			})
+			// eslint-disable-next-line no-empty -- If URL creation fails, it's irrelevant, no need to handle error
+		} catch {}
 	}
 }
 
