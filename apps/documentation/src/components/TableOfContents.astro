@@ -1,0 +1,41 @@
+---
+import type { MarkdownHeading } from "astro"
+
+interface Props {
+	/**
+	 * Note that all headings are given at same level regardless of given depth.
+	 * If deeper depths are needed, consider simplifying the page instead.
+	 */
+	headings: MarkdownHeading[]
+}
+const { headings: allHeadings = [] } = Astro.props
+const path = Astro.url.pathname
+
+const headings = allHeadings.filter(({ depth }) => depth > 1)
+---
+
+{
+	headings.length > 0 && (
+		<ul class="menu menu-sm bg-base-200 rounded-xl px-4 space-y-4 flex-nowrap">
+			<li class="space-y-2">
+				<span class="menu-title px-0 font-title font-semibold">
+					<a href={path}>On This Page:</a>
+				</span>
+				<ul class="content-section ml-0 px-0 !mt-0">
+					{headings.map(({ text, slug, depth }) => (
+						<li>
+							<a href={`${path}#${slug}`}>{text}</a>
+						</li>
+					))}
+				</ul>
+			</li>
+		</ul>
+	)
+}
+
+<style>
+	/* Remove thin line before each section provided from DaisyUI */
+	ul.content-section::before {
+		content: none;
+	}
+</style>

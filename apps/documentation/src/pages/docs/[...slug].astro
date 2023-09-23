@@ -2,11 +2,12 @@
 import Documentation from "@/layouts/Documentation.astro"
 import { getCollection } from "astro:content"
 import { pathPartMapping } from "@/utils/path-mapping"
-import type { TableOfContents } from "@/utils/table-of-contents"
+import type { TableOfContents as ToCType } from "@/utils/table-of-contents"
+import TableOfContents from "@/components/TableOfContents.astro"
 
 interface Props {
 	entry: Awaited<ReturnType<typeof getCollection<"docs">>>[number]
-	tableOfContents: TableOfContents
+	tableOfContents: ToCType
 }
 export async function getStaticPaths() {
 	const documentation = await getCollection("docs")
@@ -59,18 +60,5 @@ const tableOfContents = [
 
 <Documentation decorationText="The Docs." title={entry.data.title} tableOfContents={tableOfContents}>
 	<Content />
-	<div slot="extra">
-		<ul class="menu menu-sm rounded-xl bg-base-200 -mx-4">
-			<li class="menu-title">On this page:</li>
-			{
-				headings.map(({ slug, text, depth }) => (
-					<>
-						<li>
-							<a href={slug}>{text}</a>
-						</li>
-					</>
-				))
-			}
-		</ul>
-	</div>
+	<TableOfContents headings={headings} slot="extra" />
 </Documentation>
