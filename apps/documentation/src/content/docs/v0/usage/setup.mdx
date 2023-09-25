@@ -12,13 +12,11 @@ import Collapse from "@/components/Markdown/Collapse.astro"
 import PluginChoices from "@/components/Markdown/PluginChoices.astro"
 import { TabsTest } from "@/components/Code/TabsTest.react.tsx"
 
-<TabsTest client:idle>
+<TabsTest client:idle tabs={[{ name: "Test" }, { name: "Test 2"}, {name: "Test 3"}]}>
 
-<div slot="tab0">
-
-Hi
-
-</div>
+<div slot="$tab0">Hi 1</div>
+<div slot="$tab1">Hi 2</div>
+<div slot="$tab2">Hi 3</div>
 
 </TabsTest>
 
