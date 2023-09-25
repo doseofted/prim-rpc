@@ -33,6 +33,7 @@ export default defineConfig({
 	integrations: [
 		tailwind(),
 		react({
+			// experimentalReactChildren: true,
 			include: "src/**/*.react.tsx",
 		}),
 		mdx(),

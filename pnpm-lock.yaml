@@ -126,6 +126,9 @@ importers:
       '@iconify-json/simple-icons':
         specifier: ^1.1.71
         version: 1.1.71
+      '@iconify/react':
+        specifier: ^4.1.1
+        version: 4.1.1(react@18.2.0)
       '@nanostores/react':
         specifier: ^0.7.1
         version: 0.7.1(nanostores@0.9.3)(react@18.2.0)
@@ -1952,7 +1955,6 @@ packages:
     dependencies:
       '@iconify/types': 2.0.0
       react: 18.2.0
-    dev: false
 
   /@iconify/tools@3.0.5:
     resolution: {integrity: sha512-NYhdaOK/pPTInlNRQHP1iaOMQtu6XfIjhYh8KBUqAiKlmSWwjWYT4bm8RpNgtgEmYAYrm2PY28A2OGBP35pA1w==}

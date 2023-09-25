@@ -51,6 +51,7 @@
 		"@formkit/auto-animate": "^0.8.0",
 		"@iconify-json/ph": "^1.1.6",
 		"@iconify-json/simple-icons": "^1.1.71",
+		"@iconify/react": "^4.1.1",
 		"@nanostores/react": "^0.7.1",
 		"@studio-freight/lenis": "^1.0.22",
 		"@tailwindcss/forms": "^0.5.6",

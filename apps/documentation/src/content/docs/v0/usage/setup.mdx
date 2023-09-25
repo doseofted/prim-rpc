@@ -7,13 +7,17 @@ order: 2
 
 import { Icon } from "astro-icon/components"
 import CodeFile from "@/components/Code/CodeFile.astro"
+// import CodeFile from "@/components/Code/CodeFile.react.tsx"
 import Collapse from "@/components/Markdown/Collapse.astro"
 import PluginChoices from "@/components/Markdown/PluginChoices.astro"
 
-Let's learn how to set up Prim+RPC in your own project. In this guide, we'll choose Prim+RPC plugins for your favorite
-server and client frameworks. There are two categories of plugins: **Method** Plugins and **Callback** Plugins. Method
-plugins handle function calls and callback plugins are optional and add support for callbacks on those functions. You
-can use callback plugins alongside method plugins: Prim+RPC knows when to use which plugin.
+Let's learn how to set up Prim+RPC in your own project. If you'd like to get set up quickly or are new to Prim+RPC, you
+may want to check out the [Examples](/docs/v0/usage/examples).
+
+In this guide, we'll choose Prim+RPC plugins for your favorite server and client frameworks. There are two categories of
+plugins: **Method** Plugins and **Callback** Plugins. Method plugins handle function calls and callback plugins are
+optional and add support for callbacks on those functions. You can use callback plugins alongside method plugins:
+Prim+RPC knows when to use which plugin.
 
 Both types of plugins have versions intended for the server and for the client. **Plugins** are used on the client and
 **Handlers** are plugins used on the server. In other words, a method plugin on the client has a corresponding method
@@ -51,11 +55,16 @@ You can add support for callbacks and other advanced types with additional, opti
 
 ## Installation
 
-The first step is to install Prim+RPC. You may find instructions for your package manager below.
+The first step is to install Prim+RPC. The core of Prim+RPC (`@doseofted/prim-rpc{:txt}`) is framework-agnostic and
+includes both server and client code. It is made compatible with frameworks by installing Prim+RPC plugins
+(`@doseofted/prim-rpc-plugins{:txt}`). Prim+RPC also includes optional tooling (`@doseofted/prim-rpc-tooling{:txt}`)
+that includes features like documentation generation and other helpers.
 
-<CodeFile tabs={["npm", "yarn", "pnpm", "bun"]}>
+You may find instructions for your package manager below.
 
-```zsh npm
+<CodeFile client:idle tabs={["npm", "yarn", "pnpm", "bun"]}>
+
+```zsh
 npm add @doseofted/prim-rpc @doseofted/prim-rpc-plugins @doseofted/prim-rpc-tooling
 ```
 
