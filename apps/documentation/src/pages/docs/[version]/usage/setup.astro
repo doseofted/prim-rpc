@@ -4,6 +4,7 @@ import { getCollection, getEntry } from "astro:content"
 import TableOfContents from "@/components/TableOfContents.astro"
 import { documentationTableOfContentsTree, createTableOfContentsFromTree } from "@/utils/table-of-contents"
 import { Debug } from "astro:components"
+import type { MarkdownHeading } from "astro"
 
 export const prerender = false
 
@@ -11,18 +12,35 @@ const documentation = await getCollection("docs")
 const tableOfContentsTree = documentationTableOfContentsTree(documentation)
 const docsSlug = `${Astro.params.version}/usage/setup`
 const entry = await getEntry("docs", docsSlug)
-const { Content, headings } = await entry!.render()
+const { Content, headings: headingsIntro } = await entry!.render()
 const { versions, tableOfContents } = createTableOfContentsFromTree(tableOfContentsTree, docsSlug)
 
 const path = Astro.url.pathname
 function getPluginChoices(search: string) {
 	const searchParams = new URLSearchParams(search)
-	const server = searchParams.get("server")
-	const client = searchParams.get("client")
+	const methodHandler = searchParams.get("mh")
+	const methodPlugin = searchParams.get("mp")
+	const callbackHandler = searchParams.get("ch")
+	const callbackPlugin = searchParams.get("cp")
 	const json = searchParams.get("json")
-	return { server, client, json }
+	return { methodHandler, methodPlugin, callbackHandler, callbackPlugin, json }
 }
 const options = getPluginChoices(Astro.url.search)
+
+const methodHandler = await getEntry("plugins", "method-handler/" + options.methodHandler)
+const methodHandlerEntry = await methodHandler?.render()
+const methodPlugin = await getEntry("plugins", "method-plugin/" + options.methodPlugin)
+const methodPluginEntry = await methodPlugin?.render()
+const callbackHandler = await getEntry("plugins", "callback-handler/" + options.callbackHandler)
+const callbackHandlerEntry = await callbackHandler?.render()
+const callbackPlugin = await getEntry("plugins", "callback-plugin/" + options.callbackPlugin)
+const callbackPluginEntry = await callbackPlugin?.render()
+
+function makeMarkdownHeading(text: string, headingLevel = 2): MarkdownHeading {
+	return { depth: headingLevel, text, slug: text.replace(/ /g, "-").toLowerCase() }
+}
+const headingsCustom = [makeMarkdownHeading("Server Setup"), makeMarkdownHeading("Client Setup")]
+const headings = [...headingsIntro, ...headingsCustom]
 ---
 
 <Documentation
@@ -32,6 +50,11 @@ const options = getPluginChoices(Astro.url.search)
 	versions={versions}>
 	<Content />
 	<Debug {options} />
-	<a href={`${path}?server=fetch#choose-your-server`}>Test</a>
+	<h2 id={headingsCustom[0].slug}>{headingsCustom[0].text}</h2>
+	{methodHandlerEntry && <methodHandlerEntry.Content />}
+	{callbackHandlerEntry && <callbackHandlerEntry.Content />}
+	<h2 id={headingsCustom[1].slug}>{headingsCustom[1].text}</h2>
+	{methodPluginEntry && <methodPluginEntry.Content />}
+	{callbackPluginEntry && <callbackPluginEntry.Content />}
 	<TableOfContents headings={headings} slot="extra" />
 </Documentation>

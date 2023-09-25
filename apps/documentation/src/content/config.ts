@@ -13,6 +13,10 @@ const pluginsCollection = defineCollection({
 	type: "content",
 	schema: z.object({
 		name: z.string(),
+		icon: z.string().optional(),
+		type: z.enum(["method-handler", "method-plugin", "callback-handler", "callback-plugin", "json-handler"]),
+		transport: z.enum(["http", "ws"]),
+		features: z.array(z.string()).optional(),
 	}),
 })
 

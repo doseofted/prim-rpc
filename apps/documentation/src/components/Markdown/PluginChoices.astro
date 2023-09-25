@@ -1,0 +1,35 @@
+---
+import LinkButton from "./LinkButton.astro"
+import ListGrid from "./ListGrid.astro"
+import { getCollection } from "astro:content"
+
+interface Props {
+	type: string
+}
+const { type: givenType = "all" } = Astro.props
+
+const plugins = await getCollection("plugins")
+const pluginShorthand: Record<string, string> = {
+	"method-handler": "mh",
+	"method-plugin": "mp",
+	"callback-handler": "ch",
+	"callback-plugin": "cp",
+	"json-handler": "json",
+}
+---
+
+<ListGrid>
+	{
+		plugins
+			.filter(plugin => givenType === "all" || plugin.data.type === givenType)
+			.map(plugin => (
+				<LinkButton
+					block
+					name={plugin.data.name}
+					search={{ [pluginShorthand[givenType]]: plugin.slug.replace(`${plugin.data.type}/`, "") }}
+					hash={`#${plugin.data.type}`}
+					icon={plugin.data.icon}
+				/>
+			))
+	}
+</ListGrid>

@@ -1,0 +1,33 @@
+---
+import { Icon } from "astro-icon/components"
+interface Props {
+	icon?: string
+	name?: string
+	href?: string
+	block?: boolean
+	/** Search is appended to given `href` and does not overrride existing query */
+	search?: Record<string, string>
+	hash?: string
+}
+const { name, href = Astro.url.toString(), icon, block, search = {}, hash: overrideHash } = Astro.props
+const urlGiven = new URL(href, Astro.site)
+const givenParams = new URLSearchParams(urlGiven.search)
+const newParams = new URLSearchParams(search)
+const uniqueParamMap = new Map([...givenParams, ...newParams])
+const searchParams = new URLSearchParams(Array.from(uniqueParamMap))
+const { origin, pathname, hash: givenHash } = urlGiven
+const newHref = [origin, pathname, "?", searchParams.toString(), overrideHash || givenHash].join("")
+
+const linkIsActive = Astro.url.toString() === newHref.replace(/#[\w-_]+$/g, "")
+const linkIncludesSearch = Object.entries(search)
+	.map(([key, value]) => givenParams.get(key) === value)
+	.every(b => b)
+const active = linkIsActive || linkIncludesSearch
+---
+
+<a
+	class:list={["btn flex justify-between text-left", active ? "btn-neutral text-white" : "", block ? "btn-block" : ""]}
+	href={newHref}>
+	{icon && <Icon class="w-6 h-6" name={icon} />}
+	<span class="flex-grow">{name}</span>
+</a>

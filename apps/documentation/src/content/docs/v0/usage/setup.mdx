@@ -7,11 +7,13 @@ order: 2
 
 import { Icon } from "astro-icon/components"
 import CodeFile from "@/components/Code/CodeFile.astro"
+import Collapse from "@/components/Markdown/Collapse.astro"
+import PluginChoices from "@/components/Markdown/PluginChoices.astro"
 
 Let's learn how to set up Prim+RPC in your own project. In this guide, we'll choose Prim+RPC plugins for your favorite
 server and client frameworks. There are two categories of plugins: **Method** Plugins and **Callback** Plugins. Method
-plugins handle function calls and callback plugins add support for callbacks on those functions. You can use callback
-plugins alongside method plugins: Prim+RPC knows when to use which plugin.
+plugins handle function calls and callback plugins are optional and add support for callbacks on those functions. You
+can use callback plugins alongside method plugins: Prim+RPC knows when to use which plugin.
 
 Both types of plugins have versions intended for the server and for the client. **Plugins** are used on the client and
 **Handlers** are plugins used on the server. In other words, a method plugin on the client has a corresponding method
@@ -23,52 +25,29 @@ This guide is interactive to help you pick the right plugins. Let's get started!
 
 **[Method Handler](#method-handler)**: send function results from the server, **required**.
 
-<div class="not-prose grid grid-cols-2 gap-4">
-	<a class="btn btn-block flex justify-between text-left" href="/">
-		<Icon class="w-6 h-6" name="simple-icons:javascript" />
-		<span class="flex-grow">Fetch API</span>
-	</a>
-</div>
+<PluginChoices type="method-handler" />
 
 **[Method Plugin](#method-plugin)**: handle function calls on the client, **required**.
 
-<div class="not-prose grid grid-cols-2 gap-4">
-	<a class="btn btn-block flex justify-between text-left" href="/">
-		<Icon class="w-6 h-6" name="simple-icons:javascript" />
-		<span class="flex-grow">Fetch API</span>
-	</a>
-</div>
+<PluginChoices type="method-plugin" />
+
+You can add support for callbacks and other advanced types with additional, optional plugins.
+
+<Collapse title="Optional Choices">
 
 **[Callback Handler](#callback-handler)**: send callback arguments from the server, optional.
 
-<div class="not-prose grid grid-cols-2 gap-4">
-	<a class="btn btn-block flex justify-between text-left" href="/">
-		<Icon class="w-6 h-6" name="simple-icons:nodedotjs" />
-		<span class="flex-grow">WS (WebSocket)</span>
-	</a>
-</div>
+<PluginChoices type="callback-handler" />
 
 **[Callback Plugin](#callback-plugin)**: receive callback events on the client, optional.
 
-<div class="not-prose grid grid-cols-2 gap-4">
-	<a class="btn btn-block flex justify-between text-left" href="/">
-		<Icon class="w-6 h-6" name="simple-icons:javascript" />
-		<span class="flex-grow">WebSocket</span>
-	</a>
-</div>
+<PluginChoices type="callback-plugin" />
 
 **[JSON Handler](#json-handler)**: support advanced types like Map/Set, optional.
 
-<div class="not-prose grid grid-cols-2 gap-4">
-	<a class="btn btn-block flex justify-between text-left" href="/">
-		<Icon class="w-6 h-6" name="simple-icons:javascript" />
-		<span class="flex-grow">JSON (default)</span>
-	</a>
-	<a class="btn btn-block flex justify-between text-left" href="/">
-		<Icon class="w-6 h-6" name="simple-icons:javascript" />
-		<span class="flex-grow">superjson</span>
-	</a>
-</div>
+<PluginChoices type="json-handler" />
+
+</Collapse>
 
 ## Installation
 
