@@ -24,7 +24,7 @@ const headings = allHeadings.filter(({ depth }) => depth > 1)
 				<ul class="content-section ml-0 px-0 !mt-0">
 					{headings.map(({ text, slug, depth }) => (
 						<li>
-							<a href={`${path}#${slug}`}>{text}</a>
+							<a href={`#${slug}`}>{text}</a>
 						</li>
 					))}
 				</ul>

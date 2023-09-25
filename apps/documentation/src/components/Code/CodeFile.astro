@@ -1,22 +1,15 @@
 ---
 import { Icon } from "astro-icon/components"
+import Code from "./Code.astro"
+
 interface Props {
 	/** A single filepath, separated by "/" */
 	filename?: string
-	/** A filename/path. The index of the tab item refers to the index of the child pane provided in the slot. */
-	tabs?: string[]
 	overrideClass?: string
 	/** "astro" is generally used in components, "rehype" always from mdx (the default) */
 	codeProvider?: "astro" | "rehype"
 }
-const { filename, tabs = [], overrideClass, codeProvider = "rehype" } = Astro.props
-
-const iconMapping = {
-	npm: "simple-icons:npm",
-	yarn: "simple-icons:yarn",
-	deno: "simple-icons:deno",
-	bun: "simple-icons:bun",
-}
+const { filename, overrideClass, codeProvider = "rehype" } = Astro.props
 ---
 
 <div class:list={["not-prose flex flex-col rounded-xl w-full overflow-hidden", overrideClass]}>
@@ -37,22 +30,7 @@ const iconMapping = {
 			</div>
 		)
 	}
-	{
-		tabs.length > 0 && (
-			<ul class="tabs bg-prim-space/90 text-sm">
-				{tabs.map(tab => (
-					<li class="tab tab-bordered text-white border-white/30">{tab}</li>
-				))}
-			</ul>
-		)
-	}
-	<div
-		class="flex-grow bg-prim-space"
-		class:list={codeProvider === "astro" ? "site-code-style" : "text-sm py-3 px-5 rounded-b-xl"}>
+	<Code provider={codeProvider} classOverride="flex-grow">
 		<slot />
-	</div>
+	</Code>
 </div>
-
-<script>
-	import autoAnimate from "@formkit/auto-animate"
-</script>

@@ -7,9 +7,20 @@ order: 2
 
 import { Icon } from "astro-icon/components"
 import CodeFile from "@/components/Code/CodeFile.astro"
-// import CodeFile from "@/components/Code/CodeFile.react.tsx"
+import CodeTabs from "@/components/Code/CodeTabs.astro"
 import Collapse from "@/components/Markdown/Collapse.astro"
 import PluginChoices from "@/components/Markdown/PluginChoices.astro"
+import { TabsTest } from "@/components/Code/TabsTest.react.tsx"
+
+<TabsTest client:idle>
+
+<div slot="tab0">
+
+Hi
+
+</div>
+
+</TabsTest>
 
 Let's learn how to set up Prim+RPC in your own project. If you'd like to get set up quickly or are new to Prim+RPC, you
 may want to check out the [Examples](/docs/v0/usage/examples).
@@ -62,11 +73,16 @@ that includes features like documentation generation and other helpers.
 
 You may find instructions for your package manager below.
 
-<CodeFile client:idle tabs={["npm", "yarn", "pnpm", "bun"]}>
+<CodeTabs tabs={["npm", "yarn", "pnpm", "bun"]}>
+
+<details open>
+<summary class="hidden">npm</summary>
 
 ```zsh
 npm add @doseofted/prim-rpc @doseofted/prim-rpc-plugins @doseofted/prim-rpc-tooling
 ```
+
+</details>
 
 ```zsh yarn
 yarn add @doseofted/prim-rpc @doseofted/prim-rpc-plugins @doseofted/prim-rpc-tooling
@@ -80,7 +96,7 @@ pnpm add @doseofted/prim-rpc @doseofted/prim-rpc-plugins @doseofted/prim-rpc-too
 bun add @doseofted/prim-rpc @doseofted/prim-rpc-plugins @doseofted/prim-rpc-tooling
 ```
 
-</CodeFile>
+</CodeTabs>
 
 You may also use Prim+RPC with Deno or from a CDN.
 
