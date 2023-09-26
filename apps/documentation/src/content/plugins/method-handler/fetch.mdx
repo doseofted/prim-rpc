@@ -8,4 +8,23 @@ features:
   - batching
 ---
 
-This is a test for Fetch API method handler.
+import CodeFile from "@/components/Code/CodeFile.astro"
+
+Prim+RPC supports the Fetch API as used in modern JavaScript runtimes like Bun and Deno.
+
+<CodeFile filename="server/index.ts">
+
+```typescript
+import { primFetch } from "@doseofted/prim-rpc-plugins/server-fetch"
+// ...other imports
+
+const prim = createPrimServer({ module /* other options */ })
+const fetch = primFetch({ prim })
+
+// - In Bun:
+Bun.serve({ fetch })
+// - In Deno:
+Deno.serve(fetch)
+```
+
+</CodeFile>

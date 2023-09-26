@@ -39,7 +39,9 @@ const callbackPluginEntry = await callbackPlugin?.render()
 function makeMarkdownHeading(text: string, headingLevel = 2): MarkdownHeading {
 	return { depth: headingLevel, text, slug: text.replace(/ /g, "-").toLowerCase() }
 }
-const headingsCustom = [makeMarkdownHeading("Server Setup"), makeMarkdownHeading("Client Setup")]
+const headingsCustom: MarkdownHeading[] = [
+	/* makeMarkdownHeading("Server Setup"), makeMarkdownHeading("Client Setup") */
+]
 const headings = [...headingsIntro, ...headingsCustom]
 ---
 
@@ -48,13 +50,14 @@ const headings = [...headingsIntro, ...headingsCustom]
 	title={entry?.data.title}
 	tableOfContents={tableOfContents}
 	versions={versions}>
-	<Content />
-	<Debug {options} />
-	<h2 id={headingsCustom[0].slug}>{headingsCustom[0].text}</h2>
+	<Content hi="you" />
+	{methodHandlerEntry && <methodHandlerEntry.Content />}
+
+	<!-- <h2 id={headingsCustom[0].slug}>{headingsCustom[0].text}</h2>
 	{methodHandlerEntry && <methodHandlerEntry.Content />}
 	{callbackHandlerEntry && <callbackHandlerEntry.Content />}
 	<h2 id={headingsCustom[1].slug}>{headingsCustom[1].text}</h2>
 	{methodPluginEntry && <methodPluginEntry.Content />}
-	{callbackPluginEntry && <callbackPluginEntry.Content />}
+	{callbackPluginEntry && <callbackPluginEntry.Content />} -->
 	<TableOfContents headings={headings} slot="extra" />
 </Documentation>
