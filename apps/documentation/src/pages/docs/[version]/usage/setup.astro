@@ -31,13 +31,13 @@ function getPluginChoices(search: string) {
 }
 const options = getPluginChoices(Astro.url.search)
 
-const methodHandler = await getEntry("plugins", "method-handler/" + options.methodHandler)
+const methodHandler = await getEntry("plugins", "v0/method-handler/" + options.methodHandler)
 const methodHandlerEntry = await methodHandler?.render()
-const methodPlugin = await getEntry("plugins", "method-plugin/" + options.methodPlugin)
+const methodPlugin = await getEntry("plugins", "v0/method-plugin/" + options.methodPlugin)
 const methodPluginEntry = await methodPlugin?.render()
-const callbackHandler = await getEntry("plugins", "callback-handler/" + options.callbackHandler)
+const callbackHandler = await getEntry("plugins", "v0/callback-handler/" + options.callbackHandler)
 const callbackHandlerEntry = await callbackHandler?.render()
-const callbackPlugin = await getEntry("plugins", "callback-plugin/" + options.callbackPlugin)
+const callbackPlugin = await getEntry("plugins", "v0/callback-plugin/" + options.callbackPlugin)
 const callbackPluginEntry = await callbackPlugin?.render()
 
 function makeMarkdownHeading(text: string, headingLevel = 2): MarkdownHeading {

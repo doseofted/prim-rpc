@@ -26,7 +26,9 @@ const pluginShorthand: Record<string, string> = {
 				<LinkButton
 					block
 					name={plugin.data.name}
-					search={{ [pluginShorthand[givenType]]: plugin.slug.replace(`${plugin.data.type}/`, "") }}
+					search={{
+						[pluginShorthand[givenType]]: plugin.slug.replace(`${Astro.params.version}/${plugin.data.type}/`, ""),
+					}}
 					hash={`#${plugin.data.type}`}
 					icon={plugin.data.icon}
 				/>

@@ -1,5 +1,6 @@
 // @ts-check
 import { defineConfig } from "tsup"
+import { $ } from "zx"
 
 const banner = `
 // Part of the Prim+RPC project ( https://prim.doseofted.me/ )
@@ -13,4 +14,7 @@ export default defineConfig({
 	dts: true,
 	clean: true,
 	banner: { js: banner },
+	async onSuccess() {
+		await $`pnpm document`
+	},
 })

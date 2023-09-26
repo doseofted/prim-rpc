@@ -74,7 +74,7 @@ importers:
         version: 5.2.2
       vite:
         specifier: ^4.4.9
-        version: 4.4.9(@types/node@18.17.4)(sass@1.66.1)
+        version: 4.4.9(@types/node@18.17.14)(sass@1.66.1)
       vitest:
         specifier: ^0.34.3
         version: 0.34.3(@vitest/ui@0.34.3)(jsdom@22.1.0)(sass@1.66.1)
@@ -592,6 +592,12 @@ importers:
       superjson:
         specifier: ^1.13.1
         version: 1.13.1
+      typedoc:
+        specifier: ^0.25.1
+        version: 0.25.1(typescript@5.2.2)
+      typedoc-plugin-markdown:
+        specifier: ^4.0.0-next.20
+        version: 4.0.0-next.21(typedoc@0.25.1)
 
   libs/tooling:
     dependencies:
@@ -3369,7 +3375,7 @@ packages:
       '@babel/plugin-transform-react-jsx-self': 7.22.5(@babel/core@7.22.15)
       '@babel/plugin-transform-react-jsx-source': 7.22.5(@babel/core@7.22.15)
       react-refresh: 0.14.0
-      vite: 4.4.9(@types/node@18.17.4)(sass@1.66.1)
+      vite: 4.4.9(@types/node@18.17.14)(sass@1.66.1)
     transitivePeerDependencies:
       - supports-color
     dev: true
@@ -4522,7 +4528,7 @@ packages:
       undici: 5.23.0
       unist-util-visit: 4.1.2
       vfile: 5.3.7
-      vite: 4.4.9(@types/node@18.17.4)(sass@1.66.1)
+      vite: 4.4.9(@types/node@18.17.14)(sass@1.66.1)
       vitefu: 0.2.4(vite@4.4.9)
       which-pm: 2.1.1
       yargs-parser: 21.1.1
@@ -11801,6 +11807,14 @@ packages:
       is-typed-array: 1.1.12
     dev: true
 
+  /typedoc-plugin-markdown@4.0.0-next.21(typedoc@0.25.1):
+    resolution: {integrity: sha512-Fvk4TTjLTwS5hsKmrT1YvdM6T2ljL2Mj8NISg9UhbNXYb3pY1ucFE4w66u2ntqadElWqsCsWLLemX3FMeykTkw==}
+    peerDependencies:
+      typedoc: '>=0.25.0'
+    dependencies:
+      typedoc: 0.25.1(typescript@5.2.2)
+    dev: true
+
   /typedoc@0.25.1(typescript@5.2.2):
     resolution: {integrity: sha512-c2ye3YUtGIadxN2O6YwPEXgrZcvhlZ6HlhWZ8jQRNzwLPn2ylhdGqdR8HbyDRyALP8J6lmSANILCkkIdNPFxqA==}
     engines: {node: '>= 16'}
@@ -12241,7 +12255,7 @@ packages:
       vite:
         optional: true
     dependencies:
-      vite: 4.4.9(@types/node@18.17.4)(sass@1.66.1)
+      vite: 4.4.9(@types/node@18.17.14)(sass@1.66.1)
     dev: true
 
   /vitest@0.34.3(@vitest/ui@0.34.3)(jsdom@22.1.0)(sass@1.66.1):
