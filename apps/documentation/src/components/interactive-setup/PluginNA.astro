@@ -1,0 +1,36 @@
+---
+import { Icon } from "astro-icon/components"
+
+interface Props {
+	message: string
+	href?: string
+	type?: "success" | "info" | "warning" | "error"
+}
+const types = {
+	success: "alert-success bg-success/40 border-success",
+	info: "alert-info bg-info/40 border-info",
+	warning: "alert-warning bg-warning/40 border-warning",
+	error: "alert-error bg-error/40 border-error",
+}
+const icons = {
+	success: "ph:check-circle-duotone",
+	info: "ph:info-duotone",
+	warning: "ph:warning-circle-duotone",
+	error: "ph:x-circle-duotone",
+}
+const { message, href, type: alertType } = Astro.props
+---
+
+<div class:list={["alert mt-6", types[alertType ?? "info"]]}>
+	<Icon class="w-6 h-6" name={icons[alertType ?? "info"]} />
+	<span>{message}</span>
+	{
+		href && (
+			<div>
+				<a href={href} class="btn btn-sm glass bg-white/30 no-underline">
+					Choose Plugin
+				</a>
+			</div>
+		)
+	}
+</div>

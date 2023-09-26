@@ -1,0 +1,16 @@
+import CodeFile from "@/components/Code/CodeFile.astro"
+
+Prim+RPC is now set up and ready to use! Try making a function call:
+
+<CodeFile filename="client/index.ts">
+
+```typescript
+import { client } from "./prim"
+
+const greeting = await client.sayHello()
+console.log(greeting) // "Frontend, meet Backend."
+```
+
+</CodeFile>
+
+Now we easily add more functions and simply call those function from the client.

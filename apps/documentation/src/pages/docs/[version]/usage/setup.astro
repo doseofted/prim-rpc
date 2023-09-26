@@ -2,9 +2,14 @@
 import Documentation from "@/layouts/Documentation.astro"
 import { getCollection, getEntry } from "astro:content"
 import TableOfContents from "@/components/TableOfContents.astro"
+import PluginNA from "@/components/interactive-setup/PluginNA.astro"
 import { documentationTableOfContentsTree, createTableOfContentsFromTree } from "@/utils/table-of-contents"
-import { Debug } from "astro:components"
 import type { MarkdownHeading } from "astro"
+import { Content as Content1, getHeadings as getHeadings1 } from "@/components/interactive-setup/1.setup.mdx"
+import { Content as Content2, getHeadings as getHeadings2 } from "@/components/interactive-setup/2.setup.mdx"
+import { Content as Content3, getHeadings as getHeadings3 } from "@/components/interactive-setup/3.setup.mdx"
+import { Content as Content4, getHeadings as getHeadings4 } from "@/components/interactive-setup/4.setup.mdx"
+import { Content as Content5, getHeadings as getHeadings5 } from "@/components/interactive-setup/5.setup.mdx"
 
 export const prerender = false
 
@@ -12,7 +17,6 @@ const documentation = await getCollection("docs")
 const tableOfContentsTree = documentationTableOfContentsTree(documentation)
 const docsSlug = `${Astro.params.version}/usage/setup`
 const entry = await getEntry("docs", docsSlug)
-const { Content, headings: headingsIntro } = await entry!.render()
 const { versions, tableOfContents } = createTableOfContentsFromTree(tableOfContentsTree, docsSlug)
 
 const path = Astro.url.pathname
@@ -39,10 +43,18 @@ const callbackPluginEntry = await callbackPlugin?.render()
 function makeMarkdownHeading(text: string, headingLevel = 2): MarkdownHeading {
 	return { depth: headingLevel, text, slug: text.replace(/ /g, "-").toLowerCase() }
 }
-const headingsCustom: MarkdownHeading[] = [
-	/* makeMarkdownHeading("Server Setup"), makeMarkdownHeading("Client Setup") */
+
+const headings = [
+	...getHeadings1(),
+	...(methodHandlerEntry?.headings ?? []),
+	...getHeadings2(),
+	...(methodPluginEntry?.headings ?? []),
+	...getHeadings3(),
+	...(callbackHandlerEntry?.headings ?? []),
+	...getHeadings4(),
+	...(callbackPluginEntry?.headings ?? []),
+	...getHeadings5(),
 ]
-const headings = [...headingsIntro, ...headingsCustom]
 ---
 
 <Documentation
@@ -50,14 +62,38 @@ const headings = [...headingsIntro, ...headingsCustom]
 	title={entry?.data.title}
 	tableOfContents={tableOfContents}
 	versions={versions}>
-	<Content hi="you" />
-	{methodHandlerEntry && <methodHandlerEntry.Content />}
-
-	<!-- <h2 id={headingsCustom[0].slug}>{headingsCustom[0].text}</h2>
-	{methodHandlerEntry && <methodHandlerEntry.Content />}
-	{callbackHandlerEntry && <callbackHandlerEntry.Content />}
-	<h2 id={headingsCustom[1].slug}>{headingsCustom[1].text}</h2>
-	{methodPluginEntry && <methodPluginEntry.Content />}
-	{callbackPluginEntry && <callbackPluginEntry.Content />} -->
+	<Content1 />
+	{
+		methodHandlerEntry ? (
+			<methodHandlerEntry.Content />
+		) : (
+			<PluginNA message="Method handler selection is required." href="#method-handler" type="warning" />
+		)
+	}
+	<Content2 />
+	{
+		callbackHandlerEntry ? (
+			<callbackHandlerEntry.Content />
+		) : (
+			<PluginNA message="Callback handler was not chosen." href="#callback-handler" />
+		)
+	}
+	<Content3 />
+	{
+		methodPluginEntry ? (
+			<methodPluginEntry.Content />
+		) : (
+			<PluginNA message="Method plugin selection is required." href="#method-plugin" type="warning" />
+		)
+	}
+	<Content4 />
+	{
+		callbackPluginEntry ? (
+			<callbackPluginEntry.Content />
+		) : (
+			<PluginNA message="Callback plugin was not chosen." href="#callback-plugin" />
+		)
+	}
+	<Content5 />
 	<TableOfContents headings={headings} slot="extra" />
 </Documentation>

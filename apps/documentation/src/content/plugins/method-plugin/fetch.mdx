@@ -8,4 +8,24 @@ features:
   - batching
 ---
 
-This is a test for Fetch API method plugin.
+import CodeFile from "@/components/Code/CodeFile.astro"
+
+Prim+RPC supports the Fetch API as implemented in all modern browsers.
+
+<CodeFile filename="client/prim.ts">
+
+```typescript
+import { createMethodPlugin } from "@doseofted/prim-rpc-plugins/browser-fetch"
+// ...other imports
+
+const methodPlugin = createMethodPlugin()
+const client = createPrimClient<Module>({
+  endpoint: "http://localhost:3000/prim"
+  methodPlugin
+  /* ...options */
+})
+```
+
+</CodeFile>
+
+Your endpoint may look different depending on your server selection. Check with your server for the correct endpoint.

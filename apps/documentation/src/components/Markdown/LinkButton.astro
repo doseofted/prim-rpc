@@ -16,7 +16,7 @@ const newParams = new URLSearchParams(search)
 const uniqueParamMap = new Map([...givenParams, ...newParams])
 const searchParams = new URLSearchParams(Array.from(uniqueParamMap))
 const { origin, pathname, hash: givenHash } = urlGiven
-const newHref = [origin, pathname, "?", searchParams.toString(), overrideHash || givenHash].join("")
+const newHref = [pathname, "?", searchParams.toString(), overrideHash || givenHash].join("")
 
 const linkIsActive = Astro.url.toString() === newHref.replace(/#[\w-_]+$/g, "")
 const linkIncludesSearch = Object.entries(search)

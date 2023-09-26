@@ -18,13 +18,17 @@ Prim+RPC supports the Fetch API as used in modern JavaScript runtimes like Bun a
 import { primFetch } from "@doseofted/prim-rpc-plugins/server-fetch"
 // ...other imports
 
-const prim = createPrimServer({ module /* other options */ })
+const prim = createPrimServer({ module /* ...options */ })
 const fetch = primFetch({ prim })
 
-// - In Bun:
+// - In Bun: serves http://localhost:3000/prim
 Bun.serve({ fetch })
-// - In Deno:
+// - In Deno: serves http://localhost:8000/prim
 Deno.serve(fetch)
 ```
 
 </CodeFile>
+
+Your server should now be available on the address show above, unless you have changed settings. Take note of the
+address as will become the client's endpoint. The `/prim{:txt}` prefix may also be different if you've configured it in
+your Prim+RPC server.
