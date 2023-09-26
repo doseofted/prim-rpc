@@ -14,6 +14,13 @@ interface Props {
 const { title = "", decorationText = "", description, tableOfContents = [], versions } = Astro.props
 const path = Astro.url.pathname
 const selectedVersion = versions?.find(v => v === (path.match(/\/docs\/(v\d+)/)?.[1] || "v0"))
+
+// NOTE: interactive guide should always override content
+const linkOverrides: Record<string, string> = {
+	"/docs/v0/usage/setup-guide": "/docs/v0/usage/setup",
+	"/docs/v1/usage/setup-guide": "/docs/v1/usage/setup",
+	"/docs/v2/usage/setup-guide": "/docs/v2/usage/setup",
+}
 ---
 
 <Layout title={title} description={description}>
@@ -77,7 +84,9 @@ const selectedVersion = versions?.find(v => v === (path.match(/\/docs\/(v\d+)/)?
 								<ul class="content-section ml-0 px-0 !mt-0">
 									{sections?.map(({ name, link }, index) => (
 										<li>
-											<a class={path.startsWith(link ?? "") ? "active text-white" : ""} href={link}>
+											<a
+												class={path.startsWith(linkOverrides[link ?? ""] ?? link ?? "") ? "active text-white" : ""}
+												href={linkOverrides[link ?? ""] ?? link}>
 												{name}
 											</a>
 										</li>
