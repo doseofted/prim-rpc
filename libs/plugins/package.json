@@ -47,6 +47,7 @@
 		"@types/supertest": "^2.0.12",
 		"@types/ws": "^8.5.5",
 		"@vitest/web-worker": "^0.34.3",
+		"@whatwg-node/server": "^0.9.14",
 		"astro": "3.0.10",
 		"axios": "^1.5.0",
 		"express": "^4.18.2",
