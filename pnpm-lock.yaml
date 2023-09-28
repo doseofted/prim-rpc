@@ -333,6 +333,9 @@ importers:
       '@vitest/web-worker':
         specifier: ^0.34.3
         version: 0.34.3(vitest@0.34.3)
+      '@whatwg-node/server':
+        specifier: ^0.9.14
+        version: 0.9.14
       astro:
         specifier: 3.0.10
         version: 3.0.10(@types/node@18.17.4)(sass@1.66.1)
@@ -2937,6 +2940,38 @@ packages:
       '@webassemblyjs/ast': 1.11.6
       '@xtuc/long': 4.2.2
 
+  /@whatwg-node/events@0.1.1:
+    resolution: {integrity: sha512-AyQEn5hIPV7Ze+xFoXVU3QTHXVbWPrzaOkxtENMPMuNL6VVHrp4hHfDt9nrQpjO7BgvuM95dMtkycX5M/DZR3w==}
+    engines: {node: '>=16.0.0'}
+    dev: true
+
+  /@whatwg-node/fetch@0.9.13:
+    resolution: {integrity: sha512-PPtMwhjtS96XROnSpowCQM85gCUG2m7AXZFw0PZlGbhzx2GK7f2iOXilfgIJ0uSlCuuGbOIzfouISkA7C4FJOw==}
+    engines: {node: '>=16.0.0'}
+    dependencies:
+      '@whatwg-node/node-fetch': 0.4.19
+      urlpattern-polyfill: 9.0.0
+    dev: true
+
+  /@whatwg-node/node-fetch@0.4.19:
+    resolution: {integrity: sha512-AW7/m2AuweAoSXmESrYQr/KBafueScNbn2iNO0u6xFr2JZdPmYsSm5yvAXYk6yDLv+eDmSSKrf7JnFZ0CsJIdA==}
+    engines: {node: '>=16.0.0'}
+    dependencies:
+      '@whatwg-node/events': 0.1.1
+      busboy: 1.6.0
+      fast-querystring: 1.1.2
+      fast-url-parser: 1.1.3
+      tslib: 2.6.2
+    dev: true
+
+  /@whatwg-node/server@0.9.14:
+    resolution: {integrity: sha512-I8TT0NoCP+xThLBuGlU6dgq5wpExkphNMo2geZwQW0vAmEPtc3MNMZMIYqg5GyNmpv5Nf7fnxb8tVOIHbDvuDA==}
+    engines: {node: '>=16.0.0'}
+    dependencies:
+      '@whatwg-node/fetch': 0.9.13
+      tslib: 2.6.2
+    dev: true
+
   /@xobotyi/scrollbar-width@1.9.5:
     resolution: {integrity: sha512-N8tkAACJx2ww8vFMneJmaAgmjAG1tnVBZJRLRcx061tmsLRZHSEZSLuGWnwPtunsSLvSqXQ2wfp7Mgqg1I+2dQ==}
     dev: false
@@ -5040,6 +5075,12 @@ packages:
 
   /fast-uri@2.2.0:
     resolution: {integrity: sha512-cIusKBIt/R/oI6z/1nyfe2FvGKVTohVRfvkOhvx0nCEW+xf5NoCXjAHcWp93uOUBchzYcsvPlrapAdX1uW+YGg==}
+
+  /fast-url-parser@1.1.3:
+    resolution: {integrity: sha512-5jOCVXADYNuRkKFzNJ0dCCewsZiYo0dz8QNYljkOpFC6r2U4OBmKtvm/Tsuh4w1YYdDqDb31a8TVhBJ2OJKdqQ==}
+    dependencies:
+      punycode: 1.4.1
+    dev: true
 
   /fastest-levenshtein@1.0.16:
     resolution: {integrity: sha512-eRnCtTTtGZFpQCwhJiUOuxPQWRXVKYDn0b2PeHfXL6/Zi53SLAzAHfVhVWK2AryC/WH05kGfxhFIPvTF0SXQzg==}
@@ -8162,6 +8203,10 @@ packages:
     dev: true
     optional: true
 
+  /punycode@1.4.1:
+    resolution: {integrity: sha512-jmYNElW7yvO7TV33CjSmvSiE2yco3bV2czu/OzDKdMNVZQWfxCblURLhf+47syQRBntjfLdd/H0egrzIG+oaFQ==}
+    dev: true
+
   /punycode@2.3.0:
     resolution: {integrity: sha512-rRV+zQD8tVFys26lAGR9WUuS4iUAngJScM+ZRSKtvl5tKeZ2t5bvdNFdNHBW9FWR4guGHlgmsZ1G7BSm2wTbuA==}
     engines: {node: '>=6'}
@@ -10376,6 +10421,10 @@ packages:
     dependencies:
       querystringify: 2.2.0
       requires-port: 1.0.0
+    dev: true
+
+  /urlpattern-polyfill@9.0.0:
+    resolution: {integrity: sha512-WHN8KDQblxd32odxeIgo83rdVDE2bvdkb86it7bMhYZwWKJz0+O0RK/eZiHYnM+zgt/U7hAHOlCQGfjjvSkw2g==}
     dev: true
 
   /use-immer@0.9.0(immer@10.0.2)(react@18.2.0):
