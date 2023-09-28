@@ -1,0 +1,1741 @@
+{
+	"id": 0,
+	"name": "@doseofted/prim-rpc-tooling",
+	"variant": "project",
+	"kind": 1,
+	"flags": {},
+	"children": [
+		{
+			"id": 31,
+			"name": "build",
+			"variant": "declaration",
+			"kind": 2,
+			"flags": {},
+			"children": [
+				{
+					"id": 32,
+					"name": "BuildModifyMethod",
+					"variant": "declaration",
+					"kind": 8,
+					"flags": {},
+					"children": [
+						{
+							"id": 33,
+							"name": "BuildTimeEmptyExport",
+							"variant": "declaration",
+							"kind": 16,
+							"flags": {},
+							"comment": {
+								"summary": [
+									{
+										"kind": "text",
+										"text": "Replace all code in given directory with an empty export for each file:\n\n"
+									},
+									{
+										"kind": "code",
+										"text": "```typescript\nexport {};\n```"
+									}
+								]
+							},
+							"sources": [
+								{
+									"fileName": "build/index.ts",
+									"line": 15,
+									"character": 1,
+									"url": "https://github.com/doseofted/prim-rpc/blob/9bea899/libs/tooling/src/build/index.ts#L15"
+								}
+							],
+							"type": {
+								"type": "literal",
+								"value": "build-time-empty-export"
+							}
+						},
+						{
+							"id": 34,
+							"name": "RunTimeProcessCheck",
+							"variant": "declaration",
+							"kind": 16,
+							"flags": {},
+							"comment": {
+								"summary": [
+									{
+										"kind": "text",
+										"text": "Add a runtime check to prevent imports from being used on the client.\nWhile this does not prevent the import from being bundled, it should flag\nan error in your testing process so that you can take action.\n\nThe following will be added to the top of each file:\n\n"
+									},
+									{
+										"kind": "code",
+										"text": "```typescript\nif (!process.server) { throw new Error(\"YOUR MESSAGE\"); }\n```"
+									}
+								]
+							},
+							"sources": [
+								{
+									"fileName": "build/index.ts",
+									"line": 27,
+									"character": 1,
+									"url": "https://github.com/doseofted/prim-rpc/blob/9bea899/libs/tooling/src/build/index.ts#L27"
+								}
+							],
+							"type": {
+								"type": "literal",
+								"value": "run-time-process-check"
+							}
+						},
+						{
+							"id": 35,
+							"name": "RunTimeWindowCheck",
+							"variant": "declaration",
+							"kind": 16,
+							"flags": {},
+							"comment": {
+								"summary": [
+									{
+										"kind": "text",
+										"text": "This is the same option as \"run-time-process-check\" except instead of checking\nthe "
+									},
+									{
+										"kind": "code",
+										"text": "`process`"
+									},
+									{
+										"kind": "text",
+										"text": " object, it checks that the "
+									},
+									{
+										"kind": "code",
+										"text": "`window`"
+									},
+									{
+										"kind": "text",
+										"text": " object isn't undefined.\n\nSee "
+									},
+									{
+										"kind": "code",
+										"text": "`\"run-time-process-check\"`"
+									},
+									{
+										"kind": "text",
+										"text": " for more details."
+									}
+								]
+							},
+							"sources": [
+								{
+									"fileName": "build/index.ts",
+									"line": 34,
+									"character": 1,
+									"url": "https://github.com/doseofted/prim-rpc/blob/9bea899/libs/tooling/src/build/index.ts#L34"
+								}
+							],
+							"type": {
+								"type": "literal",
+								"value": "run-time-window-check"
+							}
+						}
+					],
+					"groups": [
+						{
+							"title": "Enumeration Members",
+							"children": [
+								33,
+								34,
+								35
+							]
+						}
+					],
+					"sources": [
+						{
+							"fileName": "build/index.ts",
+							"line": 7,
+							"character": 12,
+							"url": "https://github.com/doseofted/prim-rpc/blob/9bea899/libs/tooling/src/build/index.ts#L7"
+						}
+					]
+				},
+				{
+					"id": 36,
+					"name": "BuildOptions",
+					"variant": "declaration",
+					"kind": 256,
+					"flags": {},
+					"children": [
+						{
+							"id": 38,
+							"name": "debug",
+							"variant": "declaration",
+							"kind": 1024,
+							"flags": {
+								"isOptional": true
+							},
+							"comment": {
+								"summary": [
+									{
+										"kind": "text",
+										"text": "Enable console logs for imports to determine what name option should be used"
+									}
+								]
+							},
+							"sources": [
+								{
+									"fileName": "build/index.ts",
+									"line": 41,
+									"character": 1,
+									"url": "https://github.com/doseofted/prim-rpc/blob/9bea899/libs/tooling/src/build/index.ts#L41"
+								}
+							],
+							"type": {
+								"type": "intrinsic",
+								"name": "boolean"
+							}
+						},
+						{
+							"id": 40,
+							"name": "method",
+							"variant": "declaration",
+							"kind": 1024,
+							"flags": {
+								"isOptional": true
+							},
+							"comment": {
+								"summary": [
+									{
+										"kind": "text",
+										"text": "Specify method of preventing import.\nMethods are prefixed \"build-time-\" to prevent code from being bundled\nor \"run-time-\" to prevent code from being used (but still bundled)."
+									}
+								]
+							},
+							"sources": [
+								{
+									"fileName": "build/index.ts",
+									"line": 49,
+									"character": 1,
+									"url": "https://github.com/doseofted/prim-rpc/blob/9bea899/libs/tooling/src/build/index.ts#L49"
+								}
+							],
+							"type": {
+								"type": "reference",
+								"target": 32,
+								"name": "BuildModifyMethod",
+								"package": "@doseofted/prim-rpc-tooling"
+							}
+						},
+						{
+							"id": 37,
+							"name": "name",
+							"variant": "declaration",
+							"kind": 1024,
+							"flags": {},
+							"comment": {
+								"summary": [
+									{
+										"kind": "text",
+										"text": "Folder name, relative to project folder that should not be imported"
+									}
+								]
+							},
+							"sources": [
+								{
+									"fileName": "build/index.ts",
+									"line": 39,
+									"character": 1,
+									"url": "https://github.com/doseofted/prim-rpc/blob/9bea899/libs/tooling/src/build/index.ts#L39"
+								}
+							],
+							"type": {
+								"type": "intrinsic",
+								"name": "string"
+							}
+						},
+						{
+							"id": 39,
+							"name": "runtimeError",
+							"variant": "declaration",
+							"kind": 1024,
+							"flags": {
+								"isOptional": true
+							},
+							"comment": {
+								"summary": [
+									{
+										"kind": "text",
+										"text": "If a given "
+									},
+									{
+										"kind": "code",
+										"text": "`.method`"
+									},
+									{
+										"kind": "text",
+										"text": " is a run-time check, what message should be given to created Error?"
+									}
+								]
+							},
+							"sources": [
+								{
+									"fileName": "build/index.ts",
+									"line": 43,
+									"character": 1,
+									"url": "https://github.com/doseofted/prim-rpc/blob/9bea899/libs/tooling/src/build/index.ts#L43"
+								}
+							],
+							"type": {
+								"type": "intrinsic",
+								"name": "string"
+							}
+						}
+					],
+					"groups": [
+						{
+							"title": "Properties",
+							"children": [
+								38,
+								40,
+								37,
+								39
+							]
+						}
+					],
+					"sources": [
+						{
+							"fileName": "build/index.ts",
+							"line": 37,
+							"character": 17,
+							"url": "https://github.com/doseofted/prim-rpc/blob/9bea899/libs/tooling/src/build/index.ts#L37"
+						}
+					]
+				},
+				{
+					"id": 41,
+					"name": "default",
+					"variant": "declaration",
+					"kind": 32,
+					"flags": {},
+					"sources": [
+						{
+							"fileName": "build/index.ts",
+							"line": 59,
+							"character": 0,
+							"url": "https://github.com/doseofted/prim-rpc/blob/9bea899/libs/tooling/src/build/index.ts#L59"
+						}
+					],
+					"type": {
+						"type": "reference",
+						"target": {
+							"sourceFileName": "../../node_modules/.pnpm/unplugin@1.4.0/node_modules/unplugin/dist/index.d.ts",
+							"qualifiedName": "UnpluginInstance"
+						},
+						"typeArguments": [
+							{
+								"type": "reference",
+								"target": 36,
+								"name": "BuildOptions",
+								"package": "@doseofted/prim-rpc-tooling"
+							},
+							{
+								"type": "intrinsic",
+								"name": "boolean"
+							}
+						],
+						"name": "UnpluginInstance",
+						"package": "unplugin"
+					}
+				}
+			],
+			"groups": [
+				{
+					"title": "Enumerations",
+					"children": [
+						32
+					]
+				},
+				{
+					"title": "Interfaces",
+					"children": [
+						36
+					]
+				},
+				{
+					"title": "Variables",
+					"children": [
+						41
+					]
+				}
+			],
+			"sources": [
+				{
+					"fileName": "build/index.ts",
+					"line": 1,
+					"character": 0,
+					"url": "https://github.com/doseofted/prim-rpc/blob/9bea899/libs/tooling/src/build/index.ts#L1"
+				}
+			]
+		},
+		{
+			"id": 42,
+			"name": "cli",
+			"variant": "declaration",
+			"kind": 2,
+			"flags": {},
+			"sources": [
+				{
+					"fileName": "cli/index.ts",
+					"line": 1,
+					"character": 0,
+					"url": "https://github.com/doseofted/prim-rpc/blob/9bea899/libs/tooling/src/cli/index.ts#L1"
+				}
+			]
+		},
+		{
+			"id": 1,
+			"name": "docs",
+			"variant": "declaration",
+			"kind": 2,
+			"flags": {},
+			"children": [
+				{
+					"id": 46,
+					"name": "PrimRpcDocs",
+					"variant": "declaration",
+					"kind": 256,
+					"flags": {},
+					"children": [
+						{
+							"id": 49,
+							"name": "docs",
+							"variant": "declaration",
+							"kind": 1024,
+							"flags": {},
+							"sources": [
+								{
+									"fileName": "docs/interfaces.ts",
+									"line": 58,
+									"character": 1,
+									"url": "https://github.com/doseofted/prim-rpc/blob/9bea899/libs/tooling/src/docs/interfaces.ts#L58"
+								}
+							],
+							"type": {
+								"type": "tuple",
+								"elements": [
+									{
+										"type": "namedTupleMember",
+										"name": "key",
+										"isOptional": false,
+										"element": {
+											"type": "union",
+											"types": [
+												{
+													"type": "literal",
+													"value": "methods"
+												},
+												{
+													"type": "literal",
+													"value": "modules"
+												}
+											]
+										}
+									},
+									{
+										"type": "namedTupleMember",
+										"name": "index",
+										"isOptional": false,
+										"element": {
+											"type": "intrinsic",
+											"name": "number"
+										}
+									}
+								]
+							},
+							"inheritedFrom": {
+								"type": "reference",
+								"target": -1,
+								"name": "PrimModuleStructure.docs"
+							}
+						},
+						{
+							"id": 47,
+							"name": "methods",
+							"variant": "declaration",
+							"kind": 1024,
+							"flags": {},
+							"sources": [
+								{
+									"fileName": "docs/interfaces.ts",
+									"line": 65,
+									"character": 1,
+									"url": "https://github.com/doseofted/prim-rpc/blob/9bea899/libs/tooling/src/docs/interfaces.ts#L65"
+								}
+							],
+							"type": {
+								"type": "array",
+								"elementType": {
+									"type": "reference",
+									"target": {
+										"sourceFileName": "src/docs/interfaces.ts",
+										"qualifiedName": "PrimMethod"
+									},
+									"name": "PrimMethod",
+									"package": "@doseofted/prim-rpc-tooling"
+								}
+							}
+						},
+						{
+							"id": 48,
+							"name": "modules",
+							"variant": "declaration",
+							"kind": 1024,
+							"flags": {},
+							"sources": [
+								{
+									"fileName": "docs/interfaces.ts",
+									"line": 66,
+									"character": 1,
+									"url": "https://github.com/doseofted/prim-rpc/blob/9bea899/libs/tooling/src/docs/interfaces.ts#L66"
+								}
+							],
+							"type": {
+								"type": "array",
+								"elementType": {
+									"type": "reference",
+									"target": {
+										"sourceFileName": "src/docs/interfaces.ts",
+										"qualifiedName": "PrimModule"
+									},
+									"name": "PrimModule",
+									"package": "@doseofted/prim-rpc-tooling"
+								}
+							}
+						},
+						{
+							"id": 50,
+							"name": "props",
+							"variant": "declaration",
+							"kind": 1024,
+							"flags": {
+								"isOptional": true
+							},
+							"sources": [
+								{
+									"fileName": "docs/interfaces.ts",
+									"line": 59,
+									"character": 1,
+									"url": "https://github.com/doseofted/prim-rpc/blob/9bea899/libs/tooling/src/docs/interfaces.ts#L59"
+								}
+							],
+							"type": {
+								"type": "reflection",
+								"declaration": {
+									"id": 51,
+									"name": "__type",
+									"variant": "declaration",
+									"kind": 65536,
+									"flags": {},
+									"sources": [
+										{
+											"fileName": "docs/interfaces.ts",
+											"line": 59,
+											"character": 9,
+											"url": "https://github.com/doseofted/prim-rpc/blob/9bea899/libs/tooling/src/docs/interfaces.ts#L59"
+										}
+									],
+									"indexSignature": {
+										"id": 52,
+										"name": "__index",
+										"variant": "signature",
+										"kind": 8192,
+										"flags": {},
+										"sources": [
+											{
+												"fileName": "docs/interfaces.ts",
+												"line": 60,
+												"character": 2,
+												"url": "https://github.com/doseofted/prim-rpc/blob/9bea899/libs/tooling/src/docs/interfaces.ts#L60"
+											}
+										],
+										"parameters": [
+											{
+												"id": 53,
+												"name": "moduleOrMethodName",
+												"variant": "param",
+												"kind": 32768,
+												"flags": {},
+												"type": {
+													"type": "intrinsic",
+													"name": "string"
+												}
+											}
+										],
+										"type": {
+											"type": "reference",
+											"target": {
+												"sourceFileName": "src/docs/interfaces.ts",
+												"qualifiedName": "PrimModuleStructure"
+											},
+											"name": "PrimModuleStructure",
+											"package": "@doseofted/prim-rpc-tooling"
+										}
+									}
+								}
+							},
+							"inheritedFrom": {
+								"type": "reference",
+								"target": -1,
+								"name": "PrimModuleStructure.props"
+							}
+						}
+					],
+					"groups": [
+						{
+							"title": "Properties",
+							"children": [
+								49,
+								47,
+								48,
+								50
+							]
+						}
+					],
+					"sources": [
+						{
+							"fileName": "docs/interfaces.ts",
+							"line": 64,
+							"character": 17,
+							"url": "https://github.com/doseofted/prim-rpc/blob/9bea899/libs/tooling/src/docs/interfaces.ts#L64"
+						}
+					],
+					"extendedTypes": [
+						{
+							"type": "reference",
+							"target": {
+								"sourceFileName": "src/docs/interfaces.ts",
+								"qualifiedName": "PrimModuleStructure"
+							},
+							"name": "PrimModuleStructure",
+							"package": "@doseofted/prim-rpc-tooling"
+						}
+					]
+				},
+				{
+					"id": 2,
+					"name": "helpers",
+					"variant": "declaration",
+					"kind": 32,
+					"flags": {
+						"isConst": true
+					},
+					"sources": [
+						{
+							"fileName": "docs/index.ts",
+							"line": 8,
+							"character": 6,
+							"url": "https://github.com/doseofted/prim-rpc/blob/9bea899/libs/tooling/src/docs/index.ts#L8"
+						}
+					],
+					"type": {
+						"type": "reflection",
+						"declaration": {
+							"id": 3,
+							"name": "__type",
+							"variant": "declaration",
+							"kind": 65536,
+							"flags": {},
+							"children": [
+								{
+									"id": 4,
+									"name": "findDocsReference",
+									"variant": "declaration",
+									"kind": 1024,
+									"flags": {},
+									"sources": [
+										{
+											"fileName": "docs/index.ts",
+											"line": 8,
+											"character": 18,
+											"url": "https://github.com/doseofted/prim-rpc/blob/9bea899/libs/tooling/src/docs/index.ts#L8"
+										}
+									],
+									"type": {
+										"type": "reflection",
+										"declaration": {
+											"id": 5,
+											"name": "__type",
+											"variant": "declaration",
+											"kind": 65536,
+											"flags": {},
+											"sources": [
+												{
+													"fileName": "docs/helpers/read.ts",
+													"line": 15,
+													"character": 16,
+													"url": "https://github.com/doseofted/prim-rpc/blob/9bea899/libs/tooling/src/docs/helpers/read.ts#L15"
+												}
+											],
+											"signatures": [
+												{
+													"id": 6,
+													"name": "__type",
+													"variant": "signature",
+													"kind": 4096,
+													"flags": {},
+													"comment": {
+														"summary": [
+															{
+																"kind": "text",
+																"text": "Simple convenience function to get documentation for reference inside of Prim RPC Docs structure ("
+															},
+															{
+																"kind": "code",
+																"text": "`.props`"
+															},
+															{
+																"kind": "text",
+																"text": ")"
+															}
+														],
+														"blockTags": [
+															{
+																"tag": "@returns",
+																"content": [
+																	{
+																		"kind": "text",
+																		"text": "Documentation for requested module or method"
+																	}
+																]
+															}
+														]
+													},
+													"sources": [
+														{
+															"fileName": "docs/helpers/read.ts",
+															"line": 15,
+															"character": 16,
+															"url": "https://github.com/doseofted/prim-rpc/blob/9bea899/libs/tooling/src/docs/helpers/read.ts#L15"
+														}
+													],
+													"parameters": [
+														{
+															"id": 7,
+															"name": "docs",
+															"variant": "param",
+															"kind": 32768,
+															"flags": {},
+															"comment": {
+																"summary": [
+																	{
+																		"kind": "text",
+																		"text": "RPc documentation"
+																	}
+																]
+															},
+															"type": {
+																"type": "reference",
+																"target": {
+																	"sourceFileName": "../../node_modules/.pnpm/typescript@5.2.2/node_modules/typescript/lib/lib.es5.d.ts",
+																	"qualifiedName": "Partial"
+																},
+																"typeArguments": [
+																	{
+																		"type": "reference",
+																		"target": 46,
+																		"name": "PrimRpcDocs",
+																		"package": "@doseofted/prim-rpc-tooling"
+																	}
+																],
+																"name": "Partial",
+																"package": "typescript"
+															}
+														},
+														{
+															"id": 8,
+															"name": "given",
+															"variant": "param",
+															"kind": 32768,
+															"flags": {
+																"isOptional": true
+															},
+															"comment": {
+																"summary": [
+																	{
+																		"kind": "text",
+																		"text": "Property found in documentation structure"
+																	}
+																]
+															},
+															"type": {
+																"type": "union",
+																"types": [
+																	{
+																		"type": "reference",
+																		"target": {
+																			"sourceFileName": "src/docs/interfaces.ts",
+																			"qualifiedName": "PrimModuleStructure"
+																		},
+																		"name": "PrimModuleStructure",
+																		"package": "@doseofted/prim-rpc-tooling"
+																	},
+																	{
+																		"type": "tuple",
+																		"elements": [
+																			{
+																				"type": "namedTupleMember",
+																				"name": "key",
+																				"isOptional": false,
+																				"element": {
+																					"type": "union",
+																					"types": [
+																						{
+																							"type": "literal",
+																							"value": "methods"
+																						},
+																						{
+																							"type": "literal",
+																							"value": "modules"
+																						}
+																					]
+																				}
+																			},
+																			{
+																				"type": "namedTupleMember",
+																				"name": "index",
+																				"isOptional": false,
+																				"element": {
+																					"type": "intrinsic",
+																					"name": "number"
+																				}
+																			}
+																		]
+																	}
+																]
+															}
+														}
+													],
+													"type": {
+														"type": "union",
+														"types": [
+															{
+																"type": "reference",
+																"target": {
+																	"sourceFileName": "src/docs/interfaces.ts",
+																	"qualifiedName": "PrimMethod"
+																},
+																"name": "PrimMethod",
+																"package": "@doseofted/prim-rpc-tooling"
+															},
+															{
+																"type": "reference",
+																"target": {
+																	"sourceFileName": "src/docs/interfaces.ts",
+																	"qualifiedName": "PrimModule"
+																},
+																"name": "PrimModule",
+																"package": "@doseofted/prim-rpc-tooling"
+															}
+														]
+													}
+												}
+											]
+										}
+									}
+								},
+								{
+									"id": 9,
+									"name": "getFunctionForDocumentation",
+									"variant": "declaration",
+									"kind": 1024,
+									"flags": {},
+									"sources": [
+										{
+											"fileName": "docs/index.ts",
+											"line": 8,
+											"character": 37,
+											"url": "https://github.com/doseofted/prim-rpc/blob/9bea899/libs/tooling/src/docs/index.ts#L8"
+										}
+									],
+									"type": {
+										"type": "reflection",
+										"declaration": {
+											"id": 10,
+											"name": "__type",
+											"variant": "declaration",
+											"kind": 65536,
+											"flags": {},
+											"sources": [
+												{
+													"fileName": "docs/helpers/read.ts",
+													"line": 63,
+													"character": 16,
+													"url": "https://github.com/doseofted/prim-rpc/blob/9bea899/libs/tooling/src/docs/helpers/read.ts#L63"
+												}
+											],
+											"signatures": [
+												{
+													"id": 11,
+													"name": "__type",
+													"variant": "signature",
+													"kind": 4096,
+													"flags": {},
+													"comment": {
+														"summary": [
+															{
+																"kind": "text",
+																"text": "Given a method's documentation, find the actual method in the documented module."
+															}
+														],
+														"blockTags": [
+															{
+																"tag": "@returns",
+																"content": [
+																	{
+																		"kind": "text",
+																		"text": "The method requested in your module"
+																	}
+																]
+															}
+														]
+													},
+													"sources": [
+														{
+															"fileName": "docs/helpers/read.ts",
+															"line": 63,
+															"character": 16,
+															"url": "https://github.com/doseofted/prim-rpc/blob/9bea899/libs/tooling/src/docs/helpers/read.ts#L63"
+														}
+													],
+													"typeParameter": [
+														{
+															"id": 12,
+															"name": "Given",
+															"variant": "typeParam",
+															"kind": 131072,
+															"flags": {},
+															"type": {
+																"type": "reflection",
+																"declaration": {
+																	"id": 13,
+																	"name": "__type",
+																	"variant": "declaration",
+																	"kind": 65536,
+																	"flags": {},
+																	"sources": [
+																		{
+																			"fileName": "docs/helpers/read.ts",
+																			"line": 64,
+																			"character": 15,
+																			"url": "https://github.com/doseofted/prim-rpc/blob/9bea899/libs/tooling/src/docs/helpers/read.ts#L64"
+																		}
+																	],
+																	"signatures": [
+																		{
+																			"id": 14,
+																			"name": "__type",
+																			"variant": "signature",
+																			"kind": 4096,
+																			"flags": {},
+																			"sources": [
+																				{
+																					"fileName": "docs/helpers/read.ts",
+																					"line": 64,
+																					"character": 15,
+																					"url": "https://github.com/doseofted/prim-rpc/blob/9bea899/libs/tooling/src/docs/helpers/read.ts#L64"
+																				}
+																			],
+																			"parameters": [
+																				{
+																					"id": 15,
+																					"name": "args",
+																					"variant": "param",
+																					"kind": 32768,
+																					"flags": {
+																						"isRest": true
+																					},
+																					"type": {
+																						"type": "array",
+																						"elementType": {
+																							"type": "intrinsic",
+																							"name": "unknown"
+																						}
+																					}
+																				}
+																			],
+																			"type": {
+																				"type": "intrinsic",
+																				"name": "unknown"
+																			}
+																		}
+																	]
+																}
+															},
+															"default": {
+																"type": "reflection",
+																"declaration": {
+																	"id": 16,
+																	"name": "__type",
+																	"variant": "declaration",
+																	"kind": 65536,
+																	"flags": {},
+																	"sources": [
+																		{
+																			"fileName": "docs/helpers/read.ts",
+																			"line": 64,
+																			"character": 49,
+																			"url": "https://github.com/doseofted/prim-rpc/blob/9bea899/libs/tooling/src/docs/helpers/read.ts#L64"
+																		}
+																	],
+																	"signatures": [
+																		{
+																			"id": 17,
+																			"name": "__type",
+																			"variant": "signature",
+																			"kind": 4096,
+																			"flags": {},
+																			"sources": [
+																				{
+																					"fileName": "docs/helpers/read.ts",
+																					"line": 64,
+																					"character": 49,
+																					"url": "https://github.com/doseofted/prim-rpc/blob/9bea899/libs/tooling/src/docs/helpers/read.ts#L64"
+																				}
+																			],
+																			"parameters": [
+																				{
+																					"id": 18,
+																					"name": "args",
+																					"variant": "param",
+																					"kind": 32768,
+																					"flags": {
+																						"isRest": true
+																					},
+																					"type": {
+																						"type": "array",
+																						"elementType": {
+																							"type": "intrinsic",
+																							"name": "unknown"
+																						}
+																					}
+																				}
+																			],
+																			"type": {
+																				"type": "intrinsic",
+																				"name": "unknown"
+																			}
+																		}
+																	]
+																}
+															}
+														}
+													],
+													"parameters": [
+														{
+															"id": 19,
+															"name": "docs",
+															"variant": "param",
+															"kind": 32768,
+															"flags": {},
+															"comment": {
+																"summary": [
+																	{
+																		"kind": "text",
+																		"text": "Prim RPC docs for module"
+																	}
+																]
+															},
+															"type": {
+																"type": "reference",
+																"target": 46,
+																"name": "PrimRpcDocs",
+																"package": "@doseofted/prim-rpc-tooling"
+															}
+														},
+														{
+															"id": 20,
+															"name": "module",
+															"variant": "param",
+															"kind": 32768,
+															"flags": {},
+															"comment": {
+																"summary": [
+																	{
+																		"kind": "text",
+																		"text": "Module that documentation references"
+																	}
+																]
+															},
+															"type": {
+																"type": "intrinsic",
+																"name": "unknown"
+															}
+														},
+														{
+															"id": 21,
+															"name": "methodDocs",
+															"variant": "param",
+															"kind": 32768,
+															"flags": {},
+															"comment": {
+																"summary": [
+																	{
+																		"kind": "text",
+																		"text": "The method's documentation within Prim RPC docs"
+																	}
+																]
+															},
+															"type": {
+																"type": "union",
+																"types": [
+																	{
+																		"type": "reference",
+																		"target": {
+																			"sourceFileName": "src/docs/interfaces.ts",
+																			"qualifiedName": "PrimMethod"
+																		},
+																		"name": "PrimMethod",
+																		"package": "@doseofted/prim-rpc-tooling"
+																	},
+																	{
+																		"type": "reference",
+																		"target": {
+																			"sourceFileName": "src/docs/interfaces.ts",
+																			"qualifiedName": "PrimModuleStructure"
+																		},
+																		"name": "PrimModuleStructure",
+																		"package": "@doseofted/prim-rpc-tooling"
+																	},
+																	{
+																		"type": "tuple",
+																		"elements": [
+																			{
+																				"type": "namedTupleMember",
+																				"name": "key",
+																				"isOptional": false,
+																				"element": {
+																					"type": "union",
+																					"types": [
+																						{
+																							"type": "literal",
+																							"value": "methods"
+																						},
+																						{
+																							"type": "literal",
+																							"value": "modules"
+																						}
+																					]
+																				}
+																			},
+																			{
+																				"type": "namedTupleMember",
+																				"name": "index",
+																				"isOptional": false,
+																				"element": {
+																					"type": "intrinsic",
+																					"name": "number"
+																				}
+																			}
+																		]
+																	}
+																]
+															}
+														}
+													],
+													"type": {
+														"type": "reference",
+														"target": -1,
+														"name": "Given",
+														"refersToTypeParameter": true
+													}
+												}
+											]
+										}
+									}
+								},
+								{
+									"id": 22,
+									"name": "iterateDocs",
+									"variant": "declaration",
+									"kind": 1024,
+									"flags": {},
+									"sources": [
+										{
+											"fileName": "docs/index.ts",
+											"line": 8,
+											"character": 66,
+											"url": "https://github.com/doseofted/prim-rpc/blob/9bea899/libs/tooling/src/docs/index.ts#L8"
+										}
+									],
+									"type": {
+										"type": "reflection",
+										"declaration": {
+											"id": 23,
+											"name": "__type",
+											"variant": "declaration",
+											"kind": 65536,
+											"flags": {},
+											"sources": [
+												{
+													"fileName": "docs/helpers/read.ts",
+													"line": 34,
+													"character": 16,
+													"url": "https://github.com/doseofted/prim-rpc/blob/9bea899/libs/tooling/src/docs/helpers/read.ts#L34"
+												}
+											],
+											"signatures": [
+												{
+													"id": 24,
+													"name": "__type",
+													"variant": "signature",
+													"kind": 4096,
+													"flags": {},
+													"comment": {
+														"summary": [
+															{
+																"kind": "text",
+																"text": "Given a module of Prim RPC documentation, find related modules/methods in the module"
+															}
+														],
+														"blockTags": [
+															{
+																"tag": "@returns",
+																"content": [
+																	{
+																		"kind": "text",
+																		"text": "A list of modules/methods for given level of documentation"
+																	}
+																]
+															}
+														]
+													},
+													"sources": [
+														{
+															"fileName": "docs/helpers/read.ts",
+															"line": 34,
+															"character": 16,
+															"url": "https://github.com/doseofted/prim-rpc/blob/9bea899/libs/tooling/src/docs/helpers/read.ts#L34"
+														}
+													],
+													"typeParameter": [
+														{
+															"id": 25,
+															"name": "T",
+															"variant": "typeParam",
+															"kind": 131072,
+															"flags": {},
+															"type": {
+																"type": "union",
+																"types": [
+																	{
+																		"type": "literal",
+																		"value": "methods"
+																	},
+																	{
+																		"type": "literal",
+																		"value": "modules"
+																	}
+																]
+															}
+														},
+														{
+															"id": 26,
+															"name": "U",
+															"variant": "typeParam",
+															"kind": 131072,
+															"flags": {},
+															"type": {
+																"type": "union",
+																"types": [
+																	{
+																		"type": "reference",
+																		"target": {
+																			"sourceFileName": "src/docs/interfaces.ts",
+																			"qualifiedName": "PrimMethod"
+																		},
+																		"name": "PrimMethod",
+																		"package": "@doseofted/prim-rpc-tooling"
+																	},
+																	{
+																		"type": "reference",
+																		"target": {
+																			"sourceFileName": "src/docs/interfaces.ts",
+																			"qualifiedName": "PrimModule"
+																		},
+																		"name": "PrimModule",
+																		"package": "@doseofted/prim-rpc-tooling"
+																	}
+																]
+															}
+														}
+													],
+													"parameters": [
+														{
+															"id": 27,
+															"name": "rootDocs",
+															"variant": "param",
+															"kind": 32768,
+															"flags": {},
+															"comment": {
+																"summary": [
+																	{
+																		"kind": "text",
+																		"text": "RPC documentation (root includes methods and modules properties)"
+																	}
+																]
+															},
+															"type": {
+																"type": "reference",
+																"target": {
+																	"sourceFileName": "src/docs/interfaces.ts",
+																	"qualifiedName": "PrimModuleStructure"
+																},
+																"name": "PrimModuleStructure",
+																"package": "@doseofted/prim-rpc-tooling"
+															}
+														},
+														{
+															"id": 28,
+															"name": "lookFor",
+															"variant": "param",
+															"kind": 32768,
+															"flags": {},
+															"comment": {
+																"summary": [
+																	{
+																		"kind": "text",
+																		"text": "Whether to look for \"modules\" or \"methods\""
+																	}
+																]
+															},
+															"type": {
+																"type": "reference",
+																"target": -1,
+																"name": "T",
+																"refersToTypeParameter": true
+															}
+														},
+														{
+															"id": 29,
+															"name": "submodule",
+															"variant": "param",
+															"kind": 32768,
+															"flags": {},
+															"comment": {
+																"summary": [
+																	{
+																		"kind": "text",
+																		"text": "A structure inside of RPC docs (when not provided, default to documentation root)"
+																	}
+																]
+															},
+															"type": {
+																"type": "reference",
+																"target": {
+																	"sourceFileName": "../../node_modules/.pnpm/typescript@5.2.2/node_modules/typescript/lib/lib.es5.d.ts",
+																	"qualifiedName": "Partial"
+																},
+																"typeArguments": [
+																	{
+																		"type": "reference",
+																		"target": {
+																			"sourceFileName": "src/docs/interfaces.ts",
+																			"qualifiedName": "PrimModuleStructure"
+																		},
+																		"name": "PrimModuleStructure",
+																		"package": "@doseofted/prim-rpc-tooling"
+																	}
+																],
+																"name": "Partial",
+																"package": "typescript"
+															},
+															"defaultValue": "{}"
+														},
+														{
+															"id": 30,
+															"name": "includeNested",
+															"variant": "param",
+															"kind": 32768,
+															"flags": {},
+															"comment": {
+																"summary": [
+																	{
+																		"kind": "text",
+																		"text": "By default, only direct properties will be found. Toggle this to include nested properties"
+																	}
+																]
+															},
+															"type": {
+																"type": "intrinsic",
+																"name": "boolean"
+															},
+															"defaultValue": "false"
+														}
+													],
+													"type": {
+														"type": "array",
+														"elementType": {
+															"type": "reference",
+															"target": -1,
+															"name": "U",
+															"refersToTypeParameter": true
+														}
+													}
+												}
+											]
+										}
+									}
+								}
+							],
+							"groups": [
+								{
+									"title": "Properties",
+									"children": [
+										4,
+										9,
+										22
+									]
+								}
+							],
+							"sources": [
+								{
+									"fileName": "docs/index.ts",
+									"line": 8,
+									"character": 16,
+									"url": "https://github.com/doseofted/prim-rpc/blob/9bea899/libs/tooling/src/docs/index.ts#L8"
+								}
+							]
+						}
+					},
+					"defaultValue": "..."
+				},
+				{
+					"id": 43,
+					"name": "createDocsForModule",
+					"variant": "declaration",
+					"kind": 64,
+					"flags": {},
+					"sources": [
+						{
+							"fileName": "docs/generator.ts",
+							"line": 203,
+							"character": 16,
+							"url": "https://github.com/doseofted/prim-rpc/blob/9bea899/libs/tooling/src/docs/generator.ts#L203"
+						}
+					],
+					"signatures": [
+						{
+							"id": 44,
+							"name": "createDocsForModule",
+							"variant": "signature",
+							"kind": 4096,
+							"flags": {},
+							"comment": {
+								"summary": [
+									{
+										"kind": "text",
+										"text": "Create documentation for a module used with Prim, as JSON. Used as input\nfor Prim Docs UI to create a documentation page. A simpler version of TypeDoc\nintended only for documenting RPC calls."
+									}
+								],
+								"blockTags": [
+									{
+										"tag": "@returns",
+										"content": [
+											{
+												"kind": "text",
+												"text": "Prim-specific documentation for RPC calls"
+											}
+										]
+									}
+								]
+							},
+							"sources": [
+								{
+									"fileName": "docs/generator.ts",
+									"line": 203,
+									"character": 16,
+									"url": "https://github.com/doseofted/prim-rpc/blob/9bea899/libs/tooling/src/docs/generator.ts#L203"
+								}
+							],
+							"parameters": [
+								{
+									"id": 45,
+									"name": "given",
+									"variant": "param",
+									"kind": 32768,
+									"flags": {},
+									"comment": {
+										"summary": [
+											{
+												"kind": "text",
+												"text": "Output of TypeDoc documentation for module used with Prim"
+											}
+										]
+									},
+									"type": {
+										"type": "intrinsic",
+										"name": "unknown"
+									}
+								}
+							],
+							"type": {
+								"type": "reference",
+								"target": 46,
+								"name": "PrimRpcDocs",
+								"package": "@doseofted/prim-rpc-tooling"
+							}
+						}
+					]
+				}
+			],
+			"groups": [
+				{
+					"title": "Interfaces",
+					"children": [
+						46
+					]
+				},
+				{
+					"title": "Variables",
+					"children": [
+						2
+					]
+				},
+				{
+					"title": "Functions",
+					"children": [
+						43
+					]
+				}
+			],
+			"sources": [
+				{
+					"fileName": "docs/index.ts",
+					"line": 1,
+					"character": 0,
+					"url": "https://github.com/doseofted/prim-rpc/blob/9bea899/libs/tooling/src/docs/index.ts#L1"
+				}
+			]
+		}
+	],
+	"groups": [
+		{
+			"title": "Modules",
+			"children": [
+				31,
+				42,
+				1
+			]
+		}
+	],
+	"packageName": "@doseofted/prim-rpc-tooling",
+	"readme": [
+		{
+			"kind": "text",
+			"text": "# Prim+RPC Tooling\n\nOptional tooling for **Prim+RPC** including a build tool and low-level documentation generator.\n\n[Learn more about Prim+RPC](https://prim.doseofted.me/)"
+		}
+	],
+	"symbolIdMap": {
+		"1": {
+			"sourceFileName": "src/docs/index.ts",
+			"qualifiedName": ""
+		},
+		"2": {
+			"sourceFileName": "src/docs/index.ts",
+			"qualifiedName": "helpers"
+		},
+		"3": {
+			"sourceFileName": "src/docs/index.ts",
+			"qualifiedName": "__object"
+		},
+		"4": {
+			"sourceFileName": "src/docs/index.ts",
+			"qualifiedName": "__object.findDocsReference"
+		},
+		"5": {
+			"sourceFileName": "src/docs/helpers/read.ts",
+			"qualifiedName": "findDocsReference"
+		},
+		"6": {
+			"sourceFileName": "src/docs/helpers/read.ts",
+			"qualifiedName": "findDocsReference"
+		},
+		"7": {
+			"sourceFileName": "src/docs/helpers/read.ts",
+			"qualifiedName": "docs"
+		},
+		"8": {
+			"sourceFileName": "src/docs/helpers/read.ts",
+			"qualifiedName": "given"
+		},
+		"9": {
+			"sourceFileName": "src/docs/index.ts",
+			"qualifiedName": "__object.getFunctionForDocumentation"
+		},
+		"10": {
+			"sourceFileName": "src/docs/helpers/read.ts",
+			"qualifiedName": "getFunctionForDocumentation"
+		},
+		"11": {
+			"sourceFileName": "src/docs/helpers/read.ts",
+			"qualifiedName": "getFunctionForDocumentation"
+		},
+		"12": {
+			"sourceFileName": "src/docs/helpers/read.ts",
+			"qualifiedName": "Given"
+		},
+		"13": {
+			"sourceFileName": "src/docs/helpers/read.ts",
+			"qualifiedName": "__type"
+		},
+		"14": {
+			"sourceFileName": "src/docs/helpers/read.ts",
+			"qualifiedName": "__type"
+		},
+		"15": {
+			"sourceFileName": "src/docs/helpers/read.ts",
+			"qualifiedName": "args"
+		},
+		"16": {
+			"sourceFileName": "src/docs/helpers/read.ts",
+			"qualifiedName": "__type"
+		},
+		"17": {
+			"sourceFileName": "src/docs/helpers/read.ts",
+			"qualifiedName": "__type"
+		},
+		"18": {
+			"sourceFileName": "src/docs/helpers/read.ts",
+			"qualifiedName": "args"
+		},
+		"19": {
+			"sourceFileName": "src/docs/helpers/read.ts",
+			"qualifiedName": "docs"
+		},
+		"20": {
+			"sourceFileName": "src/docs/helpers/read.ts",
+			"qualifiedName": "module"
+		},
+		"21": {
+			"sourceFileName": "src/docs/helpers/read.ts",
+			"qualifiedName": "methodDocs"
+		},
+		"22": {
+			"sourceFileName": "src/docs/index.ts",
+			"qualifiedName": "__object.iterateDocs"
+		},
+		"23": {
+			"sourceFileName": "src/docs/helpers/read.ts",
+			"qualifiedName": "iterateDocs"
+		},
+		"24": {
+			"sourceFileName": "src/docs/helpers/read.ts",
+			"qualifiedName": "iterateDocs"
+		},
+		"25": {
+			"sourceFileName": "src/docs/helpers/read.ts",
+			"qualifiedName": "T"
+		},
+		"26": {
+			"sourceFileName": "src/docs/helpers/read.ts",
+			"qualifiedName": "U"
+		},
+		"27": {
+			"sourceFileName": "src/docs/helpers/read.ts",
+			"qualifiedName": "rootDocs"
+		},
+		"28": {
+			"sourceFileName": "src/docs/helpers/read.ts",
+			"qualifiedName": "lookFor"
+		},
+		"29": {
+			"sourceFileName": "src/docs/helpers/read.ts",
+			"qualifiedName": "submodule"
+		},
+		"30": {
+			"sourceFileName": "src/docs/helpers/read.ts",
+			"qualifiedName": "includeNested"
+		},
+		"31": {
+			"sourceFileName": "src/build/index.ts",
+			"qualifiedName": ""
+		},
+		"32": {
+			"sourceFileName": "src/build/index.ts",
+			"qualifiedName": "BuildModifyMethod"
+		},
+		"33": {
+			"sourceFileName": "src/build/index.ts",
+			"qualifiedName": "BuildModifyMethod.BuildTimeEmptyExport"
+		},
+		"34": {
+			"sourceFileName": "src/build/index.ts",
+			"qualifiedName": "BuildModifyMethod.RunTimeProcessCheck"
+		},
+		"35": {
+			"sourceFileName": "src/build/index.ts",
+			"qualifiedName": "BuildModifyMethod.RunTimeWindowCheck"
+		},
+		"36": {
+			"sourceFileName": "src/build/index.ts",
+			"qualifiedName": "BuildOptions"
+		},
+		"37": {
+			"sourceFileName": "src/build/index.ts",
+			"qualifiedName": "BuildOptions.name"
+		},
+		"38": {
+			"sourceFileName": "src/build/index.ts",
+			"qualifiedName": "BuildOptions.debug"
+		},
+		"39": {
+			"sourceFileName": "src/build/index.ts",
+			"qualifiedName": "BuildOptions.runtimeError"
+		},
+		"40": {
+			"sourceFileName": "src/build/index.ts",
+			"qualifiedName": "BuildOptions.method"
+		},
+		"41": {
+			"sourceFileName": "src/build/index.ts",
+			"qualifiedName": "default"
+		},
+		"42": {
+			"sourceFileName": "src/cli/index.ts",
+			"qualifiedName": ""
+		},
+		"43": {
+			"sourceFileName": "src/docs/generator.ts",
+			"qualifiedName": "createDocsForModule"
+		},
+		"44": {
+			"sourceFileName": "src/docs/generator.ts",
+			"qualifiedName": "createDocsForModule"
+		},
+		"45": {
+			"sourceFileName": "src/docs/generator.ts",
+			"qualifiedName": "given"
+		},
+		"46": {
+			"sourceFileName": "src/docs/interfaces.ts",
+			"qualifiedName": "PrimRpcDocs"
+		},
+		"47": {
+			"sourceFileName": "src/docs/interfaces.ts",
+			"qualifiedName": "PrimRpcDocs.methods"
+		},
+		"48": {
+			"sourceFileName": "src/docs/interfaces.ts",
+			"qualifiedName": "PrimRpcDocs.modules"
+		},
+		"49": {
+			"sourceFileName": "src/docs/interfaces.ts",
+			"qualifiedName": "PrimModuleStructure.docs"
+		},
+		"50": {
+			"sourceFileName": "src/docs/interfaces.ts",
+			"qualifiedName": "PrimModuleStructure.props"
+		},
+		"51": {
+			"sourceFileName": "src/docs/interfaces.ts",
+			"qualifiedName": "__type"
+		},
+		"52": {
+			"sourceFileName": "src/docs/interfaces.ts",
+			"qualifiedName": "__type.__index"
+		}
+	}
+}

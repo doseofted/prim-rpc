@@ -32,7 +32,6 @@
 		"build": "tsup --config build.config.js",
 		"check": "tsc --noEmit",
 		"document": "typedoc",
-		"document-md": "typedoc --plugin typedoc-plugin-markdown src/index.ts --out docs",
 		"test": "vitest run",
 		"testing": "vitest watch",
 		"lint": "eslint ."
@@ -55,8 +54,7 @@
 		"@types/lodash-es": "^4.17.9",
 		"@types/node": "^18.17.4",
 		"superjson": "^1.13.1",
-		"typedoc": "^0.25.1",
-		"typedoc-plugin-markdown": "^4.0.0-next.20"
+		"typedoc": "^0.25.1"
 	},
 	"type": "module",
 	"exports": {

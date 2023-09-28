@@ -20,7 +20,12 @@ const pluginsCollection = defineCollection({
 	}),
 })
 
+const apiCollection = defineCollection({
+	type: "data",
+})
+
 export const collections = {
 	docs: documentationCollection,
 	plugins: pluginsCollection,
+	api: apiCollection,
 }

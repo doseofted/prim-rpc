@@ -16,14 +16,12 @@ export default defineConfig({
 	clean: true,
 	banner: { js: banner },
 	async onSuccess() {
-		// await $`pnpm document`
-		await $`pnpm document-md`
-		const packageJson = JSON.parse((await fs.readFile("package.json")).toString("utf-8"))
-		const versionPrefix = "v" + major(packageJson.version)
-		const rpcFolder = process.cwd()
-		const docsGeneratedFolder = path.join(rpcFolder, "docs")
-		const documentationFolder = path.join(rpcFolder, "../../apps/documentation")
-		const documentationApiFolder = path.join(documentationFolder, "src/content/api/rpc", versionPrefix)
-		fs.cpSync(docsGeneratedFolder, documentationApiFolder, { recursive: true, force: true })
+		await $`pnpm document`
+		const cwd = process.cwd()
+		const version = JSON.parse((await fs.readFile("package.json")).toString("utf-8")).version
+		const versionPrefix = ["v", major(version)].join("")
+		const generatedDocs = path.join(cwd, "docs")
+		const apiContent = path.join(cwd, "../../apps/documentation/src/content/api", versionPrefix, path.basename(cwd))
+		fs.cpSync(generatedDocs, apiContent, { recursive: true, force: true })
 	},
 })

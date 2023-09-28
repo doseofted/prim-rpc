@@ -4,6 +4,5 @@
 		"lib": ["DOM", "DOM.Iterable", "ESNext", "WebWorker"]
 	},
 	"extends": "../../tsconfig.json",
-	"include": ["src/**/*"],
-	"references": [{ "path": "./tsconfig.worker.json" }]
+	"include": ["src/**/*"]
 }
