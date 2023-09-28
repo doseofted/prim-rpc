@@ -1,0 +1,243 @@
+---
+title: Setup
+order: 2
+---
+
+# {frontmatter.title}
+
+import { Icon } from "astro-icon/components"
+import CodeFile from "@/components/Code/CodeFile.astro"
+import Code from "@/components/Code/Code.astro"
+import Collapse from "@/components/Markdown/Collapse.astro"
+import PluginChoices from "@/components/Markdown/PluginChoices.astro"
+import PluginNA from "@/components/InteractiveSetup/PluginNA.astro"
+import CodeTabs from "@/components/Code/CodeTabs.react.tsx"
+
+Let's learn how to set up Prim+RPC in our own project! **Prim+RPC works with many frameworks in all JavaScript
+environments** but for the purpose of this guide, we'll keep it simple and use the standard Fetch API to communicate
+between an HTTP server and a webpage in the browser.
+
+## Optional Starter
+
+It is assumed that you already have **server** and **client** parts configured in a JavaScript project (either in two
+separate folders, a monorepo, or across two repositories and using a registry).
+
+If you don't, you can use [the starter project](https://github.com/doseofted/prim-rpc-examples/tree/main/starter) to
+follow along. The following one-liner will download the starter project:
+
+<CodeFile>
+
+```zsh
+npx giget@latest gh:doseofted/prim-rpc-examples/starter prim-rpc-examples/starter
+```
+
+</CodeFile>
+
+See the project's `README.md{:txt}` file to learn more about how the project runs and is configured.
+
+## Preparation
+
+Prim+RPC is composed of multiple packages, in order: the **core** RPC functionality, **plugins** for it, and optional
+**tooling**. You may find install commands for your package manager or runtime below.
+
+These packages should be installed on both server and client portions of your project.
+
+<CodeTabs client:visible details={[
+		{ name: "npm", icon: "simple-icons:npm" },
+		{ name: "yarn", icon: "simple-icons:yarn" },
+		{ name: "pnpm", icon: "simple-icons:pnpm" },
+		{ name: "bun", icon: "simple-icons:bun" },
+	]}>
+
+<Code slot="$tab0">
+
+```zsh
+npm add @doseofted/prim-rpc @doseofted/prim-rpc-plugins @doseofted/prim-rpc-tooling
+```
+
+</Code>
+
+<Code slot="$tab1">
+
+```zsh
+yarn add @doseofted/prim-rpc @doseofted/prim-rpc-plugins @doseofted/prim-rpc-tooling
+```
+
+</Code>
+
+<Code slot="$tab2">
+
+```zsh
+pnpm add @doseofted/prim-rpc @doseofted/prim-rpc-plugins @doseofted/prim-rpc-tooling
+```
+
+</Code>
+
+<Code slot="$tab4">
+
+```zsh
+bun add @doseofted/prim-rpc @doseofted/prim-rpc-plugins @doseofted/prim-rpc-tooling
+```
+
+</Code>
+
+</CodeTabs>
+
+You may also use Prim+RPC with Deno or from a CDN with the following
+[import maps](https://developer.mozilla.org/en-US/docs/Web/HTML/Element/script/type/importmap):
+
+<CodeTabs client:visible details={[
+		{ name: "Deno", icon: "simple-icons:deno" },
+		{ name: "esm.sh", icon: "ph:globe-simple-bold" },
+		{ name: "jsdelivr", icon: "ph:globe-simple-bold" },
+		{ name: "unpkg", icon: "ph:globe-simple-bold" }
+	]}>
+
+<Code slot="$tab1">
+
+```json
+{
+	"imports": {
+		"@doseofted/prim-rpc": "npm:@doseofted/prim-rpc@latest",
+		"@doseofted/prim-rpc-plugins/": "npm:@doseofted/prim-rpc-plugins@latest/",
+		"@doseofted/prim-rpc-tooling/": "npm:@doseofted/prim-rpc-tooling@latest/"
+	}
+}
+```
+
+</Code>
+
+<Code slot="$tab2">
+
+```json
+{
+	"imports": {
+		"@doseofted/prim-rpc": "https://esm.sh/@doseofted/prim-rpc@latest",
+		"@doseofted/prim-rpc-plugins/": "https://esm.sh/@doseofted/prim-rpc-plugins@latest/",
+		"@doseofted/prim-rpc-tooling/": "https://esm.sh/@doseofted/prim-rpc-tooling@latest/"
+	}
+}
+```
+
+</Code>
+
+<Code slot="$tab3">
+
+```json
+{
+	"imports": {
+		"@doseofted/prim-rpc": "https://esm.run/@doseofted/prim-rpc@latest",
+		"@doseofted/prim-rpc-plugins/": "https://esm.run/@doseofted/prim-rpc-plugins@latest/",
+		"@doseofted/prim-rpc-tooling/": "https://esm.run/@doseofted/prim-rpc-tooling@latest/"
+	}
+}
+```
+
+</Code>
+
+<Code slot="$tab4">
+
+```json
+{
+	"imports": {
+		"@doseofted/prim-rpc": "https://unpkg.com/@doseofted/prim-rpc@latest",
+		"@doseofted/prim-rpc-plugins/": "https://unpkg.com/@doseofted/prim-rpc-plugins@latest/",
+		"@doseofted/prim-rpc-tooling/": "https://unpkg.com/@doseofted/prim-rpc-tooling@latest/"
+	}
+}
+```
+
+</Code>
+
+</CodeTabs>
+
+## Server Setup
+
+Prim+RPC bridges two separated environments: the **server** where your functions are located and the **client** where
+those functions are called. The server may be a literal HTTP server or could be some other environment like a web
+worker. Regardless, this setup should apply to most situations.
+
+First, we'll need some function to call. Let's start with something simple:
+
+<CodeFile filename="server/module.ts">
+
+```typescript
+export function sayHello(x = "Backend", y = "Frontend") {
+	return `${x}, meet ${y}.`
+}
+sayHello.rpc = true
+```
+
+</CodeFile>
+
+The `rpc` property here signals to Prim+RPC that it can safely call this function. Functions are objects in JavaScript
+so if this looks unfamiliar, this is perfectly valid code.
+
+Now let's set up the server and import our function:
+
+<CodeFile filename="server/index.ts">
+
+```typescript
+import { createPrimServer } from "@doseofted/prim-rpc"
+import * as module from "./module"
+
+const prim = createPrimServer({ module })
+
+export type Module = typeof module
+```
+
+</CodeFile>
+
+Note that we exported the module type. This is optional but can make for an easier development experience when shared
+with the client (either locally or by uploading types only to a registry).
+
+The server is now configured. However it doesn't do much alone. Prim+RPC depends on handler plugins that transform
+requests into a form that it understands. Let's set them up now.
+
+**Method Handler Setup**
+
+**Callback Handler Setup**
+
+Our server is now fully configured and ready to work with the client! Let's set up the client next.
+
+## Client Setup
+
+Now that the server can receive function calls, we'll need a client that knows how to interact with the server. Let's
+set that up now.
+
+We'll start off with the following:
+
+<CodeFile filename="client/prim.ts">
+
+```typescript
+import { createPrimClient } from "@doseofted/prim-rpc"
+import type { Module } from "../server"
+
+const prim = createPrimClient<Module>()
+```
+
+</CodeFile>
+
+We have set up the client and passed the type parameter from the server to get type definitions. Like the server, the
+client doesn't do anything by itself. It needs compatible plugins to work with the server. Let's set that up now.
+
+**Method Plugin Setup**
+
+**Callback Plugin Setup**
+
+Prim+RPC is now set up and ready to use! Try making a function call:
+
+<CodeFile filename="client/index.ts">
+
+```typescript
+import { client } from "./prim"
+
+const greeting = await client.sayHello()
+console.log(greeting) // "Frontend, meet Backend."
+```
+
+</CodeFile>
+
+Now we easily add more functions and simply call those function from the client.
+
+<PluginNA message="You're all set up! Read on to support advanced types in your functions." type="success" />
