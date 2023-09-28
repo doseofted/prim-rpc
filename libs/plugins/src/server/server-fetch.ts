@@ -6,30 +6,40 @@ import { BlobRecords, PrimServerEvents } from "@doseofted/prim-rpc"
 
 interface PrimRequestOptions {
 	prim: PrimServerEvents
+	/** Transform a request into an object to be passed to your function's `this` context */
 	contextTransform?: (request: Request) => unknown
+	/** Process given Request before handing it off to this plugin */
+	preprocess?: (request: Request) => Request | Promise<Request | undefined> | void
+	/** Process Prim+RPC generated Response before sending it back to your server */
+	postprocess?: (response: Response) => Response | Promise<Response | undefined> | void
 }
 
 export function primFetch(options: PrimRequestOptions) {
-	const { prim, contextTransform = _request => undefined } = options
+	const { prim, contextTransform = _request => undefined, preprocess = r => r, postprocess = r => r } = options
 	const { prefix = "/", jsonHandler } = prim.options
 	return async (request: Request) => {
-		const { method } = request
+		const { method } = (await preprocess(request)) || request
 		const { pathname, search } = new URL(request.url)
 		const url = pathname + search
 		let body: string | ArrayBuffer
 		const blobs: BlobRecords = {}
 		if (!url.startsWith(prefix)) {
-			return new Response(null, { status: 404 })
+			const response = new Response(null, { status: 404 })
+			return (await postprocess(response)) || response
 		}
 		const requestType = request.headers.get("content-type") ?? ""
 		if (requestType.startsWith("multipart/form-data")) {
 			const formData = await request.formData()
 			for (const [key, value] of formData) {
+				// NOTE: if using @whatwg-node/fetch ponyfill, value is blob-like but not Blob so check arrayBuffer as given in
+				// https://github.com/ardatan/whatwg-node/blob/23de5ba01229f2a33f322494ef84bfcea665ed25/packages/node-fetch/src/FormData.ts#L141-L143
+				// eslint-disable-next-line @typescript-eslint/no-unsafe-member-access, @typescript-eslint/no-explicit-any
+				const isBinary = (value as any)?.arrayBuffer != null || value instanceof Blob
 				if (key === "rpc") {
-					const binaryBody = value instanceof Blob && jsonHandler.binary
-					body = binaryBody ? await value.arrayBuffer() : value.toString()
-				} else if (key.startsWith("_bin_") && value instanceof Blob) {
-					blobs[key] = value
+					const binaryBody = isBinary && jsonHandler.binary
+					body = binaryBody ? await (value as Blob).arrayBuffer() : value.toString()
+				} else if (key.startsWith("_bin_") && isBinary) {
+					blobs[key] = value as Blob
 				}
 			}
 		} else if (method === "POST") {
@@ -54,12 +64,13 @@ export function primFetch(options: PrimRequestOptions) {
 			}
 			if (method === "POST" && blobEntries.length > 0) {
 				delete result.headers["content-type"] // NOTE: Response will handle this
-				return new Response(formData, {
+				const response = new Response(formData, {
 					headers: result.headers,
 					status: result.status,
 				})
+				return (await postprocess(response)) || response
 			} else if (method === "GET" && blobEntries.length === 1) {
-				return new Response(firstFile.blob, {
+				const response = new Response(firstFile.blob, {
 					headers: {
 						...result.headers,
 						"content-disposition": `inline; filename="${firstFile.name}"`,
@@ -67,12 +78,14 @@ export function primFetch(options: PrimRequestOptions) {
 					},
 					status: result.status,
 				})
+				return (await postprocess(response)) || response
 			}
 		}
 		// eslint-disable-next-line @typescript-eslint/no-unsafe-argument
-		return new Response(result.body, {
+		const response = new Response(result.body, {
 			headers: result.headers,
 			status: result.status,
 		})
+		return (await postprocess(response)) || response
 	}
 }
