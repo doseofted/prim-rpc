@@ -18,14 +18,14 @@ compatible they must use the same type of transport (given in **Transport Type**
 
 ## Table of Contents
 
-## Fetch API (Bun / Deno)
+## Fetch API
 
-| For                                                                                                                               | Plugin Type    | Transport Type | File Support |
-| --------------------------------------------------------------------------------------------------------------------------------- | -------------- | -------------- | ------------ |
-| [Fetch API](https://github.com/wintercg/fetch) ([Bun](https://github.com/oven-sh/bun) / [Deno](https://github.com/denoland/deno)) | Method handler | HTTP           | `File`       |
+| For                                            | Plugin Type    | Transport Type | File Support |
+| ---------------------------------------------- | -------------- | -------------- | ------------ |
+| [Fetch API](https://github.com/wintercg/fetch) | Method handler | HTTP           | `File`       |
 
-Prim+RPC supports the Fetch API used in Bun and Deno. The plugin accepts a standard `Request` and returns a standard
-`Response`.
+Prim+RPC supports the Fetch API on the server. This can be used with any runtime: Node, Deno, or Bun. The plugin accepts
+a standard `Request` and returns a standard `Response`.
 
 You can configure the handler in the following ways (depending on your environment). In Bun:
 
@@ -38,11 +38,8 @@ const prim = createPrimServer({ module })
 
 // Using generic default fetch export
 export default primFetch({ prim })
-
 // Or otherwise:
-Bun.serve({
-	fetch: primFetch({ prim }),
-})
+Bun.serve({ fetch: primFetch({ prim }) })
 ```
 
 In Deno:
@@ -58,7 +55,24 @@ const prim = createPrimServer({ module })
 Deno.serve(primFetch({ prim }))
 ```
 
+In Node, using an adapter to allow usage of Fetch API:
+
+```typescript index.ts
+import { createPrimServer } from "@doseofted/prim-rpc"
+import { primFetch } from "@doseofted/prim-rpc-plugins/server-fetch"
+import module from "./my-example-module"
+import { createServer } from "node:http"
+import { createServerAdapter } from "@whatwg-node/server"
+
+const prim = createPrimServer({ module })
+const fetch = primFetch({ prim })
+
+const fetchAdapter = createServerAdapter(fetch)
+createServer(fetchAdapter).listen(3000)
+```
+
 The `.contextTransform` option of the plugin can be used to set the `this` value inside of functions used with Prim+RPC.
+The Request and Response can be manipulated using the `postprocess` and `preprocess` option of the plugin respectively.
 
 ## Astro
 
