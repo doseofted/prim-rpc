@@ -25,7 +25,7 @@ const pluginShorthand: Record<string, string> = {
 			.map(plugin => (
 				<LinkButton
 					block
-					name={plugin.data.name}
+					name={plugin.data.title}
 					search={{
 						[pluginShorthand[givenType]]: plugin.slug.replace(`${Astro.params.version}/${plugin.data.type}/`, ""),
 					}}

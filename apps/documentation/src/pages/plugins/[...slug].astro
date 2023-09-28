@@ -10,11 +10,12 @@ import {
 } from "@/utils/table-of-contents"
 
 interface Props {
-	entry: CollectionType<"docs">
-	tableOfContentsTree: CollectionTree<CollectionType<"docs">["data"]>
+	entry: CollectionType<"plugins">
+	tableOfContentsTree: CollectionTree<CollectionType<"plugins">["data"]>
 }
 export async function getStaticPaths() {
-	const documentation = await getCollection("docs")
+	const documentation = await getCollection("plugins")
+
 	const tableOfContentsTree = documentationTableOfContentsTree(documentation)
 	return documentation.map(entry => {
 		const { slug } = entry
@@ -26,7 +27,7 @@ export async function getStaticPaths() {
 
 const { entry, tableOfContentsTree } = Astro.props
 const { Content, headings } = await entry.render()
-const { versions, tableOfContents } = createTableOfContentsFromTree("docs", tableOfContentsTree, Astro.params.slug)
+const { versions, tableOfContents } = createTableOfContentsFromTree("plugins", tableOfContentsTree, Astro.params.slug)
 ---
 
 <Documentation

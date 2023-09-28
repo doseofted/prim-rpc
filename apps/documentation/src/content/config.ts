@@ -12,7 +12,8 @@ const documentationCollection = defineCollection({
 const pluginsCollection = defineCollection({
 	type: "content",
 	schema: z.object({
-		name: z.string(),
+		title: z.string(),
+		order: z.number().optional(),
 		icon: z.string().optional(),
 		type: z.enum(["method-handler", "method-plugin", "callback-handler", "callback-plugin", "json-handler"]),
 		transport: z.enum(["http", "ws"]),

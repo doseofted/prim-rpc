@@ -17,7 +17,7 @@ const documentation = await getCollection("docs")
 const tableOfContentsTree = documentationTableOfContentsTree(documentation)
 const docsSlug = `${Astro.params.version}/usage/setup`
 const entry = await getEntry("docs", docsSlug)
-const { versions, tableOfContents } = createTableOfContentsFromTree(tableOfContentsTree, docsSlug)
+const { versions, tableOfContents } = createTableOfContentsFromTree("docs", tableOfContentsTree, docsSlug)
 
 function getPluginChoices(search: string) {
 	const searchParams = new URLSearchParams(search)
