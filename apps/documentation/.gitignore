@@ -22,3 +22,6 @@ pnpm-debug.log*
 
 # Vercel adaptor build output from Astro
 .vercel
+
+# This content folder is generated on project build and doesn't need to be committed
+src/content/api/v**
