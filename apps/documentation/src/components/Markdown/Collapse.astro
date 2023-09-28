@@ -1,12 +1,13 @@
 ---
 interface Props {
 	title: string
+	collapseId?: string
 }
-const { title } = Astro.props
+const { title, collapseId } = Astro.props
 ---
 
 <div class="collapse collapse-arrow bg-base-200 mt-6">
-	<input type="checkbox" />
+	<input id={collapseId} type="checkbox" />
 	<div class="collapse-title text-xl font-medium">
 		{title}
 	</div>

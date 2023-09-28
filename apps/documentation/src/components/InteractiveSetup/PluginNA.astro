@@ -5,6 +5,8 @@ interface Props {
 	message: string
 	href?: string
 	type?: "success" | "info" | "warning" | "error"
+	actionText?: string
+	onAction?: string
 }
 const types = {
 	success: "alert-success bg-success/40 border-success",
@@ -18,7 +20,7 @@ const icons = {
 	warning: "ph:warning-circle-duotone",
 	error: "ph:x-circle-duotone",
 }
-const { message, href, type: alertType } = Astro.props
+const { message, href, type: alertType, actionText, onAction } = Astro.props
 ---
 
 <div class:list={["alert mt-6", types[alertType ?? "info"]]}>
@@ -27,8 +29,8 @@ const { message, href, type: alertType } = Astro.props
 	{
 		href && (
 			<div>
-				<a href={href} class="btn btn-sm glass bg-white/30 no-underline">
-					Choose Plugin
+				<a href={href} onclick={onAction} class="btn btn-sm glass bg-white/30 no-underline">
+					{actionText}
 				</a>
 			</div>
 		)

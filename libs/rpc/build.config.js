@@ -1,6 +1,7 @@
 // @ts-check
 import { defineConfig } from "tsup"
-import { $ } from "zx"
+import { $, fs, path } from "zx"
+import { major } from "semver"
 
 const banner = `
 // Part of the Prim+RPC project ( https://prim.doseofted.me/ )
@@ -15,6 +16,14 @@ export default defineConfig({
 	clean: true,
 	banner: { js: banner },
 	async onSuccess() {
-		await $`pnpm document`
+		// await $`pnpm document`
+		await $`pnpm document-md`
+		const packageJson = JSON.parse((await fs.readFile("package.json")).toString("utf-8"))
+		const versionPrefix = "v" + major(packageJson.version)
+		const rpcFolder = process.cwd()
+		const docsGeneratedFolder = path.join(rpcFolder, "docs")
+		const documentationFolder = path.join(rpcFolder, "../../apps/documentation")
+		const documentationApiFolder = path.join(documentationFolder, "src/content/api/rpc", versionPrefix)
+		fs.cpSync(docsGeneratedFolder, documentationApiFolder, { recursive: true, force: true })
 	},
 })

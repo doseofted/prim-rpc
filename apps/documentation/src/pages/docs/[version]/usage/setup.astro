@@ -2,14 +2,14 @@
 import Documentation from "@/layouts/Documentation.astro"
 import { getCollection, getEntry } from "astro:content"
 import TableOfContents from "@/components/TableOfContents.astro"
-import PluginNA from "@/components/interactive-setup/PluginNA.astro"
+import PluginNA from "@/components/InteractiveSetup/PluginNA.astro"
 import { documentationTableOfContentsTree, createTableOfContentsFromTree } from "@/utils/table-of-contents"
 import type { MarkdownHeading } from "astro"
-import { Content as Content1, getHeadings as getHeadings1 } from "@/components/interactive-setup/1.setup.mdx"
-import { Content as Content2, getHeadings as getHeadings2 } from "@/components/interactive-setup/2.setup.mdx"
-import { Content as Content3, getHeadings as getHeadings3 } from "@/components/interactive-setup/3.setup.mdx"
-import { Content as Content4, getHeadings as getHeadings4 } from "@/components/interactive-setup/4.setup.mdx"
-import { Content as Content5, getHeadings as getHeadings5 } from "@/components/interactive-setup/5.setup.mdx"
+import { Content as Content1, getHeadings as getHeadings1 } from "@/components/InteractiveSetup/1.setup.mdx"
+import { Content as Content2, getHeadings as getHeadings2 } from "@/components/InteractiveSetup/2.setup.mdx"
+import { Content as Content3, getHeadings as getHeadings3 } from "@/components/InteractiveSetup/3.setup.mdx"
+import { Content as Content4, getHeadings as getHeadings4 } from "@/components/InteractiveSetup/4.setup.mdx"
+import { Content as Content5, getHeadings as getHeadings5 } from "@/components/InteractiveSetup/5.setup.mdx"
 
 export const prerender = false
 
@@ -19,7 +19,6 @@ const docsSlug = `${Astro.params.version}/usage/setup`
 const entry = await getEntry("docs", docsSlug)
 const { versions, tableOfContents } = createTableOfContentsFromTree(tableOfContentsTree, docsSlug)
 
-const path = Astro.url.pathname
 function getPluginChoices(search: string) {
 	const searchParams = new URLSearchParams(search)
 	const methodHandler = searchParams.get("mh")
@@ -67,7 +66,12 @@ const headings = [
 		methodHandlerEntry ? (
 			<methodHandlerEntry.Content />
 		) : (
-			<PluginNA message="Method handler selection is required." href="#method-handler" type="warning" />
+			<PluginNA
+				message="Method handler selection is required."
+				href="#method-handler"
+				type="warning"
+				actionText="Choose Plugin"
+			/>
 		)
 	}
 	<Content2 />
@@ -75,7 +79,12 @@ const headings = [
 		callbackHandlerEntry ? (
 			<callbackHandlerEntry.Content />
 		) : (
-			<PluginNA message="Callback handler was not chosen." href="#callback-handler" />
+			<PluginNA
+				message="Skipped step. Callback handler was not chosen."
+				href="#callback-handler"
+				actionText="Choose Plugin"
+				onAction="optionalChoices.checked = true"
+			/>
 		)
 	}
 	<Content3 />
@@ -83,7 +92,12 @@ const headings = [
 		methodPluginEntry ? (
 			<methodPluginEntry.Content />
 		) : (
-			<PluginNA message="Method plugin selection is required." href="#method-plugin" type="warning" />
+			<PluginNA
+				message="Method plugin selection is required."
+				href="#method-plugin"
+				type="warning"
+				actionText="Choose Plugin"
+			/>
 		)
 	}
 	<Content4 />
@@ -91,7 +105,12 @@ const headings = [
 		callbackPluginEntry ? (
 			<callbackPluginEntry.Content />
 		) : (
-			<PluginNA message="Callback plugin was not chosen." href="#callback-plugin" />
+			<PluginNA
+				message="Skipped step. Callback plugin was not chosen."
+				href="#callback-plugin"
+				actionText="Choose Plugin"
+				onAction="optionalChoices.checked = true"
+			/>
 		)
 	}
 	<Content5 />

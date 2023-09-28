@@ -31,7 +31,8 @@
 		"dev": "tsup --watch --config build.config.js",
 		"build": "tsup --config build.config.js",
 		"check": "tsc --noEmit",
-		"document": "typedoc --plugin typedoc-plugin-markdown src/index.ts --out dist/docs",
+		"document": "typedoc",
+		"document-md": "typedoc --plugin typedoc-plugin-markdown src/index.ts --out docs",
 		"test": "vitest run",
 		"testing": "vitest watch",
 		"lint": "eslint ."
