@@ -1,0 +1,30 @@
+---
+name: WebSocket
+icon: simple-icons:javascript
+type: "callback-plugin"
+transport: "ws"
+features: []
+---
+
+import CodeFile from "@/components/Code/CodeFile.astro"
+
+Prim+RPC can be used with the WebSocket API as implemented in all modern browsers.
+
+<CodeFile filename="client/prim.ts">
+
+```typescript
+import { createCallbackPlugin } from "@doseofted/prim-rpc-plugins/browser-websocket"
+// ...other imports
+
+const callbackPlugin = createCallbackPlugin()
+const client = createPrimClient<Module>({
+  wsEndpoint: "ws://localhost:3000/prim"
+  callbackPlugin
+  /* ...options */
+})
+```
+
+</CodeFile>
+
+If you are using the callback plugin alongside a method plugin, ensure that the WebSocket endpoint is correct as this
+server may share the same port as your HTTP server. This will depend on how you choose to configure your WebSockets.

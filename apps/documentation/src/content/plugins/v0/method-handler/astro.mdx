@@ -1,0 +1,32 @@
+---
+name: Astro
+icon: simple-icons:astro
+type: "method-handler"
+transport: "http"
+features:
+  - files
+  - batching
+---
+
+import CodeFile from "@/components/Code/CodeFile.astro"
+
+Prim+RPC supports Astro in SSR mode. It supports both Astro 2 and 3.
+
+Configure a catch-all route in Astro by creating a route in your pages directory:
+
+<CodeFile filename="src/pages/prim/[...prim].ts">
+
+```typescript
+import { createPrimServer } from "@doseofted/prim-rpc"
+import { defineAstroPrimHandler } from "@doseofted/prim-rpc-plugins/astro"
+import module from "./my-example-module"
+
+const prim = createPrimServer({ module })
+
+// Astro 3.0
+export const { GET, POST } = defineAstroPrimHandler({ prim })
+// Astro 2.0 (exported method names are lowercase)
+export const { GET: get, POST: post } = defineAstroPrimHandler({ prim })
+```
+
+</CodeFile>
