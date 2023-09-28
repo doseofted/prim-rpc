@@ -1,6 +1,6 @@
 {
 	"name": "@doseofted/prim-rpc-plugins",
-	"version": "0.1.0-alpha.16",
+	"version": "0.1.0-alpha.17",
 	"description": "Prim+RPC plugins/handlers for popular frameworks both server and client side.",
 	"license": "Apache-2.0",
 	"author": {
@@ -48,6 +48,7 @@
 		"@types/supertest": "^2.0.12",
 		"@types/ws": "^8.5.5",
 		"@vitest/web-worker": "^0.34.3",
+		"@whatwg-node/server": "^0.9.14",
 		"astro": "3.0.10",
 		"axios": "^1.5.0",
 		"express": "^4.18.2",

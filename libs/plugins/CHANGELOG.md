@@ -1,5 +1,12 @@
 # @doseofted/prim-rpc-plugins
 
+## 0.1.0-alpha.17
+
+### Patch Changes
+
+- 77450a2: Fetch API plugin for servers now has "preprocess" option to modify Request and "postprocess" option to modify
+  Response
+
 ## 0.1.0-alpha.16
 
 ### Patch Changes
