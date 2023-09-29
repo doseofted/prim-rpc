@@ -7,6 +7,7 @@ import sitemap from "@astrojs/sitemap"
 import vercel from "@astrojs/vercel/serverless"
 import rehypePrettyCode from "rehype-pretty-code"
 import icon from "astro-icon"
+import rehypeExternalLinks from "rehype-external-links"
 
 /** @type {import('rehype-pretty-code').Options} */
 const rehypePrettyOptions = {
@@ -28,7 +29,10 @@ export default defineConfig({
 		},
 		remarkPlugins: [],
 		syntaxHighlight: false, // "shiki",
-		rehypePlugins: [[rehypePrettyCode, rehypePrettyOptions]],
+		rehypePlugins: [
+			[rehypePrettyCode, rehypePrettyOptions],
+			[rehypeExternalLinks, { target: "_blank" }],
+		],
 	},
 	integrations: [
 		tailwind(),

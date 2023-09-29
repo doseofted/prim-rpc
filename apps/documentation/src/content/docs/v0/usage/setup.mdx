@@ -10,35 +10,55 @@ import CodeFile from "@/components/Code/CodeFile.astro"
 import Code from "@/components/Code/Code.astro"
 import Collapse from "@/components/Markdown/Collapse.astro"
 import PluginChoices from "@/components/Markdown/PluginChoices.astro"
-import PluginNA from "@/components/InteractiveSetup/PluginNA.astro"
+import Aside from "@/components/Markdown/Aside.astro"
 import CodeTabs from "@/components/Code/CodeTabs.react.tsx"
 
-Let's learn how to set up Prim+RPC in our own project! **Prim+RPC works with many frameworks in all JavaScript
-environments** but for the purpose of this guide, we'll keep it simple and use the standard Fetch API to communicate
-between an HTTP server and a webpage in the browser.
+Prim+RPC bridges two separated environments: the server, where your functions are located, and the client, where those
+functions are called. The server may be a literal HTTP server or could be some other environment like a Web Worker.
+Prim+RPC is able to work in all of these environments because of its plugin system.
 
-## Optional Starter
+More importantly, it makes communication between server and client actually easy. Functions are functions, server and
+client, you define it and call it. Done. Prim+RPC handles the dance.
 
-It is assumed that you already have **server** and **client** parts configured in a JavaScript project (either in two
-separate folders, a monorepo, or across two repositories and using a registry).
+Prim+RPC has two types of plugins, each with a version for the server and client. **Method plugins** handle calls to
+methods. **Callback plugins** optionally handle callbacks on those methods. Plugins used on the server are referred to
+as **handlers** to easily differentiate server/client.
 
-If you don't, you can use [the starter project](https://github.com/doseofted/prim-rpc-examples/tree/main/starter) to
-follow along. The following one-liner will download the starter project:
+Today, we'll set up a method handler to receive method calls over the Fetch API on the server. On the client, we'll set
+up a method plugin to to call those methods using the Fetch API.
+
+## Starter Project
+
+We'll use a starter project to get up and running quickly. You may clone the starter project with the following command,
+or [download directly](https://github.com/doseofted/prim-rpc-examples/tree/main/starter).
 
 <CodeFile>
 
 ```zsh
 npx giget@latest gh:doseofted/prim-rpc-examples/starter prim-rpc-examples/starter
+cd prim-rpc-examples/starter
 ```
 
 </CodeFile>
 
-See the project's `README.md{:txt}` file to learn more about how the project runs and is configured.
+You may also open the starter project in StackBlitz:
 
-## Preparation
+[![Open in StackBlitz](/open_in_stackblitz.svg)](https://stackblitz.com/github/doseofted/prim-rpc-examples/tree/main/starter)
+
+See the project's `README.md{:txt}` file to learn how the project is configured. For this guide we'll use the
+[pnpm package manager](https://github.com/pnpm/pnpm#readme) but you may choose to use any runtime or package manager
+that you like.
+
+Run `pnpm dev{:zsh}` to start the project. A browser window will open that says **"Not implemented"**.
+
+Let's implement it!
+
+## Installation
 
 Prim+RPC is composed of multiple packages, in order: the **core** RPC functionality, **plugins** for it, and optional
 **tooling**. You may find install commands for your package manager or runtime below.
+
+<Aside message="If you're using the starter project, you can skip this step: Prim+RPC is already installed in both server and client parts of the project." />
 
 These packages should be installed on both server and client portions of your project.
 
@@ -153,11 +173,7 @@ You may also use Prim+RPC with Deno or from a CDN with the following
 
 ## Server Setup
 
-Prim+RPC bridges two separated environments: the **server** where your functions are located and the **client** where
-those functions are called. The server may be a literal HTTP server or could be some other environment like a web
-worker. Regardless, this setup should apply to most situations.
-
-First, we'll need some function to call. Let's start with something simple:
+First, we need some function to call on the server. Let's start with something simple:
 
 <CodeFile filename="server/module.ts">
 
@@ -173,7 +189,7 @@ sayHello.rpc = true
 The `rpc` property here signals to Prim+RPC that it can safely call this function. Functions are objects in JavaScript
 so if this looks unfamiliar, this is perfectly valid code.
 
-Now let's set up the server and import our function:
+Now let's set up the Prim+RPC server and pass our function to it:
 
 <CodeFile filename="server/index.ts">
 
@@ -188,24 +204,110 @@ export type Module = typeof module
 
 </CodeFile>
 
-Note that we exported the module type. This is optional but can make for an easier development experience when shared
+Note that we exported the module's type. This is optional but can make for an easier development experience when shared
 with the client (either locally or by uploading types only to a registry).
 
-The server is now configured. However it doesn't do much alone. Prim+RPC depends on handler plugins that transform
-requests into a form that it understands. Let's set them up now.
+The Prim+RPC server is now configured however it doesn't do much alone. Prim+RPC depends on plugins that transform
+requests into a form that it understands.
 
-**Method Handler Setup**
+Let's expose our function over HTTP using the Fetch API:
 
-**Callback Handler Setup**
+<CodeFile filename="server/index.ts">
 
-Our server is now fully configured and ready to work with the client! Let's set up the client next.
+```typescript {2,6}
+import { createPrimServer } from "@doseofted/prim-rpc"
+import { primFetch } from "@doseofted/prim-rpc-plugins/server-fetch"
+import * as module from "./module"
+
+const prim = createPrimServer({ module })
+const fetch = primFetch({ prim })
+
+export type Module = typeof module
+```
+
+</CodeFile>
+
+In Deno and Bun runtimes, this will work out of the box by utilizing the created `fetch` object. In Node, we'll need to
+install an adapter called `@whatwg-node/server{:txt}` (if using the starter project, this is already installed):
+
+<CodeFile>
+
+```zsh
+pnpm add @whatwg-node/server
+```
+
+</CodeFile>
+
+Now we can set up the fetch handler in Node, just like other runtimes:
+
+<CodeFile filename="server/index.ts">
+
+```typescript {4-5,10-12}
+import { createPrimServer } from "@doseofted/prim-rpc"
+import { primFetch } from "@doseofted/prim-rpc-plugins/server-fetch"
+import * as module from "./module"
+import { createServer } from "node:http"
+import { createServerAdapter } from "@whatwg-node/server"
+
+const prim = createPrimServer({ module })
+const fetch = primFetch({ prim })
+
+const fetchAdapter = createServerAdapter(fetch)
+createServer(fetchAdapter).listen(3000)
+console.log("Prim+RPC is available at http://localhost:3000/prim")
+
+export type Module = typeof module
+```
+
+</CodeFile>
+
+We can now make requests to the server! We haven't set up the client yet but we can still try it out. Requests in
+Prim+RPC are typically made over POST but for demo's sake:
+
+<CodeFile>
+
+```zsh
+curl --request GET --url "http://localhost:3000/prim/sayHello?0=Backend&1=Terminal"
+```
+
+</CodeFile>
+
+We'll be calling this function from a web browser next. This means that we'll need to
+[implement CORS](https://developer.mozilla.org/en-US/docs/Glossary/CORS) so that the client is allowed to call the
+server. We can configure this in the Fetch handler's options:
+
+<CodeFile filename="server/index.ts">
+
+```typescript {8-11} /postprocess/2
+import { createPrimServer } from "@doseofted/prim-rpc"
+import { primFetch } from "@doseofted/prim-rpc-plugins/server-fetch"
+import * as module from "./module"
+import { createServer } from "node:http"
+import { createServerAdapter } from "@whatwg-node/server"
+
+const prim = createPrimServer({ module })
+function postprocess(res: Response) {
+	res.headers.set("access-control-allow-origin", "http://localhost:5173")
+	res.headers.set("access-control-allow-headers", "content-type")
+}
+const fetch = primFetch({ prim, postprocess })
+
+const fetchAdapter = createServerAdapter(fetch)
+createServer(fetchAdapter).listen(3000)
+console.log("Prim+RPC is available at http://localhost:3000/prim")
+
+export type Module = typeof module
+```
+
+</CodeFile>
+
+This will allow our client, which will run on `http://localhost:5173{:txt}`, to call the server. Our server is fully
+configured and we can now set up the client!
 
 ## Client Setup
 
 Now that the server can receive function calls, we'll need a client that knows how to interact with the server. Let's
-set that up now.
-
-We'll start off with the following:
+set that up now. We'll start off with the following:
 
 <CodeFile filename="client/prim.ts">
 
@@ -219,18 +321,34 @@ const prim = createPrimClient<Module>()
 </CodeFile>
 
 We have set up the client and passed the type parameter from the server to get type definitions. Like the server, the
-client doesn't do anything by itself. It needs compatible plugins to work with the server. Let's set that up now.
+client doesn't do anything by itself. It needs compatible plugins to work with the server.
 
-**Method Plugin Setup**
+Let's set up our method plugin next. This plugin will utilize the browser's Fetch API under the hood:
 
-**Callback Plugin Setup**
+<CodeFile filename="client/prim.ts">
+
+```typescript {2,6-7}
+import { createPrimClient } from "@doseofted/prim-rpc"
+import { createMethodPlugin } from "@doseofted/prim-rpc-plugins/browser-fetch"
+import type { Module } from "../server"
+
+export default createPrimClient<Module>({
+	endpoint: "http://localhost:3000/prim",
+	methodPlugin: createMethodPlugin(),
+})
+```
+
+</CodeFile>
+
+We have passed the server's address, from the last step, to the client and told the Prim+RPC client to send an HTTP
+request containing the function call to the server.
 
 Prim+RPC is now set up and ready to use! Try making a function call:
 
 <CodeFile filename="client/index.ts">
 
 ```typescript
-import { client } from "./prim"
+import client from "./prim"
 
 const greeting = await client.sayHello()
 console.log(greeting) // "Frontend, meet Backend."
@@ -238,6 +356,46 @@ console.log(greeting) // "Frontend, meet Backend."
 
 </CodeFile>
 
-Now we easily add more functions and simply call those function from the client.
+Now we can see our message logged to the developer's console. Let's replace the **"Not implemented"** message on the
+page with our greeting:
 
-<PluginNA message="You're all set up! Read on to support advanced types in your functions." type="success" />
+<CodeFile filename="client/index.ts">
+
+```typescript {6-8}
+import { client } from "./prim"
+
+const greeting = await client.sayHello()
+console.log(greeting) // "Frontend, meet Backend."
+
+const app = document.getElementById("app")
+if (!app) throw new Error("Missing #app element")
+app.innerText = greeting
+```
+
+</CodeFile>
+
+Now we can easily add more functions on the server and simply call those functions from the client.
+
+<Aside message="You're all set up! Read on to support callbacks and advanced types in your functions." type="success" />
+
+## Support Callbacks
+
+So far, we can already call functions on the server from the client with support for all valid JSON types and even Files
+and Blobs. But Prim+RPC has a few other tricks up its sleeve: support for callbacks and many other types.
+
+We'll start with callbacks because it's kind of fun. Or you may skip ahead if you'd like to
+[support even more types](#extended-types).
+
+## Extended Types
+
+Prim+RPC uses the built-in JSON handler for its environment by default to serialize RPC messages. This means that we can
+pass arguments and receive return values from our function between the server and client, as long as the JSON handler
+can serialize it. However this can be limiting because we may want to work with additional types like Dates, Maps, Sets,
+and more.
+
+That's why Prim+RPC allows you to swap out this JSON handler with you own. For instance, you may use
+[superjson](https://github.com/blitz-js/superjson#readme) to support many JavaScript built-ins or
+[devalue](https://github.com/Rich-Harris/devalue#readme) for the same reason (plus support for cyclical references). In
+fact, it doesn't even need to be JSON. You may choose to serialize messages using
+[YAML](https://github.com/eemeli/yaml#readme) (for readability) or
+[MsgPack](https://github.com/msgpack/msgpack-javascript#readme) (for its size and support for more types).

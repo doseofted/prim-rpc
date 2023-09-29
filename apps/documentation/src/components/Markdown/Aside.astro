@@ -23,8 +23,8 @@ const icons = {
 const { message, href, type: alertType, actionText, onAction } = Astro.props
 ---
 
-<div class:list={["alert mt-6", types[alertType ?? "info"]]}>
-	<Icon class="w-6 h-6" name={icons[alertType ?? "info"]} />
+<div class:list={["alert mt-6 items-start", types[alertType ?? "info"]]}>
+	<Icon class="w-6 h-6 relative top-0.5" name={icons[alertType ?? "info"]} />
 	<span>{message}</span>
 	{
 		href && (
