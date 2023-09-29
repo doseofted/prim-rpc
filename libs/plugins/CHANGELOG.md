@@ -1,5 +1,11 @@
 # @doseofted/prim-rpc-plugins
 
+## 0.1.0-alpha.18
+
+### Patch Changes
+
+- 16ad50f: Fetch API no longer errors on preflight requests, headers like CORS should be added as part of plugin setup
+
 ## 0.1.0-alpha.17
 
 ### Patch Changes
