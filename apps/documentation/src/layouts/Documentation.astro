@@ -2,7 +2,7 @@
 import Layout from "@/layouts/Default.astro"
 import { Icon } from "astro-icon/components"
 import { IntroText } from "@/components/IntroText.react"
-import type { TableOfContents } from "@/utils/table-of-contents"
+import { versionsAvailable, type TableOfContents } from "@/content/config"
 
 interface Props {
 	decorationText?: string
@@ -11,9 +11,11 @@ interface Props {
 	tableOfContents?: TableOfContents
 	versions?: string[]
 }
+
 const { title = "", decorationText = "", description, tableOfContents = [], versions } = Astro.props
 const path = Astro.url.pathname
-const selectedVersion = versions?.find(v => v === (path.match(/\/docs\/(v\d+)/)?.[1] || "v0"))
+const selectedVersion = versionsAvailable?.find(v => v.name === (path.match(/\/docs\/(v\d+)/)?.[1] || "v0"))
+const versionName = selectedVersion?.aliases[0] ? `${selectedVersion.name} (${selectedVersion?.aliases[0]})` : ""
 ---
 
 <Layout title={title} description={description}>
@@ -50,7 +52,7 @@ const selectedVersion = versions?.find(v => v === (path.match(/\/docs\/(v\d+)/)?
 							tabindex="0"
 							class="btn btn-block glass bg-white/50 btn-xs flex justify-between normal-case"
 							onclick="versionSelection.focus()">
-							<span>{selectedVersion}</span>
+							<span>{versionName}</span>
 							<Icon name="ph:caret-down-bold" />
 						</label>
 						<ul
@@ -58,9 +60,9 @@ const selectedVersion = versions?.find(v => v === (path.match(/\/docs\/(v\d+)/)?
 							tabindex="-1"
 							class="dropdown-content focus-within:dropdown-hover w-full z-[1] menu menu-sm p-1 shadow glass !bg-white/70 rounded-xl">
 							{
-								versions?.map(version => (
+								versionsAvailable?.map(version => (
 									<li>
-										<a href={path.replace(/(\/docs\/)v\d+(.*)/, `$1${version}$2`)}>{version}</a>
+										<a href={path.replace(/(\/docs\/)v\d+(.*)/, `$1${version.name}$2`)}>{version.name}</a>
 									</li>
 								))
 							}
