@@ -23,6 +23,11 @@ export function primFetch(options: PrimRequestOptions) {
 		const url = pathname + search
 		let body: string | ArrayBuffer
 		const blobs: BlobRecords = {}
+		if (method === "OPTIONS") {
+			// don't response or error on preflight requests
+			const response = new Response(null, { status: 204 })
+			return (await postprocess(response)) || response
+		}
 		if (!url.startsWith(prefix)) {
 			const response = new Response(null, { status: 404 })
 			return (await postprocess(response)) || response
