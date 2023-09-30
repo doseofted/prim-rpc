@@ -54,7 +54,6 @@ export const collections = {
 		type: "content",
 		schema: z.object({
 			title: z.string(),
-			order: z.number().optional(),
 			description: z.string().optional(),
 		}),
 	}),
@@ -62,7 +61,6 @@ export const collections = {
 		type: "content",
 		schema: z.object({
 			title: z.string(),
-			order: z.number().optional(),
 			icon: z.string().optional(),
 			type: pluginTypes,
 			transport: z.enum(["http", "ws"]),
