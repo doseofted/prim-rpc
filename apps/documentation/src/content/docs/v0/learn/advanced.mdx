@@ -327,7 +327,7 @@ Let's set this up now.
 
 <CodeFile filename="server/index.ts">
 
-```typescript {9,11-30} /contextTransform/2
+```typescript {9,11-27} /contextTransform/3
 import { createPrimServer } from "@doseofted/prim-rpc"
 import { primFetch } from "@doseofted/prim-rpc-plugins/server-fetch"
 import { createCallbackHandler } from "@doseofted/prim-rpc-plugins/ws"
@@ -338,11 +338,7 @@ import { WebSocketServer } from "ws"
 import jsonHandler from "superjson"
 import { parse, serialize } from "cookie"
 
-export interface ServerContext {
-	setSecret(given: string): void
-	allowed: boolean
-}
-function contextTransform(req: Request): ServerContext {
+function contextTransform(req: Request, res: Response): ServerContext {
 	const secret = "can't-touch-this"
 	const cookies = parse(req.headers.get("cookie") ?? "")
 	return {
@@ -351,13 +347,15 @@ function contextTransform(req: Request): ServerContext {
 				httpOnly: true,
 				sameSite: "none",
 			})
-			req.headers.set("set-cookie", cookie)
+			res.headers.set("set-cookie", cookie)
 		},
 		get allowed() {
 			return cookies.secret === secret
 		},
 	}
 }
+export type ServerContext = ReturnType<typeof contextTransform>
+
 const wss = new WebSocketServer({ noServer: true })
 const callbackHandler = createCallbackHandler({ wss })
 const prim = createPrimServer({ module, jsonHandler, callbackHandler })
@@ -403,7 +401,9 @@ export function secretMessage(this: ServerContext, secret?: string) {
 </CodeFile>
 
 Our function can now return a message to the client, only if the correct cookie is given. Yet it doesn't touch the
-actual cookie.
+actual cookie. Also note that passing `this` as an argument is only necessary if you are using TypeScript. It is removed
+from generated code and
+[only serves as a type hint](https://www.typescriptlang.org/docs/handbook/release-notes/typescript-2-0.html#specifying-the-type-of-this-for-functions).
 
 <Aside>
 	Passing server context in this way can be useful for swapping out implementations of a server. If we ever swap our the
@@ -450,4 +450,18 @@ your choice.
 
 ## Next Steps
 
-There are still many options available to you in Prim+RPC.
+There are many features available in Prim+RPC that we haven't even touched yet. You may both upload _and_ download files
+from your functions. You can define methods on other methods. You may swap out your server framework. See the
+[usage guide](/docs/v0/learn/usage) or one of the [available examples](/docs/v0/learn/examples) to learn more about what
+can be done with Prim+RPC.
+
+<div class="flex gap-4 mt-6">
+	<a href="/docs/v0/learn/usage" class="not-prose btn">
+		<Icon class="w-6 h-6" name="ph:lightbulb-bold"></Icon>
+		<span>Usage</span>
+	</a>
+	<a href="/docs/v0/learn/examples" class="not-prose btn">
+		<Icon class="w-6 h-6" name="ph:terminal-window-fill"></Icon>
+		<span>Examples</span>
+	</a>
+</div>
