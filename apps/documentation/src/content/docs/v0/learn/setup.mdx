@@ -58,7 +58,10 @@ Let's implement it!
 Prim+RPC is composed of multiple packages, in order: the **core** RPC functionality, **plugins** for it, and optional
 **tooling**. You may find install commands for your package manager or runtime below.
 
-<Aside message="If you're using the starter project, you can skip this step: Prim+RPC is already installed in both server and client parts of the project." />
+<Aside>
+	If you're using the starter project, you can skip this step: Prim+RPC is already installed in both server and client
+	parts of the project.
+</Aside>
 
 These packages should be installed on both server and client portions of your project.
 
@@ -367,19 +370,23 @@ import { client } from "./prim"
 const greeting = await client.sayHello()
 console.log(greeting) // "Frontend, meet Backend."
 
-const app = document!.getElementById("app")
-app.innerText = greeting
+const app = document.getElementById("app")
+if (app) app.innerText = message
 ```
 
 </CodeFile>
 
 Now we can easily add more functions on the server and simply call those functions from the client.
 
-<Aside message="You're all set up! Find next steps below to learn more about what Prim+RPC can do." type="success" />
+<Aside type="success">You're all set up! Find next steps below to learn more about what Prim+RPC can do.</Aside>
 
 <div class="flex gap-4 mt-6">
-	<a href="/docs/v0/learn/usage" class="not-prose btn">
+	<a href="/docs/v0/learn/advanced" class="not-prose btn">
 		<Icon class="w-6 h-6" name="ph:toolbox-bold"></Icon>
+		<span>Advanced Setup</span>
+	</a>
+	<a href="/docs/v0/learn/usage" class="not-prose btn">
+		<Icon class="w-6 h-6" name="ph:lightbulb-bold"></Icon>
 		<span>Usage</span>
 	</a>
 	<a href="/docs/v0/learn/examples" class="not-prose btn">

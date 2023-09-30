@@ -28,7 +28,8 @@ export const documentationContents = (collection = "docs", version: `v${string}`
 					sections: [
 						{ name: "Introduction", link: `/${collection}/${version}/learn/intro` },
 						{ name: "Setup", link: `/${collection}/${version}/learn/setup` },
-						{ name: "How to Use", link: `/${collection}/${version}/learn/usage` },
+						{ name: "Advanced", link: `/${collection}/${version}/learn/advanced` },
+						{ name: "Usage", link: `/${collection}/${version}/learn/usage` },
 						{ name: "Examples", link: `/${collection}/${version}/learn/examples` },
 						{ name: "Security", link: `/${collection}/${version}/learn/security` },
 						{ name: "Limitations", link: `/${collection}/${version}/learn/limitations` },
