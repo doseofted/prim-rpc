@@ -54,7 +54,7 @@ export default defineConfig({
 	}),
 	// FIXME: add redirects for old website
 	redirects: {
-		"/docs/v0": { destination: "/docs/v0/usage/introduction", status: 301 },
+		"/docs/v0": { destination: "/docs/v0/learn/intro", status: 301 },
 		"/docs/latest": { destination: "/docs/v0", status: 302 },
 	},
 })
