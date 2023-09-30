@@ -3,6 +3,7 @@ import Layout from "@/layouts/Default.astro"
 import { Icon } from "astro-icon/components"
 import { IntroText } from "@/components/IntroText.react"
 import { versionsAvailable, type TableOfContents } from "@/content/config"
+import Prerelease from "@/components/Prerelease.astro"
 
 interface Props {
 	decorationText?: string
@@ -22,7 +23,9 @@ const versionName = selectedVersion?.aliases[0] ? `${selectedVersion.name} (${se
 	<!-- Side decorations -->
 	<div slot="after" class="relative h-full flex flex-col">
 		<div class="h-[40svh]"></div>
-		<div class="flex-grow bg-white -ml-px"></div>
+		<div class="flex-grow bg-white -ml-px">
+			<Prerelease />
+		</div>
 	</div>
 	<div slot="before" class="lg:hidden relative h-full flex flex-col">
 		<div class="h-[40svh]"></div>
@@ -91,15 +94,34 @@ const versionName = selectedVersion?.aliases[0] ? `${selectedVersion.name} (${se
 				</ul>
 			</div>
 
-			<div class="bg-white -mr-4 pr-4 -ml-4 lg:ml-0 pl-4 lg:pl-0 col-span-8 grid grid-cols-8 gap-x-4 py-8">
-				<div class="lg:col-start-2 col-span-12 lg:col-span-6">
-					<div class="prose max-w-none">
-						<slot />
+			<div class="bg-white -mr-4 -ml-4 lg:ml-0 col-span-8">
+				<Prerelease transition:persist="prelease">
+					<div class="grid grid-cols-8 flex-grow gap-x-4">
+						<div class="lg:col-start-2 col-span-8 lg:col-span-8 flex gap-4 items-center">
+							<Icon class="w-6 h-6" name="ph:warning-circle-duotone" />
+							<span>
+								Prim+RPC is in <a
+									class="underline"
+									href="https://github.com/doseofted/prim-rpc#release-plan"
+									target="_blank">prerelease mode</a
+								> and may be unstable until stable release.</span
+							>
+						</div>
+					</div>
+				</Prerelease>
+				<div class="pr-4 pl-4 lg:pl-0 grid grid-cols-8 gap-x-4">
+					<div class="py-8 lg:col-start-2 col-span-12 lg:col-span-6">
+						<div class="prose max-w-none">
+							<slot />
+						</div>
 					</div>
 				</div>
 			</div>
 
 			<div class="col-span-2 bg-white -mr-4 pr-4">
+				<div class="-mr-4">
+					<Prerelease />
+				</div>
 				<div class="sticky top-0 py-4 -mx-4">
 					<slot name="extra" />
 				</div>

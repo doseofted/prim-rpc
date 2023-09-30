@@ -53,8 +53,18 @@ markdownToHtml.rpc = true
 
 </CodeFile>
 
-This function takes either a string of Markdown or a Markdown file and converts it into an HTML file. We can call this
-function from the client like so:
+This function takes either a string of Markdown or a Markdown file and converts it into an HTML file. We can test this
+out directly by just making a request to the server to retrieve the file itself:
+
+<CodeFile>
+
+```zsh
+curl --request GET --url "http://localhost:3000/prim/markdownToHtml?0=Hello%20there"
+```
+
+</CodeFile>
+
+We can call this function from the client like so:
 
 <CodeFile filename="client/index.ts">
 
@@ -70,6 +80,8 @@ if (app) app.innerHTML = await htmlFile.text()
 ```
 
 </CodeFile>
+
+If we open the page in the browser, we should now see our Markdown content as formatted content on the page.
 
 ## Extended Types
 
@@ -503,11 +515,13 @@ to pass it in our function less that cookie is removed.
 This can be a powerful tool for setting up authentication, adding redirects, or otherwise integrating with the server of
 your choice.
 
+<Aside type="success">You've finished the advanced guide!</Aside>
+
 ## Next Steps
 
 There are many features available in Prim+RPC that we haven't even touched yet. You could (and should) validate
-arguments inside of your functions (using any validation library). You may define methods on other methods or swap out
-your server framework. See the [usage guide](/docs/v0/learn/usage) or one of the
+arguments inside of your functions, using the validation library of your choice. You may define methods on other methods
+or swap out your server framework. See the [usage guide](/docs/v0/learn/usage) or one of the
 [available examples](/docs/v0/learn/examples) to learn more about what can be done with Prim+RPC.
 
 <div class="flex gap-4 mt-6">

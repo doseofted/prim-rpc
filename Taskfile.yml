@@ -29,8 +29,8 @@ tasks:
       - "find . -name node_modules -type d -prune -exec rm -fr {} +"
       - 'find . -name dist -not -path "*/shiki/dist" -type d -prune -exec rm -fr {} +'
       - "find . -name .turbo -type d -prune -exec rm -fr {} +"
-      - "rm -r ./apps/documentation/.next/"
-      - "rm -r ./apps/documentation/out/"
+      - "rm -r ./apps/documentation/.astro/"
+      - "rm -r ./apps/documentation/.vercel/"
       - "rm -fr .task"
 
   build:

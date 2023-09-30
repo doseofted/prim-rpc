@@ -2,7 +2,6 @@
 import { Icon } from "astro-icon/components"
 
 interface Props {
-	message: string
 	href?: string
 	type?: "success" | "info" | "warning" | "error"
 	actionText?: string
@@ -20,7 +19,7 @@ const icons = {
 	warning: "ph:warning-circle-duotone",
 	error: "ph:x-circle-duotone",
 }
-const { message, href, type: alertType, actionText, onAction } = Astro.props
+const { href, type: alertType, actionText, onAction } = Astro.props
 ---
 
 <div class:list={["alert mt-6 items-start", types[alertType ?? "info"]]}>

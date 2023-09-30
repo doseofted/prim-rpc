@@ -1,0 +1,104 @@
+---
+import { client } from "@/client"
+import Columns from "@/components/Columns.astro"
+import { HomepageIntro } from "@/components/IntroText.react"
+import Prim from "@/components/Prim.astro"
+import Layout from "@/layouts/Default.astro"
+import { Icon } from "astro-icon/components"
+import { Code } from "astro/components"
+import { stripIndent } from "common-tags"
+
+const greeting = await client.greetings()
+
+const codeTheme = { lang: "typescript", theme: "material-theme-palenight" } as const
+
+const serverCodeSnippet = stripIndent`
+	export const sayHello = (x, y) => \`\${x}, meet \${y}.\`
+	sayHello.rpc = true
+`
+const clientCodeSnippet = stripIndent`
+	const hello = await sayHello("Backend", "Frontend")
+	console.log(hello)
+`
+const snippets = [serverCodeSnippet, clientCodeSnippet]
+---
+
+<Layout fullscreen>
+	<div class="grid place-items-center min-h-[100svh]">
+		<div class="w-full max-w-[1200px] aspect-[1200/630] outline outline-white outline-1 outline-offset-1 grid">
+			<div class="screenshot flex flex-col px-8">
+				<Columns>
+					<div class="mt-8 grid grid-cols-12 gap-x-4">
+						<div class="col-span-8 col-start-1 flex">
+							<div
+								class="prim-logo-container text-prim-space flex items-center"
+								data-light="8"
+								data-brightness="0.5,1.5"
+								data-size="0.5,1.1"
+								data-offset="2,3">
+								<Prim>RPC</Prim>
+							</div>
+						</div>
+						<div class="col-span-4 flex items-center text-right gap-4 justify-end text-white">
+							<div>
+								<div class="text-[0.85rem]">a project from</div>
+								<div class="text-[1rem]"><strong>Dose of Ted</strong></div>
+							</div>
+							<img class="w-12 h-12 relative invert" src="/prim-nav-doseofted-attribution.png" alt="Dose of Ted" />
+						</div>
+					</div>
+				</Columns>
+				<Columns className="flex-grow">
+					<div class="grid grid-cols-12 h-full gap-x-4 gap-y-0">
+						{
+							snippets.map((snippet, index) => (
+								<div
+									class:list={[
+										"col-span-6 grid place-items-center",
+										index === 0 ? "row-start-1 col-start-6" : "row-start-2 col-start-2",
+									]}>
+									<div class="homepage-snippets-lights w-full relative">
+										<div
+											class:list={[
+												"absolute w-full h-full transform",
+												index === 0 ? "-translate-x-1/3 translate-y-1/3" : "translate-x-1/3 -translate-y-1/3",
+											]}
+											data-light="7"
+											data-size="0.4,0.9"
+											data-offset="1,1.2"
+											data-brightness="0.5,0.9"
+										/>
+										<div class="homepage-snippets">
+											<div class="mockup-code text-sm bg-white/70 border border-white/70 pb-4 w-full">
+												<div class="px-4">
+													<div class="rounded-lg overflow-hidden bg-prim-space site-code-style">
+														<Code {...codeTheme} code={snippet} />
+													</div>
+												</div>
+											</div>
+										</div>
+									</div>
+								</div>
+							))
+						}
+					</div>
+				</Columns>
+				<Columns>
+					<div class="grid grid-cols-12 gap-x-4">
+						<div class="col-span-12 col-start-1 flex justify-end">
+							<p
+								class="mb-8 font-title text-[4.2rem] font-semibold text-white uppercase text-right leading-none overflow-hidden">
+								<HomepageIntro client:load text={greeting.split("\n")} />
+							</p>
+						</div>
+					</div>
+				</Columns>
+			</div>
+		</div>
+	</div>
+</Layout>
+
+<script>
+	// Capture screenshot using developer tools: "Capture Node Screenshot" with width set to 1200px
+	// ...
+</script>
