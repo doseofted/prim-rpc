@@ -127,4 +127,327 @@ We already can do a lot with Prim+RPC but we we can do even more with callbacks.
 
 ## Support Callbacks
 
+We can pass callbacks to our functions to receive events from the server as they happen, as opposed to polling the
+server manually. In Prim+RPC, we can pass callbacks as long as a **callback handler** is set up.
+
+Callbacks are handled differently from methods. While methods return only once, callbacks on a method may be called
+multiple times, meaning we need to support multiple responses from the server. There are several ways to support this
+but for this guide, we will set up a WebSocket server and use it with an available callback handler for Prim+RPC.
+
+In Node, we can use [ws](https://github.com/websockets/ws#readme) to add support for WebSockets. First install the
+package.
+
+<CodeFile>
+
+```zsh
+cd server
+pnpm add ws
+```
+
+</CodeFile>
+
+Now we can configure the WebSocket server with our HTTP server, to handle upgrades to the connection. This setup may
+look complicated, and WebSockets can be difficult, but with Prim+RPC we only have to worry about this once.
+
+<CodeFile filename="server/index.ts">
+
+```typescript {6,9,21-25}
+import { createPrimServer } from "@doseofted/prim-rpc"
+import { primFetch } from "@doseofted/prim-rpc-plugins/server-fetch"
+import * as module from "./module"
+import { createServer } from "node:http"
+import { createServerAdapter } from "@whatwg-node/server"
+import { WebSocketServer } from "ws"
+import jsonHandler from "superjson"
+
+const wss = new WebSocketServer({ noServer: true })
+const prim = createPrimServer({ module, jsonHandler })
+function postprocess(res: Response) {
+	res.headers.set("access-control-allow-origin", "http://localhost:5173")
+	res.headers.set("access-control-allow-headers", "content-type")
+}
+const fetch = primFetch({ prim, postprocess })
+
+const fetchAdapter = createServerAdapter(fetch)
+const server = createServer(fetchAdapter).listen(3000)
+console.log("Prim+RPC is available at http://localhost:3000/prim")
+
+server.on("upgrade", (request, socket, head) => {
+	wss.handleUpgrade(request, socket, head, ws => {
+		wss.emit("connection", ws, request)
+	})
+})
+
+export type Module = typeof module
+```
+
+</CodeFile>
+
+Let's take a deep breath. Our WebSockets are now configured! Now let's create a callback handler that will use this
+WebSocket connection. This step is much less complicated.
+
+<CodeFile filename="server/index.ts">
+
+```typescript {3,11} /callbackHandler/2
+import { createPrimServer } from "@doseofted/prim-rpc"
+import { primFetch } from "@doseofted/prim-rpc-plugins/server-fetch"
+import { createCallbackHandler } from "@doseofted/prim-rpc-plugins/ws"
+import * as module from "./module"
+import { createServer } from "node:http"
+import { createServerAdapter } from "@whatwg-node/server"
+import { WebSocketServer } from "ws"
+import jsonHandler from "superjson"
+
+const wss = new WebSocketServer({ noServer: true })
+const callbackHandler = createCallbackHandler({ wss })
+const prim = createPrimServer({ module, jsonHandler, callbackHandler })
+function postprocess(res: Response) {
+	res.headers.set("access-control-allow-origin", "http://localhost:5173")
+	res.headers.set("access-control-allow-headers", "content-type")
+}
+const fetch = primFetch({ prim, postprocess })
+
+const fetchAdapter = createServerAdapter(fetch)
+const server = createServer(fetchAdapter).listen(3000)
+console.log("Prim+RPC is available at http://localhost:3000/prim")
+
+server.on("upgrade", (request, socket, head) => {
+	wss.handleUpgrade(request, socket, head, ws => {
+		wss.emit("connection", ws, request)
+	})
+})
+
+export type Module = typeof module
+```
+
+</CodeFile>
+
+We're almost ready to use callbacks. But since we created a callback handler on the server, we will need a compatible
+callback plugin on the client. Since we're using WebSockets on the server, we'll use the WebSocket callback plugin on
+the client:
+
+<CodeFile filename="client/prim.ts">
+
+```typescript {3,10}
+import { createPrimClient } from "@doseofted/prim-rpc"
+import { createMethodPlugin } from "@doseofted/prim-rpc-plugins/browser-fetch"
+import { createCallbackPlugin } from "@doseofted/prim-rpc-plugins/browser-websocket"
+import type { Module } from "../server"
+import jsonHandler from "superjson"
+
+export default createPrimClient<Module>({
+	endpoint: "http://localhost:3000/prim",
+	methodPlugin: createMethodPlugin(),
+	callbackPlugin: createCallbackPlugin(),
+	jsonHandler,
+})
+```
+
+</CodeFile>
+
+<Aside>
+	Since our callback handler is using the same server, we can use the same endpoint. Prim+RPC will replace the protocol
+	on our endpoint for us. Prim+RPC also provides a `wsEndpoint` option if the callback handler ever uses a separate
+	address.
+</Aside>
+
+Now we're ready to use callbacks on our methods. Let's define one now. Replace the `whatIsDayAfter()` function, or
+`sayHello()` function if the [Extended Types](#extended-types) section was skipped, with the following:
+
+<CodeFile filename="server/module.ts">
+
+```typescript
+export function typeMessage(message: string, typed: (letter: string) => void) {
+	let timeout = 0
+	const letters = message.split("")
+	for (const letter of letters) {
+		setTimeout(() => typed(letter), ++timeout * 300)
+	}
+}
+typeMessage.rpc = true
+```
+
+</CodeFile>
+
+Now we can use this callback on the client. Let's update our client to use this new function:
+
+<CodeFile filename="client/index.ts">
+
+```typescript {3,6-10}
+import { client } from "./prim"
+
+client.typeMessage("Hello world!", console.log)
+
+const app = document.getElementById("app")
+if (app) {
+	client.typeMessage("Hello world!", letter => {
+		app.innerText += letter
+	})
+}
+```
+
+</CodeFile>
+
+Typing a message isn't exactly a great use of server resources but it is a good demo. We can now open the console to see
+each letter of our message logged and see that message typed on our webpage.
+
 ## Pass Server Context
+
+Prim+RPC separates the method of communication between server and client from your function logic, allowing you to write
+framework-agnostic code. But there are times where you need data only available in your server's context.
+
+We can share this server context with Prim+RPC. Better yet, we can transform the server context so that our functions
+only receive data relevant to them.
+
+In this example, we'll set a secret cookie from the client that is required to access our secret function. Without the
+cookie: no function access. However our function won't have to touch the cookie at all.
+
+<Aside type="warning">
+	**This is only a demo.** In a real application, you will want to use some form of cryptography.
+</Aside>
+
+First, let's install a small helper package to manage cookies on the server. This isn't specific to Prim+RPC but will be
+used by our HTTP server.
+
+<CodeFile>
+
+```zsh
+cd server
+pnpm add cookie
+pnpm add -D @types/cookie
+```
+
+</CodeFile>
+
+Now we can use this package with our server. Our `primFetch` method handler (and all method handlers in Prim+RPC) accept
+a `contextTransform` option that takes the server context as an argument, in this case our Request object, and returns a
+variable that will be bound to our function's `this` context.
+
+Let's set this up now.
+
+<CodeFile filename="server/index.ts">
+
+```typescript {9,11-30} /contextTransform/2
+import { createPrimServer } from "@doseofted/prim-rpc"
+import { primFetch } from "@doseofted/prim-rpc-plugins/server-fetch"
+import { createCallbackHandler } from "@doseofted/prim-rpc-plugins/ws"
+import * as module from "./module"
+import { createServer } from "node:http"
+import { createServerAdapter } from "@whatwg-node/server"
+import { WebSocketServer } from "ws"
+import jsonHandler from "superjson"
+import { parse, serialize } from "cookie"
+
+export interface ServerContext {
+	setSecret(given: string): void
+	allowed: boolean
+}
+function contextTransform(req: Request): ServerContext {
+	const secret = "can't-touch-this"
+	const cookies = parse(req.headers.get("cookie") ?? "")
+	return {
+		setSecret(given: string) {
+			const cookie = serialize("secret", given, {
+				httpOnly: true,
+				sameSite: "none",
+			})
+			req.headers.set("set-cookie", cookie)
+		},
+		get allowed() {
+			return cookies.secret === secret
+		},
+	}
+}
+const wss = new WebSocketServer({ noServer: true })
+const callbackHandler = createCallbackHandler({ wss })
+const prim = createPrimServer({ module, jsonHandler, callbackHandler })
+function postprocess(res: Response) {
+	res.headers.set("access-control-allow-origin", "http://localhost:5173")
+	res.headers.set("access-control-allow-headers", "content-type")
+}
+const fetch = primFetch({ prim, postprocess, contextTransform })
+
+const fetchAdapter = createServerAdapter(fetch)
+const server = createServer(fetchAdapter).listen(3000)
+console.log("Prim+RPC is available at http://localhost:3000/prim")
+
+server.on("upgrade", (request, socket, head) => {
+	wss.handleUpgrade(request, socket, head, ws => {
+		wss.emit("connection", ws, request)
+	})
+})
+
+export type Module = typeof module
+```
+
+</CodeFile>
+
+We have defined a function and a property that we want to expose to our functions: `setSecret()` will set the secret and
+`allowed` will return whether the secret is to the correct value.
+
+Note that we have defined a `ServerContext` interface. This will become available to our functions. We can now utilize
+the new interface in our functions, like so:
+
+<CodeFile filename="server/module.ts">
+
+```typescript
+import type { ServerContext } from "./index"
+
+export function secretMessage(this: ServerContext, secret?: string) {
+	if (secret) this.setSecret(secret)
+	if (!this.allowed) throw new Error("No secret, no entry.")
+	return "Access granted! The answer is 42."
+}
+```
+
+</CodeFile>
+
+Our function can now return a message to the client, only if the correct cookie is given. Yet it doesn't touch the
+actual cookie.
+
+<Aside>
+	Passing server context in this way can be useful for swapping out implementations of a server. If we ever swap our the
+	server in the future, our function logic doesn't change. We simply modify the `contextTransform` function to match our
+	new server.
+</Aside>
+
+Let's call this function from the client.
+
+<CodeFile filename="client/index.ts">
+
+```typescript {3,6-10}
+import { client } from "./prim"
+
+client.secretMessage("can't-touch-this").then(console.log).catch(console.error)
+
+const app = document.getElementById("app")
+if (app) app.innerText = client.secretMessage()
+```
+
+</CodeFile>
+
+Because we passed the the correct secret, we can see the secret message from the server. Because this secret has been
+set in the cookie, we don't need to set it again. For demonstration, comment out that first line:
+
+<CodeFile filename="client/index.ts">
+
+```typescript {3}
+import { client } from "./prim"
+
+// client.secretMessage("can't-touch-this").then(console.log).catch(console.error)
+
+const app = document.getElementById("app")
+if (app) app.innerText = client.secretMessage()
+```
+
+</CodeFile>
+
+And note that we can still access the secret message because we've already set the secret in a cookie! So we don't need
+to pass it in our function less that cookie is removed.
+
+This can be a powerful tool for setting up authentication, adding redirects, or otherwise integrating with the server of
+your choice.
+
+## Next Steps
+
+There are still many options available to you in Prim+RPC.
