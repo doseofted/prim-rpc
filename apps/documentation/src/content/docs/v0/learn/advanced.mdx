@@ -19,12 +19,65 @@ This guide builds on the [basic setup guide](/docs/v0/learn/setup) and will use 
 
 </Aside>
 
+## File Support
+
+Prim+RPC supports passing Files and Blobs as part of a function's arguments and returning Files and Blobs as a function
+result. With the Fetch API, we don't even need to set up anything additional. **It works out of the box!**
+
+Let's try this out. First, we'll create a function that returns a File. As a demo, we'll write a function that takes a
+Markdown file and returns an HTML file. We'll use a library called
+[micromark](https://github.com/micromark/micromark#readme) for this.
+
+<CodeFile>
+
+```zsh
+cd server
+pnpm add micromark
+```
+
+</CodeFile>
+
+Replace the `sayHello()` function with this:
+
+<CodeFile filename="server/module.ts">
+
+```typescript
+import { micromark } from "micromark"
+
+export function markdownToHtml(markdownFile: File | string) {
+	const markdown = typeof markdownFile === "string" ? markdownFile : await markdownFile.text()
+	const html = micromark(markdown)
+	return new File([html], "snippet.html", { type: "text/html" })
+}
+markdownToHtml.rpc = true
+```
+
+</CodeFile>
+
+This function takes either a string of Markdown or a Markdown file and converts it into an HTML file. We can call this
+function from the client like so:
+
+<CodeFile filename="client/index.ts">
+
+```typescript {3-5,8}
+import { client } from "./prim"
+
+const markdown = "[**Backend**, meet **Frontend**.](https://prim.doseofted.me/)"
+const htmlFile = await client.markdownToHtml(markdown)
+console.log(htmlFile.name, htmlFile instanceof File)
+
+const app = document.getElementById("app")
+if (app) app.innerHTML = await htmlFile.text()
+```
+
+</CodeFile>
+
 ## Extended Types
 
-Prim+RPC can support all types in function arguments and return values that are supported in JSON. It even supports
-Files and Blobs (by skipping the JSON serialization step). However we may want to work with additional types like Dates,
-Maps, and Sets, which are not supported by the default JSON handler. That's why Prim+RPC allows you to swap out this
-JSON handler with you own.
+Prim+RPC can support all types in function arguments and return values that are supported in JSON, as well as Files and
+Blobs (by skipping the JSON serialization step). However we may want to work with additional types like Dates, Maps, and
+Sets, which are not supported by the default JSON handler. That's why Prim+RPC allows you to swap out this JSON handler
+with you own.
 
 For instance, you may use [superjson](https://github.com/blitz-js/superjson#readme) to support many JavaScript built-ins
 or [devalue](https://github.com/Rich-Harris/devalue#readme) to support cyclical references. In fact, it doesn't even
@@ -90,8 +143,8 @@ export default createPrimClient<Module>({
 
 </CodeFile>
 
-That's all there is to it! Let's try it out with a function that accepts a Date. Replace our `sayHello()` function with
-the function below:
+That's all there is to it! Let's try it out with a function that accepts a Date. Replace our `markdownToHtml()` function
+from the last example with the function below:
 
 <CodeFile filename="server/module.ts">
 
@@ -108,7 +161,7 @@ And now we can call that function from the client:
 
 <CodeFile filename="client/index.ts">
 
-```typescript {3-4} /tomorrow.toDateString()/
+```typescript {3-4,7}
 import { client } from "./prim"
 
 const tomorrow = await client.whatIsDayAfter(new Date())
@@ -392,7 +445,10 @@ the new interface in our functions, like so:
 import type { ServerContext } from "./index"
 
 export function secretMessage(this: ServerContext, secret?: string) {
-	if (secret) this.setSecret(secret)
+	if (secret) {
+		this.setSecret(secret)
+		return
+	}
 	if (!this.allowed) throw new Error("No secret, no entry.")
 	return "Access granted! The answer is 42."
 }
@@ -418,7 +474,7 @@ Let's call this function from the client.
 ```typescript {3,6-10}
 import { client } from "./prim"
 
-client.secretMessage("can't-touch-this").then(console.log).catch(console.error)
+await client.secretMessage("can't-touch-this")
 
 const app = document.getElementById("app")
 if (app) app.innerText = client.secretMessage()
@@ -434,10 +490,10 @@ set in the cookie, we don't need to set it again. For demonstration, comment out
 ```typescript {3}
 import { client } from "./prim"
 
-// client.secretMessage("can't-touch-this").then(console.log).catch(console.error)
+// await client.secretMessage("can't-touch-this")
 
 const app = document.getElementById("app")
-if (app) app.innerText = client.secretMessage()
+if (app) app.innerText = await client.secretMessage()
 ```
 
 </CodeFile>
@@ -450,10 +506,10 @@ your choice.
 
 ## Next Steps
 
-There are many features available in Prim+RPC that we haven't even touched yet. You may both upload _and_ download files
-from your functions. You can define methods on other methods. You may swap out your server framework. See the
-[usage guide](/docs/v0/learn/usage) or one of the [available examples](/docs/v0/learn/examples) to learn more about what
-can be done with Prim+RPC.
+There are many features available in Prim+RPC that we haven't even touched yet. You could (and should) validate
+arguments inside of your functions (using any validation library). You may define methods on other methods or swap out
+your server framework. See the [usage guide](/docs/v0/learn/usage) or one of the
+[available examples](/docs/v0/learn/examples) to learn more about what can be done with Prim+RPC.
 
 <div class="flex gap-4 mt-6">
 	<a href="/docs/v0/learn/usage" class="not-prose btn">
