@@ -1,0 +1,120 @@
+---
+title: Advanced Setup
+---
+
+import { Icon } from "astro-icon/components"
+import CodeFile from "@/components/Code/CodeFile.astro"
+import Code from "@/components/Code/Code.astro"
+import Collapse from "@/components/Markdown/Collapse.astro"
+import PluginChoices from "@/components/Markdown/PluginChoices.astro"
+import Aside from "@/components/Markdown/Aside.astro"
+import CodeTabs from "@/components/Code/CodeTabs.react.tsx"
+
+This guide builds on the [basic setup guide](/docs/v0/usage/setup) and will use the same starter project.
+
+## Extended Types
+
+By default, Prim+RPC uses environment's built-in JSON handler to serialize RPC messages. This means that we can pass
+arguments and receive return values from our function between the server and client, as long as the JSON handler can
+serialize it. We can also pass Files and Blobs but these are special cases and skip the JSON handler.
+
+However we may want to work with additional types like Dates, Maps, and Sets, which are not supported by the default
+JSON handler. That's why Prim+RPC allows you to swap out this JSON handler with you own.
+
+For instance, you may use [superjson](https://github.com/blitz-js/superjson#readme) to support many JavaScript built-ins
+or [devalue](https://github.com/Rich-Harris/devalue#readme) to support cyclical references. In fact, it doesn't even
+need to be JSON. You may choose to serialize messages using [YAML](https://github.com/eemeli/yaml#readme) (for
+readability) or [MsgPack](https://github.com/msgpack/msgpack-javascript#readme) (for its size and support for more
+types).
+
+We'll set up superjson as an example. We'll add support on both the server and client. On the server:
+
+<CodeFile filename="server/index.ts">
+
+```typescript {6} /jsonHandler/2
+import { createPrimServer } from "@doseofted/prim-rpc"
+import { primFetch } from "@doseofted/prim-rpc-plugins/server-fetch"
+import * as module from "./module"
+import { createServer } from "node:http"
+import { createServerAdapter } from "@whatwg-node/server"
+import jsonHandler from "superjson"
+
+const prim = createPrimServer({ module, jsonHandler })
+function postprocess(res: Response) {
+	res.headers.set("access-control-allow-origin", "http://localhost:5173")
+	res.headers.set("access-control-allow-headers", "content-type")
+}
+const fetch = primFetch({ prim, postprocess })
+
+const fetchAdapter = createServerAdapter(fetch)
+createServer(fetchAdapter).listen(3000)
+console.log("Prim+RPC is available at http://localhost:3000/prim")
+
+export type Module = typeof module
+```
+
+</CodeFile>
+
+And on the client:
+
+<CodeFile filename="client/prim.ts">
+
+```typescript {4} /jsonHandler/2
+import { createPrimClient } from "@doseofted/prim-rpc"
+import { createMethodPlugin } from "@doseofted/prim-rpc-plugins/browser-fetch"
+import type { Module } from "../server"
+import jsonHandler from "superjson"
+
+export default createPrimClient<Module>({
+	endpoint: "http://localhost:3000/prim",
+	methodPlugin: createMethodPlugin(),
+	jsonHandler,
+})
+```
+
+</CodeFile>
+
+That's all there is to it! Let's try it out with a function that accepts a Date:
+
+<CodeFile filename="server/module.ts">
+
+```typescript {6-9}
+export function sayHello(x = "Backend", y = "Frontend") {
+	return `${x}, meet ${y}.`
+}
+sayHello.rpc = true
+
+export function whatIsDayAfter(day: Date) {
+	return new Date(day.valueOf() + 1000 * 60 * 60 * 24)
+}
+whatIsDayAfter.rpc = true
+```
+
+</CodeFile>
+
+And now we can call that function from the client:
+
+<CodeFile filename="client/index.ts">
+
+```typescript {6-7}
+import { client } from "./prim"
+
+const greeting = await client.sayHello()
+console.log(greeting) // "Frontend, meet Backend."
+
+const tomorrow = await client.whatIsDayAfter(new Date())
+console.log(tomorrow, tomorrow instanceof Date)
+
+const app = document.getElementById("app")
+if (!app) throw new Error("Missing #app element")
+app.innerText = greeting
+```
+
+</CodeFile>
+
+We can check the developer's console to find that we have received a new Date instance. We can swap our this JSON
+handler with another as needed. Check the reference guide to learn how to set up other JSON handlers.
+
+We already can do a lot with Prim+RPC but we we can do even more with callbacks.
+
+## Support Callbacks

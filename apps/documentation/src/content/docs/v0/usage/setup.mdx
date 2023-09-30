@@ -361,14 +361,13 @@ page with our greeting:
 
 <CodeFile filename="client/index.ts">
 
-```typescript {6-8}
+```typescript {6-7}
 import { client } from "./prim"
 
 const greeting = await client.sayHello()
 console.log(greeting) // "Frontend, meet Backend."
 
-const app = document.getElementById("app")
-if (!app) throw new Error("Missing #app element")
+const app = document!.getElementById("app")
 app.innerText = greeting
 ```
 
@@ -376,26 +375,18 @@ app.innerText = greeting
 
 Now we can easily add more functions on the server and simply call those functions from the client.
 
-<Aside message="You're all set up! Read on to support callbacks and advanced types in your functions." type="success" />
+<Aside
+	message="You're all set up! See the advanced setup guide to continue and support callbacks on your functions as well as additional types."
+	type="success"
+/>
 
-## Support Callbacks
-
-So far, we can already call functions on the server from the client with support for all valid JSON types and even Files
-and Blobs. But Prim+RPC has a few other tricks up its sleeve: support for callbacks and many other types.
-
-We'll start with callbacks because it's kind of fun. Or you may skip ahead if you'd like to
-[support even more types](#extended-types).
-
-## Extended Types
-
-Prim+RPC uses the built-in JSON handler for its environment by default to serialize RPC messages. This means that we can
-pass arguments and receive return values from our function between the server and client, as long as the JSON handler
-can serialize it. However this can be limiting because we may want to work with additional types like Dates, Maps, Sets,
-and more.
-
-That's why Prim+RPC allows you to swap out this JSON handler with you own. For instance, you may use
-[superjson](https://github.com/blitz-js/superjson#readme) to support many JavaScript built-ins or
-[devalue](https://github.com/Rich-Harris/devalue#readme) for the same reason (plus support for cyclical references). In
-fact, it doesn't even need to be JSON. You may choose to serialize messages using
-[YAML](https://github.com/eemeli/yaml#readme) (for readability) or
-[MsgPack](https://github.com/msgpack/msgpack-javascript#readme) (for its size and support for more types).
+<div class="flex gap-4 mt-6">
+	<a href="/docs/v0/usage/advanced" class="not-prose btn">
+		<Icon class="w-6 h-6" name="ph:toolbox-bold"></Icon>
+		<span>Advanced Setup</span>
+	</a>
+	<a href="/docs/v0/usage/examples" class="not-prose btn">
+		<Icon class="w-6 h-6" name="ph:terminal-window-fill"></Icon>
+		<span>Examples</span>
+	</a>
+</div>
