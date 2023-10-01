@@ -4,9 +4,10 @@ import Columns from "@/components/Columns.astro"
 import { HomepageIntro } from "@/components/IntroText.react"
 import Prim from "@/components/Prim.astro"
 import Layout from "@/layouts/Default.astro"
-import { Icon } from "astro-icon/components"
 import { Code } from "astro/components"
 import { stripIndent } from "common-tags"
+
+// Capture screenshot using developer tools: "Capture Node Screenshot" with width set to 1200px
 
 const greeting = await client.greetings()
 
@@ -25,8 +26,9 @@ const snippets = [serverCodeSnippet, clientCodeSnippet]
 
 <Layout fullscreen>
 	<div class="grid place-items-center min-h-[100svh]">
-		<div class="w-full max-w-[1200px] aspect-[1200/630] outline outline-white outline-1 outline-offset-1 grid">
-			<div class="screenshot flex flex-col px-8">
+		<div
+			class="pointer-events-auto w-full max-w-[1200px] aspect-[1200/630] outline outline-white outline-1 outline-offset-1 grid">
+			<div class="pointer-events-none screenshot flex flex-col px-8">
 				<Columns>
 					<div class="mt-8 grid grid-cols-12 gap-x-4">
 						<div class="col-span-8 col-start-1 flex">
@@ -97,8 +99,3 @@ const snippets = [serverCodeSnippet, clientCodeSnippet]
 		</div>
 	</div>
 </Layout>
-
-<script>
-	// Capture screenshot using developer tools: "Capture Node Screenshot" with width set to 1200px
-	// ...
-</script>

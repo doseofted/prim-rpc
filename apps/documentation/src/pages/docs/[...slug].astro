@@ -6,8 +6,10 @@ import {
 	versionsAvailable,
 	documentationContents,
 	type DocumentationCollection,
-	type CollectionType
+	type CollectionType,
 } from "@/content/config"
+import H2 from "@/components/Markdown/Heading/H2.astro"
+import H3 from "@/components/Markdown/Heading/H3.astro"
 
 interface Props {
 	entry: CollectionType<DocumentationCollection>
@@ -35,6 +37,6 @@ const tableOfContents = documentationContents("docs", version)
 	title={entry.data.title}
 	tableOfContents={tableOfContents}
 	versions={versionsAvailable.map(v => v.name)}>
-	<Content />
+	<Content components={{ h2: H2, h3: H3 }} />
 	<TableOfContents headings={headings} slot="extra" />
 </Documentation>

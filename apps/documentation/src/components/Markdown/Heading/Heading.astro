@@ -1,0 +1,19 @@
+---
+import { Icon } from "astro-icon/components"
+
+interface Props {
+	id: string
+	level: "h1" | "h2" | "h3" | "h4" | "h5" | "h6"
+}
+const { id, level: HeadingType } = Astro.props
+---
+
+<HeadingType id={id} class="relative group">
+	<a href={`#${id}`} class="absolute transform -translate-x-full pr-2 h-full inset-y-0 flex items-center">
+		<Icon
+			class="opacity-0 group-hover:opacity-100 transition-opacity duration-300 w-4 h-4 inline-block"
+			name="ph:link-bold"
+		/>
+	</a>
+	<slot />
+</HeadingType>
