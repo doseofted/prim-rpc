@@ -33,10 +33,10 @@ security headers. These may be provided by or be options of your server framewor
 
 ## Safely Serialize
 
-Prim+RPC uses the default JSON "stringify" method to serialize RPC and the [destr](https://github.com/unjs/destr)
+Prim+RPC uses the default JSON "stringify" method to serialize RPC and the [destr](https://github.com/unjs/destr#readme)
 library to deserialize RPC by default. You may override this behavior by providing your own alternative JSON handler.
 However you should be aware of any possible security implications of doing so.
 
 Particularly, consider whether the library has protection for prototype pollution or has any unpatched security
-vulnerabilities. If your custom JSON handler allows additional types or supports circular references to be used,
-consider how this may impact your code.
+vulnerabilities. If your custom JSON handler allows additional types or supports circular references, consider how this
+may impact your code.

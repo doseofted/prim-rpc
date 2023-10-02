@@ -445,7 +445,7 @@ export type Module = typeof module
 </CodeFile>
 
 We have defined a function and a property that we want to expose to our functions: `setSecret()` will set the secret and
-`allowed` will return whether the secret is to the correct value.
+`allowed` will return whether the secret is set to the correct value.
 
 Note that we have defined a `ServerContext` interface. This will become available to our functions. We can now utilize
 the new interface in our functions, like so:
@@ -493,8 +493,8 @@ if (app) app.innerText = client.secretMessage()
 
 </CodeFile>
 
-Because we passed the the correct secret, we can see the secret message from the server. Because this secret has been
-set in the cookie, we don't need to set it again. For demonstration, comment out that first line:
+Because we passed the correct secret, we can see the secret message from the server. Because this secret has been set in
+the cookie, we don't need to set it again. For demonstration, comment out that first line:
 
 <CodeFile filename="client/index.ts">
 
@@ -510,7 +510,7 @@ if (app) app.innerText = await client.secretMessage()
 </CodeFile>
 
 And note that we can still access the secret message because we've already set the secret in a cookie! So we don't need
-to pass it in our function less that cookie is removed.
+to pass it in our function unless that cookie is removed.
 
 This can be a powerful tool for setting up authentication, adding redirects, or otherwise integrating with the server of
 your choice.

@@ -4,5 +4,53 @@ title: Limitations
 
 # {frontmatter.title}
 
-Prim+RPC allows functions on the server to be called from the client. This is possible because all function calls on the
-client are captured on the client, processed on the server, and sent back to the client. But there are some limitations.
+Prim+RPC allows functions on the server to be called from the client. This is possible because all function calls are
+captured on the client, processed on the server, and sent back to the client. But there are some limitations.
+
+## Results are Promised
+
+All functions on the server, whether async or not, are considered async on the client and type definitions will reflect
+that your function results are wrapped in a Promise. This is because while it appears that you are calling the function
+directly, your function is being requested from another environment where it may take time to receive the result (for
+example, over a network) or that result may not be received in some circumstances (i.e. when network access is lost).
+
+It's also worth noting that if your function is requested over a network and the network is lost, your client's method
+plugin may error. The thrown error will be forwarded to your function's caller. This is the default behavior of
+client-side plugins unless you enable options to silence the error or repeat the request on a failure.
+
+## Keep Data Serializable
+
+Since function calls are not answered on the same client and must be sent somewhere else, the data passed to and
+received from functions must be serializable by your chosen JSON handler. Most of the time, this will be the
+[JSON object](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/JSON) (or
+[structured cloning](https://developer.mozilla.org/en-US/docs/Web/API/Web_Workers_API/Structured_clone_algorithm), if
+used with Web Workers) unless you choose to override it in Prim+RPC's options.
+
+## Function Context is Set
+
+Prim+RPC sets the context of your function, the `this` object, to your chosen handler's context. This allows
+server-specific details to be passed to your function easily and optionally.
+
+However it means that methods on an instantiated object may not be called directly without potential errors. The easy
+workaround for this is to wrap your method in another function. The wrapper function will have the server's context and
+the contained function will keep its original context.
+
+**This behavior may change prior to official release.** If the behavior is changed then the original context will be
+kept by default unless server context is explicitly set on your chosen handler (currently the context is `undefined` if
+not explicitly set from the server).
+
+## Prerelease Limitations
+
+Prim+RPC is currently in prerelease mode and some features are intended to be supported but are not yet implemented:
+
+- Functions can't be returned from functions yet (no currying)
+- Callbacks can't return values back to function yet
+- Files and callbacks can't be passed together on the same function yet
+
+There are also some features that won't be available in the first official release:
+
+- Generator functions are unsupported
+- Method chaining is unsupported (partially depends on ability to curry)
+
+It is still possible that these features will be added in the future but since these features are difficult to support,
+unlikely to be used, and Prim+RPC is gearing up for a stable release, they are considered low priority for version one.
