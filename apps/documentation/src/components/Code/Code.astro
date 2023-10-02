@@ -10,8 +10,14 @@ const { provider: provider = "rehype", classOverride } = Astro.props
 <div
 	class:list={[
 		"bg-prim-space",
-		provider === "astro" ? "site-code-style" : "text-sm py-3 px-5 rounded-b-xl",
+		provider === "astro" ? "site-code-style h-full" : "text-sm rounded-b-xl",
 		classOverride,
 	]}>
 	<slot />
 </div>
+
+<style is:global>
+	.site-code-style .astro-code {
+		height: 100%;
+	}
+</style>

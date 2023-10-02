@@ -3,3 +3,40 @@ title: Security
 ---
 
 # {frontmatter.title}
+
+Prim+RPC is a low-level library and keeps a narrow scope: handling RPC and providing the tools to easily integrate with
+other libraries. There are a few things to keep in mind when using Prim+RPC to keep your functions secure.
+
+## Selectively Import
+
+Prim+RPC is very selective about what gets exposed from the server. Functions (and functions only) must be passed to the
+server, must explicitly be marked as RPC, must not be defined on another function, and cannot access built-in functions.
+
+While this provides a lot of protection against accidental imports, you should still be cautious about what is passed to
+the Prim+PRC server. If Prim+RPC doesn't need access to a function or variable then don't pass it to the server.
+
+## Validate Arguments
+
+Prim+PRC validates that messages passed to it is RPC but it does not validate what's in that RPC. This means that
+arguments passed to your function and their return values are not validated for you: this is the developer's
+responsibility. Validation is especially important if your RPC is sent over a network like an HTTP server.
+
+This also makes Prim+RPC very flexible. You may use any validation library of your choice because validation is part of
+your function logic and not restricted by your server framework.
+
+## Secure the Transport
+
+Prim+RPC does not transport your RPC messages. It creates RPC messages and passes them to your server and client
+frameworks. Securing the transport means something different for every environment and falls outside of Prim+RPC's
+scope. When sending RPC over a network for instance, you will want to use a security certificate and implement relevant
+security headers. These may be provided by or be options of your server framework.
+
+## Safely Serialize
+
+Prim+RPC uses the default JSON "stringify" method to serialize RPC and the [destr](https://github.com/unjs/destr)
+library to deserialize RPC by default. You may override this behavior by providing your own alternative JSON handler.
+However you should be aware of any possible security implications of doing so.
+
+Particularly, consider whether the library has protection for prototype pollution or has any unpatched security
+vulnerabilities. If your custom JSON handler allows additional types or supports circular references to be used,
+consider how this may impact your code.

@@ -29,12 +29,25 @@ export const documentationContents = (collection = "docs", version: `v${string}`
 						{ name: "Introduction", link: `/${collection}/${version}/learn/intro` },
 						{ name: "Setup", link: `/${collection}/${version}/learn/setup` },
 						{ name: "Advanced", link: `/${collection}/${version}/learn/advanced` },
-						{ name: "Usage", link: `/${collection}/${version}/learn/usage` },
 						{ name: "Examples", link: `/${collection}/${version}/learn/examples` },
 						{ name: "Security", link: `/${collection}/${version}/learn/security` },
 						{ name: "Limitations", link: `/${collection}/${version}/learn/limitations` },
 					],
 				},
+				// {
+				// 	name: "Reference",
+				// 	sections: [
+				// 		{ name: "API", link: `/${collection}/${version}/reference/api` },
+				// 		{ name: "Configuration", link: `/${collection}/${version}/reference/Options` },
+				// 	],
+				// },
+				// {
+				// 	name: "Plugins",
+				// 	sections: [
+				// 		{ name: "Browse", link: `/${collection}/${version}/plugins/browse` },
+				// 		{ name: "Create", link: `/${collection}/${version}/plugins/create` },
+				// 	],
+				// },
 			],
 		},
 		{

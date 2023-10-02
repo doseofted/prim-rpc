@@ -25,8 +25,14 @@
 	@apply text-sm py-3 px-5 rounded-xl !bg-prim-space;
 }
 
-[data-rehype-pretty-code-fragment] code {
-	@apply bg-prim-space;
+/** Code block */
+[data-rehype-pretty-code-fragment] pre code {
+	@apply bg-prim-space overflow-x-auto !py-3 !px-5;
+}
+
+/* Inline code */
+[data-rehype-pretty-code-fragment] > code {
+	@apply bg-prim-space overflow-x-auto;
 }
 
 /* Override default styles (I think mostly applied by DaisyUI?) */

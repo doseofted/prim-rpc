@@ -42,17 +42,17 @@ const steps = [
 	},
 	{
 		step: "Create the server",
-		details: "We'll use Bun's Fetch API here but pick your favorite runtime/framework.",
+		details: "Prim+RPC supports your existing server framework.",
 		code: await getExample("homepage", "server/index.ts"),
 	},
 	{
 		step: "Create the client",
-		details: "We'll use the browser's Fetch API but you can choose your own.",
+		details: "Prim+RPC handles the client/server dance.",
 		code: await getExample("homepage", "client/prim.ts"),
 	},
 	{
 		step: "Call your function",
-		details: "Don't think about how you call it. It's handled for you.",
+		details: "No wrappers or client generation. Just call the function.",
 		code: await getExample("homepage", "client/index.ts"),
 	},
 ]
