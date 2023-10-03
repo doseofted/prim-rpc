@@ -4,32 +4,34 @@ import { Icon } from "astro-icon/components"
 import { IntroText } from "@/components/IntroText.react"
 import { versionsAvailable, type TableOfContents } from "@/content/config"
 import Prerelease from "@/components/Prerelease.astro"
+import NavigationDocs from "@/components/Documentation/NavigationDocs.astro"
+import VersionSelection from "@/components/Documentation/VersionSelection.astro"
 
 interface Props {
 	decorationText?: string
 	title?: string
 	description?: string
 	tableOfContents?: TableOfContents
-	versions?: string[]
 }
 
-const { title = "", decorationText = "", description, tableOfContents = [], versions } = Astro.props
-const path = Astro.url.pathname
-const selectedVersion = versionsAvailable?.find(v => v.name === (path.match(/\/docs\/(v\d+)/)?.[1] || "v0"))
-const versionName = selectedVersion?.aliases[0] ? `${selectedVersion.name} (${selectedVersion?.aliases[0]})` : ""
+const { title = "", decorationText = "", description, tableOfContents = [] } = Astro.props
 ---
 
 <Layout title={title} description={description}>
 	<!-- Side decorations -->
 	<div slot="after" class="relative h-full flex flex-col">
 		<div class="h-[40svh]"></div>
+		<div class="h-14 bg-white/70 lg:hidden -ml-[1px]"></div>
 		<div class="flex-grow bg-white -ml-px">
 			<Prerelease />
 		</div>
 	</div>
 	<div slot="before" class="lg:hidden relative h-full flex flex-col">
 		<div class="h-[40svh]"></div>
-		<div class="flex-grow bg-white -mr-px"></div>
+		<div class="h-14 bg-white/70 lg:hidden -mr-[1px]"></div>
+		<div class="flex-grow bg-white -mr-px">
+			<Prerelease />
+		</div>
 	</div>
 
 	<div class="flex flex-col h-full">
@@ -48,56 +50,24 @@ const versionName = selectedVersion?.aliases[0] ? `${selectedVersion.name} (${se
 
 		<!-- Page content -->
 		<div class="flex-grow grid grid-cols-6 lg:grid-cols-12 gap-x-4">
-			<div class="bg-white/70 rounded-l-xl -ml-4 pl-4 -mr-4 pr-4 col-span-2">
+			<div
+				class="bg-white/70 lg:rounded-l-xl -ml-4 pl-4 -mr-4 pr-4 col-span-6 lg:col-span-2 flex justify-between lg:block">
+				<button class="lg:hidden btn btn-xs my-4">
+					<Icon class="w-3 h-3" name="ph:list-bold" />
+					<span>Table of Contents</span>
+				</button>
 				<div class="py-3">
-					<div class="dropdown dropdown-bottom w-full">
-						<label
-							tabindex="0"
-							class="btn btn-block glass bg-white/50 btn-xs my-1 flex justify-between normal-case"
-							onclick="versionSelection.focus()">
-							<span>{versionName}</span>
-							<Icon name="ph:caret-down-bold" />
-						</label>
-						<ul
-							id="versionSelection"
-							tabindex="-1"
-							class="dropdown-content focus-within:dropdown-hover w-full z-[1] menu menu-sm p-1 shadow glass !bg-white/70 rounded-xl">
-							{
-								versionsAvailable?.map(version => (
-									<li>
-										<a href={path.replace(/(\/docs\/)v\d+(.*)/, `$1${version.name}$2`)}>{version.name}</a>
-									</li>
-								))
-							}
-						</ul>
-					</div>
+					<VersionSelection />
 				</div>
-				<ul
-					class="menu menu-sm px-0 space-y-4 flex-nowrap pt-6 pb-4 sticky top-0 max-h-[100svh] overflow-auto"
-					data-lenis-prevent>
-					{
-						tableOfContents.map(({ name, sections }, sectionIndex) => (
-							<li class="space-y-2">
-								<span class="menu-title !text-black px-0 font-title font-semibold">{name}</span>
-								<ul class="content-section ml-0 px-0 !mt-0">
-									{sections?.map(({ name, link }, index) => (
-										<li>
-											<a class={path.startsWith(link ?? "") ? "active text-white" : ""} href={link}>
-												{name}
-											</a>
-										</li>
-									))}
-								</ul>
-							</li>
-						))
-					}
-				</ul>
+				<div class="hidden lg:block sticky top-0">
+					<NavigationDocs tableOfContents={tableOfContents} />
+				</div>
 			</div>
 
-			<div class="bg-white -mr-4 -ml-4 lg:ml-0 col-span-8">
-				<Prerelease transition:persist="prelease">
+			<div class="bg-white -mr-4 -ml-4 lg:ml-0 col-span-6 lg:col-span-8">
+				<Prerelease>
 					<div class="grid grid-cols-8 flex-grow gap-x-4">
-						<div class="lg:col-start-2 col-span-8 lg:col-span-8 flex gap-4 items-center">
+						<div class="lg:col-start-2 col-span-8 px-4 lg:px-0 lg:col-span-8 flex gap-4 items-center">
 							<Icon class="w-6 h-6" name="ph:warning-circle-duotone" />
 							<span>
 								Prim+RPC is in <a
@@ -118,11 +88,11 @@ const versionName = selectedVersion?.aliases[0] ? `${selectedVersion.name} (${se
 				</div>
 			</div>
 
-			<div class="col-span-2 bg-white -mr-4 pr-4">
-				<div class="-mr-4">
+			<div class="col-span-6 lg:col-span-2 bg-white -mx-4 px-4 lg:-mr-4 lg:pr-4">
+				<div class="hidden lg:block -mr-4">
 					<Prerelease />
 				</div>
-				<div class="sticky top-0 py-4 -mx-4">
+				<div class="sticky top-0 lg:py-4 lg:-mx-4">
 					<slot name="extra" />
 				</div>
 			</div>
