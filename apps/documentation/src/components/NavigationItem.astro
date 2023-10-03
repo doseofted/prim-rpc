@@ -6,33 +6,40 @@ interface Props {
 	icon?: string
 	text?: string
 	link?: string
-	type?: "a" | "button"
+	type?: "a" | "button" | "div"
 	className?: string
+	onclick?: string
+	rounded?: "all" | "bottom"
 }
-const { type: ElemType = "a", ...item } = Astro.props
+const { type: ElemType = "a", rounded = "all", ...item } = Astro.props
 ---
 
 <ElemType
 	class:list={twMerge([
-		"navigation-item flex justify-center items-center relative z-10 pt-10 pb-2 h-full font-semibold uppercase text-sm",
+		["nav-rounded", rounded].filter(g => g).join("-"),
+		"navigation-item flex justify-center items-center relative z-10 p-4 h-full font-semibold uppercase text-sm",
 		item.icon ? "px-4" : "px-6",
 		item.className,
 	])}
 	href={item.link}
 	target={item.link?.startsWith("/") ? "_self" : "_blank"}
-	aria-label={item.text}>
+	aria-label={item.text}
+	onclick={item.onclick}>
 	{
 		item.icon ? (
 			<>
 				{item.icon.startsWith("/") ? (
-					<img class="w-6 h-6 relative" src={item.icon} />
+					<img class="transition-transform duration-300 w-6 h-6 relative" src={item.icon} />
 				) : (
-					<Icon class="w-6 h-6 relative" name={item.icon} />
+					<Icon class="transition-transform duration-300 w-6 h-6 relative" name={item.icon} />
 				)}
-				<div class="lg:tooltip lg:tooltip-bottom !absolute inset-0 w-full h-full" data-tip={item.text} />
+				<div
+					class="transition-transform duration-300 lg:tooltip lg:tooltip-bottom !absolute inset-0 w-full h-full"
+					data-tip={item.text}
+				/>
 			</>
 		) : (
-			<span class="relative">{item.text}</span>
+			<span class="transition-transform duration-300 relative">{item.text}</span>
 		)
 	}
 </ElemType>
@@ -48,6 +55,13 @@ const { type: ElemType = "a", ...item } = Astro.props
 			inset: 0;
 			background-color: transparent;
 			transition: all 300ms;
+		}
+
+		&.nav-rounded-all::before {
+			border-radius: theme("borderRadius.xl");
+		}
+
+		&.nav-rounded-bottom::before {
 			border-bottom-left-radius: theme("borderRadius.xl");
 			border-bottom-right-radius: theme("borderRadius.xl");
 		}
@@ -59,7 +73,7 @@ const { type: ElemType = "a", ...item } = Astro.props
 			background-color: #fff;
 		}
 
-		&:hover {
+		&:hover > * {
 			transform: scale(1.05);
 		}
 	}
