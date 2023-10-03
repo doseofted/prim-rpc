@@ -12,12 +12,13 @@ import Lights from "@/components/Lights.astro"
 import Footer from "@/components/Footer.astro"
 
 interface Props {
+	brand?: string
 	title?: string
 	description?: string
 	fullscreen?: boolean
 	className?: string
 }
-const { title = "", fullscreen, description, className } = Astro.props
+const { brand, title = "", fullscreen, description, className } = Astro.props
 
 const siteName = "Prim+RPC"
 const image = `${Astro.site}/social.png`
@@ -77,7 +78,7 @@ const image = `${Astro.site}/social.png`
 				<>
 					<Container>
 						<Columns className="h-24">
-							<Navigation transition:persist="logo" />
+							<Navigation brand={brand} transition:persist="logo" />
 						</Columns>
 						<div slot="after" class="prim-navigation h-24 bg-white/70 border-b border-white/70 z-10 relative" />
 					</Container>

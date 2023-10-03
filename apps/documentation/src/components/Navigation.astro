@@ -1,10 +1,14 @@
 ---
-import { Icon } from "astro-icon/components"
 import Prim from "@/components/Prim.astro"
+import NavigationItem from "./NavigationItem.astro"
+
+interface Props {
+	brand?: string
+}
+const { brand = "RPC" } = Astro.props
 
 const navigation = [
 	{ link: "/docs/v0/learn/intro", text: "Docs" },
-	{ link: "/api/v0", text: "API" },
 	{ link: "/cms", text: "CMS" },
 	{ link: "https://doseofted.me/", text: "Dose of Ted", icon: "/prim-nav-doseofted-attribution.png" },
 	{ link: "https://www.threads.net/@doseofted", text: "Threads", icon: "simple-icons:threads" },
@@ -19,63 +23,9 @@ const navigation = [
 		data-brightness="0.5,1.5"
 		data-size="0.5,1.8"
 		data-offset="2,4">
-		<Prim>RPC</Prim>
+		<Prim>{brand}</Prim>
 	</div>
 	<div class="bg-white/70 border-b border-white/70 relative right-[-1px] pr-4 pt-0 rounded-bl-xl flex items-center">
-		{
-			navigation.map(item => (
-				<>
-					{item.icon ? (
-						<a
-							class="navigation-item relative px-4 pt-10 pb-2 h-full font-semibold uppercase text-sm flex justify-center items-center"
-							href={item.link}
-							target={item.link.startsWith("/") ? "_self" : "_blank"}
-							aria-label={item.text}>
-							{item.icon.startsWith("/") ? (
-								<img class="w-6 h-6 relative" src={item.icon} />
-							) : (
-								<Icon class="w-6 h-6 relative" name={item.icon} />
-							)}
-							<div class="lg:tooltip lg:tooltip-bottom !absolute inset-0 w-full h-full" data-tip={item.text} />
-						</a>
-					) : (
-						<a
-							class="navigation-item relative z-10 px-6 pt-10 pb-2 h-full font-semibold uppercase text-sm flex justify-center items-center"
-							href={item.link}
-							target={item.link.startsWith("/") ? "_self" : "_blank"}>
-							<span class="relative">{item.text}</span>
-						</a>
-					)}
-				</>
-			))
-		}
+		{navigation.map(item => <NavigationItem {...item} className="hidden lg:flex" />)}
 	</div>
 </nav>
-
-<style>
-	.navigation-item {
-		transition: transform 300ms;
-
-		&::before {
-			content: "";
-			display: block;
-			position: absolute;
-			inset: 0;
-			background-color: transparent;
-			transition: all 300ms;
-			border-bottom-left-radius: theme("borderRadius.xl");
-			border-bottom-right-radius: theme("borderRadius.xl");
-		}
-
-		&:hover::before {
-			left: -6px;
-			right: -6px;
-			bottom: -4px;
-			background-color: #fff;
-		}
-
-		&:hover {
-			transform: scale(1.05);
-		}
-	}
-</style>

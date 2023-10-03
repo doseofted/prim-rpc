@@ -1,11 +1,13 @@
 ---
+import { twMerge } from "tailwind-merge"
+
 interface Props {
 	className?: string
 }
 const { className } = Astro.props
 ---
 
-<div class:list={["flex", className]}>
+<div class:list={twMerge(["flex", className])}>
 	<div class="flex-grow">
 		<slot name="before" />
 	</div>

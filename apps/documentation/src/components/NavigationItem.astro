@@ -1,0 +1,66 @@
+---
+import { Icon } from "astro-icon/components"
+import { twMerge } from "tailwind-merge"
+
+interface Props {
+	icon?: string
+	text?: string
+	link?: string
+	type?: "a" | "button"
+	className?: string
+}
+const { type: ElemType = "a", ...item } = Astro.props
+---
+
+<ElemType
+	class:list={twMerge([
+		"navigation-item flex justify-center items-center relative z-10 pt-10 pb-2 h-full font-semibold uppercase text-sm",
+		item.icon ? "px-4" : "px-6",
+		item.className,
+	])}
+	href={item.link}
+	target={item.link?.startsWith("/") ? "_self" : "_blank"}
+	aria-label={item.text}>
+	{
+		item.icon ? (
+			<>
+				{item.icon.startsWith("/") ? (
+					<img class="w-6 h-6 relative" src={item.icon} />
+				) : (
+					<Icon class="w-6 h-6 relative" name={item.icon} />
+				)}
+				<div class="lg:tooltip lg:tooltip-bottom !absolute inset-0 w-full h-full" data-tip={item.text} />
+			</>
+		) : (
+			<span class="relative">{item.text}</span>
+		)
+	}
+</ElemType>
+
+<style>
+	.navigation-item {
+		transition: transform 300ms;
+
+		&::before {
+			content: "";
+			display: block;
+			position: absolute;
+			inset: 0;
+			background-color: transparent;
+			transition: all 300ms;
+			border-bottom-left-radius: theme("borderRadius.xl");
+			border-bottom-right-radius: theme("borderRadius.xl");
+		}
+
+		&:hover::before {
+			left: -6px;
+			right: -6px;
+			bottom: -4px;
+			background-color: #fff;
+		}
+
+		&:hover {
+			transform: scale(1.05);
+		}
+	}
+</style>

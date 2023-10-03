@@ -24,7 +24,7 @@ export const documentationContents = (collection = "docs", version: `v${string}`
 			version: "v0",
 			content: [
 				{
-					name: "Learn",
+					name: "Learning",
 					sections: [
 						{ name: "Introduction", link: `/${collection}/${version}/learn/intro` },
 						{ name: "Setup", link: `/${collection}/${version}/learn/setup` },
@@ -34,20 +34,22 @@ export const documentationContents = (collection = "docs", version: `v${string}`
 						{ name: "Limitations", link: `/${collection}/${version}/learn/limitations` },
 					],
 				},
-				// {
-				// 	name: "Reference",
-				// 	sections: [
-				// 		{ name: "API", link: `/${collection}/${version}/reference/api` },
-				// 		{ name: "Configuration", link: `/${collection}/${version}/reference/Options` },
-				// 	],
-				// },
-				// {
-				// 	name: "Plugins",
-				// 	sections: [
-				// 		{ name: "Browse", link: `/${collection}/${version}/plugins/browse` },
-				// 		{ name: "Create", link: `/${collection}/${version}/plugins/create` },
-				// 	],
-				// },
+				{
+					name: "Reference",
+					sections: [
+						{ name: "Configuration", link: `/${collection}/${version}/reference/config` },
+						{ name: "Browse Plugins", link: `/${collection}/${version}/reference/plugins` },
+						{ name: "Create Plugin", link: `/${collection}/${version}/reference/create` },
+						{ name: "Structure", link: `/${collection}/${version}/reference/structure` },
+					],
+				},
+				{
+					name: "Tooling",
+					sections: [
+						{ name: "Documentation", link: `/${collection}/${version}/tooling/docs` },
+						{ name: "Build Utility", link: `/${collection}/${version}/tooling/build` },
+					],
+				},
 			],
 		},
 		{
