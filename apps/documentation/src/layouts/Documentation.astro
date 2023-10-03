@@ -49,11 +49,11 @@ const versionName = selectedVersion?.aliases[0] ? `${selectedVersion.name} (${se
 		<!-- Page content -->
 		<div class="flex-grow grid grid-cols-6 lg:grid-cols-12 gap-x-4">
 			<div class="bg-white/70 rounded-l-xl -ml-4 pl-4 -mr-4 pr-4 col-span-2">
-				<div class="pt-4">
+				<div class="py-3">
 					<div class="dropdown dropdown-bottom w-full">
 						<label
 							tabindex="0"
-							class="btn btn-block glass bg-white/50 btn-xs flex justify-between normal-case"
+							class="btn btn-block glass bg-white/50 btn-xs my-1 flex justify-between normal-case"
 							onclick="versionSelection.focus()">
 							<span>{versionName}</span>
 							<Icon name="ph:caret-down-bold" />
@@ -73,7 +73,7 @@ const versionName = selectedVersion?.aliases[0] ? `${selectedVersion.name} (${se
 					</div>
 				</div>
 				<ul
-					class="menu menu-sm px-0 space-y-4 flex-nowrap py-4 sticky top-0 max-h-[100svh] overflow-auto"
+					class="menu menu-sm px-0 space-y-4 flex-nowrap pt-6 pb-4 sticky top-0 max-h-[100svh] overflow-auto"
 					data-lenis-prevent>
 					{
 						tableOfContents.map(({ name, sections }, sectionIndex) => (
