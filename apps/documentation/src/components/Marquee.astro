@@ -10,7 +10,7 @@ const { direction = "left", speed = "100s" } = Astro.props
 	<div class="transform">
 		<slot />
 	</div>
-	<div class="transform">
+	<div class="transform" aria-hidden="true">
 		<slot />
 	</div>
 </div>
@@ -28,15 +28,19 @@ const { direction = "left", speed = "100s" } = Astro.props
 
 	@keyframes marquee-right {
 		from {
-			transform: translateX(100%);
+			transform: translateX(0);
 		}
 
 		to {
-			transform: translateX(0);
+			transform: translateX(100%);
 		}
 	}
 
 	.marquee {
+		--mask-image: linear-gradient(to right, rgba(0, 0, 0, 0), rgba(0, 0, 0, 1), rgba(0, 0, 0, 1), rgba(0, 0, 0, 0));
+		mask-image: var(--mask-image);
+		-webkit-mask-image: var(--mask-image);
+
 		& > .transform {
 			animation: var(--direction) var(--speed) linear infinite;
 		}

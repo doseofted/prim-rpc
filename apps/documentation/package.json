@@ -73,6 +73,7 @@
 		"framer-motion": "^10.16.4",
 		"just-safe-get": "^4.2.0",
 		"just-safe-set": "^4.2.1",
+		"just-shuffle": "^4.2.0",
 		"mitt": "^3.0.1",
 		"motion": "^10.16.4",
 		"nanostores": "^0.9.3",

@@ -12,6 +12,7 @@ import path from "node:path"
 import process from "node:process"
 import Marquee from "@/components/Marquee.astro"
 import { getCollection } from "astro:content"
+import shuffle from "just-shuffle"
 
 const greeting = await client.greetings()
 
@@ -143,7 +144,18 @@ const features = [
 ]
 
 const pluginsCollection = await getCollection("plugins")
-const plugins = pluginsCollection.map(({ slug, data: { title, icon } }) => ({ slug, title, icon }))
+const plugins = pluginsCollection.map(({ slug, data: { title, icon } }) => ({
+	slug: String(slug),
+	title,
+	icon: String(icon),
+}))
+const integrations = shuffle(
+	[
+		{ slug: "method-handler/fetch", icon: "simple-icons:nodedotjs", title: "Node" },
+		{ slug: "method-handler/fetch", icon: "simple-icons:deno", title: "Deno" },
+		{ slug: "method-handler/fetch", icon: "simple-icons:bun", title: "Bun" },
+	].concat(plugins)
+)
 ---
 
 <Layout className="homepage-intro">
@@ -267,15 +279,16 @@ const plugins = pluginsCollection.map(({ slug, data: { title, icon } }) => ({ sl
 				already and can be extended to work with any framework.
 			</p>
 		</div>
-		<div class="text-white col-span-6 lg:col-span-12 space-y-8">
+		<div class="text-white col-span-6 lg:col-span-12 space-y-4">
 			<Marquee speed="100s">
-				<div class="flex gap-8 pl-8 text-white">
+				<div class="flex gap-12 pl-12 text-white">
 					{
-						plugins.slice(0, Math.floor(plugins.length / 2)).map(plugin => {
+						integrations.slice(0, Math.floor(integrations.length / 2)).map(plugin => {
 							return (
 								<div class="flex gap-2">
-									<Icon class="w-6 h-6" name={plugin.icon} />
-									<span class="font-bold">{plugin.title}</span>
+									<a class="font-bold hover:underline p-2" href={`/docs/plugins/${plugin.slug}`}>
+										{plugin.title}
+									</a>
 								</div>
 							)
 						})
@@ -283,19 +296,24 @@ const plugins = pluginsCollection.map(({ slug, data: { title, icon } }) => ({ sl
 				</div>
 			</Marquee>
 			<Marquee speed="50s">
-				<div class="flex gap-8 pl-8 text-white">
+				<div class="flex gap-12 pl-12 text-white">
 					{
-						plugins.slice(Math.floor(plugins.length / 2) + 1).map(plugin => {
+						integrations.slice(Math.floor(integrations.length / 2) + 1).map(plugin => {
 							return (
 								<div class="flex gap-2">
-									<Icon class="w-6 h-6" name={plugin.icon} />
-									<span class="font-bold">{plugin.title}</span>
+									<a class="font-bold hover:underline p-2" href={`/docs/plugins/${plugin.slug}`}>
+										{plugin.title}
+									</a>
 								</div>
 							)
 						})
 					}
 				</div>
 			</Marquee>
+			<p class="text-xs opacity-75 flex gap-2 items-center leading-none">
+				<Icon name="ph:asterisk-bold" />
+				 All trademarks are property of their respective owners. Prim+RPC is not endorsed by any of these frameworks.
+			</p>
 		</div>
 	</div>
 
