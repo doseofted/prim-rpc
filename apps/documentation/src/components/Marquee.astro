@@ -1,0 +1,48 @@
+---
+interface Props {
+	direction?: "left" | "right"
+	speed?: `${number}s` | `${number}ms`
+}
+const { direction = "left", speed = "100s" } = Astro.props
+---
+
+<div class="marquee flex overflow-hidden" style={`--direction: marquee-${direction}; --speed: ${speed};`}>
+	<div class="transform">
+		<slot />
+	</div>
+	<div class="transform">
+		<slot />
+	</div>
+</div>
+
+<style>
+	@keyframes marquee-left {
+		from {
+			transform: translateX(0);
+		}
+
+		to {
+			transform: translateX(-100%);
+		}
+	}
+
+	@keyframes marquee-right {
+		from {
+			transform: translateX(100%);
+		}
+
+		to {
+			transform: translateX(0);
+		}
+	}
+
+	.marquee {
+		& > .transform {
+			animation: var(--direction) var(--speed) linear infinite;
+		}
+
+		&:hover > .transform {
+			animation-play-state: paused;
+		}
+	}
+</style>

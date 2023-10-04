@@ -10,6 +10,8 @@ import CodeFile from "@/components/Code/CodeFile.astro"
 import { readFile } from "node:fs/promises"
 import path from "node:path"
 import process from "node:process"
+import Marquee from "@/components/Marquee.astro"
+import { getCollection } from "astro:content"
 
 const greeting = await client.greetings()
 
@@ -139,6 +141,9 @@ const features = [
 		details: "Function logic is separate from the transport, makes testing easy.",
 	},
 ]
+
+const pluginsCollection = await getCollection("plugins")
+const plugins = pluginsCollection.map(({ slug, data: { title, icon } }) => ({ slug, title, icon }))
 ---
 
 <Layout className="homepage-intro">
@@ -211,6 +216,7 @@ const features = [
 		}
 	</div>
 
+	<!-- Give a short, working demo -->
 	<div class="grid grid-cols-12 gap-4 py-8">
 		<div
 			class="col-span-12 xl:col-span-6 max-w-xl xl:max-w-2xl text-white space-y-4 flex flex-col items-center justify-center">
@@ -246,6 +252,50 @@ const features = [
 					</div>
 				))
 			}
+		</div>
+	</div>
+
+	<!-- Show off everywhere it works -->
+	<div class="feature-list grid grid-cols-12 gap-4 py-8">
+		<div
+			class="col-span-12 xl:col-span-6 max-w-xl xl:max-w-2xl text-white space-y-4 flex flex-col items-center justify-center">
+			<p class="font-title text-xl sm:text-2xl lg:text-4xl font-semibold uppercase leading-none w-full">
+				It Works Everywhere. With&nbsp;Everything.
+			</p>
+			<p class="text-sm lg:text-base w-full">
+				Prim+RPC works in all JavaScript envrionments: Node, Deno, Bun, browser, wherever. It supports many frameworks
+				already and can be extended to work with any framework.
+			</p>
+		</div>
+		<div class="text-white col-span-6 lg:col-span-12 space-y-8">
+			<Marquee speed="100s">
+				<div class="flex gap-8 pl-8 text-white">
+					{
+						plugins.slice(0, Math.floor(plugins.length / 2)).map(plugin => {
+							return (
+								<div class="flex gap-2">
+									<Icon class="w-6 h-6" name={plugin.icon} />
+									<span class="font-bold">{plugin.title}</span>
+								</div>
+							)
+						})
+					}
+				</div>
+			</Marquee>
+			<Marquee speed="50s">
+				<div class="flex gap-8 pl-8 text-white">
+					{
+						plugins.slice(Math.floor(plugins.length / 2) + 1).map(plugin => {
+							return (
+								<div class="flex gap-2">
+									<Icon class="w-6 h-6" name={plugin.icon} />
+									<span class="font-bold">{plugin.title}</span>
+								</div>
+							)
+						})
+					}
+				</div>
+			</Marquee>
 		</div>
 	</div>
 
