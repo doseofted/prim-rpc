@@ -27,8 +27,8 @@ export default defineConfig({
 			langs: ["typescript", "javascript", "jsx", "tsx", "shellscript"],
 			wrap: false,
 		},
-		remarkPlugins: [],
 		syntaxHighlight: false, // "shiki",
+		remarkPlugins: [],
 		rehypePlugins: [
 			[rehypePrettyCode, rehypePrettyOptions],
 			[rehypeExternalLinks, { target: "_blank" }],
@@ -40,7 +40,7 @@ export default defineConfig({
 			include: "src/**/*.react.tsx",
 		}),
 		mdx(),
-		sitemap(),
+		sitemap({ filter: page => !page.startsWith("/tests/") }),
 		icon({
 			include: {
 				ph: ["*"],

@@ -7,6 +7,8 @@ title: Basic Setup
 import { Icon } from "astro-icon/components"
 import CodeFile from "@/components/Code/CodeFile.astro"
 import Code from "@/components/Code/Code.astro"
+import Button from "@/components/Markdown/Button.astro"
+import ButtonGroup from "@/components/Markdown/ButtonGroup.astro"
 import Collapse from "@/components/Markdown/Collapse.astro"
 import PluginChoices from "@/components/Markdown/PluginChoices.astro"
 import Aside from "@/components/Markdown/Aside.astro"
@@ -193,6 +195,8 @@ so if this looks unfamiliar, this is perfectly valid code.
 
 Now let's set up the Prim+RPC server and pass our function to it:
 
+{/* prettier-ignore-start */}
+
 <CodeFile filename="server/index.ts">
 
 ```typescript
@@ -202,6 +206,7 @@ import * as module from "./module"
 const prim = createPrimServer({ module })
 
 export type Module = typeof module
+
 ```
 
 </CodeFile>
@@ -225,6 +230,7 @@ const prim = createPrimServer({ module })
 const fetch = primFetch({ prim })
 
 export type Module = typeof module
+
 ```
 
 </CodeFile>
@@ -259,6 +265,7 @@ const server = createServer(fetchAdapter).listen(3000)
 console.log("Prim+RPC is available at http://localhost:3000/prim")
 
 export type Module = typeof module
+
 ```
 
 </CodeFile>
@@ -299,9 +306,12 @@ const server = createServer(fetchAdapter).listen(3000)
 console.log("Prim+RPC is available at http://localhost:3000/prim")
 
 export type Module = typeof module
+
 ```
 
 </CodeFile>
+
+{/* prettier-ignore-end */}
 
 This will allow our client, which will run on `http://localhost:5173{:txt}`, to call the server. Our server is fully
 configured and we can now set up the client!
@@ -384,17 +394,14 @@ Now we can easily add more functions on the server and simply call those functio
 While we could stop right here, Prim+RPC can do much more. See the [advanced guide](/docs/v0/learn/advanced) to continue
 on and send and receive Files, work with callbacks, and work with more types.
 
-<div class="flex gap-4 mt-6">
-	<a href="/docs/v0/learn/advanced" class="not-prose btn">
-		<Icon class="w-6 h-6" name="ph:toolbox-bold"></Icon>
-		<span>Advanced Setup</span>
-	</a>
-	<a href="/docs/v0/reference/config" class="not-prose btn">
-		<Icon class="w-6 h-6" name="ph:wrench-bold"></Icon>
-		<span>Configuration</span>
-	</a>
-	<a href="/docs/v0/learn/examples" class="not-prose btn">
-		<Icon class="w-6 h-6" name="ph:terminal-window-fill"></Icon>
-		<span>Examples</span>
-	</a>
-</div>
+<ButtonGroup>
+	<Button href="/docs/v0/learn/advanced" icon="ph:toolbox-bold">
+		Advanced Setup
+	</Button>
+	<Button href="/docs/v0/reference/config" icon="ph:wrench-bold">
+		Configuration
+	</Button>
+	<Button href="/docs/v0/learn/examples" icon="ph:terminal-window-fill">
+		Examples
+	</Button>
+</ButtonGroup>

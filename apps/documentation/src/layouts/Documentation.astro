@@ -90,7 +90,7 @@ const { title = "", decorationText = "", description, tableOfContents = [] } = A
 									class="underline"
 									href="https://github.com/doseofted/prim-rpc#release-plan"
 									target="_blank">prerelease mode</a
-								> and may be unstable until stable release.</span
+								> and may be unstable until official release.</span
 							>
 						</div>
 					</div>
@@ -100,15 +100,17 @@ const { title = "", decorationText = "", description, tableOfContents = [] } = A
 						<div class="prose max-w-none">
 							<slot />
 						</div>
-						<button
-							onclick="onThisPageTableOfContents.showModal()"
-							class="sticky bottom-8 z-40 lg:hidden btn btn-xs btn-block ring-1 ring-neutral/30 drop-shadow-lg justify-between mt-8">
-							<div class="flex gap-4">
-								<Icon class="w-3 h-3" name="ph:book-bold" />
-								<span>On This Page</span>
-							</div>
-							<Icon class="w-3 h-3" name="ph:caret-down-bold" />
-						</button>
+						<div class="sticky bottom-0 z-40 bg-gradient-to-t from-white to-transparent -mb-8 lg:mb-8">
+							<button
+								onclick="onThisPageTableOfContents.showModal()"
+								class="lg:hidden btn btn-xs btn-block ring-1 ring-neutral/30 drop-shadow-lg justify-between my-8">
+								<div class="flex gap-4">
+									<Icon class="w-3 h-3" name="ph:book-bold" />
+									<span>On This Page</span>
+								</div>
+								<Icon class="w-3 h-3" name="ph:caret-down-bold" />
+							</button>
+						</div>
 					</div>
 				</div>
 			</div>
