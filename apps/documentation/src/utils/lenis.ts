@@ -1,23 +1,40 @@
 import Lenis from "@studio-freight/lenis"
 import { easeOutExpo } from "./easings"
 
-export const lenis = new Lenis({
-	duration: 1,
-	easing: easeOutExpo,
-	orientation: "vertical",
-	gestureOrientation: "vertical",
-	smoothWheel: true,
-	wheelMultiplier: 1,
-	smoothTouch: false,
-	touchMultiplier: 2,
-	infinite: false,
-})
+const USE_LENIS = true
+
+export const lenis = USE_LENIS
+	? new Lenis({
+			duration: 1,
+			easing: easeOutExpo,
+			orientation: "vertical",
+			gestureOrientation: "vertical",
+			smoothWheel: true,
+			wheelMultiplier: 1,
+			smoothTouch: false,
+			touchMultiplier: 2,
+			infinite: false,
+	  })
+	: {
+			/** If Lenis isn't given, add back method called in TableOfContents.astro and use native behavior */
+			scrollTo(_given: string) {
+				window.scrollTo({ top: 0, behavior: "smooth" })
+			},
+			raf(_time: number) {},
+	  }
+
+declare global {
+	interface Window {
+		lenis: Lenis | { scrollTo(given: string): void }
+	}
+}
+window.lenis = lenis
 
 function raf(time: number) {
 	lenis.raf(time)
 	requestAnimationFrame(raf)
 }
-requestAnimationFrame(raf)
+if (USE_LENIS) requestAnimationFrame(raf)
 
 function handleHashNavigation() {
 	for (const possibleLink of document.querySelectorAll<HTMLAnchorElement>('a[href*="#"]')) {

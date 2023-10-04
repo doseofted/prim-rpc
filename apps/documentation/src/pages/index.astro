@@ -153,6 +153,7 @@ const features = [
 				snippets.map((snippet, index) => (
 					<div
 						class:list={[
+							"max-w-full",
 							index === 0 ? "md:translate-x-16 lg:translate-x-32" : "md:-translate-x-16 lg:-translate-x-32",
 						]}>
 						<div
@@ -161,7 +162,7 @@ const features = [
 							data-size="0.4,1"
 							data-offset="1.5,3"
 							data-brightness="0.5,1">
-							<div class="homepage-snippets opacity-0">
+							<div class:list={["homepage-snippets opacity-0", index === 0 ? "ml-8 md:ml-0" : "mr-8 md:mr-0"]}>
 								<div class="mockup-code text-sm bg-white/70 border border-white/70 pb-4 w-full max-w-lg">
 									<div class="px-4">
 										<div class="rounded-lg overflow-hidden bg-prim-space site-code-style">
@@ -212,7 +213,7 @@ const features = [
 
 	<div class="grid grid-cols-12 gap-4 py-8">
 		<div
-			class="col-span-8 xl:col-span-6 max-w-xl xl:max-w-2xl text-white space-y-4 flex flex-col items-center justify-center">
+			class="col-span-12 xl:col-span-6 max-w-xl xl:max-w-2xl text-white space-y-4 flex flex-col items-center justify-center">
 			<p class="font-title text-xl sm:text-2xl lg:text-4xl font-semibold uppercase leading-none w-full">
 				Write a Function. Call&nbsp;It.&nbsp;Done.
 			</p>
@@ -251,7 +252,7 @@ const features = [
 	<!-- Show even more features -->
 	<div class="feature-list grid grid-cols-12 gap-4 py-8">
 		<div
-			class="lg:row-start-2 col-span-8 xl:col-span-6 max-w-xl xl:max-w-2xl text-white space-y-4 flex flex-col items-center justify-center">
+			class="lg:row-start-2 col-span-12 md:col-span-8 xl:col-span-6 max-w-xl xl:max-w-2xl text-white space-y-4 flex flex-col items-center justify-center">
 			<p class="font-title text-xl sm:text-2xl lg:text-4xl font-semibold uppercase leading-none w-full">
 				Oh, but that&apos;s not all.
 			</p>
@@ -277,13 +278,15 @@ const features = [
 		data-brightness="0.1,0.3"
 		data-size="0.5,0.6"
 		data-offset="1,1"
-		class="grid grid-cols-12 text-center justify-items-center gap-4 py-8 mt-12 mb-20">
+		class="grid grid-cols-12 text-center justify-items-center gap-4 py-8 lg:mt-12 lg:mb-20">
 		<div class="col-span-12 text-white space-y-4">
 			<p class="font-title text-xl sm:text-2xl lg:text-4xl font-semibold uppercase leading-none">
-				It&apos;s Available Now. Right Now.
+				It&apos;s Available Now. Right&nbsp;Now.
 			</p>
-			<p class="text-sm lg:text-base w-full pb-2">Easy to setup, lots of features, and open source. Try it out!</p>
-			<div class="flex flex-wrap lg:flex-nowrap justify-center gap-4">
+			<p class="text-sm lg:text-base w-full pb-2">
+				Easy to setup, lots of features, and open source. Try&nbsp;it&nbsp;out!
+			</p>
+			<div class="flex flex-wrap flex-col lg:flex-row justify-center gap-4">
 				<a href="/docs/learn/setup" class="btn glass hover:bg-neutral text-white">
 					<Icon class="w-6 h-6" name="ph:notebook-fill" />
 					 Get Started
@@ -292,7 +295,7 @@ const features = [
 					<Icon class="w-6 h-6" name="ph:terminal-window-fill" />
 					 Try An Example
 				</a>
-				<div class="w-full block lg:hidden"></div>
+				<!-- <div class="w-full hidden lg:block"></div> -->
 				<a href="/docs/features" class="btn glass hover:bg-neutral text-white">
 					<Icon class="w-6 h-6" name="ph:lightbulb-fill" />
 					 Learn to Use
