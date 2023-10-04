@@ -2,18 +2,12 @@
 import Documentation from "@/layouts/Documentation.astro"
 import { getCollection } from "astro:content"
 import TableOfContents from "@/components/TableOfContents.astro"
-import {
-	versionsAvailable,
-	documentationContents,
-	type DocumentationCollection,
-	type CollectionType,
-} from "@/content/config"
+import { documentationContents, type DocumentationCollection, type CollectionType } from "@/content/config"
 import H2 from "@/components/Markdown/Heading/H2.astro"
 import H3 from "@/components/Markdown/Heading/H3.astro"
 
 interface Props {
 	entry: CollectionType<DocumentationCollection>
-	version: `v${string}`
 }
 export async function getStaticPaths() {
 	const documentation = await getCollection("docs")
@@ -21,22 +15,17 @@ export async function getStaticPaths() {
 		const { slug } = entry
 		const params = { slug }
 		const slugParts = slug.split("/")
-		const version = slugParts[0].match(/v\d+/)?.[0]
-		const props = { entry, version }
+		const props = { entry }
 		return { params, props }
 	})
 }
 
-const { entry, version } = Astro.props
+const { entry } = Astro.props
 const { Content, headings } = await entry.render()
-const tableOfContents = documentationContents("docs", version)
+const tableOfContents = documentationContents("docs")
 ---
 
-<Documentation
-	decorationText="The Docs."
-	title={entry.data.title}
-	tableOfContents={tableOfContents}
-	versions={versionsAvailable.map(v => v.name)}>
+<Documentation decorationText="The Docs." title={entry.data.title} tableOfContents={tableOfContents}>
 	<Content components={{ h2: H2, h3: H3 }} />
 	<TableOfContents headings={headings} slot="extra" />
 </Documentation>

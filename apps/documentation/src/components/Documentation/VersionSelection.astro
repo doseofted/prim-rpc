@@ -3,7 +3,7 @@ import { versionsAvailable, type TableOfContents } from "@/content/config"
 import { Icon } from "astro-icon/components"
 
 const path = Astro.url.pathname
-const selectedVersion = versionsAvailable?.find(v => v.name === (path.match(/\/docs\/(v\d+)/)?.[1] || "v0"))
+const selectedVersion = versionsAvailable?.find(v => !v.subdomain)
 const versionName = selectedVersion?.aliases[0] ? `${selectedVersion.name} (${selectedVersion?.aliases[0]})` : ""
 ---
 

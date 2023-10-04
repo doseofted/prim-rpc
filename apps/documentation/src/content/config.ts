@@ -11,6 +11,7 @@ export const versionsAvailable = [
 	{
 		name: "v0",
 		aliases: ["latest"],
+		subdomain: "", // not on a subdomain
 		available: true,
 	},
 ]
@@ -18,45 +19,35 @@ export const latestVersion = "v0"
 export const documentationCollections = ["docs", "plugins"] as const
 
 /** Table of Contents for Documentation pages */
-export const documentationContents = (collection = "docs", version: `v${string}` = latestVersion): TableOfContents =>
-	[
-		{
-			version: "v0",
-			content: [
-				{
-					name: "Learning",
-					sections: [
-						{ name: "Introduction", link: `/${collection}/${version}/learn/intro` },
-						{ name: "Setup", link: `/${collection}/${version}/learn/setup` },
-						{ name: "Advanced", link: `/${collection}/${version}/learn/advanced` },
-						{ name: "Examples", link: `/${collection}/${version}/learn/examples` },
-						{ name: "Security", link: `/${collection}/${version}/learn/security` },
-						{ name: "Limitations", link: `/${collection}/${version}/learn/limitations` },
-					],
-				},
-				{
-					name: "Reference",
-					sections: [
-						{ name: "Configuration", link: `/${collection}/${version}/reference/config` },
-						{ name: "Browse Plugins", link: `/${collection}/${version}/reference/plugins` },
-						{ name: "Create Plugin", link: `/${collection}/${version}/reference/create` },
-						{ name: "Structure", link: `/${collection}/${version}/reference/structure` },
-					],
-				},
-				{
-					name: "Tooling",
-					sections: [
-						{ name: "Documentation", link: `/${collection}/${version}/tooling/docs` },
-						{ name: "Build Utility", link: `/${collection}/${version}/tooling/build` },
-					],
-				},
-			],
-		},
-		{
-			version: "v1",
-			content: [],
-		},
-	].find(v => v.version === version)?.content ?? []
+export const documentationContents = (collection = "docs"): TableOfContents => [
+	{
+		name: "Learning",
+		sections: [
+			{ name: "Introduction", link: `/${collection}/learn/intro` },
+			{ name: "Setup", link: `/${collection}/learn/setup` },
+			{ name: "Advanced", link: `/${collection}/learn/advanced` },
+			{ name: "Examples", link: `/${collection}/learn/examples` },
+			{ name: "Security", link: `/${collection}/learn/security` },
+			{ name: "Limitations", link: `/${collection}/learn/limitations` },
+		],
+	},
+	{
+		name: "Reference",
+		sections: [
+			{ name: "Configuration", link: `/${collection}/reference/config` },
+			{ name: "Browse Plugins", link: `/${collection}/reference/plugins` },
+			{ name: "Create Plugin", link: `/${collection}/reference/create` },
+			{ name: "Structure", link: `/${collection}/reference/structure` },
+		],
+	},
+	{
+		name: "Tooling",
+		sections: [
+			{ name: "Documentation", link: `/${collection}/tooling/docs` },
+			{ name: "Build Utility", link: `/${collection}/tooling/build` },
+		],
+	},
+]
 
 const pluginTypes = z.enum(["method-handler", "method-plugin", "callback-handler", "callback-plugin", "json-handler"])
 export type PluginType = z.infer<typeof pluginTypes>
