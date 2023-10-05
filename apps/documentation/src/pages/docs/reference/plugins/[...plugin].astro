@@ -10,10 +10,10 @@ interface Props {
 	entry: CollectionType<DocumentationCollection>
 }
 export async function getStaticPaths() {
-	const documentation = await getCollection("docs")
+	const documentation = await getCollection("plugins")
 	return documentation.map(entry => {
-		const { slug } = entry
-		const params = { slug }
+		const { slug: plugin } = entry
+		const params = { plugin }
 		const props = { entry }
 		return { params, props }
 	})

@@ -1,5 +1,5 @@
 ---
-title: Fetch
+title: Fetch API
 icon: simple-icons:javascript
 type: method-plugin
 transport: http
@@ -8,20 +8,26 @@ status: available
 ---
 
 import CodeFile from "@/components/Code/CodeFile.astro"
+import Aside from "@/components/Markdown/Aside.astro"
+
+# {frontmatter.title}
+
+<Aside>
+	This covers the client-side Fetch handler. There's also a [server-specific Fetch plugin
+	available](/docs/reference/plugins/server/server-fetch) to use.
+</Aside>
 
 Prim+RPC supports the Fetch API as implemented in all modern browsers.
 
 <CodeFile filename="client/prim.ts">
 
-```typescript
+```typescript {2,5-6}
+import { createPrimClient } from "@doseofted/prim-rpc"
 import { createMethodPlugin } from "@doseofted/prim-rpc-plugins/browser-fetch"
-// ...other imports
 
-const methodPlugin = createMethodPlugin()
-const client = createPrimClient<Module>({
+const client = createPrimClient({
   endpoint: "http://localhost:3000/prim"
-  methodPlugin
-  /* ...options */
+  methodPlugin: createMethodPlugin()
 })
 ```
 

@@ -153,13 +153,14 @@ const plugins = pluginsCollection
 		status,
 		type,
 	}))
+	.filter(plugin => plugin.status === "available")
 	.sort((a, b) => (a.type.endsWith("handler") ? -1 : b.type.endsWith("handler") ? 1 : 1))
 	.filter(plugin => {
 		if (pluginsUnique.has(plugin.title)) return false
 		pluginsUnique.add(plugin.title)
 		return true
 	})
-	.filter(plugin => plugin.status === "available")
+	.map(({ slug, icon, title }) => ({ slug, icon, title }))
 const integrations = shuffle(
 	[
 		{ slug: "server/server-fetch", icon: "simple-icons:nodedotjs", title: "Node" },
