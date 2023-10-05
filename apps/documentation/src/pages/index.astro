@@ -144,16 +144,27 @@ const features = [
 ]
 
 const pluginsCollection = await getCollection("plugins")
-const plugins = pluginsCollection.map(({ slug, data: { title, icon } }) => ({
-	slug: String(slug),
-	title,
-	icon: String(icon),
-}))
+let pluginsUnique = new Set()
+const plugins = pluginsCollection
+	.map(({ slug, data: { title, icon, status, type } }) => ({
+		slug: String(slug),
+		title,
+		icon: String(icon),
+		status,
+		type,
+	}))
+	.sort((a, b) => (a.type.endsWith("handler") ? -1 : b.type.endsWith("handler") ? 1 : 1))
+	.filter(plugin => {
+		if (pluginsUnique.has(plugin.title)) return false
+		pluginsUnique.add(plugin.title)
+		return true
+	})
+	.filter(plugin => plugin.status === "available")
 const integrations = shuffle(
 	[
-		{ slug: "method-handler/fetch", icon: "simple-icons:nodedotjs", title: "Node" },
-		{ slug: "method-handler/fetch", icon: "simple-icons:deno", title: "Deno" },
-		{ slug: "method-handler/fetch", icon: "simple-icons:bun", title: "Bun" },
+		{ slug: "server/server-fetch", icon: "simple-icons:nodedotjs", title: "Node" },
+		{ slug: "server/server-fetch", icon: "simple-icons:deno", title: "Deno" },
+		{ slug: "server/server-fetch", icon: "simple-icons:bun", title: "Bun" },
 	].concat(plugins)
 )
 ---
@@ -280,28 +291,13 @@ const integrations = shuffle(
 			</p>
 		</div>
 		<div class="text-white col-span-6 lg:col-span-12 space-y-4">
-			<Marquee speed="100s">
+			<Marquee speed="75s">
 				<div class="flex gap-12 pl-12 text-white">
 					{
-						integrations.slice(0, Math.floor(integrations.length / 2)).map(plugin => {
+						integrations.map(plugin => {
 							return (
 								<div class="flex gap-2">
-									<a class="font-bold hover:underline p-2" href={`/docs/plugins/${plugin.slug}`}>
-										{plugin.title}
-									</a>
-								</div>
-							)
-						})
-					}
-				</div>
-			</Marquee>
-			<Marquee speed="50s">
-				<div class="flex gap-12 pl-12 text-white">
-					{
-						integrations.slice(Math.floor(integrations.length / 2) + 1).map(plugin => {
-							return (
-								<div class="flex gap-2">
-									<a class="font-bold hover:underline p-2" href={`/docs/plugins/${plugin.slug}`}>
+									<a class="whitespace-nowrap font-bold hover:underline p-2" href={`/docs/plugins/${plugin.slug}`}>
 										{plugin.title}
 									</a>
 								</div>
@@ -401,14 +397,14 @@ const integrations = shuffle(
 
 <script>
 	import { $navigationHappened } from "@/utils/store"
-	import { animate, inView, stagger } from "motion"
+	import { animate, inView, stagger } from "framer-motion/dom"
 
 	const startDefault = 1.8
 	function introAnimation(start = startDefault) {
 		const scrollIndicatorParent = document.getElementById("scroll-down-parent") as HTMLElement
 		animate(scrollIndicatorParent, { opacity: [0, 1] }, { duration: 1, delay: start === startDefault ? 2.5 : 0 })
 		const scrollIndicator = document.getElementById("scroll-down-indicator") as HTMLElement
-		animate(scrollIndicator, { y: [0, 10, 0] }, { duration: 1.5, repeat: Infinity, easing: ["ease-out", "ease-in"] })
+		animate(scrollIndicator, { y: [0, 10, 0] }, { duration: 1.5, repeat: Infinity, ease: ["easeOut", "easeIn"] })
 
 		for (const featureCard of document.querySelectorAll<HTMLElement>(".feature-card")) {
 			featureCard.style.opacity = "0"
@@ -436,7 +432,7 @@ const integrations = shuffle(
 			}
 		}, start * 1000)
 		const codeSnippets = document.querySelectorAll<HTMLElement>(".homepage-snippets")
-		animate(codeSnippets, slideIn, { delay: stagger(0.2, { start, from: "last" }), duration: 0.9 })
+		animate(codeSnippets, slideIn, { delay: stagger(0.2, { startDelay: start, from: "last" }), duration: 0.9 })
 		// navigation only needs to be animated on first load
 		const pageLogo = document.querySelector<HTMLElement>(".prim-logo-container")
 		const navigationElem = document.querySelectorAll<HTMLElement>(".prim-navigation")
