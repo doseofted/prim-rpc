@@ -40,72 +40,63 @@ export class LightGroup {
 		})
 	}
 
+	#interval: number | undefined
 	#intervalRunCount = 0
-	#destroyed = false
-
-	setAnimation() {
-		const onIntervalUpdate = () => {
-			const count = this.#lights.length
-			let index = 0
-			for (const light of this.#lights) {
-				const [xMax, yMax] = this.ranges.offset
-				const max = Math.max(xMax, yMax)
-				const angle = Math.random() * Math.PI * 2
-				// NOTE: since spring motion blends values with tight intervals, place offset at circle circumference,
-				// so that the offset jumps around more (but remains within offset bounds)
-				const offsetBase = [
-					(Math.cos(angle) * max) / 2, // this.utils.randomInt(0, max),
-					(Math.sin(angle) * max) / 2, // this.utils.randomInt(0, max),
-				]
-				// const distance = Math.sqrt(offsetBase[0] ** 2 + offsetBase[1] ** 2)
-				const easing = easeOut(transform(index, [0, count], [0.5, 1]))
-				const offset = offsetBase.map(o => o * easing) as [number, number]
-				// const offsetBase = [xMax, yMax].map(max => this.utils.randomDouble(max * -1, max))
-				// const offset = offsetBase.map(max => transform(index, [0, count], [0, max])) as [number, number]
-				// NOTE: since spring motion blends values with tight intervals, place offset at circle circumference,
-				// so that the offset jumps around more (but remains within offset bounds)
-				light.offset = offset
-				// NOTE: since lights are additive, make lights closer to the center dimmer
-				const highestBrightness = this.ranges.brightness[1]
-				const baseBrightness = this.utils.randomDouble(...this.ranges.brightness)
-				const brightness = transform(index, [0, count], [baseBrightness, highestBrightness])
-				// console.log(distance, brightness)
-				light.brightness = brightness
-				const size = this.utils.randomInt(...this.ranges.size)
-				// const size = transform(distance, [0, maxOffset], [baseSize, minSize])
-				light.size = size
-				const randomColorChange = this.#intervalRunCount % transform(Math.random(), [0, 1], [10, 15])
-				if (!randomColorChange) {
-					light.color = this.utils.randomArrayItem(this.ranges.colors)
-				}
-				index++
-			}
-			// console.debug("---")
-			this.#intervalRunCount += 1
-		}
-
+	#firstRun = true
+	setInterval() {
+		clearInterval(this.#interval)
 		const base = this.ranges.interval[0]
-		let start: number
-		let goal: number | undefined
-		console.log("Animation loop started")
-		const animationLoop = (time: number) => {
-			if (!goal) {
-				goal = start ? this.utils.randomInt(...this.ranges.interval) - base : 0
-				start = time
-			}
-			const passed = time - start
-			if (passed >= goal) {
-				onIntervalUpdate()
-				goal = undefined
-				if (this.#destroyed) return
-			}
-			window.requestAnimationFrame(animationLoop)
+		const animate = () => {
+			window.setTimeout(
+				() => {
+					const count = this.#lights.length
+					let index = 0
+					for (const light of this.#lights) {
+						const [xMax, yMax] = this.ranges.offset
+						const max = Math.max(xMax, yMax)
+						const angle = Math.random() * Math.PI * 2
+						// NOTE: since spring motion blends values with tight intervals, place offset at circle circumference,
+						// so that the offset jumps around more (but remains within offset bounds)
+						const offsetBase = [
+							(Math.cos(angle) * max) / 2, // this.utils.randomInt(0, max),
+							(Math.sin(angle) * max) / 2, // this.utils.randomInt(0, max),
+						]
+						// const distance = Math.sqrt(offsetBase[0] ** 2 + offsetBase[1] ** 2)
+						const easing = easeOut(transform(index, [0, count], [0.5, 1]))
+						const offset = offsetBase.map(o => o * easing) as [number, number]
+						// const offsetBase = [xMax, yMax].map(max => this.utils.randomDouble(max * -1, max))
+						// const offset = offsetBase.map(max => transform(index, [0, count], [0, max])) as [number, number]
+						// NOTE: since spring motion blends values with tight intervals, place offset at circle circumference,
+						// so that the offset jumps around more (but remains within offset bounds)
+						light.offset = offset
+						// NOTE: since lights are additive, make lights closer to the center dimmer
+						const highestBrightness = this.ranges.brightness[1]
+						const baseBrightness = this.utils.randomDouble(...this.ranges.brightness)
+						const brightness = transform(index, [0, count], [baseBrightness, highestBrightness])
+						// console.log(distance, brightness)
+						light.brightness = brightness
+						const size = this.utils.randomInt(...this.ranges.size)
+						// const size = transform(distance, [0, maxOffset], [baseSize, minSize])
+						light.size = size
+						const randomColorChange = this.#intervalRunCount % transform(Math.random(), [0, 1], [10, 15])
+						if (!randomColorChange) {
+							light.color = this.utils.randomArrayItem(this.ranges.colors)
+						}
+						index++
+					}
+					// console.debug("---")
+					this.#intervalRunCount += 1
+				},
+				!this.#firstRun ? this.utils.randomInt(...this.ranges.interval) - base : 0
+			)
+			if (this.#firstRun) this.#firstRun = false
 		}
-		window.requestAnimationFrame(animationLoop)
+		this.#interval = window.setInterval(animate, base)
+		animate()
 	}
 
 	destroy() {
-		this.#destroyed = true
+		clearInterval(this.#interval)
 		// for (const light of this.#lights) {
 		// 	light.destroy()
 		// }
@@ -119,7 +110,7 @@ export class LightGroup {
 			offset: [200, 200],
 			interval: [800, 2300],
 		})
-		this.setAnimation()
+		this.setInterval()
 	}
 
 	updateRanges(ranges: Partial<LightGroupOptions>) {
