@@ -2,8 +2,10 @@ import { animate, motionValue } from "framer-motion/dom"
 import { type ValueAnimationTransition } from "framer-motion"
 import { defu } from "defu"
 import { createConsola } from "consola"
+import mitt from "mitt"
 
-const console = createConsola({ level: 5 }).withTag("LightSet")
+const level = import.meta.env.PROD ? 0 : 5
+const console = createConsola({ level }).withTag("LightSet")
 
 export interface LightProperties {
 	/** Center point of light */
@@ -31,7 +33,13 @@ export enum LightState {
 
 export type LightStatesSet = Exclude<LightState, LightState.Inactive | LightState.Active | LightState.Destroyed>
 
+type LightEvents = {
+	destroyed: undefined
+}
+
 export class Light implements LightProperties {
+	#events = mitt<LightEvents>()
+
 	#targets: LightProperties
 	get targets() {
 		return this.#targets
@@ -98,6 +106,14 @@ export class Light implements LightProperties {
 		return this.#color.get()
 	}
 
+	onDestroyed(cb?: () => void) {
+		this.#events.on("destroyed", () => {
+			cb?.()
+			// this event should only fire once
+			this.#events.all.clear()
+		})
+	}
+
 	destroy() {
 		this.#brightness.destroy()
 		this.#size.destroy()
@@ -105,6 +121,8 @@ export class Light implements LightProperties {
 		this.#x.destroy()
 		this.#y.destroy()
 		this.#state = LightState.Destroyed
+		this.#events.emit("destroyed")
+		console.debug("Light instance was destroyed")
 	}
 
 	// state of light (to animate properties before adding/removing)
@@ -147,6 +165,7 @@ export class Light implements LightProperties {
 					this.#state = LightState.Destroyed
 					this.#brightness.clearListeners()
 					console.debug("updated light state:", this.#state)
+					this.destroy()
 				})
 				break
 			}

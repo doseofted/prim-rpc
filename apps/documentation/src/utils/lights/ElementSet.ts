@@ -1,7 +1,8 @@
 import mitt from "mitt"
 import { createConsola } from "consola"
 
-const console = createConsola({ level: 5 }).withTag("ElementSet")
+const level = import.meta.env.PROD ? 0 : 5
+const console = createConsola({ level }).withTag("ElementSet")
 
 export class ElementSet extends Set<HTMLElement> {
 	#watchAttributes: string[]

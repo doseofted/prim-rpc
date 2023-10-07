@@ -2,8 +2,10 @@ import defu from "defu"
 import { Light, LightState, type LightProperties } from "./Light"
 import { createConsola } from "consola"
 import { easeOut, transform } from "framer-motion/dom"
+import mitt from "mitt"
 
-const console = createConsola({ level: 5 }).withTag("LightGroup")
+const level = import.meta.env.PROD ? 0 : 5
+const console = createConsola({ level }).withTag("LightGroup")
 
 type NumericalValueRange<T> = [min: T, max: T]
 interface LightGroupOptions {
@@ -17,12 +19,18 @@ interface LightGroupOptions {
 // export type Coord = [x: number, y: number]
 // type Bounds = DOMRect & { center: Coord }
 
+type LightGroupEvents = {
+	destroyed: undefined
+}
+
 /**
  * A light group contains multiple lights and is controlled by properties set on the group.
  * The other lights in the group are variations of the primary light and are used to
  * create a colorful glow effect.
  */
 export class LightGroup {
+	#events = mitt<LightGroupEvents>()
+
 	ranges: LightGroupOptions
 
 	#lights: Light[] = []
@@ -66,8 +74,6 @@ export class LightGroup {
 						const offset = offsetBase.map(o => o * easing) as [number, number]
 						// const offsetBase = [xMax, yMax].map(max => this.utils.randomDouble(max * -1, max))
 						// const offset = offsetBase.map(max => transform(index, [0, count], [0, max])) as [number, number]
-						// NOTE: since spring motion blends values with tight intervals, place offset at circle circumference,
-						// so that the offset jumps around more (but remains within offset bounds)
 						light.offset = offset
 						// NOTE: since lights are additive, make lights closer to the center dimmer
 						const highestBrightness = this.ranges.brightness[1]
@@ -95,11 +101,34 @@ export class LightGroup {
 		animate()
 	}
 
+	onDestroyed(cb?: () => void) {
+		this.#events.on("destroyed", () => cb?.())
+		// this event can only fire once
+		this.#events.all.clear()
+	}
+
 	destroy() {
 		clearInterval(this.#interval)
-		// for (const light of this.#lights) {
-		// 	light.destroy()
-		// }
+		let lightToBeDestroyed = 0
+		let lightsDestroyed = 0
+		let lightsDetermined = false
+		for (const light of this.#lights) {
+			if (light.state !== LightState.Destroyed) {
+				lightToBeDestroyed += 1
+				light.onDestroyed(() => {
+					lightsDestroyed += 1
+					// console.debug("Light was destroyed", lightsDestroyed, lightToBeDestroyed)
+					if (lightsDetermined && lightsDestroyed === lightToBeDestroyed) {
+						this.#lights = []
+						this.#events.emit("destroyed")
+						console.debug("LightGroup instance and Lights were destroyed")
+					}
+				})
+			}
+			light.changeState(LightState.Destroying)
+		}
+		lightsDetermined = true
+		console.debug("LightGroup instance was destroyed, Lights pending", lightToBeDestroyed)
 	}
 
 	constructor(defaultRanges: Partial<LightGroupOptions>) {

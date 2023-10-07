@@ -10,7 +10,7 @@ const debug = false
  *
  * Given an HTML `<canvas />` element, return it as-is, assume pre-configured.
  */
-function createDomStucture(parent: HTMLElement | string, debug = false) {
+function createDomStructure(parent: HTMLElement | string, debug = false) {
 	const possibleParent = typeof parent === "string" ? document.querySelector(parent) : parent
 	if (possibleParent instanceof HTMLCanvasElement) {
 		return possibleParent
@@ -26,7 +26,12 @@ function createDomStucture(parent: HTMLElement | string, debug = false) {
 	blurLayer.style.width = "100%"
 	blurLayer.style.height = "100%"
 	blurLayer.style.backgroundColor = "transparent"
-	if (!debug) blurLayer.style.backdropFilter = "blur(16px) saturate(1.5)"
+	if (!debug) {
+		blurLayer.style.backdropFilter = "blur(16px) saturate(1.5)"
+		// eslint-disable-next-line @typescript-eslint/ban-ts-comment
+		// @ts-ignore -- vendor prefix that Safari still needs
+		blurLayer.style.webkitBackdropFilter = "blur(16px) saturate(1.5)"
+	}
 	if (possibleParent instanceof HTMLElement) {
 		parent = possibleParent
 		parent.appendChild(canvas)
@@ -41,7 +46,7 @@ function createDomStucture(parent: HTMLElement | string, debug = false) {
  * **Note:** the canvas should be fixed to and fill the entire viewport.
  */
 export function createLightCanvas(lights: LightElements, parent: HTMLElement | string) {
-	const canvas = createDomStucture(parent, debug)
+	const canvas = createDomStructure(parent, debug)
 	const space = new CanvasSpace(canvas).setup({ resize: true, retina: false })
 	const form = space.getForm()
 

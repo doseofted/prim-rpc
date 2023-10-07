@@ -4,7 +4,8 @@ import { ElementSet } from "./ElementSet"
 import { Light } from "./Light"
 import { LightGroup } from "./LightGroup"
 
-const console = createConsola({ level: 5 }).withTag("LightEvents")
+const level = import.meta.env.PROD ? 0 : 5
+const console = createConsola({ level }).withTag("LightEvents")
 
 /**
  * Manages all lights on on a page, created by assigning `data-light` attributes to elements.
