@@ -298,7 +298,9 @@ const integrations = shuffle(
 						integrations.map(plugin => {
 							return (
 								<div class="flex gap-2">
-									<a class="whitespace-nowrap font-bold hover:underline p-2" href={`/docs/plugins/${plugin.slug}`}>
+									<a
+										class="whitespace-nowrap font-bold hover:underline p-2"
+										href={`/docs/reference/plugins/${plugin.slug}`}>
 										{plugin.title}
 									</a>
 								</div>
@@ -309,7 +311,8 @@ const integrations = shuffle(
 			</Marquee>
 			<p class="text-xs opacity-75 flex gap-2 items-center leading-none">
 				<Icon name="ph:asterisk-bold" />
-				 All trademarks are property of their respective owners. Prim+RPC is not endorsed by any of these frameworks.
+				 All trademarks are property of their respective owners. Prim+RPC is not endorsed by or affiliated with any of
+				these frameworks.
 			</p>
 		</div>
 	</div>
@@ -398,14 +401,14 @@ const integrations = shuffle(
 
 <script>
 	import { $navigationHappened } from "@/utils/store"
-	import { animate, inView, stagger } from "framer-motion/dom"
+	import { animate, inView, stagger } from "motion"
 
 	const startDefault = 1.8
 	function introAnimation(start = startDefault) {
 		const scrollIndicatorParent = document.getElementById("scroll-down-parent") as HTMLElement
 		animate(scrollIndicatorParent, { opacity: [0, 1] }, { duration: 1, delay: start === startDefault ? 2.5 : 0 })
 		const scrollIndicator = document.getElementById("scroll-down-indicator") as HTMLElement
-		animate(scrollIndicator, { y: [0, 10, 0] }, { duration: 1.5, repeat: Infinity, ease: ["easeOut", "easeIn"] })
+		animate(scrollIndicator, { y: [0, 10, 0] }, { duration: 1.5, repeat: Infinity, easing: ["ease-out", "ease-in"] })
 
 		for (const featureCard of document.querySelectorAll<HTMLElement>(".feature-card")) {
 			featureCard.style.opacity = "0"
@@ -433,7 +436,7 @@ const integrations = shuffle(
 			}
 		}, start * 1000)
 		const codeSnippets = document.querySelectorAll<HTMLElement>(".homepage-snippets")
-		animate(codeSnippets, slideIn, { delay: stagger(0.2, { startDelay: start, from: "last" }), duration: 0.9 })
+		animate(codeSnippets, slideIn, { delay: stagger(0.2, { start, from: "last" }), duration: 0.9 })
 		// navigation only needs to be animated on first load
 		const pageLogo = document.querySelector<HTMLElement>(".prim-logo-container")
 		const navigationElem = document.querySelectorAll<HTMLElement>(".prim-navigation")

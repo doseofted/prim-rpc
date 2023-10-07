@@ -1,5 +1,5 @@
 import React, { useEffect } from "react"
-import { animate, stagger } from "framer-motion/dom"
+import { animate, stagger } from "motion"
 import { easeOutExpo as easing } from "@/utils/easings"
 import { $navigationHappened } from "@/utils/store"
 
@@ -20,7 +20,7 @@ export function IntroText(props: IntroTextProps) {
 			y: ["100%", "0%"],
 			opacity: [0.3, 1],
 		}
-		const options = { duration, delay: stagger(staggerAmount, { startDelay: start }), easing }
+		const options = { duration, delay: stagger(staggerAmount, { start }), easing }
 		const animated = animate(elementsOnly, keyframes, options)
 		return () => animated.stop()
 	}, [])
