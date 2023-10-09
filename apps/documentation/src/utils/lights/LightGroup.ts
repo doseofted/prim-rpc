@@ -102,9 +102,11 @@ export class LightGroup {
 	}
 
 	onDestroyed(cb?: () => void) {
-		this.#events.on("destroyed", () => cb?.())
-		// this event can only fire once
-		this.#events.all.clear()
+		this.#events.on("destroyed", () => {
+			cb?.()
+			// this event can only fire once
+			this.#events.all.clear()
+		})
 	}
 
 	destroy() {

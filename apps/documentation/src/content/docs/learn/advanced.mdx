@@ -393,7 +393,7 @@ Let's set this up now.
 
 <CodeFile filename="server/index.ts">
 
-```typescript {9,11-27} /contextTransform/3
+```typescript {9,11-23} /contextTransform/3
 import { createPrimServer } from "@doseofted/prim-rpc"
 import { primFetch } from "@doseofted/prim-rpc-plugins/server-fetch"
 import { createCallbackHandler } from "@doseofted/prim-rpc-plugins/ws"
@@ -404,19 +404,15 @@ import { WebSocketServer } from "ws"
 import jsonHandler from "superjson"
 import { parse, serialize } from "cookie"
 
-function contextTransform(req: Request, res: Response): ServerContext {
+const cookieOpts = { httpOnly: true, sameSite: "none" }
+function contextTransform(req: Request, res: Response) {
 	const secret = "can't-touch-this"
-	const cookies = parse(req.headers.get("cookie") ?? "")
 	return {
 		setSecret(given: string) {
-			const cookie = serialize("secret", given, {
-				httpOnly: true,
-				sameSite: "none",
-			})
-			res.headers.set("set-cookie", cookie)
+			res.headers.set("set-cookie", serialize("secret", given, cookieOpts))
 		},
 		get allowed() {
-			return cookies.secret === secret
+			return secret === parse(req.headers.get("cookie") ?? "").secret
 		},
 	}
 }

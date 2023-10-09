@@ -63,7 +63,6 @@ export class LightElements {
 		return this.#listCached
 	}
 	[Symbol.iterator]() {
-		// console.log("iterating")
 		let index = -1
 		const next = () => ({ value: this.all[++index], done: !(index in this.all) })
 		return { next }
@@ -123,7 +122,7 @@ export class LightElements {
 				if (removeAllLights) {
 					void lights.destroy()
 					// this.#lights.delete(element)
-					this.#elements.delete(element)
+					// this.#elements.delete(element)
 				}
 				// const removeGroup = lights.lights
 				// 	.map(({ state }) => state === LightState.Destroyed)
@@ -135,6 +134,12 @@ export class LightElements {
 			}
 			const newLightGroup = new LightGroup(options)
 			this.#lights.set(element, newLightGroup)
+			newLightGroup.onDestroyed(() => {
+				this.#lights.delete(element)
+				this.#elements.delete(element)
+				this.#listNeedsUpdate = true
+				console.debug("Light cache update triggered by group destroyed event")
+			})
 			this.#listNeedsUpdate = true
 			console.debug("initializing new lights for element", newLightGroup.lights.length)
 		}

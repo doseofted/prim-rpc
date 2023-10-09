@@ -6,6 +6,45 @@ import type { LightElements } from "./LightElements"
 const debug = false
 
 /**
+ * Place Lights on a canvas.
+ *
+ * **Note:** the canvas should be fixed to and fill the entire viewport.
+ */
+export function createLightCanvas(lights: LightElements, parent: HTMLElement | string) {
+	const canvas = createDomStructure(parent, debug)
+	const space = new CanvasSpace(canvas).setup({ resize: true, retina: false })
+	const form = space.getForm()
+	if (debug) console.log("Lights", lights)
+	space.add(() => {
+		form.composite("screen")
+		// console.log(lights.length)
+		// const screenSize = space.width // Math.min(space.width, space.height)
+		if (debug) console.log("Lights count", lights.length)
+		for (const light of lights) {
+			const { center, offset, brightness, color, size /* : sizeBase */ } = light
+			// const size = transform(sizeBase, [0, 100], [0, screenSize])
+			const centerPt = new Pt(center).$add(new Pt(offset))
+			const lightStart = 1.5 // point at which `lighten()` starts
+			const colorStart = transparentize(
+				lighten(color, easeIn((clamp(lightStart, 2, brightness) - lightStart) * 2)),
+				easeOut(clamp(0, 1, 1 - brightness))
+			)
+			const colorEnd = transparentize(colorStart, 1)
+			const gradientShape = form.gradient([colorStart, colorEnd])
+			const gradientStartShape = Circle.fromCenter(centerPt, (size * easeIn(clamp(0, 1, brightness - 1))) / 2)
+			if (size <= 0) continue // FIXME: find out why size is sometimes less than 0 when page is left in background
+			const circleShape = Circle.fromCenter(centerPt, size)
+			const gradientFill = gradientShape(gradientStartShape, circleShape)
+			const stroke = debug ? "white" : false
+			form.fill(gradientFill).stroke(stroke).circle(circleShape)
+		}
+	})
+	space.play()
+	if (debug) console.debug("Canvas animation started")
+	return () => space.dispose()
+}
+
+/**
  * Given an HTML `<div />` element create structure needed to display lights properly.
  *
  * Given an HTML `<canvas />` element, return it as-is, assume pre-configured.
@@ -38,41 +77,4 @@ function createDomStructure(parent: HTMLElement | string, debug = false) {
 		parent.appendChild(blurLayer)
 	}
 	return canvas
-}
-
-/**
- * Place Lights on a canvas.
- *
- * **Note:** the canvas should be fixed to and fill the entire viewport.
- */
-export function createLightCanvas(lights: LightElements, parent: HTMLElement | string) {
-	const canvas = createDomStructure(parent, debug)
-	const space = new CanvasSpace(canvas).setup({ resize: true, retina: false })
-	const form = space.getForm()
-
-	space.add(() => {
-		form.composite("screen")
-		// console.log(lights.length)
-		// const screenSize = space.width // Math.min(space.width, space.height)
-		for (const light of lights) {
-			const { center, offset, brightness, color, size /* : sizeBase */ } = light
-			// const size = transform(sizeBase, [0, 100], [0, screenSize])
-			const centerPt = new Pt(center).$add(new Pt(offset))
-			const lightStart = 1.5 // point at which `lighten()` starts
-			const colorStart = transparentize(
-				lighten(color, easeIn((clamp(lightStart, 2, brightness) - lightStart) * 2)),
-				easeOut(clamp(0, 1, 1 - brightness))
-			)
-			const colorEnd = transparentize(colorStart, 1)
-			const gradientShape = form.gradient([colorStart, colorEnd])
-			const gradientStartShape = Circle.fromCenter(centerPt, (size * easeIn(clamp(0, 1, brightness - 1))) / 2)
-			const circleShape = Circle.fromCenter(centerPt, size)
-			const gradientFill = gradientShape(gradientStartShape, circleShape)
-			const stroke = debug ? "white" : false
-			form.fill(gradientFill).stroke(stroke).circle(circleShape)
-		}
-	})
-	space.play()
-	console.debug("Canvas animation started")
-	return () => space.dispose()
 }
