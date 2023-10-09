@@ -25,7 +25,7 @@ const console = createConsola({ level }).withTag("LightEvents")
  * - `data-brightness={0-2,0-2}` - min/max brightness of light: 0 is transparent, 1 utilizes given color, 2 is white
  */
 export class LightElements {
-	#elements = new ElementSet(["data-light", "data-colors", "data-size", "data-offset", "brightness"])
+	#elements = new ElementSet(["data-light", "data-colors", "data-size", "data-offset", "data-brightness"])
 
 	scrollEvent() {
 		console.debug("scroll update happened")
@@ -175,10 +175,11 @@ export class LightElements {
 		document.addEventListener("astro:after-swap", () => {
 			const elementCount = addPossibleElements()
 			console.debug("page update happened, elements found:", elementCount)
+			setTimeout(() => (this.#listNeedsUpdate = true), 0) // FIXME: timing issue, this is only a workaround
 		})
 
 		/** Determine if given `<div />` has "light" properties */
-		function isElementWithLight(node: Node): HTMLElement | false {
+		const isElementWithLight = (node: Node): HTMLElement | false => {
 			const elem = node.nodeType === 1 ? (node as HTMLElement) : null
 			const isLightDirect = elem && elem.hasAttribute("data-light") ? elem : false
 			// it's possible that element mutated was not a light but children might be
