@@ -20,6 +20,52 @@ This guide builds on the [basic setup guide](/docs/learn/setup) and will use the
 
 </Aside>
 
+## Add Validation
+
+Prim+RPC validates RPC sent to the server but does not validate arguments and return types by default: this is up to the
+developer. When using Prim+RPC over the internet it is important to validate user input. We can validate data in our
+functions easily though.
+
+We can use any validation framework that we like but we'll a popular framework, Zod. Let's install it on the server:
+
+<CodeFile>
+
+```zsh
+cd server
+pnpm add zod
+```
+
+</CodeFile>
+
+Now let's modify our function on the server to overwrite and validate our arguments:
+
+<CodeFile filename="server/module.ts">
+
+```typescript {1,4-5} /x: string/ /y: string/
+import { z } from "zod"
+
+export function sayHello(x: string, y: string) {
+	x = z.string().default("Backend").parse(x)
+	y = z.string().default("Frontend").parse(y)
+	return `${x}, meet ${y}.`
+}
+sayHello.rpc = true
+```
+
+</CodeFile>
+
+Now we can ensure that the our arguments are strings. This works well for one function but if we have a lot of
+functions, we may want to require that all functions have their arguments validated and fail if they are not.
+
+We can easily add this functionality to Prim+RPC using its `preprocess` option. This will allow us to modify our
+function arguments prior to passing them to the intended function. Let's set this up:
+
+<Aside type="error">
+
+**Todo:** add preprocess option to Prim+RPC
+
+</Aside>
+
 ## File Support
 
 Prim+RPC supports passing Files and Blobs as part of a function's arguments and returning Files and Blobs as a function
@@ -111,6 +157,8 @@ cd client && pnpm add superjson
 
 Now we can set up the handler. On the server:
 
+{/* prettier-ignore-start */}
+
 <CodeFile filename="server/index.ts">
 
 ```typescript {6} /jsonHandler/2
@@ -133,9 +181,12 @@ createServer(fetchAdapter).listen(3000)
 console.log("Prim+RPC is available at http://localhost:3000/prim")
 
 export type Module = typeof module
+
 ```
 
 </CodeFile>
+
+{/* prettier-ignore-end */}
 
 And on the client:
 
@@ -215,6 +266,9 @@ pnpm add ws
 Now we can configure the WebSocket server with our HTTP server, to handle upgrades to the connection. This setup may
 look complicated, and WebSockets can be difficult, but with Prim+RPC we only have to worry about this once.
 
+{/* prettier-ignore-start */}
+
+
 <CodeFile filename="server/index.ts">
 
 ```typescript {6,9,21-25}
@@ -245,6 +299,7 @@ server.on("upgrade", (request, socket, head) => {
 })
 
 export type Module = typeof module
+
 ```
 
 </CodeFile>
@@ -284,9 +339,12 @@ server.on("upgrade", (request, socket, head) => {
 })
 
 export type Module = typeof module
+
 ```
 
 </CodeFile>
+
+{/* prettier-ignore-end */}
 
 We're almost ready to use callbacks. But since we created a callback handler on the server, we will need a compatible
 callback plugin on the client. Since we're using WebSockets on the server, we'll use the WebSocket callback plugin on
@@ -391,6 +449,8 @@ variable that will be bound to our function's `this` context.
 
 Let's set this up now.
 
+{/* prettier-ignore-start */}
+
 <CodeFile filename="server/index.ts">
 
 ```typescript {9,11-23} /contextTransform/3
@@ -438,9 +498,12 @@ server.on("upgrade", (request, socket, head) => {
 })
 
 export type Module = typeof module
+
 ```
 
 </CodeFile>
+
+{/* prettier-ignore-end */}
 
 We have defined a function and a property that we want to expose to our functions: `setSecret()` will set the secret and
 `allowed` will return whether the secret is set to the correct value.

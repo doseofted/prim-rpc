@@ -29,6 +29,7 @@ export const documentationContents = (collection = "docs"): TableOfContents => [
 			{ name: "Examples", link: `/${collection}/learn/examples` },
 			{ name: "Security", link: `/${collection}/learn/security` },
 			{ name: "Limitations", link: `/${collection}/learn/limitations` },
+			{ name: "Comparisons", link: `/${collection}/learn/comparisons` },
 		],
 	},
 	{

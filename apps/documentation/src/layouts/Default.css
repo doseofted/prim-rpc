@@ -35,6 +35,10 @@
 	@apply bg-prim-space overflow-x-auto;
 }
 
+pre {
+	tab-size: 2;
+}
+
 /* Override default styles (I think mostly applied by DaisyUI?) */
 [data-rehype-pretty-code-fragment] pre {
 	padding: 0; /* Assign padding to code element instead */

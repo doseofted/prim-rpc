@@ -61,7 +61,6 @@ export default defineConfig({
 		// NOTE: features page removed
 		"/docs/security": { destination: "/docs/learn/security", status: 301 },
 		"/docs/limitations": { destination: "/docs/learn/limitations", status: 301 },
-		// FIXME: add back comparisons page
 		"/docs/comparisons": { destination: "/docs/learn/comparisons", status: 301 },
 		// TODO: add back remaining redirects once new pages are created
 	},

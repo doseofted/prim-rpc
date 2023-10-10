@@ -5,6 +5,7 @@ import TableOfContents from "@/components/TableOfContents.astro"
 import { documentationContents, type DocumentationCollection, type CollectionType } from "@/content/config"
 import H2 from "@/components/Markdown/Heading/H2.astro"
 import H3 from "@/components/Markdown/Heading/H3.astro"
+import Table from "@/components/Markdown/Table.astro"
 
 interface Props {
 	entry: CollectionType<DocumentationCollection>
@@ -25,6 +26,6 @@ const tableOfContents = documentationContents("docs")
 ---
 
 <Documentation decorationText="The Docs." title={entry.data.title} tableOfContents={tableOfContents}>
-	<Content components={{ h2: H2, h3: H3 }} />
+	<Content components={{ h2: H2, h3: H3, table: Table }} />
 	<TableOfContents headings={headings} slot="extra" />
 </Documentation>

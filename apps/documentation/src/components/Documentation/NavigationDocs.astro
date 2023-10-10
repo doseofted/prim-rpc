@@ -27,3 +27,10 @@ const path = Astro.url.pathname
 		))
 	}
 </ul>
+
+<style>
+	/* Remove thin line before each section provided from DaisyUI */
+	ul.content-section::before {
+		content: none;
+	}
+</style>

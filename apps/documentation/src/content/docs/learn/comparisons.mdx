@@ -1,0 +1,134 @@
+---
+title: Comparisons
+---
+
+import CodeFile from "@/components/Code/CodeFile.astro"
+import Aside from "@/components/Markdown/Aside.astro"
+
+# {frontmatter.title}
+
+It can sometimes be difficult to understand how a new tool fits in your existing toolchain. How is it used with another
+framework? Does it replace other libraries? What is the difference between them? Let's look through some popular tools
+today so that we can better understand what Prim+RPC is and how it can be used.
+
+<Aside>
+
+The purpose of this page is to show how Prim+RPC compares to and integrates with other tools, not to dissuade usage of
+other tools.
+
+</Aside>
+
+This page is not comprehensive and aims only to provide a high-level overview.
+
+## GraphQL
+
+GraphQL is a form of RPC with its own querying language and types. It is a specification implemented in many programming
+languages and frameworks. It defines several operations to interact with data: queries to retrieve data, mutations to
+change data, and subscriptions to react to events on the server.
+
+Prim+RPC is an RPC library that uses JavaScript as the query language. It does not define operations, instead data is
+retrieved by calling a defined function. Since it takes advantage of JavaScript as a language, the server and client are
+expected to be JavaScript however RPC requests are simple to make from other languages.
+
+As a high-level overview, here is a summary of notable differences:
+
+| GraphQL                                                 | Prim+RPC                                                |
+| ------------------------------------------------------- | ------------------------------------------------------- |
+| Has its own query language                              | JavaScript is the query language: it doesn't have one   |
+| Types defined using their SDL                           | Existing types (TypeScript/JSDoc) are utilized          |
+| Validation based on types                               | Validation is provided by developer                     |
+| Provides queries to get data                            | Function call retrieves data                            |
+| Provides mutations to change data                       | Function call changes data                              |
+| Server updates given as subscriptions                   | Callbacks on functions receives server updates          |
+| Files uploads given by community-provided specification | Files can be passed to function                         |
+| File downloads unsupported                              | Files can be returned from function                     |
+| Servers supports many languages                         | Server is expected to be JavaScript                     |
+| Clients supports many languages                         | Client is JavaScript but can be made in other languages |
+
+## tRPC
+
+tRPC is an RPC library for JavaScript/TypeScript using many concepts from GraphQL but taking advantage of validation
+frameworks like Zod to both validate queries and mutations and also to provide static type safety. While backend
+implementations can be changed, it is typically used with HTTP servers and has several adapters available. The client
+generally sends HTTP requests but this can be changed with a custom "terminating link."
+
+Prim+RPC is also an RPC library for JavaScript but does not compare itself with GraphQL but rather with JavaScript.
+Queries and mutations in tRPC are just function calls. Subscriptions are simply callbacks on functions. It's also
+runtime and framework agnostic: it works over HTTP but also over WebSocket, Web Workers, or any other transport through
+plugins. Prim+RPC also provides type safety through TypeScript but leaves validation to the developer in the defined
+functions.
+
+Both libraries have features such as custom serialization, batching support, ability to "subscribe" to server updates,
+ability to pass server context to RPC library, among other features. A summary of notable differences:
+
+| tRPC                                                  | Prim+RPC                                          |
+| ----------------------------------------------------- | ------------------------------------------------- |
+| Borrows terminology from GraphQL                      | Compares itself to JavaScript                     |
+| Generally intended for HTTP but can be used elsewhere | Transport agnostic but supports HTTP              |
+| Uses queries and mutations defined on a router        | Uses functions defined a module                   |
+| Uses subscriptions for server updates                 | Callbacks on functions receive server updates     |
+| Does not yet support file uploads or downloads        | Files can be passed to and returned from function |
+
+## Data Loaders
+
+Data loaders is a concept that's become popular with fullstack frameworks like Qwik, Next.js, Remix, and others. It is
+auto-generated RPC, created as part of a compile step, allowing server-side code to be written inside of and extracted
+from client-side code. This is generally used to transform data only available on the server into a format expected by
+UI components on the client but could potentially be used to create a client-specific API.
+
+Prim+RPC auto-generates RPC as well but requests are inferred at runtime, without a compilation step. Server-side code
+is intended to be written separately from client-side code, by design. Since RPC is not extracted from code, there is no
+auto-generation of function names or routes: they are given by the name of your functions. There is also less risk of
+accidentally exposing server-side code to the client since client and server are separate and only types are shared.
+
+As for how they may fit together: Prim+RPC is intended to write a full server API while data loaders are commonly used
+to transform data from a server's API into a format expected by the client.
+
+| Data Loaders                                     | Prim+RPC                                              |
+| ------------------------------------------------ | ----------------------------------------------------- |
+| RPC created during compilation                   | RPC inferred at runtime                               |
+| Usually used to transform data from API to UI    | Used to create a full server API                      |
+| Server code exists inside of client code         | Server and client are separate                        |
+| Server utilities specific to given framework     | Works with server of your choice                      |
+| Type support limited to those given in framework | Type support can be extended with custom JSON handler |
+
+## gRPC
+
+gRPC is a form of RPC based around Protocol Buffers ("protobufs") designed to work with many languages by creating a
+schema and implementing that schema with the server of your choice and connecting to the server with a compiled client
+which can be used in various programming languages. It provides many transport options such as unary, server-side,
+client-side, and bidirectional streaming, and has options for authentication.
+
+Prim+RPC on the other hand is intended for JavaScript and does not utilize a schema language. It instead infers
+information from the module provided to Prim+RPC. It also does not require a compiled client since the client will
+simply intercept calls and turn that into RPC. In terms of transport, Prim+RPC supports options comparable to unary and
+server-side streaming. Authentication is not provided with Prim+RPC but can be implemented by handing server context to
+Prim+RPC.
+
+| gRPC                                    | Prim+RPC                                                |
+| --------------------------------------- | ------------------------------------------------------- |
+| Server implements given specification   | No specification required, inferred from module         |
+| Client compiled from specification      | No client generation, uses JavaScript                   |
+| Supports many languages                 | Intended for and takes advantage of JavaScript features |
+| Unary streaming                         | Function call                                           |
+| Server-side streaming                   | Callbacks on functions                                  |
+| Client-side and bidirectional streaming | No comparable options                                   |
+
+## JSON RPC
+
+JSON RPC is an RPC specification based on JSON. It is a lightweight protocol and implementations vary widely. There are
+many implementations available in many languages but the underlying specification is fairly simple. It allows methods to
+be called and results received as either a result or an error. It also includes an option for batching requests. Many
+implementations support these basic features and may add additional features.
+
+Prim+RPC supports all of JSON RPC's features and many more. While the underlying RPC structures appear similar, Prim+RPC
+is not based on JSON RPC and covers features that don't have equivalents in JSON RPC like callback support and file
+uploads. It has one implementation and it is both runtime and framework agnostic.
+
+| JSON RPC                                    | Prim+RPC                                              |
+| ------------------------------------------- | ----------------------------------------------------- |
+| Lightweight specification based on JSON     | Framework built around JavaScript language using JSON |
+| Many implementations available              | One implementation, framework-agnostic                |
+| Implementations available in many languages | Supports JavaScript and TypeScript                    |
+| Supports JSON types only                    | Serialization library can be swapped out              |
+| No file support officially                  | Files can be uploaded and downloaded with plugins     |
