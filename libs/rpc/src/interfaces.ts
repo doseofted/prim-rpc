@@ -401,6 +401,12 @@ export interface PrimServerOptions<M extends PossibleModule = object, J extends 
 	 * TODO: consider splitting client options to this property
 	 */
 	// clientOptions?: PrimOptions
+	/** Prior to calling function, transform given arguments and return them back to be used with function */
+	// eslint-disable-next-line @typescript-eslint/no-explicit-any
+	preCall?: (args: any[], func?: any) => any[]
+	/** After function call, transform return result before sending back to client */
+	// eslint-disable-next-line @typescript-eslint/no-explicit-any
+	postCall?: (result: any, func?: any) => any
 }
 
 export type PrimServerSocketAnswer = (result: string) => void
