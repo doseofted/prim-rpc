@@ -2,10 +2,101 @@
 title: Security
 ---
 
+import CodeFile from "@/components/Code/CodeFile.astro"
+
 # {frontmatter.title}
 
 Prim+RPC is a low-level library and keeps a narrow scope: handling RPC and providing the tools to easily integrate with
 other libraries. There are a few things to keep in mind when using Prim+RPC to keep your functions secure.
+
+## Validate Arguments
+
+By default, Prim+PRC validates that messages passed to it are RPC but it does not validate what's in that RPC.
+Validation is especially important if your RPC is sent over a network like an HTTP server. Prim+RPC provides several
+options to easily set up validation.
+
+The **first option** is the most flexible: choose any validation library and use it directly in your function to
+overwrite arguments. Here is an example using ArkType:
+
+<CodeFile filename="server/module.ts">
+
+```typescript {1,4}
+import { type } from "arktype"
+
+export function sayHello(x = "Backend", y = "Frontend") {
+	;[x, y] = type(["string", "string"]).assert([x, y])
+	return `${x}, meet ${y}.`
+}
+sayHello.rpc = true
+```
+
+</CodeFile>
+
+The **second option** is to wrap your function in another library that validates arguments for you. This example using
+Zod may look familiar if you are coming from tRPC:
+
+<CodeFile filename="server/module.ts">
+
+```typescript {1-6,8-9}
+import { z } from "zod"
+
+export const sayHello = z
+	.function()
+	.args(z.string().optional(), z.string().optional())
+	.implement(function (x = "Backend", y = "Frontend") {
+		return `${x}, meet ${y}.`
+	})
+Object.defineProperty(sayHello, "rpc", { value: true })
+```
+
+</CodeFile>
+
+The **third option** is to have Prim+RPC enforce validation through `preCall` and/or `postCall` hooks, instead of
+validating within the function. First, we must set up a `preCall` hook. This example will use Valibot:
+
+<CodeFile filename="server/index.ts">
+
+```typescript {3,7-10}
+import { createPrimServer } from "@doseofted/prim-rpc"
+import * as module from "./module"
+import { parse } from "valibot"
+
+const prim = createPrimServer({
+	module,
+	preCall(args, func) {
+		if ("params" in func) return parse(func.params, args)
+		throw new Error("Function validation is required")
+	},
+})
+```
+
+</CodeFile>
+
+Notice that we parse arguments according to the `params` property defined on the given function. Let's add that to our
+example:
+
+{/* prettier-ignore-start */}
+
+<CodeFile filename="server/module.ts">
+
+```typescript {1,7-8} /x?: SayHelloParams[0], y?: SayHelloParams[1]/
+import { tuple, string, fallback, type Input } from "valibot"
+
+export function sayHello(x?: SayHelloParams[0], y?: SayHelloParams[1]) {
+	return `${x}, meet ${y}.`
+}
+sayHello.rpc = true
+sayHello.params = tuple([fallback(string(), "Backend"), fallback(string(), "Frontend")])
+type SayHelloParams = Input<typeof sayHello.params>
+
+```
+
+</CodeFile>
+
+{/* prettier-ignore-end */}
+
+Now we can be certain that not only will this function's arguments be validated but functions added in the future will
+require validation through the `params` property.
 
 ## Selectively Import
 
@@ -14,15 +105,6 @@ server, must explicitly be marked as RPC, must not be defined on another functio
 
 While this provides a lot of protection against accidental imports, you should still be cautious about what is passed to
 the Prim+PRC server. If Prim+RPC doesn't need access to a function or variable then don't pass it to the server.
-
-## Validate Arguments
-
-Prim+PRC validates that messages passed to it is RPC but it does not validate what's in that RPC. This means that
-arguments passed to your function and their return values are not validated for you: this is the developer's
-responsibility. Validation is especially important if your RPC is sent over a network like an HTTP server.
-
-This also makes Prim+RPC very flexible. You may use any validation library of your choice because validation is part of
-your function logic and not restricted by your server framework.
 
 ## Secure the Transport
 

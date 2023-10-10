@@ -26,7 +26,8 @@ Prim+RPC validates RPC sent to the server but does not validate arguments and re
 developer. When using Prim+RPC over the internet it is important to validate user input. We can validate data in our
 functions easily though.
 
-We can use any validation framework that we like but we'll a popular framework, Zod. Let's install it on the server:
+We can use any validation framework that we like but, for example, we'll choose a popular framework: Zod. Let's install
+it on the server:
 
 <CodeFile>
 
@@ -41,12 +42,11 @@ Now let's modify our function on the server to overwrite and validate our argume
 
 <CodeFile filename="server/module.ts">
 
-```typescript {1,4-5} /x: string/ /y: string/
+```typescript {1,4} /x?: string/ /y?: string/
 import { z } from "zod"
 
-export function sayHello(x: string, y: string) {
-	x = z.string().default("Backend").parse(x)
-	y = z.string().default("Frontend").parse(y)
+export function sayHello(x = "Backend", y = "Frontend") {
+	;[x, y] = z.tuple([z.string(), z.string()]).parse([x, y])
 	return `${x}, meet ${y}.`
 }
 sayHello.rpc = true
@@ -54,15 +54,13 @@ sayHello.rpc = true
 
 </CodeFile>
 
-Now we can ensure that the our arguments are strings. This works well for one function but if we have a lot of
-functions, we may want to require that all functions have their arguments validated and fail if they are not.
+Now we can ensure that our arguments are strings. We could also validate the return value, use multiple validation
+libraries, or skip validation if needed. Since validation is part of function logic it is up to you.
 
-We can easily add this functionality to Prim+RPC using its `preprocess` option. This will allow us to modify our
-function arguments prior to passing them to the intended function. Let's set this up:
+<Aside>
 
-<Aside type="error">
-
-**Todo:** add preprocess option to Prim+RPC
+There are several options to add validation to Prim+RPC, not mentioned here. See the
+[Security guide to learn more](/docs/learn/security#validate-arguments).
 
 </Aside>
 
