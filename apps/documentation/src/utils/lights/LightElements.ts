@@ -39,17 +39,27 @@ export class LightElements {
 	}
 	#resizeListener: typeof this.resizeEvent
 
-	destroy() {
-		this.#mutationObserver.disconnect()
-		document.removeEventListener("scroll", this.#scrollListener)
-		document.removeEventListener("resize", this.#resizeListener)
-		for (const [_, light] of this.#lights) {
-			light.destroy()
+	addPossibleElements(parent: HTMLElement | Document = document) {
+		const lightElements = parent.querySelectorAll("[data-light]")
+		for (const lightElem of lightElements) {
+			this.#elements.add(lightElem as HTMLElement)
 		}
-		this.#lights.clear()
-		this.#elements.destroy()
-		console.debug("LightEvents instance was destroyed")
+		this.elementUpdates("mutation")
+		return lightElements.length
 	}
+
+	astroPageLoad() {
+		const elementCount = this.addPossibleElements()
+		console.debug("page loaded, elements found:", elementCount)
+	}
+	#astroPageLoadListener: typeof this.astroPageLoad
+
+	astroAfterSwap() {
+		const elementCount = this.addPossibleElements()
+		console.debug("page update happened, elements found:", elementCount)
+		setTimeout(() => (this.#listNeedsUpdate = true), 0) // FIXME: timing issue, this is only a workaround
+	}
+	#astroAfterSwapListener: typeof this.astroAfterSwap
 
 	#mutationObserver: MutationObserver
 
@@ -150,37 +160,12 @@ export class LightElements {
 	}
 	#elementUpdatesListener: typeof this.elementUpdates
 
-	constructor() {
+	constructor(init = false) {
 		this.#elementUpdatesListener = () => this.elementUpdates("mutation")
-		this.#elements.onUpdates(this.#elementUpdatesListener)
 		this.#scrollListener = this.scrollEvent.bind(this)
-		document.addEventListener("scroll", this.#scrollListener)
 		this.#resizeListener = this.resizeEvent.bind(this)
-		window.addEventListener("resize", this.#resizeListener)
-
-		const addPossibleElements = (parent: HTMLElement | Document = document) => {
-			const lightElements = parent.querySelectorAll("[data-light]")
-			for (const lightElem of lightElements) {
-				this.#elements.add(lightElem as HTMLElement)
-			}
-			this.elementUpdates("mutation")
-			return lightElements.length
-		}
-
-		document.addEventListener(
-			"astro:page-load",
-			() => {
-				const elementCount = addPossibleElements()
-				console.debug("page loaded, elements found:", elementCount)
-			},
-			{ once: true }
-		)
-		// find elements on page load
-		document.addEventListener("astro:after-swap", () => {
-			const elementCount = addPossibleElements()
-			console.debug("page update happened, elements found:", elementCount)
-			setTimeout(() => (this.#listNeedsUpdate = true), 0) // FIXME: timing issue, this is only a workaround
-		})
+		this.#astroPageLoadListener = this.astroPageLoad.bind(this)
+		this.#astroAfterSwapListener = this.astroAfterSwap.bind(this)
 
 		/** Determine if given `<div />` has "light" properties */
 		const isElementWithLight = (node: Node): HTMLElement | false => {
@@ -188,7 +173,7 @@ export class LightElements {
 			const isLightDirect = elem && elem.hasAttribute("data-light") ? elem : false
 			// it's possible that element mutated was not a light but children might be
 			if (!isLightDirect && elem) {
-				addPossibleElements(elem)
+				this.addPossibleElements(elem)
 			}
 			return isLightDirect
 		}
@@ -212,6 +197,37 @@ export class LightElements {
 				}
 			}
 		})
+		if (init) this.init()
+	}
+
+	#initialized = false
+	init() {
+		if (this.#initialized) return
+		this.#initialized = true
+		// watch attributes for changes
+		this.#elements.onUpdates(this.#elementUpdatesListener)
+		// watch for changes in position of lights
+		document.addEventListener("scroll", this.#scrollListener)
+		window.addEventListener("resize", this.#resizeListener)
+		// find elements on page load
+		document.addEventListener("astro:page-load", this.#astroPageLoadListener, { once: true })
+		// and after navigation
+		document.addEventListener("astro:after-swap", this.#astroAfterSwapListener)
+		// watch for element changes
 		this.#mutationObserver.observe(document.body, { childList: true, subtree: true })
+	}
+
+	destroy() {
+		document.removeEventListener("scroll", this.#scrollListener)
+		document.removeEventListener("resize", this.#resizeListener)
+		document.removeEventListener("astro:page-load", this.#astroPageLoadListener)
+		document.removeEventListener("astro:after-swap", this.#astroAfterSwapListener)
+		this.#mutationObserver.disconnect()
+		for (const [_, light] of this.#lights) {
+			light.destroy()
+		}
+		this.#lights.clear()
+		this.#elements.destroy()
+		console.debug("LightEvents instance was destroyed")
 	}
 }

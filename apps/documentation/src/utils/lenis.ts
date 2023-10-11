@@ -1,7 +1,8 @@
 import Lenis from "@studio-freight/lenis"
 import { easeOutExpo } from "./easings"
+import { visualEffects } from "./disable-effects"
 
-const USE_LENIS = true
+const USE_LENIS = visualEffects.enabled
 
 export const lenis = USE_LENIS
 	? new Lenis({
@@ -21,6 +22,7 @@ export const lenis = USE_LENIS
 				window.scrollTo({ top: 0, behavior: "smooth" })
 			},
 			raf(_time: number) {},
+			destroy() {},
 	  }
 
 declare global {
@@ -30,8 +32,13 @@ declare global {
 }
 window.lenis = lenis
 
+let disableLenis = false
 function raf(time: number) {
 	lenis.raf(time)
+	if (disableLenis) {
+		lenis.destroy()
+		return
+	}
 	requestAnimationFrame(raf)
 }
 if (USE_LENIS) requestAnimationFrame(raf)
@@ -52,5 +59,11 @@ function handleHashNavigation() {
 	}
 }
 
-document.addEventListener("DOMContentLoaded", handleHashNavigation)
-document.addEventListener("astro:after-swap", handleHashNavigation)
+if (USE_LENIS) {
+	document.addEventListener("DOMContentLoaded", handleHashNavigation)
+	document.addEventListener("astro:after-swap", handleHashNavigation)
+}
+
+export function disableScrollEffect() {
+	disableLenis = true
+}
