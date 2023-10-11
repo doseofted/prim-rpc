@@ -50,7 +50,7 @@ const { title = "", decorationText = "", description, tableOfContents = [] } = A
 		</div>
 
 		<!-- Page content -->
-		<div class="relative flex-grow grid grid-cols-6 lg:grid-cols-12 gap-x-4">
+		<div class="relative flex-grow grid grid-cols-6 lg:grid-cols-12 gap-x-4 grid-rows-[auto_1fr]">
 			<div
 				class="bg-white/70 lg:rounded-l-xl -ml-4 pl-4 -mr-4 pr-4 col-span-6 lg:col-span-2 flex justify-between lg:block">
 				<button onclick="pageTableOfContents.showModal();" class="lg:hidden btn btn-xs my-4">
@@ -70,7 +70,7 @@ const { title = "", decorationText = "", description, tableOfContents = [] } = A
 					<div slot="before" class="drawer-like bg-white/70 h-full"></div>
 					<div class="grid grid-cols-6 lg:grid-col-12 h-full">
 						<div
-							class="drawer-like col-span-3 px-4 relative z-50 h-full w-full bg-white/70 border-y border-r border-white/70 rounded-r-xl flex flex-col items-stretch">
+							class="drawer-like col-span-4 sm:col-span-3 md:col-span-2 px-4 relative z-50 h-full w-full bg-white/70 border-y border-r border-white/70 rounded-r-xl flex flex-col items-stretch">
 							<NavigationDocs tableOfContents={tableOfContents} />
 						</div>
 					</div>

@@ -15,5 +15,7 @@ const { id, level: HeadingType } = Astro.props
 			name="ph:link-bold"
 		/>
 	</a>
-	<slot />
+	<span class="inline-flex items-center gap-2">
+		<slot />
+	</span>
 </HeadingType>

@@ -38,14 +38,14 @@ export const documentationContents = (collection = "docs"): TableOfContents => [
 			{ name: "Configuration", link: `/${collection}/reference/config` },
 			{ name: "Browse Plugins", link: `/${collection}/reference/plugins` },
 			{ name: "Create Plugin", link: `/${collection}/reference/create` },
-			{ name: "Structure", link: `/${collection}/reference/structure` },
+			{ name: "RPC Structure", link: `/${collection}/reference/structure` },
 		],
 	},
 	{
 		name: "Tooling",
 		sections: [
 			{ name: "Documentation", link: `/${collection}/tooling/docs` },
-			{ name: "Build Utility", link: `/${collection}/tooling/build` },
+			{ name: "Prevent Build", link: `/${collection}/tooling/build` },
 		],
 	},
 ]

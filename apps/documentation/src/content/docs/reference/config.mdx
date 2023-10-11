@@ -1,0 +1,77 @@
+---
+title: Configuration
+---
+
+# {frontmatter.title}
+
+import { Icon } from "astro-icon/components"
+import CodeFile from "@/components/Code/CodeFile.astro"
+
+Prim+RPC exports two primary functions: `createPrimClient()` and `createPrimServer()`. Both functions take a
+configuration object as their only argument and the server configuration extends the client configuration.
+
+Some options should be synced between server and client and will be marked accordingly.
+
+## <Icon name="ph:function-bold"/> Create Server
+
+<CodeFile>
+
+```ts
+createPrimServer(options: PrimServerOptions): PrimServer
+```
+
+</CodeFile>
+
+The Prim+RPC server is the tool that transforms requests into RPC and RPC results into responses. It is a misnomer as it
+is not a server per se but is a framework agnostic utility to work with the server of your choice.
+
+It works with the server of your choice through handler plugins: the method handler handles method calls, the callback
+handler optionally handles callbacks on those methods. They are separate plugins because of their design: while the
+method handler has a single response for every request (a function result for every call), the callback handler can
+return multiple responses for a request (because callbacks can be fired multiple times).
+
+This function is given a single argument which is its configuration. You may reference
+[server options](/docs/reference/config/server) for more details.
+
+## <Icon name="ph:function-bold"/> Create Client
+
+<CodeFile>
+
+```ts
+createPrimClient<ModuleType>(options: PrimOptions): PrimClient
+```
+
+</CodeFile>
+
+The Prim+RPC client is a JavaScript Proxy that transforms method calls into requests and transforms responses back into
+a useable result. Like its server counterpart, it is not responsible for the transport. Instead, this responsibility is
+given to plugins: method plugins handle method calls and callback plugins handle callbacks. These client plugins
+correspond with handler plugins on the server of the same name.
+
+This function takes a type parameter (if using TypeScript) that is the type of the module given to the server. It also
+takes a single argument which is the client configuration. You may reference
+[client options](/docs/reference/config/client) for more details.
+
+## <Icon name="ph:brackets-curly-bold"/> Testing Utilities
+
+<CodeFile>
+
+```ts
+// create plugins to use with client/server
+const plugins = createPrimTestingPlugins<Ctx>(exampleContext: Ctx)
+const { methodHandler, callbackHandler } = plugins // server
+const { methodPlugin, callbackPlugin } = plugins // client
+// or create client/server pre-configured to use test plugins
+const { client, server } = createPrimTestingSuite<Module, Ctx>(serverOpts: PrimOptions, clientOpts: PrimServerOptions, exampleContext: Ctx)
+```
+
+</CodeFile>
+
+Prim+RPC comes with utilities to test itself that are bundled with Prim+RPC itself. While all plugins used with Prim+RPC
+are intended to bridge separated JavaScript environments, the testing plugins are meant to be used within the same file
+and communicate over a generic event handler.
+
+The test plugins apply similar transformations to and undergo the same events as other plugins but are sent using local
+event handlers. This is useful in environments like Jest and Vitest where you would otherwise have to emulate the
+separated environments. This means that instead of setting up an HTTP server or emulating features of other
+environments, you may instead use the test plugins.
