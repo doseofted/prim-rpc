@@ -6,6 +6,8 @@ title: Configuration
 
 import { Icon } from "astro-icon/components"
 import CodeFile from "@/components/Code/CodeFile.astro"
+import Button from "@/components/Markdown/Button.astro"
+import ButtonGroup from "@/components/Markdown/ButtonGroup.astro"
 
 Prim+RPC exports two primary functions: `createPrimClient()` and `createPrimServer()`. Both functions take a
 configuration object as their only argument and the server configuration extends the client configuration.
@@ -33,6 +35,15 @@ return multiple responses for a request (because callbacks can be fired multiple
 This function is given a single argument which is its configuration. You may reference
 [server options](/docs/reference/config/server) for more details.
 
+<ButtonGroup>
+	<Button href="/docs/reference/config/server" icon="ph:wrench-bold">
+		Server Options
+	</Button>
+	<Button href="/docs/reference/plugins#server" icon="ph:code-block-bold">
+		Available Handlers
+	</Button>
+</ButtonGroup>
+
 ## <Icon name="ph:function-bold"/> Create Client
 
 <CodeFile>
@@ -52,6 +63,15 @@ This function takes a type parameter (if using TypeScript) that is the type of t
 takes a single argument which is the client configuration. You may reference
 [client options](/docs/reference/config/client) for more details.
 
+<ButtonGroup>
+	<Button href="/docs/reference/config/client" icon="ph:wrench-bold">
+		Client Options
+	</Button>
+	<Button href="/docs/reference/plugins#client" icon="ph:code-block-bold">
+		Available Plugins
+	</Button>
+</ButtonGroup>
+
 ## <Icon name="ph:brackets-curly-bold"/> Testing Utilities
 
 <CodeFile>
@@ -67,11 +87,16 @@ const { client, server } = createPrimTestingSuite<Module, Ctx>(serverOpts: PrimO
 
 </CodeFile>
 
-Prim+RPC comes with utilities to test itself that are bundled with Prim+RPC itself. While all plugins used with Prim+RPC
-are intended to bridge separated JavaScript environments, the testing plugins are meant to be used within the same file
-and communicate over a generic event handler.
+Prim+RPC includes utilities to test itself. While most plugins used with Prim+RPC are intended to bridge separated
+JavaScript environments, the testing plugins are meant to be used within the same file and communicate over a generic
+event handler.
 
 The test plugins apply similar transformations to and undergo the same events as other plugins but are sent using local
 event handlers. This is useful in environments like Jest and Vitest where you would otherwise have to emulate the
-separated environments. This means that instead of setting up an HTTP server or emulating features of other
-environments, you may instead use the test plugins.
+separated environments.
+
+<ButtonGroup>
+	<Button href="/docs/reference/plugins/server/testing" icon="ph:code-block-bold">
+		Plugin Details
+	</Button>
+</ButtonGroup>

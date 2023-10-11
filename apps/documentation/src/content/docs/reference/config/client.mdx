@@ -2,13 +2,31 @@
 title: Client Configuration
 ---
 
+import CodeFile from "@/components/Code/CodeFile.astro"
+
 # {frontmatter.title}
 
-## `module`
+## HTTP Endpoint
 
-## `endpoint`
+<CodeFile>
 
-## `wsEndpoint`
+```typescript
+const endpoint = "https://example.com/prim"
+createPrimServer({ endpoint })
+```
+
+</CodeFile>
+
+## WS Endpoint
+
+<CodeFile>
+
+```typescript
+const wsEndpoint = "wss://example.com/prim"
+createPrimServer({ wsEndpoint })
+```
+
+</CodeFile>
 
 ## `clientBatchTime`
 

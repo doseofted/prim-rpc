@@ -43,6 +43,10 @@ export class LightElements {
 		this.#mutationObserver.disconnect()
 		document.removeEventListener("scroll", this.#scrollListener)
 		document.removeEventListener("resize", this.#resizeListener)
+		for (const [_, light] of this.#lights) {
+			light.destroy()
+		}
+		this.#lights.clear()
 		this.#elements.destroy()
 		console.debug("LightEvents instance was destroyed")
 	}

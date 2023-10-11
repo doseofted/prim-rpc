@@ -44,7 +44,8 @@ const navigation = [
 		<div class="grid place-items-start justify-items-center px-4">
 			<div
 				class="drawer-like relative z-50 w-full bg-white/70 border-x border-b border-white/70 rounded-b-xl flex flex-col items-stretch">
-				<form method="dialog" class="flex justify-end h-24">
+				<form method="dialog" class="flex justify-between h-24">
+					<NavigationItem type="a" icon="ph:house-bold" text="Home" link="/" rounded="bottom" className="pt-10 pb-2" />
 					<NavigationItem type="button" icon="ph:x-bold" text="Close" rounded="bottom" className="pt-10 pb-2" />
 				</form>
 				{navigation.filter(nav => !nav.icon).map(item => <NavigationItem {...item} className="flex-grow" />)}

@@ -2,11 +2,12 @@
 import Layout from "@/layouts/Default.astro"
 import { Icon } from "astro-icon/components"
 import { IntroText } from "@/components/IntroText.react"
-import { versionsAvailable, type TableOfContents } from "@/content/config"
 import Prerelease from "@/components/Prerelease.astro"
 import NavigationDocs from "@/components/Documentation/NavigationDocs.astro"
 import VersionSelection from "@/components/Documentation/VersionSelection.astro"
 import Container from "@/components/Container.astro"
+import ToggleEffects from "@/components/ToggleEffects.astro"
+import type { TableOfContents } from "@/content/config"
 
 interface Props {
 	decorationText?: string
@@ -57,8 +58,11 @@ const { title = "", decorationText = "", description, tableOfContents = [] } = A
 					<Icon class="w-3 h-3" name="ph:list-bold" />
 					<span>Table of Contents</span>
 				</button>
-				<div class="py-3">
+				<div class="py-3 flex gap-2 items-center">
 					<VersionSelection />
+					<div class="relative top-1 left-0.5">
+						<ToggleEffects />
+					</div>
 				</div>
 				<div class="hidden lg:block sticky top-0">
 					<NavigationDocs tableOfContents={tableOfContents} />

@@ -2,4 +2,29 @@
 title: Server Configuration
 ---
 
+import CodeFile from "@/components/Code/CodeFile.astro"
+import Aside from "@/components/Markdown/Aside.astro"
+
 # {frontmatter.title}
+
+## Module
+
+<CodeFile>
+
+```typescript
+const module = { default: () => "Hello!" }
+createPrimServer({
+	module,
+	allowList: { default: true },
+})
+```
+
+</CodeFile>
+
+The module provided to Prim+RPC contains functions intended to be exposed as RPC.
+
+<Aside>
+
+Modules may conditionally be provided to the client, for instance when the client is used in a fullstack framework.
+
+</Aside>
