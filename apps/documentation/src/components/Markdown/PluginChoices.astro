@@ -1,37 +1,31 @@
 ---
-import LinkButton from "./LinkButton.astro"
+import Button from "./Button.astro"
 import ListGrid from "./ListGrid.astro"
 import { getCollection } from "astro:content"
 
 interface Props {
-	type: string
+	type?: string
+	transport?: string
 }
-const { type: givenType = "all" } = Astro.props
+const { type: givenType = "all", transport: givenTransport = "all" } = Astro.props
 
 const plugins = await getCollection("plugins")
-const pluginShorthand: Record<string, string> = {
-	"method-handler": "mh",
-	"method-plugin": "mp",
-	"callback-handler": "ch",
-	"callback-plugin": "cp",
-	"json-handler": "json",
-}
+const pluginsSorted = plugins.sort((a, b) => (a.data.title > b.data.title ? 1 : -1))
 ---
 
 <ListGrid>
 	{
-		plugins
+		pluginsSorted
 			.filter(plugin => givenType === "all" || plugin.data.type === givenType)
+			.filter(plugin => givenTransport === "all" || plugin.data.transport === givenTransport)
 			.map(plugin => (
-				<LinkButton
+				<Button
+					classes="normal-case"
 					block
-					name={plugin.data.title}
-					search={{
-						[pluginShorthand[givenType]]: plugin.slug.replace(`${Astro.params.version}/${plugin.data.type}/`, ""),
-					}}
-					hash={`#${plugin.data.type}`}
-					icon={plugin.data.icon}
-				/>
+					disabled={plugin.data.status === "planned"}
+					href={plugin.data.status === "available" ? `/docs/reference/plugins/${plugin.slug}` : undefined}>
+					<span>{[plugin.data.title, plugin.data.status === "planned" ? "(planned)" : ""].join(" ")}</span>
+				</Button>
 			))
 	}
 </ListGrid>

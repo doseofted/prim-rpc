@@ -70,7 +70,7 @@ export const collections = {
 			title: z.string(),
 			icon: z.string().optional(),
 			type: pluginTypes,
-			transport: z.enum(["http", "ws", "event", "worker", "socket-io"]),
+			transport: z.enum(["http", "ws", "event", "worker", "socket-io", "electron", "node"]),
 			features: z.array(z.string()).optional(),
 			status: z.enum(["planned", "available", "deprecated"]),
 		}),

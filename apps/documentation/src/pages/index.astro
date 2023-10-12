@@ -153,7 +153,10 @@ const plugins = pluginsCollection
 		status,
 		type,
 	}))
-	.filter(plugin => plugin.status === "available")
+	.filter(
+		plugin =>
+			plugin.status === "available" && (plugin.type.startsWith("method-") || plugin.type.startsWith("callback-"))
+	)
 	.sort((a, b) => (a.type.endsWith("handler") ? -1 : b.type.endsWith("handler") ? 1 : 1))
 	.filter(plugin => {
 		if (pluginsUnique.has(plugin.title)) return false

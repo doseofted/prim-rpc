@@ -2,4 +2,37 @@
 title: All Plugins
 ---
 
+import PluginChoices from "@/components/Markdown/PluginChoices.astro"
+import Aside from "@/components/Markdown/Aside.astro"
+
 # {frontmatter.title}
+
+Prim+RPC works with many frameworks though plugins on the client and handlers on the server. See the
+[Setup Guide](/docs/learn/setup) to learn more about how Prim+RPC works and how it interacts with plugins.
+
+<Aside>
+
+All trademarks are property of their respective owners. Prim+RPC is not endorsed by or affiliated with any of these
+frameworks.
+
+</Aside>
+
+## Server Handlers
+
+**Method Handlers**: allow methods on the server to be called
+
+<PluginChoices type="method-handler"></PluginChoices>
+
+**Callback Handlers**: allow callbacks given to the server (optional)
+
+<PluginChoices type="callback-handler"></PluginChoices>
+
+## Client Plugins
+
+**Method Plugins**: allow method usage on the client
+
+<PluginChoices type="method-plugin"></PluginChoices>
+
+**Callback Plugins**: allow callback usage on the client (optional)
+
+<PluginChoices type="callback-plugin"></PluginChoices>

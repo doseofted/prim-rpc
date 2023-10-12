@@ -8,7 +8,7 @@ import H3 from "@/components/Markdown/Heading/H3.astro"
 import Table from "@/components/Markdown/Table.astro"
 
 interface Props {
-	entry: CollectionType<DocumentationCollection>
+	entry: CollectionType<"docs">
 }
 export async function getStaticPaths() {
 	const documentation = await getCollection("docs")

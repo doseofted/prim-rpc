@@ -6,9 +6,11 @@ import { documentationContents, type DocumentationCollection, type CollectionTyp
 import H2 from "@/components/Markdown/Heading/H2.astro"
 import H3 from "@/components/Markdown/Heading/H3.astro"
 import Table from "@/components/Markdown/Table.astro"
+import { Icon } from "astro-icon/components"
+import PluginChoices from "@/components/Markdown/PluginChoices.astro"
 
 interface Props {
-	entry: CollectionType<DocumentationCollection>
+	entry: CollectionType<"plugins">
 }
 export async function getStaticPaths() {
 	const documentation = await getCollection("plugins")
@@ -21,11 +23,38 @@ export async function getStaticPaths() {
 }
 
 const { entry } = Astro.props
+const {
+	data: { type, transport },
+} = entry
+
+const compatibilityTable: Record<string, string> = {
+	"method-handler": "method-plugin",
+	"callback-handler": "callback-plugin",
+	"method-plugin": "method-handler",
+	"callback-plugin": "callback-handler",
+}
+
 const { Content, headings } = await entry.render()
 const tableOfContents = documentationContents("docs")
 ---
 
 <Documentation decorationText="The Docs." title={entry.data.title} tableOfContents={tableOfContents}>
+	<a href="/docs/reference/plugins" class="-mx-3 my-2 mb-4 btn btn-sm btn-ghost no-underline">
+		<Icon name="ph:caret-left-bold" />
+		<span>All Plugins</span>
+	</a>
 	<Content components={{ h2: H2, h3: H3, table: Table }} />
+	{
+		compatibilityTable[type] && (
+			<>
+				<hr class="my-6" />
+				<p>
+					You may also choose a compatible <strong>{compatibilityTable[type]?.replace("-", " ")}</strong>:
+				</p>
+				<PluginChoices type={compatibilityTable[type]} transport={transport} />
+			</>
+		)
+	}
+
 	<TableOfContents headings={headings} slot="extra" />
 </Documentation>
