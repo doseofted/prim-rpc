@@ -4,6 +4,7 @@ title: Server Configuration
 
 import CodeFile from "@/components/Code/CodeFile.astro"
 import Aside from "@/components/Markdown/Aside.astro"
+import ServerNotice from "@/components/Snippets/ServerNotice.astro"
 import { Icon } from "astro-icon/components"
 
 <a href="/docs/reference/config" class="-mx-3 my-2 mb-4 btn btn-sm btn-ghost no-underline">
@@ -13,24 +14,49 @@ import { Icon } from "astro-icon/components"
 
 # {frontmatter.title}
 
-## Module
+## <Icon name="ph:brackets-curly-bold"/> Module
 
 <CodeFile>
 
 ```typescript
-const module = { default: () => "Hello!" }
+function hello() {
+	return "Hello from Prim+RPC!"
+}
+hello.rpc = true
+
 createPrimServer({
-	module,
-	allowList: { default: true },
+	module: { hello },
 })
 ```
 
 </CodeFile>
 
-The module provided to Prim+RPC contains functions intended to be exposed as RPC.
-
 <Aside>
 
-Modules may conditionally be provided to the client, for instance when the client is used in a fullstack framework.
+This option can also be used from [client options](/docs/reference/config/client#-module).
 
 </Aside>
+
+The module provided to Prim+RPC contains functions intended to be exposed as RPC.
+
+## <Icon name="ph:brackets-curly-bold"/> HTTP Endpoint
+
+This option extends the [client configuration](/docs/reference/config/client#-http-endpoint).
+
+<ServerNotice />
+
+## <Icon name="ph:brackets-curly-bold"/> WebSocket Endpoint
+
+This option extends the [client configuration](/docs/reference/config/client#-websocket-endpoint).
+
+<ServerNotice />
+
+## <Icon name="ph:brackets-curly-bold"/> Client Batch Time
+
+This option extends the [client configuration](/docs/reference/config/client#-client-batch-time).
+
+<ServerNotice />
+
+## <Icon name="ph:brackets-curly-bold"/> JSON Handler
+
+This option extends the [client configuration](/docs/reference/config/client#-client-batch-time).
