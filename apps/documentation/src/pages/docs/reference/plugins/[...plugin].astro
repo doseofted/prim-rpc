@@ -8,6 +8,7 @@ import H3 from "@/components/Markdown/Heading/H3.astro"
 import Table from "@/components/Markdown/Table.astro"
 import { Icon } from "astro-icon/components"
 import PluginChoices from "@/components/Markdown/PluginChoices.astro"
+import DataListPlugin from "@/components/Markdown/DataListPlugin.astro"
 
 interface Props {
 	entry: CollectionType<"plugins">
@@ -43,6 +44,8 @@ const tableOfContents = documentationContents("docs")
 		<Icon name="ph:caret-left-bold" />
 		<span>All Plugins</span>
 	</a>
+	<h1>{entry.data.title}</h1>
+	<DataListPlugin data={entry.data} />
 	<Content components={{ h2: H2, h3: H3, table: Table }} />
 	{
 		compatibilityTable[type] && (

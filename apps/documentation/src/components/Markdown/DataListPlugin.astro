@@ -1,0 +1,16 @@
+---
+import DataList from "./DataList.astro"
+
+interface Props {
+	data?: Record<string, unknown>
+}
+const { data: given } = Astro.props
+
+const data = JSON.parse(JSON.stringify(given))
+delete data?.title
+delete data?.icon
+delete data?.features
+data.type = data?.type?.replace("-", " ")
+---
+
+<DataList title="Plugin Details" data={data} />
