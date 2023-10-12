@@ -18,12 +18,12 @@ Prim+RPC bridges two separated environments: the server, where your functions ar
 functions are called. The server may be a literal HTTP server or could be some other environment like a Web Worker.
 Prim+RPC is able to work in all of these environments because of its plugin system.
 
-More importantly, it makes communication between server and client actually easy. Functions are functions, server and
-client, you define it and call it. Done. Prim+RPC handles the dance.
+More importantly, it makes communication between server and client easy. Functions are functions, on the server and
+client. You call the function on the client like you would on the server: Prim+RPC handles the dance between the two.
 
-Prim+RPC has two types of plugins, each with a version for the server and client. **Method plugins** handle calls to
-methods. **Callback plugins** optionally handle callbacks on those methods. Plugins used on the server are referred to
-as **handlers** to easily differentiate server/client.
+Prim+RPC communicates between the server and client over two types of plugins, each with a version for the server and
+client. **Method plugins** handle calls to methods. **Callback plugins** optionally handle callbacks on those methods.
+Plugins used on the server are referred to as **handlers** to easily differentiate server/client.
 
 Today, we'll set up a method handler to receive method calls over the Fetch API on the server. On the client, we'll set
 up a method plugin to to call those methods using the Fetch API.

@@ -239,9 +239,73 @@ is given in this option. This may be useful for adding metadata to your function
 
 ## <Icon name="ph:brackets-curly-bold"/> Handle Error
 
+<CodeFile>
+
+```typescript
+function oops() {
+	throw new Error("I did it again")
+}
+oops.rpc = true
+
+createPrimServer({
+	module: { hello },
+	handleError: true,
+})
+```
+
+</CodeFile>
+
+By default, Prim+RPC handles thrown errors so that errors thrown on the server are also thrown to the client and error
+mapping can be avoided (for instance, of HTTP codes or error codes). This option is true unless the
+[JSON Handler](#-json-handler) is overridden in which case it will default to false.
+
+If you explicitly set this option, this will override any default. However, if your JSON handler supports serializing
+errors and this option is set to true, this may lead to unexpected behavior.
+
 ## <Icon name="ph:brackets-curly-bold"/> Show Error Stack
 
+<CodeFile>
+
+```typescript
+createPrimServer({
+	handleError: true,
+	showErrorStack: process.env.NODE_ENV === "development",
+})
+```
+
+</CodeFile>
+
+When the [Handle Error](#-handle-error) option is set to true, Prim+RPC will send the error message to the client. On
+the server this could potentially include a stack trace. By default, Prim+RPC will not send the stack trace to the
+client. This option can be set to true to override this behavior. This is useful in development but depending on your
+security needs may not be wanted in production.
+
 ## <Icon name="ph:brackets-curly-bold"/> Handle Blobs
+
+<CodeFile>
+
+```typescript
+function index() {
+	return new File(["<p>I'm HTML</p>"], "index.html", { type: "text/html" })
+}
+index.rpc = true
+
+createPrimServer({
+	prefix: "/",
+	module: { default: index },
+	handleBlobs: true,
+})
+```
+
+</CodeFile>
+
+When using the default [JSON Handler](#-json-handler) or any JSON handler that serializes to a string, Prim+RPC will
+separate binary data given from the client or returned from the server into a separate object and replace that binary
+data with a reference to that object. This is because JSON cannot support binary data but generally Prim+RPC plugins can
+still transport this information separately.
+
+If your JSON handler supports binary data or you do not want to support binary data used with Prim+RPC, you can toggle
+this option off.
 
 <Aside type="error">
 
