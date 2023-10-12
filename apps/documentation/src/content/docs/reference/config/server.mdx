@@ -5,7 +5,11 @@ title: Server Configuration
 import CodeFile from "@/components/Code/CodeFile.astro"
 import Aside from "@/components/Markdown/Aside.astro"
 import ServerNotice from "@/components/Snippets/ServerNotice.astro"
+import CodeTabs from "@/components/Code/CodeTabs.react.tsx"
+import Code from "@/components/Code/Code.astro"
 import { Icon } from "astro-icon/components"
+import Button from "@/components/Markdown/Button.astro"
+import ButtonGroup from "@/components/Markdown/ButtonGroup.astro"
 
 <a href="/docs/reference/config" class="-mx-3 my-2 mb-4 btn btn-sm btn-ghost no-underline">
 	<Icon name="ph:caret-left-bold" />
@@ -42,7 +46,7 @@ regular JavaScript module and may either be imported from elsewhere or defined d
 
 <Aside>
 
-There's a variant of this option [available on the client](/docs/reference/config/client#-module).
+There's also a variant of this option [available on the client](/docs/reference/config/client#-module).
 
 </Aside>
 
@@ -54,19 +58,184 @@ one of two ways:
 
 ## <Icon name="ph:brackets-curly-bold"/> HTTP Endpoint
 
+<CodeFile>
+
+```typescript
+const endpoint = "https://example.com/prim"
+createPrimClient({ endpoint })
+```
+
+</CodeFile>
+
+While Prim+RPC can be used with many transports, it's often used with HTTP servers so, for convenience, an option to
+pass the server address is given on Prim+RPC itself and is shared with plugins.
+
 ## <Icon name="ph:brackets-curly-bold"/> WebSocket Endpoint
+
+<CodeFile>
+
+```typescript
+const wsEndpoint = "wss://example.com/prim"
+createPrimClient({ wsEndpoint })
+```
+
+</CodeFile>
+
+The WebSocket Endpoint option is given for convenience when using a plugin (usually a
+[Callback Handler](#-callback-handler)) that uses WebSockets. If not given, plugins will fallback to using the
+[HTTP Endpoint](#-http-endpoint) option (and change the protocol if needed).
 
 ## <Icon name="ph:brackets-curly-bold"/> Client Batch Time
 
+<CodeFile>
+
+```typescript
+const clientBatchTime = 15
+createPrimClient({ clientBatchTime })
+```
+
+</CodeFile>
+
+Prim+RPC can batch RPC so that multiple function calls are sent in a single request. By default, Prim+RPC will not batch
+RPC: the batch time is set to 0. If batching is needed, set this option to a value greater than 0. The value given is
+the time in milliseconds that Prim+RPC will wait before sending batched requests.
+
 ## <Icon name="ph:brackets-curly-bold"/> JSON Handler
+
+<CodeFile>
+
+```typescript
+const jsonHandler = { stringify: JSON.stringify, parse: JSON.parse }
+createPrimServer({ jsonHandler })
+```
+
+</CodeFile>
+
+Prim+RPC uses the default JSON "stringify" method to serialize RPC and the [destr](https://github.com/unjs/destr#readme)
+library to deserialize RPC by default. But this can be overridden by providing your own handler. Despite the name, this
+doesn't even necessarily need to be JSON.
+
+JSON handlers must provide two methods:
+
+- `.stringify(rpc)`: Takes RPC object and serializes into string or binary data
+- `.parse(obj)`: Takes string or binary data and deserializes it into the expected data structure
+
+If your JSON handler serializes into a string containing some form of JSON then this is all you need.
+
+If your JSON handler is another format (like YAML) or a binary format (like MsgPack), you may provide options to help
+plugins better understand these formats:
+
+- `.binary`: a boolean flag that states whether the format is binary or a string
+- `.mediaType`: the MIME type of the serialized data, useful for transporting over a network.
+
+Examples with popular libraries are [given in this documentation](/docs/reference/plugins/additional/json-handlers).
+
+<ButtonGroup>
+	<Button href="/docs/reference/plugins/additional/json-handlers" icon="ph:code-block-bold">
+		Example JSON Handlers
+	</Button>
+</ButtonGroup>
 
 ## <Icon name="ph:brackets-curly-bold"/> Method Plugin
 
+<CodeFile>
+
+```typescript
+import { createMethodPlugin } from "@doseofted/prim-rpc-plugins/browser-fetch"
+createPrimClient({ methodPlugin: createMethodPlugin() })
+```
+
+</CodeFile>
+
+The method plugin takes RPC made from the Prim+RPC client and transforms it into some form of a request that is sent off
+to another environment. The method plugin is intended to send this data to a corresponding
+[method handler](#-method-handler) on the server using the same transport. It makes a request to the server and awaits a
+response for each request.
+
+There are plugins already available to use but you may also create your own.
+
+<ButtonGroup>
+	<Button href="/docs/reference/plugins#client-plugins" icon="ph:code-block-bold">
+		Method Plugins
+	</Button>
+	<Button href="/docs/reference/create#method-plugin" icon="ph:lightbulb-bold">
+		Create a Method Plugin
+	</Button>
+</ButtonGroup>
+
 ## <Icon name="ph:brackets-curly-bold"/> Callback Plugin
+
+<CodeFile>
+
+```typescript
+import { createCallbackPlugin } from "@doseofted/prim-rpc-plugins/browser-websocket"
+createPrimClient({ callbackPlugin: createCallbackPlugin() })
+```
+
+</CodeFile>
+
+The client plugin is similar in a lot of ways to the [method plugin](#-method-plugin) but works differently under the
+hood. While the method plugin sends a request to the server and awaits a response, the callback plugin sends a request
+and then may receive multiple responses. This is because the callback plugin is used to listen to callbacks on the
+server and those callbacks may fire multiple times.
+
+There are plugins already available to use but you may also create your own.
+
+<ButtonGroup>
+	<Button href="/docs/reference/plugins#client-plugins" icon="ph:code-block-bold">
+		Callback Plugins
+	</Button>
+	<Button href="/docs/reference/create#callback-plugin" icon="ph:lightbulb-bold">
+		Create a Callback Plugin
+	</Button>
+</ButtonGroup>
 
 ## <Icon name="ph:brackets-curly-bold"/> Allow List
 
+<CodeFile>
+
+```typescript
+const module = {
+	default: () => "Hi!",
+	good: { morning: () => "Good morning!" },
+}
+const allowList = {
+	default: true,
+	good: { morning: true },
+}
+createPrimServer({ module, allowList })
+```
+
+</CodeFile>
+
+By default, functions given to Prim+RPC are not allowed to be called unless a `.rpc` property is set on the function or
+that function is added to an allow list.
+
+The Allow List is an object that resembles the module that you give to Prim+RPC where each function name is a key and
+the value is a boolean flag stating whether that function should be considered RPC.
+
 ## <Icon name="ph:brackets-curly-bold"/> Methods on Methods
+
+<CodeFile>
+
+```typescript
+function hello() {
+	return "Hello from Prim+RPC!"
+}
+hello.rpc = true
+hello.documentation = () => "I say hello"
+
+createPrimServer({
+	module: { hello },
+	methodsOnMethods: ["documentation"],
+})
+```
+
+</CodeFile>
+
+By default, functions are not allowed to be called with Prim+RPC if, anywhere in the chain, it is defined on another
+function. The exception to this rule is if a method is defined directly on another method _and_ the name of that method
+is given in this option. This may be useful for adding metadata to your functions.
 
 ## <Icon name="ph:brackets-curly-bold"/> Handle Error
 
