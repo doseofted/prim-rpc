@@ -14,6 +14,12 @@ import { Icon } from "astro-icon/components"
 
 # {frontmatter.title}
 
+<Aside type="error">
+
+**Note to self:** this page currently contains all options and should be split up between server and client later.
+
+</Aside>
+
 ## <Icon name="ph:brackets-curly-bold"/> Module
 
 <CodeFile>
@@ -31,32 +37,55 @@ createPrimServer({
 
 </CodeFile>
 
+The module provided to Prim+RPC's server contains functions intended to be exposed as RPC on the client. This is just a
+regular JavaScript module and may either be imported from elsewhere or defined directly on this option.
+
 <Aside>
 
-This option can also be used from [client options](/docs/reference/config/client#-module).
+There's a variant of this option [available on the client](/docs/reference/config/client#-module).
 
 </Aside>
 
-The module provided to Prim+RPC contains functions intended to be exposed as RPC.
+In addition to passing your functions to this option, Prim+RPC requires that you explicitly mark functions as RPC, in
+one of two ways:
+
+- Define a `.rpc` property on each of your functions with a value of `true`
+- Or add your function to the [Allow List](#-allow-list) option
 
 ## <Icon name="ph:brackets-curly-bold"/> HTTP Endpoint
 
-This option extends the [client configuration](/docs/reference/config/client#-http-endpoint).
-
-<ServerNotice />
-
 ## <Icon name="ph:brackets-curly-bold"/> WebSocket Endpoint
-
-This option extends the [client configuration](/docs/reference/config/client#-websocket-endpoint).
-
-<ServerNotice />
 
 ## <Icon name="ph:brackets-curly-bold"/> Client Batch Time
 
-This option extends the [client configuration](/docs/reference/config/client#-client-batch-time).
-
-<ServerNotice />
-
 ## <Icon name="ph:brackets-curly-bold"/> JSON Handler
 
-This option extends the [client configuration](/docs/reference/config/client#-client-batch-time).
+## <Icon name="ph:brackets-curly-bold"/> Method Plugin
+
+## <Icon name="ph:brackets-curly-bold"/> Callback Plugin
+
+## <Icon name="ph:brackets-curly-bold"/> Allow List
+
+## <Icon name="ph:brackets-curly-bold"/> Methods on Methods
+
+## <Icon name="ph:brackets-curly-bold"/> Handle Error
+
+## <Icon name="ph:brackets-curly-bold"/> Show Error Stack
+
+## <Icon name="ph:brackets-curly-bold"/> Handle Blobs
+
+<Aside type="error">
+
+**Note to self:** the following are server only options.
+
+</Aside>
+
+## <Icon name="ph:brackets-curly-bold"/> Prefix
+
+## <Icon name="ph:brackets-curly-bold"/> Method Handler
+
+## <Icon name="ph:brackets-curly-bold"/> Callback Handler
+
+## <Icon name="ph:brackets-curly-bold"/> Pre-Call Hook
+
+## <Icon name="ph:brackets-curly-bold"/> Post-Call Hook
