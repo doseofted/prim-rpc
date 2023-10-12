@@ -50,7 +50,14 @@ export const documentationContents = (collection = "docs"): TableOfContents => [
 	},
 ]
 
-const pluginTypes = z.enum(["method-handler", "method-plugin", "callback-handler", "callback-plugin", "json-handler"])
+const pluginTypes = z.enum([
+	"method-handler",
+	"method-plugin",
+	"callback-handler",
+	"callback-plugin",
+	"json-handler",
+	"validator",
+])
 export type PluginType = z.infer<typeof pluginTypes>
 
 export type DocumentationCollection = (typeof documentationCollections)[number]
@@ -70,7 +77,7 @@ export const collections = {
 			title: z.string(),
 			icon: z.string().optional(),
 			type: pluginTypes,
-			transport: z.enum(["http", "ws", "event", "worker", "socket-io", "electron", "node"]),
+			transport: z.enum(["http", "ws", "event", "worker", "socket-io", "electron", "node", "inapplicable"]),
 			features: z.array(z.string()).optional(),
 			status: z.enum(["planned", "available", "deprecated"]),
 		}),

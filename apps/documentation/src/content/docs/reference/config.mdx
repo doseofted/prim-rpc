@@ -18,7 +18,8 @@ Some options should be synced between server and client and will be marked accor
 
 <CodeFile>
 
-```ts
+```typescript
+import { createPrimServer } from "@doseofted/prim-rpc"
 createPrimServer(options: PrimServerOptions): PrimServer
 ```
 
@@ -48,7 +49,8 @@ This function is given a single argument which is its configuration. You may ref
 
 <CodeFile>
 
-```ts
+```typescript
+import { createPrimClient } from "@doseofted/prim-rpc"
 createPrimClient<ModuleType>(options: PrimOptions): PrimClient
 ```
 
@@ -76,13 +78,13 @@ takes a single argument which is the client configuration. You may reference
 
 <CodeFile>
 
-```ts
-// create plugins to use with client/server
-const plugins = createPrimTestingPlugins<Ctx>(exampleContext: Ctx)
-const { methodHandler, callbackHandler } = plugins // server
-const { methodPlugin, callbackPlugin } = plugins // client
-// or create client/server pre-configured to use test plugins
+```typescript
+import { testing } from "@doseofted/prim-rpc"
+const { createPrimTestingSuite, createPrimTestingPlugins } = testing
+// create client/server pre-configured to use test plugins
 const { client, server } = createPrimTestingSuite<Module, Ctx>(serverOpts: PrimOptions, clientOpts: PrimServerOptions, exampleContext: Ctx)
+// or create plugins to use with client/server
+const plugins = createPrimTestingPlugins<Ctx>(exampleContext: Ctx)
 ```
 
 </CodeFile>
