@@ -315,10 +315,100 @@ this option off.
 
 ## <Icon name="ph:brackets-curly-bold"/> Prefix
 
+<CodeFile>
+
+```typescript
+const prefix = "/prim"
+createPrimServer({ prefix })
+```
+
+</CodeFile>
+
+The Prefix option is a convenience option to be used by plugins that communicate over a specific address, specifically
+HTTP and WebSocket servers. It can be used by plugins to establish a path of a URL. By default, it is set to
+`/prim{:txt}` so as not to collide with other possible routes on an existing server. If Prim+RPC is the only service
+used with a server, you may change this to `/{:txt}` (or any other path that you'd like).
+
 ## <Icon name="ph:brackets-curly-bold"/> Method Handler
+
+<CodeFile>
+
+```typescript
+import { createMethodHandler } from "@doseofted/prim-rpc-plugins/hono"
+import { Hono } from "hono"
+
+const app = new Hono()
+const methodHandler = createMethodHandler({ app })
+createPrimServer({ methodHandler })
+```
+
+</CodeFile>
+
+The Method Handler takes a request from the server and extracts RPC from it before sending it to the Prim+RPC server. It
+also formats the RPC back into a response for your chosen server. Each method handler on the server has a corresponding
+[Method Plugin](#-method-plugin) on the client that can understand communicate with it.
 
 ## <Icon name="ph:brackets-curly-bold"/> Callback Handler
 
+<CodeFile>
+
+```typescript
+import { createCallbackHandler } from "@doseofted/prim-rpc-plugins/ws"
+import { WebSocketServer } from "ws"
+
+const wss = new WebSocketServer({ port: 1234 })
+const callbackHandler = createCallbackHandler({ wss })
+createPrimServer({ callbackHandler })
+```
+
+</CodeFile>
+
+The Callback Handler is similar to the [Method Handler](#-method-handler) but is primarily intended to handle callbacks
+given on functions. The primary difference between the two is that the Method Handler sends a response for every request
+while the Callback Handler may send multiple responses for a request (because callbacks may be fired multiple times).
+
+It can be used alone or alongside a Method Handler, Prim+RPC is able to determine which plugin to use. Each Callback
+Handler on the server has a corresponding [Callback Plugin](#-callback-plugin) on the client.
+
 ## <Icon name="ph:brackets-curly-bold"/> Pre-Call Hook
 
+<CodeFile>
+
+```typescript
+import { parse } from "valibot"
+
+const prim = createPrimServer({
+	preCall(args, func) {
+		if ("params" in func) return parse(func.params, args)
+		throw new Error("Argument validation is required")
+	},
+})
+```
+
+</CodeFile>
+
+The pre-call hook is optional and is executed _before_ calling a given function. It is given the arguments passed to the
+server and the function that is being called. **Do not call the function inside of the hook** as Prim+RPC will call this
+function itself (resulting in the function being called twice). This may be useful for logging, validation, or adding
+and processing metadata attached to a function.
+
 ## <Icon name="ph:brackets-curly-bold"/> Post-Call Hook
+
+<CodeFile>
+
+```typescript
+import { parse } from "valibot"
+
+const prim = createPrimServer({
+	postCall(returns, func) {
+		if ("returns" in func) return parse(func.returns, returns)
+		throw new Error("Result validation is required")
+	},
+})
+```
+
+</CodeFile>
+
+The post-call hook is optional and is executed _after_ calling a given function. It is given the return value of the
+function given to the server and the function that was called. **Do not call the function inside of the hook** as it
+will be executed a second time.
