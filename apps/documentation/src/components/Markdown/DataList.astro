@@ -1,22 +1,24 @@
 ---
 import Collapse from "./Collapse.astro"
+import DataListItem from "./DataListItem.astro"
 
 interface Props {
 	title?: string
 	data?: Record<string, string>
 }
 const { title = "Data", data } = Astro.props
+
+const contentsGiven = Astro.slots.has("default")
 ---
 
-<Collapse title={title}>
-	<div class="grid grid-cols-3 gap-6 py-4">
+<Collapse title={title} checked>
+	<ul class="grid grid-cols-3 gap-6 py-4">
 		{
-			Object.entries(data ?? {}).map(([key, value]) => (
-				<div class="flex flex-col gap-2 text-sm">
-					<div class="capitalize font-semibold">{key}</div>
-					<div>{value}</div>
-				</div>
-			))
+			contentsGiven ? (
+				<slot />
+			) : (
+				Object.entries(data ?? {}).map(([key, value]) => <DataListItem key={key} value={value} />)
+			)
 		}
-	</div>
+	</ul>
 </Collapse>

@@ -64,6 +64,9 @@ export type PluginType = z.infer<typeof pluginTypes>
 export type DocumentationCollection = (typeof documentationCollections)[number]
 export type CollectionType<C extends DocumentationCollection> = Awaited<ReturnType<typeof getCollection<C>>>[number]
 
+const transportTypes = z.enum(["http", "ws", "event", "worker", "socket-io", "electron", "node", "inapplicable"])
+export type TransportType = z.infer<typeof transportTypes>
+
 export const collections = {
 	docs: defineCollection({
 		type: "content",
@@ -78,9 +81,10 @@ export const collections = {
 			title: z.string(),
 			icon: z.string().optional(),
 			type: pluginTypes,
-			transport: z.enum(["http", "ws", "event", "worker", "socket-io", "electron", "node", "inapplicable"]),
+			transport: transportTypes,
 			features: z.array(z.string()).optional(),
 			status: z.enum(["planned", "available", "deprecated"]),
+			links: z.object({ name: z.string(), href: z.string() }).array().optional(),
 		}),
 	}),
 	api: defineCollection({
