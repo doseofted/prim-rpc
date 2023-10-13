@@ -18,12 +18,6 @@ import ButtonGroup from "@/components/Markdown/ButtonGroup.astro"
 
 # {frontmatter.title}
 
-<Aside type="error">
-
-**Note to self:** this page currently contains all options and should be split up between server and client later.
-
-</Aside>
-
 ## <Icon name="ph:brackets-curly-bold"/> Module
 
 <CodeFile>
@@ -56,49 +50,11 @@ one of two ways:
 - Define a `.rpc` property on each of your functions with a value of `true`
 - Or add your function to the [Allow List](#-allow-list) option
 
-## <Icon name="ph:brackets-curly-bold"/> HTTP Endpoint
+{/* ## <Icon name="ph:brackets-curly-bold"/> HTTP Endpoint */}
 
-<CodeFile>
+{/* ## <Icon name="ph:brackets-curly-bold"/> WebSocket Endpoint */}
 
-```typescript
-const endpoint = "https://example.com/prim"
-createPrimClient({ endpoint })
-```
-
-</CodeFile>
-
-While Prim+RPC can be used with many transports, it's often used with HTTP servers so, for convenience, an option to
-pass the server address is given on Prim+RPC itself and is shared with plugins.
-
-## <Icon name="ph:brackets-curly-bold"/> WebSocket Endpoint
-
-<CodeFile>
-
-```typescript
-const wsEndpoint = "wss://example.com/prim"
-createPrimClient({ wsEndpoint })
-```
-
-</CodeFile>
-
-The WebSocket Endpoint option is given for convenience when using a plugin (usually a
-[Callback Handler](#-callback-handler)) that uses WebSockets. If not given, plugins will fallback to using the
-[HTTP Endpoint](#-http-endpoint) option (and change the protocol if needed).
-
-## <Icon name="ph:brackets-curly-bold"/> Client Batch Time
-
-<CodeFile>
-
-```typescript
-const clientBatchTime = 15
-createPrimClient({ clientBatchTime })
-```
-
-</CodeFile>
-
-Prim+RPC can batch RPC so that multiple function calls are sent in a single request. By default, Prim+RPC will not batch
-RPC: the batch time is set to 0. If batching is needed, set this option to a value greater than 0. The value given is
-the time in milliseconds that Prim+RPC will wait before sending batched requests.
+{/* ## <Icon name="ph:brackets-curly-bold"/> Client Batch Time */}
 
 ## <Icon name="ph:brackets-curly-bold"/> JSON Handler
 
@@ -136,59 +92,9 @@ Examples with popular libraries are [given in this documentation](/docs/referenc
 	</Button>
 </ButtonGroup>
 
-## <Icon name="ph:brackets-curly-bold"/> Method Plugin
+{/* ## <Icon name="ph:brackets-curly-bold"/> Method Plugin */}
 
-<CodeFile>
-
-```typescript
-import { createMethodPlugin } from "@doseofted/prim-rpc-plugins/browser-fetch"
-createPrimClient({ methodPlugin: createMethodPlugin() })
-```
-
-</CodeFile>
-
-The method plugin takes RPC made from the Prim+RPC client and transforms it into some form of a request that is sent off
-to another environment. The method plugin is intended to send this data to a corresponding
-[method handler](#-method-handler) on the server using the same transport. It makes a request to the server and awaits a
-response for each request.
-
-There are plugins already available to use but you may also create your own.
-
-<ButtonGroup>
-	<Button href="/docs/reference/plugins#client-plugins" icon="ph:code-block-bold">
-		Method Plugins
-	</Button>
-	<Button href="/docs/reference/create#method-plugin" icon="ph:lightbulb-bold">
-		Create a Method Plugin
-	</Button>
-</ButtonGroup>
-
-## <Icon name="ph:brackets-curly-bold"/> Callback Plugin
-
-<CodeFile>
-
-```typescript
-import { createCallbackPlugin } from "@doseofted/prim-rpc-plugins/browser-websocket"
-createPrimClient({ callbackPlugin: createCallbackPlugin() })
-```
-
-</CodeFile>
-
-The client plugin is similar in a lot of ways to the [method plugin](#-method-plugin) but works differently under the
-hood. While the method plugin sends a request to the server and awaits a response, the callback plugin sends a request
-and then may receive multiple responses. This is because the callback plugin is used to listen to callbacks on the
-server and those callbacks may fire multiple times.
-
-There are plugins already available to use but you may also create your own.
-
-<ButtonGroup>
-	<Button href="/docs/reference/plugins#client-plugins" icon="ph:code-block-bold">
-		Callback Plugins
-	</Button>
-	<Button href="/docs/reference/create#callback-plugin" icon="ph:lightbulb-bold">
-		Create a Callback Plugin
-	</Button>
-</ButtonGroup>
+{/* ## <Icon name="ph:brackets-curly-bold"/> Callback Plugin */}
 
 ## <Icon name="ph:brackets-curly-bold"/> Allow List
 
@@ -237,30 +143,7 @@ By default, functions are not allowed to be called with Prim+RPC if, anywhere in
 function. The exception to this rule is if a method is defined directly on another method _and_ the name of that method
 is given in this option. This may be useful for adding metadata to your functions.
 
-## <Icon name="ph:brackets-curly-bold"/> Handle Error
-
-<CodeFile>
-
-```typescript
-function oops() {
-	throw new Error("I did it again")
-}
-oops.rpc = true
-
-createPrimServer({
-	module: { hello },
-	handleError: true,
-})
-```
-
-</CodeFile>
-
-By default, Prim+RPC handles thrown errors so that errors thrown on the server are also thrown to the client and error
-mapping can be avoided (for instance, of HTTP codes or error codes). This option is true unless the
-[JSON Handler](#-json-handler) is overridden in which case it will default to false.
-
-If you explicitly set this option, this will override any default. However, if your JSON handler supports serializing
-errors and this option is set to true, this may lead to unexpected behavior.
+{/* ## <Icon name="ph:brackets-curly-bold"/> Handle Error */}
 
 ## <Icon name="ph:brackets-curly-bold"/> Show Error Stack
 
@@ -280,38 +163,7 @@ the server this could potentially include a stack trace. By default, Prim+RPC wi
 client. This option can be set to true to override this behavior. This is useful in development but depending on your
 security needs may not be wanted in production.
 
-## <Icon name="ph:brackets-curly-bold"/> Handle Blobs
-
-<CodeFile>
-
-```typescript
-function index() {
-	return new File(["<p>I'm HTML</p>"], "index.html", { type: "text/html" })
-}
-index.rpc = true
-
-createPrimServer({
-	prefix: "/",
-	module: { default: index },
-	handleBlobs: true,
-})
-```
-
-</CodeFile>
-
-When using the default [JSON Handler](#-json-handler) or any JSON handler that serializes to a string, Prim+RPC will
-separate binary data given from the client or returned from the server into a separate object and replace that binary
-data with a reference to that object. This is because JSON cannot support binary data but generally Prim+RPC plugins can
-still transport this information separately.
-
-If your JSON handler supports binary data or you do not want to support binary data used with Prim+RPC, you can toggle
-this option off.
-
-<Aside type="error">
-
-**Note to self:** the following are server only options.
-
-</Aside>
+{/* ## <Icon name="ph:brackets-curly-bold"/> Handle Blobs */}
 
 ## <Icon name="ph:brackets-curly-bold"/> Prefix
 
@@ -348,6 +200,17 @@ The Method Handler takes a request from the server and extracts RPC from it befo
 also formats the RPC back into a response for your chosen server. Each method handler on the server has a corresponding
 [Method Plugin](#-method-plugin) on the client that can understand communicate with it.
 
+There are handlers already available to use but you may also create your own.
+
+<ButtonGroup>
+	<Button href="/docs/reference/plugins#server-handlers" icon="ph:code-block-bold">
+		Method Handlers
+	</Button>
+	<Button href="/docs/reference/create#method-handler" icon="ph:lightbulb-bold">
+		Create a Method Handler
+	</Button>
+</ButtonGroup>
+
 ## <Icon name="ph:brackets-curly-bold"/> Callback Handler
 
 <CodeFile>
@@ -369,6 +232,17 @@ while the Callback Handler may send multiple responses for a request (because ca
 
 It can be used alone or alongside a Method Handler, Prim+RPC is able to determine which plugin to use. Each Callback
 Handler on the server has a corresponding [Callback Plugin](#-callback-plugin) on the client.
+
+There are handlers already available to use but you may also create your own.
+
+<ButtonGroup>
+	<Button href="/docs/reference/plugins#server-handlers" icon="ph:code-block-bold">
+		Callback Handlers
+	</Button>
+	<Button href="/docs/reference/create#callback-handler" icon="ph:lightbulb-bold">
+		Create a Callback Handler
+	</Button>
+</ButtonGroup>
 
 ## <Icon name="ph:brackets-curly-bold"/> Pre-Call Hook
 
