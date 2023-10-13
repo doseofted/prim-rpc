@@ -1,5 +1,5 @@
 ---
-title: Client Configuration
+title: Shared Configuration
 ---
 
 import CodeFile from "@/components/Code/CodeFile.astro"
@@ -18,27 +18,43 @@ import ButtonGroup from "@/components/Markdown/ButtonGroup.astro"
 
 # {frontmatter.title}
 
+These options can be used from both the server and the client. Because the server may act as a client if a function is
+unavailable on the server, most client options are also available on the server.
+
+If an option should be synced to use the same value on both the server and client, it will be marked accordingly.
+
 ## <Icon name="ph:brackets-curly-bold"/> Module
 
 <CodeFile>
 
 ```typescript
-const module = typeof window === "undefined" ? import("./example") : null
-createPrimClient({ module })
+function hello() {
+	return "Hello from Prim+RPC!"
+}
+hello.rpc = true
+
+createPrimServer({
+	module: { hello },
+})
 ```
 
 </CodeFile>
 
+The module provided to Prim+RPC's server contains functions intended to be exposed as RPC on the client. This is just a
+regular JavaScript module and may either be imported from elsewhere or defined directly on this option.
+
 <Aside>
 
-This option is [primarily used on the server](/docs/reference/config/server#-module).
+This option may also be conditionally passed to the client. This is useful in fullstack frameworks where the client has
+direct access when used on the server and remote access when used off of the server.
 
 </Aside>
 
-The Module option primarily is intended for the Prim+RPC server so that server-side functions can be called from the
-client. However you may want to conditionally pass the module to the client, for instance inside of fullstack frameworks
-like Next.js where the client can have direct access to the module on the server but remote access when called outside
-of the server.
+In addition to passing your functions to this option, Prim+RPC requires that you explicitly mark functions as RPC, in
+one of two ways:
+
+- Define a `.rpc` property on each of your functions with a value of `true`
+- Or add your function to the [Allow List](#-allow-list) option
 
 ## <Icon name="ph:brackets-curly-bold"/> HTTP Endpoint
 
@@ -86,11 +102,39 @@ the time in milliseconds that Prim+RPC will wait before sending batched requests
 
 ## <Icon name="ph:brackets-curly-bold"/> JSON Handler
 
-<Aside>
+<CodeFile>
 
-This option is [described in the server options](/docs/reference/config/server#-module).
+```typescript
+const jsonHandler = { stringify: JSON.stringify, parse: JSON.parse }
+createPrimServer({ jsonHandler })
+```
 
-</Aside>
+</CodeFile>
+
+Prim+RPC uses the default JSON "stringify" method to serialize RPC and the [destr](https://github.com/unjs/destr#readme)
+library to deserialize RPC by default. But this can be overridden by providing your own handler. Despite the name, this
+doesn't even necessarily need to be JSON.
+
+JSON handlers must provide two methods:
+
+- `.stringify(rpc)`: Takes RPC object and serializes into string or binary data
+- `.parse(obj)`: Takes string or binary data and deserializes it into the expected data structure
+
+If your JSON handler serializes into a string containing some form of JSON then this is all you need.
+
+If your JSON handler is another format (like YAML) or a binary format (like MsgPack), you may provide options to help
+plugins better understand these formats:
+
+- `.binary`: a boolean flag that states whether the format is binary or a string
+- `.mediaType`: the MIME type of the serialized data, useful for transporting over a network.
+
+Examples with popular libraries are [given in this documentation](/docs/reference/plugins/additional/json-handlers).
+
+<ButtonGroup>
+	<Button href="/docs/reference/plugins/additional/json-handlers" icon="ph:code-block-bold">
+		Example JSON Handlers
+	</Button>
+</ButtonGroup>
 
 ## <Icon name="ph:brackets-curly-bold"/> Method Plugin
 
@@ -146,10 +190,6 @@ There are plugins already available to use but you may also create your own.
 	</Button>
 </ButtonGroup>
 
-{/* ## <Icon name="ph:brackets-curly-bold"/> Allow List */}
-
-{/* ## <Icon name="ph:brackets-curly-bold"/> Methods on Methods */}
-
 ## <Icon name="ph:brackets-curly-bold"/> Handle Error
 
 <CodeFile>
@@ -174,8 +214,6 @@ mapping can be avoided (for instance, of HTTP codes or error codes). This option
 
 If you explicitly set this option, this will override any default. However, if your JSON handler supports serializing
 errors and this option is set to true, this may lead to unexpected behavior.
-
-{/* ## <Icon name="ph:brackets-curly-bold"/> Show Error Stack */}
 
 ## <Icon name="ph:brackets-curly-bold"/> Handle Blobs
 

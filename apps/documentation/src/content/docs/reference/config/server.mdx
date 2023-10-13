@@ -18,83 +18,14 @@ import ButtonGroup from "@/components/Markdown/ButtonGroup.astro"
 
 # {frontmatter.title}
 
-## <Icon name="ph:brackets-curly-bold"/> Module
-
-<CodeFile>
-
-```typescript
-function hello() {
-	return "Hello from Prim+RPC!"
-}
-hello.rpc = true
-
-createPrimServer({
-	module: { hello },
-})
-```
-
-</CodeFile>
-
-The module provided to Prim+RPC's server contains functions intended to be exposed as RPC on the client. This is just a
-regular JavaScript module and may either be imported from elsewhere or defined directly on this option.
-
-<Aside>
-
-There's also a variant of this option [available on the client](/docs/reference/config/client#-module).
-
-</Aside>
-
-In addition to passing your functions to this option, Prim+RPC requires that you explicitly mark functions as RPC, in
-one of two ways:
-
-- Define a `.rpc` property on each of your functions with a value of `true`
-- Or add your function to the [Allow List](#-allow-list) option
-
-{/* ## <Icon name="ph:brackets-curly-bold"/> HTTP Endpoint */}
-
-{/* ## <Icon name="ph:brackets-curly-bold"/> WebSocket Endpoint */}
-
-{/* ## <Icon name="ph:brackets-curly-bold"/> Client Batch Time */}
-
-## <Icon name="ph:brackets-curly-bold"/> JSON Handler
-
-<CodeFile>
-
-```typescript
-const jsonHandler = { stringify: JSON.stringify, parse: JSON.parse }
-createPrimServer({ jsonHandler })
-```
-
-</CodeFile>
-
-Prim+RPC uses the default JSON "stringify" method to serialize RPC and the [destr](https://github.com/unjs/destr#readme)
-library to deserialize RPC by default. But this can be overridden by providing your own handler. Despite the name, this
-doesn't even necessarily need to be JSON.
-
-JSON handlers must provide two methods:
-
-- `.stringify(rpc)`: Takes RPC object and serializes into string or binary data
-- `.parse(obj)`: Takes string or binary data and deserializes it into the expected data structure
-
-If your JSON handler serializes into a string containing some form of JSON then this is all you need.
-
-If your JSON handler is another format (like YAML) or a binary format (like MsgPack), you may provide options to help
-plugins better understand these formats:
-
-- `.binary`: a boolean flag that states whether the format is binary or a string
-- `.mediaType`: the MIME type of the serialized data, useful for transporting over a network.
-
-Examples with popular libraries are [given in this documentation](/docs/reference/plugins/additional/json-handlers).
+These are options specific to the server. Options that work on both the server and the client are documented in the
+[shared configuration](/docs/reference/config/shared).
 
 <ButtonGroup>
-	<Button href="/docs/reference/plugins/additional/json-handlers" icon="ph:code-block-bold">
-		Example JSON Handlers
+	<Button href="/docs/reference/config/shared" icon="ph:wrench-bold">
+		Shared Configuration
 	</Button>
 </ButtonGroup>
-
-{/* ## <Icon name="ph:brackets-curly-bold"/> Method Plugin */}
-
-{/* ## <Icon name="ph:brackets-curly-bold"/> Callback Plugin */}
 
 ## <Icon name="ph:brackets-curly-bold"/> Allow List
 
@@ -143,8 +74,6 @@ By default, functions are not allowed to be called with Prim+RPC if, anywhere in
 function. The exception to this rule is if a method is defined directly on another method _and_ the name of that method
 is given in this option. This may be useful for adding metadata to your functions.
 
-{/* ## <Icon name="ph:brackets-curly-bold"/> Handle Error */}
-
 ## <Icon name="ph:brackets-curly-bold"/> Show Error Stack
 
 <CodeFile>
@@ -162,8 +91,6 @@ When the [Handle Error](#-handle-error) option is set to true, Prim+RPC will sen
 the server this could potentially include a stack trace. By default, Prim+RPC will not send the stack trace to the
 client. This option can be set to true to override this behavior. This is useful in development but depending on your
 security needs may not be wanted in production.
-
-{/* ## <Icon name="ph:brackets-curly-bold"/> Handle Blobs */}
 
 ## <Icon name="ph:brackets-curly-bold"/> Prefix
 
