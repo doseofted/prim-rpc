@@ -2,103 +2,432 @@
 title: Configuration
 ---
 
-# {frontmatter.title}
-
-import { Icon } from "astro-icon/components"
 import CodeFile from "@/components/Code/CodeFile.astro"
+import Aside from "@/components/Markdown/Aside.astro"
+import ServerNotice from "@/components/Snippets/ServerNotice.astro"
+import CodeTabs from "@/components/Code/CodeTabs.react.tsx"
+import Code from "@/components/Code/Code.astro"
+import { Icon } from "astro-icon/components"
 import Button from "@/components/Markdown/Button.astro"
 import ButtonGroup from "@/components/Markdown/ButtonGroup.astro"
 
-Prim+RPC exports two primary functions: `createPrimClient()` and `createPrimServer()`. Both functions take a
-configuration object as their only argument and the server configuration extends the client configuration.
+# {frontmatter.title}
 
-Some options should be synced between server and client and will be marked accordingly.
+Both the Prim+RPC server and client take an options argument to be configured. The server configuration extends the
+client configuration for two reasons: one, some options should be synced between server and client (such as overrides to
+RPC serialization) and two, the server can optionally make use of its own client if a function is unavailable.
 
-## <Icon name="ph:function-bold"/> Create Server
-
-<CodeFile>
-
-```typescript
-import { createPrimServer } from "@doseofted/prim-rpc"
-createPrimServer(options: PrimServerOptions): PrimServer
-```
-
-</CodeFile>
-
-The Prim+RPC server is the tool that transforms requests into RPC and RPC results into responses. It is a misnomer as it
-is not a server per se but is a framework agnostic utility to work with the server of your choice.
-
-It works with the server of your choice through handler plugins: the method handler handles method calls, the callback
-handler optionally handles callbacks on those methods. They are separate plugins because of their design: while the
-method handler has a single response for every request (a function result for every call), the callback handler can
-return multiple responses for a request (because callbacks can be fired multiple times).
-
-This function is given a single argument which is its configuration. You may reference
-[server options](/docs/reference/config/server) for more details.
+If an option should be synced to use the same value on both server and client, it will be marked accordingly. You can
+reference the functions exported by Prim+RPC in the API reference.
 
 <ButtonGroup>
-	<Button href="/docs/reference/config/server" icon="ph:wrench-bold">
-		Server Options
-	</Button>
-	<Button href="/docs/reference/plugins#server-handlers" icon="ph:code-block-bold">
-		Available Handlers
+	<Button href="/docs/reference/api" icon="ph:code-block-bold">
+		API Reference
 	</Button>
 </ButtonGroup>
 
-## <Icon name="ph:function-bold"/> Create Client
+## <Icon name="ph:brackets-curly-bold"/> Module
 
 <CodeFile>
 
 ```typescript
-import { createPrimClient } from "@doseofted/prim-rpc"
-createPrimClient<ModuleType>(options: PrimOptions): PrimClient
+function hello() {
+	return "Hello from Prim+RPC!"
+}
+hello.rpc = true
+
+createPrimServer({
+	module: { hello },
+})
 ```
 
 </CodeFile>
 
-The Prim+RPC client is a JavaScript Proxy that transforms method calls into requests and transforms responses back into
-a useable result. Like its server counterpart, it is not responsible for the transport. Instead, this responsibility is
-given to plugins: method plugins handle method calls and callback plugins handle callbacks. These client plugins
-correspond with handler plugins on the server of the same name.
+The module provided to Prim+RPC's server contains functions intended to be exposed as RPC on the client. This is just a
+regular JavaScript module and may either be imported from elsewhere or defined directly on this option.
 
-This function takes a type parameter (if using TypeScript) that is the type of the module given to the server. It also
-takes a single argument which is the client configuration. You may reference
-[shared options](/docs/reference/config/shared) for more details.
+<Aside>
+
+This option may also be conditionally passed to the client. This is useful in fullstack frameworks where the client has
+direct access when used on the server and remote access when used off of the server.
+
+</Aside>
+
+In addition to passing your functions to this option, Prim+RPC requires that you explicitly mark functions as RPC, in
+one of two ways:
+
+- Define a `.rpc` property on each of your functions with a value of `true`
+- Or add your function to the [Allow List](#-allow-list) option
+
+## <Icon name="ph:brackets-curly-bold"/> HTTP Endpoint
+
+<CodeFile>
+
+```typescript
+const endpoint = "https://example.com/prim"
+createPrimClient({ endpoint })
+```
+
+</CodeFile>
+
+While Prim+RPC can be used with many transports, it's often used with HTTP servers so, for convenience, an option to
+pass the server address is given on Prim+RPC itself and is shared with plugins.
+
+## <Icon name="ph:brackets-curly-bold"/> WebSocket Endpoint
+
+<CodeFile>
+
+```typescript
+const wsEndpoint = "wss://example.com/prim"
+createPrimClient({ wsEndpoint })
+```
+
+</CodeFile>
+
+The WebSocket Endpoint option is given for convenience when using a plugin (usually a
+[Callback Handler](#-callback-handler)) that uses WebSockets. If not given, plugins will fallback to using the
+[HTTP Endpoint](#-http-endpoint) option (and change the protocol if needed).
+
+## <Icon name="ph:brackets-curly-bold"/> Client Batch Time
+
+<CodeFile>
+
+```typescript
+const clientBatchTime = 15
+createPrimClient({ clientBatchTime })
+```
+
+</CodeFile>
+
+Prim+RPC can batch RPC so that multiple function calls are sent in a single request. By default, Prim+RPC will not batch
+RPC: the batch time is set to 0. If batching is needed, set this option to a value greater than 0. The value given is
+the time in milliseconds that Prim+RPC will wait before sending batched requests.
+
+## <Icon name="ph:brackets-curly-bold"/> JSON Handler
+
+<CodeFile>
+
+```typescript
+const jsonHandler = { stringify: JSON.stringify, parse: JSON.parse }
+createPrimServer({ jsonHandler })
+```
+
+</CodeFile>
+
+Prim+RPC uses the default JSON "stringify" method to serialize RPC and the [destr](https://github.com/unjs/destr#readme)
+library to deserialize RPC by default. But this can be overridden by providing your own handler. Despite the name, this
+doesn't even necessarily need to be JSON.
+
+JSON handlers must provide two methods:
+
+- `.stringify(rpc)`: Takes RPC object and serializes into string or binary data
+- `.parse(obj)`: Takes string or binary data and deserializes it into the expected data structure
+
+If your JSON handler serializes into a string containing some form of JSON then this is all you need.
+
+If your JSON handler is another format (like YAML) or a binary format (like MsgPack), you may provide options to help
+plugins better understand these formats:
+
+- `.binary`: a boolean flag that states whether the format is binary or a string
+- `.mediaType`: the MIME type of the serialized data, useful for transporting over a network.
+
+Examples with popular libraries are [given in this documentation](/docs/reference/plugins/additional/json-handlers).
 
 <ButtonGroup>
-	<Button href="/docs/reference/config/shared" icon="ph:wrench-bold">
-		Shared Options
+	<Button href="/docs/reference/plugins/additional/json-handlers" icon="ph:code-block-bold">
+		Example JSON Handlers
 	</Button>
+</ButtonGroup>
+
+## <Icon name="ph:brackets-curly-bold"/> Method Plugin
+
+<CodeFile>
+
+```typescript
+import { createMethodPlugin } from "@doseofted/prim-rpc-plugins/browser-fetch"
+createPrimClient({ methodPlugin: createMethodPlugin() })
+```
+
+</CodeFile>
+
+The method plugin takes RPC made from the Prim+RPC client and transforms it into some form of a request that is sent off
+to another environment. The method plugin is intended to send this data to a corresponding
+[method handler](#-method-handler) on the server using the same transport. It makes a request to the server and awaits a
+response for each request.
+
+There are plugins already available to use but you may also create your own.
+
+<ButtonGroup>
 	<Button href="/docs/reference/plugins#client-plugins" icon="ph:code-block-bold">
-		Available Plugins
+		Method Plugins
+	</Button>
+	<Button href="/docs/reference/create#method-plugin" icon="ph:lightbulb-bold">
+		Create a Method Plugin
 	</Button>
 </ButtonGroup>
 
-## <Icon name="ph:brackets-curly-bold"/> Testing Utilities
+## <Icon name="ph:brackets-curly-bold"/> Callback Plugin
 
 <CodeFile>
 
 ```typescript
-import { testing } from "@doseofted/prim-rpc"
-const { createPrimTestingSuite, createPrimTestingPlugins } = testing
-// create client/server pre-configured to use test plugins
-const { client, server } = createPrimTestingSuite<Module, Ctx>(serverOpts: PrimOptions, clientOpts: PrimServerOptions, exampleContext: Ctx)
-// or create plugins to use with client/server
-const plugins = createPrimTestingPlugins<Ctx>(exampleContext: Ctx)
+import { createCallbackPlugin } from "@doseofted/prim-rpc-plugins/browser-websocket"
+createPrimClient({ callbackPlugin: createCallbackPlugin() })
 ```
 
 </CodeFile>
 
-Prim+RPC includes utilities to test itself. While most plugins used with Prim+RPC are intended to bridge separated
-JavaScript environments, the testing plugins are meant to be used within the same file and communicate over a generic
-event handler.
+The client plugin is similar in a lot of ways to the [method plugin](#-method-plugin) but works differently under the
+hood. While the method plugin sends a request to the server and awaits a response, the callback plugin sends a request
+and then may receive multiple responses. This is because the callback plugin is used to listen to callbacks on the
+server and those callbacks may fire multiple times.
 
-The test plugins apply similar transformations to and undergo the same events as other plugins but are sent using local
-event handlers. This is useful in environments like Jest and Vitest where you would otherwise have to emulate the
-separated environments.
+There are plugins already available to use but you may also create your own.
 
 <ButtonGroup>
-	<Button href="/docs/reference/plugins/server/testing" icon="ph:code-block-bold">
-		Plugin Details
+	<Button href="/docs/reference/plugins#client-plugins" icon="ph:code-block-bold">
+		Callback Plugins
+	</Button>
+	<Button href="/docs/reference/create#callback-plugin" icon="ph:lightbulb-bold">
+		Create a Callback Plugin
 	</Button>
 </ButtonGroup>
+
+## <Icon name="ph:brackets-curly-bold"/> Handle Error
+
+<CodeFile>
+
+```typescript
+function oops() {
+	throw new Error("I did it again")
+}
+oops.rpc = true
+
+createPrimServer({
+	module: { hello },
+	handleError: true,
+})
+```
+
+</CodeFile>
+
+By default, Prim+RPC handles thrown errors so that errors thrown on the server are also thrown to the client and error
+mapping can be avoided (for instance, of HTTP codes or error codes). This option is true unless the
+[JSON Handler](#-json-handler) is overridden in which case it will default to false.
+
+If you explicitly set this option, this will override any default. However, if your JSON handler supports serializing
+errors and this option is set to true, this may lead to unexpected behavior.
+
+## <Icon name="ph:brackets-curly-bold"/> Handle Blobs
+
+<CodeFile>
+
+```typescript
+function index() {
+	return new File(["<p>I'm HTML</p>"], "index.html", { type: "text/html" })
+}
+index.rpc = true
+
+createPrimServer({
+	prefix: "/",
+	module: { default: index },
+	handleBlobs: true,
+})
+```
+
+</CodeFile>
+
+When using the default [JSON Handler](#-json-handler) or any JSON handler that serializes to a string, Prim+RPC will
+separate binary data given from the client or returned from the server into a separate object and replace that binary
+data with a reference to that object. This is because JSON cannot support binary data but generally Prim+RPC plugins can
+still transport this information separately.
+
+If your JSON handler supports binary data or you do not want to support binary data used with Prim+RPC, you can toggle
+this option off.
+
+## <Icon name="ph:brackets-curly-bold"/> Allow List
+
+<CodeFile>
+
+```typescript
+const module = {
+	default: () => "Hi!",
+	good: { morning: () => "Good morning!" },
+}
+const allowList = {
+	default: true,
+	good: { morning: true },
+}
+createPrimServer({ module, allowList })
+```
+
+</CodeFile>
+
+By default, functions given to Prim+RPC are not allowed to be called unless a `.rpc` property is set on the function or
+that function is added to an allow list.
+
+The Allow List is an object that resembles the module that you give to Prim+RPC where each function name is a key and
+the value is a boolean flag stating whether that function should be considered RPC.
+
+## <Icon name="ph:brackets-curly-bold"/> Methods on Methods
+
+<CodeFile>
+
+```typescript
+function hello() {
+	return "Hello from Prim+RPC!"
+}
+hello.rpc = true
+hello.documentation = () => "I say hello"
+
+createPrimServer({
+	module: { hello },
+	methodsOnMethods: ["documentation"],
+})
+```
+
+</CodeFile>
+
+By default, functions are not allowed to be called with Prim+RPC if, anywhere in the chain, it is defined on another
+function. The exception to this rule is if a method is defined directly on another method _and_ the name of that method
+is given in this option. This may be useful for adding metadata to your functions.
+
+## <Icon name="ph:brackets-curly-bold"/> Show Error Stack
+
+<CodeFile>
+
+```typescript
+createPrimServer({
+	handleError: true,
+	showErrorStack: process.env.NODE_ENV === "development",
+})
+```
+
+</CodeFile>
+
+When the [Handle Error](#-handle-error) option is set to true, Prim+RPC will send the error message to the client. On
+the server this could potentially include a stack trace. By default, Prim+RPC will not send the stack trace to the
+client. This option can be set to true to override this behavior. This is useful in development but depending on your
+security needs may not be wanted in production.
+
+## <Icon name="ph:brackets-curly-bold"/> Prefix
+
+<CodeFile>
+
+```typescript
+const prefix = "/prim"
+createPrimServer({ prefix })
+```
+
+</CodeFile>
+
+The Prefix option is a convenience option to be used by plugins that communicate over a specific address, specifically
+HTTP and WebSocket servers. It can be used by plugins to establish a path of a URL. By default, it is set to
+`/prim{:txt}` so as not to collide with other possible routes on an existing server. If Prim+RPC is the only service
+used with a server, you may change this to `/{:txt}` (or any other path that you'd like).
+
+## <Icon name="ph:brackets-curly-bold"/> Method Handler
+
+<CodeFile>
+
+```typescript
+import { createMethodHandler } from "@doseofted/prim-rpc-plugins/hono"
+import { Hono } from "hono"
+
+const app = new Hono()
+const methodHandler = createMethodHandler({ app })
+createPrimServer({ methodHandler })
+```
+
+</CodeFile>
+
+The Method Handler takes a request from the server and extracts RPC from it before sending it to the Prim+RPC server. It
+also formats the RPC back into a response for your chosen server. Each method handler on the server has a corresponding
+[Method Plugin](#-method-plugin) on the client that can understand communicate with it.
+
+There are handlers already available to use but you may also create your own.
+
+<ButtonGroup>
+	<Button href="/docs/reference/plugins#server-handlers" icon="ph:code-block-bold">
+		Method Handlers
+	</Button>
+	<Button href="/docs/reference/create#method-handler" icon="ph:lightbulb-bold">
+		Create a Method Handler
+	</Button>
+</ButtonGroup>
+
+## <Icon name="ph:brackets-curly-bold"/> Callback Handler
+
+<CodeFile>
+
+```typescript
+import { createCallbackHandler } from "@doseofted/prim-rpc-plugins/ws"
+import { WebSocketServer } from "ws"
+
+const wss = new WebSocketServer({ port: 1234 })
+const callbackHandler = createCallbackHandler({ wss })
+createPrimServer({ callbackHandler })
+```
+
+</CodeFile>
+
+The Callback Handler is similar to the [Method Handler](#-method-handler) but is primarily intended to handle callbacks
+given on functions. The primary difference between the two is that the Method Handler sends a response for every request
+while the Callback Handler may send multiple responses for a request (because callbacks may be fired multiple times).
+
+It can be used alone or alongside a Method Handler, Prim+RPC is able to determine which plugin to use. Each Callback
+Handler on the server has a corresponding [Callback Plugin](#-callback-plugin) on the client.
+
+There are handlers already available to use but you may also create your own.
+
+<ButtonGroup>
+	<Button href="/docs/reference/plugins#server-handlers" icon="ph:code-block-bold">
+		Callback Handlers
+	</Button>
+	<Button href="/docs/reference/create#callback-handler" icon="ph:lightbulb-bold">
+		Create a Callback Handler
+	</Button>
+</ButtonGroup>
+
+## <Icon name="ph:brackets-curly-bold"/> Pre-Call Hook
+
+<CodeFile>
+
+```typescript
+import { parse } from "valibot"
+
+const prim = createPrimServer({
+	preCall(args, func) {
+		if ("params" in func) return parse(func.params, args)
+		throw new Error("Argument validation is required")
+	},
+})
+```
+
+</CodeFile>
+
+The pre-call hook is optional and is executed _before_ calling a given function. It is given the arguments passed to the
+server and the function that is being called. **Do not call the function inside of the hook** as Prim+RPC will call this
+function itself (resulting in the function being called twice). This may be useful for logging, validation, or adding
+and processing metadata attached to a function.
+
+## <Icon name="ph:brackets-curly-bold"/> Post-Call Hook
+
+<CodeFile>
+
+```typescript
+import { parse } from "valibot"
+
+const prim = createPrimServer({
+	postCall(returns, func) {
+		if ("returns" in func) return parse(func.returns, returns)
+		throw new Error("Result validation is required")
+	},
+})
+```
+
+</CodeFile>
+
+The post-call hook is optional and is executed _after_ calling a given function. It is given the return value of the
+function given to the server and the function that was called. **Do not call the function inside of the hook** as it
+will be executed a second time.

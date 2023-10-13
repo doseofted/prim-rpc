@@ -35,6 +35,7 @@ export const documentationContents = (collection = "docs"): TableOfContents => [
 	{
 		name: "Reference",
 		sections: [
+			{ name: "Core API", link: `/${collection}/reference/api` },
 			{ name: "Configuration", link: `/${collection}/reference/config` },
 			{ name: "Browse Plugins", link: `/${collection}/reference/plugins` },
 			{ name: "Create Plugin", link: `/${collection}/reference/create` },
