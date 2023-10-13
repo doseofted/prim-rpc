@@ -123,13 +123,13 @@ const { title = "", decorationText = "", description, tableOfContents = [] } = A
 				<div class="hidden lg:block -mr-4">
 					<Prerelease />
 				</div>
-				<div class="sticky top-0 lg:py-4 lg:-mx-4">
+				<div class="sticky top-0 lg:py-4 lg:-mx-4 max-h-[100svh] overflow-auto" data-lenis-prevent>
 					<slot name="extra" />
 				</div>
 			</div>
 
 			<dialog id="onThisPageTableOfContents" class="modal modal-bottom">
-				<div class="modal-box shadow-none p-4">
+				<div class="modal-box shadow-none p-4" data-lenis-prevent>
 					<form method="dialog">
 						<button class="btn btn-sm btn-circle btn-ghost absolute right-2 top-2">
 							<Icon class="w-4 h-4" name="ph:x-bold" />
