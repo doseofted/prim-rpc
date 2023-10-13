@@ -27,16 +27,31 @@ import Aside from "@/components/Markdown/Aside.astro"
 Prim+RPC supports the Fetch API as used in modern JavaScript runtimes like Bun and Deno. Node can also use the Fetch API
 through the `@whatwg-node/*{:txt}` ponyfill and server adapter.
 
-<CodeFile filename="server/index.ts">
+First, you'll need some module with functions that you'd like to expose to the client:
 
-```typescript {2,8}
+<CodeFile filename="src/functions.ts">
+
+```typescript
+export function hello() {
+	return "Hi from Prim+RPC!"
+}
+hello.rpc = true
+
+export default hello
+```
+
+</CodeFile>
+
+Now we can configure our Prim+RPC server with our module using the Fetch API:
+
+<CodeFile filename="src/index.ts">
+
+```typescript {2,6}
 import { createPrimServer } from "@doseofted/prim-rpc"
 import { primFetch } from "@doseofted/prim-rpc-plugins/server-fetch"
+import * as module from "./functions"
 
-const prim = createPrimServer({
-	module: { default: () => "Hi from Prim+RPC" },
-	allowList: { default: true },
-})
+const prim = createPrimServer({ module })
 const fetch = primFetch({ prim })
 ```
 
@@ -52,14 +67,12 @@ The Fetch function will be used with the server of your choice. Choose your runt
 
 <Code slot="$tab0">
 
-```typescript {10-11}
+```typescript {8-9}
 import { createPrimServer } from "@doseofted/prim-rpc"
 import { primFetch } from "@doseofted/prim-rpc-plugins/server-fetch"
+import * as module from "./functions"
 
-const prim = createPrimServer({
-	module: { default: () => "Hi from Prim+RPC" },
-	allowList: { default: true },
-})
+const prim = createPrimServer({ module })
 const fetch = primFetch({ prim })
 
 // Serves http://localhost:8000/prim
@@ -70,14 +83,12 @@ Deno.serve(fetch)
 
 <Code slot="$tab1">
 
-```typescript {10-11}
+```typescript {8-9}
 import { createPrimServer } from "@doseofted/prim-rpc"
 import { primFetch } from "@doseofted/prim-rpc-plugins/server-fetch"
+import * as module from "./functions"
 
-const prim = createPrimServer({
-	module: { default: () => "Hi from Prim+RPC" },
-	allowList: { default: true },
-})
+const prim = createPrimServer({ module })
 const fetch = primFetch({ prim })
 
 // Serves http://localhost:3000/prim
@@ -88,15 +99,13 @@ Bun.serve({ fetch })
 
 <Code slot="$tab3">
 
-```typescript {3,11-13}
+```typescript {3,9-11}
 import { createPrimServer } from "@doseofted/prim-rpc"
 import { primFetch } from "@doseofted/prim-rpc-plugins/server-fetch"
 import { createServerAdapter } from "@whatwg-node/server"
+import * as module from "./functions"
 
-const prim = createPrimServer({
-	module: { default: () => "Hi from Prim+RPC" },
-	allowList: { default: true },
-})
+const prim = createPrimServer({ module })
 const fetch = primFetch({ prim })
 
 // Serves http://localhost:3000/prim

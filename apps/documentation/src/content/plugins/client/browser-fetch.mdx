@@ -20,18 +20,52 @@ import Aside from "@/components/Markdown/Aside.astro"
 
 Prim+RPC supports the Fetch API as implemented in all modern browsers.
 
-<CodeFile filename="client/prim.ts">
+<CodeFile filename="src/client.ts">
 
 ```typescript {2,5-6}
 import { createPrimClient } from "@doseofted/prim-rpc"
 import { createMethodPlugin } from "@doseofted/prim-rpc-plugins/browser-fetch"
 
-const client = createPrimClient({
-  endpoint: "http://localhost:3000/prim"
-  methodPlugin: createMethodPlugin()
+export const client = createPrimClient({
+	endpoint: "http://localhost:3000/prim",
+	methodPlugin: createMethodPlugin(),
 })
 ```
 
 </CodeFile>
 
 Your endpoint may look different depending on your server selection. Check with your server for the correct endpoint.
+
+You may also add types to your client by passing them as a type argument to the client. **Always ensure that only types
+are passed to the client, not the module itself.**
+
+<CodeFile filename="src/client.ts">
+
+```typescript {3} /<Module>/
+import { createPrimClient } from "@doseofted/prim-rpc"
+import { createMethodPlugin } from "@doseofted/prim-rpc-plugins/browser-fetch"
+import type * as Module from "./functions"
+
+export const client = createPrimClient<Module>({
+	endpoint: "http://localhost:3000/prim",
+	methodPlugin: createMethodPlugin(),
+})
+```
+
+</CodeFile>
+
+The imported types given here is an example and your import will depend on where your types are exported from the
+server.
+
+Now you may use this client anywhere in your project:
+
+<CodeFile filename="src/index.ts">
+
+```typescript
+import { client } from "./client"
+
+const greeting = await client.hello()
+console.log(greeting)
+```
+
+</CodeFile>

@@ -12,23 +12,82 @@ links:
 
 import CodeFile from "@/components/Code/CodeFile.astro"
 
-Prim+RPC supports Astro in SSR mode. It supports both Astro 2 and 3.
+Prim+RPC supports
+[Astro in SSR mode](https://docs.astro.build/en/guides/server-side-rendering/#enabling-ssr-in-your-project).
 
-Configure a catch-all route in Astro by creating a route in your pages directory:
+Let's say that you have a module like so (you can place functions wherever you'd like):
+
+<CodeFile filename="src/server/index.ts">
+
+```typescript
+export function hello() {
+	return "Hi from Prim+RPC!"
+}
+hello.rpc = true
+
+export default hello
+```
+
+</CodeFile>
+
+You may configure Prim+RPC with Astro's Server Endpoints by using a catch-all route in your pages directory:
 
 <CodeFile filename="src/pages/prim/[...prim].ts">
 
 ```typescript
 import { createPrimServer } from "@doseofted/prim-rpc"
 import { defineAstroPrimHandler } from "@doseofted/prim-rpc-plugins/astro"
-import module from "./my-example-module"
+import * as module from "../../server"
 
 const prim = createPrimServer({ module })
 
-// Astro 3.0
+// Astro 3+
 export const { GET, POST } = defineAstroPrimHandler({ prim })
-// Astro 2.0 (exported method names are lowercase)
+// Only if Astro <=3 (exported method names were lowercase)
 export const { GET: get, POST: post } = defineAstroPrimHandler({ prim })
+```
+
+</CodeFile>
+
+Your Prim+RPC server is now set up! Astro is a fullstack framework that runs on both server and client, which means the
+Prim+RPC client may be called on the server.
+
+On the server, you can avoid a network request from the client by conditionally passing the module. Below is an example
+of how you may do so, using the Fetch API method plugin:
+
+<CodeFile filename="src/client.ts">
+
+```typescript
+import { createPrimClient } from "@doseofted/prim-rpc"
+import { createMethodPlugin } from "@doseofted/prim-rpc-plugins/browser"
+import type * as Module from "./server"
+
+const endpoint = import.meta.env.SSR ? "" : "/prim"
+const module = import.meta.env.SSR ? import("./server") : null
+const methodPlugin = createMethodPlugin()
+export const client = createPrimClient<Promise<Module>>({ endpoint, module, methodPlugin })
+```
+
+</CodeFile>
+
+Now this exported client may used from anywhere in your project:
+
+<CodeFile filename="src/pages/index.astro">
+
+```astro
+---
+import { client } from "../client"
+const greeting = await client.hello()
+---
+
+<p>Server rendered: {greeting}</p>
+<p>Client rendered: <span id="client-rendered"></span></p>
+
+<script>
+	import { client } from "../client"
+	const clientRendered = document.getElementById("client-rendered")
+	if (clientRendered) clientRendered.innerText = await client.hello()
+</script>
 ```
 
 </CodeFile>
