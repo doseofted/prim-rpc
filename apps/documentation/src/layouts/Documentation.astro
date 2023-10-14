@@ -147,6 +147,19 @@ const { title = "", decorationText = "", description, tableOfContents = [] } = A
 	</div>
 </Layout>
 
+<script>
+	import mermaid from "mermaid"
+
+	function loadMermaid(pageLoad = false) {
+		mermaid.initialize({ startOnLoad: true })
+		if (!pageLoad) mermaid.run()
+	}
+
+	// NOTE: documentation pages may potentially include Mermaid diagrams given as `pre.mermaid` elements
+	document.addEventListener("astro:page-load", () => loadMermaid(true), { once: true })
+	document.addEventListener("astro:after-swap", () => loadMermaid(false))
+</script>
+
 <style>
 	/* Remove thin line before each section provided from DaisyUI */
 	ul.content-section::before {

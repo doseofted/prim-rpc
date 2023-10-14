@@ -89,3 +89,7 @@ pre {
 		padding-left: 4px;
 	}
 }
+
+pre.mermaid {
+	background-color: transparent !important;
+}

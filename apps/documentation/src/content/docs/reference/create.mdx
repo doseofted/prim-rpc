@@ -3,3 +3,312 @@ title: Create a Plugin
 ---
 
 # {frontmatter.title}
+
+import Code from "@/components/Code/Code.astro"
+import CodeFile from "@/components/Code/CodeFile.astro"
+import CodeTabs from "@/components/Code/CodeTabs.react.tsx"
+import Button from "@/components/Markdown/Button.astro"
+import ButtonGroup from "@/components/Markdown/ButtonGroup.astro"
+import Aside from "@/components/Markdown/Aside.astro"
+
+Prim+RPC does not include methods to transport RPC by default. Instead, it relies on plugins so that the core of the
+library is framework-agnostic. It could be used with HTTP servers, WebSocket servers, between Web Workers, separate
+processes, or other transports.
+
+<Aside type="warning">
+
+This is an advanced guide and is not required for most usages of Prim+RPC.
+
+</Aside>
+
+Prim+RPC communicates between the server and client over two types of plugins, each with a version for the server and
+client. **Method plugins** handle calls to methods. **Callback plugins** optionally handle callbacks on those methods.
+Plugins used on the server are referred to as **handlers** to easily differentiate server/client.
+
+In this guide we will learn how to create our own plugins for Prim+RPC. Note that there are
+[many plugins already available to use](/docs/reference/plugins) and you may not need to create your own. This may be
+considered an advanced topic for most users and is not required for most usages of Prim+RPC.
+
+<ButtonGroup>
+	<Button href="/docs/reference/plugins" icon="ph:wrench-bold">
+		Available Plugins
+	</Button>
+</ButtonGroup>
+
+## Method Plugin
+
+A Method Plugin is given RPC as an object and returns back a promise containing an RPC result object given from a
+[Method Handler](#method-handler). Every method plugin may be started from the following skeleton:
+
+<CodeFile>
+
+```typescript
+import { type PrimClientMethodPlugin, createPrimClient } from "@doseofted/prim-rpc"
+
+interface Options {
+	/* (options for your plugin) */
+}
+export function createMethodPlugin(options?: Options): PrimClientMethodPlugin {
+	return async function (endpoint, rpcBody, jsonHandler, blobs) {
+		/* (plugin code here) */
+	}
+}
+
+/* (this method plugin can be passed to Prim+RPC) */
+const methodPlugin = createMethodPlugin()
+const client = createPrimClient({ methodPlugin })
+```
+
+</CodeFile>
+
+The `createMethodPlugin` function is configured with your options and returns a function compatible with Prim+RPC's
+method plugin option. In this function, your plugin is given the following arguments:
+
+- `endpoint` is the [URL given to Prim+RPC](/docs/reference/config#-endpoint). This is useful if your plugin
+  communicates over a URL, otherwise it may be ignored.
+- `rpcBody` is the RPC to be sent, as an object. If batching is enabled, this will be an array of RPC calls. It should
+  be processed by the given JSON Handler.
+- `jsonHandler` is the [JSON Handler configured with Prim+RPC](/docs/reference/config#-json-handler). This option should
+  be used instead of the environment's default JSON object.
+- `blobs` is a key/value record of binary blobs. This is only used if
+  [Prim+RPC is configured to handle Blobs](/docs/reference/config#-handle-blobs). The key is a string identifier used in
+  the RPC (in `rpcBody`) and the value is a File or Blob.
+
+The return value of this function should be the RPC result as an object. Your transport (method handler) may returned a
+serialized version of this RPC. It should be deserialized using the provided `jsonHandler` argument.
+
+You may [reference existing plugin code](https://github.com/doseofted/prim-rpc/tree/main/libs/plugins) to learn how they
+typically transport RPC over protocols like HTTP, WebSocket, or others.
+
+## Method Handler
+
+A Method Handler is given RPC from the transport of your choice, provided by a [Method Plugin](#method-plugin), and
+sends this data back to your transport, to be handled again by the Method Plugin. The Prim+RPC "server" is a misnomer
+and doesn't actually serve RPC, instead this function is a wrapper around setup performed by the server of your choice.
+
+{/* prettier-ignore-start */}
+<pre class="mermaid">sequenceDiagram
+  Prim RPC Client->>Method Plugin: RPC call(s)
+  Method Plugin->>Server: Request with RPC(s)
+  Server->>Method Handler: Generic request with RPC(s)
+  Method Handler->>Prim RPC Server: RPC call(s)
+  Prim RPC Server->>Method Handler: RPC result(s)
+  Method Handler->>Server: Generic response with RPC result(s)
+  Server->>Method Plugin: Response with RPC result(s)
+  Method Plugin->>Prim RPC Client: RPC result(s)</pre>
+{/* prettier-ignore-end */}
+
+Server Handlers are used with Prim+RPC in one of two ways, depending on how the transport is configured. You may either
+pass a Method Handler function to Prim+RPC or you may pass a Prim+RPC instance to your Method Handler. The latter is
+only used when your server exports functions which are called by your server (this is the case in many serverless
+environments).
+
+Below is a basic skeleton of a method handler:
+
+<CodeFile>
+
+```typescript
+import { type PrimServerMethodHandler, createPrimServer } from "@doseofted/prim-rpc"
+
+interface Options {
+	/* (options for your handler plugin) */
+}
+export function createMethodHandler(options: Options): PrimServerMethodHandler {
+	return prim => {
+		/* (handler registration here) */
+		const {} = prim.server()
+	}
+}
+
+const methodHandler = createMethodHandler()
+const prim = createPrimServer({ methodHandler })
+```
+
+</CodeFile>
+
+The `createMethodHandler` function is configured with your options and returns a function compatible with
+[Prim+RPC's Method Handler option](/docs/reference/config#-method-handler). In this function, your handler is given a
+single argument `prim` which contains the following:
+
+- `prim.options`: Options as given to the Prim+RPC instance
+- `prim.server()`: a function that creates a new Prim+RPC server instance
+
+**Your method handler is only called once on Prim+RPC server initialization.** Inside of this function, you should set
+up the server of your choice to respond to requests that come in. For instance if setting up an HTTP server, this would
+be a configured route handler (and your HTTP server would then become an option of your setup function).
+
+For each request that comes into your server, call the `prim.server()` function. **This function should be called for
+every request that comes into your server framework.** That may look something like this (this example assumes
+[some connect-based server](https://github.com/senchalabs/connect#readme) is used):
+
+<CodeFile>
+
+```typescript {5,8,11-13}
+import { type PrimServerMethodHandler, createPrimServer } from "@doseofted/prim-rpc"
+
+interface Options {
+	/* (options for your handler plugin) */
+	app: any
+}
+export function createMethodHandler(options: Options): PrimServerMethodHandler {
+	const { app } = options
+	return prim => {
+		/* (example handler registration here) */
+		app.use((req, res, next) => {
+			const { prepareCall, prepareRpc, prepareSend, call } = prim.server()
+		})
+	}
+}
+
+const methodHandler = createMethodHandler()
+const prim = createPrimServer({ methodHandler })
+```
+
+</CodeFile>
+
+The result of this function call to `prim.server()` contains several methods to transform requests into RPC that
+Prim+RPC can understand.
+
+- `server.prepareCall()` takes common server options and transforms it into an RPC object.
+- `server.prepareRpc()` takes result of `server.prepareCall()` and creates an RPC result object from the function call.
+- `server.prepareSend()` takes the result of `server.prepareRpc()` and serializes it into common server response
+  options.
+- `server.call()` is a shortcut that calls all of the above methods in order. This is useful in HTTP/WebSocket server
+  environments but no so much in others (such as IPC).
+
+When setting up a method handler to be used with Prim+RPC, you may use all of these options. If your method handler does
+not use HTTP, you may only need to use `server.prepareRpc()`. If only `server.prepareRpc()` you may need to serialize
+RPC using the JSON Handler given in `prim.options`.
+
+The result of calling these functions should be passed back to your configured server framework to send back a response.
+You may learn how to implement your own by
+[referencing existing plugin code](https://github.com/doseofted/prim-rpc/tree/main/libs/plugins).
+
+## Callback Plugin
+
+A Callback Plugin is given options from the Prim+RPC client and returns back functions to be called whenever a new
+function call is made from the client. Your chosen transport will receive new messages (from the
+[Callback Handler](#callback-handler)) and convert this into an RPC result that is then shared with the Prim+RPC client.
+
+The skeleton of a Callback Plugin may look like this:
+
+<CodeFile>
+
+```typescript
+import { type PrimClientCallbackPlugin, createPrimClient } from "@doseofted/prim-rpc"
+
+interface Options {
+	/* (options for your plugin) */
+}
+export function createCallbackPlugin(options: Options): PrimClientCallbackPlugin {
+	return (endpoint, events, jsonHandler) => {
+		/* (plugin implementation here) */
+		return {
+			send(rpcBody) {},
+			close() {},
+		}
+	}
+}
+
+/* (this callback plugin can be passed to Prim+RPC) */
+const callbackPlugin = createCallbackPlugin()
+const client = createPrimClient({ callbackPlugin })
+```
+
+</CodeFile>
+
+The `createCallbackPlugin` function is configured with your options and returns a function compatible with Prim+RPC's
+[Callback Plugin option](/docs/reference/config#-callback-plugin). In this function, your plugin is given the following
+arguments:
+
+- `endpoint` is the [URL given to Prim+RPC](/docs/reference/config#-websocket-endpoint). This is useful if your plugin
+  communicates over a URL, otherwise it may be ignored.
+- `events` is an object that contains three functions: `events.connected()` when the transport connects,
+  `events.response()` when a new message is received, and `events.ended()` when the transport disconnects.
+- `jsonHandler` is the [JSON Handler configured with Prim+RPC](/docs/reference/config#-json-handler). This option should
+  be used instead of the environment's default JSON object inside of your defined `send()` method and the
+  `events.response()` function.
+
+The Callback Plugin is only called once for each new connection over your transport. The existing plugin will continue
+to be used until you call `events.ended()` which will signal that this plugin can no longer be used without
+re-initializing. Somewhere in your transport you should listen for new messages from the server and send these back
+using `events.response()` with the RPC result as an argument. You may serialize that argument using the provided JSON
+Handler.
+
+With an active connection, the functions you return from your Callback Plugin will be called on all subsequent events.
+The `send()` method will send a new message over your transport and the `close()` method will terminate an active
+connection.
+
+You may [reference existing plugin code](https://github.com/doseofted/prim-rpc/tree/main/libs/plugins) to learn how they
+typically transport RPC over protocols like HTTP, WebSocket, or others.
+
+## Callback Handler
+
+A Callback Handler is given new messages from the transport of your choice, provided by a
+[Callback Plugin](#callback-plugin), and sends this data back to your transport. In addition, it maintains that
+connection to send additional messages for the same request over your transport. This is useful for callbacks which may
+fire multiple times.
+
+{/* prettier-ignore-start */}
+<pre class="mermaid">sequenceDiagram
+  Prim RPC Client->>Callback Plugin: Upgraded needed
+  Callback Plugin->>Server: Make connection
+  Server->>Callback Handler: Make generic connection
+  Callback Handler->>Prim RPC Server: Connect
+  Server->>Callback Plugin: Connected
+  Callback Plugin->>Prim RPC Client: Ready
+  Prim RPC Client->>Callback Plugin: RPC call
+  Callback Plugin->>Server: Request with RPC
+  Server->>Callback Handler: Generic request with RPC
+  Callback Handler->>Prim RPC Server: RPC call
+  Prim RPC Server->>Callback Handler: RPC result
+  Callback Handler->>Server: Generic response with RPC result
+  Server->>Callback Plugin: Response with RPC result
+  Callback Plugin->>Prim RPC Client: RPC result
+  Prim RPC Server->>Callback Handler: RPC callback results
+  Callback Handler->>Server: Generic response with RPC callback results
+  Server->>Callback Plugin: Response with RPC callback results
+  Callback Plugin->>Prim RPC Client: RPC callback results
+  Server->>Callback Plugin: Disconnected
+  Callback Plugin->>Prim RPC Client: Disconnect
+  Server->>Callback Handler: Disconnected
+  Callback Handler->>Prim RPC Server: Disconnect</pre>
+{/* prettier-ignore-end */}
+
+The diagram is somewhat intimidating but the implementation is less complicated, as steps like making the connection and
+sending callback results is largely handled by other frameworks rather than your plugin: you just need to support the
+given events.
+
+Below is a skeleton of what a callback handler may look like:
+
+<CodeFile>
+
+```typescript
+import { type PrimServerCallbackHandler, createPrimServer } from "@doseofted/prim-rpc"
+
+interface Options {
+	/* (options for your handler plugin) */
+}
+export function createCallbackHandler(options: Options): PrimServerCallbackHandler {
+	return prim => {
+		/* (handler registration here) */
+	}
+}
+
+const callbackHandler = createCallbackHandler()
+const prim = createPrimServer({ callbackHandler })
+```
+
+</CodeFile>
+
+The `createCallbackHandler` function is configured with your options and returns a function compatible with
+[Prim+RPC's Callback Handler option](/docs/reference/config#-callback-handler). In this function, your handler is given
+a single argument `prim` which contains the following:
+
+- `prim.options`: Options as given to the Prim+RPC instance
+- `prim.connected()`: a function that creates a new active Prim+RPC server instance.
+
+Unlike the method handler's `prim.server()` option, the `prim.connected()` event is intended to keep an active
+connection to the client as opposed to sending a single response and then closing the connection.
+
+...
