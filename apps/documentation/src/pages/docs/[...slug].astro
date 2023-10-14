@@ -6,6 +6,7 @@ import { documentationContents, type DocumentationCollection, type CollectionTyp
 import H2 from "@/components/Markdown/Heading/H2.astro"
 import H3 from "@/components/Markdown/Heading/H3.astro"
 import Table from "@/components/Markdown/Table.astro"
+import ReportIssue from "@/components/ReportIssue.astro"
 
 interface Props {
 	entry: CollectionType<"docs">
@@ -27,5 +28,6 @@ const tableOfContents = documentationContents("docs")
 
 <Documentation decorationText="The Docs." title={entry.data.title} tableOfContents={tableOfContents}>
 	<Content components={{ h2: H2, h3: H3, table: Table }} />
+	<ReportIssue title={entry.data.title} href={Astro.url.href} />
 	<TableOfContents headings={headings} slot="extra" />
 </Documentation>

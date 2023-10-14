@@ -4,7 +4,7 @@ import DataList from "./DataList.astro"
 import DataListItem from "./DataListItem.astro"
 
 interface Props {
-	data?: Record<string, string | string[] | boolean | number>
+	data?: Record<string, string | string[] | boolean | number | { name: string; href: string }[]>
 }
 const { data: given = {} } = Astro.props
 

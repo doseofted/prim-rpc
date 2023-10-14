@@ -9,6 +9,7 @@ import Table from "@/components/Markdown/Table.astro"
 import { Icon } from "astro-icon/components"
 import PluginChoices from "@/components/Markdown/PluginChoices.astro"
 import DataListPlugin from "@/components/Markdown/DataListPlugin.astro"
+import ReportIssue from "@/components/ReportIssue.astro"
 
 interface Props {
 	entry: CollectionType<"plugins">
@@ -58,6 +59,6 @@ const tableOfContents = documentationContents("docs")
 			</>
 		)
 	}
-
+	<ReportIssue title={entry.data.title} href={Astro.url.href} />
 	<TableOfContents headings={headings} slot="extra" />
 </Documentation>

@@ -210,6 +210,9 @@ importers:
       pts:
         specifier: ^0.11.4
         version: 0.11.4
+      query-string:
+        specifier: ^8.1.0
+        version: 8.1.0
       react:
         specifier: ^18.0.0
         version: 18.2.0
