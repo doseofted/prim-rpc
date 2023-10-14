@@ -22,7 +22,8 @@ may choose to implement your own JSON handler.
 
 ## SuperJSON
 
-SuperJSON allows additional types to be used with Prim+RPC. The JSON handler will look like this:
+[SuperJSON](https://github.com/blitz-js/superjson#readme) allows additional types to be used with Prim+RPC. The JSON
+handler will look like this:
 
 <CodeFile>
 
@@ -37,8 +38,11 @@ createPrimServer({ jsonHandler })
 
 ## MsgPack
 
-MsgPack supports additional types including ArrayBuffer types. While it is not JSON, it can be used with Prim+RPC. We'll
-add a few additional options to the handler to allow Prim+RPC plugins to better work with binary data:
+[MsgPack](https://github.com/msgpack/msgpack-javascript#readme) supports additional types including ArrayBuffer types.
+While it is not JSON, it can be used with Prim+RPC. There are also several implementations of MsgPack and you may choose
+one that best suits your needs.
+
+We'll add a few additional options to the handler to allow Prim+RPC plugins to better work with binary data:
 
 <CodeFile>
 
@@ -60,8 +64,8 @@ createPrimServer({ jsonHandler })
 
 ## devalue
 
-Like the SuperJSON example, devalue may be used to support additional types with Prim+RPC. The JSON handler can be set
-up like so:
+Like the SuperJSON example, [devalue](https://github.com/Rich-Harris/devalue#readme) may be used to support additional
+types with Prim+RPC. The JSON handler can be set up like so:
 
 <CodeFile>
 
@@ -76,8 +80,8 @@ createPrimServer({ jsonHandler })
 
 ## YAML
 
-YAML may be used with Prim+RPC and may be a more readable alternative to JSON. The JSON-like handler can be set up like
-so:
+[YAML](https://github.com/eemeli/yaml#readme) may be used with Prim+RPC and may be a more readable alternative to JSON.
+The JSON-like handler can be set up like so:
 
 <CodeFile>
 
@@ -95,3 +99,7 @@ createPrimServer({ jsonHandler })
 ```
 
 </CodeFile>
+
+## Others
+
+These are some popular examples but Prim+RPC can be configured to use other JSON or JSON-like handlers.
