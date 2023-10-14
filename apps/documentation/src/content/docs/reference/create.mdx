@@ -156,6 +156,7 @@ export function createMethodHandler(options: Options): PrimServerMethodHandler {
 		/* (example handler registration here) */
 		app.use((req, res, next) => {
 			const { prepareCall, prepareRpc, prepareSend, call } = prim.server()
+			// ...
 		})
 	}
 }
@@ -308,7 +309,56 @@ a single argument `prim` which contains the following:
 - `prim.options`: Options as given to the Prim+RPC instance
 - `prim.connected()`: a function that creates a new active Prim+RPC server instance.
 
-Unlike the method handler's `prim.server()` option, the `prim.connected()` event is intended to keep an active
-connection to the client as opposed to sending a single response and then closing the connection.
+Unlike the Method Handler's `prim.server()` option, the `prim.connected()` event is intended to keep an active
+connection to the client as opposed to sending a single response and then closing the connection. This means that
+servers used with the callback handler must have the ability to maintain a connection (like WebSocket or an HTTP
+Stream).
 
-...
+**Note that the `prim.connected()` event should be called upon every new connection to your server.** Inside of this
+function, you would configure the server of your choice to respond to requests that come in. For instance, if setting up
+a WebSocket server, this would listen for new "connected" events.
+
+Below is how a generic WebSocket-like server would be configured to accept new connections:
+
+<CodeFile>
+
+```typescript
+import { type PrimServerCallbackHandler, createPrimServer } from "@doseofted/prim-rpc"
+
+interface Options {
+	/* (options for your handler plugin) */
+	websocket: any
+}
+export function createCallbackHandler(options: Options): PrimServerCallbackHandler {
+	return prim => {
+		/* (example handler registration here) */
+		websocket.on("connection", connection => {
+			const { ended, call } = prim.connected()
+			connection.on("close", ended)
+			connection.on("error", ended)
+			connection.on("message", message => {
+				// ...
+			})
+		})
+	}
+}
+
+const callbackHandler = createCallbackHandler()
+const prim = createPrimServer({ callbackHandler })
+```
+
+</CodeFile>
+
+The result of this function call to `prim.connected()` contains several methods to transform requests into RPC that
+Prim+RPC can understand:
+
+- `connected.call()` is a function that should be called when a new message is received from the client. This will
+  transform the data using the configured JSON handler and call the function.
+- `connected.rpc()` is an alternative function that can be called when you want to serialize messages using the given
+  JSON Handler yourself.
+- `connected.ended()` is a function that should be called when the connection is closed. This will signal to Prim+RPC
+  that this connection is no longer active.
+
+The result of calling these functions should be passed back to your configured server framework to send back any
+possible results created for your function call. You may learn how to implement your own by
+[referencing existing plugin code](https://github.com/doseofted/prim-rpc/tree/main/libs/plugins).
