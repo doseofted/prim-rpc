@@ -8,8 +8,8 @@ import { z } from "zod"
  * @returns New Friends
  */
 export function greetings(x?: string, y?: string) {
-	x = z.string().default("Backend").parse(x)
-	y = z.string().default("Frontend").parse(y)
+	;[x, y] = greetings.params.parse([x, y])
 	return `${x},\nmeet ${y}.`
 }
+greetings.params = z.tuple([z.string().default("Backend"), z.string().default("Frontend")])
 greetings.rpc = true

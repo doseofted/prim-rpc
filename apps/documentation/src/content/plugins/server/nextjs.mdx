@@ -9,3 +9,107 @@ links:
   - name: Next.js
     href: https://github.com/vercel/next.js
 ---
+
+import CodeFile from "@/components/Code/CodeFile.astro"
+
+Prim+RPC supports Next.js through a route defined on its App Router. Next.js allows both Pages Router and App Router
+folders to exist in the same project, so you may still use Prim+RPC if you have not yet made the transition to App
+Router.
+
+Let's say that you have a module like so (you can place functions wherever you'd like). In this example, functions are
+defined inside of the app router and we prefix the our function with an underscore to mark it as a private folder
+co-located with our code in the app router:
+
+<CodeFile filename="app/prim/[[...prim]]/_functions/index.ts">
+
+```typescript
+export function hello() {
+	return "Hi from Prim+RPC!"
+}
+hello.rpc = true
+
+export default hello
+```
+
+</CodeFile>
+
+You may configure Prim+RPC with Next.js by using a catch-all route in your app directory:
+
+<CodeFile filename="app/prim/[[...prim]]/route.ts">
+
+```typescript
+import { createPrimServer } from "@doseofted/prim-rpc"
+import { defineNextjsAppPrimHandler } from "@doseofted/prim-rpc-plugins/nextjs"
+import * as module from "./_functions"
+
+const prim = createPrimServer({ module })
+
+export const { GET, POST } = defineNextjsAppPrimHandler({ prim })
+```
+
+</CodeFile>
+
+Your Prim+RPC server is now set up! Next.js is a fullstack framework that can run on both server and client, which means
+the Prim+RPC client may be called on the server as well as the client.
+
+On the server, you can avoid a network request from the client by conditionally passing the module. Below is an example
+of how you may do so, using the Fetch API method plugin:
+
+<CodeFile filename="app/prim/[[...prim]]/_client.ts">
+
+```typescript
+import { createPrimClient } from "@doseofted/prim-rpc"
+import { createMethodPlugin } from "@doseofted/prim-rpc-plugins/browser"
+import type * as Module from "./_functions"
+
+const endpoint = typeof window === "undefined" ? "" : "/prim"
+const module = typeof window === "undefined" ? import("./_functions") : null
+const methodPlugin = createMethodPlugin()
+export const client = createPrimClient<Promise<Module>>({ endpoint, module, methodPlugin })
+```
+
+</CodeFile>
+
+Now this exported client may used from anywhere in your project. Let's demonstrate this first by setting up a client
+component that will call the function from the client:
+
+<CodeFile filename="components/ClientRendered.tsx">
+
+```tsx
+"use client"
+import { client } from "../app/prim/_client"
+import { useState, useEffect } from "react"
+
+export default function ClientRendered() {
+	const [greeting, setGreeting] = useState("")
+	useEffect(() => {
+		client.hello().then(greeting => setGreeting(greeting))
+	}, [])
+	return <p>Client rendered: {greeting}</p>
+}
+```
+
+</CodeFile>
+
+And we can use this component in our page, alongside the client used on the server:
+
+<CodeFile filename="app/page.tsx">
+
+```tsx
+import { client } from "./prim/[[...prim]]/_client"
+import ClientRendered from "../components/ClientRendered"
+
+export default function Page() {
+	const serverGreeting = await client.hello()
+	return (
+		<div>
+			<p>Server rendered: {serverGreeting}</p>
+			<ClientRendered />
+		</div>
+	)
+}
+```
+
+</CodeFile>
+
+Now we are all set up!
