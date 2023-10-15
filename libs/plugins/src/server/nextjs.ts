@@ -49,8 +49,8 @@ export function defineNextjsAppPrimHandler(options: PrimNextjsAppPluginOptions) 
 			for (const [key, value] of blobEntries) {
 				formData.append(key, value as Blob)
 				if (!firstFile.blob) {
-					const blob = value as Blob
-					firstFile = { name: blob.name, blob, type: blob.type }
+					const blob = value as File
+					firstFile = { name: blob?.name, blob, type: blob.type }
 				}
 			}
 			if (method === "POST" && blobEntries.length > 0) {
