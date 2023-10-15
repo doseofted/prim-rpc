@@ -22,6 +22,11 @@ tasks:
       - "pnpm install"
       - task: build
 
+  upgrade:
+    desc: "Interactively upgrade all dependencies in monorepo"
+    cmds:
+      - "pnpm upgrade -r --interactive --latest"
+
   cleanup:
     desc: "Remove various temporary files and directories created within project, for a clean run"
     ignore_error: true
@@ -29,8 +34,8 @@ tasks:
       - "find . -name node_modules -type d -prune -exec rm -fr {} +"
       - 'find . -name dist -not -path "*/shiki/dist" -type d -prune -exec rm -fr {} +'
       - "find . -name .turbo -type d -prune -exec rm -fr {} +"
-      - "rm -r ./apps/documentation/.next/"
-      - "rm -r ./apps/documentation/out/"
+      - "rm -r ./apps/documentation/.astro/"
+      - "rm -r ./apps/documentation/.vercel/"
       - "rm -fr .task"
 
   build:

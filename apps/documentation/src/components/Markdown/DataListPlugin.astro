@@ -1,0 +1,40 @@
+---
+import type { PluginType, TransportType } from "@/content/config"
+import DataList from "./DataList.astro"
+import DataListItem from "./DataListItem.astro"
+
+interface Props {
+	data?: Record<string, string | string[] | boolean | number | { name: string; href: string }[]>
+}
+const { data: given = {} } = Astro.props
+
+const typeMappings: Record<string, string> = {
+	"callback-handler": "Callback Handler",
+	"method-handler": "Method Handler",
+	"callback-plugin": "Callback Plugin",
+	"method-plugin": "Method Plugin",
+	"json-handler": "JSON Handler",
+	validator: "Validation Tool",
+} satisfies Record<PluginType, string>
+const type = typeMappings["type" in given ? String(given.type) : ""]
+
+const transportMappings: Record<string, string> = {
+	inapplicable: "Inapplicable",
+	http: "HTTP",
+	ws: "WebSocket",
+	node: "Node",
+	"socket-io": "Socket.io",
+	worker: "Web Worker",
+	event: "Event handler",
+	electron: "Electron",
+} satisfies Record<TransportType, string>
+const transport = transportMappings["transport" in given ? String(given.transport) : "inapplicable"]
+
+const links = Array.isArray(given.links) ? given.links : []
+---
+
+<DataList title="Plugin Details">
+	<DataListItem type="text" key="Plugin Type" value={type} />
+	<DataListItem type="text" key="Transport" value={transport} />
+	{links.length > 0 && <DataListItem type="link" key="Works with" value={links} />}
+</DataList>

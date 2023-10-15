@@ -31,7 +31,7 @@
 		"dev": "tsup --watch --config build.config.js",
 		"build": "tsup --config build.config.js",
 		"check": "tsc --noEmit",
-		"document": "typedoc src/index.ts --json dist/docs.json",
+		"document": "typedoc",
 		"test": "vitest run",
 		"testing": "vitest watch",
 		"lint": "eslint ."
@@ -42,18 +42,19 @@
 		"just-remove": "^3.2.0",
 		"just-safe-get": "^4.2.0",
 		"mitt": "^3.0.1",
-		"nanoid": "^4.0.2",
+		"nanoid": "^5.0.1",
 		"proxy-deep": "^3.1.1",
 		"query-string": "^8.1.0",
 		"serialize-error": "^11.0.2",
-		"type-fest": "^4.3.1"
+		"type-fest": "^4.4.0"
 	},
 	"devDependencies": {
 		"@doseofted/prim-example": "workspace:*",
 		"@msgpack/msgpack": "3.0.0-beta2",
 		"@types/lodash-es": "^4.17.9",
 		"@types/node": "^18.17.4",
-		"superjson": "^1.13.1"
+		"superjson": "^2.0.0",
+		"typedoc": "^0.25.2"
 	},
 	"type": "module",
 	"exports": {

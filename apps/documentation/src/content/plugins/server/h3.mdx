@@ -1,0 +1,220 @@
+---
+title: Nuxt / Nitro / H3
+icon: simple-icons:nuxtdotjs
+type: method-handler
+transport: http
+features: []
+status: available
+links:
+  - name: Nuxt
+    href: https://github.com/nuxt/nuxt#readme
+  - name: Nitro
+    href: https://github.com/unjs/nitro#readme
+  - name: H3
+    href: https://github.com/unjs/h3#readme
+---
+
+import CodeFile from "@/components/Code/CodeFile.astro"
+
+Prim+RPC supports H3 which is the foundation of the Nitro server, used by the Nuxt framework. This means that Prim+RPC
+works with all of these frameworks. Setup between the three frameworks is mostly the same but with slightly different
+naming patterns. We'll cover all frameworks separately to reduce confusion.
+
+**In all three frameworks**, we will be working with the following functions to be used from the server:
+
+<CodeFile filename="functions/index.ts">
+
+```typescript
+export function hello() {
+	return "Hi from Prim+RPC!"
+}
+hello.rpc = true
+
+export default hello
+```
+
+</CodeFile>
+
+## H3 Setup
+
+H3 is the easiest to set up since it just a simple HTTP server framework without file naming patterns. Setup is straight
+forward:
+
+<CodeFile filename="index.ts">
+
+```typescript
+import { createPrimServer } from "@doseofted/prim-rpc"
+import { createMethodHandler } from "@doseofted/prim-rpc-plugins/h3"
+import { createApp, toNodeListener } from "h3"
+import { createServer } from "node:http"
+import * as module from "./functions"
+
+const app = createApp()
+
+const methodHandler = createMethodHandler({ app })
+const prim = createPrimServer({ module, methodHandler })
+
+const server = createServer(toNodeListener(app))
+server.listen(3000)
+```
+
+</CodeFile>
+
+In this example, it's assumed that you are using Node but H3 can be used in Deno and Bun as well.
+
+This configuration does not yet support sending files back to the client yet but we can add support by installing a new
+module called `form-data{:txt}` and configuring it with our server:
+
+<CodeFile filename="index.ts">
+
+```typescript {6} /formDataHandler/2
+import { createPrimServer } from "@doseofted/prim-rpc"
+import { createMethodHandler } from "@doseofted/prim-rpc-plugins/h3"
+import { createApp, toNodeListener } from "h3"
+import { createServer } from "node:http"
+import * as module from "./functions"
+import formDataHandler from "form-data"
+
+const app = createApp()
+
+const methodHandler = createMethodHandler({ app, formDataHandler })
+const prim = createPrimServer({ module, methodHandler })
+
+const server = createServer(toNodeListener(app))
+server.listen(3000)
+```
+
+</CodeFile>
+
+We can test this out by issuing a new request from the command line:
+
+<CodeFile>
+
+```zsh
+curl --request GET --url "http://localhost:3000/prim"
+```
+
+</CodeFile>
+
+## Nitro Setup
+
+Nitro is the same server framework used in Nuxt. Setup is similar to H3 except routing in Nitro is file-based. In order
+to serve functions used with Prim+RPC, we will need to create a catch-all route (take note of the filename):
+
+<CodeFile filename="routes/prim/[...].ts">
+
+```typescript
+import { createPrimServer } from "@doseofted/prim-rpc"
+import { defineH3PrimHandler } from "@doseofted/prim-rpc-plugins/h3"
+import * as module from "./functions"
+
+const prim = createPrimServer({ module })
+
+export default defineH3PrimHandler({ prim })
+```
+
+</CodeFile>
+
+Similar to H3, we can also add file download support by using the `form-data{:txt}` module:
+
+<CodeFile filename="routes/prim/[...].ts">
+
+```typescript {3} /formDataHandler/2
+import { createPrimServer } from "@doseofted/prim-rpc"
+import { defineH3PrimHandler } from "@doseofted/prim-rpc-plugins/h3"
+import formDataHandler from "form-data"
+import * as module from "./functions"
+
+const prim = createPrimServer({ module })
+
+export default defineH3PrimHandler({ prim, formDataHandler })
+```
+
+</CodeFile>
+
+We can test this out by issuing a new request from the command line (change port as needed):
+
+<CodeFile>
+
+```zsh
+curl --request GET --url "http://localhost:3000/prim"
+```
+
+</CodeFile>
+
+## Nuxt Setup
+
+Prim+RPC setup in Nuxt is almost identical to Nitro except all routes are prefixed with `/server{:txt}`. Routing in Nuxt
+is file-based and in order to serve functions used with Prim+RPC, we will need to create a catch-all route (take note of
+the filename):
+
+<CodeFile filename="server/routes/prim/[...].ts">
+
+```typescript
+import { createPrimServer } from "@doseofted/prim-rpc"
+import { defineH3PrimHandler } from "@doseofted/prim-rpc-plugins/h3"
+import * as module from "./functions"
+
+const prim = createPrimServer({ module })
+
+export default defineH3PrimHandler({ prim })
+```
+
+</CodeFile>
+
+Similar to H3 and Nitro, we can also add file download support by using the `form-data{:txt}` module:
+
+<CodeFile filename="server/routes/prim/[...].ts">
+
+```typescript {3} /formDataHandler/2
+import { createPrimServer } from "@doseofted/prim-rpc"
+import { defineH3PrimHandler } from "@doseofted/prim-rpc-plugins/h3"
+import formDataHandler from "form-data"
+import * as module from "./functions"
+
+const prim = createPrimServer({ module })
+
+export default defineH3PrimHandler({ prim, formDataHandler })
+```
+
+</CodeFile>
+
+Since Nuxt is a fullstack framework, running on both the server and the client, this means that the Prim+RPC client may
+run on either the server or the client.
+
+On the server, you can avoid a network request from the client by conditionally passing the module to the client. Below
+is an example of how you may do so, using the Fetch API method plugin:
+
+<CodeFile filename="composables/client.ts">
+
+```typescript
+import { createPrimClient } from "@doseofted/prim-rpc"
+import { createMethodPlugin } from "@doseofted/prim-rpc-plugins/browser"
+import type * as Module from "../functions"
+
+const endpoint = process.server ? "" : "/prim"
+const module = process.server ? import("../functions") : null
+const methodPlugin = createMethodPlugin()
+export const client = createPrimClient<Promise<Module>>({ endpoint, module, methodPlugin })
+```
+
+</CodeFile>
+
+We defined this function as a composable (using the "composables" folder) so now we can use this client anywhere in our
+application, without needing to import it:
+
+<CodeFile filename="pages/index.vue">
+
+```vue
+<script lang="ts" setup>
+const { data: serverGreeting } = useAsyncData(() => client.hello(), { server: true })
+const { data: clientGreeting } = useAsyncData(() => client.hello(), { server: false })
+</script>
+
+<template>
+	<p>Server rendered: {serverGreeting}</p>
+	<p>Client rendered: {clientGreeting}</p>
+</template>
+```
+
+</CodeFile>

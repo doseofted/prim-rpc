@@ -50,6 +50,7 @@
 			"*.Corefile": "caddyfile"
 		},
 		"cSpell.words": [
+			"frontmatter",
 			"composables",
 			"defu",
 			"doseofted",
@@ -88,11 +89,11 @@
 	"extensions": {
 		"recommendations": [
 			"redhat.vscode-yaml",
-			"matthewpi.caddyfile-support",
 			"dbaeumer.vscode-eslint",
 			"esbenp.prettier-vscode",
 			"stylelint.vscode-stylelint",
-			"irongeek.vscode-env",
+			"astro-build.astro-vscode",
+			"unifiedjs.vscode-mdx",
 			"streetsidesoftware.code-spell-checker"
 		]
 	}

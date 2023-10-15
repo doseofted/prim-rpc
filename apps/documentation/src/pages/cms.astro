@@ -1,0 +1,34 @@
+---
+import { IntroText } from "@/components/IntroText.react"
+import Layout from "@/layouts/Default.astro"
+---
+
+<Layout brand="CMS" className="min-h-[calc(100svh-6.5rem)]">
+	<div data-light="10" data-brightness="0.1,0.2" class="flex w-full h-full items-center justify-center pb-16">
+		<div
+			data-light="12"
+			data-offset="0.5,2"
+			data-size="0.5,1"
+			data-brightness="0.6,1"
+			class="bg-white/30 border border-white/70 rounded-xl p-12 flex flex-col justify-center gap-2">
+			<div>
+				<p
+					class="whitespace-nowrap font-title text-[2.3rem] sm:text-[3rem] lg:text-[5.5rem] font-semibold text-prim-space uppercase text-left leading-none overflow-hidden">
+					<IntroText delay={0.5} stagger={0.7} client:load text={"Content\nMade Easy\nas RPC.".split("\n")} />
+				</p>
+			</div>
+			<div class="flex-grow space-y-4 w-full max-w-md">
+				<p>
+					Prim+CMS is a content manager designed to disappear.<br />Based on Prim+RPC:
+					<strong>A truly headless CMS.</strong>
+				</p>
+				<div class="flex gap-4">
+					<a href="https://www.threads.net/@doseofted" target="_blank" class="btn btn-neutral text-white"> Follow</a>
+					<a href="https://blog.doseofted.me/newsletter" target="_blank" class="btn btn-neutral text-white">
+						Subscribe</a
+					>
+				</div>
+			</div>
+		</div>
+	</div>
+</Layout>

@@ -1,0 +1,102 @@
+---
+title: Core API
+---
+
+# {frontmatter.title}
+
+import { Icon } from "astro-icon/components"
+import CodeFile from "@/components/Code/CodeFile.astro"
+import Button from "@/components/Markdown/Button.astro"
+import ButtonGroup from "@/components/Markdown/ButtonGroup.astro"
+
+Prim+RPC exports two primary functions: `createPrimClient()` and `createPrimServer()`. Both functions take a
+configuration object as their only argument and the server configuration extends the client configuration.
+
+<ButtonGroup>
+	<Button href="/docs/reference/config" icon="ph:code-block-bold">
+		Configuration
+	</Button>
+</ButtonGroup>
+
+## <Icon name="ph:function-bold"/> Create Server
+
+<CodeFile>
+
+```typescript
+import { createPrimServer } from "@doseofted/prim-rpc"
+createPrimServer(options: PrimServerOptions): PrimServer
+```
+
+</CodeFile>
+
+The Prim+RPC server is the tool that transforms requests into RPC and RPC results into responses. It is a misnomer as it
+is not a server per se but is a framework agnostic utility to work with the server of your choice.
+
+It works with the server of your choice through handler plugins: the method handler handles method calls, the callback
+handler optionally handles callbacks on those methods. They are separate plugins because of their design: while the
+method handler has a single response for every request (a function result for every call), the callback handler can
+return multiple responses for a request (because callbacks can be fired multiple times).
+
+This function is given a single argument which is its configuration. You may reference
+[server options](/docs/reference/config/server) for more details.
+
+<ButtonGroup>
+	<Button href="/docs/reference/plugins#server-handlers" icon="ph:code-block-bold">
+		Available Handlers
+	</Button>
+</ButtonGroup>
+
+## <Icon name="ph:function-bold"/> Create Client
+
+<CodeFile>
+
+```typescript
+import { createPrimClient } from "@doseofted/prim-rpc"
+createPrimClient<ModuleType>(options: PrimOptions): PrimClient
+```
+
+</CodeFile>
+
+The Prim+RPC client is a JavaScript Proxy that transforms method calls into requests and transforms responses back into
+a useable result. Like its server counterpart, it is not responsible for the transport. Instead, this responsibility is
+given to plugins: method plugins handle method calls and callback plugins handle callbacks. These client plugins
+correspond with handler plugins on the server of the same name.
+
+This function takes a type parameter (if using TypeScript) that is the type of the module given to the server. It also
+takes a single argument which is the client configuration. You may reference
+[shared options](/docs/reference/config/shared) for more details.
+
+<ButtonGroup>
+	<Button href="/docs/reference/plugins#client-plugins" icon="ph:code-block-bold">
+		Available Plugins
+	</Button>
+</ButtonGroup>
+
+## <Icon name="ph:brackets-curly-bold"/> Testing Utilities
+
+<CodeFile>
+
+```typescript
+import { testing } from "@doseofted/prim-rpc"
+const { createPrimTestingSuite, createPrimTestingPlugins } = testing
+// create client/server pre-configured to use test plugins
+const { client, server } = createPrimTestingSuite<Module, Ctx>(serverOpts: PrimOptions, clientOpts: PrimServerOptions, exampleContext: Ctx)
+// or create plugins to use with client/server
+const plugins = createPrimTestingPlugins<Ctx>(exampleContext: Ctx)
+```
+
+</CodeFile>
+
+Prim+RPC includes utilities to test itself. While most plugins used with Prim+RPC are intended to bridge separated
+JavaScript environments, the testing plugins are meant to be used within the same file and communicate over a generic
+event handler.
+
+The test plugins apply similar transformations to and undergo the same events as other plugins but are sent using local
+event handlers. This is useful in environments like Jest and Vitest where you would otherwise have to emulate the
+separated environments.
+
+<ButtonGroup>
+	<Button href="/docs/reference/plugins/server/testing" icon="ph:code-block-bold">
+		Plugin Details
+	</Button>
+</ButtonGroup>

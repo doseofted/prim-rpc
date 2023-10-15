@@ -215,8 +215,11 @@ function createServerActions(
 						}
 						// call module with `client` if not provided directly to server (checks already ran on module, if provided)
 						const targetRemote = getProperty(client, methodExpanded) as AnyFunction & { rpc?: boolean }
-						const result = (await Reflect.apply(targetRemote, context, args)) as unknown
-						return { ...rpcBase, result }
+						const processedArgs = configured.preCall?.(args, targetLocal) ?? args
+						const result = (await Reflect.apply(targetRemote, context, processedArgs)) as unknown
+						// eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
+						const processedResult = configured.postCall?.(result, targetLocal) ?? result
+						return { ...rpcBase, result: processedResult }
 					} else {
 						// If either the module wasn't provided or target doesn't exist (even if module does), send a request using
 						// a client that doesn't know about the module provided (will use provided plugin to server).
@@ -227,8 +230,13 @@ function createServerActions(
 							limitedEvent.on("response", cbResults)
 						}
 						const targetRemote = getProperty(limitedClient, methodExpanded) as AnyFunction & { rpc?: boolean }
-						const result = (await Reflect.apply(targetRemote, context, args)) as unknown
-						return { ...rpcBase, result }
+						// const targetLocal = getProperty(givenModule, methodExpanded) as AnyFunction & { rpc?: boolean }
+						// const processedArgs = preprocess(...args).bind(targetLocal)
+						const processedArgs = configured.preCall?.(args) ?? args
+						const result = (await Reflect.apply(targetRemote, context, processedArgs)) as unknown
+						// eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
+						const processedResult = configured.postCall?.(result) ?? result
+						return { ...rpcBase, result: processedResult }
 					}
 					// TODO: today, result must be supported by JSON handler but consider supporting returned functions
 					// in the same way that callback are supported today (by passing reference to client)

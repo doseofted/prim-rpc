@@ -1,0 +1,80 @@
+---
+import Prim from "@/components/Prim.astro"
+import NavigationItem from "./NavigationItem.astro"
+import Container from "./Container.astro"
+
+interface Props {
+	brand?: string
+}
+const { brand = "RPC" } = Astro.props
+
+const navigation = [
+	{ link: "/docs/learn/introduction", text: "Docs" },
+	{ link: "/cms", text: "CMS" },
+	{ link: "https://doseofted.me/", text: "Dose of Ted", icon: "/prim-nav-doseofted-attribution.png" },
+	{ link: "https://www.threads.net/@doseofted", text: "Threads", icon: "simple-icons:threads" },
+	{ link: "https://github.com/doseofted/prim-rpc", text: "GitHub", icon: "simple-icons:github" },
+]
+---
+
+<nav class="prim-navigation -mx-4 h-24 flex justify-between">
+	<div
+		class="prim-logo-container text-prim-space flex items-center mt-8 px-4"
+		data-light="10"
+		data-brightness="0.5,1.5"
+		data-size="0.5,1.8"
+		data-offset="2,4">
+		<Prim>{brand}</Prim>
+	</div>
+	<div class="bg-white/70 border-b border-white/70 relative right-[-1px] pr-4 pt-0 rounded-bl-xl flex items-center">
+		<NavigationItem
+			type="button"
+			onclick="websiteNavigation.showModal()"
+			icon="ph:list-bold"
+			text="Menu"
+			rounded="bottom"
+			className="flex lg:hidden pt-10 pb-2"
+		/>
+		{navigation.map(item => <NavigationItem {...item} rounded="bottom" className="hidden lg:flex pt-10 pb-2" />)}
+	</div>
+</nav>
+
+<dialog id="websiteNavigation" class="modal backdrop:backdrop-blur-sm">
+	<Container className="w-full h-full">
+		<div class="grid place-items-start justify-items-center px-4">
+			<div
+				class="drawer-like relative z-50 w-full bg-white/70 border-x border-b border-white/70 rounded-b-xl flex flex-col items-stretch">
+				<form method="dialog" class="flex justify-between h-24">
+					<NavigationItem type="a" icon="ph:house-bold" text="Home" link="/" rounded="bottom" className="pt-10 pb-2" />
+					<NavigationItem type="button" icon="ph:x-bold" text="Close" rounded="bottom" className="pt-10 pb-2" />
+				</form>
+				{navigation.filter(nav => !nav.icon).map(item => <NavigationItem {...item} className="flex-grow" />)}
+				<div class="inline-flex">
+					{navigation.filter(nav => nav.icon).map(item => <NavigationItem {...item} className="flex-grow" />)}
+				</div>
+			</div>
+		</div>
+	</Container>
+	<form method="dialog" class="fixed inset-0">
+		<button class="absolute z-0 inset-0 opacity-0">close</button>
+	</form>
+</dialog>
+
+<style is:global>
+	#websiteNavigation.modal {
+		.drawer-like {
+			opacity: 0;
+			transition: all 300ms;
+			transform: translateY(-3rem);
+		}
+
+		&[open] .drawer-like {
+			opacity: 1;
+			transform: translateY(0);
+		}
+	}
+
+	.disable-effects .prim-logo-container {
+		color: white;
+	}
+</style>

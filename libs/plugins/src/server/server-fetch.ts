@@ -7,7 +7,7 @@ import { BlobRecords, PrimServerEvents } from "@doseofted/prim-rpc"
 interface PrimRequestOptions {
 	prim: PrimServerEvents
 	/** Transform a request into an object to be passed to your function's `this` context */
-	contextTransform?: (request: Request) => unknown
+	contextTransform?: (request: Request, response: Response) => unknown
 	/** Process given Request before handing it off to this plugin */
 	preprocess?: (request: Request) => Request | Promise<Request | undefined> | void
 	/** Process Prim+RPC generated Response before sending it back to your server */
@@ -52,7 +52,8 @@ export function primFetch(options: PrimRequestOptions) {
 		}
 		const server = prim.server()
 		const methodCall = { body, url, method, blobs }
-		const result = await server.call(methodCall, contextTransform(request))
+		let response = new Response(null, { status: 500 }) // default response, to be merged with intended response
+		const result = await server.call(methodCall, contextTransform(request, response))
 		const hasBinary = ["application/octet-stream", "multipart/form-data"].includes(result.headers["content-type"])
 		let firstFile = { name: "", blob: null as Blob | null, type: "application/octet-stream" }
 		const blobEntries = Object.entries(result.blobs)
@@ -63,20 +64,23 @@ export function primFetch(options: PrimRequestOptions) {
 			for (const [key, value] of blobEntries) {
 				formData.append(key, value as Blob)
 				if (!firstFile.blob) {
-					const blob = value as Blob
-					firstFile = { name: blob.name, blob, type: blob.type }
+					const blob = value as File
+					firstFile = { name: blob?.name, blob, type: blob.type }
 				}
 			}
 			if (method === "POST" && blobEntries.length > 0) {
 				delete result.headers["content-type"] // NOTE: Response will handle this
-				const response = new Response(formData, {
-					headers: result.headers,
+				response = new Response(formData, {
+					...response,
+					headers: { ...response.headers, ...result.headers },
 					status: result.status,
 				})
 				return (await postprocess(response)) || response
 			} else if (method === "GET" && blobEntries.length === 1) {
-				const response = new Response(firstFile.blob, {
+				response = new Response(firstFile.blob, {
+					...response,
 					headers: {
+						...response.headers,
 						...result.headers,
 						"content-disposition": `inline; filename="${firstFile.name}"`,
 						"content-type": firstFile.type,
@@ -87,8 +91,9 @@ export function primFetch(options: PrimRequestOptions) {
 			}
 		}
 		// eslint-disable-next-line @typescript-eslint/no-unsafe-argument
-		const response = new Response(result.body, {
-			headers: result.headers,
+		response = new Response(result.body, {
+			...response,
+			headers: { ...response.headers, ...result.headers },
 			status: result.status,
 		})
 		return (await postprocess(response)) || response

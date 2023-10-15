@@ -23,3 +23,5 @@ node_modules
 dist
 # The .pnpm-store folder is usually in a system-specific location but just in case:
 .pnpm-store
+# The API docs are generated with TypeDoc on each build are don't need to be commited to repo
+**/docs/api.json

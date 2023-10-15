@@ -135,7 +135,7 @@ export const expressPrimRpc = (options: PrimExpressPluginOptions) => {
 					const asBuffer = blobValue instanceof Blob ? await blobValue.arrayBuffer() : blobValue
 					const fileBuffer = Buffer.from(asBuffer)
 					const options: AppendOptions = {
-						filename: blobValue instanceof Blob ? blobValue.name : "",
+						filename: blobValue instanceof Blob ? (blobValue as File)?.name : "",
 						contentType: blobValue instanceof Blob ? blobValue.type : "",
 					}
 					formResponse.append(blobKey, fileBuffer, options)

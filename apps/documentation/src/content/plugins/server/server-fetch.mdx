@@ -1,0 +1,131 @@
+---
+title: Fetch API
+icon: simple-icons:javascript
+type: "method-handler"
+transport: "http"
+features: []
+status: available
+links:
+  - name: Node
+    href: https://github.com/nodejs/node#readme
+  - name: Deno
+    href: https://github.com/denoland/deno#readme
+  - name: Bun
+    href: https://github.com/oven-sh/bun#readme
+---
+
+import CodeFile from "@/components/Code/CodeFile.astro"
+import Code from "@/components/Code/Code.astro"
+import CodeTabs from "@/components/Code/CodeTabs.react.tsx"
+import Aside from "@/components/Markdown/Aside.astro"
+
+<Aside>
+	This covers the server-side Fetch handler. There's also a [client-specific Fetch plugin
+	available](/docs/reference/plugins/client/browser-fetch) to use.
+</Aside>
+
+Prim+RPC supports the Fetch API as used in modern JavaScript runtimes like Bun and Deno. Node can also use the Fetch API
+through the `@whatwg-node/*{:txt}` ponyfill and server adapter.
+
+First, you'll need some module with functions that you'd like to expose to the client:
+
+<CodeFile filename="src/functions.ts">
+
+```typescript
+export function hello() {
+	return "Hi from Prim+RPC!"
+}
+hello.rpc = true
+
+export default hello
+```
+
+</CodeFile>
+
+Now we can configure our Prim+RPC server with our module using the Fetch API:
+
+<CodeFile filename="src/index.ts">
+
+```typescript {2,6}
+import { createPrimServer } from "@doseofted/prim-rpc"
+import { primFetch } from "@doseofted/prim-rpc-plugins/server-fetch"
+import * as module from "./functions"
+
+const prim = createPrimServer({ module })
+const fetch = primFetch({ prim })
+```
+
+</CodeFile>
+
+The Fetch function will be used with the server of your choice. Choose your runtime:
+
+<CodeTabs client:visible details={[
+		{ name: "Deno", icon: "simple-icons:deno" },
+		{ name: "Bun", icon: "simple-icons:bun" },
+		{ name: "Node", icon: "simple-icons:nodedotjs" },
+  ]}>
+
+<Code slot="$tab0">
+
+```typescript {8-9}
+import { createPrimServer } from "@doseofted/prim-rpc"
+import { primFetch } from "@doseofted/prim-rpc-plugins/server-fetch"
+import * as module from "./functions"
+
+const prim = createPrimServer({ module })
+const fetch = primFetch({ prim })
+
+// Serves http://localhost:8000/prim
+Deno.serve(fetch)
+```
+
+</Code>
+
+<Code slot="$tab1">
+
+```typescript {8-9}
+import { createPrimServer } from "@doseofted/prim-rpc"
+import { primFetch } from "@doseofted/prim-rpc-plugins/server-fetch"
+import * as module from "./functions"
+
+const prim = createPrimServer({ module })
+const fetch = primFetch({ prim })
+
+// Serves http://localhost:3000/prim
+Bun.serve({ fetch })
+```
+
+</Code>
+
+<Code slot="$tab3">
+
+```typescript {3,9-11}
+import { createPrimServer } from "@doseofted/prim-rpc"
+import { primFetch } from "@doseofted/prim-rpc-plugins/server-fetch"
+import { createServerAdapter } from "@whatwg-node/server"
+import * as module from "./functions"
+
+const prim = createPrimServer({ module })
+const fetch = primFetch({ prim })
+
+// Serves http://localhost:3000/prim
+const fetchAdapter = createServerAdapter(fetch)
+const server = createServer(fetchAdapter).listen(3000)
+```
+
+</Code>
+
+</CodeTabs>
+
+Your server should now be available on the address show above, unless you have changed settings. Take note of the
+address as will become the client's endpoint. The `/prim{:txt}` prefix may also be different if you've configured it in
+your Prim+RPC server. You can test it out like so:
+
+<CodeFile>
+
+```zsh
+# Remember to change the address depending on your server
+curl --request GET --url "http://localhost:3000/prim"
+```
+
+</CodeFile>

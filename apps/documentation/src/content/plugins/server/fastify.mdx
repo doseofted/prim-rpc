@@ -1,0 +1,81 @@
+---
+title: Fastify
+icon: simple-icons:fastify
+type: method-handler
+transport: http
+features: []
+status: available
+links:
+  - name: Fastify
+    href: https://github.com/fastify/fastify#readme
+---
+
+import CodeFile from "@/components/Code/CodeFile.astro"
+
+The Prim+RPC server can be configured with Fastify. First, create some module to be shared with server
+
+<CodeFile filename="src/functions.ts">
+
+```typescript
+export function hello() {
+	return "Hi from Prim+RPC!"
+}
+hello.rpc = true
+
+export default hello
+```
+
+</CodeFile>
+
+Below is a simple example of how to use this module with Fastify:
+
+<CodeFile filename="src/index.ts">
+
+```typescript
+import { createPrimServer } from "@doseofted/prim-rpc"
+import { createMethodHandler } from "@doseofted/prim-rpc-plugins/fastify"
+import Fastify from "fastify"
+import * as module from "./functions"
+
+const fastify = Fastify()
+
+const methodHandler = createMethodHandler({ fastify })
+createPrimServer({ module, methodHandler })
+
+fastify.listen({ port: 3000 })
+```
+
+</CodeFile>
+
+This configuration does not yet support Files and Blobs but we can do so by adding new Fastify plugins. First, install
+both `@fastify/multipart{:txt}` and `form-data{:txt}` using your chosen package manager. Then you can configure it like
+so:
+
+<CodeFile filename="src/index.ts">
+
+```typescript {4-5} /multipartPlugin, formDataHandler/
+import { createPrimServer } from "@doseofted/prim-rpc"
+import { createMethodHandler } from "@doseofted/prim-rpc-plugins/fastify"
+import Fastify from "fastify"
+import multipartPlugin from "@fastify/multipart"
+import formDataHandler from "form-data"
+
+const fastify = Fastify()
+
+const methodHandler = createMethodHandler({ fastify, multipartPlugin, formDataHandler })
+createPrimServer({ module, methodHandler })
+
+fastify.listen({ port: 3000 })
+```
+
+</CodeFile>
+
+Now we can test this out with a simple call from the command line:
+
+<CodeFile>
+
+```zsh
+curl --request GET --url "http://localhost:3000/prim"
+```
+
+</CodeFile>

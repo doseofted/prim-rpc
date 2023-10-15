@@ -1,0 +1,27 @@
+---
+import { Icon } from "astro-icon/components"
+import queryString from "query-string"
+
+interface Props {
+	type?: string
+	title: string
+	href: string
+}
+const { type = "Documentation", title, href } = Astro.props
+
+const reportIssueUrl = [
+	"https://github.com/doseofted/prim-rpc/issues/new",
+	queryString.stringify({
+		title: `${type} Issue: ${title}`,
+		body: `**Link**: [${href}](${href})\n\n**What's happening:**\n\n`,
+	}),
+].join("?")
+---
+
+<a
+	href={reportIssueUrl}
+	class="mt-6 text-sm hover:underline no-underline flex items-center gap-2 opacity-60"
+	target="_blank">
+	<Icon name="ph:git-branch-bold" />
+	<span>Report an Issue</span>
+</a>

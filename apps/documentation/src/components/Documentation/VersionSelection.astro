@@ -1,0 +1,30 @@
+---
+import { versionsAvailable, type TableOfContents } from "@/content/config"
+import { Icon } from "astro-icon/components"
+
+const path = Astro.url.pathname
+const selectedVersion = versionsAvailable?.find(v => !v.subdomain)
+const versionName = selectedVersion?.aliases[0] ? `${selectedVersion.name} (${selectedVersion?.aliases[0]})` : ""
+---
+
+<div class="dropdown dropdown-bottom w-full">
+	<label
+		tabindex="0"
+		class="btn btn-block glass bg-white/50 btn-xs my-1 flex justify-between normal-case"
+		onclick="versionSelection.focus()">
+		<span>{versionName}</span>
+		<Icon name="ph:caret-down-bold" />
+	</label>
+	<ul
+		id="versionSelection"
+		tabindex="-1"
+		class="dropdown-content focus-within:dropdown-hover w-full z-[1] menu menu-sm p-1 shadow glass !bg-white/70 rounded-xl">
+		{
+			versionsAvailable?.map(version => (
+				<li>
+					<a href={path.replace(/(\/docs\/)v\d+(.*)/, `$1${version.name}$2`)}>{version.name}</a>
+				</li>
+			))
+		}
+	</ul>
+</div>
