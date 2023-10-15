@@ -1,5 +1,11 @@
 # @doseofted/prim-rpc
 
+## 0.1.0-alpha.18
+
+### Patch Changes
+
+- 4b2ca8e: Added .preCall and .postCall hooks on server to transform args and results respectively
+
 ## 0.1.0-alpha.17
 
 ### Patch Changes
