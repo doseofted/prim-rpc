@@ -30,7 +30,6 @@
 		"postcss": "^8.4.29",
 		"prettier": "^3.0.3",
 		"prettier-plugin-astro": "^0.12.0",
-		"sass": "^1.66.1",
 		"semver": "^7.5.4",
 		"stylelint": "^15.10.3",
 		"stylelint-config-recommended": "^13.0.0",
@@ -38,7 +37,7 @@
 		"turbo": "^1.10.13",
 		"typedoc": "^0.25.1",
 		"typescript": "5.2.2",
-		"vite": "^4.4.9",
-		"vitest": "^0.34.3"
+		"vite": "^4.4.11",
+		"vitest": "^0.34.6"
 	}
 }

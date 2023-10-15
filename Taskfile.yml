@@ -22,6 +22,11 @@ tasks:
       - "pnpm install"
       - task: build
 
+  upgrade:
+    desc: "Interactively upgrade all dependencies in monorepo"
+    cmds:
+      - "pnpm upgrade -r --interactive --latest"
+
   cleanup:
     desc: "Remove various temporary files and directories created within project, for a clean run"
     ignore_error: true
