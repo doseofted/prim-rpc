@@ -39,17 +39,17 @@
 	"dependencies": {
 		"just-safe-get": "^4.2.0",
 		"just-safe-set": "^4.2.1",
-		"unplugin": "^1.4.0",
+		"unplugin": "^1.5.0",
 		"zx": "^7.2.3"
 	},
 	"devDependencies": {
 		"@doseofted/prim-example": "workspace:*",
-		"@sinclair/typebox": "^0.31.14",
-		"@types/json-schema": "^7.0.12",
-		"@types/lodash": "^4.14.198",
+		"@sinclair/typebox": "^0.31.17",
+		"@types/json-schema": "^7.0.13",
+		"@types/lodash": "^4.14.199",
 		"@types/lodash-es": "^4.17.9",
 		"type-fest": "^4.4.0",
-		"typedoc": "^0.25.1",
+		"typedoc": "^0.25.2",
 		"typescript": "5.2.2"
 	},
 	"type": "module",
