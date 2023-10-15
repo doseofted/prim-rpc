@@ -58,10 +58,13 @@ export default defineConfig({
 		// Redirects from old documentation website
 		"/docs/setup": { destination: "/docs/learn/setup", status: 301 },
 		"/docs/examples": { destination: "/docs/learn/examples", status: 301 },
-		// NOTE: features page removed
 		"/docs/security": { destination: "/docs/learn/security", status: 301 },
-		"/docs/limitations": { destination: "/docs/learn/limitations", status: 301 },
 		"/docs/comparisons": { destination: "/docs/learn/comparisons", status: 301 },
-		// TODO: add back remaining redirects once new pages are created
+		"/docs/limitations": { destination: "/docs/learn/limitations", status: 301 },
+		"/docs/reference/configuration": { destination: "/docs/reference/config", status: 301 },
+		"/docs/plugins/create": { destination: "/docs/reference/create", status: 301 },
+		"/docs/plugins/server": { destination: "/docs/reference/plugins", status: 301 },
+		"/docs/plugins/client": { destination: "/docs/reference/plugins", status: 301 },
+		"/docs/plugins/ipc": { destination: "/docs/reference/plugins", status: 301 },
 	},
 })

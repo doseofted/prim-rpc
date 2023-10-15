@@ -21,10 +21,6 @@
 			"path": "./apps/documentation"
 		},
 		{
-			"name": "🌐 Old Documentation",
-			"path": "./apps/documentation-old"
-		},
-		{
 			"name": "📗 Example Server",
 			"path": "./apps/example"
 		},
