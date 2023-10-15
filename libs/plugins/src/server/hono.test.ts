@@ -12,7 +12,6 @@ import { Hono } from "hono"
 import { JsonHandler, RpcAnswer, createPrimServer } from "@doseofted/prim-rpc"
 import { createMethodHandler, honoPrimRpc } from "./hono"
 import queryString from "query-string"
-import type { Server } from "node:http"
 import FormData from "form-data"
 import { Blob, File } from "node:buffer"
 import { readFileSync } from "node:fs"
@@ -22,7 +21,7 @@ import { encode as msgPack, decode as msgUnpack } from "@msgpack/msgpack"
 describe("Hono plugin is functional as Prim Plugin", () => {
 	const app = new Hono()
 	createPrimServer({ module, methodHandler: createMethodHandler({ app }) })
-	let server: Server
+	let server: ReturnType<typeof serve>
 	beforeEach(async () => {
 		server = serve({ fetch: app.fetch, port: 0 })
 		const listening = new Promise(resolve => {
@@ -54,7 +53,7 @@ describe("Hono plugin is functional as Hono middleware", () => {
 	const methodHandler = createMethodHandler({ app })
 	const prim = createPrimServer({ module, methodHandler })
 	app.use("/prim", honoPrimRpc({ prim }))
-	let server: Server
+	let server: ReturnType<typeof serve>
 	beforeEach(async () => {
 		server = serve({ fetch: app.fetch, port: 0 })
 		const listening = new Promise(resolve => {
@@ -85,7 +84,7 @@ describe("Hono middleware works with over GET/POST", () => {
 	const app = new Hono()
 	const methodHandler = createMethodHandler({ app })
 	createPrimServer({ module, methodHandler })
-	let server: Server
+	let server: ReturnType<typeof serve>
 	beforeEach(async () => {
 		server = serve({ fetch: app.fetch, port: 0 })
 		const listening = new Promise(resolve => {
@@ -125,7 +124,7 @@ describe("Hono middleware works with over GET/POST", () => {
 describe("Hono middleware can support binary data", () => {
 	const app = new Hono()
 	createPrimServer({ module, methodHandler: createMethodHandler({ app }) })
-	let server: Server
+	let server: ReturnType<typeof serve>
 	beforeEach(async () => {
 		server = serve({ fetch: app.fetch, port: 0 })
 		const listening = new Promise(resolve => {

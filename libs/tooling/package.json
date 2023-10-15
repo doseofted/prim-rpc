@@ -48,7 +48,7 @@
 		"@types/json-schema": "^7.0.12",
 		"@types/lodash": "^4.14.198",
 		"@types/lodash-es": "^4.17.9",
-		"type-fest": "^4.3.1",
+		"type-fest": "^4.4.0",
 		"typedoc": "^0.25.1",
 		"typescript": "5.2.2"
 	},
