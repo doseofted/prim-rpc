@@ -1,5 +1,12 @@
 # @doseofted/prim-rpc-plugins
 
+## 0.1.0-alpha.19
+
+### Patch Changes
+
+- d67e440: Bump to package dependencies
+- 4272969: Fetch plugin now has empty Response added to contextTransform option's arguments
+
 ## 0.1.0-alpha.18
 
 ### Patch Changes
