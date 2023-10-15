@@ -24,7 +24,7 @@ export default defineConfig({
 			theme: "material-theme-palenight",
 			// eslint-disable-next-line @typescript-eslint/ban-ts-comment
 			// @ts-ignore
-			langs: ["typescript", "javascript", "jsx", "tsx", "shellscript", "console", "astro", "vue"],
+			langs: ["typescript", "javascript", "jsx", "tsx", "json", "json5", "shellscript", "console", "astro", "vue"],
 			wrap: false,
 		},
 		syntaxHighlight: false, // "shiki",

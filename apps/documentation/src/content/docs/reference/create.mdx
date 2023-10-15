@@ -359,6 +359,9 @@ Prim+RPC can understand:
 - `connected.ended()` is a function that should be called when the connection is closed. This will signal to Prim+RPC
   that this connection is no longer active.
 
+When using `connected.call()` or `connected.rpc()`, ensure that the result of these calls is sent back to your server so
+that the corresponding Callback Plugin on the client can receive the messages.
+
 The result of calling these functions should be passed back to your configured server framework to send back any
 possible results created for your function call. You may learn how to implement your own by
 [referencing existing plugin code](https://github.com/doseofted/prim-rpc/tree/main/libs/plugins).

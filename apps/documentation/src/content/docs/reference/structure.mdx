@@ -3,3 +3,397 @@ title: RPC Structure
 ---
 
 # {frontmatter.title}
+
+import Aside from "@/components/Markdown/Aside.astro"
+import CodeFile from "@/components/Code/CodeFile.astro"
+import Code from "@/components/Code/Code.astro"
+import CodeTabs from "@/components/Code/CodeTabs.react.tsx"
+
+In this guide we'll cover how Prim+RPC structures RPC messages and results. This may be useful to understand if you
+decide to [write your own plugin](/docs/reference/create) or if you'd like to make a request to a Prim+RPC server in
+another language. The format is purposely kept simple so that requests are easy to make and results are easy to parse.
+
+<Aside type="warning">
+
+This is an advanced guide and is not required for most usages of Prim+RPC.
+
+</Aside>
+
+We will also touch lightly on how information may be sent over a protocol like HTTP but will focus primarily on the RPC
+part. **Note that you do not need to read this guide to use Prim+RPC.**
+
+If you'd like to try out these examples yourself, you can do so by using this JavaScript file (and installing utilized
+dependencies):
+
+<CodeFile>
+
+```javascript
+import { createPrimServer } from "@doseofted/prim-rpc"
+import { Hono } from "hono"
+import { createMethodHandler } from "@doseofted/prim-rpc-plugins/hono"
+import { serve } from "@hono/node-server"
+import { WebSocketServer } from "ws"
+import { createCallbackHandler } from "@doseofted/prim-rpc-plugins/ws"
+
+// functions will go here!
+
+const module = {}
+const app = new Hono()
+const methodHandler = createMethodHandler({ app })
+const server = serve({ fetch: app.fetch, port: 1234 })
+const wss = new WebSocketServer({ server })
+const callbackHandler = createCallbackHandler({ wss })
+const prim = createPrimServer({ module, methodHandler, callbackHandler })
+```
+
+</CodeFile>
+
+We've exposed an HTTP server running on `http://localhost:1234/prim{:txt}` and a WebSocket server at
+`ws://localhost:4321/prim{:txt}`. All requests sent to these addresses will be JSON.
+
+We'll use these addresses in any examples below when needed. All functions mentioned below should be added to the
+`module`.
+
+## Function Calls
+
+Let's say that we have set up a Prim+RPC server and gave it a module with a single function:
+
+<CodeFile>
+
+```javascript
+function add(a, b) {
+	return a + b
+}
+add.rpc = true
+```
+
+</CodeFile>
+
+We can this easily call this from the Prim+RPC client with `client.add(1, 2)`. The resulting RPC message would become:
+
+<CodeFile>
+
+```json
+{
+	"id": 123,
+	"method": "add",
+	"args": [1, 2]
+}
+```
+
+</CodeFile>
+
+And the result would be given back as:
+
+<CodeFile>
+
+```json
+{
+	"id": 123,
+	"result": 3
+}
+```
+
+</CodeFile>
+
+Note that the ID is random and optional but always used by the Prim+RPC client. If we only have one argument, we can
+omit the array and just pass the value itself. If the first function _is_ an array, we simply wrap the array in an array
+with only one item: the array.
+
+## Handling Errors
+
+Let's say we have a function that throws an error:
+
+<CodeFile>
+
+```javascript
+function oops() {
+	throw "I did it again"
+}
+oops.rpc = true
+```
+
+</CodeFile>
+
+If we call `client.oops()`, the resulting RPC call would become
+
+<CodeFile>
+
+```json
+{
+	"id": 123,
+	"method": "oops",
+	"args": []
+}
+```
+
+</CodeFile>
+
+And the result would be an error:
+
+<CodeFile>
+
+```json
+{
+	"id": 123,
+	"error": "I did it again"
+}
+```
+
+</CodeFile>
+
+Since the function had thrown an error, the result property is missing and the error property is given instead. Note
+that we had thrown a string instead of a standard Error object. We could have done this instead:
+
+<CodeFile>
+
+```javascript
+function oops() {
+	throw new Error("I did it again")
+}
+oops.rpc = true
+```
+
+</CodeFile>
+
+The call remains the same but the resulting RPC result would become:
+
+<CodeFile>
+
+```json
+{
+	"id": 123,
+	"error": {
+		"name": "Error",
+		"message": "I did it again"
+	}
+}
+```
+
+</CodeFile>
+
+## Using Callbacks
+
+Prim+RPC can support callbacks given on a function. We'll use a callback like so:
+
+<CodeFile>
+
+```javascript
+function thinking(name, callback) {
+	setTimeout(() => callback("your name is..."), 1000)
+	setTimeout(() => callback(name), 3000)
+	return "hello"
+}
+thinking.rpc = true
+```
+
+</CodeFile>
+
+When we call `client.thinking("Ted", console.log)`, the Prim+RPC client will generate the following request:
+
+<CodeFile>
+
+```json
+{
+	"id": 123,
+	"method": "thinking",
+	"args": ["Ted", "_cb_123"]
+}
+```
+
+</CodeFile>
+
+Our callback was turned into a placeholder and the client will await results with this ID. We will receive a result from
+the server but also several additional messages from our callback. Results are given in order, in each tab:
+
+<CodeTabs client:visible details={[
+		{ name: "Result", icon: "ph:brackets-curly-bold" },
+		{ name: "Callback #1", icon: "ph:brackets-round-bold" },
+		{ name: "Callback #2", icon: "ph:brackets-round-bold" }
+	]}>
+
+<Code slot="$tab1">
+
+```json
+{
+	"id": 123,
+	"result": "hello"
+}
+```
+
+</Code>
+
+<Code slot="$tab2">
+
+```json
+{
+	"id": "_cb_123",
+	"result": "your name is..."
+}
+```
+
+</Code>
+
+<Code slot="$tab3">
+
+```json
+{
+	"id": "_cb_123",
+	"result": "Ted"
+}
+```
+
+</Code>
+
+</CodeTabs>
+
+## Supporting Files
+
+We can support files (single or multiple) as both an argument but also a result. Let's set up an example:
+
+<CodeFile>
+
+```javascript
+function convertFiles(...files) {
+  return files.map(file => {
+    const contents = await file.text()
+    return new File([contents.toLowerCase()], file.name.toLowerCase())
+  })
+}
+convertFiles.rpc = true
+```
+
+</CodeFile>
+
+We could use this function in the client like so:
+
+<CodeFile>
+
+```javascript
+client.convertFiles(new File(["I'm Ted"], "Ted.txt"), new File(["I'm someone else"], "Someone.txt"))
+```
+
+</CodeFile>
+
+This call will be converted into the following RPC structure:
+
+<CodeFile>
+
+```json
+{
+	"id": 123,
+	"method": "convertFiles",
+	"args": ["_bin_1", "_bin_2"]
+}
+```
+
+</CodeFile>
+
+Note that our files were transformed into placeholders. JSON itself cannot support file types but typically our
+transport can. For example when used over an HTTP server, Prim+RPC will send this data as FormData alongside a form-item
+named `rpc` containing the RPC message above along with two other form-items named `_bin_1` and `_bin_2` with the files
+attached.
+
+The result would become:
+
+<CodeFile>
+
+```json
+{
+	"id": 123,
+	"result": ["_bin_something_random_123", "_bin_something_else_abc"]
+}
+```
+
+</CodeFile>
+
+Since JSON cannot support files, we'll receive a list of placeholder names alongside files given in our transport. When
+the transport is HTTP, this will typically be FormData. Like the request object, we will receive an `rpc` form-item with
+the result above and two additional form-items with random identifiers that correspond to the file contents given in our
+FormData.
+
+We will receive both files given as Files in JavaScript. Many plugins also support sending a file back over a GET
+request, which allows you to send files back without the need to set up a client. This could be used to serve static
+files or serve downloads.
+
+## Batching Calls
+
+Finally, we can batch calls into one single request and receive one single response with all of our results. Typically
+this is only done over the method handler since the callback handler maintains an active connection and doesn't
+necessarily benefit from batching.
+
+By default the Prim+RPC client does not batch requests but we can set the
+[Client Batch Time](/config/reference/config#-client-batch-time) to a value greater than 0 to enable it.
+
+Let's say we have several functions and we can call them like so:
+
+<CodeFile>
+
+```javascript
+function hello(name = "world") {
+	return `Hello ${name}!`
+}
+hello.rpc = true
+
+function add(a, b) {
+	return a + b
+}
+add.rpc = true
+
+hello()
+add(5, 5)
+hello("Ted")
+```
+
+</CodeFile>
+
+Our RPC would be batched like so:
+
+<CodeFile>
+
+```json
+[
+	{
+		"id": 1,
+		"method": "hello",
+		"args": []
+	},
+	{
+		"id": 2,
+		"method": "add",
+		"args": [5, 5]
+	},
+	{
+		"id": 3,
+		"method": "hello",
+		"args": ["Ted"]
+	}
+]
+```
+
+</CodeFile>
+
+Identifiers are highly suggested when batching to link back a function call to its result. The RPC result would become:
+
+<CodeFile>
+
+```json
+[
+	{
+		"id": 1,
+		"result": "Hello world!"
+	},
+	{
+		"id": 2,
+		"result": 5
+	},
+	{
+		"id": 3,
+		"result": "Hello Ted!"
+	}
+]
+```
+
+</CodeFile>
+
+And when using the Prim+RPC client, our functions will receive their results as expected.
