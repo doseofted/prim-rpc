@@ -1,0 +1,13 @@
+---
+import DataListItem from "./DataListItem.astro"
+
+interface Props {
+	synced?: boolean
+}
+
+const { synced = false } = Astro.props
+---
+
+<ul class="my-6 px-0 not-prose">
+	<DataListItem type="boolean" keyName="Sync Required" value={synced} horizontal={true} />
+</ul>

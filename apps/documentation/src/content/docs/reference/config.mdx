@@ -10,6 +10,9 @@ import Code from "@/components/Code/Code.astro"
 import { Icon } from "astro-icon/components"
 import Button from "@/components/Markdown/Button.astro"
 import ButtonGroup from "@/components/Markdown/ButtonGroup.astro"
+import DataList from "@/components/Markdown/DataList.astro"
+import DataListItem from "@/components/Markdown/DataListItem.astro"
+import DataListOptions from "@/components/Markdown/DataListOptions.astro"
 
 # {frontmatter.title}
 
@@ -27,6 +30,8 @@ reference the functions exported by Prim+RPC in the API reference.
 </ButtonGroup>
 
 ## <Icon name="ph:brackets-curly-bold"/> Module
+
+<DataListOptions />
 
 <CodeFile>
 
@@ -61,6 +66,8 @@ one of two ways:
 
 ## <Icon name="ph:brackets-curly-bold"/> HTTP Endpoint
 
+<DataListOptions />
+
 <CodeFile>
 
 ```typescript
@@ -74,6 +81,8 @@ While Prim+RPC can be used with many transports, it's often used with HTTP serve
 pass the server address is given on Prim+RPC itself and is shared with plugins.
 
 ## <Icon name="ph:brackets-curly-bold"/> WebSocket Endpoint
+
+<DataListOptions />
 
 <CodeFile>
 
@@ -90,6 +99,8 @@ The WebSocket Endpoint option is given for convenience when using a plugin (usua
 
 ## <Icon name="ph:brackets-curly-bold"/> Client Batch Time
 
+<DataListOptions />
+
 <CodeFile>
 
 ```typescript
@@ -104,6 +115,8 @@ RPC: the batch time is set to 0. If batching is needed, set this option to a val
 the time in milliseconds that Prim+RPC will wait before sending batched requests.
 
 ## <Icon name="ph:brackets-curly-bold"/> JSON Handler
+
+<DataListOptions synced />
 
 <CodeFile>
 
@@ -141,6 +154,8 @@ Examples with popular libraries are [given in this documentation](/docs/referenc
 
 ## <Icon name="ph:brackets-curly-bold"/> Method Plugin
 
+<DataListOptions />
+
 <CodeFile>
 
 ```typescript
@@ -167,6 +182,8 @@ There are plugins already available to use but you may also create your own.
 </ButtonGroup>
 
 ## <Icon name="ph:brackets-curly-bold"/> Callback Plugin
+
+<DataListOptions />
 
 <CodeFile>
 
@@ -195,6 +212,8 @@ There are plugins already available to use but you may also create your own.
 
 ## <Icon name="ph:brackets-curly-bold"/> Handle Error
 
+<DataListOptions synced />
+
 <CodeFile>
 
 ```typescript
@@ -219,6 +238,8 @@ If you explicitly set this option, this will override any default. However, if y
 errors and this option is set to true, this may lead to unexpected behavior.
 
 ## <Icon name="ph:brackets-curly-bold"/> Handle Blobs
+
+<DataListOptions synced />
 
 <CodeFile>
 
@@ -247,6 +268,8 @@ this option off.
 
 ## <Icon name="ph:brackets-curly-bold"/> Allow List
 
+<DataListOptions />
+
 <CodeFile>
 
 ```typescript
@@ -271,6 +294,8 @@ the value is a boolean flag stating whether that function should be considered R
 
 ## <Icon name="ph:brackets-curly-bold"/> Methods on Methods
 
+<DataListOptions />
+
 <CodeFile>
 
 ```typescript
@@ -294,6 +319,8 @@ is given in this option. This may be useful for adding metadata to your function
 
 ## <Icon name="ph:brackets-curly-bold"/> Show Error Stack
 
+<DataListOptions />
+
 <CodeFile>
 
 ```typescript
@@ -312,6 +339,8 @@ security needs may not be wanted in production.
 
 ## <Icon name="ph:brackets-curly-bold"/> Prefix
 
+<DataListOptions />
+
 <CodeFile>
 
 ```typescript
@@ -327,6 +356,8 @@ HTTP and WebSocket servers. It can be used by plugins to establish a path of a U
 used with a server, you may change this to `/{:txt}` (or any other path that you'd like).
 
 ## <Icon name="ph:brackets-curly-bold"/> Method Handler
+
+<DataListOptions />
 
 <CodeFile>
 
@@ -357,6 +388,8 @@ There are handlers already available to use but you may also create your own.
 </ButtonGroup>
 
 ## <Icon name="ph:brackets-curly-bold"/> Callback Handler
+
+<DataListOptions />
 
 <CodeFile>
 
@@ -391,6 +424,8 @@ There are handlers already available to use but you may also create your own.
 
 ## <Icon name="ph:brackets-curly-bold"/> Pre-Call Hook
 
+<DataListOptions />
+
 <CodeFile>
 
 ```typescript
@@ -412,6 +447,8 @@ function itself (resulting in the function being called twice). This may be usef
 and processing metadata attached to a function.
 
 ## <Icon name="ph:brackets-curly-bold"/> Post-Call Hook
+
+<DataListOptions />
 
 <CodeFile>
 

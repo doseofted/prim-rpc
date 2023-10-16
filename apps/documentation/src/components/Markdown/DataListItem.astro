@@ -3,12 +3,13 @@ import { Icon } from "astro-icon/components"
 import defu from "defu"
 interface Props {
 	type?: "slot" | "text" | "boolean" | "link"
-	key: string
+	keyName: string
 	value?: string | string[] | boolean | number | { name: string; href: string }[]
 	name?: string
 	mappings?: Record<"truthy" | "falsey", string>
+	horizontal?: boolean
 }
-const { key, value, type, name, mappings: mappingsGiven } = Astro.props
+const { keyName: keyName, value, type, name, mappings: mappingsGiven, horizontal = false } = Astro.props
 const mappings = defu(mappingsGiven, {
 	truthy: "Yes",
 	falsey: "No",
@@ -17,16 +18,16 @@ const mappings = defu(mappingsGiven, {
 const valueAsArray = Array.isArray(value) ? value : [value]
 ---
 
-<li class="flex flex-col gap-2 text-sm">
-	<div class="capitalize font-semibold">{key}</div>
+<li class:list={["flex gap-2 text-sm", horizontal ? "flex-row items-center" : "flex-col"]}>
+	<div class="capitalize font-semibold">{keyName}:</div>
 	{
 		type === "text" ? (
 			<div>{value}</div>
 		) : type === "boolean" ? (
-			<div class="flex gap-2 items-center">
+			<div class="flex gap-1 items-center">
 				<Icon
 					name={typeof value === "boolean" ? (value ? "ph:check-circle-bold" : "ph:x-circle-bold") : value}
-					class:list={["w-5 h-5", typeof value === "boolean" ? (value ? "text-green-500" : "text-red-500") : ""]}
+					class:list={["w-5 h-5", typeof value === "boolean" ? (value ? "text-gray-700" : "text-gray-700") : ""]}
 				/>
 				<span>{mappings[value ? "truthy" : "falsey"]}</span>
 			</div>

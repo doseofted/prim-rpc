@@ -34,7 +34,7 @@ const links = Array.isArray(given.links) ? given.links : []
 ---
 
 <DataList title="Plugin Details">
-	<DataListItem type="text" key="Plugin Type" value={type} />
-	<DataListItem type="text" key="Transport" value={transport} />
-	{links.length > 0 && <DataListItem type="link" key="Works with" value={links} />}
+	<DataListItem type="text" keyName="Plugin Type" value={type} />
+	<DataListItem type="text" keyName="Transport" value={transport} />
+	{links.length > 0 && <DataListItem type="link" keyName="Works with" value={links} />}
 </DataList>

@@ -17,7 +17,7 @@ const contentsGiven = Astro.slots.has("default")
 			contentsGiven ? (
 				<slot />
 			) : (
-				Object.entries(data ?? {}).map(([key, value]) => <DataListItem key={key} value={value} />)
+				Object.entries(data ?? {}).map(([key, value]) => <DataListItem keyName={key} value={value} />)
 			)
 		}
 	</ul>
