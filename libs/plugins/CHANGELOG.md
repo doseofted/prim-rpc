@@ -1,5 +1,12 @@
 # @doseofted/prim-rpc-plugins
 
+## 0.1.0-alpha.20
+
+### Patch Changes
+
+- 7ddfb01: contextTransform option of client-side Fetch method handler now passes argument of ResponseInit type instead
+  of empty Response object
+
 ## 0.1.0-alpha.19
 
 ### Patch Changes
