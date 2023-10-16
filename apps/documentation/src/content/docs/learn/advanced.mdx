@@ -88,8 +88,9 @@ Replace the `sayHello()` function with this:
 
 ```typescript
 import { micromark } from "micromark"
+import { File } from "node:buffer"
 
-export function markdownToHtml(markdownFile: File | string) {
+export async function markdownToHtml(markdownFile: File | string) {
 	const markdown = typeof markdownFile === "string" ? markdownFile : await markdownFile.text()
 	const html = micromark(markdown)
 	return new File([html], "snippet.html", { type: "text/html" })
@@ -98,6 +99,12 @@ markdownToHtml.rpc = true
 ```
 
 </CodeFile>
+
+<Aside>
+
+If using Bun or Deno, you do not need to import `File` as it's already a global.
+
+</Aside>
 
 This function takes either a string of Markdown or a Markdown file and converts it into an HTML file. We can test this
 out directly by just making a request to the server to retrieve the file itself:
@@ -257,6 +264,7 @@ package.
 ```zsh
 cd server
 pnpm add ws
+pnpm add -D @types/ws
 ```
 
 </CodeFile>
@@ -398,11 +406,9 @@ Now we can use this callback on the client. Let's update our client to use this 
 ```typescript {3,6-10}
 import { client } from "./prim"
 
-client.typeMessage("Hello world!", console.log)
-
 const app = document.getElementById("app")
 if (app) {
-	client.typeMessage("Hello world!", letter => {
+	client.typeMessage("Hello!", letter => {
 		app.innerText += letter
 	})
 }
@@ -417,6 +423,13 @@ each letter of our message logged and see that message typed on our webpage.
 
 Prim+RPC separates the method of communication between server and client from your function logic, allowing you to write
 framework-agnostic code. But there are times where you need data only available in your server's context.
+
+<Aside>
+
+If you are running the starter project in a hosted environment like Stackblitz, you will need to adjust CORS rules to
+match the domain where your project is hosted.
+
+</Aside>
 
 We can share this server context with Prim+RPC. Better yet, we can transform the server context so that our functions
 only receive data relevant to them.
@@ -462,8 +475,8 @@ import { WebSocketServer } from "ws"
 import jsonHandler from "superjson"
 import { parse, serialize } from "cookie"
 
-const cookieOpts = { httpOnly: true, sameSite: "none" }
-function contextTransform(req: Request, res: Response) {
+const cookieOpts = { httpOnly: true, sameSite: "none", secure: true } as const
+function contextTransform(req: Request, res: { headers: Headers }) {
 	const secret = "can't-touch-this"
 	return {
 		setSecret(given: string) {
@@ -517,11 +530,35 @@ import type { ServerContext } from "./index"
 export function secretMessage(this: ServerContext, secret?: string) {
 	if (secret) {
 		this.setSecret(secret)
-		return
+		return ""
 	}
 	if (!this.allowed) throw new Error("No secret, no entry.")
 	return "Access granted! The answer is 42."
 }
+secretMessage.rpc = true
+```
+
+</CodeFile>
+
+There is one last step to perform on our Prim+RPC client. Since we are setting a cookie from the server, we must set the
+`credentials` [option of the fetch function](https://developer.mozilla.org/en-US/docs/Web/API/fetch#include) to
+"include" so that cookies can be set properly. we can do this easily with our method plugin:
+
+<CodeFile filename="client/prim.ts">
+
+```typescript /{ credentials: "include" }/
+import { createPrimClient } from "@doseofted/prim-rpc"
+import { createMethodPlugin } from "@doseofted/prim-rpc-plugins/browser-fetch"
+import { createCallbackPlugin } from "@doseofted/prim-rpc-plugins/browser-websocket"
+import type { Module } from "../server"
+import jsonHandler from "superjson"
+
+export default createPrimClient<Module>({
+	endpoint: "http://localhost:3000/prim",
+	methodPlugin: createMethodPlugin({ credentials: "include" }),
+	callbackPlugin: createCallbackPlugin(),
+	jsonHandler,
+})
 ```
 
 </CodeFile>
@@ -547,7 +584,7 @@ import { client } from "./prim"
 await client.secretMessage("can't-touch-this")
 
 const app = document.getElementById("app")
-if (app) app.innerText = client.secretMessage()
+if (app) app.innerText = await client.secretMessage()
 ```
 
 </CodeFile>

@@ -193,7 +193,8 @@ sayHello.rpc = true
 The `rpc` property here signals to Prim+RPC that it can safely call this function. Functions are objects in JavaScript
 so if this looks unfamiliar, this is perfectly valid code.
 
-Now let's set up the Prim+RPC server and pass our function to it:
+Now let's set up the Prim+RPC server and pass our function to it (if using starter project, erase contents with the
+following):
 
 {/* prettier-ignore-start */}
 
@@ -210,6 +211,7 @@ export type Module = typeof module
 ```
 
 </CodeFile>
+
 
 Note that we exported the module's type. This is optional but can make for an easier development experience when shared
 with the client (either locally or by uploading types only to a registry).
@@ -344,10 +346,11 @@ import { createPrimClient } from "@doseofted/prim-rpc"
 import { createMethodPlugin } from "@doseofted/prim-rpc-plugins/browser-fetch"
 import type { Module } from "../server"
 
-export default createPrimClient<Module>({
+export const client = createPrimClient<Module>({
 	endpoint: "http://localhost:3000/prim",
 	methodPlugin: createMethodPlugin(),
 })
+export default client
 ```
 
 </CodeFile>
@@ -360,7 +363,7 @@ Prim+RPC is now set up and ready to use! Try making a function call:
 <CodeFile filename="client/index.ts">
 
 ```typescript
-import client from "./prim"
+import { client } from "./prim"
 
 const greeting = await client.sayHello()
 console.log(greeting) // "Frontend, meet Backend."
