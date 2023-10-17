@@ -403,7 +403,7 @@ Now we can use this callback on the client. Let's update our client to use this 
 
 <CodeFile filename="client/index.ts">
 
-```typescript {3,6-10}
+```typescript {5-7}
 import { client } from "./prim"
 
 const app = document.getElementById("app")
@@ -540,6 +540,17 @@ secretMessage.rpc = true
 
 </CodeFile>
 
+Our function can now return a message to the client, only if the correct cookie is given. Yet it doesn't touch the
+actual cookie. Also note that passing `this` as an argument is only necessary if you are using TypeScript. It is removed
+from generated code and
+[only serves as a type hint](https://www.typescriptlang.org/docs/handbook/release-notes/typescript-2-0.html#specifying-the-type-of-this-for-functions).
+
+<Aside>
+	Passing server context in this way can be useful for swapping out implementations of a server. If we ever swap our the
+	server in the future, our function logic doesn't change. We simply modify the `contextTransform` function to match our
+	new server.
+</Aside>
+
 There is one last step to perform on our Prim+RPC client. Since we are setting a cookie from the server, we must set the
 `credentials` [option of the fetch function](https://developer.mozilla.org/en-US/docs/Web/API/fetch#include) to
 "include" so that cookies can be set properly. we can do this easily with our method plugin:
@@ -563,18 +574,7 @@ export default createPrimClient<Module>({
 
 </CodeFile>
 
-Our function can now return a message to the client, only if the correct cookie is given. Yet it doesn't touch the
-actual cookie. Also note that passing `this` as an argument is only necessary if you are using TypeScript. It is removed
-from generated code and
-[only serves as a type hint](https://www.typescriptlang.org/docs/handbook/release-notes/typescript-2-0.html#specifying-the-type-of-this-for-functions).
-
-<Aside>
-	Passing server context in this way can be useful for swapping out implementations of a server. If we ever swap our the
-	server in the future, our function logic doesn't change. We simply modify the `contextTransform` function to match our
-	new server.
-</Aside>
-
-Let's call this function from the client.
+Now let's call this function from the client:
 
 <CodeFile filename="client/index.ts">
 
@@ -589,8 +589,8 @@ if (app) app.innerText = await client.secretMessage()
 
 </CodeFile>
 
-Because we passed the correct secret, we can see the secret message from the server. Because this secret has been set in
-the cookie, we don't need to set it again. For demonstration, comment out that first line:
+Because we passed the correct secret, we can see the secret message from the server. And because this secret has been
+set in the cookie, we don't need to set it again. For demonstration, comment out that first line:
 
 <CodeFile filename="client/index.ts">
 
