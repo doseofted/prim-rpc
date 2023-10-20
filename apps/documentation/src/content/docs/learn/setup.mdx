@@ -279,7 +279,7 @@ Prim+RPC are typically made over POST but for demo's sake:
 <CodeFile>
 
 ```zsh
-curl --request GET --url "http://localhost:3001/prim/sayHello?0=Backend&1=Terminal"
+curl "http://localhost:3001/prim/sayHello?0=Backend&1=Terminal"
 ```
 
 </CodeFile>
@@ -315,6 +315,13 @@ export type Module = typeof module
 </CodeFile>
 
 {/* prettier-ignore-end */}
+
+<Aside>
+
+If you are running the starter project in a hosted environment like Stackblitz, you may need to adjust CORS rules to use
+`https://localhost:3000{:txt}` (using HTTPS instead of HTTP).
+
+</Aside>
 
 This will allow our client, which will run on `http://localhost:3000{:txt}`, to call the server. Our server is fully
 configured and we can now set up the client!

@@ -112,7 +112,7 @@ out directly by just making a request to the server to retrieve the file itself:
 <CodeFile>
 
 ```zsh
-curl --request GET --url "http://localhost:3001/prim/markdownToHtml?0=Hello%20there"
+curl "http://localhost:3001/prim/markdownToHtml?0=Hello%20there"
 ```
 
 </CodeFile>
@@ -203,11 +203,12 @@ import { createMethodPlugin } from "@doseofted/prim-rpc-plugins/browser-fetch"
 import type { Module } from "../server"
 import jsonHandler from "superjson"
 
-export default createPrimClient<Module>({
+export const client = createPrimClient<Module>({
 	endpoint: "http://localhost:3001/prim",
 	methodPlugin: createMethodPlugin(),
 	jsonHandler,
 })
+export default client
 ```
 
 </CodeFile>
@@ -365,12 +366,13 @@ import { createCallbackPlugin } from "@doseofted/prim-rpc-plugins/browser-websoc
 import type { Module } from "../server"
 import jsonHandler from "superjson"
 
-export default createPrimClient<Module>({
+export const client = createPrimClient<Module>({
 	endpoint: "http://localhost:3001/prim",
 	methodPlugin: createMethodPlugin(),
 	callbackPlugin: createCallbackPlugin(),
 	jsonHandler,
 })
+export default client
 ```
 
 </CodeFile>
@@ -424,13 +426,6 @@ each letter of our message logged and see that message typed on our webpage.
 Prim+RPC separates the method of communication between server and client from your function logic, allowing you to write
 framework-agnostic code. But there are times where you need data only available in your server's context.
 
-<Aside>
-
-If you are running the starter project in a hosted environment like Stackblitz, you will need to adjust CORS rules to
-match the domain where your project is hosted.
-
-</Aside>
-
 We can share this server context with Prim+RPC. Better yet, we can transform the server context so that our functions
 only receive data relevant to them.
 
@@ -464,7 +459,7 @@ Let's set this up now.
 
 <CodeFile filename="server/index.ts">
 
-```typescript {9,11-23} /contextTransform/3
+```typescript {9,11-23,31} /contextTransform/3
 import { createPrimServer } from "@doseofted/prim-rpc"
 import { primFetch } from "@doseofted/prim-rpc-plugins/server-fetch"
 import { createCallbackHandler } from "@doseofted/prim-rpc-plugins/ws"
@@ -476,11 +471,11 @@ import jsonHandler from "superjson"
 import { parse, serialize } from "cookie"
 
 const cookieOpts = { httpOnly: true, sameSite: "none", secure: true } as const
-function contextTransform(req: Request, res: { headers: Headers }) {
+function contextTransform(req: Request, res?: { headers: Headers }) {
 	const secret = "can't-touch-this"
 	return {
 		setSecret(given: string) {
-			res.headers.set("set-cookie", serialize("secret", given, cookieOpts))
+			res?.headers.set("set-cookie", serialize("secret", given, cookieOpts))
 		},
 		get allowed() {
 			return secret === parse(req.headers.get("cookie") ?? "").secret
@@ -495,6 +490,7 @@ const prim = createPrimServer({ module, jsonHandler, callbackHandler })
 function postprocess(res: Response) {
 	res.headers.set("access-control-allow-origin", "http://localhost:3000")
 	res.headers.set("access-control-allow-headers", "content-type")
+	res.headers.set("access-control-allow-credentials", "true")
 }
 const fetch = primFetch({ prim, postprocess, contextTransform })
 
@@ -517,7 +513,15 @@ export type Module = typeof module
 {/* prettier-ignore-end */}
 
 We have defined a function and a property that we want to expose to our functions: `setSecret()` will set the secret and
-`allowed` will return whether the secret is set to the correct value.
+`allowed` will return whether the secret is set to the correct value, both using cookies. We have also added a new CORS
+header which will allow the browser to set the cookie.
+
+<Aside>
+
+If you are running the starter project in a hosted environment like Stackblitz, you may need to adjust CORS rules to use
+`https://localhost:3000{:txt}` (using HTTPS instead of HTTP).
+
+</Aside>
 
 Note that we have defined a `ServerContext` interface. This will become available to our functions. We can now utilize
 the new interface in our functions, like so:
@@ -564,12 +568,13 @@ import { createCallbackPlugin } from "@doseofted/prim-rpc-plugins/browser-websoc
 import type { Module } from "../server"
 import jsonHandler from "superjson"
 
-export default createPrimClient<Module>({
+export const client = createPrimClient<Module>({
 	endpoint: "http://localhost:3001/prim",
 	methodPlugin: createMethodPlugin({ credentials: "include" }),
 	callbackPlugin: createCallbackPlugin(),
 	jsonHandler,
 })
+export default client
 ```
 
 </CodeFile>
