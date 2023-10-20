@@ -112,7 +112,7 @@ out directly by just making a request to the server to retrieve the file itself:
 <CodeFile>
 
 ```zsh
-curl --request GET --url "http://localhost:3000/prim/markdownToHtml?0=Hello%20there"
+curl --request GET --url "http://localhost:3001/prim/markdownToHtml?0=Hello%20there"
 ```
 
 </CodeFile>
@@ -176,14 +176,14 @@ import jsonHandler from "superjson"
 
 const prim = createPrimServer({ module, jsonHandler })
 function postprocess(res: Response) {
-	res.headers.set("access-control-allow-origin", "http://localhost:5173")
+	res.headers.set("access-control-allow-origin", "http://localhost:3000")
 	res.headers.set("access-control-allow-headers", "content-type")
 }
 const fetch = primFetch({ prim, postprocess })
 
 const fetchAdapter = createServerAdapter(fetch)
-createServer(fetchAdapter).listen(3000)
-console.log("Prim+RPC is available at http://localhost:3000/prim")
+createServer(fetchAdapter).listen(3001)
+console.log("Prim+RPC is available at http://localhost:3001/prim")
 
 export type Module = typeof module
 
@@ -204,7 +204,7 @@ import type { Module } from "../server"
 import jsonHandler from "superjson"
 
 export default createPrimClient<Module>({
-	endpoint: "http://localhost:3000/prim",
+	endpoint: "http://localhost:3001/prim",
 	methodPlugin: createMethodPlugin(),
 	jsonHandler,
 })
@@ -289,14 +289,14 @@ import jsonHandler from "superjson"
 const wss = new WebSocketServer({ noServer: true })
 const prim = createPrimServer({ module, jsonHandler })
 function postprocess(res: Response) {
-	res.headers.set("access-control-allow-origin", "http://localhost:5173")
+	res.headers.set("access-control-allow-origin", "http://localhost:3000")
 	res.headers.set("access-control-allow-headers", "content-type")
 }
 const fetch = primFetch({ prim, postprocess })
 
 const fetchAdapter = createServerAdapter(fetch)
-const server = createServer(fetchAdapter).listen(3000)
-console.log("Prim+RPC is available at http://localhost:3000/prim")
+const server = createServer(fetchAdapter).listen(3001)
+console.log("Prim+RPC is available at http://localhost:3001/prim")
 
 server.on("upgrade", (request, socket, head) => {
 	wss.handleUpgrade(request, socket, head, ws => {
@@ -329,14 +329,14 @@ const wss = new WebSocketServer({ noServer: true })
 const callbackHandler = createCallbackHandler({ wss })
 const prim = createPrimServer({ module, jsonHandler, callbackHandler })
 function postprocess(res: Response) {
-	res.headers.set("access-control-allow-origin", "http://localhost:5173")
+	res.headers.set("access-control-allow-origin", "http://localhost:3000")
 	res.headers.set("access-control-allow-headers", "content-type")
 }
 const fetch = primFetch({ prim, postprocess })
 
 const fetchAdapter = createServerAdapter(fetch)
-const server = createServer(fetchAdapter).listen(3000)
-console.log("Prim+RPC is available at http://localhost:3000/prim")
+const server = createServer(fetchAdapter).listen(3001)
+console.log("Prim+RPC is available at http://localhost:3001/prim")
 
 server.on("upgrade", (request, socket, head) => {
 	wss.handleUpgrade(request, socket, head, ws => {
@@ -366,7 +366,7 @@ import type { Module } from "../server"
 import jsonHandler from "superjson"
 
 export default createPrimClient<Module>({
-	endpoint: "http://localhost:3000/prim",
+	endpoint: "http://localhost:3001/prim",
 	methodPlugin: createMethodPlugin(),
 	callbackPlugin: createCallbackPlugin(),
 	jsonHandler,
@@ -493,14 +493,14 @@ const wss = new WebSocketServer({ noServer: true })
 const callbackHandler = createCallbackHandler({ wss })
 const prim = createPrimServer({ module, jsonHandler, callbackHandler })
 function postprocess(res: Response) {
-	res.headers.set("access-control-allow-origin", "http://localhost:5173")
+	res.headers.set("access-control-allow-origin", "http://localhost:3000")
 	res.headers.set("access-control-allow-headers", "content-type")
 }
 const fetch = primFetch({ prim, postprocess, contextTransform })
 
 const fetchAdapter = createServerAdapter(fetch)
-const server = createServer(fetchAdapter).listen(3000)
-console.log("Prim+RPC is available at http://localhost:3000/prim")
+const server = createServer(fetchAdapter).listen(3001)
+console.log("Prim+RPC is available at http://localhost:3001/prim")
 
 server.on("upgrade", (request, socket, head) => {
 	wss.handleUpgrade(request, socket, head, ws => {
@@ -565,7 +565,7 @@ import type { Module } from "../server"
 import jsonHandler from "superjson"
 
 export default createPrimClient<Module>({
-	endpoint: "http://localhost:3000/prim",
+	endpoint: "http://localhost:3001/prim",
 	methodPlugin: createMethodPlugin({ credentials: "include" }),
 	callbackPlugin: createCallbackPlugin(),
 	jsonHandler,
