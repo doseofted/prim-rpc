@@ -1,5 +1,15 @@
 # @doseofted/prim-rpc
 
+## 0.1.0-alpha.19
+
+### Minor Changes
+
+- c33e036: Client's module type parameter created with createPrimTestingSuite() is no longer wrapped in Partial type
+
+### Patch Changes
+
+- 24fdfdc: Function on client can now be passed as form's onsubmit handler directly
+
 ## 0.1.0-alpha.18
 
 ### Patch Changes
