@@ -9,11 +9,20 @@ import { BLOB_PREFIX } from "./client"
  * Helper to get entries from given the form as a record
  * (which can then be used to get Blobs)
  */
-function handlePossibleForm(form: HTMLFormElement | FormData) {
-	const formData = form instanceof HTMLFormElement ? new FormData(form) : form
+function handlePossibleForm(form: HTMLFormElement | FormData | SubmitEvent) {
+	if (form instanceof SubmitEvent && form.target instanceof HTMLFormElement) {
+		form.preventDefault()
+	}
+	const formData =
+		form instanceof HTMLFormElement
+			? new FormData(form)
+			: form instanceof SubmitEvent
+			? form.target instanceof HTMLFormElement
+				? new FormData(form.target)
+				: undefined
+			: form
 	const data: Record<string, FormDataEntryValue | FormDataEntryValue[]> = {}
-	// NOTE: not using `Object.fromEntries(formData.entries())` because inputs with multiple values aren't utilized
-	formData.forEach((val, key) => {
+	for (const [key, val] of formData) {
 		if (data[key]) {
 			const previous = data[key]
 			if (Array.isArray(previous)) {
@@ -24,7 +33,7 @@ function handlePossibleForm(form: HTMLFormElement | FormData) {
 		} else {
 			data[key] = val
 		}
-	})
+	}
 	return data
 }
 
@@ -55,10 +64,11 @@ export function handlePossibleBlobs(
 			? possiblyBin
 			: false
 	const binaryGiven = isBinaryLike(given)
-	const givenForm = (maybeForm: unknown): maybeForm is HTMLFormElement | FormData =>
+	const givenFormLike = (maybeForm: unknown): maybeForm is HTMLFormElement | FormData | SubmitEvent =>
 		(typeof HTMLFormElement === "function" && maybeForm instanceof HTMLFormElement) ||
-		(typeof FormData === "function" && maybeForm instanceof FormData)
-	if (givenForm(given)) {
+		(typeof FormData === "function" && maybeForm instanceof FormData) ||
+		(typeof SubmitEvent === "function" && maybeForm instanceof SubmitEvent)
+	if (givenFormLike(given)) {
 		// form was given that possibly contains blobs
 		const newGiven = handlePossibleForm(given)
 		return handlePossibleBlobs(newGiven, true)
