@@ -4,7 +4,7 @@
 
 import mitt, { Emitter, EventType } from "mitt"
 import { nanoid } from "nanoid"
-import { createPrimClient } from "./client"
+import { PrimClient, createPrimClient } from "./client"
 import {
 	PrimServerMethodHandler,
 	PrimServerCallbackHandler,
@@ -12,8 +12,10 @@ import {
 	PrimClientCallbackPlugin,
 	PrimOptions,
 	BlobRecords,
+	PrimServerOptions,
 } from "./interfaces"
 import { createPrimServer } from "./server"
+import type { PartialDeep } from "type-fest"
 
 // NOTE: these testing plugins are intended to mimic interactions with an HTTP and WS server in a single file
 
@@ -200,8 +202,8 @@ export function createPrimTestingPlugins<Ctx = unknown>(exampleContext?: Ctx) {
  * @returns Configured Prim RPC client and server
  */
 export function createPrimTestingSuite<Module extends object, Ctx = unknown>(
-	serverOptions: PrimOptions<Module>,
-	clientOptions: PrimOptions<Module>,
+	serverOptions: PrimServerOptions<Module>,
+	clientOptions: PrimOptions<Module> = {},
 	exampleContext?: Ctx
 ) {
 	const { methodHandler, callbackHandler, methodPlugin, callbackPlugin } = createPrimTestingPlugins(exampleContext)
@@ -210,11 +212,12 @@ export function createPrimTestingSuite<Module extends object, Ctx = unknown>(
 		methodHandler,
 		callbackHandler,
 	})
-	const client = createPrimClient({
+	// FIXME: reconsider how partial modules are provided to client and how it interacts with type parameter
+	const client = createPrimClient<PartialDeep<Module>>({
 		...clientOptions,
 		methodPlugin,
 		callbackPlugin,
-	})
+	}) as unknown as PrimClient<Module>
 	return { client, server }
 }
 // !SECTION
