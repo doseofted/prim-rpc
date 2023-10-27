@@ -100,7 +100,7 @@ export class LightElements {
 		const bounds = element.getBoundingClientRect()
 		const { dataset } = element
 		const count = this.#parse.dataset(dataset, "light", n => clamp(0, Infinity, parseInt(n)))
-		const colors = this.#parse.csvData(dataset, "color")
+		const colors = this.#parse.csvData(dataset, "colors")
 		const sizeElem = [Math.min(bounds.width, bounds.height), Math.max(bounds.width, bounds.height)]
 		const sizeSuggest = this.#parse.csvData(dataset, "size", parseFloat) ?? [1, 1]
 		const size = [sizeElem[0] * sizeSuggest[0], sizeElem[1] * sizeSuggest[1]] as [number, number]
