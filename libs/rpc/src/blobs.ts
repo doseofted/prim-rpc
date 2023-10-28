@@ -2,12 +2,41 @@
 // Copyright 2023 Ted Klingenberg
 // SPDX-License-Identifier: Apache-2.0
 
-import { nanoid } from "nanoid"
 import { BLOB_PREFIX } from "./client"
+import { extractGivenData, mergeGivenData } from "./extract"
 
 /**
- * Helper to get entries from given the form as a record
- * (which can then be used to get Blobs)
+ * Determine if given argument is a Blob or File (universal) or Buffer (Node)
+ *
+ * @param possiblyBinary - Maybe a binary-like object
+ * @returns The binary given, otherwise `false`
+ */
+function isBinaryLike(possiblyBinary: unknown) {
+	return (typeof Blob !== "undefined" && possiblyBinary instanceof Blob) ||
+		(typeof Buffer !== "undefined" && possiblyBinary instanceof Buffer)
+		? possiblyBinary
+		: false
+}
+
+/**
+ * Determine if given argument is form-like
+ *
+ * @param maybeForm - FormData, FormElement containing FormData, or SubmitEvent (whose target is a FormElement with FormData)
+ * @returns Boolean if given is a form-like object
+ */
+function givenFormLike(maybeForm: unknown): maybeForm is HTMLFormElement | FormData | SubmitEvent {
+	return (
+		(typeof HTMLFormElement === "function" && maybeForm instanceof HTMLFormElement) ||
+		(typeof FormData === "function" && maybeForm instanceof FormData) ||
+		(typeof SubmitEvent === "function" && maybeForm instanceof SubmitEvent)
+	)
+}
+
+/**
+ * Turn `FormData` into an object of a similar structure. Given a form-like
+ * object that can be used to reference `FormData`, extract the data from it
+ * into an object. If given a `SubmitEvent`, prevent page navigation since the
+ * event should be handled by this library.
  */
 function handlePossibleForm(form: HTMLFormElement | FormData | SubmitEvent) {
 	if (form instanceof SubmitEvent && form.target instanceof HTMLFormElement) {
@@ -57,63 +86,14 @@ export function handlePossibleBlobs(
 	given: unknown,
 	fromForm = false
 ): [given: unknown, blobs: Record<string, Blob | Buffer>, fromForm: boolean] {
-	const blobs: Record<string, Blob | Buffer> = {}
-	const isBinaryLike = (possiblyBin: unknown) =>
-		(typeof Blob !== "undefined" && possiblyBin instanceof Blob) ||
-		(typeof Buffer !== "undefined" && possiblyBin instanceof Buffer)
-			? possiblyBin
-			: false
-	const binaryGiven = isBinaryLike(given)
-	const givenFormLike = (maybeForm: unknown): maybeForm is HTMLFormElement | FormData | SubmitEvent =>
-		(typeof HTMLFormElement === "function" && maybeForm instanceof HTMLFormElement) ||
-		(typeof FormData === "function" && maybeForm instanceof FormData) ||
-		(typeof SubmitEvent === "function" && maybeForm instanceof SubmitEvent)
+	// form was given that possibly contains blobs
 	if (givenFormLike(given)) {
-		// form was given that possibly contains blobs
 		const newGiven = handlePossibleForm(given)
 		return handlePossibleBlobs(newGiven, true)
 	}
-	if (binaryGiven) {
-		// blob was given directly
-		const binaryIdentifier = [BLOB_PREFIX, nanoid()].join("")
-		blobs[binaryIdentifier] = binaryGiven
-		return [binaryIdentifier, blobs, fromForm]
-	}
-	if (typeof given === "object") {
-		for (const [key, val] of Object.entries(given)) {
-			// possibly given from form data
-			const valBinary = isBinaryLike(val)
-			if (valBinary) {
-				const binaryIdentifier = [BLOB_PREFIX, nanoid()].join("")
-				given[key] = binaryIdentifier
-				blobs[binaryIdentifier] = valBinary
-			} else if (Array.isArray(val)) {
-				// maybe multiple files were given in form data
-				const [replacedVal, moreBlobs] = handlePossibleBlobs(val)
-				given[key] = replacedVal
-				for (const [blobKey, blob] of Object.entries(moreBlobs)) {
-					blobs[blobKey] = blob
-				}
-			}
-		}
-		if (Object.keys(blobs).length > 0) {
-			return [given, blobs, fromForm]
-		}
-	}
-	if (Array.isArray(given) && given.filter(a => a instanceof Blob).length > 0) {
-		// list of blobs given
-		const replaced = given.map(val => {
-			const valBinary = isBinaryLike(val)
-			if (valBinary) {
-				const binaryIdentifier = [BLOB_PREFIX, nanoid()].join("")
-				blobs[binaryIdentifier] = valBinary
-				return binaryIdentifier
-			}
-			return val as unknown
-		})
-		return [replaced, blobs, fromForm]
-	}
-	return [given, blobs, fromForm]
+	// now we can extract the blobs
+	const [newlyGiven, blobs] = extractGivenData(given, isBinaryLike, BLOB_PREFIX)
+	return [newlyGiven, blobs, fromForm]
 }
 
 /**
@@ -126,28 +106,6 @@ export function handlePossibleBlobs(
  *
  * This undoes `handlePossibleBlobs()`.
  */
-export function mergeBlobLikeWithGiven(given: unknown, blobs: Record<string, unknown>): unknown {
-	if (typeof given === "string" && given.startsWith(BLOB_PREFIX)) {
-		return blobs[given] ?? given
-	}
-	if (typeof given === "object") {
-		for (const [key, val] of Object.entries(given)) {
-			if (typeof val === "string" && val.startsWith(BLOB_PREFIX)) {
-				given[key] = blobs[val] ?? val
-			} else if (Array.isArray(val)) {
-				const newVal = mergeBlobLikeWithGiven(val, blobs)
-				given[key] = newVal
-			}
-		}
-		return given as unknown
-	}
-	if (Array.isArray(given)) {
-		return given.map(given => {
-			if (typeof given === "string" && given.startsWith(BLOB_PREFIX)) {
-				return blobs[given] ?? given
-			}
-			return given as unknown
-		})
-	}
-	return given
+export function mergeBlobLikeWithGiven(given: unknown, blobs: Record<string, Blob | Buffer>): unknown {
+	return mergeGivenData(given, blobs, BLOB_PREFIX)
 }

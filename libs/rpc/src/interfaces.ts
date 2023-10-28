@@ -20,6 +20,16 @@ export interface RpcAnswer<Result = unknown, Error = unknown> extends RpcBase {
 	result?: Result
 	error?: Error
 }
+
+export enum UniquePrefixName {
+	/** Prefix for binary data */
+	Binary = "bin",
+	/** Prefix for callbacks */
+	Callback = "cb",
+	/** Prefix for promises */
+	Promise = "prom",
+}
+export type UniqueTypePrefix = `_${UniquePrefixName}_${string}`
 // !SECTION
 
 // SECTION HTTP/WebSocket events
