@@ -75,7 +75,7 @@ type PromisifiedModuleDirect<
 > = ConditionalExcept<
 	{
 		[Key in Keys]: ModuleGiven[Key] extends ((...args: infer A) => infer R) & object
-			? ((...args: A) => Promise<Awaited<R>>) & PromisifiedModuleDirect<ModuleGiven[Key], false>
+			? FunctionAndForm<A, Promise<Awaited<R>>> & PromisifiedModuleDirect<ModuleGiven[Key], false>
 			: ModuleGiven[Key] extends object
 			? Recursive extends true
 				? PromisifiedModuleDirect<ModuleGiven[Key], true>
