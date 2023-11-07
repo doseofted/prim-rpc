@@ -60,6 +60,12 @@ interface PrimWebSocketFunctionEvents {
 // SECTION Client options
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
+type FunctionAndForm<Args extends any[], Result> = {
+	(...args: Args): Result
+	(formLike: SubmitEvent | FormData | HTMLFormElement): Result
+}
+
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
 export type AnyFunction = (...args: any[]) => any
 // NOTE: consider condition of checking `.rpc` property on function (but also remember that it may be in allow list)
 type PromisifiedModuleDirect<
@@ -69,11 +75,7 @@ type PromisifiedModuleDirect<
 > = ConditionalExcept<
 	{
 		[Key in Keys]: ModuleGiven[Key] extends ((...args: infer A) => infer R) & object
-			? // eslint-disable-next-line @typescript-eslint/no-explicit-any
-			  R extends PromiseLike<any>
-				? // NOTE: function comment is kept here but lost in function transform (need a workaround)
-				  ModuleGiven[Key] & PromisifiedModuleDirect<ModuleGiven[Key], false>
-				: ((...args: A) => Promise<Awaited<R>>) & PromisifiedModuleDirect<ModuleGiven[Key], false>
+			? FunctionAndForm<A, Promise<Awaited<R>>> & PromisifiedModuleDirect<ModuleGiven[Key], false>
 			: ModuleGiven[Key] extends object
 			? Recursive extends true
 				? PromisifiedModuleDirect<ModuleGiven[Key], true>
