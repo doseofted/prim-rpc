@@ -1,5 +1,13 @@
 # @doseofted/prim-rpc
 
+## 0.1.0-alpha.20
+
+### Patch Changes
+
+- 22d7cec: Improved type support on client for passing form events to a function (transformed by server)
+- db47bc4: All type definitions for functions are transformed client-side because `this` argument is not needed on
+  client
+
 ## 0.1.0-alpha.19
 
 ### Minor Changes
