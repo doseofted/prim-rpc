@@ -50,7 +50,7 @@
 		"@vitest/web-worker": "^0.34.6",
 		"@whatwg-node/server": "^0.9.14",
 		"astro": "3.3.0",
-		"axios": "^1.5.1",
+		"axios": "^1.6.0",
 		"express": "^4.18.2",
 		"fastify": "^4.24.1",
 		"form-data": "^4.0.0",
