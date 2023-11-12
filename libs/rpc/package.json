@@ -1,6 +1,6 @@
 {
 	"name": "@doseofted/prim-rpc",
-	"version": "0.1.0-alpha.19",
+	"version": "0.1.0-alpha.20",
 	"description": "Easy-to-understand, type-safe, transport-agnostic RPC/IPC for JavaScript, supporting callbacks, batching, file uploads, custom serialization, and more.",
 	"license": "Apache-2.0",
 	"author": {
@@ -37,24 +37,24 @@
 		"lint": "eslint ."
 	},
 	"dependencies": {
-		"defu": "^6.1.2",
-		"destr": "^2.0.1",
+		"defu": "^6.1.3",
+		"destr": "^2.0.2",
 		"just-remove": "^3.2.0",
 		"just-safe-get": "^4.2.0",
 		"mitt": "^3.0.1",
-		"nanoid": "^5.0.1",
+		"nanoid": "^5.0.3",
 		"proxy-deep": "^3.1.1",
 		"query-string": "^8.1.0",
-		"serialize-error": "^11.0.2",
-		"type-fest": "^4.4.0"
+		"serialize-error": "^11.0.3",
+		"type-fest": "^4.7.1"
 	},
 	"devDependencies": {
 		"@doseofted/prim-example": "workspace:*",
 		"@msgpack/msgpack": "3.0.0-beta2",
-		"@types/lodash-es": "^4.17.9",
-		"@types/node": "^18.17.4",
-		"superjson": "^2.0.0",
-		"typedoc": "^0.25.2"
+		"@types/lodash-es": "^4.17.11",
+		"@types/node": "^20.9.0",
+		"superjson": "^2.2.1",
+		"typedoc": "^0.25.3"
 	},
 	"type": "module",
 	"exports": {

@@ -31,9 +31,7 @@ call it: less setup, easier access, quicker development of your API.
 
 Focus less on message transport and more on the message being sent, **with minimal setup**, using Prim+RPC:
 
-**[📖 Read the Docs](https://prim.doseofted.me/) ∙
-[💡 Try an Example](https://prim.doseofted.me/docs/reference/examples) ∙
-[⚙️ Setup in Project](https://prim.doseofted.me/docs/learn/setup) ∙ [🧑‍💻 Follow Author](https://doseofted.me/)**
+**[📖 Read the Docs](https://prim.doseofted.me/) ∙ [💡 Examples](https://prim.doseofted.me/docs/reference/examples) ∙ [⚙️ Setup](https://prim.doseofted.me/docs/learn/setup) ∙ [🔌 Plugins](https://prim.doseofted.me/docs/reference/plugins) ∙ [🧑‍💻 Follow Author](https://doseofted.me/)**
 
 ## Contributions
 
@@ -65,7 +63,7 @@ to use the library, please see the [Documentation](https://prim.doseofted.me/).
 > project!
 <!-- prettier-ignore-end -->
 
-Prim+RPC is planned to become stable by the end of 2023 (and is on track to be stable much sooner than that).
+Prim+RPC is planned to become stable by the end of 2023.
 
 Prim+RPC Core, the framework-agnostic core of the project, will become stable first and will be released once the
 default plugins are stable. Lastly, Prim+RPC's optional tooling (such as documentation generation) will become stable.

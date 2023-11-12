@@ -7,7 +7,7 @@ import { BlobRecords, PrimServerEvents } from "@doseofted/prim-rpc"
 interface PrimRequestOptions {
 	prim: PrimServerEvents
 	/** Transform a request into an object to be passed to your function's `this` context */
-	contextTransform?: (request: Request, response?: ResponseInit & { headers: Headers }) => unknown
+	contextTransform?: (request: Request, response: ResponseInit & { headers: Headers }) => unknown
 	/** Process given Request before handing it off to this plugin */
 	preprocess?: (request: Request) => Request | Promise<Request | undefined> | void
 	/** Process Prim+RPC generated Response before sending it back to your server */
