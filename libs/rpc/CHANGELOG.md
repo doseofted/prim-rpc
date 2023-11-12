@@ -1,5 +1,11 @@
 # @doseofted/prim-rpc
 
+## 0.1.0-alpha.21
+
+### Patch Changes
+
+- 5a61c07: Upgraded project dependencies
+
 ## 0.1.0-alpha.20
 
 ### Patch Changes
