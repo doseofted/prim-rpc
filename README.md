@@ -31,10 +31,7 @@ call it: less setup, easier access, quicker development of your API.
 
 Focus less on message transport and more on the message being sent, **with minimal setup**, using Prim+RPC:
 
-**[📖 Read the Docs](https://prim.doseofted.me/) ∙
-[💡 Try an Example](https://prim.doseofted.me/docs/reference/examples) ∙
-[⚙️ Setup in Project](https://prim.doseofted.me/docs/learn/setup) ∙
-[🔌 Available Plugins](http://localhost:4321/docs/reference/plugins) ∙ [🧑‍💻 Follow Author](https://doseofted.me/)**
+**[📖 Read the Docs](https://prim.doseofted.me/) ∙ [💡 Examples](https://prim.doseofted.me/docs/reference/examples) ∙ [⚙️ Setup](https://prim.doseofted.me/docs/learn/setup) ∙ [🔌 Plugins](http://localhost:4321/docs/reference/plugins) ∙ [🧑‍💻 Follow Author](https://doseofted.me/)**
 
 ## Contributions
 

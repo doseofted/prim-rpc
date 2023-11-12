@@ -47,7 +47,7 @@
 	],
 	"devDependencies": {
 		"@types/lodash-es": "^4.17.11",
-		"@types/node": "^18.17.4",
+		"@types/node": "^20.9.0",
 		"lodash-es": "^4.17.21"
 	}
 }

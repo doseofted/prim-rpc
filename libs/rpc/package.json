@@ -52,7 +52,7 @@
 		"@doseofted/prim-example": "workspace:*",
 		"@msgpack/msgpack": "3.0.0-beta2",
 		"@types/lodash-es": "^4.17.11",
-		"@types/node": "^18.17.4",
+		"@types/node": "^20.9.0",
 		"superjson": "^2.2.1",
 		"typedoc": "^0.25.3"
 	},
