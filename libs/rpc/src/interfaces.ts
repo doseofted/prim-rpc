@@ -69,6 +69,53 @@ interface PrimWebSocketFunctionEvents {
 
 // SECTION Client options
 
+// type TransformATest<T> = T
+// type TransformRTest<T> = Promise<T>
+// // NOTE: allow up to {x} number of overloads (since TypeScript doesn't have syntax for transforming function overloads)
+// // https://stackoverflow.com/a/74209026/5916475
+// // eslint-disable-next-line @typescript-eslint/no-explicit-any
+// type VariableArgsFunction<Func> = Func extends {
+// 	(...args: infer A1): infer R1
+// 	(...args: infer A2): infer R2
+// 	(...args: infer A3): infer R3
+// }
+// 	? {
+// 		(...args: TransformATest<A1>): TransformRTest<R1>
+// 		(...args: TransformATest<A2>): TransformRTest<R2>
+// 		(...args: TransformATest<A3>): TransformRTest<R3>
+// 	  }
+// 	: Func extends {
+// 		(...args: infer A1): infer R1
+// 		(...args: infer A2): infer R2
+// 	}
+// 	? {
+// 			(...args: TransformATest<A1>): TransformRTest<R1>
+// 			(...args: TransformATest<A2>): TransformRTest<R2>
+// 	  }
+// 	: Func extends {
+// 		(...args: infer A1): infer R1
+// 	}
+// 	? {
+// 			(...args: TransformATest<A1>): TransformRTest<R1>
+// 	  }
+// 	: Func
+// // function testFunc(x: string, y: number): Promise<string>
+// // function testFunc(x: boolean): boolean
+// function testFunc(x: string): string
+// function testFunc(x: number): number
+// // eslint-disable-next-line @typescript-eslint/no-explicit-any, @typescript-eslint/no-unsafe-return
+// function testFunc(x: any) {
+// 	// eslint-disable-next-line @typescript-eslint/no-unsafe-return
+// 	return x
+// }
+// let a: typeof testFunc
+// let b: VariableArgsFunction<typeof testFunc>
+// a("a")
+// await b()
+// function c(x: string) { return x }
+// let d: VariableArgsFunction<typeof c>
+// await d("what")
+
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 type FunctionAndForm<Args extends any[], Result> = {
 	(...args: Args): Result
