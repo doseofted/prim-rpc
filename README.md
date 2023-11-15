@@ -31,15 +31,16 @@ call it: less setup, easier access, quicker development of your API.
 
 Focus less on message transport and more on the message being sent, **with minimal setup**, using Prim+RPC:
 
-**[📖 Read the Docs](https://prim.doseofted.me/) ∙ [💡 Examples](https://prim.doseofted.me/docs/reference/examples) ∙ [⚙️ Setup](https://prim.doseofted.me/docs/learn/setup) ∙ [🔌 Plugins](https://prim.doseofted.me/docs/reference/plugins) ∙ [🧑‍💻 Follow Author](https://doseofted.me/)**
+**[📖 Read the Docs](https://prim.doseofted.me/) ∙ [💡 Examples](https://prim.doseofted.me/docs/reference/examples) ∙
+[⚙️ Setup](https://prim.doseofted.me/docs/learn/setup) ∙ [🔌 Plugins](https://prim.doseofted.me/docs/reference/plugins)
+∙ [🧑‍💻 Follow Author](https://doseofted.me/)**
 
 ## Contributions
 
-<!-- prettier-ignore-start -->
-> **Note**
+> [!NOTE]
+>
 > Prim+RPC is in early stages and is marching towards a [stable release](#release-plan). Support Prim+RPC by
 > [starring the repository](https://github.com/doseofted/prim-rpc), sharing with others, and following for updates.
-<!-- prettier-ignore-end -->
 
 Happy to have you! Please see the [Contribution Guide](./CONTRIBUTING.md) to learn more. If you're only looking for how
 to use the library, please see the [Documentation](https://prim.doseofted.me/).
@@ -54,14 +55,13 @@ to use the library, please see the [Documentation](https://prim.doseofted.me/).
 
 ## Release Plan
 
-<!-- prettier-ignore-start -->
-> **Warning**
+> [!WARNING]
+>
 > Prim+RPC is in **alpha** and it may be unstable. Keep up-to-date with the
 > [latest releases](https://github.com/doseofted/prim-rpc/releases), report any
 > [found security issues](https://github.com/doseofted/prim-rpc/security/advisories/new), and
 > [participate in discussions](https://github.com/doseofted/prim-rpc/discussions) to help shape the future of the
 > project!
-<!-- prettier-ignore-end -->
 
 Prim+RPC is planned to become stable by the end of 2023.
 

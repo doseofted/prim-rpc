@@ -10,12 +10,11 @@ should be:
 
 It can be difficult to achieve all of these goals and your contributions can help make this possible.
 
-<!-- prettier-ignore-start -->
-> **Warning**
+> [!WARNING]
+>
 > It is possible that a feature is already being or has been developed or that a feature may have already been rejected.
 > If you'd like to contribute to the project, [open an issue first](https://github.com/doseofted/prim-rpc/issues/new)
 > and describe what change that you would like to make.
-<!-- prettier-ignore-end -->
 
 ## Setup
 
