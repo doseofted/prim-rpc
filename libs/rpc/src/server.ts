@@ -8,7 +8,7 @@ import queryString from "query-string"
 import { serializeError } from "serialize-error"
 import { createPrimOptions, primMajorVersion, useVersionInRpc } from "./options"
 import { createPrimClient } from "./client"
-import { handlePossibleBlobs, mergeBlobLikeWithGiven } from "./blobs"
+import { handlePossibleBlobs, mergeBlobLikeWithGiven } from "./extract/blobs"
 import { PrimRpcSpecific, checkHttpLikeRequest, checkHttpLikeResponse, checkRpcCall, checkRpcResult } from "./validate"
 import type {
 	AnyFunction,

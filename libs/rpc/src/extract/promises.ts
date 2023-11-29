@@ -1,5 +1,5 @@
-import { PROMISE_PREFIX } from "./client"
-import { extractGivenData, mergeGivenData } from "./extract"
+import { PROMISE_PREFIX } from "../constants"
+import { extractGivenData, mergeGivenData } from "./base"
 
 function isPromise(given: unknown) {
 	return given instanceof Promise ? given : false

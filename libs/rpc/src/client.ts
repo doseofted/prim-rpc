@@ -20,7 +20,7 @@ import getProperty from "just-safe-get"
 import removeFromArray from "just-remove"
 import { deserializeError } from "serialize-error"
 import { createPrimOptions, primMajorVersion, useVersionInRpc } from "./options"
-import { handlePossibleBlobs, mergeBlobLikeWithGiven } from "./blobs"
+import { handlePossibleBlobs, mergeBlobLikeWithGiven } from "./extract/blobs"
 import { PromiseResolveStatus } from "./interfaces"
 import type {
 	PromisifiedModule,
@@ -33,10 +33,7 @@ import type {
 	BlobRecords,
 	JsonHandler,
 } from "./interfaces"
-
-/** Callback prefix */ export const CB_PREFIX = "_cb_"
-/** Binary prefix (Blob/File) */ export const BLOB_PREFIX = "_bin_"
-/** Promise prefix */ export const PROMISE_PREFIX = "_prom_"
+import { CB_PREFIX } from "./constants"
 
 export type PrimClient<ModuleType extends PrimOptions["module"]> = PromisifiedModule<ModuleType>
 // export interface PrimClient<ModuleType extends PrimOptions["module"]> {

@@ -2,8 +2,8 @@
 // Copyright 2023 Ted Klingenberg
 // SPDX-License-Identifier: Apache-2.0
 
-import { BLOB_PREFIX } from "./client"
-import { extractGivenData, mergeGivenData } from "./extract"
+import { BLOB_PREFIX } from "../constants"
+import { extractGivenData, mergeGivenData } from "./base"
 
 /**
  * Determine if given argument is a Blob or File (universal) or Buffer (Node)

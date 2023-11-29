@@ -1,5 +1,5 @@
 import { nanoid } from "nanoid"
-import type { UniqueTypePrefix } from "./interfaces"
+import type { UniqueTypePrefix } from "../interfaces"
 
 /**
  * Extract given type `T` from any given argument (object/array/primitive) to form `Record<string, T>`.
