@@ -212,6 +212,9 @@ export interface JsonHandler {
 // type JsonHandlerOptional  = Partial<JsonHandler>
 /** The record key is a string prefixed with `_bin_` and the value is the Blob */
 export type BlobRecords = Record<string, Blob | File | Buffer>
+/** The record key is a string prefixed with `_prom_` and the value is the value of the *resolved* Promise value */
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+export type PromiseRecords = Record<string, any>
 export type PrimClientMethodPlugin<J = JsonHandler> = (
 	endpoint: string,
 	jsonBody: RpcCall | RpcCall[],

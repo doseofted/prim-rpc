@@ -82,14 +82,14 @@ function handlePossibleForm(form: HTMLFormElement | FormData | SubmitEvent) {
  * @param fromForm - It is important for Prim Client to use data from a given form element even if blobs
  *   are not given. This is used in recursive calls to determine if given element is a form element/data
  */
-export function handlePossibleBlobs(
+export function extractBlobData(
 	given: unknown,
 	fromForm = false
 ): [given: unknown, blobs: Record<string, Blob | Buffer>, fromForm: boolean] {
 	// form was given that possibly contains blobs
 	if (givenFormLike(given)) {
 		const newGiven = handlePossibleForm(given)
-		return handlePossibleBlobs(newGiven, true)
+		return extractBlobData(newGiven, true)
 	}
 	// now we can extract the blobs
 	const [newlyGiven, blobs] = extractGivenData(given, isBinaryLike, BLOB_PREFIX)
@@ -106,6 +106,6 @@ export function handlePossibleBlobs(
  *
  * This undoes `handlePossibleBlobs()`.
  */
-export function mergeBlobLikeWithGiven(given: unknown, blobs: Record<string, Blob | Buffer>): unknown {
+export function mergeBlobData(given: unknown, blobs: Record<string, Blob | Buffer>): unknown {
 	return mergeGivenData(given, blobs, BLOB_PREFIX)
 }

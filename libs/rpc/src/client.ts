@@ -20,7 +20,7 @@ import getProperty from "just-safe-get"
 import removeFromArray from "just-remove"
 import { deserializeError } from "serialize-error"
 import { createPrimOptions, primMajorVersion, useVersionInRpc } from "./options"
-import { handlePossibleBlobs, mergeBlobLikeWithGiven } from "./extract/blobs"
+import { extractBlobData, mergeBlobData } from "./extract/blobs"
 import { PromiseResolveStatus } from "./interfaces"
 import type {
 	PromisifiedModule,
@@ -98,7 +98,7 @@ export function createPrimClient<
 					const blobs: BlobRecords = {}
 					const args = givenArgs.map(arg => {
 						if (binaryHandlingNeeded) {
-							const [replacedArg, newBlobs, givenFromFormElement] = handlePossibleBlobs(arg)
+							const [replacedArg, newBlobs, givenFromFormElement] = extractBlobData(arg)
 							const blobEntries = Object.entries(newBlobs)
 							for (const [key, val] of blobEntries) {
 								blobs[key] = val
@@ -248,12 +248,12 @@ export function createPrimClient<
 					// return either the single result or the batched results to caller
 					if (Array.isArray(answers)) {
 						answers.forEach(answer => {
-							const answerMerged = binaryHandlingNeeded ? mergeBlobLikeWithGiven(answer, givenBlobs) : answer
+							const answerMerged = binaryHandlingNeeded ? mergeBlobData(answer, givenBlobs) : answer
 							httpEvent.emit("response", answerMerged)
 						})
 					} else {
 						const answer = answers
-						const answerMerged = binaryHandlingNeeded ? mergeBlobLikeWithGiven(answer, givenBlobs) : answer
+						const answerMerged = binaryHandlingNeeded ? mergeBlobData(answer, givenBlobs) : answer
 						httpEvent.emit("response", answerMerged)
 					}
 				})

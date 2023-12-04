@@ -8,7 +8,7 @@ import queryString from "query-string"
 import { serializeError } from "serialize-error"
 import { createPrimOptions, primMajorVersion, useVersionInRpc } from "./options"
 import { createPrimClient } from "./client"
-import { handlePossibleBlobs, mergeBlobLikeWithGiven } from "./extract/blobs"
+import { extractBlobData, mergeBlobData } from "./extract/blobs"
 import { PrimRpcSpecific, checkHttpLikeRequest, checkHttpLikeResponse, checkRpcCall, checkRpcResult } from "./validate"
 import type {
 	AnyFunction,
@@ -80,7 +80,7 @@ function createServerActions(
 				const possibleCalls = Array.isArray(prepared) ? checkRpcCall(prepared) : [checkRpcCall(prepared)]
 				if (binaryHandlingNeeded && Object.entries(blobs || {}).length > 0) {
 					for (const toCall of possibleCalls) {
-						toCall.args = toCall.args.map(arg => mergeBlobLikeWithGiven(arg, blobs))
+						toCall.args = toCall.args.map(arg => mergeBlobData(arg, blobs))
 					}
 				}
 				return Array.isArray(prepared) ? possibleCalls : possibleCalls[0]
@@ -266,9 +266,7 @@ function createServerActions(
 		let blobs: BlobRecords = {}
 		const givenOnly = (separationNeeded => {
 			if (separationNeeded) {
-				const givenSeparated = Array.isArray(given)
-					? given.map(g => handlePossibleBlobs(g))
-					: [handlePossibleBlobs(given)]
+				const givenSeparated = Array.isArray(given) ? given.map(g => extractBlobData(g)) : [extractBlobData(given)]
 				const givenOnly = givenSeparated.map(([given, newBlobs]) => {
 					blobs = { ...blobs, ...newBlobs }
 					return given
