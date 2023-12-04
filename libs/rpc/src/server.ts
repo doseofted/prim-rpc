@@ -28,6 +28,7 @@ import type {
 	PrimServer,
 	PrimServerSocketAnswerRpc,
 } from "./interfaces"
+import { extractPromiseData } from "./extract/promises"
 
 /**
  *
@@ -217,8 +218,29 @@ function createServerActions(
 						const targetRemote = getProperty(client, methodExpanded) as AnyFunction & { rpc?: boolean }
 						const processedArgs = configured.preCall?.(args, targetLocal) ?? args
 						const result = (await Reflect.apply(targetRemote, context, processedArgs)) as unknown
+						const [resultExtracted, promisesRecord] = extractPromiseData(result)
+						Object.entries(promisesRecord).forEach(async ([id, promise]) => {
+							try {
+								console.log({ id, promise })
+								// void promise.then(l => console.log(id, l))
+								const result = await promise
+								if (cbResults) cbResults({ id, result })
+								event.emit("response", { id, result })
+							} catch (e) {
+								if (handleError && e instanceof Error) {
+									const error = serializeError<unknown>(e)
+									if (!serverOptions.showErrorStack) {
+										delete error.stack
+									}
+									return { id, error }
+								}
+								// eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
+								if (cbResults) cbResults({ id, error: e })
+								event.emit("response", { id, error: e })
+							}
+						})
 						// eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
-						const processedResult = configured.postCall?.(result, targetLocal) ?? result
+						const processedResult = configured.postCall?.(resultExtracted, targetLocal) ?? resultExtracted
 						return { ...rpcBase, result: processedResult }
 					} else {
 						// If either the module wasn't provided or target doesn't exist (even if module does), send a request using

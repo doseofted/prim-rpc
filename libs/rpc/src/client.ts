@@ -33,7 +33,8 @@ import type {
 	BlobRecords,
 	JsonHandler,
 } from "./interfaces"
-import { CB_PREFIX } from "./constants"
+import { CB_PREFIX, PROMISE_PREFIX } from "./constants"
+import { extractPromisePlaceholders } from "./extract/promises"
 
 export type PrimClient<ModuleType extends PrimOptions["module"]> = PromisifiedModule<ModuleType>
 // export interface PrimClient<ModuleType extends PrimOptions["module"]> {
@@ -133,6 +134,14 @@ export function createPrimClient<
 						// TODO: add fallback in case client cannot support websocket
 						const result = new Promise<RpcAnswer>((resolve, reject) => {
 							wsEvent.on("response", answer => {
+								const promiseEvents = mitt<Record<string | number, unknown>>()
+								console.log(answer.id)
+								if (answer.id.toString().startsWith(PROMISE_PREFIX)) {
+									console.log({ answer })
+									promiseEvents.emit(answer.id, answer.result)
+									promiseEvents.off(answer.id)
+									return
+								}
 								if (rpc.id !== answer.id) {
 									return
 								}
@@ -140,7 +149,10 @@ export function createPrimClient<
 									// TODO: if callback result, handle potential Errors (as given in options)
 									reject(answer.error)
 								} else {
-									resolve(answer.result)
+									const resultWithPromises = extractPromisePlaceholders(answer.result, (promiseId, resolvePromise) => {
+										promiseEvents.on(promiseId, resolvePromise)
+									})
+									resolve(resultWithPromises)
 								}
 							})
 						})
