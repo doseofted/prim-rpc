@@ -42,5 +42,10 @@ module.exports = {
 			},
 		],
 	},
-	plugins: [require("daisyui"), require("@tailwindcss/typography") /* require("@tailwindcss/forms") */],
+	plugins: [
+		require("daisyui"),
+		require("@tailwindcss/typography"),
+		// eslint-disable-next-line @typescript-eslint/no-var-requires
+		require("tailwind-scrollbar")({ nocompatible: true }),
+	],
 }

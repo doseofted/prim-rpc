@@ -5,6 +5,12 @@
 	}
 } */
 
+/* Apply custom scrollbar to nested scroll bars on page (including code blocks) */
+pre.astro-code,
+[data-rehype-pretty-code-figure] pre code {
+	@apply scrollbar-thin overflow-x-auto;
+}
+
 /* Override DaisyUI code wrapper/window component to match website colors */
 .mockup-code {
 	&::before {
@@ -17,6 +23,11 @@
 	pre::before {
 		content: none !important;
 	}
+}
+
+/* Override default prose style on code that conflicts with rehype-pretty-code styling */
+.prose :where(code):not(:where([class~="not-prose"] *)) {
+	padding: 1px 2px;
 }
 
 /* Override Astro's Code component default styles */
@@ -38,6 +49,11 @@
 /* Fix for "txt" (plaintext) code not appearing on dark background after rehype-pretty-code upgrade */
 [data-rehype-pretty-code-figure] code[data-language="txt"] {
 	color: #dbdcde;
+}
+/* Fix for more conflicts between Tailwind prose styling and rehype-pretty-code */
+.prose :where(code):not(:where([class~="not-prose"], [class~="not-prose"] *))::before,
+.prose :where(code):not(:where([class~="not-prose"], [class~="not-prose"] *))::after {
+	opacity: 0;
 }
 
 pre {
