@@ -12,7 +12,10 @@ import rehypeExternalLinks from "rehype-external-links"
 /** @type {import('rehype-pretty-code').Options} */
 const rehypePrettyOptions = {
 	theme: "material-theme-palenight",
-	defaultLang: "typescript",
+	defaultLang: {
+		block: "typescript",
+		inline: "typescript",
+	},
 	keepBackground: false,
 }
 
