@@ -62,7 +62,7 @@
 		"@types/common-tags": "^1.8.4",
 		"@types/react": "^18.2.42",
 		"@types/react-dom": "^18.2.17",
-		"astro": "^4.0.1",
+		"astro": "^4.0.2",
 		"astro-icon": "1.0.0-next.2",
 		"astro-seo": "^0.8.0",
 		"color2k": "^2.0.2",
