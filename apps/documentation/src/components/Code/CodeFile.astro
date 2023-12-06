@@ -15,7 +15,7 @@ const { filename, overrideClass, codeProvider = "rehype" } = Astro.props
 <div class:list={["not-prose flex flex-col rounded-xl w-full overflow-hidden", overrideClass]}>
 	{
 		filename && (
-			<div class="bg-prim-space/90 text-sm breadcrumbs text-white border-b border-white/20 px-5">
+			<div class="bg-prim-space/90 text-sm breadcrumbs text-white border-b border-white/20 px-5 overflow-y-hidden">
 				<ul>
 					{filename.split("/").map((part, index, parts) => (
 						<li class="space-x-2">
