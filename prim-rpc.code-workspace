@@ -35,7 +35,7 @@
 		"editor.renderWhitespace": "selection",
 		"editor.detectIndentation": true,
 		"editor.codeActionsOnSave": {
-			"source.fixAll": true
+			"source.fixAll": "explicit"
 		},
 		"editor.linkedEditing": true,
 		"editor.formatOnSave": true,
