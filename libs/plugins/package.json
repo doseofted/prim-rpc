@@ -49,7 +49,7 @@
 		"@types/ws": "^8.5.10",
 		"@vitest/web-worker": "^1.0.1",
 		"@whatwg-node/server": "^0.9.18",
-		"astro": "4.0.2",
+		"astro": "4.2.6",
 		"axios": "^1.6.2",
 		"express": "^4.18.2",
 		"fastify": "^4.24.3",

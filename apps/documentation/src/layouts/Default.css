@@ -25,11 +25,6 @@ pre.astro-code,
 	}
 }
 
-/* Override default prose style on code that conflicts with rehype-pretty-code styling */
-.prose :where(code):not(:where([class~="not-prose"] *)) {
-	padding: 1px 2px;
-}
-
 /* Override Astro's Code component default styles */
 .site-code-style pre {
 	/* See CodeFile.astro component for reference style */

@@ -29,7 +29,7 @@ reference the functions exported by Prim+RPC in the API reference.
 	</Button>
 </ButtonGroup>
 
-## <Icon name="ph:brackets-curly-bold"/> Module
+## <Icon class="w-6 h-6" name="ph:brackets-curly-bold"/> Module
 
 <DataListOptions />
 
@@ -64,7 +64,7 @@ one of two ways:
 - Define a `.rpc` property on each of your functions with a value of `true`
 - Or add your function to the [Allow List](#-allow-list) option
 
-## <Icon name="ph:brackets-curly-bold"/> HTTP Endpoint
+## <Icon class="w-6 h-6" name="ph:brackets-curly-bold"/> HTTP Endpoint
 
 <DataListOptions />
 
@@ -80,7 +80,7 @@ createPrimClient({ endpoint })
 While Prim+RPC can be used with many transports, it's often used with HTTP servers so, for convenience, an option to
 pass the server address is given on Prim+RPC itself and is shared with plugins.
 
-## <Icon name="ph:brackets-curly-bold"/> WebSocket Endpoint
+## <Icon class="w-6 h-6" name="ph:brackets-curly-bold"/> WebSocket Endpoint
 
 <DataListOptions />
 
@@ -97,7 +97,7 @@ The WebSocket Endpoint option is given for convenience when using a plugin (usua
 [Callback Handler](#-callback-handler)) that uses WebSockets. If not given, plugins will fallback to using the
 [HTTP Endpoint](#-http-endpoint) option (and change the protocol if needed).
 
-## <Icon name="ph:brackets-curly-bold"/> Client Batch Time
+## <Icon class="w-6 h-6" name="ph:brackets-curly-bold"/> Client Batch Time
 
 <DataListOptions />
 
@@ -114,7 +114,7 @@ Prim+RPC can batch RPC so that multiple function calls are sent in a single requ
 RPC: the batch time is set to 0. If batching is needed, set this option to a value greater than 0. The value given is
 the time in milliseconds that Prim+RPC will wait before sending batched requests.
 
-## <Icon name="ph:brackets-curly-bold"/> JSON Handler
+## <Icon class="w-6 h-6" name="ph:brackets-curly-bold"/> JSON Handler
 
 <DataListOptions synced />
 
@@ -152,7 +152,7 @@ Examples with popular libraries are [given in this documentation](/docs/referenc
 	</Button>
 </ButtonGroup>
 
-## <Icon name="ph:brackets-curly-bold"/> Method Plugin
+## <Icon class="w-6 h-6" name="ph:brackets-curly-bold"/> Method Plugin
 
 <DataListOptions />
 
@@ -181,7 +181,7 @@ There are plugins already available to use but you may also create your own.
 	</Button>
 </ButtonGroup>
 
-## <Icon name="ph:brackets-curly-bold"/> Callback Plugin
+## <Icon class="w-6 h-6" name="ph:brackets-curly-bold"/> Callback Plugin
 
 <DataListOptions />
 
@@ -210,7 +210,7 @@ There are plugins already available to use but you may also create your own.
 	</Button>
 </ButtonGroup>
 
-## <Icon name="ph:brackets-curly-bold"/> Handle Error
+## <Icon class="w-6 h-6" name="ph:brackets-curly-bold"/> Handle Error
 
 <DataListOptions synced />
 
@@ -237,7 +237,7 @@ mapping can be avoided (for instance, of HTTP codes or error codes). This option
 If you explicitly set this option, this will override any default. However, if your JSON handler supports serializing
 errors and this option is set to true, this may lead to unexpected behavior.
 
-## <Icon name="ph:brackets-curly-bold"/> Handle Blobs
+## <Icon class="w-6 h-6" name="ph:brackets-curly-bold"/> Handle Blobs
 
 <DataListOptions synced />
 
@@ -266,7 +266,7 @@ still transport this information separately.
 If your JSON handler supports binary data or you do not want to support binary data used with Prim+RPC, you can toggle
 this option off.
 
-## <Icon name="ph:brackets-curly-bold"/> Allow List
+## <Icon class="w-6 h-6" name="ph:brackets-curly-bold"/> Allow List
 
 <DataListOptions />
 
@@ -292,7 +292,7 @@ that function is added to an allow list.
 The Allow List is an object that resembles the module that you give to Prim+RPC where each function name is a key and
 the value is a boolean flag stating whether that function should be considered RPC.
 
-## <Icon name="ph:brackets-curly-bold"/> Methods on Methods
+## <Icon class="w-6 h-6" name="ph:brackets-curly-bold"/> Methods on Methods
 
 <DataListOptions />
 
@@ -317,7 +317,7 @@ By default, functions are not allowed to be called with Prim+RPC if, anywhere in
 function. The exception to this rule is if a method is defined directly on another method _and_ the name of that method
 is given in this option. This may be useful for adding metadata to your functions.
 
-## <Icon name="ph:brackets-curly-bold"/> Show Error Stack
+## <Icon class="w-6 h-6" name="ph:brackets-curly-bold"/> Show Error Stack
 
 <DataListOptions />
 
@@ -337,7 +337,7 @@ the server this could potentially include a stack trace. By default, Prim+RPC wi
 client. This option can be set to true to override this behavior. This is useful in development but depending on your
 security needs may not be wanted in production.
 
-## <Icon name="ph:brackets-curly-bold"/> Prefix
+## <Icon class="w-6 h-6" name="ph:brackets-curly-bold"/> Prefix
 
 <DataListOptions />
 
@@ -355,7 +355,7 @@ HTTP and WebSocket servers. It can be used by plugins to establish a path of a U
 `/prim{:txt}` so as not to collide with other possible routes on an existing server. If Prim+RPC is the only service
 used with a server, you may change this to `/{:txt}` (or any other path that you'd like).
 
-## <Icon name="ph:brackets-curly-bold"/> Method Handler
+## <Icon class="w-6 h-6" name="ph:brackets-curly-bold"/> Method Handler
 
 <DataListOptions />
 
@@ -387,7 +387,7 @@ There are handlers already available to use but you may also create your own.
 	</Button>
 </ButtonGroup>
 
-## <Icon name="ph:brackets-curly-bold"/> Callback Handler
+## <Icon class="w-6 h-6" name="ph:brackets-curly-bold"/> Callback Handler
 
 <DataListOptions />
 
@@ -422,7 +422,7 @@ There are handlers already available to use but you may also create your own.
 	</Button>
 </ButtonGroup>
 
-## <Icon name="ph:brackets-curly-bold"/> Pre-Call Hook
+## <Icon class="w-6 h-6" name="ph:brackets-curly-bold"/> Pre-Call Hook
 
 <DataListOptions />
 
@@ -446,7 +446,7 @@ server and the function that is being called. **Do not call the function inside 
 function itself (resulting in the function being called twice). This may be useful for logging, validation, or adding
 and processing metadata attached to a function.
 
-## <Icon name="ph:brackets-curly-bold"/> Post-Call Hook
+## <Icon class="w-6 h-6" name="ph:brackets-curly-bold"/> Post-Call Hook
 
 <DataListOptions />
 
