@@ -49,8 +49,8 @@
 		"@types/lodash": "^4.14.202",
 		"@types/lodash-es": "^4.17.12",
 		"type-fest": "^4.8.3",
-		"typedoc": "^0.25.4",
-		"typescript": "5.3.2"
+		"typedoc": "^0.25.7",
+		"typescript": "5.3.3"
 	},
 	"type": "module",
 	"exports": {

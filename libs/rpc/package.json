@@ -54,7 +54,7 @@
 		"@types/lodash-es": "^4.17.12",
 		"@types/node": "^20.10.3",
 		"superjson": "^2.2.1",
-		"typedoc": "^0.25.4"
+		"typedoc": "^0.25.7"
 	},
 	"type": "module",
 	"exports": {
