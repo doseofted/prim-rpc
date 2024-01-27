@@ -39,16 +39,16 @@
 	"dependencies": {
 		"just-safe-get": "^4.2.0",
 		"just-safe-set": "^4.2.1",
-		"unplugin": "^1.5.1",
+		"unplugin": "^1.6.0",
 		"zx": "^7.2.3"
 	},
 	"devDependencies": {
 		"@doseofted/prim-example": "workspace:*",
-		"@sinclair/typebox": "^0.31.28",
+		"@sinclair/typebox": "^0.32.13",
 		"@types/json-schema": "^7.0.15",
 		"@types/lodash": "^4.14.202",
 		"@types/lodash-es": "^4.17.12",
-		"type-fest": "^4.8.3",
+		"type-fest": "^4.10.1",
 		"typedoc": "^0.25.7",
 		"typescript": "5.3.3"
 	},
