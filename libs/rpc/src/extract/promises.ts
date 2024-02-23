@@ -1,4 +1,5 @@
 import { PROMISE_PREFIX } from "../constants"
+import { featureFlags } from "../flags"
 import { extractGivenData, mergeGivenData } from "./base"
 
 function isPromise(given: unknown) {
@@ -6,6 +7,7 @@ function isPromise(given: unknown) {
 }
 
 export function extractPromiseData(given: unknown): [given: unknown, promises: Record<string, Promise<unknown>>] {
+	if (!featureFlags.supportPromises) return [given, {}]
 	return extractGivenData(given, isPromise, PROMISE_PREFIX)
 }
 
@@ -24,6 +26,7 @@ export function extractPromiseData(given: unknown): [given: unknown, promises: R
 } */
 
 export function mergePromiseData(given: unknown, promises: Record<string, Promise<unknown>>): unknown {
+	if (!featureFlags.supportPromises) return given
 	return mergeGivenData(given, promises, PROMISE_PREFIX)
 }
 
@@ -36,6 +39,7 @@ export function extractPromisePlaceholders(
 	given: unknown,
 	cb?: (promiseId: string, resolve: (given: unknown) => void) => void
 ): unknown {
+	if (!featureFlags.supportPromises) return given
 	const [_, extracted] = extractGivenData(given, isPromisePlaceholder, PROMISE_PREFIX)
 	const extractedTransformed: Record<string, Promise<unknown>> = {}
 	for (const [_, value] of Object.entries(extracted)) {

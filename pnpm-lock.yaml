@@ -6,7 +6,7 @@ settings:
 
 patchedDependencies:
   proxy-deep@4.0.0:
-    hash: 7rs6nghdyzzoccydwp2i5bpc4q
+    hash: emy3u2zn4kqtvd3w5hdqkw77iu
     path: patches/proxy-deep@4.0.0.patch
 
 importers:
@@ -429,7 +429,7 @@ importers:
         version: 5.0.6
       proxy-deep:
         specifier: ^4.0.0
-        version: 4.0.0(patch_hash=7rs6nghdyzzoccydwp2i5bpc4q)
+        version: 4.0.0(patch_hash=emy3u2zn4kqtvd3w5hdqkw77iu)
       query-string:
         specifier: ^8.1.0
         version: 8.2.0
@@ -10000,7 +10000,7 @@ packages:
     resolution: {integrity: sha512-8xuCeM3l8yqdmbPoYeLbrAXCBWu19XEYc5/F28f5qOaoAIMyfmBUkl5axiK+x9olUvRlcekvnm98AP9RDngOIw==}
     dev: true
 
-  /proxy-deep@4.0.0(patch_hash=7rs6nghdyzzoccydwp2i5bpc4q):
+  /proxy-deep@4.0.0(patch_hash=emy3u2zn4kqtvd3w5hdqkw77iu):
     resolution: {integrity: sha512-kZF6uVELCrk2khKHYKCLtk7SZirAdiksIpTBPGYG+cjF3KEWbDsoUN2mNDXuSX/ujmQaCsZhE0oFY50ONywoLw==}
     dev: false
     patched: true
