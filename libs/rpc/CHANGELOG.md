@@ -1,5 +1,11 @@
 # @doseofted/prim-rpc
 
+## 0.1.0-alpha.23
+
+### Patch Changes
+
+- c7716bd: Added ability to receive multiple promises from a function with callback handler (disabled by default, must be enabled in options under `flags`)
+
 ## 0.1.0-alpha.22
 
 ### Patch Changes
