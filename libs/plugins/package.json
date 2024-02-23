@@ -124,6 +124,7 @@
 		"./ws": "./dist/server/ws.js",
 		"./web-worker": "./dist/ipc/web-worker.js",
 		"./nextjs": "./dist/server/nextjs.js",
+		"./remix": "./dist/server/remix.js",
 		"./hono": "./dist/server/hono.js",
 		"./package.json": "./package.json"
 	},
@@ -164,6 +165,9 @@
 			],
 			"nextjs": [
 				"./dist/server/nextjs.d.ts"
+			],
+			"remix": [
+				"./dist/server/remix.d.ts"
 			],
 			"hono": [
 				"./dist/server/hono.d.ts"

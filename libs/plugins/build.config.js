@@ -23,6 +23,7 @@ export default defineConfig({
 		"src/client/browser-websocket.ts",
 		"src/ipc/web-worker.ts",
 		"src/server/nextjs.ts",
+		"src/server/remix.ts",
 		"src/server/hono.ts",
 	],
 	target: "es2020",
