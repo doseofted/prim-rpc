@@ -218,7 +218,10 @@ function createServerActions(
 						const targetRemote = getProperty(client, methodExpanded) as AnyFunction & { rpc?: boolean }
 						const processedArgs = configured.preCall?.(args, targetLocal) ?? args
 						const result = (await Reflect.apply(targetRemote, context, processedArgs)) as unknown
-						const [resultExtracted, promisesRecord] = extractPromiseData(result)
+						const [resultExtracted, promisesRecord] = extractPromiseData(
+							result,
+							serverOptions?.flags?.supportMultiplePromiseResults
+						)
 						Object.entries(promisesRecord).forEach(async ([id, promise]) => {
 							try {
 								const result = await promise

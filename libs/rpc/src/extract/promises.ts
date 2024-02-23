@@ -6,8 +6,11 @@ function isPromise(given: unknown) {
 	return given instanceof Promise ? given : false
 }
 
-export function extractPromiseData(given: unknown): [given: unknown, promises: Record<string, Promise<unknown>>] {
-	if (!featureFlags.supportPromises) return [given, {}]
+export function extractPromiseData(
+	given: unknown,
+	enabled = featureFlags.supportMultiplePromiseResults
+): [given: unknown, promises: Record<string, Promise<unknown>>] {
+	if (!enabled) return [given, {}]
 	return extractGivenData(given, isPromise, PROMISE_PREFIX)
 }
 
@@ -25,8 +28,7 @@ export function extractPromiseData(given: unknown): [given: unknown, promises: R
 	return resolvedRecord
 } */
 
-export function mergePromiseData(given: unknown, promises: Record<string, Promise<unknown>>): unknown {
-	if (!featureFlags.supportPromises) return given
+function mergePromiseData(given: unknown, promises: Record<string, Promise<unknown>>): unknown {
 	return mergeGivenData(given, promises, PROMISE_PREFIX)
 }
 
@@ -37,9 +39,10 @@ function isPromisePlaceholder(given: unknown) {
 /** Take Promise placeholders from a server-given result and turn those into real Promises */
 export function extractPromisePlaceholders(
 	given: unknown,
-	cb?: (promiseId: string, resolve: (given: unknown) => void) => void
+	cb?: (promiseId: string, resolve: (given: unknown) => void) => void,
+	enabled = featureFlags.supportMultiplePromiseResults
 ): unknown {
-	if (!featureFlags.supportPromises) return given
+	if (!enabled) return given
 	const [_, extracted] = extractGivenData(given, isPromisePlaceholder, PROMISE_PREFIX)
 	const extractedTransformed: Record<string, Promise<unknown>> = {}
 	for (const [replacedKey, originalKey] of Object.entries(extracted)) {
@@ -47,5 +50,5 @@ export function extractPromisePlaceholders(
 			cb?.(originalKey, resolve)
 		})
 	}
-	return mergePromiseData(given, extractedTransformed)
+	return enabled ? mergePromiseData(given, extractedTransformed) : given
 }

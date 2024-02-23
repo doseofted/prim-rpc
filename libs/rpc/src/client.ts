@@ -147,11 +147,15 @@ export function createPrimClient<
 									// TODO: if callback result, handle potential Errors (as given in options)
 									reject(answer.error)
 								} else {
-									const resultWithPromises = extractPromisePlaceholders(answer.result, (promiseId, resolvePromise) => {
-										promiseEvents.on(promiseId, given => {
-											resolvePromise(given)
-										})
-									})
+									const resultWithPromises = extractPromisePlaceholders(
+										answer.result,
+										(promiseId, resolvePromise) => {
+											promiseEvents.on(promiseId, given => {
+												resolvePromise(given)
+											})
+										},
+										options?.flags?.supportMultiplePromiseResults
+									)
 									resolve(resultWithPromises)
 								}
 							})

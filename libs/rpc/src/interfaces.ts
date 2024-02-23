@@ -4,6 +4,7 @@
 
 import type { Emitter } from "mitt"
 import type { Schema, ConditionalExcept, PartialDeep } from "type-fest"
+import type { featureFlags } from "./flags"
 
 // SECTION RPC call and result structure
 export interface RpcBase {
@@ -134,10 +135,10 @@ type PromisifiedModuleDirect<
 		[Key in Keys]: ModuleGiven[Key] extends ((...args: infer A) => infer R) & object
 			? FunctionAndForm<A, Promise<Awaited<R>>> & PromisifiedModuleDirect<ModuleGiven[Key], false>
 			: ModuleGiven[Key] extends object
-			? Recursive extends true
-				? PromisifiedModuleDirect<ModuleGiven[Key], true>
+				? Recursive extends true
+					? PromisifiedModuleDirect<ModuleGiven[Key], true>
+					: never
 				: never
-			: never
 	},
 	never
 >
@@ -181,7 +182,7 @@ type PromisifiedModuleDynamicImport<ModuleGiven extends object> = ModuleGiven ex
 	then: (onfulfilled: infer F, ...args: infer _) => any
 }
 	? // eslint-disable-next-line @typescript-eslint/no-explicit-any
-	  F extends (value: infer V, ...args: infer _) => any
+		F extends (value: infer V, ...args: infer _) => any
 		? V extends object
 			? PromisifiedModuleDirect<V>
 			: never
@@ -383,6 +384,8 @@ export interface PrimOptions<M extends PossibleModule = object, J extends JsonHa
 		/** Event emitter for RPC to be shared with Prim Server */
 		clientEvent?: Emitter<PrimHttpEvents>
 	}
+	/** Experimental flags */
+	flags?: Partial<typeof featureFlags>
 }
 // !SECTION
 

@@ -72,6 +72,9 @@ const createBaseClientOptions = (server = false): PrimOptions => ({
 	// SECTION Client and server
 	// these options should not be passed by a developer but are used internally
 	internal: {},
+	flags: {
+		supportMultiplePromiseResults: false,
+	},
 	// !SECTION
 })
 
