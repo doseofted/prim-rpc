@@ -1,0 +1,12 @@
+diff --git a/package.json b/package.json
+index 1014d4fc9adf611adc1d9848163b40f24537e16a..b987b20e56f705d7759f99e7416a5cb66405f681 100644
+--- a/package.json
++++ b/package.json
+@@ -3,6 +3,7 @@
+   "version": "4.0.0",
+   "description": "A Proxy object that can nest itself when accessed",
+   "exports": {
++    "types": "./index.d.ts",
+     "import": "./index.mjs",
+     "require": "./index.js"
+   },
