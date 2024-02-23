@@ -84,7 +84,7 @@ const { title = "", decorationText = "", description, tableOfContents = [] } = A
 				</form>
 			</dialog>
 
-			<div class="bg-white -mr-4 -ml-4 lg:ml-0 col-span-6 lg:col-span-8">
+			<div class="bg-white -mr-4 -ml-4 lg:mr-0 lg:ml-0 col-span-6 lg:col-span-8">
 				<Prerelease>
 					<div class="grid grid-cols-8 flex-grow gap-x-4">
 						<div class="lg:col-start-2 col-span-8 px-4 lg:px-0 lg:col-span-8 flex gap-4 items-center">
@@ -120,10 +120,12 @@ const { title = "", decorationText = "", description, tableOfContents = [] } = A
 			</div>
 
 			<div class="hidden lg:block col-span-6 lg:col-span-2 bg-white -mx-4 px-4 lg:-mr-4 lg:pr-4">
-				<div class="hidden lg:block -mr-4">
+				<div class="hidden lg:block -mx-4">
 					<Prerelease />
 				</div>
-				<div class="sticky top-0 lg:py-4 lg:-mx-4 h-full max-h-[100svh] overflow-auto flex flex-col" data-lenis-prevent>
+				<div
+					class="sticky top-0 lg:py-4 lg:-mx-4 h-full max-h-[100svh] scrollbar-thin scrollbar-thumb-prim-space overflow-auto flex flex-col"
+					data-lenis-prevent>
 					<slot name="extra" />
 				</div>
 			</div>

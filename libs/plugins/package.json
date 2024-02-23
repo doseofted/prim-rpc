@@ -1,6 +1,6 @@
 {
 	"name": "@doseofted/prim-rpc-plugins",
-	"version": "0.1.0-alpha.20",
+	"version": "0.1.0-alpha.22",
 	"description": "Prim+RPC plugins/handlers for popular frameworks both server and client side.",
 	"license": "Apache-2.0",
 	"author": {
@@ -39,37 +39,39 @@
 	"devDependencies": {
 		"@doseofted/prim-example": "workspace:*",
 		"@doseofted/prim-rpc": "workspace:*",
-		"@fastify/multipart": "^8.0.0",
-		"@hono/node-server": "^1.2.2",
+		"@fastify/multipart": "^8.1.0",
+		"@hono/node-server": "^1.5.0",
 		"@msgpack/msgpack": "3.0.0-beta2",
+		"@remix-run/node": "^2.4.0",
 		"@types/express": "^4.17.21",
 		"@types/formidable": "^3.4.5",
-		"@types/node": "^20.9.0",
-		"@types/supertest": "^2.0.16",
-		"@types/ws": "^8.5.9",
-		"@vitest/web-worker": "^0.34.6",
-		"@whatwg-node/server": "^0.9.16",
-		"astro": "3.5.3",
-		"axios": "^1.6.1",
+		"@types/node": "^20.11.8",
+		"@types/supertest": "^6.0.2",
+		"@types/ws": "^8.5.10",
+		"@vitest/web-worker": "^1.2.2",
+		"@whatwg-node/server": "^0.9.24",
+		"astro": "4.4.3",
+		"axios": "^1.6.7",
 		"express": "^4.18.2",
-		"fastify": "^4.24.3",
+		"fastify": "^4.25.2",
 		"form-data": "^4.0.0",
 		"formidable": "^3.5.1",
-		"h3": "^1.8.2",
-		"hono": "^3.9.2",
-		"next": "14.0.2",
+		"h3": "^1.10.1",
+		"hono": "^4.0.5",
+		"next": "14.1.0",
 		"query-string": "^8.1.0",
 		"react": "^18.2.0",
 		"react-dom": "^18.2.0",
-		"socket.io": "^4.7.2",
-		"socket.io-client": "^4.7.2",
+		"socket.io": "^4.7.4",
+		"socket.io-client": "^4.7.4",
 		"superjson": "^2.2.1",
-		"supertest": "^6.3.3",
+		"supertest": "^6.3.4",
 		"superwstest": "^2.0.3",
-		"type-fest": "^4.7.1",
-		"ws": "^8.14.2"
+		"type-fest": "^4.10.1",
+		"ws": "^8.16.0"
 	},
 	"peerDependencies": {
+		"@remix-run/node": "2.x",
 		"astro": "3.x",
 		"axios": "1.x",
 		"express": "4.x",
@@ -101,6 +103,9 @@
 		"next": {
 			"optional": true
 		},
+		"@remix-run/node": {
+			"optional": true
+		},
 		"hono": {
 			"optional": true
 		}
@@ -119,6 +124,7 @@
 		"./ws": "./dist/server/ws.js",
 		"./web-worker": "./dist/ipc/web-worker.js",
 		"./nextjs": "./dist/server/nextjs.js",
+		"./remix": "./dist/server/remix.js",
 		"./hono": "./dist/server/hono.js",
 		"./package.json": "./package.json"
 	},
@@ -160,6 +166,9 @@
 			"nextjs": [
 				"./dist/server/nextjs.d.ts"
 			],
+			"remix": [
+				"./dist/server/remix.d.ts"
+			],
 			"hono": [
 				"./dist/server/hono.d.ts"
 			]
@@ -172,6 +181,6 @@
 	],
 	"dependencies": {
 		"mitt": "^3.0.1",
-		"nanoid": "^5.0.3"
+		"nanoid": "^5.0.4"
 	}
 }

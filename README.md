@@ -11,11 +11,11 @@ without the wrappers. It's just JavaScript. You could bridge:
 - Web server and client
 - Two browser tabs
 - Main thread and Web Worker
-- Two entirely separate processes
-- Or **any two separated JavaScript environments**
+- Two separate processes
+- Any other separated JavaScript environments
 
-Prim+RPC is framework-agnostic (bring your own server _and_ client tools), fully-typed, lightweight, doesn't require a
-compile-step, and is **loaded with features**:
+Prim+RPC is framework-agnostic (bring your own server and client tools), fully-typed, lightweight, doesn't require a
+compile-step, and is loaded with features:
 
 - File handling
 - Callback support
@@ -26,20 +26,19 @@ compile-step, and is **loaded with features**:
 - Documentation generation
 - Access control
 
-Best of all, **if you know JavaScript, you already know how to use Prim+RPC**. If you want access to a function, just
-call it: less setup, easier access, quicker development of your API.
+**If you know JavaScript, you know how to use Prim+RPC**. If you want access to a function, just call it: less setup,
+easier access, quicker development of your API.
 
-Focus less on message transport and more on the message being sent, **with minimal setup**, using Prim+RPC:
-
-**[📖 Read the Docs](https://prim.doseofted.me/) ∙ [💡 Examples](https://prim.doseofted.me/docs/reference/examples) ∙ [⚙️ Setup](https://prim.doseofted.me/docs/learn/setup) ∙ [🔌 Plugins](https://prim.doseofted.me/docs/reference/plugins) ∙ [🧑‍💻 Follow Author](https://doseofted.me/)**
+**[📖 Read the Docs](https://prim.doseofted.me/) ∙ [💡 Examples](https://prim.doseofted.me/docs/learn/examples) ∙
+[⚙️ Setup](https://prim.doseofted.me/docs/learn/setup) ∙ [🔌 Plugins](https://prim.doseofted.me/docs/reference/plugins)
+∙ [🧑‍💻 Follow Author](https://doseofted.me/)**
 
 ## Contributions
 
-<!-- prettier-ignore-start -->
-> **Note**
+> [!NOTE]
+>
 > Prim+RPC is in early stages and is marching towards a [stable release](#release-plan). Support Prim+RPC by
 > [starring the repository](https://github.com/doseofted/prim-rpc), sharing with others, and following for updates.
-<!-- prettier-ignore-end -->
 
 Happy to have you! Please see the [Contribution Guide](./CONTRIBUTING.md) to learn more. If you're only looking for how
 to use the library, please see the [Documentation](https://prim.doseofted.me/).
@@ -54,16 +53,16 @@ to use the library, please see the [Documentation](https://prim.doseofted.me/).
 
 ## Release Plan
 
-<!-- prettier-ignore-start -->
-> **Warning**
+> [!WARNING]
+>
 > Prim+RPC is in **alpha** and it may be unstable. Keep up-to-date with the
 > [latest releases](https://github.com/doseofted/prim-rpc/releases), report any
 > [found security issues](https://github.com/doseofted/prim-rpc/security/advisories/new), and
 > [participate in discussions](https://github.com/doseofted/prim-rpc/discussions) to help shape the future of the
 > project!
-<!-- prettier-ignore-end -->
 
-Prim+RPC is planned to become stable by the end of 2023.
+Prim+RPC is planned to become stable by the end of Q1 2024, alongside the release Ted's
+[portfolio website](https://doseofted.me/) that will make use of it.
 
 Prim+RPC Core, the framework-agnostic core of the project, will become stable first and will be released once the
 default plugins are stable. Lastly, Prim+RPC's optional tooling (such as documentation generation) will become stable.

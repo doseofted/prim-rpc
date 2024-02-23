@@ -1,6 +1,6 @@
 {
 	"name": "@doseofted/prim-example-server",
-	"version": "0.1.0-alpha.30",
+	"version": "0.1.0-alpha.32",
 	"description": "An example backend making use of Prim+RPC.",
 	"license": "UNLICENSED",
 	"private": true,
@@ -29,14 +29,14 @@
 		"@doseofted/prim-example": "workspace:*",
 		"@doseofted/prim-rpc": "workspace:*",
 		"@doseofted/prim-rpc-plugins": "workspace:*",
-		"@fastify/cors": "^8.4.1",
-		"@fastify/multipart": "^8.0.0",
+		"@fastify/cors": "^9.0.0",
+		"@fastify/multipart": "^8.1.0",
 		"@msgpack/msgpack": "3.0.0-beta2",
-		"fastify": "^4.24.3",
+		"fastify": "^4.25.2",
 		"form-data": "^4.0.0",
 		"superjson": "^2.2.1",
-		"tsx": "^4.1.1",
-		"ws": "^8.14.2"
+		"tsx": "^4.7.0",
+		"ws": "^8.16.0"
 	},
 	"scripts": {
 		"dev": "tsx watch --clear-screen=false src/index.ts",
@@ -51,7 +51,7 @@
 		"node": ">= 18.7.0"
 	},
 	"devDependencies": {
-		"@types/ws": "^8.5.9"
+		"@types/ws": "^8.5.10"
 	},
 	"type": "module"
 }

@@ -1,5 +1,17 @@
 # @doseofted/prim-rpc-plugins
 
+## 0.1.0-alpha.22
+
+### Patch Changes
+
+- 6745565: Added Remix plugin
+
+## 0.1.0-alpha.21
+
+### Patch Changes
+
+- 5a61c07: Upgraded project dependencies
+
 ## 0.1.0-alpha.20
 
 ### Patch Changes

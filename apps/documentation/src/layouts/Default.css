@@ -5,6 +5,12 @@
 	}
 } */
 
+/* Apply custom scrollbar to nested scroll bars on page (including code blocks) */
+pre.astro-code,
+[data-rehype-pretty-code-figure] pre code {
+	@apply scrollbar-thin overflow-x-auto;
+}
+
 /* Override DaisyUI code wrapper/window component to match website colors */
 .mockup-code {
 	&::before {
@@ -26,13 +32,23 @@
 }
 
 /** Code block */
-[data-rehype-pretty-code-fragment] pre code {
+[data-rehype-pretty-code-figure] pre code {
 	@apply bg-prim-space overflow-x-auto !py-3 !px-5;
 }
 
 /* Inline code */
-[data-rehype-pretty-code-fragment] > code {
+[data-rehype-pretty-code-figure] > code {
 	@apply bg-prim-space overflow-x-auto;
+}
+
+/* Fix for "txt" (plaintext) code not appearing on dark background after rehype-pretty-code upgrade */
+[data-rehype-pretty-code-figure] code[data-language="txt"] {
+	color: #dbdcde;
+}
+/* Fix for more conflicts between Tailwind prose styling and rehype-pretty-code */
+.prose :where(code):not(:where([class~="not-prose"], [class~="not-prose"] *))::before,
+.prose :where(code):not(:where([class~="not-prose"], [class~="not-prose"] *))::after {
+	opacity: 0;
 }
 
 pre {
@@ -40,7 +56,7 @@ pre {
 }
 
 /* Override default styles (I think mostly applied by DaisyUI?) */
-[data-rehype-pretty-code-fragment] pre {
+[data-rehype-pretty-code-figure] pre {
 	padding: 0; /* Assign padding to code element instead */
 	background-color: transparent !important; /* Assign this from parent element instead. */
 
