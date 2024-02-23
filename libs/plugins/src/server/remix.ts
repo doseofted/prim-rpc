@@ -17,7 +17,7 @@ interface PrimRequestOptions {
 	postprocess?: (response: Response) => Response | Promise<Response | undefined> | void
 }
 
-export function primFetch(options: PrimRequestOptions) {
+export function primRemix(options: PrimRequestOptions) {
 	const { prim, contextTransform = _request => undefined, preprocess = r => r, postprocess = r => r } = options
 	const { prefix = "/", jsonHandler } = prim.options
 	const fetchLike = async (args: LoaderFunctionArgs | ActionFunctionArgs) => {
