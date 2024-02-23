@@ -1,5 +1,6 @@
 import { Tabs } from "@ark-ui/react"
 import { Icon } from "@iconify/react"
+import type { CSSProperties } from "react"
 
 // Slot key names need to be named for usage in Astro
 type CodeTabsList = {
@@ -30,7 +31,7 @@ export function CodeTabs(props: CodeTabsProps) {
 						<span>{name}</span>
 					</Tabs.Trigger>
 				))}
-				<Tabs.Indicator className="tab tab-active text-white !border-white/70" />
+				<Tabs.Indicator className="tab tab-active text-white !border-white/70" style={{ width: "var(--width)" }} />
 			</Tabs.List>
 			{tabs.map((tab, index) => (
 				<Tabs.Content key={index} value={details?.[index].name ?? ""}>

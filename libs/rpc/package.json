@@ -43,7 +43,7 @@
 		"just-safe-get": "^4.2.0",
 		"mitt": "^3.0.1",
 		"nanoid": "^5.0.4",
-		"proxy-deep": "^3.1.1",
+		"proxy-deep": "^4.0.0",
 		"query-string": "^8.1.0",
 		"serialize-error": "^11.0.3",
 		"type-fest": "^4.10.1"
