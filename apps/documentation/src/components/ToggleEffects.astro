@@ -11,7 +11,7 @@
 		const toggleEffectsElem = document.querySelector<HTMLInputElement>("#toggleEffects")
 		toggleEffectsElem?.addEventListener("change", toggleEffects)
 		const disabled = sessionStorage.getItem("disable-effects")
-		console.log("disableEffects check", disabled)
+		// console.log("disableEffects check", disabled)
 		if (toggleEffectsElem) toggleEffectsElem.checked = !disabled
 	}
 	document.addEventListener("astro:page-load", disableEffects, { once: true })

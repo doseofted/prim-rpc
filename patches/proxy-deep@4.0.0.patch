@@ -1,0 +1,18 @@
+diff --git a/package.json b/package.json
+index 1014d4fc9adf611adc1d9848163b40f24537e16a..5abf06eacf7c1632da4b9be89809ebaf8b448a17 100644
+--- a/package.json
++++ b/package.json
+@@ -2,9 +2,11 @@
+   "name": "proxy-deep",
+   "version": "4.0.0",
+   "description": "A Proxy object that can nest itself when accessed",
++  "module": "./index.mjs",
++  "types": "./index.d.ts",
+   "exports": {
+-    "import": "./index.mjs",
+-    "require": "./index.js"
++    "types": "./index.d.ts",
++    "import": "./index.mjs"
+   },
+   "scripts": {
+     "prepare": "tsc",

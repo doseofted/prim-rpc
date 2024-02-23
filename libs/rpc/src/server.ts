@@ -8,7 +8,7 @@ import queryString from "query-string"
 import { serializeError } from "serialize-error"
 import { createPrimOptions, primMajorVersion, useVersionInRpc } from "./options"
 import { createPrimClient } from "./client"
-import { handlePossibleBlobs, mergeBlobLikeWithGiven } from "./blobs"
+import { extractBlobData, mergeBlobData } from "./extract/blobs"
 import { PrimRpcSpecific, checkHttpLikeRequest, checkHttpLikeResponse, checkRpcCall, checkRpcResult } from "./validate"
 import type {
 	AnyFunction,
@@ -28,6 +28,7 @@ import type {
 	PrimServer,
 	PrimServerSocketAnswerRpc,
 } from "./interfaces"
+import { extractPromiseData } from "./extract/promises"
 
 /**
  *
@@ -80,7 +81,7 @@ function createServerActions(
 				const possibleCalls = Array.isArray(prepared) ? checkRpcCall(prepared) : [checkRpcCall(prepared)]
 				if (binaryHandlingNeeded && Object.entries(blobs || {}).length > 0) {
 					for (const toCall of possibleCalls) {
-						toCall.args = toCall.args.map(arg => mergeBlobLikeWithGiven(arg, blobs))
+						toCall.args = toCall.args.map(arg => mergeBlobData(arg, blobs))
 					}
 				}
 				return Array.isArray(prepared) ? possibleCalls : possibleCalls[0]
@@ -217,8 +218,30 @@ function createServerActions(
 						const targetRemote = getProperty(client, methodExpanded) as AnyFunction & { rpc?: boolean }
 						const processedArgs = configured.preCall?.(args, targetLocal) ?? args
 						const result = (await Reflect.apply(targetRemote, context, processedArgs)) as unknown
+						const [resultExtracted, promisesRecord] = extractPromiseData(
+							result,
+							serverOptions?.flags?.supportMultiplePromiseResults
+						)
+						Object.entries(promisesRecord).forEach(async ([id, promise]) => {
+							try {
+								const result = await promise
+								if (cbResults) cbResults({ id, result })
+								event.emit("response", { id, result })
+							} catch (e) {
+								if (handleError && e instanceof Error) {
+									const error = serializeError<unknown>(e)
+									if (!serverOptions.showErrorStack) {
+										delete error.stack
+									}
+									return { id, error }
+								}
+								// eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
+								if (cbResults) cbResults({ id, error: e })
+								event.emit("response", { id, error: e })
+							}
+						})
 						// eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
-						const processedResult = configured.postCall?.(result, targetLocal) ?? result
+						const processedResult = configured.postCall?.(resultExtracted, targetLocal) ?? resultExtracted
 						return { ...rpcBase, result: processedResult }
 					} else {
 						// If either the module wasn't provided or target doesn't exist (even if module does), send a request using
@@ -266,9 +289,7 @@ function createServerActions(
 		let blobs: BlobRecords = {}
 		const givenOnly = (separationNeeded => {
 			if (separationNeeded) {
-				const givenSeparated = Array.isArray(given)
-					? given.map(g => handlePossibleBlobs(g))
-					: [handlePossibleBlobs(given)]
+				const givenSeparated = Array.isArray(given) ? given.map(g => extractBlobData(g)) : [extractBlobData(given)]
 				const givenOnly = givenSeparated.map(([given, newBlobs]) => {
 					blobs = { ...blobs, ...newBlobs }
 					return given
@@ -287,8 +308,8 @@ function createServerActions(
 		let contentType = singleFileResult
 			? "application/octet-stream"
 			: blobCount > 1
-			? "multipart/form-data"
-			: jsonHandler.mediaType ?? "application/json"
+				? "multipart/form-data"
+				: jsonHandler.mediaType ?? "application/json"
 		contentType = jsonHandler?.binary ? "application/octet-stream" : contentType
 		const headers = { "content-type": contentType }
 		const answers = Array.isArray(given) ? given : [given]

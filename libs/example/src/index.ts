@@ -316,6 +316,37 @@ lookAtThisMess.somethingMadeUp = () => "Maybe we'll allow it"
 lookAtThisMess.prototype.somethingMadeUp = () => "Nope"
 lookAtThisMess.messy = { technicallyNotRpc: sayHelloAlternative, definitelyNotRpc: () => "Hi" }
 
+/** Promises are promises. */
+export function promisesUnwrapped(waitFactor = 10, _hi?: () => void) {
+	const today = new Date()
+	return {
+		hi: "there",
+		date: new Date(),
+		navigation: new Promise<{ title: string; href: string }[]>(resolve => {
+			setTimeout(
+				() =>
+					resolve([
+						{ title: "Home", href: "/" },
+						{ title: "Blog", href: "/blog" },
+						{ title: "Contact", href: "/contact" },
+					]),
+				3 * waitFactor
+			)
+		}),
+		posts: new Promise<{ title: string; date: Date }[]>(resolve => {
+			setTimeout(
+				() =>
+					resolve([
+						{ title: "First post", date: new Date(today.valueOf() - 1000 * 60 * 60 * 24 * 365) },
+						{ title: "Oh I forgot about this blog", date: new Date(today.valueOf() - 1000 * 60 * 60) },
+					]),
+				5 * waitFactor
+			)
+		}),
+	}
+}
+promisesUnwrapped.rpc = true
+
 /** I don't mind unwrapping layers of needless properties. It makes me feel alive. */
 // eslint-disable-next-line @typescript-eslint/require-await
 export async function wrapReturn<U>(given: U) {

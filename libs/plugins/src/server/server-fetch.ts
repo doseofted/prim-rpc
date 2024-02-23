@@ -73,7 +73,6 @@ export function primFetch(options: PrimRequestOptions) {
 			}
 			if (method === "POST" && blobEntries.length > 0) {
 				responseInit.headers.delete("content-type") // NOTE: Response will handle this
-				console.log(Array.from(Object.entries(result.headers)))
 				const response = new Response(formData, {
 					...responseInit,
 					status: result.status,

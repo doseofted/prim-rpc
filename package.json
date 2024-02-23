@@ -39,5 +39,10 @@
 		"typescript": "5.3.3",
 		"vite": "^5.0.12",
 		"vitest": "^1.2.2"
+	},
+	"pnpm": {
+		"patchedDependencies": {
+			"proxy-deep@4.0.0": "patches/proxy-deep@4.0.0.patch"
+		}
 	}
 }

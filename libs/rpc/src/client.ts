@@ -20,7 +20,7 @@ import getProperty from "just-safe-get"
 import removeFromArray from "just-remove"
 import { deserializeError } from "serialize-error"
 import { createPrimOptions, primMajorVersion, useVersionInRpc } from "./options"
-import { handlePossibleBlobs, mergeBlobLikeWithGiven } from "./blobs"
+import { extractBlobData, mergeBlobData } from "./extract/blobs"
 import { PromiseResolveStatus } from "./interfaces"
 import type {
 	PromisifiedModule,
@@ -33,9 +33,8 @@ import type {
 	BlobRecords,
 	JsonHandler,
 } from "./interfaces"
-
-/** Callback prefix */ export const CB_PREFIX = "_cb_"
-/** Binary prefix (Blob/File) */ export const BLOB_PREFIX = "_bin_"
+import { CB_PREFIX, PROMISE_PREFIX } from "./constants"
+import { extractPromisePlaceholders } from "./extract/promises"
 
 export type PrimClient<ModuleType extends PrimOptions["module"]> = PromisifiedModule<ModuleType>
 // export interface PrimClient<ModuleType extends PrimOptions["module"]> {
@@ -100,7 +99,7 @@ export function createPrimClient<
 					const blobs: BlobRecords = {}
 					const args = givenArgs.map(arg => {
 						if (binaryHandlingNeeded) {
-							const [replacedArg, newBlobs, givenFromFormElement] = handlePossibleBlobs(arg)
+							const [replacedArg, newBlobs, givenFromFormElement] = extractBlobData(arg)
 							const blobEntries = Object.entries(newBlobs)
 							for (const [key, val] of blobEntries) {
 								blobs[key] = val
@@ -134,7 +133,13 @@ export function createPrimClient<
 					if ((callbackPluginGiven && callbacksWereGiven) || !methodPluginGiven) {
 						// TODO: add fallback in case client cannot support websocket
 						const result = new Promise<RpcAnswer>((resolve, reject) => {
+							const promiseEvents = mitt<Record<string | number, unknown>>()
 							wsEvent.on("response", answer => {
+								if (answer.id.toString().startsWith(PROMISE_PREFIX)) {
+									promiseEvents.emit(answer.id, answer.result)
+									promiseEvents.off(answer.id)
+									return
+								}
 								if (rpc.id !== answer.id) {
 									return
 								}
@@ -142,7 +147,16 @@ export function createPrimClient<
 									// TODO: if callback result, handle potential Errors (as given in options)
 									reject(answer.error)
 								} else {
-									resolve(answer.result)
+									const resultWithPromises = extractPromisePlaceholders(
+										answer.result,
+										(promiseId, resolvePromise) => {
+											promiseEvents.on(promiseId, given => {
+												resolvePromise(given)
+											})
+										},
+										options?.flags?.supportMultiplePromiseResults
+									)
+									resolve(resultWithPromises)
 								}
 							})
 						})
@@ -250,12 +264,12 @@ export function createPrimClient<
 					// return either the single result or the batched results to caller
 					if (Array.isArray(answers)) {
 						answers.forEach(answer => {
-							const answerMerged = binaryHandlingNeeded ? mergeBlobLikeWithGiven(answer, givenBlobs) : answer
+							const answerMerged = binaryHandlingNeeded ? mergeBlobData(answer, givenBlobs) : answer
 							httpEvent.emit("response", answerMerged)
 						})
 					} else {
 						const answer = answers
-						const answerMerged = binaryHandlingNeeded ? mergeBlobLikeWithGiven(answer, givenBlobs) : answer
+						const answerMerged = binaryHandlingNeeded ? mergeBlobData(answer, givenBlobs) : answer
 						httpEvent.emit("response", answerMerged)
 					}
 				})

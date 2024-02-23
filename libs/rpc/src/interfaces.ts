@@ -4,6 +4,7 @@
 
 import type { Emitter } from "mitt"
 import type { Schema, ConditionalExcept, PartialDeep } from "type-fest"
+import type { featureFlags } from "./flags"
 
 // SECTION RPC call and result structure
 export interface RpcBase {
@@ -20,6 +21,16 @@ export interface RpcAnswer<Result = unknown, Error = unknown> extends RpcBase {
 	result?: Result
 	error?: Error
 }
+
+export enum UniquePrefixName {
+	/** Prefix for binary data */
+	Binary = "bin",
+	/** Prefix for callbacks */
+	Callback = "cb",
+	/** Prefix for promises */
+	Promise = "prom",
+}
+export type UniqueTypePrefix = `_${UniquePrefixName}_${string}`
 // !SECTION
 
 // SECTION HTTP/WebSocket events
@@ -59,6 +70,53 @@ interface PrimWebSocketFunctionEvents {
 
 // SECTION Client options
 
+// type TransformATest<T> = T
+// type TransformRTest<T> = Promise<T>
+// // NOTE: allow up to {x} number of overloads (since TypeScript doesn't have syntax for transforming function overloads)
+// // https://stackoverflow.com/a/74209026/5916475
+// // eslint-disable-next-line @typescript-eslint/no-explicit-any
+// type VariableArgsFunction<Func> = Func extends {
+// 	(...args: infer A1): infer R1
+// 	(...args: infer A2): infer R2
+// 	(...args: infer A3): infer R3
+// }
+// 	? {
+// 		(...args: TransformATest<A1>): TransformRTest<R1>
+// 		(...args: TransformATest<A2>): TransformRTest<R2>
+// 		(...args: TransformATest<A3>): TransformRTest<R3>
+// 	  }
+// 	: Func extends {
+// 		(...args: infer A1): infer R1
+// 		(...args: infer A2): infer R2
+// 	}
+// 	? {
+// 			(...args: TransformATest<A1>): TransformRTest<R1>
+// 			(...args: TransformATest<A2>): TransformRTest<R2>
+// 	  }
+// 	: Func extends {
+// 		(...args: infer A1): infer R1
+// 	}
+// 	? {
+// 			(...args: TransformATest<A1>): TransformRTest<R1>
+// 	  }
+// 	: Func
+// // function testFunc(x: string, y: number): Promise<string>
+// // function testFunc(x: boolean): boolean
+// function testFunc(x: string): string
+// function testFunc(x: number): number
+// // eslint-disable-next-line @typescript-eslint/no-explicit-any, @typescript-eslint/no-unsafe-return
+// function testFunc(x: any) {
+// 	// eslint-disable-next-line @typescript-eslint/no-unsafe-return
+// 	return x
+// }
+// let a: typeof testFunc
+// let b: VariableArgsFunction<typeof testFunc>
+// a("a")
+// await b()
+// function c(x: string) { return x }
+// let d: VariableArgsFunction<typeof c>
+// await d("what")
+
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 type FunctionAndForm<Args extends any[], Result> = {
 	(...args: Args): Result
@@ -77,10 +135,10 @@ type PromisifiedModuleDirect<
 		[Key in Keys]: ModuleGiven[Key] extends ((...args: infer A) => infer R) & object
 			? FunctionAndForm<A, Promise<Awaited<R>>> & PromisifiedModuleDirect<ModuleGiven[Key], false>
 			: ModuleGiven[Key] extends object
-			? Recursive extends true
-				? PromisifiedModuleDirect<ModuleGiven[Key], true>
+				? Recursive extends true
+					? PromisifiedModuleDirect<ModuleGiven[Key], true>
+					: never
 				: never
-			: never
 	},
 	never
 >
@@ -124,7 +182,7 @@ type PromisifiedModuleDynamicImport<ModuleGiven extends object> = ModuleGiven ex
 	then: (onfulfilled: infer F, ...args: infer _) => any
 }
 	? // eslint-disable-next-line @typescript-eslint/no-explicit-any
-	  F extends (value: infer V, ...args: infer _) => any
+		F extends (value: infer V, ...args: infer _) => any
 		? V extends object
 			? PromisifiedModuleDirect<V>
 			: never
@@ -155,6 +213,9 @@ export interface JsonHandler {
 // type JsonHandlerOptional  = Partial<JsonHandler>
 /** The record key is a string prefixed with `_bin_` and the value is the Blob */
 export type BlobRecords = Record<string, Blob | File | Buffer>
+/** The record key is a string prefixed with `_prom_` and the value is the value of the *resolved* Promise value */
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+export type PromiseRecords = Record<string, any>
 export type PrimClientMethodPlugin<J = JsonHandler> = (
 	endpoint: string,
 	jsonBody: RpcCall | RpcCall[],
@@ -323,6 +384,8 @@ export interface PrimOptions<M extends PossibleModule = object, J extends JsonHa
 		/** Event emitter for RPC to be shared with Prim Server */
 		clientEvent?: Emitter<PrimHttpEvents>
 	}
+	/** Experimental flags */
+	flags?: Partial<typeof featureFlags>
 }
 // !SECTION
 

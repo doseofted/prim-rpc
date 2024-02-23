@@ -307,6 +307,40 @@ describe("Prim Client can make use of callbacks", () => {
 	})
 })
 
+test("Prim Client can handle return of multiple promises", async () => {
+	const flags = { supportMultiplePromiseResults: true }
+	const { callbackPlugin, methodPlugin, callbackHandler, methodHandler } = createPrimTestingPlugins()
+	createPrimServer({ module, callbackHandler, methodHandler, jsonHandler, flags })
+	const prim = createPrimClient<IModule>({ callbackPlugin, methodPlugin, jsonHandler, flags })
+	const expected = module.promisesUnwrapped(10)
+	// FIXME: callback is needed to use callback plugin (otherwise method plugin is used which doesn't support promises)
+	const result = await prim.promisesUnwrapped(10, () => "uh oh")
+	expect(result.hi).toEqual(expected.hi)
+	expect(result.date).toBeInstanceOf(Date)
+	expect(result.navigation).toBeInstanceOf(Promise)
+	expect(result.posts).toBeInstanceOf(Promise)
+	await expect(result.navigation).resolves.toBeInstanceOf(Array)
+	await expect(result.posts).resolves.toBeInstanceOf(Array)
+})
+
+test("Prim Client knows when an experimental flag is disabled", async () => {
+	const flags = { supportMultiplePromiseResults: false }
+	const { callbackPlugin, methodPlugin, callbackHandler, methodHandler } = createPrimTestingPlugins()
+	createPrimServer({ module, callbackHandler, methodHandler, jsonHandler, flags })
+	const prim = createPrimClient<IModule>({ callbackPlugin, methodPlugin, jsonHandler, flags })
+	const expected = module.promisesUnwrapped(10)
+	// FIXME: callback is needed to use callback plugin (otherwise method plugin is used which doesn't support promises)
+	const result = await prim.promisesUnwrapped(10, () => "uh oh")
+	console.log("expected", result)
+	expect(result.hi).toEqual(expected.hi)
+	expect(result.date).toBeInstanceOf(Date)
+	// NOTE: without promise support (flag disabled), promises in the result are stringified into empty object
+	expect(result.navigation).toBeTypeOf("object")
+	expect(Object.keys(result.navigation).length).toEqual(0)
+	expect(result.posts).toBeTypeOf("object")
+	expect(Object.keys(result.posts).length).toEqual(0)
+})
+
 // TODO: consider case where callbacks are used and result is returned (withCall)
 // this could be tested by testing a function:
 // `typeMessage(msg: string, transform: "upper"|"lower"|"none", cb: (letter: string) => void): string`
