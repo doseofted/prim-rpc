@@ -15,6 +15,7 @@ import jsonHandler from "superjson"
 import { createPrimTestingPlugins } from "./testing"
 import { File } from "node:buffer"
 import { encode as msgPack, decode as msgUnpack } from "@msgpack/msgpack"
+import { featureFlags } from "./flags"
 
 const module = exampleServer
 type IModule = typeof exampleClient
@@ -307,21 +308,23 @@ describe("Prim Client can make use of callbacks", () => {
 	})
 })
 
-// test("Prim Client can handle return of multiple promises", async () => {
-// 	const { callbackPlugin, methodPlugin, callbackHandler, methodHandler } = createPrimTestingPlugins()
-// 	createPrimServer({ module, callbackHandler, methodHandler, jsonHandler })
-// 	const prim = createPrimClient<IModule>({ callbackPlugin, methodPlugin, jsonHandler })
-// 	const expected = module.promisesUnwrapped(10)
-// 	// FIXME: callback is needed to use callback plugin (otherwise method plugin is used which doesn't support promises)
-// 	const result = await prim.promisesUnwrapped(10, () => "uh oh")
-// 	console.log({ result })
-// 	expect(result.hi).toEqual(expected.hi)
-// 	expect(result.date).toBeInstanceOf(Date)
-// 	expect(result.navigation).toBeInstanceOf(Promise)
-// 	expect(result.posts).toBeInstanceOf(Promise)
-// 	await expect(result.navigation).resolves.toBeInstanceOf(Array)
-// 	await expect(result.posts).resolves.toBeInstanceOf(Array)
-// })
+if (featureFlags.supportPromises) {
+	test("Prim Client can handle return of multiple promises", async () => {
+		const { callbackPlugin, methodPlugin, callbackHandler, methodHandler } = createPrimTestingPlugins()
+		createPrimServer({ module, callbackHandler, methodHandler, jsonHandler })
+		const prim = createPrimClient<IModule>({ callbackPlugin, methodPlugin, jsonHandler })
+		const expected = module.promisesUnwrapped(10)
+		// FIXME: callback is needed to use callback plugin (otherwise method plugin is used which doesn't support promises)
+		const result = await prim.promisesUnwrapped(10, () => "uh oh")
+		console.log({ result })
+		expect(result.hi).toEqual(expected.hi)
+		expect(result.date).toBeInstanceOf(Date)
+		expect(result.navigation).toBeInstanceOf(Promise)
+		expect(result.posts).toBeInstanceOf(Promise)
+		await expect(result.navigation).resolves.toBeInstanceOf(Array)
+		await expect(result.posts).resolves.toBeInstanceOf(Array)
+	})
+}
 
 // TODO: consider case where callbacks are used and result is returned (withCall)
 // this could be tested by testing a function:

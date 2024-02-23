@@ -133,11 +133,11 @@ export function createPrimClient<
 					if ((callbackPluginGiven && callbacksWereGiven) || !methodPluginGiven) {
 						// TODO: add fallback in case client cannot support websocket
 						const result = new Promise<RpcAnswer>((resolve, reject) => {
+							const promiseEvents = mitt<Record<string | number, unknown>>()
 							wsEvent.on("response", answer => {
-								const promiseEvents = mitt<Record<string | number, unknown>>()
-								console.log(answer.id)
+								console.log(1, { client: answer.id })
 								if (answer.id.toString().startsWith(PROMISE_PREFIX)) {
-									console.log({ answer })
+									console.log("emit!", answer.id, answer.result)
 									promiseEvents.emit(answer.id, answer.result)
 									promiseEvents.off(answer.id)
 									return
@@ -150,8 +150,13 @@ export function createPrimClient<
 									reject(answer.error)
 								} else {
 									const resultWithPromises = extractPromisePlaceholders(answer.result, (promiseId, resolvePromise) => {
-										promiseEvents.on(promiseId, resolvePromise)
+										console.log("resolved?", promiseId)
+										promiseEvents.on(promiseId, given => {
+											console.log("resolved!", promiseId, given)
+											resolvePromise(given)
+										})
 									})
+									console.log(2, { client: answer.id, resultWithPromises })
 									resolve(resultWithPromises)
 								}
 							})

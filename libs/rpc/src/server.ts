@@ -307,8 +307,8 @@ function createServerActions(
 		let contentType = singleFileResult
 			? "application/octet-stream"
 			: blobCount > 1
-			? "multipart/form-data"
-			: jsonHandler.mediaType ?? "application/json"
+				? "multipart/form-data"
+				: jsonHandler.mediaType ?? "application/json"
 		contentType = jsonHandler?.binary ? "application/octet-stream" : contentType
 		const headers = { "content-type": contentType }
 		const answers = Array.isArray(given) ? given : [given]
@@ -364,6 +364,7 @@ function createSocketEvents(serverOptions: PrimServerOptions): PrimServerSocketE
 			// FIXME: don't stop listening to other responses when new call is made)
 			event.off("response")
 			event.on("response", data => {
+				console.log("server promise?", data)
 				// FIXME: in the future, binary data should also become supported in callback handlers (also, no type cast will be needed)
 				// eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
 				const { body } = prepareSend(data)
