@@ -10,7 +10,9 @@ interface PrimRequestOptions {
 	/** Transform a request into an object to be passed to your function's `this` context */
 	contextTransform?: (request: Request, response: ResponseInit & { headers: Headers }) => unknown
 	/** Process given Request before handing it off to this plugin */
-	preprocess?: (request: LoaderFunctionArgs) => LoaderFunctionArgs | Promise<LoaderFunctionArgs | undefined> | void
+	preprocess?:
+		| ((request: LoaderFunctionArgs) => LoaderFunctionArgs | Promise<LoaderFunctionArgs | undefined> | void)
+		| ((request: ActionFunctionArgs) => ActionFunctionArgs | Promise<ActionFunctionArgs | undefined> | void)
 	/** Process Prim+RPC generated Response before sending it back to your server */
 	postprocess?: (response: Response) => Response | Promise<Response | undefined> | void
 }
@@ -18,8 +20,9 @@ interface PrimRequestOptions {
 export function primFetch(options: PrimRequestOptions) {
 	const { prim, contextTransform = _request => undefined, preprocess = r => r, postprocess = r => r } = options
 	const { prefix = "/", jsonHandler } = prim.options
-	const loader = async (args: LoaderFunctionArgs | ActionFunctionArgs) => {
-		const { request } = (await preprocess(args)) || args
+	const fetchLike = async (args: LoaderFunctionArgs | ActionFunctionArgs) => {
+		const givenArgs = (await preprocess(args)) || args
+		const { request } = givenArgs
 		const { pathname, search } = new URL(request.url)
 		const url = pathname + search
 		let body: string | ArrayBuffer
@@ -98,5 +101,5 @@ export function primFetch(options: PrimRequestOptions) {
 		})
 		return (await postprocess(response)) || response
 	}
-	return { loader, action: loader }
+	return { loader: fetchLike, action: fetchLike }
 }
