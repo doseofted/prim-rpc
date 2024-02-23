@@ -468,3 +468,29 @@ const prim = createPrimServer({
 The post-call hook is optional and is executed _after_ calling a given function. It is given the return value of the
 function given to the server and the function that was called. **Do not call the function inside of the hook** as it
 will be executed a second time.
+
+## <Icon class="w-6 h-6" name="ph:brackets-curly-bold"/> Flags (Experimental)
+
+<DataListOptions synced />
+
+<CodeFile>
+
+```typescript
+const flags = {
+	/**
+	 * Support return values in functions with multiple promises. This currently
+	 * works with the callback handler only. This means only functions with a
+	 * callback as an argument can return multiple promises. Once limitation is
+	 * removed, this feature is expected be enabled by default.
+	 */
+	supportMultiplePromiseResults: false,
+}
+createPrimClient({ flags })
+createPrimServer({ flags })
+```
+
+</CodeFile>
+
+Prim+RPC places some features behind experimental flags. These generally work as intended but may have limitations that
+will be addressed before enabling by default. Flags should be assumed to be synced between the server and client unless
+otherwise specified.
