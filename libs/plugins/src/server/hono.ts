@@ -28,7 +28,7 @@ export function honoPrimRpc(options: PrimHonoPluginOptions) {
 		if (!url.startsWith(prim.options.prefix ?? "/")) {
 			return next()
 		}
-		const requestType = req.headers.get("content-type") ?? ""
+		const requestType = req.header("content-type") ?? ""
 		if (requestType.startsWith("multipart/form-data")) {
 			const formData = await req.formData()
 			for (const [key, value] of formData) {
