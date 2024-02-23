@@ -1,5 +1,11 @@
 # @doseofted/prim-rpc
 
+## 0.1.0-alpha.22
+
+### Patch Changes
+
+- c2d2d3f: Updated dependencies to latest
+
 ## 0.1.0-alpha.21
 
 ### Patch Changes
