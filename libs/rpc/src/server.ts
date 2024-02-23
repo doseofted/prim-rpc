@@ -221,8 +221,6 @@ function createServerActions(
 						const [resultExtracted, promisesRecord] = extractPromiseData(result)
 						Object.entries(promisesRecord).forEach(async ([id, promise]) => {
 							try {
-								console.log({ id, promise })
-								// void promise.then(l => console.log(id, l))
 								const result = await promise
 								if (cbResults) cbResults({ id, result })
 								event.emit("response", { id, result })
@@ -364,7 +362,6 @@ function createSocketEvents(serverOptions: PrimServerOptions): PrimServerSocketE
 			// FIXME: don't stop listening to other responses when new call is made)
 			event.off("response")
 			event.on("response", data => {
-				console.log("server promise?", data)
 				// FIXME: in the future, binary data should also become supported in callback handlers (also, no type cast will be needed)
 				// eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
 				const { body } = prepareSend(data)

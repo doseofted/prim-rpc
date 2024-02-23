@@ -27,9 +27,7 @@ export function extractPromiseData(given: unknown): [given: unknown, promises: R
 
 export function mergePromiseData(given: unknown, promises: Record<string, Promise<unknown>>): unknown {
 	if (!featureFlags.supportPromises) return given
-	console.log("SO CLOSE 2", given, promises)
-	const merged = mergeGivenData(given, promises, PROMISE_PREFIX)
-	return merged
+	return mergeGivenData(given, promises, PROMISE_PREFIX)
 }
 
 function isPromisePlaceholder(given: unknown) {
@@ -42,17 +40,12 @@ export function extractPromisePlaceholders(
 	cb?: (promiseId: string, resolve: (given: unknown) => void) => void
 ): unknown {
 	if (!featureFlags.supportPromises) return given
-	console.log("SO CLOSE 1", given)
-	const [value, extracted] = extractGivenData(given, isPromisePlaceholder, PROMISE_PREFIX)
-	console.log("SO CLOSE 1.5", value, extracted)
+	const [_, extracted] = extractGivenData(given, isPromisePlaceholder, PROMISE_PREFIX)
 	const extractedTransformed: Record<string, Promise<unknown>> = {}
 	for (const [replacedKey, originalKey] of Object.entries(extracted)) {
 		extractedTransformed[replacedKey] = new Promise(resolve => {
 			cb?.(originalKey, resolve)
 		})
 	}
-	console.log("SO CLOSE 3", extractedTransformed)
-	const givenWithPromises = mergePromiseData(given, extractedTransformed)
-	console.log("SO CLOSE 4", givenWithPromises)
-	return givenWithPromises
+	return mergePromiseData(given, extractedTransformed)
 }

@@ -96,7 +96,6 @@ export const createCallbackHandler = (options: CallbackTestingOptions): PrimServ
 						String(m),
 						// eslint-disable-next-line max-nested-callbacks
 						data => {
-							console.log("messageServer", data)
 							wsSession.emit("messageServer", data)
 						},
 						context

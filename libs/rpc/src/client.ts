@@ -135,9 +135,7 @@ export function createPrimClient<
 						const result = new Promise<RpcAnswer>((resolve, reject) => {
 							const promiseEvents = mitt<Record<string | number, unknown>>()
 							wsEvent.on("response", answer => {
-								console.log(1, { client: answer.id })
 								if (answer.id.toString().startsWith(PROMISE_PREFIX)) {
-									console.log("emit!", answer.id, answer.result)
 									promiseEvents.emit(answer.id, answer.result)
 									promiseEvents.off(answer.id)
 									return
@@ -150,13 +148,10 @@ export function createPrimClient<
 									reject(answer.error)
 								} else {
 									const resultWithPromises = extractPromisePlaceholders(answer.result, (promiseId, resolvePromise) => {
-										console.log("resolved?", promiseId)
 										promiseEvents.on(promiseId, given => {
-											console.log("resolved!", promiseId, given)
 											resolvePromise(given)
 										})
 									})
-									console.log(2, { client: answer.id, resultWithPromises })
 									resolve(resultWithPromises)
 								}
 							})

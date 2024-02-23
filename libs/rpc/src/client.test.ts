@@ -316,7 +316,6 @@ if (featureFlags.supportPromises) {
 		const expected = module.promisesUnwrapped(10)
 		// FIXME: callback is needed to use callback plugin (otherwise method plugin is used which doesn't support promises)
 		const result = await prim.promisesUnwrapped(10, () => "uh oh")
-		console.log({ result })
 		expect(result.hi).toEqual(expected.hi)
 		expect(result.date).toBeInstanceOf(Date)
 		expect(result.navigation).toBeInstanceOf(Promise)
