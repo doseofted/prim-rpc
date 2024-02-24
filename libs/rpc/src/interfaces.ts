@@ -511,7 +511,11 @@ export interface PrimServerActionsBase<Context = unknown> {
 	 * Step 2: Using the result of `.prepareCall()`, use the RPC to get a result from Prim.
 	 * See `.prepareSend()` for next step.
 	 */
-	prepareRpc: (given: RpcCall | RpcCall[], context?: Context) => Promise<RpcAnswer | RpcAnswer[]>
+	prepareRpc: (
+		given: RpcCall | RpcCall[],
+		context: Context,
+		httpMethod: string | false
+	) => Promise<RpcAnswer | RpcAnswer[]>
 	/**
 	 * Step 3: Using the result of `.rpc()`, prepare the result to be sent with the server framework.
 	 */

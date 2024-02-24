@@ -35,13 +35,14 @@ describe("Hono plugin is functional as Prim Plugin", () => {
 	const expected = { id: 1, result: module.sayHello(args) }
 	test("registered as Prim Plugin", async () => {
 		const response = await request(server)
-			.post("/prim/sayHello")
+			.post("/prim")
 			.send({
 				method: "sayHello",
 				args,
 				id: 1,
 			})
 			.set("accept", "application/json")
+		console.log(response.body)
 		expect(response.headers["content-type"]).toContain("application/json")
 		expect(response.status).toEqual(200)
 		expect(response.body).toEqual(expected)
