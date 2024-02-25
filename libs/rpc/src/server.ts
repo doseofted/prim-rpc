@@ -168,7 +168,7 @@ function createServerActions(
 								const currentPathCheck: string[] = []
 								// NOTE: `.methodsOnMethods` is only allowed if method is defined _directly_ on another method
 								const previousPathsIncludeFunction = methodExpanded
-									.slice(0, serverOptions.methodsOnMethods.length > 0 ? -2 : -1)
+									.slice(0, Object.keys(serverOptions.methodsOnMethods).length > 0 ? -2 : -1)
 									.map(method => {
 										currentPathCheck.push(method)
 										const currentPath = getProperty(givenModule, currentPathCheck) as unknown
@@ -179,11 +179,13 @@ function createServerActions(
 									return { ...rpcBase, error: "Method on method was not valid" }
 								}
 								const directPreviousPath = getProperty(givenModule, methodExpanded.slice(0, -1)) as unknown
-								const disallowedMethodOnMethod =
-									typeof directPreviousPath === "function" &&
-									!serverOptions.methodsOnMethods.includes(methodExpanded.slice(-1)[0])
-								if (disallowedMethodOnMethod) {
-									return { ...rpcBase, error: "Method on method was not allowed" }
+								const rpcSpecifierForMethodOnMethod = serverOptions.methodsOnMethods[methodExpanded.slice(-1)[0]]
+								console.log({ rpcSpecifierForMethodOnMethod })
+								if (typeof directPreviousPath === "function" && !rpcSpecifierForMethodOnMethod) {
+									const rpcAllowedForMethodOnMethod = checkRpcIdentifier(rpcSpecifierForMethodOnMethod, httpMethod)
+									if (!rpcAllowedForMethodOnMethod) {
+										return { ...rpcBase, error: "Method on method was not allowed" }
+									}
 								}
 								const rpcProperty = getFunctionRpcProperty(directPreviousPath)
 								possiblyMethodOnMethod = checkRpcIdentifier(rpcProperty, httpMethod)
@@ -197,9 +199,14 @@ function createServerActions(
 							const rpcProperty = getFunctionRpcProperty(targetLocal)
 							const methodAllowedDirectly = checkRpcIdentifier(rpcProperty, httpMethod)
 							if (!methodAllowedDirectly) {
-								const allowedInSchema =
+								const allowListValueForMethod =
 									Object.entries(serverOptions.allowList ?? {}).length > 0 &&
-									!!getProperty(serverOptions.allowList, methodExpanded)
+									(getProperty(serverOptions.allowList, methodExpanded) as unknown)
+								const rpcPropertyFromAllowList =
+									typeof allowListValueForMethod === "string" || typeof allowListValueForMethod === "boolean"
+										? allowListValueForMethod
+										: false
+								const allowedInSchema = checkRpcIdentifier(rpcPropertyFromAllowList, httpMethod)
 								if (!allowedInSchema && !possiblyMethodOnMethod) {
 									return { ...rpcBase, error: "Method was not allowed" }
 								}

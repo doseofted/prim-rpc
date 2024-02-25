@@ -183,19 +183,7 @@ describe("Prim Server can call RPC only over specified methods", () => {
 		expect(module.sayHello.rpc).toEqual("idempotent")
 		expect(result).toEqual({ result: expected, id: 1 })
 	})
-	test("with a POST request on regular RPC", async () => {
-		const prim = createPrimServer({ module, prefix: "/prim" })
-		const server = prim.server()
-		const result = await handlePost(server, {
-			method: "sayHelloAlternative",
-			args: ["Hi", "Ted"],
-			id: 1,
-		})
-		const expected = module.sayHelloAlternative("Hi", "Ted")
-		expect(module.sayHelloAlternative.rpc).toEqual(true)
-		expect(result).toEqual({ result: expected, id: 1 })
-	})
-	test("with a GET request on idempotent RPC", async () => {
+	test("with a GET request on idempotent RPC, defined directly", async () => {
 		const prim = createPrimServer({ module, prefix: "/prim" })
 		const server = prim.server()
 		const options = { greeting: "Salut", name: "Ted" }
@@ -208,6 +196,34 @@ describe("Prim Server can call RPC only over specified methods", () => {
 		const result = JSON.parse(response.body) as RpcAnswer
 		const expected = module.sayHello(options)
 		expect(module.sayHello.rpc).toEqual("idempotent")
+		expect(result).toEqual({ result: expected, id: 1 })
+	})
+	test("with a GET request on idempotent RPC, defined in allow-list", async () => {
+		const module = { justATestMoveAlong: () => "Hello" }
+		const allowList = { justATestMoveAlong: "idempotent" }
+		const prim = createPrimServer({ module, allowList, prefix: "/prim" })
+		const server = prim.server()
+		const url = queryString.stringifyUrl({
+			url: "/prim/justATestMoveAlong",
+			query: { ["-"]: 1 },
+		})
+		const response = await server.call({ method: "GET", url })
+		// eslint-disable-next-line @typescript-eslint/no-unsafe-argument
+		const result = JSON.parse(response.body) as RpcAnswer
+		const expected = module.justATestMoveAlong()
+		expect(module.justATestMoveAlong).not.toHaveProperty("rpc")
+		expect(result).toEqual({ result: expected, id: 1 })
+	})
+	test("with a POST request on regular RPC", async () => {
+		const prim = createPrimServer({ module, prefix: "/prim" })
+		const server = prim.server()
+		const result = await handlePost(server, {
+			method: "sayHelloAlternative",
+			args: ["Hi", "Ted"],
+			id: 1,
+		})
+		const expected = module.sayHelloAlternative("Hi", "Ted")
+		expect(module.sayHelloAlternative.rpc).toEqual(true)
 		expect(result).toEqual({ result: expected, id: 1 })
 	})
 	test("with a GET request on regular RPC", async () => {

@@ -336,7 +336,7 @@ export interface PrimOptions<M extends PossibleModule = object, J extends JsonHa
 	 * If given function specifies a `.rpc` boolean property with a value of `true` then those functions do not need
 	 * to be added to the allow-list.
 	 */
-	allowList?: PartialDeep<Schema<PromisifiedModule<M>, boolean>>
+	allowList?: PartialDeep<Schema<PromisifiedModule<M>, boolean | "idempotent">>
 	/**
 	 * In JavaScript, functions are objects. Those objects can have methods. This means that functions can have methods.
 	 *
@@ -344,7 +344,7 @@ export interface PrimOptions<M extends PossibleModule = object, J extends JsonHa
 	 * a list of those names in this option. For instance, if this option is set to `["docs"]` then that means you
 	 * could call `sayHello.docs()` where `sayHello` is another function.
 	 */
-	methodsOnMethods?: string[]
+	methodsOnMethods?: { [key: string]: true | "idempotent" }
 	/**
 	 * Whether Errors should be serialized before sending from the server and deserialized when received on the client.
 	 * The default is `true` unless a custom JSON handler is set. You may set this option explicitly to always use your
