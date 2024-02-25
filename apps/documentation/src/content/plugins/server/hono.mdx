@@ -20,7 +20,7 @@ Prim+RPC supports Hono and is very easy to set up. First, let's set up our funct
 export function hello() {
 	return "Hi from Prim+RPC!"
 }
-hello.rpc = true
+hello.rpc = "idempotent"
 
 export default hello
 ```
@@ -56,7 +56,7 @@ to be changed):
 <CodeFile>
 
 ```zsh
-curl --request GET --url "http://localhost:3000/prim"
+curl "http://localhost:3000/prim"
 ```
 
 </CodeFile>

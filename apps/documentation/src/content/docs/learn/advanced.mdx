@@ -95,7 +95,7 @@ export async function markdownToHtml(markdownFile: File | string) {
 	const html = micromark(markdown)
 	return new File([html], "snippet.html", { type: "text/html" })
 }
-markdownToHtml.rpc = true
+markdownToHtml.rpc = "idempotent"
 ```
 
 </CodeFile>

@@ -68,7 +68,7 @@ export function sayHello(options?: Greeting) {
 	const { greeting, name } = options ?? {}
 	return `${greeting ?? "Hello"} ${name ?? "you"}!`
 }
-sayHello.rpc = true
+sayHello.rpc = "idempotent"
 
 /**
  * An alternative to `sayHello` that uses positional arguments.
@@ -291,7 +291,7 @@ export async function makeItATextFile(text: string) {
 	const { File } = await import("node:buffer")
 	return new File([text], "text.txt", { type: "text/plain" })
 }
-makeItATextFile.rpc = true
+makeItATextFile.rpc = "idempotent" // I mean in a way, server resources aren't changed, maybe I need another keyword
 
 /**
  * Make an introduction.

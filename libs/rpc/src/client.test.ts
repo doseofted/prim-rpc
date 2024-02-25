@@ -83,11 +83,11 @@ describe("Prim Client cannot call non-RPC", () => {
 		const functionCall = () => prim.definitelyNotRpc()
 		await expect(functionCall()).rejects.toThrow("Method was not allowed")
 	})
-	test("with method on method that's not allowed", async () => {
+	test("with methods on methods that are not allowed", async () => {
 		const { callbackPlugin, methodPlugin, callbackHandler, methodHandler } = createPrimTestingPlugins()
 		// We pass some made-up method-on-method name because if none are given then no methods on methods are allowed
 		// and I need to test to make sure that the allow list is working
-		createPrimServer({ module, callbackHandler, methodHandler, methodsOnMethods: ["somethingMadeUp"] })
+		createPrimServer({ module, callbackHandler, methodHandler, methodsOnMethods: { somethingMadeUp: true } })
 		const prim = createPrimClient<IModule>({ callbackPlugin, methodPlugin })
 		// below is not valid because it's in Prim RPC's deny list
 		const functionCall1 = () => prim.greetings.toString()
@@ -95,6 +95,9 @@ describe("Prim Client cannot call non-RPC", () => {
 		// this is not valid because, while the method-on-method is allowed, it's called on the prototype
 		const functionCall2 = () => prim.lookAtThisMess.prototype.somethingMadeUp()
 		await expect(functionCall2()).rejects.toThrow("Method was not valid")
+		// this is valid because the method-on-method is allowed and is not defined on the prototype
+		const functionCall5 = () => prim.lookAtThisMess.somethingMadeUp()
+		await expect(functionCall5()).resolves.toEqual("Maybe we'll allow it")
 		// below is not valid because "docs" method-on-method is not in the allowed list
 		const functionCall3 = () => prim.lookAtThisMess.docs()
 		await expect(functionCall3()).rejects.toThrow("Method on method was not allowed")
@@ -126,7 +129,7 @@ describe("Prim Client can call methods with positional parameters", () => {
 test("Prim Client can call allowed methods on methods", async () => {
 	const { callbackPlugin, methodPlugin, callbackHandler, methodHandler } = createPrimTestingPlugins()
 	// JSON handler is only useful with remote source (no local source test needed)
-	createPrimServer({ module, callbackHandler, methodHandler, methodsOnMethods: ["docs"] })
+	createPrimServer({ module, callbackHandler, methodHandler, methodsOnMethods: { docs: true } })
 	const prim = createPrimClient<IModule>({ callbackPlugin, methodPlugin })
 	const expected = module.lookAtThisMess.docs()
 	const result = await prim.lookAtThisMess.docs()
@@ -331,7 +334,6 @@ test("Prim Client knows when an experimental flag is disabled", async () => {
 	const expected = module.promisesUnwrapped(10)
 	// FIXME: callback is needed to use callback plugin (otherwise method plugin is used which doesn't support promises)
 	const result = await prim.promisesUnwrapped(10, () => "uh oh")
-	console.log("expected", result)
 	expect(result.hi).toEqual(expected.hi)
 	expect(result.date).toBeInstanceOf(Date)
 	// NOTE: without promise support (flag disabled), promises in the result are stringified into empty object

@@ -20,7 +20,7 @@ The Prim+RPC server can be configured with Fastify. First, create some module to
 export function hello() {
 	return "Hi from Prim+RPC!"
 }
-hello.rpc = true
+hello.rpc = "idempotent"
 
 export default hello
 ```
@@ -75,7 +75,7 @@ Now we can test this out with a simple call from the command line:
 <CodeFile>
 
 ```zsh
-curl --request GET --url "http://localhost:3000/prim"
+curl "http://localhost:3000/prim"
 ```
 
 </CodeFile>

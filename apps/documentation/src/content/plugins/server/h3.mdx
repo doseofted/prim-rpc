@@ -28,7 +28,7 @@ naming patterns. We'll cover all frameworks separately to reduce confusion.
 export function hello() {
 	return "Hi from Prim+RPC!"
 }
-hello.rpc = true
+hello.rpc = "idempotent"
 
 export default hello
 ```
@@ -91,7 +91,7 @@ We can test this out by issuing a new request from the command line:
 <CodeFile>
 
 ```zsh
-curl --request GET --url "http://localhost:3000/prim"
+curl "http://localhost:3000/prim"
 ```
 
 </CodeFile>
@@ -137,7 +137,7 @@ We can test this out by issuing a new request from the command line (change port
 <CodeFile>
 
 ```zsh
-curl --request GET --url "http://localhost:3000/prim"
+curl "http://localhost:3000/prim"
 ```
 
 </CodeFile>

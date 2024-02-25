@@ -35,7 +35,7 @@ describe("Hono plugin is functional as Prim Plugin", () => {
 	const expected = { id: 1, result: module.sayHello(args) }
 	test("registered as Prim Plugin", async () => {
 		const response = await request(server)
-			.post("/prim/sayHello")
+			.post("/prim")
 			.send({
 				method: "sayHello",
 				args,
