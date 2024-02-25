@@ -311,7 +311,7 @@ hello.documentation = () => "I say hello"
 
 createPrimServer({
 	module: { hello },
-	methodsOnMethods: ["documentation"],
+	methodsOnMethods: { documentation: true },
 })
 ```
 

@@ -341,7 +341,7 @@ export interface PrimOptions<M extends PossibleModule = object, J extends JsonHa
 	 * In JavaScript, functions are objects. Those objects can have methods. This means that functions can have methods.
 	 *
 	 * By default, methods on functions are not allowed as RPC. You may optionally allow some methods by specifying
-	 * a list of those names in this option. For instance, if this option is set to `["docs"]` then that means you
+	 * a key/value pair of those names in this option. For instance, if this option is set to `{ docs: true }` then that means you
 	 * could call `sayHello.docs()` where `sayHello` is another function.
 	 */
 	methodsOnMethods?: { [key: string]: true | "idempotent" }
