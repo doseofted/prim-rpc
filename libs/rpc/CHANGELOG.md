@@ -1,5 +1,12 @@
 # @doseofted/prim-rpc
 
+## 0.1.0-alpha.24
+
+### Minor Changes
+
+- 8072796: .methodsOnMethods option now requires an key/value object where the key is the method-on-method name and the value is either `true` or `"idempotent"` (similar to .allowList option)
+- d5887ab: RPC can no longer be made by GET requests by default: introduced new keyword for function's `.rpc` property named "idempotent" that, when used with HTTP plugins, allows RPC over GET requests
+
 ## 0.1.0-alpha.23
 
 ### Patch Changes
