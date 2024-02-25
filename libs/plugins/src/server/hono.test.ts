@@ -42,7 +42,6 @@ describe("Hono plugin is functional as Prim Plugin", () => {
 				id: 1,
 			})
 			.set("accept", "application/json")
-		console.log(response.body)
 		expect(response.headers["content-type"]).toContain("application/json")
 		expect(response.status).toEqual(200)
 		expect(response.body).toEqual(expected)

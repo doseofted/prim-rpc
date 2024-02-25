@@ -43,9 +43,7 @@ export function honoPrimRpc(options: PrimHonoPluginOptions) {
 			body = await req.text()
 		}
 		const server = prim.server()
-		console.log({ body, url, method, blobs })
 		const result = await server.call({ body, url, method, blobs }, contextTransform(context))
-		console.log({ result })
 		const hasBinary = ["application/octet-stream", "multipart/form-data"].includes(result.headers["content-type"])
 		let firstFile = { name: "", blob: null as Blob | null, type: "application/octet-stream" }
 		const blobEntries = Object.entries(result.blobs)

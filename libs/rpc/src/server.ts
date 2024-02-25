@@ -180,7 +180,6 @@ function createServerActions(
 								}
 								const directPreviousPath = getProperty(givenModule, methodExpanded.slice(0, -1)) as unknown
 								const rpcSpecifierForMethodOnMethod = serverOptions.methodsOnMethods[methodExpanded.slice(-1)[0]]
-								console.log({ rpcSpecifierForMethodOnMethod })
 								if (typeof directPreviousPath === "function" && !rpcSpecifierForMethodOnMethod) {
 									const rpcAllowedForMethodOnMethod = checkRpcIdentifier(rpcSpecifierForMethodOnMethod, httpMethod)
 									if (!rpcAllowedForMethodOnMethod) {
