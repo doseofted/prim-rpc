@@ -171,6 +171,63 @@ describe("Prim Server cannot call non-RPC", () => {
 	})
 })
 
+describe("Prim Server can call RPC only over specified methods", () => {
+	test("with a POST request on idempotent RPC", async () => {
+		const prim = createPrimServer({ module, prefix: "/prim" })
+		const server = prim.server()
+		const result = await handlePost(server, {
+			method: "sayHello",
+			id: 1,
+		})
+		const expected = module.sayHello()
+		expect(module.sayHello.rpc).toEqual("idempotent")
+		expect(result).toEqual({ result: expected, id: 1 })
+	})
+	test("with a POST request on regular RPC", async () => {
+		const prim = createPrimServer({ module, prefix: "/prim" })
+		const server = prim.server()
+		const result = await handlePost(server, {
+			method: "sayHelloAlternative",
+			args: ["Hi", "Ted"],
+			id: 1,
+		})
+		const expected = module.sayHelloAlternative("Hi", "Ted")
+		expect(module.sayHelloAlternative.rpc).toEqual(true)
+		expect(result).toEqual({ result: expected, id: 1 })
+	})
+	test("with a GET request on idempotent RPC", async () => {
+		const prim = createPrimServer({ module, prefix: "/prim" })
+		const server = prim.server()
+		const options = { greeting: "Salut", name: "Ted" }
+		const url = queryString.stringifyUrl({
+			url: "/prim/sayHello",
+			query: { ...options, ["-"]: 1 },
+		})
+		const response = await server.call({ method: "GET", url })
+		// eslint-disable-next-line @typescript-eslint/no-unsafe-argument
+		const result = JSON.parse(response.body) as RpcAnswer
+		const expected = module.sayHello(options)
+		expect(module.sayHello.rpc).toEqual("idempotent")
+		expect(result).toEqual({ result: expected, id: 1 })
+	})
+	test("with a GET request on regular RPC", async () => {
+		const prim = createPrimServer({ module, prefix: "/prim" })
+		const server = prim.server()
+		const options = { 0: "Salut", 1: "Ted" }
+		const url = queryString.stringifyUrl({
+			url: "/prim/sayHelloAlternative",
+			query: { ...options, ["-"]: 1 },
+		})
+		const response = await server.call({ method: "GET", url })
+		// eslint-disable-next-line @typescript-eslint/no-unsafe-argument
+		const result = JSON.parse(response.body) as RpcAnswer
+		const expected = module.sayHelloAlternative(...(Object.values(options) as [string, string]))
+		expect(module.sayHelloAlternative.rpc).toEqual(true)
+		expect(result).not.toEqual({ result: expected, id: 1 })
+		expect(result).toEqual({ error: "Method was not allowed", id: 1 })
+	})
+})
+
 test("Prim Server can call remote methods (without module directly)", async () => {
 	const { callbackPlugin, methodPlugin, callbackHandler, methodHandler } = createPrimTestingPlugins()
 	createPrimServer({ module, callbackHandler, methodHandler }) // server 1
