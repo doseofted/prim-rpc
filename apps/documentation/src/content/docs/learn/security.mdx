@@ -98,6 +98,49 @@ type SayHelloParams = Input<typeof sayHello.params>
 Now we can be certain that not only will this function's arguments be validated but functions added in the future will
 require validation through the `params` property.
 
+## Limit RPC Access
+
+By default, when Prim+RPC is used over a network, it only accepts requests over a POST request. However, you can still
+make an RPC with a GET request using the special keyword `"idempotent"`.
+
+However, you should take caution when doing so. We can demonstrate with an example. This is an idempotent function:
+
+<CodeFile filename="server/module.ts">
+
+```typescript
+export function add(x: number, y: number) {
+	return x + y
+}
+add.rpc = "idempotent"
+```
+
+</CodeFile>
+
+No matter how many times that we call this function, we will always get the same result. This can be exposed over a URL
+(with a GET request) because simply visiting that URL won't change the state of the server. Here's a bad example:
+
+<CodeFile filename="server/module.ts">
+
+```typescript
+const x = 0
+
+export function add(y: number) {
+	return x + y
+}
+// NOTE: the property below should be set to `true` instead
+add.rpc = "idempotent"
+```
+
+</CodeFile>
+
+If we expose this function over a URL, then visiting that URL will change the state of the server which may not be
+intended.
+
+It's also important to note that GET requests are often logged so functions that use the `"idempotent"` keyword should
+**never have sensitive arguments passed** to them. All functions where `.rpc = true` will be POST requests and cannot be
+accessed with a GET request. All functions where `.rpc = "idempotent"` may be accessed from either a GET or POST
+request.
+
 ## Selectively Import
 
 Prim+RPC is very selective about what gets exposed from the server. Functions (and functions only) must be passed to the

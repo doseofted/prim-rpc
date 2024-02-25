@@ -172,6 +172,8 @@ Prim+RPC can understand.
 
 - `server.prepareCall()` takes common server options and transforms it into an RPC object.
 - `server.prepareRpc()` takes result of `server.prepareCall()` and creates an RPC result object from the function call.
+  It also takes an optional HTTP method argument if used over a network (if not used on a network, set this argument to
+  `false`).
 - `server.prepareSend()` takes the result of `server.prepareRpc()` and serializes it into common server response
   options.
 - `server.call()` is a shortcut that calls all of the above methods in order. This is useful in HTTP/WebSocket server

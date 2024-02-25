@@ -35,7 +35,7 @@ First, you'll need some module with functions that you'd like to expose to the c
 export function hello() {
 	return "Hi from Prim+RPC!"
 }
-hello.rpc = true
+hello.rpc = "idempotent"
 
 export default hello
 ```
@@ -125,7 +125,7 @@ your Prim+RPC server. You can test it out like so:
 
 ```zsh
 # Remember to change the address depending on your server
-curl --request GET --url "http://localhost:3000/prim"
+curl "http://localhost:3000/prim"
 ```
 
 </CodeFile>

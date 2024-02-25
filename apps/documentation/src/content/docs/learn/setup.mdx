@@ -273,20 +273,50 @@ export type Module = typeof module
 
 </CodeFile>
 
-We can now make requests to the server! We haven't set up the client yet but we can still try it out. Requests in
-Prim+RPC are typically made over POST but for demo's sake:
+We can now make requests to the server! We haven't set up the client yet but we can still try it out from the command line:
+
+<CodeFile>
+
+```zsh
+curl \
+	--request POST \
+	--header "Content-Type: application/json" \
+	--data '{ "method": "sayHello", "args": ["Backend", "Terminal"] }' \
+	"http://localhost:3001/prim"
+# {"result":"Backend, meet Terminal."}
+```
+
+</CodeFile>
+
+In fact, we could even call this function over a GET request. We just need to modify out `.rpc` property to use a
+special keyword: `"idempotent"`
+
+<CodeFile filename="server/module.ts">
+
+```typescript /"idempotent"/
+export function sayHello(x = "Backend", y = "Frontend") {
+	return `${x}, meet ${y}.`
+}
+sayHello.rpc = "idempotent"
+```
+
+</CodeFile>
+
+This will signal to Prim+RPC that it's safe to call from a URL. Now we can make a GET request to this function
+or paste the link into a web browser:
 
 <CodeFile>
 
 ```zsh
 curl "http://localhost:3001/prim/sayHello?0=Backend&1=Terminal"
+# {"result":"Backend, meet Terminal."}
 ```
 
 </CodeFile>
 
-We'll be calling this function from a web browser next. This means that we'll need to
-[implement CORS](https://developer.mozilla.org/en-US/docs/Glossary/CORS) so that the client is allowed to call the
-server. We can configure this in the Fetch handler's options:
+Of course, this is not the primary way we'll be using Prim+RPC: we'll be setting up the client next. This means that
+we'll need to [implement CORS](https://developer.mozilla.org/en-US/docs/Glossary/CORS) so that the client is allowed to
+call the server. We can configure this in the Fetch handler's options:
 
 <CodeFile filename="server/index.ts">
 

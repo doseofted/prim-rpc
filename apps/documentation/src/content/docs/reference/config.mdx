@@ -64,6 +64,10 @@ one of two ways:
 - Define a `.rpc` property on each of your functions with a value of `true`
 - Or add your function to the [Allow List](#-allow-list) option
 
+If your function may be accessed by visiting a URL, you may set the `.rpc` option to `"idempotent"`. If an HTTP method
+handler has been configured, this will allow the function to be accessed by a GET request (by default, only POST
+requests are allowed with a method handler).
+
 ## <Icon class="w-6 h-6" name="ph:brackets-curly-bold"/> HTTP Endpoint
 
 <DataListOptions />
