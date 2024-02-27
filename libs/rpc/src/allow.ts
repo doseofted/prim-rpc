@@ -1,3 +1,7 @@
+// Part of the Prim+RPC project ( https://prim.doseofted.me/ )
+// Copyright 2023 Ted Klingenberg
+// SPDX-License-Identifier: Apache-2.0
+
 /**
  * Check that a function can be executed as RPC based on the given `.rpc` property. The `.rpc` property can be retrieved
  * from a function by calling `getFunctionRpcProperty()`.
