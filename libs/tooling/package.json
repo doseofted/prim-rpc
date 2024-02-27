@@ -37,6 +37,11 @@
 		"lint": "eslint ."
 	},
 	"dependencies": {
+		"@babel/core": "^7.23.9",
+		"@babel/parser": "^7.23.9",
+		"@babel/traverse": "^7.23.9",
+		"@babel/types": "^7.23.9",
+		"defu": "^6.1.4",
 		"just-safe-get": "^4.2.0",
 		"just-safe-set": "^4.2.1",
 		"unplugin": "^1.6.0",
@@ -45,21 +50,28 @@
 	"devDependencies": {
 		"@doseofted/prim-example": "workspace:*",
 		"@sinclair/typebox": "^0.32.13",
+		"@types/babel__core": "^7.20.5",
+		"@types/babel__traverse": "^7.20.5",
 		"@types/json-schema": "^7.0.15",
 		"@types/lodash": "^4.14.202",
 		"@types/lodash-es": "^4.17.12",
+		"esbuild": "^0.20.1",
 		"type-fest": "^4.10.1",
 		"typedoc": "^0.25.7",
 		"typescript": "5.3.3"
 	},
 	"type": "module",
 	"exports": {
+		"./compiler": "./dist/compiler/index.js",
 		"./build": "./dist/build/index.js",
 		"./docs": "./dist/docs/index.js",
 		"./package.json": "./package.json"
 	},
 	"typesVersions": {
 		"*": {
+			"compiler": [
+				"dist/compiler/index.d.ts"
+			],
 			"build": [
 				"dist/build/index.d.ts"
 			],

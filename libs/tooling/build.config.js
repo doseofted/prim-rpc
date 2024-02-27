@@ -9,7 +9,7 @@ const banner = `
 // SPDX-License-Identifier: Apache-2.0`.replace(/^\n/g, "")
 
 export default defineConfig({
-	entry: ["src/docs/index.ts", "src/build/index.ts", "src/cli/index.ts"],
+	entry: ["src/compiler/index.ts", "src/docs/index.ts", "src/build/index.ts", "src/cli/index.ts"],
 	target: "es2020",
 	format: ["esm"],
 	dts: true,
