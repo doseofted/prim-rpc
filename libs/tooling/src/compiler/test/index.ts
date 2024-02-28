@@ -1,10 +1,12 @@
-function hi() {
+export function hi() {
 	console.log("hi!")
 }
 hi.rpc = true
 
 export function what() {
-	function hi() {}
+	function hi() {
+		console.log("hello")
+	}
 	hi.rpc = true
 }
 
