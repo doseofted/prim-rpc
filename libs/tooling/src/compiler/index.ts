@@ -8,10 +8,17 @@ import { parse } from "@babel/parser"
 import traverse, { type NodePath } from "@babel/traverse"
 import type { FunctionDeclaration, VariableDeclaration } from "@babel/types"
 
-export interface RpcCompileOptions {}
+export interface RpcCompileOptions {
+	/**
+	 * The import path of your Prim+RPC client. This client must be the default export and will be used in place of your
+	 * function declarations. If not provided, a default client using fetch/websocket plugins will be created.
+	 */
+	clientImport?: string
+}
 
-const defaults: Partial<RpcCompileOptions> = {}
+const defaultOptions: Partial<RpcCompileOptions> = {}
 
+/** Readable yet unique name to give potential RPC functions */
 function functionWithScope(name: string, scope: number) {
 	return `${scope}:${name}()`
 }
@@ -33,8 +40,28 @@ type DeclarationReferences = {
 		  }
 }
 
-export default createUnplugin((options: RpcCompileOptions) => {
-	const _configured = defu(options, defaults)
+/**
+ * **Experimental:** take caution and review generated code before any deployment. This plugin is not yet stable.
+ *
+ * Allow server-side functions to exist beside client-side code. This plugin will search for functions marked as inline
+ * RPC and move them into a virtual import that you can utilize in your Prim+RPC server. All inline RPC functions will
+ * be replaced with a call to that RPC using your provided Prim+RPC client.
+ *
+ * In detail, the plugin will do the following:
+ *
+ * - Search for functions marked as inline RPC ("rpc" property of function must be set to "inline")
+ * - Replace function declaration with a call using provided Prim+RPC client (import path provided in plugin options)
+ *   - Ensure function body utilizes only variables in scope or variables for server environment (no context sharing)
+ *   - Remove RPC property from code
+ * - Move function declaration to a new file, give unique and predictable name and keep reference (and add exports)
+ * - Create new virtual import containing moved functions (to be used by developer setting up Prim+RPC server)
+ *
+ * Inline RPC functions must be marked with `function.rpc = "inline"` and can only use variables in its defined scope
+ * or defined for the server environment. Prim+RPC and this plugin are flexible, so this environment may be a literal
+ * server, web worker, or another browser.
+ */
+export const inlineRpcPlugin = createUnplugin((options: RpcCompileOptions) => {
+	const _configured = defu(options, defaultOptions)
 	return {
 		name: "unplugin-prim-compiler",
 		transform: (code, _id) => {
@@ -96,9 +123,15 @@ export default createUnplugin((options: RpcCompileOptions) => {
 			const rpcFunctions = Object.keys(functionRpc)
 				.map(functionUniqueName => functionDeclarations[functionUniqueName])
 				.filter(given => given)
-			const rpcFunctionIdentifiers = rpcFunctions.map(func => functionWithScope(func.name, func.scope))
+			const rpcFunctionIdentifiers = rpcFunctions.map(
+				func => `${func.type}:${functionWithScope(func.name, func.scope)}`
+			)
 			console.debug("RPC:", rpcFunctionIdentifiers)
+			// for (const rpcFunction of rpcFunctions) {
+			// 	traverse(rpcFunction.path.node, {})
+			// }
 			return { code }
 		},
 	}
 })
+export default inlineRpcPlugin

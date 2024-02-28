@@ -3,7 +3,7 @@ export function hi() {
 }
 hi.rpc = true
 
-export function what() {
+export function bonjour() {
 	function hi() {
 		console.log("hello")
 	}
@@ -17,3 +17,6 @@ export const func = function () {
 	console.log("uhm")
 }
 func.rpc = true
+
+export { hi as hello } from "./imported"
+export const hola = await import("./imported")
