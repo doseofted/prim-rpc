@@ -56,7 +56,7 @@ const pluginDefaults = {
 	debug: false,
 }
 
-export default createUnplugin((options: BuildOptions) => {
+export const preventBuildPlugin = createUnplugin((options: BuildOptions) => {
 	const configured = { ...pluginDefaults, ...options }
 	return {
 		name: "unplugin-prim-prevent-import",
@@ -90,3 +90,5 @@ export default createUnplugin((options: BuildOptions) => {
 		},
 	}
 })
+
+export default preventBuildPlugin

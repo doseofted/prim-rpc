@@ -63,7 +63,7 @@
 	"type": "module",
 	"exports": {
 		"./compiler": "./dist/compiler/index.js",
-		"./build": "./dist/build/index.js",
+		"./prevent": "./dist/prevent/index.js",
 		"./docs": "./dist/docs/index.js",
 		"./package.json": "./package.json"
 	},
@@ -72,8 +72,8 @@
 			"compiler": [
 				"dist/compiler/index.d.ts"
 			],
-			"build": [
-				"dist/build/index.d.ts"
+			"prevent": [
+				"dist/prevent/index.d.ts"
 			],
 			"docs": [
 				"dist/docs/index.d.ts"
