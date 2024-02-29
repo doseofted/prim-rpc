@@ -13,7 +13,7 @@ const buildOptions: BuildOptions = {
 test("It builds", async () => {
 	const a = await build({
 		...buildOptions,
-		plugins: [plugin.esbuild()],
+		plugins: [plugin.esbuild({ debug: true, client: { type: "generated", endpoint: "/" } })],
 	})
 	console.log(a)
 })

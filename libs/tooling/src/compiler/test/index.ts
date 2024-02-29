@@ -20,3 +20,8 @@ func.rpc = true
 
 export { hi as hello } from "./imported"
 export const hola = await import("./imported")
+
+import testModule from "virtual:prim-rpc?module=inline"
+import client from "virtual:prim-rpc?client=true"
+
+console.log({ testModule, client })

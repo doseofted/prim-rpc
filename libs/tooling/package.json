@@ -38,7 +38,9 @@
 	},
 	"dependencies": {
 		"@babel/core": "^7.23.9",
+		"@babel/generator": "^7.23.6",
 		"@babel/parser": "^7.23.9",
+		"@babel/template": "^7.24.0",
 		"@babel/traverse": "^7.23.9",
 		"@babel/types": "^7.23.9",
 		"defu": "^6.1.4",
@@ -49,8 +51,12 @@
 	},
 	"devDependencies": {
 		"@doseofted/prim-example": "workspace:*",
+		"@doseofted/prim-rpc": "workspace:*",
+		"@doseofted/prim-rpc-plugins": "workspace:*",
 		"@sinclair/typebox": "^0.32.13",
 		"@types/babel__core": "^7.20.5",
+		"@types/babel__generator": "^7.6.8",
+		"@types/babel__template": "^7.4.4",
 		"@types/babel__traverse": "^7.20.5",
 		"@types/json-schema": "^7.0.15",
 		"@types/lodash": "^4.14.202",

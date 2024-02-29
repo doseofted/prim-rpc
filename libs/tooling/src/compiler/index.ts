@@ -7,16 +7,50 @@ import { defu } from "defu"
 import { parse } from "@babel/parser"
 import traverse, { type NodePath } from "@babel/traverse"
 import type { FunctionDeclaration, VariableDeclaration } from "@babel/types"
+import * as types from "@babel/types"
+import template from "@babel/template"
+import generate from "@babel/generator"
 
+type ClientOption =
+	| {
+			type: "import"
+			path: string
+	  }
+	| {
+			type: "generated"
+			endpoint: string
+			wsEndpoint?: string
+	  }
+	| {
+			type: "generated"
+			endpoint?: string
+			wsEndpoint: string
+	  }
 export interface RpcCompileOptions {
 	/**
-	 * The import path of your Prim+RPC client. This client must be the default export and will be used in place of your
-	 * function declarations. If not provided, a default client using fetch/websocket plugins will be created.
+	 * Specify the Prim+RPC client that should be used in place of your inline RPC functions. There are two options, you
+	 * can select your option by specifying the `type` property. The options are as follows:
+	 *
+	 * - `"import"`: Provide the import path of your custom Prim+RPC client to be used by the compiler (recommended)
+	 * - `"generated"`: Use the default, generated Prim+RPC client. It will use the fetch/websocket client plugins with
+	 *    your chosen endpoint(s). This may be useful when you're getting started or don't need a lot of customization.
 	 */
-	clientImport?: string
+	client: ClientOption
+	/**
+	 * The RPC compiler will move defined functions into a new virtual module that you can import into your app.
+	 *
+	 * @default "inline"
+	 */
+	generatedModuleName?: string
+	/** Print additional information about compilation of inline RPC functions */
+	debug?: boolean
 }
 
-const defaultOptions: Partial<RpcCompileOptions> = {}
+const defaultOptions: Partial<RpcCompileOptions> = {
+	client: { type: "generated", endpoint: "/prim" },
+	generatedModuleName: "inline",
+	debug: false,
+}
 
 /** Readable yet unique name to give potential RPC functions */
 function functionWithScope(name: string, scope: number) {
@@ -40,6 +74,24 @@ type DeclarationReferences = {
 		  }
 }
 
+const virtualModuleSpecifier = "virtual:prim-rpc?module="
+const virtualModuleIdentifier = `\0${virtualModuleSpecifier}`
+
+const virtualClientSpecifier = "virtual:prim-rpc?client=true"
+const virtualClientIdentifier = `\0${virtualClientSpecifier}`
+const defaultClientTemplate = template.program(`
+import { createPrimClient } from "@doseofted/prim-rpc"
+import { createMethodPlugin } from "@doseofted/prim-rpc-plugins/browser-fetch"
+import { createCallbackPlugin } from "@doseofted/prim-rpc-plugins/browser-websocket"
+const client = createPrimClient({
+	endpoint: %%endpoint%%,
+	wsEndpoint: %%wsEndpoint%%,
+	methodPlugin: createMethodPlugin(),
+	callbackPlugin: createCallbackPlugin()
+})
+export default client
+`)
+
 /**
  * **Experimental:** take caution and review generated code before any deployment. This plugin is not yet stable.
  *
@@ -61,7 +113,7 @@ type DeclarationReferences = {
  * server, web worker, or another browser.
  */
 export const inlineRpcPlugin = createUnplugin((options: RpcCompileOptions) => {
-	const _configured = defu(options, defaultOptions)
+	const configured = defu(options, defaultOptions)
 	return {
 		name: "unplugin-prim-compiler",
 		transform: (code, _id) => {
@@ -71,7 +123,8 @@ export const inlineRpcPlugin = createUnplugin((options: RpcCompileOptions) => {
 			traverse(parsed, {
 				/** find `function func () {}` */
 				FunctionDeclaration(path) {
-					const functionName = path.node.id.name
+					const functionName = path.node.id?.name
+					if (!functionName) return
 					const scopeId = path.scope.parent.uid
 					const functionUnique = functionWithScope(functionName, scopeId)
 					functionDeclarations[functionUnique] = { type: "function", path, name: functionName, scope: scopeId }
@@ -82,7 +135,7 @@ export const inlineRpcPlugin = createUnplugin((options: RpcCompileOptions) => {
 						const declaredFuncExpression =
 							declaration.type === "VariableDeclarator" &&
 							declaration.id.type === "Identifier" &&
-							["ArrowFunctionExpression", "FunctionExpression"].includes(declaration.init.type) &&
+							["ArrowFunctionExpression", "FunctionExpression"].includes(declaration.init?.type) &&
 							declaration
 						const variableName =
 							declaredFuncExpression &&
@@ -126,11 +179,29 @@ export const inlineRpcPlugin = createUnplugin((options: RpcCompileOptions) => {
 			const rpcFunctionIdentifiers = rpcFunctions.map(
 				func => `${func.type}:${functionWithScope(func.name, func.scope)}`
 			)
-			console.debug("RPC:", rpcFunctionIdentifiers)
+			if (configured.debug && rpcFunctionIdentifiers.length > 0) console.debug("RPC:", rpcFunctionIdentifiers)
 			// for (const rpcFunction of rpcFunctions) {
 			// 	traverse(rpcFunction.path.node, {})
 			// }
 			return { code }
+		},
+		resolveId(id, _importer, _options) {
+			if (id.startsWith(virtualModuleSpecifier)) return id.replace(virtualModuleSpecifier, virtualModuleIdentifier)
+			if (id.startsWith(virtualClientSpecifier)) return id.replace(virtualClientSpecifier, virtualClientIdentifier)
+		},
+		load(id) {
+			if (id.startsWith(virtualModuleIdentifier)) {
+				// TODO: functions needs to be added here
+				return "export default {}"
+			}
+			if (id.startsWith(virtualClientIdentifier) && configured.client.type === "generated") {
+				const endpoint = types.stringLiteral(configured.client.endpoint || "")
+				const wsEndpoint = types.stringLiteral(configured.client.wsEndpoint || "")
+				const ast = defaultClientTemplate({ endpoint, wsEndpoint })
+				const generated = generate(ast)
+				if (configured.debug) console.debug("A default Prim+RPC client was generated")
+				return generated
+			}
 		},
 	}
 })

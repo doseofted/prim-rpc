@@ -16,6 +16,7 @@ export default defineConfig({
 	clean: true,
 	banner: { js: banner },
 	async onSuccess() {
+		// generate and move API documentation to documentation website
 		await $`pnpm document`
 		const cwd = process.cwd()
 		const version = JSON.parse((await fs.readFile("package.json")).toString("utf-8")).version
@@ -23,5 +24,11 @@ export default defineConfig({
 		const generatedDocs = path.join(cwd, "docs")
 		const apiContent = path.join(cwd, "../../apps/documentation/src/content/api", versionPrefix, path.basename(cwd))
 		fs.cpSync(generatedDocs, apiContent, { recursive: true, force: true })
+		// move global type definitions
+		// FIXME: look for other ways to do this (and ensure that this method works)
+		const typeDefinitionCompilerName = "compiler.d.ts"
+		const typeDefinitionCompilerSrc = path.join(cwd, "src/compiler", typeDefinitionCompilerName)
+		const typeDefinitionCompilerDist = path.join(cwd, "dist/compiler", typeDefinitionCompilerName)
+		fs.cpSync(typeDefinitionCompilerSrc, typeDefinitionCompilerDist)
 	},
 })
