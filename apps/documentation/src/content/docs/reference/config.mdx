@@ -460,7 +460,7 @@ import { parse } from "valibot"
 
 const prim = createPrimServer({
 	preCall(args, func) {
-		if ("params" in func) return parse(func.params, args)
+		if ("params" in func) return { args: parse(func.params, args) }
 		throw new Error("Argument validation is required")
 	},
 })
