@@ -2,4 +2,4 @@
 "@doseofted/prim-rpc": patch
 ---
 
-Added .preCallClient and .postCallClient hooks, available in client options
+Added .preRequest and .postRequest hooks, available in client options

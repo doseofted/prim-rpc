@@ -426,6 +426,29 @@ There are handlers already available to use but you may also create your own.
 	</Button>
 </ButtonGroup>
 
+## <Icon class="w-6 h-6" name="ph:brackets-curly-bold"/> Pre-Request Hook
+
+<DataListOptions />
+
+<CodeFile>
+
+```typescript
+import TTLCache from "@isaacs/ttlcache"
+
+const cache = new TTLCache({ ttl: 1000 * 5 })
+const prim = createPrimClient({
+	preRequest(args, name) {
+		if (cache.has(name)) return { result: cache.get(name) }
+		return { args }
+	},
+})
+```
+
+</CodeFile>
+
+The pre-request hook is optional and is executed _before_ sending an RPC to the server. It is given the arguments passed
+to your function. This may be useful for logging, client-side checks, or caching.
+
 ## <Icon class="w-6 h-6" name="ph:brackets-curly-bold"/> Pre-Call Hook
 
 <DataListOptions />
@@ -472,6 +495,29 @@ const prim = createPrimServer({
 The post-call hook is optional and is executed _after_ calling a given function. It is given the return value of the
 function given to the server and the function that was called. **Do not call the function inside of the hook** as it
 will be executed a second time.
+
+## <Icon class="w-6 h-6" name="ph:brackets-curly-bold"/> Post-Request Hook
+
+<DataListOptions />
+
+<CodeFile>
+
+```typescript
+import TTLCache from "@isaacs/ttlcache"
+
+const cache = new TTLCache({ ttl: 1000 * 5 })
+const prim = createPrimClient({
+	postRequest(result, name) {
+		if (!cache.has(name)) cache.set(name, result)
+		return result
+	},
+})
+```
+
+</CodeFile>
+
+The post-request hook is optional and is executed _after_ receiving an RPC result from the server. It is given the
+result of your function call. This may be useful for logging, client-side checks, or caching.
 
 ## <Icon class="w-6 h-6" name="ph:brackets-curly-bold"/> Flags (Experimental)
 

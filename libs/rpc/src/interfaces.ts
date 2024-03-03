@@ -375,12 +375,10 @@ export interface PrimOptions<M extends PossibleModule = object, J extends JsonHa
 	 * then you may toggle this option `false` to prevent Prim from extracting binary data.
 	 */
 	handleBlobs?: boolean
-	/** Transform given arguments prior to sending RPC to server */
-	// eslint-disable-next-line @typescript-eslint/no-explicit-any
-	preCallClient?: (args: any[]) => any[]
+	/** Transform given arguments prior to sending RPC to server (unlike post-request hook, it must be synchronous) */
+	preRequest?: (args: unknown[], name: string) => { args: unknown[]; result?: unknown } | undefined
 	/** Transform given result prior to being returned to the RPC caller */
-	// eslint-disable-next-line @typescript-eslint/no-explicit-any
-	postCallClient?: (result: any) => any
+	postRequest?: (result: unknown, name: string) => unknown
 	// TODO: Prim Server should create these options and hold references. This will be removed.
 	/** Properties belonging to `internal` are for internal use by Prim-RPC. */
 	internal?: {
@@ -472,12 +470,13 @@ export interface PrimServerOptions<M extends PossibleModule = object, J extends 
 	 * TODO: consider splitting client options to this property
 	 */
 	// clientOptions?: PrimOptions
-	/** Prior to calling function, transform given arguments and return them back to be used with function */
-	// eslint-disable-next-line @typescript-eslint/no-explicit-any
-	preCall?: (args: any[], func?: any) => any[]
+	/** Prior to calling function, transform given arguments and return them back to be used with function (must be synchronous) */
+	preCall?: (
+		args: unknown[],
+		func?: (...args: unknown[]) => unknown
+	) => { args: unknown[]; result?: unknown } | undefined
 	/** After function call, transform return result before sending back to client */
-	// eslint-disable-next-line @typescript-eslint/no-explicit-any
-	postCall?: (result: any, func?: any) => any
+	postCall?: (result: unknown, func?: (...args: unknown[]) => unknown) => unknown
 }
 
 export type PrimServerSocketAnswer = (result: string) => void

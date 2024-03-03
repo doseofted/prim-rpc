@@ -283,9 +283,9 @@ describe("Prim Client can use its specific hooks", () => {
 	test("Pre-call hooks with local module", async () => {
 		const prim = createPrimClient({
 			module,
-			preCallClient([arg]) {
-				if ("greeting" in arg) arg.greeting = "Bye"
-				return [arg]
+			preRequest(args) {
+				if (typeof args[0] === "object" && "greeting" in args[0]) args[0].greeting = "Bye"
+				return { args }
 			},
 		})
 		const args = { greeting: "Hi", name: "Ted" }
@@ -301,9 +301,9 @@ describe("Prim Client can use its specific hooks", () => {
 		const prim = createPrimClient<IModule>({
 			callbackPlugin,
 			methodPlugin,
-			preCallClient([arg]) {
-				if ("greeting" in arg) arg.greeting = "Bye"
-				return [arg]
+			preRequest(args) {
+				if (typeof args[0] === "object" && "greeting" in args[0]) args[0].greeting = "Bye"
+				return { args }
 			},
 		})
 		const args = { greeting: "Hi", name: "Ted" }
@@ -316,7 +316,7 @@ describe("Prim Client can use its specific hooks", () => {
 	test("Post-call hooks with local module", async () => {
 		const prim = createPrimClient({
 			module,
-			postCallClient(_result) {
+			postRequest(_result) {
 				return "Intercepted!"
 			},
 		})
@@ -333,7 +333,7 @@ describe("Prim Client can use its specific hooks", () => {
 		const prim = createPrimClient<IModule>({
 			callbackPlugin,
 			methodPlugin,
-			postCallClient(_result) {
+			postRequest(_result) {
 				return "Intercepted!"
 			},
 		})
