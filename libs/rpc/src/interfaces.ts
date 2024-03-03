@@ -375,6 +375,12 @@ export interface PrimOptions<M extends PossibleModule = object, J extends JsonHa
 	 * then you may toggle this option `false` to prevent Prim from extracting binary data.
 	 */
 	handleBlobs?: boolean
+	/** Transform given arguments prior to sending RPC to server */
+	// eslint-disable-next-line @typescript-eslint/no-explicit-any
+	preCallClient?: (args: any[]) => any[]
+	/** Transform given result prior to being returned to the RPC caller */
+	// eslint-disable-next-line @typescript-eslint/no-explicit-any
+	postCallClient?: (result: any) => any
 	// TODO: Prim Server should create these options and hold references. This will be removed.
 	/** Properties belonging to `internal` are for internal use by Prim-RPC. */
 	internal?: {

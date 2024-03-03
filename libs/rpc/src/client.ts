@@ -72,12 +72,15 @@ export function createPrimClient<
 			apply(_target, targetContext, givenArgs: unknown[]) {
 				// NOTE: client could've been given either Promise or function that resolves to Promise (dynamic imports)
 				function applySync(givenPath: string[], givenModule: ModuleType, targetContext: unknown, givenArgs: unknown[]) {
+					const argsProcessed = configured.preCallClient
+						? (configured.preCallClient(givenArgs) as unknown[])
+						: givenArgs
 					// SECTION Server-side module handling
 					const targetFunction = getProperty(givenModule, givenPath) as ModuleType
 					const targetIsCallable = typeof targetFunction === "function"
 					if (targetIsCallable) {
 						// if an argument is a callback reference, the created callback below will send the result back to client
-						const argsWithListeners = givenArgs.map(arg => {
+						const argsWithListeners = argsProcessed.map(arg => {
 							const argIsReferenceToCallback = typeof arg === "string" && arg.startsWith(CB_PREFIX)
 							if (!argIsReferenceToCallback) {
 								return arg
@@ -91,13 +94,14 @@ export function createPrimClient<
 							}
 						})
 						const functionResult = Reflect.apply(targetFunction, targetContext, argsWithListeners)
-						return functionResult
+						// eslint-disable-next-line @typescript-eslint/no-unsafe-return
+						return configured.postCallClient ? configured.postCallClient(functionResult) : functionResult
 					}
 					// !SECTION
 					// SECTION Client-side module handling
 					let callbacksWereGiven = false
 					const blobs: BlobRecords = {}
-					const args = givenArgs.map(arg => {
+					const args = argsProcessed.map(arg => {
 						if (binaryHandlingNeeded) {
 							const [replacedArg, newBlobs, givenFromFormElement] = extractBlobData(arg)
 							const blobEntries = Object.entries(newBlobs)
@@ -162,6 +166,10 @@ export function createPrimClient<
 						})
 						sendMessage(rpc, blobs)
 						return result
+							.then(result => (configured.postCallClient ? (configured.postCallClient(result) as unknown) : result))
+							.catch(error => {
+								throw configured.postCallClient ? (configured.postCallClient(error) as unknown) : (error as unknown)
+							})
 					}
 					// TODO: consider extending Promise to include methods like `.refetch()` or `.stopListening()` (for callbacks)
 					// NOTE: if promises are extended, this also needs to be done on results returned with callbacks (above)
@@ -183,18 +191,25 @@ export function createPrimClient<
 					})
 					httpEvent.emit("queue", { rpc, result, blobs, resolved: PromiseResolveStatus.Unhandled })
 					return result
+						.then(result => (configured.postCallClient ? (configured.postCallClient(result) as unknown) : result))
+						.catch(error => {
+							throw configured.postCallClient ? (configured.postCallClient(error) as unknown) : (error as unknown)
+						})
 					// !SECTION
 				}
 				if (determinedModule) {
+					// eslint-disable-next-line @typescript-eslint/no-unsafe-return
 					return applySync(this.path, determinedModule, targetContext, givenArgs)
 				}
 				if (givenModulePromise instanceof Promise) {
 					return givenModulePromise.then(givenModule => {
 						determinedModule = givenModule
+						// eslint-disable-next-line @typescript-eslint/no-unsafe-return
 						return applySync(this.path, determinedModule, targetContext, givenArgs)
 					})
 				} else {
 					determinedModule = givenModulePromise
+					// eslint-disable-next-line @typescript-eslint/no-unsafe-return
 					return applySync(this.path, determinedModule, targetContext, givenArgs)
 				}
 			},
