@@ -96,10 +96,6 @@ async function handlePost(server: PrimServerActionsExtended, call: RpcCall): Pro
 }
 
 describe("Prim Server cannot call non-RPC", () => {
-	// function prepareCall (given: RpcCall) {
-	// 	const body = JSON.stringify(given)
-	// 	return { method: "POST", body }
-	// }
 	test("with exported object", async () => {
 		const prim = createPrimServer({ module, prefix: "/prim" })
 		const server = prim.server()
@@ -285,28 +281,74 @@ describe("Prim Server can handle invalid requests", () => {
 		const result = JSON.parse(response.body) as RpcAnswer
 		expect(result).toEqual({ error: "Invalid RPC" })
 	})
-	// TODO: "Invalid method name" may not be the correct error (this may be related to testing plugin, need to check)
-	// test("with wrong HTTP method and body/url given (GET)", async () => {
-	// 	const server = prim.server()
-	// 	const call: RpcCall = {
-	// 		method: "greetings",
-	// 		id: 1,
-	// 	}
-	// 	const body = JSON.stringify(call)
-	// 	const response = await server.call({ method: "GET", body })
-	// 	const result = JSON.parse(response.body) as RpcAnswer
-	// 	expect(result).toEqual({ error: "Invalid method name" })
-	// })
-	// test("with wrong HTTP method and body/url given (POST)", async () => {
-	// 	const server = prim.server()
-	// 	const url = queryString.stringifyUrl({
-	// 		url: "/greetings",
-	// 		query: { greeting: "Howdy", name: "Ted" },
-	// 	})
-	// 	const response = await server.call({ method: "POST", url })
-	// 	const result = JSON.parse(response.body) as RpcAnswer
-	// 	expect(result).toEqual({ error: "Invalid method name" })
-	// })
+	// TODO: "Invalid method name" may not be the most correct error (this may be related to testing plugin, need to check)
+	test("with wrong HTTP method and body/url given (GET)", async () => {
+		const server = prim.server()
+		const call: RpcCall = {
+			method: "greetings",
+			id: 1,
+		}
+		const body = JSON.stringify(call)
+		const response = await server.call({ method: "GET", body })
+		// eslint-disable-next-line @typescript-eslint/no-unsafe-argument
+		const result = JSON.parse(response.body) as RpcAnswer
+		expect(result).toEqual({ error: "Invalid method name" })
+	})
+	test("with wrong HTTP method and body/url given (POST)", async () => {
+		const server = prim.server()
+		const url = queryString.stringifyUrl({
+			url: "/greetings",
+			query: { greeting: "Howdy", name: "Ted" },
+		})
+		const response = await server.call({ method: "POST", url })
+		// eslint-disable-next-line @typescript-eslint/no-unsafe-argument
+		const result = JSON.parse(response.body) as RpcAnswer
+		expect(result).toEqual({ error: "Invalid method name" })
+	})
+})
+
+describe("Prim Server can make use of server-side hooks", () => {
+	test("pre-call and post-call hooks", async () => {
+		const { callbackHandler, methodHandler } = createPrimTestingPlugins()
+		const prim = createPrimServer({
+			module,
+			callbackHandler,
+			methodHandler,
+			preCall(args, func) {
+				console.log("Pre-call hook", func.name)
+				if (typeof args[0] === "object" && "greeting" in args[0]) args[0].greeting = "Bonjour"
+				return { args }
+			},
+			postCall(result, func) {
+				console.log("Post-call hook", func.name)
+				return typeof result === "string" ? result.replace("Bonjour", "Salut") : result
+			},
+		})
+		const server = prim.server()
+		const result = await handlePost(server, {
+			method: "sayHello",
+			args: { greeting: "Hello", name: "Ted" },
+			id: 1,
+		})
+		expect(result).toEqual({ result: "Salut Ted!", id: 1 })
+	})
+	test("pre-call hook with thrown error", async () => {
+		const { callbackHandler, methodHandler } = createPrimTestingPlugins()
+		const prim = createPrimServer({
+			module,
+			callbackHandler,
+			methodHandler,
+			postCall(_result, _func) {
+				return "What"
+			},
+		})
+		const server = prim.server()
+		const result = await handlePost(server, {
+			method: "oops",
+			id: 1,
+		})
+		expect(result).toEqual({ error: "What", id: 1 })
+	})
 })
 
 describe("Prim Server can understand its given context", () => {

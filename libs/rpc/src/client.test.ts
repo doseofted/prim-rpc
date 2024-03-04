@@ -344,6 +344,18 @@ describe("Prim Client can use its specific hooks", () => {
 		expect(result).not.toEqual(expectedNormally)
 		expect(result).toEqual(expected)
 	})
+	test("Post-call hooks with remote module, errored", async () => {
+		const { callbackPlugin, methodPlugin, callbackHandler, methodHandler } = createPrimTestingPlugins()
+		createPrimServer({ module, callbackHandler, methodHandler })
+		const prim = createPrimClient<IModule>({
+			callbackPlugin,
+			methodPlugin,
+			postRequest(_error) {
+				return "Intercepted!"
+			},
+		})
+		await expect(prim.oops()).rejects.toBe("Intercepted!")
+	})
 })
 
 describe("Prim Client can make use of callbacks", () => {

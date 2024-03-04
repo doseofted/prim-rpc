@@ -379,6 +379,8 @@ export interface PrimOptions<M extends PossibleModule = object, J extends JsonHa
 	preRequest?: (args: unknown[], name: string) => { args: unknown[]; result?: unknown } | undefined
 	/** Transform given result prior to being returned to the RPC caller */
 	postRequest?: (result: unknown, name: string) => unknown
+	/** Transform given error prior to being thrown */
+	// postRequestError?: (result: unknown, name: string) => unknown
 	// TODO: Prim Server should create these options and hold references. This will be removed.
 	/** Properties belonging to `internal` are for internal use by Prim-RPC. */
 	internal?: {
@@ -477,6 +479,8 @@ export interface PrimServerOptions<M extends PossibleModule = object, J extends 
 	) => { args: unknown[]; result?: unknown } | undefined
 	/** After function call, transform return result before sending back to client */
 	postCall?: (result: unknown, func?: (...args: unknown[]) => unknown) => unknown
+	/** Transform given error before sending back to client */
+	// postCallError?: (error: unknown, func?: (...args: unknown[]) => unknown) => unknown
 }
 
 export type PrimServerSocketAnswer = (result: string) => void
