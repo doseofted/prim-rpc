@@ -1,6 +1,6 @@
 {
 	"name": "@doseofted/prim-monorepo",
-	"packageManager": "pnpm@8.15.0",
+	"packageManager": "pnpm@8.15.4",
 	"description": "Monorepo that houses Prim+RPC projects",
 	"type": "module",
 	"license": "UNLICENSED",
@@ -14,17 +14,17 @@
 		"start": "task"
 	},
 	"dependencies": {
-		"@go-task/cli": "3.34.1",
+		"@go-task/cli": "3.35.0",
 		"zx": "^7.2.3"
 	},
 	"devDependencies": {
 		"@changesets/cli": "^2.27.1",
-		"@types/eslint": "^8.56.2",
-		"@typescript-eslint/eslint-plugin": "^7.0.2",
-		"@typescript-eslint/parser": "^7.0.2",
+		"@types/eslint": "^8.56.5",
+		"@typescript-eslint/eslint-plugin": "^7.1.0",
+		"@typescript-eslint/parser": "^7.1.0",
 		"@vitest/ui": "^1.2.2",
 		"chokidar": "^3.5.3",
-		"eslint": "^8.56.0",
+		"eslint": "^8.57.0",
 		"eslint-config-prettier": "^9.1.0",
 		"jsdom": "^24.0.0",
 		"postcss": "^8.4.33",
@@ -35,14 +35,9 @@
 		"stylelint-config-recommended": "^14.0.0",
 		"tsup": "^8.0.1",
 		"turbo": "^1.11.3",
-		"typedoc": "^0.25.7",
+		"typedoc": "^0.25.9",
 		"typescript": "5.3.3",
 		"vite": "^5.0.12",
 		"vitest": "^1.2.2"
-	},
-	"pnpm": {
-		"patchedDependencies": {
-			"proxy-deep@4.0.0": "patches/proxy-deep@4.0.0.patch"
-		}
 	}
 }

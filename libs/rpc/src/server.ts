@@ -218,7 +218,11 @@ function createServerActions(
 							// so we can call the method using the client.
 							// call module with `client` if not provided directly to server (checks already ran on module, if provided)
 							const targetRemote = getProperty(client, methodExpanded) as AnyFunction & { rpc?: boolean }
-							const processedArgs = configured.preCall?.(args, targetLocal) ?? args
+							const preCallResult = configured.preCall ? configured.preCall(args, targetLocal) ?? { args } : { args }
+							if (configured.preCall && "result" in preCallResult) {
+								return { ...rpcBase, result: await preCallResult.result }
+							}
+							const { args: processedArgs } = preCallResult
 							const result = (await Reflect.apply(targetRemote, context, processedArgs)) as unknown
 							const [resultExtracted, promisesRecord] = extractPromiseData(
 								result,
@@ -239,9 +243,12 @@ function createServerActions(
 									event.emit("response", { id, error: e })
 								}
 							})
-							// eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
-							const processedResult = configured.postCall?.(resultExtracted, targetLocal) ?? resultExtracted
-							return { ...rpcBase, result: processedResult }
+							const functionResultProcessed = configured.postCall
+								? configured.postCall(resultExtracted, targetLocal)
+								: resultExtracted
+							return configured.postCall && typeof functionResultProcessed === "undefined"
+								? { ...rpcBase, result: resultExtracted }
+								: { ...rpcBase, result: await functionResultProcessed }
 						} else {
 							// If either the module wasn't provided or target doesn't exist (even if module does), send a request using
 							// a client that doesn't know about the module provided (will use provided plugin to server).
@@ -251,25 +258,35 @@ function createServerActions(
 							const targetRemote = getProperty(limitedClient, methodExpanded) as AnyFunction & { rpc?: boolean }
 							// const targetLocal = getProperty(givenModule, methodExpanded) as AnyFunction & { rpc?: boolean }
 							// const processedArgs = preprocess(...args).bind(targetLocal)
-							const processedArgs = configured.preCall?.(args) ?? args
+							const preCallResult = configured.preCall ? configured.preCall(args) ?? { args } : { args }
+							if (configured.preCall && "result" in preCallResult) {
+								return { ...rpcBase, result: await preCallResult.result }
+							}
+							const { args: processedArgs } = preCallResult
 							const result = (await Reflect.apply(targetRemote, context, processedArgs)) as unknown
-							// eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
-							const processedResult = configured.postCall?.(result) ?? result
-							return { ...rpcBase, result: processedResult }
+							const functionResultProcessed = configured.postCall ? configured.postCall(result) : result
+							return configured.postCall && typeof functionResultProcessed === "undefined"
+								? { ...rpcBase, result: result }
+								: { ...rpcBase, result: await functionResultProcessed }
 						}
 						// TODO: today, result must be supported by JSON handler but consider supporting returned functions
 						// in the same way that callback are supported today (by passing reference to client)
 					} catch (e) {
+						// eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
+						const errorProcessed = configured.postCall ? configured.postCall(e) : e
+						// eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
+						const errorProcessedReady =
+							configured.postCall && typeof errorProcessed === "undefined" ? e : errorProcessed
 						// JSON.stringify on Error results in an empty object. Since Error is common, serialize it
 						// when a custom JSON handler is not provided
 						if (handleError && e instanceof Error) {
-							const error = serializeError<unknown>(e)
+							const error = serializeError<unknown>(await errorProcessedReady)
 							if (!serverOptions.showErrorStack) {
 								delete error.stack
 							}
 							return { ...rpcBase, error }
 						}
-						return { ...rpcBase, error: e }
+						return { ...rpcBase, error: await errorProcessedReady }
 					}
 				})
 				const answeredCalls = checkRpcResult(await Promise.all(answeringCalls))

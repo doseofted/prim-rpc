@@ -53,7 +53,7 @@
 		"@doseofted/prim-example": "workspace:*",
 		"@doseofted/prim-rpc": "workspace:*",
 		"@doseofted/prim-rpc-plugins": "workspace:*",
-		"@sinclair/typebox": "^0.32.13",
+		"@sinclair/typebox": "^0.32.15",
 		"@types/babel__core": "^7.20.5",
 		"@types/babel__generator": "^7.6.8",
 		"@types/babel__template": "^7.4.4",
@@ -63,7 +63,7 @@
 		"@types/lodash-es": "^4.17.12",
 		"esbuild": "^0.20.1",
 		"type-fest": "^4.10.1",
-		"typedoc": "^0.25.7",
+		"typedoc": "^0.25.9",
 		"typescript": "5.3.3"
 	},
 	"type": "module",
