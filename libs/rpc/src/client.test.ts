@@ -279,6 +279,85 @@ describe("Prim Client can throw errors", () => {
 	})
 })
 
+describe("Prim Client can use its specific hooks", () => {
+	test("Pre-call hooks with local module", async () => {
+		const prim = createPrimClient({
+			module,
+			preRequest(args) {
+				if (typeof args[0] === "object" && "greeting" in args[0]) args[0].greeting = "Bye"
+				return { args }
+			},
+		})
+		const args = { greeting: "Hi", name: "Ted" }
+		const expectedNormally = module.sayHello(args)
+		const expected = module.sayHello({ ...args, greeting: "Bye" })
+		const result = await prim.sayHello(args)
+		expect(result).not.toEqual(expectedNormally)
+		expect(result).toEqual(expected)
+	})
+	test("Pre-call hooks with remote module", async () => {
+		const { callbackPlugin, methodPlugin, callbackHandler, methodHandler } = createPrimTestingPlugins()
+		createPrimServer({ module, callbackHandler, methodHandler })
+		const prim = createPrimClient<IModule>({
+			callbackPlugin,
+			methodPlugin,
+			preRequest(args) {
+				if (typeof args[0] === "object" && "greeting" in args[0]) args[0].greeting = "Bye"
+				return { args }
+			},
+		})
+		const args = { greeting: "Hi", name: "Ted" }
+		const expectedNormally = module.sayHello(args)
+		const expected = module.sayHello({ ...args, greeting: "Bye" })
+		const result = await prim.sayHello(args)
+		expect(result).not.toEqual(expectedNormally)
+		expect(result).toEqual(expected)
+	})
+	test("Post-call hooks with local module", async () => {
+		const prim = createPrimClient({
+			module,
+			postRequest(_result) {
+				return "Intercepted!"
+			},
+		})
+		const args = { greeting: "Hi", name: "Ted" }
+		const expectedNormally = module.sayHello(args)
+		const expected = "Intercepted!"
+		const result = await prim.sayHello(args)
+		expect(result).not.toEqual(expectedNormally)
+		expect(result).toEqual(expected)
+	})
+	test("Post-call hooks with remote module", async () => {
+		const { callbackPlugin, methodPlugin, callbackHandler, methodHandler } = createPrimTestingPlugins()
+		createPrimServer({ module, callbackHandler, methodHandler })
+		const prim = createPrimClient<IModule>({
+			callbackPlugin,
+			methodPlugin,
+			postRequest(_result) {
+				return "Intercepted!"
+			},
+		})
+		const args = { greeting: "Hi", name: "Ted" }
+		const expectedNormally = module.sayHello(args)
+		const expected = "Intercepted!"
+		const result = await prim.sayHello(args)
+		expect(result).not.toEqual(expectedNormally)
+		expect(result).toEqual(expected)
+	})
+	test("Post-call hooks with remote module, errored", async () => {
+		const { callbackPlugin, methodPlugin, callbackHandler, methodHandler } = createPrimTestingPlugins()
+		createPrimServer({ module, callbackHandler, methodHandler })
+		const prim = createPrimClient<IModule>({
+			callbackPlugin,
+			methodPlugin,
+			postRequest(_error) {
+				return "Intercepted!"
+			},
+		})
+		await expect(prim.oops()).rejects.toBe("Intercepted!")
+	})
+})
+
 describe("Prim Client can make use of callbacks", () => {
 	test("with local source", async () => {
 		const prim = createPrimClient({ module })
