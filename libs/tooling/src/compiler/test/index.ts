@@ -18,8 +18,10 @@ export const func = function () {
 }
 func.rpc = true
 
-export { hi as hello } from "./imported"
+// "rpc" import attribute may be requirement for readability
+import { hi as hello } from "./imported" with { type: "rpc" }
 export const hola = await import("./imported")
+export { hello }
 
 import testModule from "virtual:prim-rpc?module=inline"
 import client from "virtual:prim-rpc?client=true"

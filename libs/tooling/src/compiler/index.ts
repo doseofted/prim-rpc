@@ -111,21 +111,43 @@ export default client
  * Inline RPC functions must be marked with `function.rpc = "inline"` and can only use variables in its defined scope
  * or defined for the server environment. Prim+RPC and this plugin are flexible, so this environment may be a literal
  * server, web worker, or another browser.
+ *
+ * If an inline RPC function is exported from a module (as part of user code, not generated code), it must be imported
+ * with an import attribute, `with { type: "rpc" }` to ensure other developers know at-a-glance that the imported
+ * function is an RPC. This is an enforced requirement of the plugin to maintain readability in a codebase.
  */
 export const inlineRpcPlugin = createUnplugin((options: RpcCompileOptions) => {
 	const configured = defu(options, defaultOptions)
 	return {
 		name: "unplugin-prim-compiler",
 		transform: (code, _id) => {
-			const parsed = parse(code, { sourceType: "module" })
+			const parsed = parse(code, {
+				sourceType: "module",
+				plugins: ["importAttributes"],
+			})
 			const functionDeclarations: DeclarationReferences = {}
 			const functionRpc: Record<string, boolean> = {}
 			traverse(parsed, {
+				/** find `import { something } from "somewhere" with { type: "rpc" }` */
+				ImportDeclaration(path) {
+					// NOTE: consider whether export statements also need to be considered
+					const rpcAttributes = path.node.attributes.filter(
+						attr =>
+							attr.type === "ImportAttribute" &&
+							attr.key.type === "Identifier" &&
+							attr.key.name === "type" &&
+							attr.value.type === "StringLiteral" &&
+							attr.value.value === "rpc"
+					)
+					if (rpcAttributes.length === 0) return
+					console.debug("Found RPC import", generate(path.node, { importAttributesKeyword: "with" }).code)
+				},
 				/** find `function func () {}` */
 				FunctionDeclaration(path) {
 					const functionName = path.node.id?.name
 					if (!functionName) return
 					const scopeId = path.scope.parent.uid
+					// console.log(path.scope.block.loc.filename)
 					const functionUnique = functionWithScope(functionName, scopeId)
 					functionDeclarations[functionUnique] = { type: "function", path, name: functionName, scope: scopeId }
 				},
