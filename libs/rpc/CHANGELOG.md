@@ -1,5 +1,15 @@
 # @doseofted/prim-rpc
 
+## 0.1.0-alpha.25
+
+### Minor Changes
+
+- fc9767e: Pre-call and pre-request hooks can now return/resolve function calls early (and the return value from this hook must be an object consisting of .args and optionally .result)
+
+### Patch Changes
+
+- 9155e71: Added .preRequest and .postRequest hooks, available in client options
+
 ## 0.1.0-alpha.24
 
 ### Minor Changes
