@@ -39,6 +39,7 @@
 	"dependencies": {
 		"defu": "^6.1.4",
 		"destr": "^2.0.2",
+		"emery": "^1.4.3",
 		"just-remove": "^3.2.0",
 		"just-safe-get": "^4.2.0",
 		"mitt": "^3.0.1",

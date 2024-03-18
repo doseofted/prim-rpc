@@ -96,7 +96,8 @@ const createBaseServerOptions = (): PrimServerOptions => ({
  * @param options Given options by developer
  * @returns Options with defaults set
  */
-export function createPrimOptions<OptionsType extends PrimOptions = PrimOptions>(
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+export function createPrimOptions<OptionsType extends PrimOptions<any, any> = PrimOptions>(
 	options?: OptionsType,
 	server = false
 ) {

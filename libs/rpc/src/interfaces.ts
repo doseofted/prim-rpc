@@ -196,6 +196,21 @@ export type PromisifiedModule<Given extends object> = Given extends AnyFunctionR
 	? PromisifiedModuleDynamicImport<ReturnType<Given>>
 	: PromisifiedModuleDynamicImport<Given>
 
+export type RemoveFunctionWrapper<Given extends object> = Given extends AnyFunctionReturnsPromise
+	? ReturnType<Given>
+	: Given
+export type RemoveDynamicImport<ModuleGiven> = ModuleGiven extends object & {
+	// eslint-disable-next-line @typescript-eslint/no-explicit-any
+	then: (onfulfilled: infer F, ...args: infer _) => any
+}
+	? // eslint-disable-next-line @typescript-eslint/no-explicit-any
+		F extends (value: infer V, ...args: infer _) => any
+		? V extends object
+			? V
+			: never
+		: never
+	: ModuleGiven
+
 // The following is intended to be used to export a module used with the client
 // (useful for JSDocs or usage outside of the Prim Client that provides this type)
 /** Module transformed as it is done by the Prim+RPC client */
@@ -259,7 +274,7 @@ export interface PrimOptions<M extends PossibleModule = object, J extends JsonHa
 	 * be made.
 	 */
 	// NOTE: `PartialDeep` allows for partial modules to be provided while full type definitions are provided as generic
-	module?: PartialDeep<M> | null
+	module?: PartialDeep<RemoveDynamicImport<RemoveFunctionWrapper<M>>> | null
 	/**
 	 * Provide the server URL where Prim is being used. This will be provided to the HTTP client as the endpoint
 	 * parameter.
@@ -336,7 +351,7 @@ export interface PrimOptions<M extends PossibleModule = object, J extends JsonHa
 	 * If given function specifies a `.rpc` boolean property with a value of `true` then those functions do not need
 	 * to be added to the allow-list.
 	 */
-	allowList?: PartialDeep<Schema<PromisifiedModule<M>, boolean | "idempotent">>
+	allowList?: PartialDeep<Schema<PromisifiedModule<M>, true | "idempotent">>
 	/**
 	 * In JavaScript, functions are objects. Those objects can have methods. This means that functions can have methods.
 	 *
