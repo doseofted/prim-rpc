@@ -12,7 +12,7 @@ export interface RpcBase {
 	id?: string | number
 }
 
-export type RpcChain = Pick<RpcCall, "method" | "args">
+export type RpcChain<Method = string, Args = unknown> = Pick<RpcCall<Method, Args>, "method" | "args">
 export interface RpcCall<Method = string, Args = unknown, Chain extends RpcChain[] = RpcChain[]> extends RpcBase {
 	method: Method
 	args?: Args
