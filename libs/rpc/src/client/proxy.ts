@@ -3,20 +3,6 @@ import { RpcCall } from ".."
 import { nanoid } from "nanoid"
 import { RpcChain } from "../interfaces"
 
-function isPromiseMethodName(given: PropertyKey): given is "then" | "catch" | "finally" {
-	return ["then", "catch", "finally"].includes(given.toString())
-}
-
-function convertChainToRpcStructure(chain: RpcChain[], withId = false) {
-	if (!Array.isArray(chain)) null
-	if (chain.length === 0) return null
-	const { method, args } = chain.slice().shift() as RpcChain<string, unknown[]>
-	const rpc: RpcCall = { method, args }
-	if (withId) rpc.id = nanoid()
-	if (chain.length > 1) rpc.chain = chain.slice(1)
-	return rpc
-}
-
 interface MethodCatcherOptions {
 	/**
 	 * Specify an existing RPC chain when using two instances of
@@ -27,14 +13,27 @@ interface MethodCatcherOptions {
 	 * Called on each method call of a given chain.
 	 * Return `next` symbol to continue, return anything else to end chain and return
 	 */
-	onMethod?: (rpc: RpcCall, next: symbol) => unknown
+	onMethod?: (rpc: RpcCall<string, unknown[]>, next: symbol) => unknown
 	/**
 	 * Called when a `Promise` method (`then`, `catch`, or `finally`) is called on
 	 * given chain. Return `next` symbol to continue, return anything else to end.
 	 */
-	onAwaited?: (rpc: RpcCall, next: symbol) => unknown
+	onAwaited?: (rpc: RpcCall<string, unknown[]>, next: symbol) => unknown
 }
-export function createMethodCatcher(options: MethodCatcherOptions = {}) {
+/**
+ * Creates a recursive Proxy that captures property access and method calls and
+ * records them to a final RPC object, including method chaining.
+ *
+ * Event handlers given in `options` can be used to intercept method calls.
+ * By default, a Promise object is used as the Proxy target and calls to `then`,
+ * `catch`, and `finally` are intercepted in the `onAwaited` hook. This also
+ * means that these method names are not otherwise allowed.
+ *
+ * It's generally expected that a `Promise` will be returned, however by using
+ * the `onMethod` hook, you can return any value synchronously, if needed.
+ */
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+export function createMethodCatcher<ModuleType extends object = any>(options: MethodCatcherOptions = {}): ModuleType {
 	// Essentially, `Promise.withResolvers`
 	// https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Promise/withResolvers#description
 	let resolvePromise: (value: unknown) => void
@@ -73,7 +72,6 @@ export function createMethodCatcher(options: MethodCatcherOptions = {}) {
 						if (result instanceof Promise) {
 							result.then(resolvePromise).catch(rejectPromise)
 						} else {
-							// return result
 							resolvePromise(result)
 						}
 					} catch (error) {
@@ -87,5 +85,24 @@ export function createMethodCatcher(options: MethodCatcherOptions = {}) {
 			}
 			return this.nest(() => {})
 		},
-	})
+	}) as ModuleType
+}
+
+function isPromiseMethodName(given: PropertyKey): given is "then" | "catch" | "finally" {
+	return ["then", "catch", "finally"].includes(given.toString())
+}
+
+/**
+ * Prim+RPC expect a root RPC call to be given with an optional chain.
+ *
+ * Given a chain of RPCs, convert it to a single root RPC with a chain of additional RPCs.
+ */
+function convertChainToRpcStructure(chain: RpcChain[], withId = false) {
+	if (!Array.isArray(chain)) null
+	if (chain.length === 0) return null
+	const { method, args } = chain.slice().shift() as RpcChain<string, unknown[]>
+	const rpc: RpcCall<string, unknown[]> = { method, args }
+	if (withId) rpc.id = nanoid()
+	if (chain.length > 1) rpc.chain = chain.slice(1)
+	return rpc
 }
