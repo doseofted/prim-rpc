@@ -7,10 +7,34 @@ function isPromiseMethodName(given: PropertyKey): given is "then" | "catch" | "f
 	return ["then", "catch", "finally"].includes(given.toString())
 }
 
-interface MethodCatcherOptions {
-	chain?: RpcChain[]
+function convertChainToRpcStructure(chain: RpcChain[], withId = false) {
+	if (!Array.isArray(chain)) null
+	if (chain.length === 0) return null
+	const { method, args } = chain.slice().shift() as RpcChain<string, unknown[]>
+	const rpc: RpcCall = { method, args }
+	if (withId) rpc.id = nanoid()
+	if (chain.length > 1) rpc.chain = chain.slice(1)
+	return rpc
 }
-export function createMethodCatcher(handler: (rpc: RpcCall) => unknown, options: MethodCatcherOptions = {}) {
+
+interface MethodCatcherOptions {
+	/**
+	 * Specify an existing RPC chain when using two instances of
+	 * `createMethodCatcher` together (used internally during recursion)
+	 */
+	chain?: RpcChain[]
+	/**
+	 * Called on each method call of a given chain.
+	 * Return `next` symbol to continue, return anything else to end chain and return
+	 */
+	onMethod?: (rpc: RpcCall, next: symbol) => unknown
+	/**
+	 * Called when a `Promise` method (`then`, `catch`, or `finally`) is called on
+	 * given chain. Return `next` symbol to continue, return anything else to end.
+	 */
+	onAwaited?: (rpc: RpcCall, next: symbol) => unknown
+}
+export function createMethodCatcher(options: MethodCatcherOptions = {}) {
 	// Essentially, `Promise.withResolvers`
 	// https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Promise/withResolvers#description
 	let resolvePromise: (value: unknown) => void
@@ -19,53 +43,37 @@ export function createMethodCatcher(handler: (rpc: RpcCall) => unknown, options:
 		resolvePromise = resolve
 		rejectPromise = reject
 	})
+	/** Signal that, when returned from event handler, the return value should be ignored */
+	const next = Symbol("next")
 	return new DeepProxy(promise, {
 		apply(target, thisArg, args: unknown[]) {
-			// const lastPath = this.path[this.path.length - 1]
-			// if (isPromiseMethodName(lastPath)) {
-			// 	if (!Array.isArray(options.chain)) return resolvePromise(null)
-			// 	if (options.chain.length === 0) return resolvePromise(null)
-			// 	const chainLength = options.chain.length
-			// 	const { method, args } = options.chain.shift() as RpcChain<string, unknown[]>
-			// 	const rpc: RpcCall = { id: nanoid(), method, args }
-			// 	if (chainLength > 1) rpc.chain = options.chain
-			// 	try {
-			// 		const result = handler(rpc)
-			// 		if (result instanceof Promise) {
-			// 			result.then(resolvePromise).catch(rejectPromise)
-			// 		} else {
-			// 			resolvePromise(result)
-			// 		}
-			// 	} catch (error) {
-			// 		rejectPromise(error)
-			// 	}
-			// 	// eslint-disable-next-line @typescript-eslint/no-unsafe-call, @typescript-eslint/no-unsafe-assignment
-			// 	const result = promise[lastPath].bind(promise)?.()
-			// 	// eslint-disable-next-line @typescript-eslint/no-unsafe-return
-			// 	return result
-			// }
-			const method = this.path.join(".")
-			const rpc: RpcChain = { method, args }
+			const method = this.path.filter(given => typeof given === "string").join(".")
+			const newRpc: RpcChain = { method, args }
 			const chain = Array.isArray(options.chain) ? options.chain : []
-			chain.push(rpc)
+			chain.push(newRpc)
+			if (typeof options.onMethod === "function") {
+				const rpc = convertChainToRpcStructure(chain, true)
+				const result = options.onMethod(rpc, next)
+				// eslint-disable-next-line @typescript-eslint/no-unsafe-return
+				if (result === next) return createMethodCatcher({ ...options, chain })
+				return result
+			}
 			// eslint-disable-next-line @typescript-eslint/no-unsafe-return
-			return createMethodCatcher(handler, { ...options, chain })
+			return createMethodCatcher({ ...options, chain })
 		},
 		get(_target, p, _receiver) {
-			if (isPromiseMethodName(p)) {
-				// console.log("promise call")
+			if (typeof options.onAwaited === "function" && isPromiseMethodName(p)) {
 				if (resolvePromise && rejectPromise) {
-					if (!Array.isArray(options.chain)) return resolvePromise(null)
-					if (options.chain.length === 0) return resolvePromise(null)
-					const chainLength = options.chain.length
-					const { method, args } = options.chain.shift() as RpcChain<string, unknown[]>
-					const rpc: RpcCall = { id: nanoid(), method, args }
-					if (chainLength > 1) rpc.chain = options.chain
+					const rpc = convertChainToRpcStructure(options.chain, true)
 					try {
-						const result = handler(rpc)
+						const result = options.onAwaited(rpc, next)
+						if (result === next) {
+							return this.nest(() => {})
+						}
 						if (result instanceof Promise) {
 							result.then(resolvePromise).catch(rejectPromise)
 						} else {
+							// return result
 							resolvePromise(result)
 						}
 					} catch (error) {
@@ -74,10 +82,8 @@ export function createMethodCatcher(handler: (rpc: RpcCall) => unknown, options:
 					resolvePromise = null
 					rejectPromise = null
 				}
-				// eslint-disable-next-line @typescript-eslint/no-unsafe-call, @typescript-eslint/no-unsafe-assignment
-				const result = promise[p].bind(promise)
 				// eslint-disable-next-line @typescript-eslint/no-unsafe-return
-				return result
+				return promise[p].bind(promise)
 			}
 			return this.nest(() => {})
 		},

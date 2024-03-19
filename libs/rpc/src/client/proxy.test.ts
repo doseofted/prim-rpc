@@ -5,23 +5,44 @@ import { expect, test } from "vitest"
 import { createMethodCatcher } from "./proxy"
 
 test("RPC proxy creates RPC-like structure, including chains", async () => {
-	const given = createMethodCatcher(rpc => {
-		rpc.id = 123
-		// console.log("rpc", rpc)
-		return rpc
+	const given = createMethodCatcher({
+		onAwaited(rpc, _next) {
+			rpc.id = 123
+			return rpc
+		},
+		onMethod(rpc, next) {
+			const keyword = "$end"
+			const keywordFound = rpc?.method?.endsWith(keyword) || rpc?.chain?.slice().pop().method.endsWith(keyword)
+			if (keywordFound) {
+				rpc.id = 123
+				return rpc
+			}
+			if (rpc.method === "testing.nonPromise") {
+				return "Hello"
+			}
+			if (rpc.method === "testing.promise") {
+				return new Promise(r => r("Hello"))
+			}
+			return next
+		},
 	})
-	// console.log("uhm", await given.test.testing.lol(123).what().test.cool("args"))
-	// console.log("async1", JSON.stringify(await given.hi("there").test.what("ever")))
 
-	// console.log("async2", hi.then().then())
-	// expect(hi).toBeInstanceOf(Promise)
-	// await expect(hi).resolves.toBe({
-	// 	id: 123,
-	// 	method: "hi",
-	// 	args: [],
-	// })
-	// console.log("what", await given.test.hello("Ted", "Hi!"))
+	// in this example, a method `.$end()` is used as a keyword to signify the end of a chain
+	expect(given.this.is().a.test().ok.$end()).toEqual({
+		id: 123,
+		method: "this.is",
+		args: [],
+		chain: [
+			{ method: "a.test", args: [] },
+			{ method: "ok.$end", args: [] },
+		],
+	})
 
+	// in this example, certain methods are overridden to return a value immediately
+	expect(given.testing.nonPromise()).toBe("Hello")
+	await expect(given.testing.promise()).resolves.toBe("Hello")
+
+	// in these examples, a call to a promise method signifies the end of a chain
 	const testing = given.test.testing("test").test.tested("test")
 	expect(testing).toBeInstanceOf(Promise)
 	await expect(testing).resolves.toEqual({
