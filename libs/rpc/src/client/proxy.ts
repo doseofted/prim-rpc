@@ -3,6 +3,26 @@ import { RpcCall } from ".."
 import { nanoid } from "nanoid"
 import { RpcChain } from "../interfaces"
 
+/** Determine if given property name is one of a Promise, with type guard */
+function isPromiseMethodName(given: PropertyKey): given is "then" | "catch" | "finally" {
+	return ["then", "catch", "finally"].includes(given.toString())
+}
+
+/**
+ * Prim+RPC expect a root RPC call to be given with an optional chain.
+ *
+ * Given a chain of RPCs, convert it to a single root RPC with a chain of additional RPCs.
+ */
+function convertChainToRpcStructure(chain: RpcChain[], withId = false) {
+	if (!Array.isArray(chain)) null
+	if (chain.length === 0) return null
+	const { method, args } = chain.slice().shift() as RpcChain<string, unknown[]>
+	const rpc: RpcCall<string, unknown[]> = { method, args }
+	if (withId) rpc.id = nanoid()
+	if (chain.length > 1) rpc.chain = chain.slice(1)
+	return rpc
+}
+
 interface MethodCatcherOptions {
 	/**
 	 * Specify an existing RPC chain when using two instances of
@@ -53,9 +73,7 @@ export function createMethodCatcher<ModuleType extends object = any>(options: Me
 			if (typeof options.onMethod === "function") {
 				const rpc = convertChainToRpcStructure(chain, true)
 				const result = options.onMethod(rpc, next)
-				// eslint-disable-next-line @typescript-eslint/no-unsafe-return
-				if (result === next) return createMethodCatcher({ ...options, chain })
-				return result
+				if (result !== next) return result
 			}
 			// eslint-disable-next-line @typescript-eslint/no-unsafe-return
 			return createMethodCatcher({ ...options, chain })
@@ -66,19 +84,20 @@ export function createMethodCatcher<ModuleType extends object = any>(options: Me
 					const rpc = convertChainToRpcStructure(options.chain, true)
 					try {
 						const result = options.onAwaited(rpc, next)
-						if (result === next) {
-							return this.nest(() => {})
-						}
-						if (result instanceof Promise) {
-							result.then(resolvePromise).catch(rejectPromise)
-						} else {
-							resolvePromise(result)
+						if (result !== next) {
+							if (result instanceof Promise) {
+								result.then(resolvePromise).catch(rejectPromise)
+							} else {
+								resolvePromise(result)
+							}
+							resolvePromise = null
+							rejectPromise = null
 						}
 					} catch (error) {
 						rejectPromise(error)
+						resolvePromise = null
+						rejectPromise = null
 					}
-					resolvePromise = null
-					rejectPromise = null
 				}
 				// eslint-disable-next-line @typescript-eslint/no-unsafe-return
 				return promise[p].bind(promise)
@@ -86,23 +105,4 @@ export function createMethodCatcher<ModuleType extends object = any>(options: Me
 			return this.nest(() => {})
 		},
 	}) as ModuleType
-}
-
-function isPromiseMethodName(given: PropertyKey): given is "then" | "catch" | "finally" {
-	return ["then", "catch", "finally"].includes(given.toString())
-}
-
-/**
- * Prim+RPC expect a root RPC call to be given with an optional chain.
- *
- * Given a chain of RPCs, convert it to a single root RPC with a chain of additional RPCs.
- */
-function convertChainToRpcStructure(chain: RpcChain[], withId = false) {
-	if (!Array.isArray(chain)) null
-	if (chain.length === 0) return null
-	const { method, args } = chain.slice().shift() as RpcChain<string, unknown[]>
-	const rpc: RpcCall<string, unknown[]> = { method, args }
-	if (withId) rpc.id = nanoid()
-	if (chain.length > 1) rpc.chain = chain.slice(1)
-	return rpc
 }

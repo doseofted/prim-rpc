@@ -1,9 +1,18 @@
 /* eslint-disable @typescript-eslint/no-unused-vars */
-import type { JsonHandler, PrimOptions, PromisifiedModule } from "../interfaces"
+import type { AnyFunction, JsonHandler, PrimOptions, PromisifiedModule, RpcCall } from "../interfaces"
 import { createPrimOptions } from "../options"
 import { isDefined } from "emery"
 import { createMethodCatcher } from "./proxy"
 import getProperty from "just-safe-get"
+import { handlePotentialPromise } from "./wrapper"
+
+/** Determine if given RPC can be resolved using a method on the locally provided module */
+function findOnProvidedModule(rpc: RpcCall<string, unknown[]>, module: object | Promise<object>): AnyFunction {
+	return handlePotentialPromise(module, module => {
+		const method = getProperty(module ?? {}, rpc.method) as AnyFunction
+		if (method) return method
+	})
+}
 
 export function createPrimClient<
 	ModuleType extends PrimOptions["module"] = object,
@@ -14,34 +23,18 @@ export function createPrimClient<
 	const providedMethodPlugin = isDefined(options.methodPlugin)
 	const providedCallbackPlugin = isDefined(options.callbackPlugin)
 	return createMethodCatcher<PromisifiedModule<ModuleType>>({
-		onMethod(rpc, next) {
-			// if first method in a chain is provided, resolve locally (promise optional)
-			const method = getProperty(options.module ?? {}, rpc.method) as undefined | ((...args: unknown[]) => unknown)
-			if (method) return method(...rpc.args)
+		onMethod(rpcRaw, next) {
+			const found = findOnProvidedModule(rpcRaw, options.module)
+			// eslint-disable-next-line @typescript-eslint/no-unsafe-return
+			if (found) return found(...rpcRaw.args)
 			return next
 		},
-		onAwaited(rpcRaw, next) {
+		onAwaited(rpcRaw, _next) {
+			const found = findOnProvidedModule(rpcRaw, options.module)
+			// eslint-disable-next-line @typescript-eslint/no-unsafe-return
+			if (found) return found(...rpcRaw.args)
 			console.log(rpcRaw)
 			throw "not implemented yet"
 		},
 	})
 }
-
-const a = createPrimClient({
-	jsonHandler: {
-		parse: () => {},
-		stringify: () => {},
-	},
-	// eslint-disable-next-line @typescript-eslint/require-await
-	async methodPlugin(a, b, c, d) {
-		return { result: {} }
-	},
-	module: {
-		lol: () => {},
-		what: () => {},
-	},
-	allowList: {
-		what: "idempotent",
-		lol: true,
-	},
-})
