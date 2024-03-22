@@ -1,40 +1,35 @@
 /* eslint-disable @typescript-eslint/no-unused-vars */
-import type { AnyFunction, JsonHandler, PrimOptions, PromisifiedModule, RpcCall } from "../interfaces"
+import type { JsonHandler, PrimOptions, PromisifiedModule } from "../interfaces"
 import { createPrimOptions } from "../options"
 import { isDefined } from "emery"
 import { createMethodCatcher } from "./proxy"
-import getProperty from "just-safe-get"
 import { handlePotentialPromise } from "./wrapper"
-
-/** Determine if given RPC can be resolved using a method on the locally provided module */
-function findOnProvidedModule(rpc: RpcCall<string, unknown[]>, module: object | Promise<object>): AnyFunction {
-	return handlePotentialPromise(module, module => {
-		const method = getProperty(module ?? {}, rpc.method) as AnyFunction
-		if (method) return method
-	})
-}
+import { getUnfulfilledModule, handleLocalModule } from "./local"
 
 export function createPrimClient<
 	ModuleType extends PrimOptions["module"] = object,
 	JsonHandlerType extends PrimOptions["jsonHandler"] = JsonHandler,
 >(options?: PrimOptions<ModuleType, JsonHandlerType>) {
 	options = createPrimOptions<PrimOptions<ModuleType, JsonHandlerType>>(options)
-	// const providedModule = unwrapModule(options.module)
+	const providedModule = getUnfulfilledModule(options.module)
 	const providedMethodPlugin = isDefined(options.methodPlugin)
 	const providedCallbackPlugin = isDefined(options.callbackPlugin)
+	// the returned client will catch all method calls given on it
 	return createMethodCatcher<PromisifiedModule<ModuleType>>({
-		onMethod(rpcRaw, next) {
-			const found = findOnProvidedModule(rpcRaw, options.module)
-			// eslint-disable-next-line @typescript-eslint/no-unsafe-return
-			if (found) return found(...rpcRaw.args)
-			return next
+		onMethod(rpc, next) {
+			// if module method was provided (and is not dynamic import), intercept call and return synchronously
+			if (providedModule instanceof Promise) return next
+			const given = handleLocalModule(rpc, options, next)
+			// because the module is not a dynamic import (Promise), we can safely check for the "next" token synchronously
+			if (given === next) return next
+			return given
 		},
-		onAwaited(rpcRaw, _next) {
-			const found = findOnProvidedModule(rpcRaw, options.module)
-			// eslint-disable-next-line @typescript-eslint/no-unsafe-return
-			if (found) return found(...rpcRaw.args)
-			console.log(rpcRaw)
-			throw "not implemented yet"
+		onAwaited(rpc, next) {
+			const localResult = handleLocalModule(rpc, options, next)
+			return handlePotentialPromise(localResult, localResult => {
+				if (localResult !== next) return localResult
+				throw "not implemented yet"
+			})
 		},
 	})
 }

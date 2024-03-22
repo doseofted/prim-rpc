@@ -1,9 +1,34 @@
 /**
- * Given object `T` (possibly as a Promise), act on the resolved value in the
- * provided `handler` which should return some value back, which will become the
- * final return value of this function.
+ * Given object `T` or `Promise<T>`, act on `T` in the
+ * provided `handler` which should return some value `R` back, which will become
+ * the final return value of this function, wrapped as `Promise<R>` if given
+ * `Promise<T>`.
  *
- * This is a small utility that should make this pattern play nicer with TypeScript.
+ * This is useful when logic need to remain synchronous because the final result
+ * may not always be a Promise. This function also makes this pattern play nicer
+ * with TypeScript.
+ *
+ * @example
+ * ```ts
+ * import staticImport from "./hello"
+ * const dynamicImport = import("./hello")
+ *
+ * const useCacheIfAvailable = true
+ * function hello(imported) {
+ *   return handlePotentialPromise(imported, imported => {
+ *     const greeting = imported.fetchHello(useCacheIfAvailable)
+ *     return handlePotentialPromise(greeting, greeting => {
+ *       return `${greeting} Testing!`
+ *     })
+ *   })
+ * }
+ *
+ * hello(dynamicImport).then(console.log) // "Hello Testing!"
+ * console.log(hello(staticImport)) // "Hello Testing!"
+ * // -- or --
+ * handlePotentialPromise(hello(dynamicImport), console.log) // "Hello Testing!"
+ * handlePotentialPromise(hello(staticImport), console.log) // "Hello Testing!"
+ * ```
  */
 export function handlePotentialPromise<
 	Given,
