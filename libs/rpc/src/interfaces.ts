@@ -276,7 +276,11 @@ export interface PrimOptions<M extends PossibleModule = object, J extends JsonHa
 	 * be made.
 	 */
 	// NOTE: `PartialDeep` allows for partial modules to be provided while full type definitions are provided as generic
-	module?: PartialDeep<RemoveDynamicImport<RemoveFunctionWrapper<M>>> | null
+	module?:
+		| (() => Promise<PartialDeep<RemoveDynamicImport<RemoveFunctionWrapper<M>>>>)
+		| Promise<PartialDeep<RemoveDynamicImport<RemoveFunctionWrapper<M>>>>
+		| PartialDeep<RemoveDynamicImport<RemoveFunctionWrapper<M>>>
+		| null
 	/**
 	 * Provide the server URL where Prim is being used. This will be provided to the HTTP client as the endpoint
 	 * parameter.
