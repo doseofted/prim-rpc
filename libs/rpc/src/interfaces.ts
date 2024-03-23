@@ -125,21 +125,47 @@ type FunctionAndForm<Args extends any[], Result> = {
 	(formLike: SubmitEvent | FormData | HTMLFormElement): Result
 }
 
+// type PromisifiedModuleDirectWithoutOverride<
+// 	ModuleGiven extends object,
+// 	Recursive extends true | false = true,
+// 	Keys extends keyof ModuleGiven = Extract<keyof ModuleGiven, string>,
+// > = ConditionalExcept<
+// 	{
+// 		[Key in Keys]: ModuleGiven[Key] extends ((...args: infer A) => infer R) & object
+// 			? FunctionAndForm<A, Promise<Awaited<R>>> & PromisifiedModuleDirect<ModuleGiven[Key], false>
+// 			: ModuleGiven[Key] extends object
+// 				? Recursive extends true
+// 					? PromisifiedModuleDirect<ModuleGiven[Key], true>
+// 					: never
+// 				: never
+// 	},
+// 	never
+// >
+
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 export type AnyFunction = (...args: any[]) => any
 // NOTE: consider condition of checking `.rpc` property on function (but also remember that it may be in allow list)
 type PromisifiedModuleDirect<
 	ModuleGiven extends object,
 	Recursive extends true | false = true,
+	ModuleOverride extends object = never,
 	Keys extends keyof ModuleGiven = Extract<keyof ModuleGiven, string>,
 > = ConditionalExcept<
 	{
-		[Key in Keys]: ModuleGiven[Key] extends ((...args: infer A) => infer R) & object
-			? FunctionAndForm<A, Promise<Awaited<R>>> & PromisifiedModuleDirect<ModuleGiven[Key], false>
+		[Key in Keys]: ModuleGiven[Key] extends (...args: infer A) => infer R
+			? Key extends keyof ModuleOverride
+				? ModuleOverride[Key] extends (...args: infer A2) => infer R2
+					? FunctionAndForm<A2, R2> & PromisifiedModuleDirect<ModuleGiven[Key], false, ModuleOverride[Key]>
+					: FunctionAndForm<A, Promise<Awaited<R>>> & PromisifiedModuleDirect<ModuleGiven[Key], false>
+				: FunctionAndForm<A, Promise<Awaited<R>>> & PromisifiedModuleDirect<ModuleGiven[Key], false>
 			: ModuleGiven[Key] extends object
 				? Recursive extends true
-					? PromisifiedModuleDirect<ModuleGiven[Key], true>
-					: never
+					? Key extends keyof ModuleOverride
+						? ModuleOverride[Key] extends object
+							? PromisifiedModuleDirect<ModuleGiven[Key], true, ModuleOverride[Key]>
+							: PromisifiedModuleDirect<ModuleGiven[Key], true>
+						: PromisifiedModuleDirect<ModuleGiven[Key], true>
+					: PromisifiedModuleDirect<ModuleGiven[Key], false>
 				: never
 	},
 	never
@@ -179,24 +205,30 @@ type PromisifiedModuleDirect<
 // void promTest.abc("what")
 
 // NOTE: this is a non-recursive version of default `Awaited` type that comes with TypeScript
-type PromisifiedModuleDynamicImport<ModuleGiven extends object> = ModuleGiven extends object & {
+type PromisifiedModuleDynamicImport<
+	ModuleGiven extends object,
+	ModuleOverride extends object = never,
+> = ModuleGiven extends object & {
 	// eslint-disable-next-line @typescript-eslint/no-explicit-any
 	then: (onfulfilled: infer F, ...args: infer _) => any
 }
 	? // eslint-disable-next-line @typescript-eslint/no-explicit-any
 		F extends (value: infer V, ...args: infer _) => any
 		? V extends object
-			? PromisifiedModuleDirect<V>
+			? PromisifiedModuleDirect<V, true, ModuleOverride>
 			: never
 		: never
-	: PromisifiedModuleDirect<ModuleGiven>
+	: PromisifiedModuleDirect<ModuleGiven, true, ModuleOverride>
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 export type AnyFunctionReturnsPromise = (...args: any[]) => PromiseLike<any>
 // If given a function that returns a promise, get the returned promise (pattern used often with dynamic imports)
-export type PromisifiedModule<Given extends object> = Given extends AnyFunctionReturnsPromise
-	? PromisifiedModuleDynamicImport<ReturnType<Given>>
-	: PromisifiedModuleDynamicImport<Given>
+export type PromisifiedModule<
+	Given extends object,
+	ModuleOverride extends object = never,
+> = Given extends AnyFunctionReturnsPromise
+	? PromisifiedModuleDynamicImport<ReturnType<Given>, ModuleOverride>
+	: PromisifiedModuleDynamicImport<Given, ModuleOverride>
 
 export type RemoveFunctionWrapper<Given extends object> = Given extends AnyFunctionReturnsPromise
 	? ReturnType<Given>
