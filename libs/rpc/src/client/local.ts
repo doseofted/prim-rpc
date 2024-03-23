@@ -42,7 +42,15 @@ export function handleLocalModule(rpc: RpcCall<string, unknown[]>, options: Prim
 		if (!providedModule) return nextToken
 		const method = getProperty(providedModule, rpc.method) as AnyFunction
 		// eslint-disable-next-line @typescript-eslint/no-unsafe-return
-		if (method) return method(...rpc.args) as unknown
+		if (method) {
+			// eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
+			const preprocessed = options.preRequest?.(rpc.args, rpc.method) ?? { args: rpc.args }
+			if ("result" in preprocessed) {
+				return options.postRequest?.(preprocessed.result, rpc.method) ?? preprocessed.result
+			}
+			const result = method(...preprocessed.args) as unknown
+			return options.postRequest?.(result, rpc.method) ?? result
+		}
 		return nextToken
 	})
 }

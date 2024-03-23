@@ -23,10 +23,36 @@ describe("Promises can be easily handled", () => {
 		await expect(hello).resolves.toBe("hello")
 	})
 
+	test("promise rejected", async () => {
+		const hello = handlePotentialPromise(Promise.reject("oops"), () => {})
+		await expect(hello).rejects.toBe("oops")
+	})
+
+	test("promise rejected, overridden", async () => {
+		const hello = handlePotentialPromise(
+			Promise.resolve("hello"),
+			() => {
+				throw "hi!"
+			},
+			() => {
+				throw "oops"
+			}
+		)
+		await expect(hello).rejects.toBe("oops")
+	})
+
 	test("no promise", () => {
 		const hello = handlePotentialPromise("hello", value => {
 			return value
 		})
 		expect(hello).toBe("hello")
+	})
+
+	test("no promise, throws", () => {
+		const thrown = () =>
+			handlePotentialPromise("hello", value => {
+				throw value
+			})
+		expect(thrown).toThrow("hello")
 	})
 })

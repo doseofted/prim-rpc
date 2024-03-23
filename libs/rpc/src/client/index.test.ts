@@ -1,7 +1,7 @@
 import { expect, test } from "vitest"
 import { createPrimClient } from "./index"
 
-type ExampleModule = { hello: (name?: string) => string; goodbye: () => string }
+type ExampleModule = { hello: (name?: string) => string; goodbye: () => string; anError: () => void }
 
 test("static import", async () => {
 	const client = createPrimClient<() => Promise<ExampleModule>>({
@@ -9,12 +9,16 @@ test("static import", async () => {
 			hello(name: string) {
 				return ["Hello", name].filter(given => given).join(" ")
 			},
+			anError() {
+				throw "Uh-oh"
+			},
 		},
 	})
 	// not async since module was provided locally
 	expect(client.hello()).toBe("Hello")
 	// FIXME: not implemented yet
 	await expect(client.goodbye()).rejects.toBe("not implemented yet")
+	expect(() => client.anError()).toThrow("Uh-oh")
 })
 
 test("dynamic import", async () => {

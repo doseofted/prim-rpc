@@ -1,12 +1,18 @@
+/** The default behavior upon receiving an error in `handlePotentialPromise()` is to rethrow that error */
+function defaultError(error: unknown) {
+	throw error
+}
+
 /**
  * Given object `T` or `Promise<T>`, act on `T` in the
  * provided `handler` which should return some value `R` back, which will become
  * the final return value of this function, wrapped as `Promise<R>` if given
- * `Promise<T>`.
+ * `Promise<T>`. If an error is thrown, it will be caught and will rethrow if
+ * behavior is not overridden in given `error` handler.
  *
- * This is useful when logic need to remain synchronous because the final result
- * may not always be a Promise. This function also makes this pattern play nicer
- * with TypeScript.
+ * This is useful when logic needs to remain synchronous because the final
+ * result may not always be a Promise. This function also makes this pattern
+ * play nicer with TypeScript.
  *
  * @example
  * ```ts
@@ -40,9 +46,13 @@ export function handlePotentialPromise<
 		: Returned extends Promise<infer _>
 			? Promise<ReturnedResolved>
 			: Returned,
->(given: Given, handler: (value: GivenResolved) => Returned): ReturnedFinal {
+>(given: Given, handler: (value: GivenResolved) => Returned, error = defaultError): ReturnedFinal {
 	if (given instanceof Promise) {
-		return given.then(handler) as ReturnedFinal
+		return given.then(handler).catch(error) as ReturnedFinal
 	}
-	return handler(given as unknown as GivenResolved) as unknown as ReturnedFinal
+	try {
+		return handler(given as unknown as GivenResolved) as unknown as ReturnedFinal
+	} catch (errorGiven) {
+		error(errorGiven)
+	}
 }
