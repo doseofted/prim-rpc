@@ -1,7 +1,7 @@
 import { expect, test, describe } from "vitest"
 import { handlePotentialPromise } from "./wrapper"
 
-describe("Promises can be easily handled", () => {
+describe("Promises can be easily handled without using async functions", () => {
 	test("promise given", async () => {
 		const hello = handlePotentialPromise(Promise.resolve("hello"), value => {
 			return value

@@ -24,7 +24,7 @@ function isBinaryLike(possiblyBinary: unknown) {
  * @param maybeForm - FormData, FormElement containing FormData, or SubmitEvent (whose target is a FormElement with FormData)
  * @returns Boolean if given is a form-like object
  */
-function givenFormLike(maybeForm: unknown): maybeForm is HTMLFormElement | FormData | SubmitEvent {
+export function givenFormLike(maybeForm: unknown): maybeForm is HTMLFormElement | FormData | SubmitEvent {
 	return (
 		(typeof HTMLFormElement === "function" && maybeForm instanceof HTMLFormElement) ||
 		(typeof FormData === "function" && maybeForm instanceof FormData) ||
@@ -38,7 +38,7 @@ function givenFormLike(maybeForm: unknown): maybeForm is HTMLFormElement | FormD
  * into an object. If given a `SubmitEvent`, prevent page navigation since the
  * event should be handled by this library.
  */
-function handlePossibleForm(form: HTMLFormElement | FormData | SubmitEvent) {
+export function handlePossibleForm(form: HTMLFormElement | FormData | SubmitEvent) {
 	if (form instanceof SubmitEvent && form.target instanceof HTMLFormElement) {
 		form.preventDefault()
 	}
@@ -46,10 +46,10 @@ function handlePossibleForm(form: HTMLFormElement | FormData | SubmitEvent) {
 		form instanceof HTMLFormElement
 			? new FormData(form)
 			: form instanceof SubmitEvent
-			? form.target instanceof HTMLFormElement
-				? new FormData(form.target)
-				: undefined
-			: form
+				? form.target instanceof HTMLFormElement
+					? new FormData(form.target)
+					: undefined
+				: form
 	const data: Record<string, FormDataEntryValue | FormDataEntryValue[]> = {}
 	for (const [key, val] of formData) {
 		if (data[key]) {

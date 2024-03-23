@@ -1,3 +1,4 @@
+import { givenFormLike, handlePossibleForm } from "../extract/blobs"
 import type { AnyFunction, PossibleModule, PrimOptions, RpcCall } from "../interfaces"
 import { handlePotentialPromise } from "./wrapper"
 import getProperty from "just-safe-get"
@@ -43,8 +44,10 @@ export function handleLocalModule(rpc: RpcCall<string, unknown[]>, options: Prim
 		const method = getProperty(providedModule, rpc.method) as AnyFunction
 		// eslint-disable-next-line @typescript-eslint/no-unsafe-return
 		if (method) {
-			// eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
 			const preprocessed = options.preRequest?.(rpc.args, rpc.method) ?? { args: rpc.args }
+			if (Array.isArray(preprocessed.args) && givenFormLike(preprocessed.args[0])) {
+				preprocessed.args[0] = handlePossibleForm(preprocessed.args[0])
+			}
 			if ("result" in preprocessed) {
 				return options.postRequest?.(preprocessed.result, rpc.method) ?? preprocessed.result
 			}
