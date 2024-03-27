@@ -25,3 +25,5 @@ dist
 .pnpm-store
 # The API docs are generated with TypeDoc on each build are don't need to be commited to repo
 **/docs/api.json
+# Vitest may generate temp files with debug information: don't commit that (or any path that ending in `-temp.json`)
+**/*-temp.json*

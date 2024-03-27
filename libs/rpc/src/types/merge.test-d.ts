@@ -68,7 +68,7 @@ describe("MergeModule merges modules", () => {
 })
 
 describe("MergeModule works with PromisifiedModule", () => {
-	test("With form handling", () => {
+	test("with form handling", () => {
 		type A = PromisifiedModule<
 			{
 				lorem(): Promise<string>

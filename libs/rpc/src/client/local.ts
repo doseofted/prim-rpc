@@ -1,5 +1,5 @@
 import { givenFormLike, handlePossibleForm } from "../extract/blobs"
-import type { AnyFunction, PossibleModule, PrimOptions, RpcCall } from "../interfaces"
+import type { AnyFunction, JsonHandler, PossibleModule, PrimOptions, RpcCall } from "../interfaces"
 import { handlePotentialPromise } from "./wrapper"
 import getProperty from "just-safe-get"
 
@@ -12,20 +12,21 @@ import getProperty from "just-safe-get"
  * - a function that returns a dynamic import containing the module
  * - a function that returns the module (unnecessary but supported)
  *
- * This function removes the function wrapper and provides a fallback to an empty object if not defined.
+ * This function removes the function wrapper and returns the module if provided, otherwise `null`.
  *
- * **This does not remove any Promise wrappers.** That should be handled in another step.
+ * **This does not remove any Promise wrappers.** That should be handled in another step (consider using the
+ * `handlePotentialPromise()` utility)
  */
 export function getUnfulfilledModule(
 	moduleMaybe: undefined | null | object | (() => Promise<object>) | (() => object) | Promise<object>
-): object | Promise<object> {
+): null | object | Promise<object> | Promise<null> {
 	if (typeof moduleMaybe === "function") {
 		const moduleMaybeDynamicImport = moduleMaybe() as Promise<object> | object
-		if (moduleMaybeDynamicImport instanceof Promise) return moduleMaybeDynamicImport.then(given => given ?? {})
-		return moduleMaybeDynamicImport ?? {}
+		if (moduleMaybeDynamicImport instanceof Promise) return moduleMaybeDynamicImport.then(given => given ?? null)
+		return moduleMaybeDynamicImport ?? null
 	}
-	if (moduleMaybe instanceof Promise) return moduleMaybe.then(given => given ?? {})
-	return moduleMaybe ?? {}
+	if (moduleMaybe instanceof Promise) return moduleMaybe.then(given => given ?? null)
+	return moduleMaybe ?? null
 }
 
 /**
@@ -35,14 +36,15 @@ export function getUnfulfilledModule(
  *
  * **Important:** The `nextToken` will be wrapped in a Promise if the module is a dynamic import.
  */
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
-export function handleLocalModule(rpc: RpcCall<string, unknown[]>, options: PrimOptions<any, any>, nextToken?: symbol) {
-	if (!options.module) return nextToken
-	const providedModule = getUnfulfilledModule(options.module as PossibleModule)
+export function handleLocalModule(
+	rpc: RpcCall<string, unknown[]>,
+	options: PrimOptions<PossibleModule, JsonHandler>,
+	nextToken?: symbol
+) {
+	const providedModule = getUnfulfilledModule(options.module)
 	return handlePotentialPromise(providedModule, providedModule => {
 		if (!providedModule) return nextToken
 		const method = getProperty(providedModule, rpc.method) as AnyFunction
-		// eslint-disable-next-line @typescript-eslint/no-unsafe-return
 		if (method) {
 			const preprocessed = options.preRequest?.(rpc.args, rpc.method) ?? { args: rpc.args }
 			if (options.handleForms && Array.isArray(preprocessed.args) && givenFormLike(preprocessed.args[0])) {

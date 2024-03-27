@@ -1,11 +1,46 @@
-/* eslint-disable @typescript-eslint/no-unsafe-assignment */
-/* eslint-disable @typescript-eslint/no-unsafe-member-access */
-/* eslint-disable @typescript-eslint/no-unsafe-call */
 import { describe, expect, test } from "vitest"
 import { createMethodCatcher } from "./proxy"
+import type { RpcCall } from "../interfaces"
+
+type PotentialModuleShape = {
+	this: {
+		is(): {
+			a: {
+				test(): {
+					ok: {
+						$end(): RpcCall
+					}
+				}
+			}
+		}
+	}
+	testing: {
+		nonPromise: () => string
+		promise: () => Promise<string>
+	}
+	test: {
+		testing(name: string): {
+			test: {
+				tested(name: string): Promise<RpcCall>
+			}
+		}
+	}
+	hello: (name: string, greeting: string) => Promise<RpcCall>
+	select: {
+		from: (table: string) => {
+			where: (
+				column: string,
+				operator: string,
+				value: number
+			) => {
+				execute: () => Promise<RpcCall>
+			}
+		}
+	}
+}
 
 describe("RPC proxy creates RPC-like structure, including chains", () => {
-	const given = createMethodCatcher({
+	const given = createMethodCatcher<PotentialModuleShape>({
 		onAwaited(rpc, _next) {
 			rpc.id = 123
 			return rpc

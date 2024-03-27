@@ -5,7 +5,6 @@ type ExampleModule = {
 	hello: (name?: string) => Promise<string>
 	goodbye: () => string
 	anError: () => void
-	// what(): { is(): { this(): void } }
 }
 const exampleModule = {
 	hello(name?: string) {
@@ -21,7 +20,7 @@ test("static import", async () => {
 		module: exampleModule,
 		handleForms: true,
 	} as const
-	const client = createPrimClient<ExampleModule, typeof options>()
+	const client = createPrimClient<ExampleModule, typeof options>(options)
 	// not async since module was provided locally
 	expect(client.hello()).toBe("Hello")
 	// FIXME: not implemented yet
