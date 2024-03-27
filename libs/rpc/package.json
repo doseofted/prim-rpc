@@ -32,13 +32,14 @@
 		"build": "tsup --config build.config.js",
 		"check": "tsc --noEmit",
 		"document": "typedoc",
-		"test": "vitest run",
-		"testing": "vitest watch",
+		"test": "vitest run --typecheck",
+		"testing": "vitest watch --typecheck",
 		"lint": "eslint ."
 	},
 	"dependencies": {
 		"defu": "^6.1.4",
 		"destr": "^2.0.2",
+		"emery": "^1.4.3",
 		"just-remove": "^3.2.0",
 		"just-safe-get": "^4.2.0",
 		"mitt": "^3.0.1",

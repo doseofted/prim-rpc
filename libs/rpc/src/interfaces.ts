@@ -12,9 +12,11 @@ export interface RpcBase {
 	id?: string | number
 }
 
-export interface RpcCall<Method = string, Args = unknown> extends RpcBase {
+export type RpcChain<Method = string, Args = unknown> = Pick<RpcCall<Method, Args>, "method" | "args">
+export interface RpcCall<Method = string, Args = unknown, Chain extends RpcChain[] = RpcChain[]> extends RpcBase {
 	method: Method
 	args?: Args
+	chain?: Chain
 }
 
 export interface RpcAnswer<Result = unknown, Error = unknown> extends RpcBase {
@@ -117,11 +119,22 @@ interface PrimWebSocketFunctionEvents {
 // let d: VariableArgsFunction<typeof c>
 // await d("what")
 
+// type B<T = never> = [T] extends [never] ? true : false
+// let b: B
+
+// NOTE: ny default, assume that form arguments could be given unless explicitly disabled
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
-type FunctionAndForm<Args extends any[], Result> = {
-	(...args: Args): Result
-	(formLike: SubmitEvent | FormData | HTMLFormElement): Result
-}
+export type FunctionAndForm<Args extends any[], Result, F extends true | false = true> = [F] extends [false]
+	? {
+			(...args: Args): Result
+		}
+	: {
+			(...args: Args): Result
+			(formLike: SubmitEvent | FormData | HTMLFormElement): Result
+		}
+
+// TODO: to support nested modules in PromisifiedModuleDirect, I need to merge returned Promise with the functions
+// returned from a given function
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 export type AnyFunction = (...args: any[]) => any
@@ -129,14 +142,17 @@ export type AnyFunction = (...args: any[]) => any
 type PromisifiedModuleDirect<
 	ModuleGiven extends object,
 	Recursive extends true | false = true,
+	HandleForm extends true | false = true,
+	Promised extends true | false = true,
 	Keys extends keyof ModuleGiven = Extract<keyof ModuleGiven, string>,
 > = ConditionalExcept<
 	{
-		[Key in Keys]: ModuleGiven[Key] extends ((...args: infer A) => infer R) & object
-			? FunctionAndForm<A, Promise<Awaited<R>>> & PromisifiedModuleDirect<ModuleGiven[Key], false>
+		[Key in Keys]: ModuleGiven[Key] extends (...args: infer A) => infer R
+			? FunctionAndForm<A, Promised extends true ? Promise<Awaited<R>> : R, HandleForm> &
+					PromisifiedModuleDirect<ModuleGiven[Key], false, HandleForm>
 			: ModuleGiven[Key] extends object
 				? Recursive extends true
-					? PromisifiedModuleDirect<ModuleGiven[Key], true>
+					? PromisifiedModuleDirect<ModuleGiven[Key], true, HandleForm>
 					: never
 				: never
 	},
@@ -177,29 +193,52 @@ type PromisifiedModuleDirect<
 // void promTest.abc("what")
 
 // NOTE: this is a non-recursive version of default `Awaited` type that comes with TypeScript
-type PromisifiedModuleDynamicImport<ModuleGiven extends object> = ModuleGiven extends object & {
+type PromisifiedModuleDynamicImport<
+	ModuleGiven extends object,
+	HandleForm extends true | false,
+	Promised extends true | false,
+> = ModuleGiven extends object & {
 	// eslint-disable-next-line @typescript-eslint/no-explicit-any
 	then: (onfulfilled: infer F, ...args: infer _) => any
 }
 	? // eslint-disable-next-line @typescript-eslint/no-explicit-any
 		F extends (value: infer V, ...args: infer _) => any
 		? V extends object
-			? PromisifiedModuleDirect<V>
+			? PromisifiedModuleDirect<V, true, HandleForm, Promised>
 			: never
 		: never
-	: PromisifiedModuleDirect<ModuleGiven>
+	: PromisifiedModuleDirect<ModuleGiven, true, HandleForm, Promised>
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 export type AnyFunctionReturnsPromise = (...args: any[]) => PromiseLike<any>
 // If given a function that returns a promise, get the returned promise (pattern used often with dynamic imports)
-export type PromisifiedModule<Given extends object> = Given extends AnyFunctionReturnsPromise
-	? PromisifiedModuleDynamicImport<ReturnType<Given>>
-	: PromisifiedModuleDynamicImport<Given>
+export type PromisifiedModule<
+	Given extends object,
+	HandleForm extends true | false,
+	Promised extends true | false = true,
+> = Given extends AnyFunctionReturnsPromise
+	? PromisifiedModuleDynamicImport<ReturnType<Given>, HandleForm, Promised>
+	: PromisifiedModuleDynamicImport<Given, HandleForm, Promised>
+
+export type RemoveFunctionWrapper<Given extends object> = Given extends AnyFunctionReturnsPromise
+	? ReturnType<Given>
+	: Given
+export type RemoveDynamicImport<ModuleGiven> = ModuleGiven extends object & {
+	// eslint-disable-next-line @typescript-eslint/no-explicit-any
+	then: (onfulfilled: infer F, ...args: infer _) => any
+}
+	? // eslint-disable-next-line @typescript-eslint/no-explicit-any
+		F extends (value: infer V, ...args: infer _) => any
+		? V extends object
+			? V
+			: never
+		: never
+	: ModuleGiven
 
 // The following is intended to be used to export a module used with the client
 // (useful for JSDocs or usage outside of the Prim Client that provides this type)
 /** Module transformed as it is done by the Prim+RPC client */
-export type RpcModule<M extends object> = PromisifiedModule<M>
+export type RpcModule<M extends object> = PromisifiedModule<M, true>
 
 export interface JsonHandler {
 	// eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -247,7 +286,11 @@ export type PossibleModule = object
 // | Promise<Record<string, unknown>>
 // | (() => Promise<Record<string, unknown>>)
 
-export interface PrimOptions<M extends PossibleModule = object, J extends JsonHandler = JsonHandler> {
+export interface PrimOptions<
+	M extends PossibleModule = PossibleModule,
+	J extends JsonHandler = JsonHandler,
+	F extends boolean = boolean,
+> {
 	/**
 	 * This option is not yet implemented.
 	 *
@@ -259,7 +302,11 @@ export interface PrimOptions<M extends PossibleModule = object, J extends JsonHa
 	 * be made.
 	 */
 	// NOTE: `PartialDeep` allows for partial modules to be provided while full type definitions are provided as generic
-	module?: PartialDeep<M> | null
+	module?:
+		| (() => Promise<PartialDeep<RemoveDynamicImport<RemoveFunctionWrapper<M>>>>)
+		| Promise<PartialDeep<RemoveDynamicImport<RemoveFunctionWrapper<M>>>>
+		| PartialDeep<RemoveDynamicImport<RemoveFunctionWrapper<M>>>
+		| null
 	/**
 	 * Provide the server URL where Prim is being used. This will be provided to the HTTP client as the endpoint
 	 * parameter.
@@ -336,7 +383,7 @@ export interface PrimOptions<M extends PossibleModule = object, J extends JsonHa
 	 * If given function specifies a `.rpc` boolean property with a value of `true` then those functions do not need
 	 * to be added to the allow-list.
 	 */
-	allowList?: PartialDeep<Schema<PromisifiedModule<M>, boolean | "idempotent">>
+	allowList?: PartialDeep<Schema<PromisifiedModule<M, false>, true | "idempotent">>
 	/**
 	 * In JavaScript, functions are objects. Those objects can have methods. This means that functions can have methods.
 	 *
@@ -375,10 +422,11 @@ export interface PrimOptions<M extends PossibleModule = object, J extends JsonHa
 	 * then you may toggle this option `false` to prevent Prim from extracting binary data.
 	 */
 	handleBlobs?: boolean
+	handleForms?: F
 	/** Transform given arguments prior to sending RPC to server (unlike post-request hook, it must be synchronous) */
-	preRequest?: (args: unknown[], name: string) => { args: unknown[]; result?: unknown } | undefined
+	preRequest?: (args: unknown[], name: string) => { args?: unknown[]; result?: unknown } | undefined | void
 	/** Transform given result prior to being returned to the RPC caller */
-	postRequest?: (result: unknown, name: string) => unknown
+	postRequest?: (args: unknown[], result: unknown, name: string) => unknown
 	/** Transform given error prior to being thrown */
 	// postRequestError?: (result: unknown, name: string) => unknown
 	// TODO: Prim Server should create these options and hold references. This will be removed.
