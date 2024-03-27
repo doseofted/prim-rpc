@@ -32,8 +32,8 @@
 		"build": "tsup --config build.config.js",
 		"check": "tsc --noEmit",
 		"document": "typedoc",
-		"test": "vitest run",
-		"testing": "vitest watch",
+		"test": "vitest run --typecheck",
+		"testing": "vitest watch --typecheck",
 		"lint": "eslint ."
 	},
 	"dependencies": {

@@ -119,28 +119,22 @@ interface PrimWebSocketFunctionEvents {
 // let d: VariableArgsFunction<typeof c>
 // await d("what")
 
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
-type FunctionAndForm<Args extends any[], Result> = {
-	(...args: Args): Result
-	(formLike: SubmitEvent | FormData | HTMLFormElement): Result
-}
+// type B<T = never> = [T] extends [never] ? true : false
+// let b: B
 
-// type PromisifiedModuleDirectWithoutOverride<
-// 	ModuleGiven extends object,
-// 	Recursive extends true | false = true,
-// 	Keys extends keyof ModuleGiven = Extract<keyof ModuleGiven, string>,
-// > = ConditionalExcept<
-// 	{
-// 		[Key in Keys]: ModuleGiven[Key] extends ((...args: infer A) => infer R) & object
-// 			? FunctionAndForm<A, Promise<Awaited<R>>> & PromisifiedModuleDirect<ModuleGiven[Key], false>
-// 			: ModuleGiven[Key] extends object
-// 				? Recursive extends true
-// 					? PromisifiedModuleDirect<ModuleGiven[Key], true>
-// 					: never
-// 				: never
-// 	},
-// 	never
-// >
+// NOTE: ny default, assume that form arguments could be given unless explicitly disabled
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+export type FunctionAndForm<Args extends any[], Result, F extends true | false = true> = [F] extends [false]
+	? {
+			(...args: Args): Result
+		}
+	: {
+			(...args: Args): Result
+			(formLike: SubmitEvent | FormData | HTMLFormElement): Result
+		}
+
+// TODO: to support nested modules in PromisifiedModuleDirect, I need to merge returned Promise with the functions
+// returned from a given function
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 export type AnyFunction = (...args: any[]) => any
@@ -148,24 +142,18 @@ export type AnyFunction = (...args: any[]) => any
 type PromisifiedModuleDirect<
 	ModuleGiven extends object,
 	Recursive extends true | false = true,
-	ModuleOverride extends object = never,
+	HandleForm extends true | false = true,
+	Promised extends true | false = true,
 	Keys extends keyof ModuleGiven = Extract<keyof ModuleGiven, string>,
 > = ConditionalExcept<
 	{
 		[Key in Keys]: ModuleGiven[Key] extends (...args: infer A) => infer R
-			? Key extends keyof ModuleOverride
-				? ModuleOverride[Key] extends (...args: infer A2) => infer R2
-					? FunctionAndForm<A2, R2> & PromisifiedModuleDirect<ModuleGiven[Key], false, ModuleOverride[Key]>
-					: FunctionAndForm<A, Promise<Awaited<R>>> & PromisifiedModuleDirect<ModuleGiven[Key], false>
-				: FunctionAndForm<A, Promise<Awaited<R>>> & PromisifiedModuleDirect<ModuleGiven[Key], false>
+			? FunctionAndForm<A, Promised extends true ? Promise<Awaited<R>> : R, HandleForm> &
+					PromisifiedModuleDirect<ModuleGiven[Key], false, HandleForm>
 			: ModuleGiven[Key] extends object
 				? Recursive extends true
-					? Key extends keyof ModuleOverride
-						? ModuleOverride[Key] extends object
-							? PromisifiedModuleDirect<ModuleGiven[Key], true, ModuleOverride[Key]>
-							: PromisifiedModuleDirect<ModuleGiven[Key], true>
-						: PromisifiedModuleDirect<ModuleGiven[Key], true>
-					: PromisifiedModuleDirect<ModuleGiven[Key], false>
+					? PromisifiedModuleDirect<ModuleGiven[Key], true, HandleForm>
+					: never
 				: never
 	},
 	never
@@ -207,7 +195,8 @@ type PromisifiedModuleDirect<
 // NOTE: this is a non-recursive version of default `Awaited` type that comes with TypeScript
 type PromisifiedModuleDynamicImport<
 	ModuleGiven extends object,
-	ModuleOverride extends object = never,
+	HandleForm extends true | false,
+	Promised extends true | false,
 > = ModuleGiven extends object & {
 	// eslint-disable-next-line @typescript-eslint/no-explicit-any
 	then: (onfulfilled: infer F, ...args: infer _) => any
@@ -215,20 +204,21 @@ type PromisifiedModuleDynamicImport<
 	? // eslint-disable-next-line @typescript-eslint/no-explicit-any
 		F extends (value: infer V, ...args: infer _) => any
 		? V extends object
-			? PromisifiedModuleDirect<V, true, ModuleOverride>
+			? PromisifiedModuleDirect<V, true, HandleForm, Promised>
 			: never
 		: never
-	: PromisifiedModuleDirect<ModuleGiven, true, ModuleOverride>
+	: PromisifiedModuleDirect<ModuleGiven, true, HandleForm, Promised>
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 export type AnyFunctionReturnsPromise = (...args: any[]) => PromiseLike<any>
 // If given a function that returns a promise, get the returned promise (pattern used often with dynamic imports)
 export type PromisifiedModule<
 	Given extends object,
-	ModuleOverride extends object = never,
+	HandleForm extends true | false,
+	Promised extends true | false = true,
 > = Given extends AnyFunctionReturnsPromise
-	? PromisifiedModuleDynamicImport<ReturnType<Given>, ModuleOverride>
-	: PromisifiedModuleDynamicImport<Given, ModuleOverride>
+	? PromisifiedModuleDynamicImport<ReturnType<Given>, HandleForm, Promised>
+	: PromisifiedModuleDynamicImport<Given, HandleForm, Promised>
 
 export type RemoveFunctionWrapper<Given extends object> = Given extends AnyFunctionReturnsPromise
 	? ReturnType<Given>
@@ -248,7 +238,7 @@ export type RemoveDynamicImport<ModuleGiven> = ModuleGiven extends object & {
 // The following is intended to be used to export a module used with the client
 // (useful for JSDocs or usage outside of the Prim Client that provides this type)
 /** Module transformed as it is done by the Prim+RPC client */
-export type RpcModule<M extends object> = PromisifiedModule<M>
+export type RpcModule<M extends object> = PromisifiedModule<M, true>
 
 export interface JsonHandler {
 	// eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -296,7 +286,11 @@ export type PossibleModule = object
 // | Promise<Record<string, unknown>>
 // | (() => Promise<Record<string, unknown>>)
 
-export interface PrimOptions<M extends PossibleModule = object, J extends JsonHandler = JsonHandler> {
+export interface PrimOptions<
+	M extends PossibleModule = PossibleModule,
+	J extends JsonHandler = JsonHandler,
+	F extends boolean = boolean,
+> {
 	/**
 	 * This option is not yet implemented.
 	 *
@@ -389,7 +383,7 @@ export interface PrimOptions<M extends PossibleModule = object, J extends JsonHa
 	 * If given function specifies a `.rpc` boolean property with a value of `true` then those functions do not need
 	 * to be added to the allow-list.
 	 */
-	allowList?: PartialDeep<Schema<PromisifiedModule<M>, true | "idempotent">>
+	allowList?: PartialDeep<Schema<PromisifiedModule<M, false>, true | "idempotent">>
 	/**
 	 * In JavaScript, functions are objects. Those objects can have methods. This means that functions can have methods.
 	 *
@@ -428,6 +422,7 @@ export interface PrimOptions<M extends PossibleModule = object, J extends JsonHa
 	 * then you may toggle this option `false` to prevent Prim from extracting binary data.
 	 */
 	handleBlobs?: boolean
+	handleForms?: F
 	/** Transform given arguments prior to sending RPC to server (unlike post-request hook, it must be synchronous) */
 	preRequest?: (args: unknown[], name: string) => { args: unknown[]; result?: unknown } | undefined
 	/** Transform given result prior to being returned to the RPC caller */

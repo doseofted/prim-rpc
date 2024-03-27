@@ -1,7 +1,12 @@
 import { expect, test } from "vitest"
 import { createPrimClient } from "./index"
 
-type ExampleModule = { hello: (name?: string) => Promise<string>; goodbye: () => string; anError: () => void }
+type ExampleModule = {
+	hello: (name?: string) => Promise<string>
+	goodbye: () => string
+	anError: () => void
+	// what(): { is(): { this(): void } }
+}
 const exampleModule = {
 	hello(name?: string) {
 		return ["Hello", name].filter(given => given).join(" ")
@@ -12,9 +17,11 @@ const exampleModule = {
 }
 
 test("static import", async () => {
-	const client = createPrimClient<Promise<ExampleModule>, typeof exampleModule>({
-		module: exampleModule,
-	})
+	const options = {
+		module: () => Promise.resolve(exampleModule),
+		handleForms: false,
+	} as const
+	const client = createPrimClient<ExampleModule>(options)
 	// not async since module was provided locally
 	expect(client.hello()).toBe("Hello")
 	// FIXME: not implemented yet

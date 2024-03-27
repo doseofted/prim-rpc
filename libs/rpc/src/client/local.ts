@@ -45,7 +45,7 @@ export function handleLocalModule(rpc: RpcCall<string, unknown[]>, options: Prim
 		// eslint-disable-next-line @typescript-eslint/no-unsafe-return
 		if (method) {
 			const preprocessed = options.preRequest?.(rpc.args, rpc.method) ?? { args: rpc.args }
-			if (Array.isArray(preprocessed.args) && givenFormLike(preprocessed.args[0])) {
+			if (options.handleForms && Array.isArray(preprocessed.args) && givenFormLike(preprocessed.args[0])) {
 				preprocessed.args[0] = handlePossibleForm(preprocessed.args[0])
 			}
 			if ("result" in preprocessed) {
