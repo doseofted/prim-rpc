@@ -1,5 +1,6 @@
 import type { AnyFunction } from "../interfaces"
 
+/** Merge two separate modules' methods into one. The second module will override the first as needed. */
 export type MergeModuleMethods<
 	ModuleGiven extends object,
 	Override extends object = never,

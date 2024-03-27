@@ -1,13 +1,6 @@
 /* eslint-disable @typescript-eslint/no-unused-vars */
-import {
-	FunctionAndForm,
-	type JsonHandler,
-	type PossibleModule,
-	type PrimOptions,
-	type PromisifiedModule,
-	type RemoveDynamicImport,
-	type RemoveFunctionWrapper,
-} from "../interfaces"
+import { type PossibleModule, type PrimOptions } from "../interfaces"
+import type { RpcModule } from "../types/rpc-module"
 import { createPrimOptions } from "../options"
 import { isDefined } from "emery"
 import { createMethodCatcher } from "./proxy"
@@ -16,9 +9,8 @@ import { getUnfulfilledModule, handleLocalModule } from "./local"
 import { MergeModuleMethods } from "../types/merge"
 
 export function createPrimClient<
-	// eslint-disable-next-line @typescript-eslint/no-explicit-any, @typescript-eslint/ban-types
 	ModuleType extends PossibleModule = never,
-	GivenOptions extends PrimOptions = PrimOptions<PossibleModule, JsonHandler, boolean>,
+	GivenOptions extends PrimOptions = PrimOptions,
 >(options?: GivenOptions) {
 	options = createPrimOptions<GivenOptions>(options)
 	const providedModule = getUnfulfilledModule(options.module)
@@ -26,8 +18,8 @@ export function createPrimClient<
 	const providedCallbackPlugin = isDefined(options.callbackPlugin)
 	// the returned client will catch all method calls given on it recursively
 	type FinalModule = MergeModuleMethods<
-		PromisifiedModule<ModuleType, GivenOptions["handleForms"], true>,
-		PromisifiedModule<GivenOptions["module"], GivenOptions["handleForms"], false>
+		RpcModule<ModuleType, GivenOptions["handleForms"], true>,
+		RpcModule<GivenOptions["module"], GivenOptions["handleForms"], false>
 	>
 	return createMethodCatcher<FinalModule>({
 		onMethod(rpc, next) {

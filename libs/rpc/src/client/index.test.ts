@@ -18,10 +18,10 @@ const exampleModule = {
 
 test("static import", async () => {
 	const options = {
-		module: () => Promise.resolve(exampleModule),
-		handleForms: false,
+		module: exampleModule,
+		handleForms: true,
 	} as const
-	const client = createPrimClient<ExampleModule>(options)
+	const client = createPrimClient<ExampleModule, typeof options>()
 	// not async since module was provided locally
 	expect(client.hello()).toBe("Hello")
 	// FIXME: not implemented yet
