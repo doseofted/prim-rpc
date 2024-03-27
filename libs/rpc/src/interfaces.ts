@@ -424,9 +424,9 @@ export interface PrimOptions<
 	handleBlobs?: boolean
 	handleForms?: F
 	/** Transform given arguments prior to sending RPC to server (unlike post-request hook, it must be synchronous) */
-	preRequest?: (args: unknown[], name: string) => { args: unknown[]; result?: unknown } | undefined
+	preRequest?: (args: unknown[], name: string) => { args?: unknown[]; result?: unknown } | undefined | void
 	/** Transform given result prior to being returned to the RPC caller */
-	postRequest?: (result: unknown, name: string) => unknown
+	postRequest?: (args: unknown[], result: unknown, name: string) => unknown
 	/** Transform given error prior to being thrown */
 	// postRequestError?: (result: unknown, name: string) => unknown
 	// TODO: Prim Server should create these options and hold references. This will be removed.

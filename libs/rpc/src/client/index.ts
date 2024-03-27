@@ -6,7 +6,7 @@ import { createPrimOptions } from "../options"
 import { isDefined } from "emery"
 import { createMethodCatcher } from "./proxy"
 import { handlePotentialPromise } from "./wrapper"
-import { getUnfulfilledModule, handleLocalModule } from "./local"
+import { getUnfulfilledModule, handleLocalModuleMethod } from "./local"
 
 export function createPrimClient<
 	ModuleType extends PossibleModule = never,
@@ -24,13 +24,13 @@ export function createPrimClient<
 		onMethod(rpc, next) {
 			// if module method was provided (and is not dynamic import), intercept call and return synchronously
 			if (getUnfulfilledModule(options.module) instanceof Promise) return next
-			const given = handleLocalModule(rpc, options, next)
+			const given = handleLocalModuleMethod(rpc, options, next)
 			// because the module is not a dynamic import (Promise), we can safely check for the "next" token synchronously
 			if (given === next) return next
 			return given
 		},
 		onAwaited(rpc, next) {
-			const localResult = handleLocalModule(rpc, options, next)
+			const localResult = handleLocalModuleMethod(rpc, options, next)
 			return handlePotentialPromise(localResult, localResult => {
 				if (localResult !== next) return localResult
 				throw "not implemented yet"

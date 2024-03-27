@@ -36,7 +36,7 @@ export function getUnfulfilledModule(
  *
  * **Important:** The `nextToken` will be wrapped in a Promise if the module is a dynamic import.
  */
-export function handleLocalModule(
+export function handleLocalModuleMethod(
 	rpc: RpcCall<string, unknown[]>,
 	options: PrimOptions<PossibleModule, JsonHandler>,
 	nextToken?: symbol
@@ -46,15 +46,15 @@ export function handleLocalModule(
 		if (!providedModule) return nextToken
 		const method = getProperty(providedModule, rpc.method) as AnyFunction
 		if (method) {
-			const preprocessed = options.preRequest?.(rpc.args, rpc.method) ?? { args: rpc.args }
+			const preprocessed = options.preRequest?.(rpc.args, rpc.method) || { args: rpc.args }
 			if (options.handleForms && Array.isArray(preprocessed.args) && givenFormLike(preprocessed.args[0])) {
 				preprocessed.args[0] = handlePossibleForm(preprocessed.args[0])
 			}
 			if ("result" in preprocessed) {
-				return options.postRequest?.(preprocessed.result, rpc.method) ?? preprocessed.result
+				return options.postRequest?.(preprocessed.args, preprocessed.result, rpc.method) ?? preprocessed.result
 			}
 			const result = method(...preprocessed.args) as unknown
-			return options.postRequest?.(result, rpc.method) ?? result
+			return options.postRequest?.(preprocessed.args, result, rpc.method) ?? result
 		}
 		return nextToken
 	})
