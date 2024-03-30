@@ -1,6 +1,6 @@
 import { expectTypeOf, test, describe } from "vitest"
 import type { MergeModuleMethods } from "./merge"
-import { PromisifiedModule } from "../interfaces"
+import type { RpcModule } from "./rpc-module"
 
 describe("MergeModule merges modules", () => {
 	test("override all without new methods", () => {
@@ -67,9 +67,9 @@ describe("MergeModule merges modules", () => {
 	})
 })
 
-describe("MergeModule works with PromisifiedModule", () => {
+describe("MergeModule works with RpcModule", () => {
 	test("with form handling", () => {
-		type A = PromisifiedModule<
+		type A = RpcModule<
 			{
 				lorem(): Promise<string>
 				ipsum(): void
@@ -90,7 +90,7 @@ describe("MergeModule works with PromisifiedModule", () => {
 	})
 
 	test("without form handling", () => {
-		type A = PromisifiedModule<
+		type A = RpcModule<
 			{
 				lorem(): Promise<string>
 				test: {

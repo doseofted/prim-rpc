@@ -58,4 +58,19 @@ describe("RpcModule produces expected types for developer", () => {
 		}
 		expectTypeOf<ProducedModule>().toMatchTypeOf<ExpectedModule>()
 	})
+
+	test("with potential synchronous generator in module", () => {
+		type Module = () => Promise<{
+			a: {
+				generator(test: number): Generator<string>
+			}
+		}>
+		type ProducedModule = RpcModule<Module>
+		type ExpectedModule = {
+			a: {
+				generator(test: number): AsyncGenerator<string>
+			}
+		}
+		expectTypeOf<ProducedModule>().toMatchTypeOf<ExpectedModule>()
+	})
 })

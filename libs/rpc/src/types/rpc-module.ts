@@ -27,7 +27,11 @@ export type RpcModule<
 	? ConditionalExcept<
 			{
 				[Key in Keys]: ModuleGiven[Key] extends (...args: infer A) => infer R
-					? FunctionWithFormParams<A, HandlePromise extends true ? Promise<Awaited<R>> : R, HandleForm> &
+					? FunctionWithFormParams<
+							A,
+							HandlePromise extends true ? (R extends Generator<infer G> ? AsyncGenerator<G> : Promise<Awaited<R>>) : R,
+							HandleForm
+						> &
 							RpcModule<ModuleGiven[Key], HandleForm, HandlePromise, false, false>
 					: ModuleGiven[Key] extends object
 						? RpcModule<ModuleGiven[Key], HandleForm, HandlePromise, Recursive, false>
