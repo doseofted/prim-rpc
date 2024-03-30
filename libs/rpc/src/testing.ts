@@ -4,7 +4,7 @@
 
 import mitt, { Emitter, EventType } from "mitt"
 import { nanoid } from "nanoid"
-import { PrimClient, createPrimClient } from "./client"
+import { createPrimClient } from "./client"
 import {
 	PrimServerMethodHandler,
 	PrimServerCallbackHandler,
@@ -15,6 +15,7 @@ import {
 	PrimServerOptions,
 } from "./interfaces"
 import { createPrimServer } from "./server"
+import type { PossibleModule } from "./types/rpc-module"
 
 // NOTE: these testing plugins are intended to mimic interactions with an HTTP and WS server in a single file
 
@@ -200,13 +201,13 @@ export function createPrimTestingPlugins<Ctx = unknown>(exampleContext?: Ctx) {
  * @param exampleContext Optional context to be used with servers
  * @returns Configured Prim RPC client and server
  */
-export function createPrimTestingSuite<Module extends object, Ctx = unknown>(
-	serverOptions: PrimServerOptions<Module>,
-	clientOptions: PrimOptions<Module> = {},
+export function createPrimTestingSuite<_Module extends PossibleModule, Ctx = unknown>(
+	serverOptions: PrimServerOptions,
+	clientOptions: PrimOptions = {},
 	exampleContext?: Ctx
 ) {
 	const { methodHandler, callbackHandler, methodPlugin, callbackPlugin } = createPrimTestingPlugins(exampleContext)
-	const server = createPrimServer({
+	const server = createPrimServer<PossibleModule>({
 		...serverOptions,
 		methodHandler,
 		callbackHandler,
@@ -216,7 +217,7 @@ export function createPrimTestingSuite<Module extends object, Ctx = unknown>(
 		...clientOptions,
 		methodPlugin,
 		callbackPlugin,
-	}) as unknown as PrimClient<Module>
+	})
 	return { client, server }
 }
 // !SECTION

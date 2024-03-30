@@ -26,10 +26,14 @@ export type RpcModule<
 > = [Root] extends [false]
 	? ConditionalExcept<
 			{
-				[Key in Keys]: ModuleGiven[Key] extends (...args: infer A) => infer R
+				[Key in Keys]: ModuleGiven[Key] extends (...args: infer Args) => infer Returned
 					? FunctionWithFormParameter<
-							A,
-							HandlePromise extends true ? (R extends Generator<infer G> ? AsyncGenerator<G> : Promise<Awaited<R>>) : R,
+							Args,
+							HandlePromise extends true
+								? Returned extends Generator<infer G>
+									? AsyncGenerator<G>
+									: Promise<Awaited<Returned>>
+								: Returned,
 							HandleForm
 						> &
 							RpcModule<ModuleGiven[Key], HandleForm, HandlePromise, false, false>
@@ -39,4 +43,12 @@ export type RpcModule<
 			},
 			never
 		>
-	: RpcModule<WithoutPromiseWrapper<WithoutFunctionWrapper<ModuleGiven>>, HandleForm, HandlePromise, Recursive, false>
+	: RpcModule<
+			WithoutPromiseWrapper<WithoutFunctionWrapper<ModuleGiven>> extends object
+				? WithoutPromiseWrapper<WithoutFunctionWrapper<ModuleGiven>>
+				: ModuleGiven,
+			HandleForm,
+			HandlePromise,
+			Recursive,
+			false
+		>

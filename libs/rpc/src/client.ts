@@ -22,20 +22,13 @@ import { deserializeError } from "serialize-error"
 import { createPrimOptions, primMajorVersion, useVersionInRpc } from "./options"
 import { extractBlobData, mergeBlobData } from "./extract/blobs"
 import { PromiseResolveStatus } from "./interfaces"
-import type {
-	PrimOptions,
-	PrimWebSocketEvents,
-	PrimHttpEvents,
-	PrimHttpQueueItem,
-	BlobRecords,
-	JsonHandler,
-} from "./interfaces"
+import type { PrimOptions, PrimWebSocketEvents, PrimHttpEvents, PrimHttpQueueItem, BlobRecords } from "./interfaces"
 import type { RpcCall, RpcAnswer } from "./types/rpc-structure"
-import type { RpcModule } from "./types/rpc-module"
+import type { PossibleModule, RpcModule } from "./types/rpc-module"
 import { CB_PREFIX, PROMISE_PREFIX } from "./constants"
 import { extractPromisePlaceholders } from "./extract/promises"
 
-export type PrimClient<ModuleType extends PrimOptions["module"]> = RpcModule<ModuleType>
+export type PrimClient<ModuleType extends PossibleModule> = RpcModule<ModuleType>
 // export interface PrimClient<ModuleType extends PrimOptions["module"]> {
 // 	client: PromisifiedModule<ModuleType>
 // 	destroy: () => void
@@ -52,8 +45,7 @@ export type PrimClient<ModuleType extends PrimOptions["module"]> = RpcModule<Mod
  */
 export function createPrimClient<
 	ModuleType extends OptionsType["module"] = object,
-	JsonHandlerType extends OptionsType["jsonHandler"] = JsonHandler,
-	OptionsType extends PrimOptions = PrimOptions<Partial<ModuleType>, JsonHandlerType>,
+	OptionsType extends PrimOptions = PrimOptions,
 >(options?: OptionsType): PrimClient<ModuleType> {
 	const methodPluginGiven = typeof options?.methodPlugin !== "undefined"
 	const callbackPluginGiven = typeof options?.callbackPlugin !== "undefined"

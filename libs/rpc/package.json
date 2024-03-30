@@ -32,8 +32,8 @@
 		"build": "tsup --config build.config.js",
 		"check": "tsc --noEmit",
 		"document": "typedoc",
-		"test": "vitest run",
-		"testing": "vitest watch",
+		"test": "vitest run --typecheck",
+		"testing": "vitest watch --typecheck",
 		"lint": "eslint ."
 	},
 	"dependencies": {
@@ -55,7 +55,7 @@
 		"@types/lodash-es": "^4.17.12",
 		"@types/node": "^20.11.24",
 		"superjson": "^2.2.1",
-		"typedoc": "^0.25.9"
+		"typedoc": "^0.25.12"
 	},
 	"type": "module",
 	"exports": {

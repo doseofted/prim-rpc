@@ -13,17 +13,17 @@ import type { UniqueTypePrefix } from "../interfaces"
  * @param prefix - A prefix to use for the identifier in returned record
  * @returns A tuple of the given argument with transformations and a record of extracted data
  */
-export function extractGivenData<Extract = unknown>(
+export function extractGivenData<Extracted = unknown>(
 	given: unknown,
-	extractMatches: (given: unknown) => Extract,
+	extractMatches: (given: unknown) => Extracted,
 	prefix: UniqueTypePrefix
-): [given: unknown, extracted: Record<string, Exclude<Extract, false>>] {
-	const extractedRecord: Record<string, Exclude<Extract, false>> = {}
+): [given: unknown, extracted: Record<string, Exclude<Extracted, false>>] {
+	const extractedRecord: Record<string, Exclude<Extracted, false>> = {}
 	const extracted = extractMatches(given)
 	// extracted type was given directly
 	if (extracted) {
 		const identifier = [prefix, nanoid()].join("")
-		extractedRecord[identifier] = extracted as Exclude<Extract, false>
+		extractedRecord[identifier] = extracted as Exclude<Extracted, false>
 		return [identifier, extractedRecord]
 	}
 	// extracted type may possibly be inside of an object
@@ -33,7 +33,7 @@ export function extractGivenData<Extract = unknown>(
 			if (valBinary) {
 				const binaryIdentifier = [prefix, nanoid()].join("")
 				given[key] = binaryIdentifier
-				extractedRecord[binaryIdentifier] = valBinary as Exclude<Extract, false>
+				extractedRecord[binaryIdentifier] = valBinary as Exclude<Extracted, false>
 			} else if (Array.isArray(val)) {
 				// maybe multiple extracted types were given
 				const [replacedVal, moreBlobs] = extractGivenData(val, extractMatches, prefix)
@@ -53,7 +53,7 @@ export function extractGivenData<Extract = unknown>(
 			const valBinary = extractMatches(val)
 			if (valBinary) {
 				const binaryIdentifier = [prefix, nanoid()].join("")
-				extractedRecord[binaryIdentifier] = valBinary as Exclude<Extract, false>
+				extractedRecord[binaryIdentifier] = valBinary as Exclude<Extracted, false>
 				return binaryIdentifier
 			}
 			return val as unknown
