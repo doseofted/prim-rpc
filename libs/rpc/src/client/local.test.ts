@@ -1,6 +1,7 @@
 import { describe, expect, test } from "vitest"
 import { handleLocalModuleMethod } from "./local"
-import { PrimOptions, RpcCall } from "../interfaces"
+import type { PrimOptions } from "../interfaces"
+import type { RpcCall } from "../types/rpc-structure"
 
 const exampleModule = {
 	hello(name?: string) {

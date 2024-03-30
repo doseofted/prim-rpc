@@ -1,7 +1,6 @@
 import { DeepProxy } from "proxy-deep"
-import { RpcCall } from ".."
 import { nanoid } from "nanoid"
-import type { RpcChain } from "../interfaces"
+import type { RpcCall, RpcChain } from "../types/rpc-structure"
 
 /** Determine if given property name is one of a Promise, with type guard */
 function isPromiseMethodName(given: PropertyKey): given is "then" | "catch" | "finally" {
@@ -29,51 +28,6 @@ function convertChainToRpcStructure(chain: RpcChain[], withId = false) {
 	if (chain.length > 1) rpc.chain = chain.slice(1)
 	return rpc
 }
-
-// class PromiseIterable<T> extends Promise<T> implements AsyncGenerator<T, T, T> {
-// 	#resolve: (value: T | PromiseLike<T>) => void
-// 	#reject: (reason?: unknown) => void
-// 	#accessor: symbol
-// 	constructor(
-// 		public accessor: symbol,
-// 		executor?: (resolve: (value: T | PromiseLike<T>) => void, reject: (reason?: unknown) => void) => void
-// 	) {
-// 		super((resolve, reject) => {
-// 			if (executor) return executor(resolve, reject)
-// 			this.#resolve = resolve
-// 			this.#reject = reject
-// 		})
-// 	}
-
-// 	resolve(accessor: symbol, value: T) {
-// 		if (accessor !== this.#accessor) throw new Error("Caller cannot resolve Promise")
-// 		this.#resolve(value)
-// 	}
-
-// 	reject(accessor: symbol, reason: unknown) {
-// 		if (accessor !== this.#accessor) throw new Error("Caller cannot reject Promise")
-// 		this.#reject(reason)
-// 	}
-
-// 	cast() {
-// 		return this as Promise<T>
-// 	}
-
-// 	// NOTE: only an `asyncIterator` is needed to avoid extra `await` on async iteration of RPC
-// 	// (otherwise, just return iterator from function call for statically imported modules)
-// 	[Symbol.asyncIterator]() {
-// 		return this
-// 	}
-// 	next(value: T) {
-// 		return Promise.resolve({ done: false, value })
-// 	}
-// 	return(value: T) {
-// 		return Promise.resolve({ done: true, value })
-// 	}
-// 	throw(value: T) {
-// 		return Promise.resolve({ done: true, value })
-// 	}
-// }
 
 interface MethodCatcherOptions {
 	/**
@@ -190,7 +144,7 @@ export function createMethodCatcher<ModuleType extends object = any>(options: Me
 							return result[p].bind(result)
 						}
 					} else if (typeof p === "symbol") {
-						// ... (create faux generator response with returned value)
+						// ... (considering creating faux generator response with returned value)
 						// return (function* () { yield result })()
 					}
 				}

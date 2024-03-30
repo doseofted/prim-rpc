@@ -1,6 +1,6 @@
 import { describe, expect, test } from "vitest"
 import { createMethodCatcher } from "./proxy"
-import type { RpcCall } from "../interfaces"
+import type { RpcCall } from "../types/rpc-structure"
 
 type PotentialModuleShape = {
 	this: {

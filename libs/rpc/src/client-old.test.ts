@@ -8,7 +8,9 @@
 /* eslint-disable @typescript-eslint/no-unsafe-return -- Test the unexpected */
 
 import { describe, test, expect } from "vitest"
-import { JsonHandler, createPrimClient, createPrimServer } from "."
+import { createPrimClient } from "./client"
+import { createPrimServer } from "./server"
+import type { JsonHandler } from "./interfaces"
 import type * as exampleClient from "@doseofted/prim-example"
 import * as exampleServer from "@doseofted/prim-example"
 import jsonHandler from "superjson"

@@ -1,6 +1,6 @@
 /* eslint-disable @typescript-eslint/no-unused-vars */
-import type { PossibleModule, PrimOptions } from "../interfaces"
-import type { RpcModule } from "../types/rpc-module"
+import type { PrimOptions } from "../interfaces"
+import type { RpcModule, PossibleModule } from "../types/rpc-module"
 import type { MergeModuleMethods } from "../types/merge"
 import { createPrimOptions } from "../options"
 import { isDefined } from "emery"
@@ -42,7 +42,7 @@ export function createPrimClient<
 			if (getUnfulfilledModule(options.module) instanceof Promise) return next
 			const given = handleLocalModuleMethod(rpc, options, next)
 			if (given === next) return next
-			if (typeof given === "object" && Symbol.iterator in given) return given
+			if (typeof given === "object" && (Symbol.iterator in given || Symbol.asyncIterator in given)) return given
 			// TODO: handle RPC (provide async iterable that iterates on server events)
 			throw "not implemented yet"
 		},

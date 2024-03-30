@@ -1,11 +1,5 @@
-import type {
-	BlobRecords,
-	CommonServerResponseOptions,
-	CommonServerSimpleGivenOptions,
-	RpcAnswer,
-	RpcBase,
-	RpcCall,
-} from "./interfaces"
+import type { BlobRecords, CommonServerResponseOptions, CommonServerSimpleGivenOptions } from "./interfaces"
+import type { RpcAnswer, RpcBase, RpcCall } from "./types/rpc-structure"
 
 export const NotGiven = Symbol("unknown")
 export const PrimRpcSpecific = Symbol("primRpc")

@@ -6,10 +6,8 @@ export { createPrimClient } from "./client"
 export { createPrimServer } from "./server"
 export * as testing from "./testing"
 
+export type { RpcAnswer, RpcCall } from "./types/rpc-structure"
 export type {
-	// Basic RPC structures
-	RpcAnswer,
-	RpcCall,
 	// Prim-RPC options, both server and client side
 	PrimOptions,
 	PrimServerOptions,

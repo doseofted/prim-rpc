@@ -23,20 +23,19 @@ import { createPrimOptions, primMajorVersion, useVersionInRpc } from "./options"
 import { extractBlobData, mergeBlobData } from "./extract/blobs"
 import { PromiseResolveStatus } from "./interfaces"
 import type {
-	PromisifiedModule,
-	RpcCall,
 	PrimOptions,
-	RpcAnswer,
 	PrimWebSocketEvents,
 	PrimHttpEvents,
 	PrimHttpQueueItem,
 	BlobRecords,
 	JsonHandler,
 } from "./interfaces"
+import type { RpcCall, RpcAnswer } from "./types/rpc-structure"
+import type { RpcModule } from "./types/rpc-module"
 import { CB_PREFIX, PROMISE_PREFIX } from "./constants"
 import { extractPromisePlaceholders } from "./extract/promises"
 
-export type PrimClient<ModuleType extends PrimOptions["module"]> = PromisifiedModule<ModuleType>
+export type PrimClient<ModuleType extends PrimOptions["module"]> = RpcModule<ModuleType>
 // export interface PrimClient<ModuleType extends PrimOptions["module"]> {
 // 	client: PromisifiedModule<ModuleType>
 // 	destroy: () => void
@@ -76,10 +75,10 @@ export function createPrimClient<
 					const preRequestResult = configured.preRequest
 						? configured.preRequest(givenArgs, functionName) ?? { args: givenArgs }
 						: { args: givenArgs }
-					if (configured.preRequest && "result" in preRequestResult) {
-						return configured.postRequest(preRequestResult.result, functionName)
+					if (configured.preRequest && typeof preRequestResult === "object" && "result" in preRequestResult) {
+						return configured.postRequest(preRequestResult.args, preRequestResult.result, functionName)
 					}
-					const { args: argsProcessed } = preRequestResult
+					const { args: argsProcessed } = preRequestResult || { args: givenArgs }
 					// SECTION Server-side module handling
 					const targetFunction = getProperty(givenModule, givenPath) as ModuleType
 					const targetIsCallable = typeof targetFunction === "function"
@@ -98,11 +97,13 @@ export function createPrimClient<
 								// NOTE: return value of callback on server will have to be awaited since result is from client
 							}
 						})
+						// eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
 						const functionResult = Reflect.apply(targetFunction, targetContext, argsWithListeners)
-						// eslint-disable-next-line @typescript-eslint/no-unsafe-return
+						// eslint-disable-next-line @typescript-eslint/no-unsafe-return, @typescript-eslint/no-unsafe-assignment
 						const functionResultProcessed = configured.postRequest
-							? configured.postRequest(functionResult, functionName)
+							? configured.postRequest(argsWithListeners, functionResult, functionName)
 							: functionResult
+						// eslint-disable-next-line @typescript-eslint/no-unsafe-return
 						return configured.postRequest && typeof functionResultProcessed === "undefined"
 							? functionResult
 							: functionResultProcessed
@@ -178,7 +179,7 @@ export function createPrimClient<
 						return result
 							.then(functionResult => {
 								const functionResultProcessed = configured.postRequest
-									? configured.postRequest(functionResult, functionName)
+									? configured.postRequest(argsProcessed, functionResult, functionName)
 									: functionResult
 								return configured.postRequest && typeof functionResultProcessed === "undefined"
 									? functionResult
@@ -187,7 +188,7 @@ export function createPrimClient<
 							.catch(error => {
 								// eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
 								const functionResultProcessed = configured.postRequest
-									? configured.postRequest(error, functionName)
+									? configured.postRequest(argsProcessed, error, functionName)
 									: error
 								throw configured.postRequest && typeof functionResultProcessed === "undefined"
 									? error
@@ -216,7 +217,7 @@ export function createPrimClient<
 					return result
 						.then(functionResult => {
 							const functionResultProcessed = configured.postRequest
-								? configured.postRequest(functionResult, functionName)
+								? configured.postRequest(argsProcessed, functionResult, functionName)
 								: functionResult
 							return configured.postRequest && typeof functionResultProcessed === "undefined"
 								? functionResult
@@ -225,7 +226,7 @@ export function createPrimClient<
 						.catch(error => {
 							// eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
 							const functionResultProcessed = configured.postRequest
-								? configured.postRequest(error, functionName)
+								? configured.postRequest(argsProcessed, error, functionName)
 								: error
 							throw configured.postRequest && typeof functionResultProcessed === "undefined"
 								? error
@@ -239,6 +240,7 @@ export function createPrimClient<
 				}
 				if (givenModulePromise instanceof Promise) {
 					return givenModulePromise.then(givenModule => {
+						// eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
 						determinedModule = givenModule
 						// eslint-disable-next-line @typescript-eslint/no-unsafe-return
 						return applySync(this.path, determinedModule, targetContext, givenArgs)
@@ -359,7 +361,7 @@ export function createPrimClient<
 		timer = setTimeout(handleRpcCallsMethodPlugin, configured.clientBatchTime)
 	}
 	// !SECTION
-	const client = proxy as PromisifiedModule<ModuleType>
+	const client = proxy as RpcModule<ModuleType>
 	// function destroy() {
 	// 	wsDestroyedEvents.forEach(shutDown => shutDown())
 	// 	wsEvent.all.clear()

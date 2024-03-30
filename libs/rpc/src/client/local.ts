@@ -1,5 +1,6 @@
 import { givenFormLike, handlePossibleForm } from "../extract/blobs"
-import type { AnyFunction, JsonHandler, PossibleModule, PrimOptions, RpcCall } from "../interfaces"
+import type { AnyFunction, JsonHandler, PossibleModule, PrimOptions } from "../interfaces"
+import type { RpcCall } from "../types/rpc-structure"
 import { handlePotentialPromise } from "./wrapper"
 import getProperty from "just-safe-get"
 

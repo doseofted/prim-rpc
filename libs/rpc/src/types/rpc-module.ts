@@ -7,7 +7,7 @@ export type WithoutPromiseWrapper<Given> = Given extends PromiseLike<infer Value
 
 /** Given the parameters and return value of a function, create a second call signature that supports forms (unless disabled) */
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
-type FunctionWithFormParams<Params extends unknown[], Result, F extends true | false = true> = [F] extends [false]
+type FunctionWithFormParameter<Params extends unknown[], Result, F extends true | false = true> = [F] extends [false]
 	? {
 			(...args: Params): Result
 		}
@@ -27,7 +27,7 @@ export type RpcModule<
 	? ConditionalExcept<
 			{
 				[Key in Keys]: ModuleGiven[Key] extends (...args: infer A) => infer R
-					? FunctionWithFormParams<
+					? FunctionWithFormParameter<
 							A,
 							HandlePromise extends true ? (R extends Generator<infer G> ? AsyncGenerator<G> : Promise<Awaited<R>>) : R,
 							HandleForm

@@ -18,8 +18,6 @@ import type {
 	CommonServerResponseOptions,
 	PrimServerOptions,
 	PrimWebSocketEvents,
-	RpcAnswer,
-	RpcCall,
 	PrimServerSocketAnswer,
 	PrimServerSocketEvents,
 	PrimServerActionsBase,
@@ -28,6 +26,7 @@ import type {
 	PrimServer,
 	PrimServerSocketAnswerRpc,
 } from "./interfaces"
+import type { RpcAnswer, RpcCall } from "./types/rpc-structure"
 import { extractPromiseData } from "./extract/promises"
 import { checkRpcIdentifier, getFunctionRpcProperty } from "./allow"
 
@@ -127,6 +126,7 @@ function createServerActions(
 				if (typeof error === "object" && "primRpc" in error && error.primRpc === PrimRpcSpecific) {
 					// FIXME: errors aren't expected to be thrown here but is needed for next step
 					// use same pattern from Prim RPC client to handle special objects
+					// eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
 					const internalError: RpcCall = { method: "_error_", args: error }
 					return internalError
 				}
