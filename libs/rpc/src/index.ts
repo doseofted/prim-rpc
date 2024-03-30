@@ -7,6 +7,7 @@ export { createPrimServer } from "./server"
 export * as testing from "./testing"
 
 export type { RpcAnswer, RpcCall } from "./types/rpc-structure"
+export type { RpcModule } from "./types/rpc-module"
 export type {
 	// Prim-RPC options, both server and client side
 	PrimOptions,
@@ -23,9 +24,6 @@ export type {
 	// needed by plugins or otherwise
 	PrimServerEvents,
 	BlobRecords,
-	// other potentially useful utilities
-	AnyFunction,
-	RpcModule,
 	// Miscellaneous options unlikely to be used but still possible
 	CommonServerResponseOptions,
 	CommonServerSimpleGivenOptions,

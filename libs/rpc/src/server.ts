@@ -11,7 +11,6 @@ import { createPrimClient } from "./client"
 import { extractBlobData, mergeBlobData } from "./extract/blobs"
 import { PrimRpcSpecific, checkHttpLikeRequest, checkHttpLikeResponse, checkRpcCall, checkRpcResult } from "./validate"
 import type {
-	AnyFunction,
 	BlobRecords,
 	JsonHandler,
 	CommonServerSimpleGivenOptions,
@@ -156,7 +155,9 @@ function createServerActions(
 							typeof configured.module === "function" ? configured.module() : configured.module
 						) as PrimServerOptions["module"] | Promise<PrimServerOptions["module"]>
 						const givenModule = givenModulePromise instanceof Promise ? await givenModulePromise : givenModulePromise
-						const targetLocal = getProperty(givenModule, methodExpanded) as AnyFunction & { rpc?: boolean }
+						const targetLocal = getProperty(givenModule, methodExpanded) as ((...args: unknown[]) => unknown) & {
+							rpc?: boolean
+						}
 						let possiblyMethodOnMethod = false
 						if (givenModule) {
 							// While subsequent checks cover these situations, some key props will immediately invalidate a given method
@@ -217,13 +218,15 @@ function createServerActions(
 							// The module was provided and the target exists. Checks have already run and did not return an error
 							// so we can call the method using the client.
 							// call module with `client` if not provided directly to server (checks already ran on module, if provided)
-							const targetRemote = getProperty(client, methodExpanded) as AnyFunction & { rpc?: boolean }
+							const targetRemote = getProperty(client, methodExpanded) as ((...args: unknown[]) => unknown) & {
+								rpc?: boolean
+							}
 							const preCallResult = configured.preCall ? configured.preCall(args, targetLocal) ?? { args } : { args }
 							if (configured.preCall && "result" in preCallResult) {
 								return { ...rpcBase, result: await preCallResult.result }
 							}
 							const { args: processedArgs } = preCallResult
-							const result = (await Reflect.apply(targetRemote, context, processedArgs)) as unknown
+							const result = await Reflect.apply(targetRemote, context, processedArgs)
 							const [resultExtracted, promisesRecord] = extractPromiseData(
 								result,
 								serverOptions?.flags?.supportMultiplePromiseResults
@@ -255,7 +258,9 @@ function createServerActions(
 							const { module: _moduleProvided, ...limitedOptions } = serverOptions
 							// create client that doesn't have access to module (target may not exist but other targets might)
 							const { client: limitedClient } = createPrimInstance(limitedOptions)
-							const targetRemote = getProperty(limitedClient, methodExpanded) as AnyFunction & { rpc?: boolean }
+							const targetRemote = getProperty(limitedClient, methodExpanded) as ((...args: unknown[]) => unknown) & {
+								rpc?: boolean
+							}
 							// const targetLocal = getProperty(givenModule, methodExpanded) as AnyFunction & { rpc?: boolean }
 							// const processedArgs = preprocess(...args).bind(targetLocal)
 							const preCallResult = configured.preCall ? configured.preCall(args) ?? { args } : { args }
@@ -263,7 +268,7 @@ function createServerActions(
 								return { ...rpcBase, result: await preCallResult.result }
 							}
 							const { args: processedArgs } = preCallResult
-							const result = (await Reflect.apply(targetRemote, context, processedArgs)) as unknown
+							const result = await Reflect.apply(targetRemote, context, processedArgs)
 							const functionResultProcessed = configured.postCall ? configured.postCall(result) : result
 							return configured.postCall && typeof functionResultProcessed === "undefined"
 								? { ...rpcBase, result: result }

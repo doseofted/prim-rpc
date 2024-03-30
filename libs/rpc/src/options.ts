@@ -4,7 +4,7 @@
 
 import { defu } from "defu"
 import { destr } from "destr"
-import { PrimOptions, PrimServerOptions } from "./interfaces"
+import type { PrimOptions, PrimServerOptions } from "./interfaces"
 import type { RpcCall } from "./types/rpc-structure"
 /**
  * As Prim+RPC introduces new updates to RPC message structure, update this version.

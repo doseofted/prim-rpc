@@ -6,7 +6,8 @@
 
 import { describe, test, expect } from "vitest"
 import { createPrimServer } from "."
-import { PrimServerActionsExtended, RpcAnswer, RpcCall } from "./interfaces"
+import type { PrimServerActionsExtended } from "./interfaces"
+import type { RpcAnswer, RpcCall } from "./types/rpc-structure"
 import type * as exampleClient from "@doseofted/prim-example"
 import * as exampleServer from "@doseofted/prim-example"
 import queryString from "query-string"
@@ -44,7 +45,7 @@ describe("Prim Server can call methods with local module", () => {
 	})
 	test("using a JSON body", async () => {
 		const server = prim.server()
-		const call: RpcCall = {
+		const call: RpcCall<string, unknown> = {
 			method: "sayHello",
 			args: { greeting: "Hola", name: "Ted" },
 			id: 1,
@@ -73,7 +74,7 @@ describe("Prim Server can call methods with dynamically imported module", () => 
 	test("function that returns a dynamic import", async () => {
 		const prim = createPrimServer({ module: () => import("@doseofted/prim-example"), prefix: "/prim" })
 		const server = prim.server()
-		const call: RpcCall = {
+		const call: RpcCall<string, unknown> = {
 			method: "sayHello",
 			args: { greeting: "Hola", name: "Ted" },
 			id: 1,
@@ -87,7 +88,7 @@ describe("Prim Server can call methods with dynamically imported module", () => 
 })
 
 /** Utility to make sending POST-like requests easier for tests */
-async function handlePost(server: PrimServerActionsExtended, call: RpcCall): Promise<RpcAnswer> {
+async function handlePost(server: PrimServerActionsExtended, call: RpcCall<string, unknown>): Promise<RpcAnswer> {
 	const body = JSON.stringify(call)
 	const response = await server.call({ method: "POST", body })
 	// eslint-disable-next-line @typescript-eslint/no-unsafe-argument
@@ -245,7 +246,7 @@ test("Prim Server can call remote methods (without module directly)", async () =
 	createPrimServer({ module, callbackHandler, methodHandler }) // server 1
 	const prim = createPrimServer<IModule>({ callbackPlugin, methodPlugin }) // server 2
 	const server = prim.server()
-	const call: RpcCall = {
+	const call: RpcCall<string, unknown> = {
 		method: "sayHello",
 		args: { greeting: "Hellooo", name: "Ted" },
 		id: 1,

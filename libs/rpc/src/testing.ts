@@ -15,7 +15,6 @@ import {
 	PrimServerOptions,
 } from "./interfaces"
 import { createPrimServer } from "./server"
-import type { PartialDeep } from "type-fest"
 
 // NOTE: these testing plugins are intended to mimic interactions with an HTTP and WS server in a single file
 
@@ -213,7 +212,7 @@ export function createPrimTestingSuite<Module extends object, Ctx = unknown>(
 		callbackHandler,
 	})
 	// FIXME: reconsider how partial modules are provided to client and how it interacts with type parameter
-	const client = createPrimClient<PartialDeep<Module>>({
+	const client = createPrimClient({
 		...clientOptions,
 		methodPlugin,
 		callbackPlugin,

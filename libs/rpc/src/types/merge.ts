@@ -1,5 +1,3 @@
-import type { AnyFunction } from "../interfaces"
-
 /** Merge two separate modules' methods into one. The second module will override the first as needed. */
 export type MergeModuleMethods<
 	ModuleGiven extends object,
@@ -11,8 +9,8 @@ export type MergeModuleMethods<
 		: Override
 	: {
 			[Key in Keys]: Key extends keyof Override
-				? ModuleGiven[Key] extends AnyFunction
-					? Override[Key] extends AnyFunction
+				? ModuleGiven[Key] extends (...args: unknown[]) => unknown
+					? Override[Key] extends (...args: unknown[]) => unknown
 						? Override[Key]
 						: ModuleGiven[Key]
 					: Override[Key] extends object
