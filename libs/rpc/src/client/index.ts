@@ -33,8 +33,18 @@ export function createPrimClient<
 			const localResult = handleLocalModuleMethod(rpc, options, next)
 			return handlePotentialPromise(localResult, localResult => {
 				if (localResult !== next) return localResult
+				// TODO: handle RPC (provide promise that resolves for server events)
 				throw "not implemented yet"
 			})
+		},
+		onIterable(rpc, next) {
+			// first determine if iterable result is given on local module
+			if (getUnfulfilledModule(options.module) instanceof Promise) return next
+			const given = handleLocalModuleMethod(rpc, options, next)
+			if (given === next) return next
+			if (typeof given === "object" && Symbol.iterator in given) return given
+			// TODO: handle RPC (provide async iterable that iterates on server events)
+			throw "not implemented yet"
 		},
 	})
 }

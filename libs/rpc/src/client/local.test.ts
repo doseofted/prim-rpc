@@ -9,6 +9,14 @@ const exampleModule = {
 	anError() {
 		throw "Uh-oh"
 	},
+	async promised() {
+		return await Promise.resolve("Hello!")
+	},
+	*generated() {
+		yield 1
+		yield 2
+		yield 3
+	},
 }
 
 describe("local client works with static import", () => {
@@ -32,6 +40,27 @@ describe("local client works with static import", () => {
 		}
 		const result = () => handleLocalModuleMethod(rpc, options)
 		expect(result).toThrow("Uh-oh")
+	})
+
+	test("with promise", async () => {
+		const rpc: RpcCall<string, unknown[]> = {
+			method: "promised",
+			args: [],
+		}
+		const result = handleLocalModuleMethod(rpc, options) as Generator<number>
+		await expect(result).resolves.toBe("Hello!")
+	})
+
+	test("with generator", () => {
+		const rpc: RpcCall<string, unknown[]> = {
+			method: "generated",
+			args: [],
+		}
+		const result = handleLocalModuleMethod(rpc, options) as Generator<number>
+		let j = 1
+		for (const i of result) {
+			expect(i).toBe(j++)
+		}
 	})
 })
 

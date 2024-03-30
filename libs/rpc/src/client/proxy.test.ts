@@ -5,16 +5,22 @@ import type { RpcCall } from "../interfaces"
 type PotentialModuleShape = {
 	this: {
 		is(): {
+			next(): RpcCall
 			a: {
 				test(): {
 					ok: {
 						$end(): RpcCall
 					}
 				}
+				generator(): Generator<number>
+			}
+			an: {
+				asyncGenerator(): AsyncGenerator<number>
 			}
 		}
 	}
 	testing: {
+		next(): string
 		nonPromise: () => string
 		promise: () => Promise<string>
 	}
@@ -41,22 +47,74 @@ type PotentialModuleShape = {
 
 describe("RPC proxy creates RPC-like structure, including chains", () => {
 	const given = createMethodCatcher<PotentialModuleShape>({
-		onAwaited(rpc, _next) {
-			rpc.id = 123
-			return rpc
-		},
 		onMethod(rpc, next) {
 			const keyword = "$end"
-			const keywordFound = rpc?.method?.endsWith(keyword) || rpc?.chain?.slice().pop().method.endsWith(keyword)
+			const method = [rpc.method, rpc.chain?.map(c => c.method)].flat().filter(Boolean).join(".")
+			const keywordFound = method.endsWith(keyword)
 			if (keywordFound) {
 				rpc.id = 123
 				return rpc
 			}
-			if (rpc.method === "testing.nonPromise") {
+			if (method === "testing.nonPromise") {
 				return "Hello"
-			}
-			if (rpc.method === "testing.promise") {
+			} else if (method === "testing.promise") {
 				return new Promise(r => r("Hello"))
+			} else if (method === "testing.next") {
+				return "I'm next!"
+			}
+			return next
+		},
+		onAwaited(rpc, _next) {
+			rpc.id = 123
+			return rpc
+		},
+		onIterable(rpc, next) {
+			const method = [rpc.method, rpc.chain?.map(c => c.method)].flat().filter(Boolean).join(".")
+			function generated(): Generator<unknown> {
+				let i = 1
+				return {
+					[Symbol.iterator]() {
+						// eslint-disable-next-line @typescript-eslint/no-unsafe-return
+						return this
+					},
+					next(value) {
+						return { value: value ?? i++, done: i > 3 }
+					},
+					return(value) {
+						// eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
+						return { value: value ?? i, done: true }
+					},
+					throw(error) {
+						// eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
+						return { value: error, done: true }
+					},
+				}
+			}
+			if ("this.is.a.generator" === method) {
+				return generated()
+			}
+			function asyncGenerated(): AsyncGenerator<unknown> {
+				let i = 1
+				return {
+					[Symbol.asyncIterator]() {
+						// eslint-disable-next-line @typescript-eslint/no-unsafe-return
+						return this
+					},
+					next(value) {
+						return Promise.resolve({ value: value ?? i++, done: i > 3 })
+					},
+					return(value) {
+						// eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
+						return Promise.resolve({ value: value ?? i, done: true })
+					},
+					throw(error) {
+						// eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
+						return Promise.resolve({ value: error, done: true })
+					},
+				}
+			}
+			if ("this.is.an.asyncGenerator" === method) {
+				return asyncGenerated()
 			}
 			return next
 		},
@@ -77,11 +135,14 @@ describe("RPC proxy creates RPC-like structure, including chains", () => {
 	test("Override a specified method to return a value immediately", async () => {
 		expect(given.testing.nonPromise()).toBe("Hello")
 		await expect(given.testing.promise()).resolves.toBe("Hello")
+		// expect(given.testing.next()).toBe("I'm next!")
 	})
 
 	test("a call to a promise method signifies the end of a chain", async () => {
 		const testing = given.test.testing("test").test.tested("test")
+
 		expect(testing).toBeInstanceOf(Promise)
+
 		await expect(testing).resolves.toEqual({
 			id: 123,
 			method: "test.testing",
@@ -93,11 +154,13 @@ describe("RPC proxy creates RPC-like structure, including chains", () => {
 				},
 			],
 		})
+
 		await expect(given.hello("Ted", "Hi!")).resolves.toEqual({
 			id: 123,
 			method: "hello",
 			args: ["Ted", "Hi!"],
 		})
+
 		await expect(given.select.from("users").where("id", "=", 1).execute()).resolves.toEqual({
 			id: 123,
 			method: "select.from",
@@ -113,5 +176,42 @@ describe("RPC proxy creates RPC-like structure, including chains", () => {
 				},
 			],
 		})
+
+		// promises are proxied first so iterator method names can be used here
+		await expect(given.this.is().next()).resolves.toEqual({
+			id: 123,
+			method: "this.is",
+			args: [],
+			chain: [
+				{
+					method: "next",
+					args: [],
+				},
+			],
+		})
+	})
+
+	test("a call to an iterator method signifies the end of a chain", async () => {
+		const iterator1 = given.this.is().a.generator()
+		let j = 1
+		for (const i of iterator1) {
+			expect(i).toEqual(j++)
+		}
+
+		const iterator2 = given.this.is().a.generator()
+		expect(iterator2.next()).toEqual({ value: 1, done: false })
+		expect(iterator2.next()).toEqual({ value: 2, done: false })
+		expect(iterator2.next()).toEqual({ value: 3, done: true })
+
+		const asyncIterator1 = given.this.is().an.asyncGenerator()
+		j = 1
+		for await (const rpc of asyncIterator1) {
+			expect(rpc).toEqual(j++)
+		}
+
+		const asyncIterator2 = given.this.is().an.asyncGenerator()
+		await expect(asyncIterator2.next()).resolves.toEqual({ value: 1, done: false })
+		await expect(asyncIterator2.next()).resolves.toEqual({ value: 2, done: false })
+		await expect(asyncIterator2.next()).resolves.toEqual({ value: 3, done: true })
 	})
 })
