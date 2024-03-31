@@ -8,13 +8,6 @@ import type { PrimOptions } from "../interfaces"
 import type { RpcModule, PossibleModule } from "../types/rpc-module"
 import type { MergeModuleMethods } from "../types/merge"
 
-// export function createPrimClient<
-// 	ModuleType extends PossibleModule = never,
-// 	GivenOptions extends PrimOptions = PrimOptions,
-// >(options?: GivenOptions) {
-// 	return new Proxy({}, {}) as RpcModule<ModuleType>
-// }
-
 export function createPrimClient<
 	ModuleType extends PossibleModule = never,
 	GivenOptions extends PrimOptions = PrimOptions,

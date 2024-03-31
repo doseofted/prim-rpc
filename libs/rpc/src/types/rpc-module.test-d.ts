@@ -64,6 +64,7 @@ describe("RpcModule produces expected types for developer", () => {
 	test("with potential synchronous generator in module", () => {
 		type Module = () => Promise<{
 			a: {
+				alreadyAsync(): AsyncGenerator<string>
 				generator(test: number): Generator<string>
 				property: {
 					here: string
@@ -74,6 +75,8 @@ describe("RpcModule produces expected types for developer", () => {
 		type ProducedModule = RpcModule<Module>
 		type ExpectedModule = {
 			a: {
+				alreadyAsync(): AsyncGenerator<string>
+				alreadyAsync(test: SubmitEvent | FormData | HTMLFormElement): AsyncGenerator<string>
 				generator(test: number): AsyncGenerator<string>
 				generator(test: SubmitEvent | FormData | HTMLFormElement): AsyncGenerator<string>
 				// eslint-disable-next-line @typescript-eslint/ban-types
