@@ -46,7 +46,9 @@ describe("RpcModule produces expected types for developer", () => {
 				b: {
 					c(test: number): string
 				}
+				lol: string
 			}
+			what: string
 		}>
 		type ProducedModule = RpcModule<Module, false, false>
 		type ExpectedModule = {
@@ -63,12 +65,19 @@ describe("RpcModule produces expected types for developer", () => {
 		type Module = () => Promise<{
 			a: {
 				generator(test: number): Generator<string>
+				property: {
+					here: string
+					somethingElse: number
+				}
 			}
 		}>
 		type ProducedModule = RpcModule<Module>
 		type ExpectedModule = {
 			a: {
 				generator(test: number): AsyncGenerator<string>
+				generator(test: SubmitEvent | FormData | HTMLFormElement): AsyncGenerator<string>
+				// eslint-disable-next-line @typescript-eslint/ban-types
+				property: {}
 			}
 		}
 		expectTypeOf<ProducedModule>().toMatchTypeOf<ExpectedModule>()
