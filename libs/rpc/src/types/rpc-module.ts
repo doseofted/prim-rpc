@@ -16,6 +16,8 @@ type FunctionWithFormParameter<Params extends unknown[], Result, F extends true 
 			(formLike: SubmitEvent | FormData | HTMLFormElement): Result
 		}
 
+export type RpcMethodSpecifier = true | "idempotent"
+
 export type RpcModule<
 	ModuleGiven extends PossibleModule,
 	HandleForm extends true | false = true,

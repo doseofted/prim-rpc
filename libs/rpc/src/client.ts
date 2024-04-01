@@ -25,7 +25,7 @@ import { PromiseResolveStatus } from "./interfaces"
 import type { PrimOptions, PrimWebSocketEvents, PrimHttpEvents, PrimHttpQueueItem, BlobRecords } from "./interfaces"
 import type { RpcCall, RpcAnswer } from "./types/rpc-structure"
 import type { PossibleModule, RpcModule } from "./types/rpc-module"
-import { CB_PREFIX, PROMISE_PREFIX } from "./constants"
+import { RpcPlaceholder, placeholderName } from "./constants"
 import { extractPromisePlaceholders } from "./extract/promises"
 
 export type PrimClient<ModuleType extends PossibleModule> = RpcModule<ModuleType>
@@ -77,7 +77,7 @@ export function createPrimClient<
 					if (targetIsCallable) {
 						// if an argument is a callback reference, the created callback below will send the result back to client
 						const argsWithListeners = argsProcessed.map(arg => {
-							const argIsReferenceToCallback = typeof arg === "string" && arg.startsWith(CB_PREFIX)
+							const argIsReferenceToCallback = typeof arg === "string" && arg.startsWith(RpcPlaceholder.CallbackPrefix)
 							if (!argIsReferenceToCallback) {
 								return arg
 							}
@@ -120,7 +120,7 @@ export function createPrimClient<
 							return arg
 						}
 						callbacksWereGiven = true
-						const callbackReferenceIdentifier = [CB_PREFIX, nanoid()].join("")
+						const callbackReferenceIdentifier = placeholderName(RpcPlaceholder.CallbackPrefix)
 						const handleRpcCallbackResult = (msg: RpcAnswer) => {
 							if (msg.id !== callbackReferenceIdentifier) {
 								return
@@ -142,7 +142,7 @@ export function createPrimClient<
 						const result = new Promise<RpcAnswer>((resolve, reject) => {
 							const promiseEvents = mitt<Record<string | number, unknown>>()
 							wsEvent.on("response", answer => {
-								if (answer.id.toString().startsWith(PROMISE_PREFIX)) {
+								if (answer.id.toString().startsWith(RpcPlaceholder.PromisePrefix)) {
 									promiseEvents.emit(answer.id, answer.result)
 									promiseEvents.off(answer.id)
 									return

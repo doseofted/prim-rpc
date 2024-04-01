@@ -9,10 +9,8 @@ export type MergeModuleMethods<
 		: Override
 	: {
 			[Key in Keys]: Key extends keyof Override
-				? ModuleGiven[Key] extends (...args: unknown[]) => unknown
-					? Override[Key] extends (...args: unknown[]) => unknown
-						? Override[Key]
-						: ModuleGiven[Key]
+				? Override[Key] extends (...args: unknown[]) => unknown
+					? Override[Key]
 					: Override[Key] extends object
 						? ModuleGiven[Key] extends object
 							? MergeModuleMethods<ModuleGiven[Key], Override[Key]>

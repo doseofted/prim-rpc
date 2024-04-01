@@ -2,7 +2,7 @@
 // Copyright 2023 Ted Klingenberg
 // SPDX-License-Identifier: Apache-2.0
 
-import { BLOB_PREFIX } from "../constants"
+import { RpcPlaceholder } from "../constants"
 import { extractGivenData, mergeGivenData } from "./base"
 
 /**
@@ -92,7 +92,7 @@ export function extractBlobData(
 		return extractBlobData(newGiven, true)
 	}
 	// now we can extract the blobs
-	const [newlyGiven, blobs] = extractGivenData(given, isBinaryLike, BLOB_PREFIX)
+	const [newlyGiven, blobs] = extractGivenData(given, isBinaryLike, RpcPlaceholder.BinaryPrefix)
 	return [newlyGiven, blobs, fromForm]
 }
 
@@ -107,5 +107,5 @@ export function extractBlobData(
  * This undoes `handlePossibleBlobs()`.
  */
 export function mergeBlobData(given: unknown, blobs: Record<string, Blob | Buffer>): unknown {
-	return mergeGivenData(given, blobs, BLOB_PREFIX)
+	return mergeGivenData(given, blobs, RpcPlaceholder.BinaryPrefix)
 }

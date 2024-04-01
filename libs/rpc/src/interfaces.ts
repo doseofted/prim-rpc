@@ -9,18 +9,6 @@ import type { RpcCall, RpcAnswer } from "./types/rpc-structure"
 import type { WithoutFunctionWrapper, WithoutPromiseWrapper } from "./types/rpc-module"
 import type { RpcModule } from "./types/rpc-module"
 
-// SECTION RPC additional structures
-export enum UniquePrefixName {
-	/** Prefix for binary data */
-	Binary = "bin",
-	/** Prefix for callbacks */
-	Callback = "cb",
-	/** Prefix for promises */
-	Promise = "prom",
-}
-export type UniqueTypePrefix = `_${UniquePrefixName}_${string}`
-// !SECTION
-
 // SECTION HTTP/WebSocket events
 export enum PromiseResolveStatus {
 	/** Promise has not been created yet */ Unhandled,

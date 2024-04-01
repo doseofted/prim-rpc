@@ -1,5 +1,5 @@
 import { nanoid } from "nanoid"
-import type { UniqueTypePrefix } from "../interfaces"
+import { RpcPlaceholder } from "../constants"
 
 /**
  * Extract given type `T` from any given argument (object/array/primitive) to form `Record<string, T>`.
@@ -16,7 +16,7 @@ import type { UniqueTypePrefix } from "../interfaces"
 export function extractGivenData<Extracted = unknown>(
 	given: unknown,
 	extractMatches: (given: unknown) => Extracted,
-	prefix: UniqueTypePrefix
+	prefix: RpcPlaceholder
 ): [given: unknown, extracted: Record<string, Exclude<Extracted, false>>] {
 	const extractedRecord: Record<string, Exclude<Extracted, false>> = {}
 	const extracted = extractMatches(given)
@@ -76,7 +76,7 @@ export function extractGivenData<Extracted = unknown>(
 export function mergeGivenData<Extract = unknown>(
 	given: unknown,
 	extracted: Record<string, Extract>,
-	prefix: UniqueTypePrefix
+	prefix: RpcPlaceholder
 ): unknown {
 	if (typeof given === "string" && given.startsWith(prefix)) {
 		return extracted[given] ?? given

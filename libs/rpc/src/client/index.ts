@@ -8,7 +8,7 @@ import type { PrimOptions } from "../interfaces"
 import type { RpcModule, PossibleModule } from "../types/rpc-module"
 import type { MergeModuleMethods } from "../types/merge"
 
-export function createPrimClient<
+export function createRpcClient<
 	ModuleType extends PossibleModule = never,
 	GivenOptions extends PrimOptions = PrimOptions,
 >(options?: GivenOptions) {

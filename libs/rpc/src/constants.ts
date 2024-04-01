@@ -1,6 +1,11 @@
-/** Callback prefix */
-export const CB_PREFIX = "_cb_"
-/** Binary prefix (Blob/File) */
-export const BLOB_PREFIX = "_bin_"
-/** Promise prefix */
-export const PROMISE_PREFIX = "_prom_"
+import { nanoid } from "nanoid"
+
+export enum RpcPlaceholder {
+	CallbackPrefix = "_cb_",
+	BinaryPrefix = "_bin_",
+	PromisePrefix = "_prom_",
+}
+
+export function placeholderName(type: RpcPlaceholder, id?: string) {
+	return `${type}${id ?? nanoid()}`
+}

@@ -83,7 +83,7 @@
 			"statusBar.foreground": "#15202b",
 			"statusBarItem.hoverBackground": "#3999b5",
 			"statusBarItem.remoteBackground": "#57b0ca",
-			"statusBarItem.remoteForeground": "#15202b",
+			"statusBarItem.remoteForeground": "#15202b"
 		},
 		"typescript.tsdk": "🌳 Prim+RPC/node_modules/typescript/lib",
 	},

@@ -1,4 +1,4 @@
-import { PROMISE_PREFIX } from "../constants"
+import { RpcPlaceholder } from "../constants"
 import { featureFlags } from "../flags"
 import { extractGivenData, mergeGivenData } from "./base"
 
@@ -11,7 +11,7 @@ export function extractPromiseData(
 	enabled = featureFlags.supportMultiplePromiseResults
 ): [given: unknown, promises: Record<string, Promise<unknown>>] {
 	if (!enabled) return [given, {}]
-	return extractGivenData(given, isPromise, PROMISE_PREFIX)
+	return extractGivenData(given, isPromise, RpcPlaceholder.PromisePrefix)
 }
 
 /* export async function resolveExtractedPromises<T = unknown>(promises: Record<string, Promise<T>>) {
@@ -29,11 +29,11 @@ export function extractPromiseData(
 } */
 
 function mergePromiseData(given: unknown, promises: Record<string, Promise<unknown>>): unknown {
-	return mergeGivenData(given, promises, PROMISE_PREFIX)
+	return mergeGivenData(given, promises, RpcPlaceholder.PromisePrefix)
 }
 
 function isPromisePlaceholder(given: unknown) {
-	return typeof given === "string" && given.startsWith(PROMISE_PREFIX) ? given : false
+	return typeof given === "string" && given.startsWith(RpcPlaceholder.PromisePrefix) ? given : false
 }
 
 /** Take Promise placeholders from a server-given result and turn those into real Promises */
@@ -43,7 +43,7 @@ export function extractPromisePlaceholders(
 	enabled = featureFlags.supportMultiplePromiseResults
 ): unknown {
 	if (!enabled) return given
-	const [_, extracted] = extractGivenData(given, isPromisePlaceholder, PROMISE_PREFIX)
+	const [_, extracted] = extractGivenData(given, isPromisePlaceholder, RpcPlaceholder.PromisePrefix)
 	const extractedTransformed: Record<string, Promise<unknown>> = {}
 	for (const [replacedKey, originalKey] of Object.entries(extracted)) {
 		extractedTransformed[replacedKey] = new Promise(resolve => {
