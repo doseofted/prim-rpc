@@ -1,20 +1,17 @@
 /* eslint-disable @typescript-eslint/no-unused-vars */
 import { createPrimOptions } from "../options"
-import { isDefined } from "emery"
 import { createMethodCatcher } from "./proxy"
 import { handlePotentialPromise } from "./wrapper"
 import { getUnfulfilledModule, handleLocalModuleMethod } from "./local"
-import type { PrimOptions } from "../interfaces"
 import type { RpcModule, PossibleModule } from "../types/rpc-module"
 import type { MergeModuleMethods } from "../types/merge"
+import type { UserProvidedClientOptions } from "../options/client/provided"
 
 export function createRpcClient<
 	ModuleType extends PossibleModule = never,
-	GivenOptions extends PrimOptions = PrimOptions,
+	GivenOptions extends UserProvidedClientOptions = UserProvidedClientOptions,
 >(options?: GivenOptions) {
 	options = createPrimOptions<GivenOptions>(options)
-	const providedMethodPlugin = isDefined(options.methodPlugin)
-	const providedCallbackPlugin = isDefined(options.callbackPlugin)
 	// the returned client will catch all method calls given on it recursively
 	type FinalModule = MergeModuleMethods<
 		RpcModule<ModuleType, GivenOptions["handleForms"], true>,

@@ -5,7 +5,7 @@ import type {
 	RpcModule,
 	WithoutFunctionWrapper,
 	WithoutPromiseWrapper,
-} from "../types/rpc-module"
+} from "../../types/rpc-module"
 
 /**
  * An object conforming to `JSON` (with `parse` and `stringify` methods) that implements serialization/deserialization
@@ -146,7 +146,7 @@ export interface UserProvidedClientOptions<
 	 *
 	 * @default undefined
 	 */
-	preRequest?: (args: unknown[], name: string) => { args: unknown[] } | { result: unknown } | undefined | void
+	preRequest?: (args: unknown[], name: string) => { result?: unknown; args: unknown[] } | undefined | void
 	/**
 	 * Transform given result prior to being returned to the RPC caller. This hook may be asynchronous.
 	 * If a the RPC result is a thrown error, this hook will not be called and the error will be thrown at the call site.
@@ -157,11 +157,11 @@ export interface UserProvidedClientOptions<
 	 */
 	postRequest?: (args: unknown[], result: unknown, name: string) => unknown
 	/**
-	 * Transform given error prior to being thrown to the RPC caller. This hook may be asynchronous.
+	 * Transform given error prior to being thrown to the RPC caller.
 	 *
 	 * This hook may be useful for invalidating cache or global handling of errors in an app.
 	 *
 	 * @default undefined
 	 */
-	postError?: (args: unknown[], error: unknown, name: string) => unknown
+	onError?: (error: unknown, name: string) => unknown
 }

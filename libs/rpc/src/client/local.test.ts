@@ -2,12 +2,13 @@ import { describe, expect, test } from "vitest"
 import { handleLocalModuleMethod } from "./local"
 import type { PrimOptions } from "../interfaces"
 import type { RpcCall } from "../types/rpc-structure"
+import type { UserProvidedClientOptions } from "../options/client/provided"
 
 const exampleModule = {
 	hello(name?: string) {
 		return ["Hello", name].filter(given => given).join(" ")
 	},
-	anError() {
+	anError(..._args: unknown[]) {
 		throw "Uh-oh"
 	},
 	async promised() {
@@ -93,7 +94,7 @@ describe("local client works pre/post hooks", () => {
 	const options = {
 		module: exampleModule,
 		preRequest(args, name) {
-			if (name === "anError") return { result: "Fixed it" }
+			if (name === "anError" && args.length === 0) return { result: "Fixed it", args }
 			return {
 				args: args.map(arg => (typeof arg === "string" ? arg.toUpperCase() : arg)),
 			}
@@ -102,7 +103,10 @@ describe("local client works pre/post hooks", () => {
 			if (name === "hello" && args[0] === "STRANGER")
 				return typeof result === "string" ? result.replace(/^Hello/, "Good Morning") : result
 		},
-	} satisfies PrimOptions
+		onError(error, _name) {
+			return typeof error === "string" ? error.toUpperCase() : error
+		},
+	} satisfies UserProvidedClientOptions
 
 	test("pre-hook with modified args", () => {
 		const rpc: RpcCall<string, unknown[]> = {
@@ -120,7 +124,7 @@ describe("local client works pre/post hooks", () => {
 		}
 		const result = () => handleLocalModuleMethod(rpc, options)
 		expect(result()).toBe("Fixed it")
-		expect(result).not.toThrow("Uh-oh")
+		expect(result).not.toThrow(/^Uh-oh$/)
 	})
 
 	test("post-hook with modified result", () => {
@@ -130,5 +134,14 @@ describe("local client works pre/post hooks", () => {
 		}
 		const result = handleLocalModuleMethod(rpc, options)
 		expect(result).toBe("Good Morning STRANGER")
+	})
+
+	test("error-hook with modified result", () => {
+		const rpc: RpcCall<string, unknown[]> = {
+			method: "anError",
+			args: ["a serious one"],
+		}
+		const result = () => handleLocalModuleMethod(rpc, options)
+		expect(result).toThrow(/^UH-OH$/)
 	})
 })

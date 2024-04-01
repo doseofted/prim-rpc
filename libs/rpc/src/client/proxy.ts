@@ -15,7 +15,7 @@ function isIterablePropertyName(
 }
 
 /**
- * Prim+RPC expect a root RPC call to be given with an optional chain.
+ * Prim+RPC expects a root RPC call to be given with an optional chain.
  *
  * Given a chain of RPCs, convert it to a single root RPC with a chain of additional RPCs.
  */
@@ -53,6 +53,7 @@ interface MethodCatcherOptions {
 	 */
 	onIterable?: (rpc: RpcCall<string, unknown[]>, next: symbol) => unknown
 }
+
 /**
  * Creates a recursive Proxy that captures property access and method calls and
  * records them to a final RPC object, including method chaining.

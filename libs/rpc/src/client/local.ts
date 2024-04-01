@@ -1,5 +1,6 @@
 import { givenFormLike, handlePossibleForm } from "../extract/blobs"
-import type { JsonHandler, PossibleModule, PrimOptions } from "../interfaces"
+import type { PossibleModule } from "../interfaces"
+import type { UserProvidedClientOptions } from "../options/client/provided"
 import type { RpcCall } from "../types/rpc-structure"
 import { handlePotentialPromise } from "./wrapper"
 import getProperty from "just-safe-get"
@@ -39,24 +40,31 @@ export function getUnfulfilledModule(
  */
 export function handleLocalModuleMethod(
 	rpc: RpcCall<string, unknown[]>,
-	options: PrimOptions<PossibleModule, JsonHandler>,
+	options: UserProvidedClientOptions<PossibleModule>,
 	nextToken?: symbol
 ) {
 	const providedModule = getUnfulfilledModule(options.module)
-	return handlePotentialPromise(providedModule, providedModule => {
-		if (!providedModule) return nextToken
-		const method = getProperty(providedModule, rpc.method) as (...args: unknown[]) => unknown
-		if (method) {
-			const preprocessed = options.preRequest?.(rpc.args, rpc.method) || { args: rpc.args }
-			if (options.handleForms && Array.isArray(preprocessed.args) && givenFormLike(preprocessed.args[0])) {
-				preprocessed.args[0] = handlePossibleForm(preprocessed.args[0])
+	return handlePotentialPromise(
+		providedModule,
+		providedModule => {
+			if (!providedModule) return nextToken
+			const method = getProperty(providedModule, rpc.method) as (...args: unknown[]) => unknown
+			if (method) {
+				const preprocessed = options.preRequest?.(rpc.args, rpc.method) || { args: rpc.args }
+				if (options.handleForms && "args" in preprocessed && givenFormLike(preprocessed.args[0])) {
+					preprocessed.args[0] = handlePossibleForm(preprocessed.args[0])
+				}
+				if ("result" in preprocessed) {
+					return options.postRequest?.(preprocessed.args, preprocessed.result, rpc.method) ?? preprocessed.result
+				}
+				const result = method(...preprocessed.args)
+				return options.postRequest?.(preprocessed.args, result, rpc.method) ?? result
 			}
-			if ("result" in preprocessed) {
-				return options.postRequest?.(preprocessed.args, preprocessed.result, rpc.method) ?? preprocessed.result
-			}
-			const result = method(...preprocessed.args)
-			return options.postRequest?.(preprocessed.args, result, rpc.method) ?? result
+			return nextToken
+		},
+		error => {
+			const processedError = options.onError?.(error, rpc.method) ?? error
+			throw processedError
 		}
-		return nextToken
-	})
+	)
 }
