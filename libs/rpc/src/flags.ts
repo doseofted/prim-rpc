@@ -1,3 +1,8 @@
+// Part of the Prim+RPC project ( https://prim.doseofted.me/ )
+// Copyright 2023 Ted Klingenberg
+// SPDX-License-Identifier: Apache-2.0
+
+/** @deprecated */
 export const featureFlags = {
 	/**
 	 * This only works with the callback handler today. By default, Prim+RPC uses the available method plugin first if a

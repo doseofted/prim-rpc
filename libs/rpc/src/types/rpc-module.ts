@@ -1,4 +1,6 @@
-// import type { ConditionalExcept } from "type-fest"
+// Part of the Prim+RPC project ( https://prim.doseofted.me/ )
+// Copyright 2023 Ted Klingenberg
+// SPDX-License-Identifier: Apache-2.0
 
 export type PossibleModule = object
 

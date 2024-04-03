@@ -1,3 +1,7 @@
+// Part of the Prim+RPC project ( https://prim.doseofted.me/ )
+// Copyright 2023 Ted Klingenberg
+// SPDX-License-Identifier: Apache-2.0
+
 import { describe, expect, test } from "vitest"
 import { createMethodCatcher } from "./proxy"
 import type { RpcCall } from "../types/rpc-structure"

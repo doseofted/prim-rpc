@@ -1,3 +1,7 @@
+// Part of the Prim+RPC project ( https://prim.doseofted.me/ )
+// Copyright 2023 Ted Klingenberg
+// SPDX-License-Identifier: Apache-2.0
+
 /** Merge two separate modules' methods into one. The second module will override the first as needed. */
 export type MergeModuleMethods<
 	ModuleGiven extends object,

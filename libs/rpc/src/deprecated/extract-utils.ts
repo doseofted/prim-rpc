@@ -2,11 +2,11 @@
 // Copyright 2023 Ted Klingenberg
 // SPDX-License-Identifier: Apache-2.0
 
-import { RpcPlaceholder, placeholderOnly } from "../constants"
+import { RpcPlaceholder, resolvePlaceholder } from "../constants"
 import { featureFlags } from "../flags"
-import { extract, merge } from "./base"
-import { blobIdentifier, givenFormLike, handlePossibleForm } from "./blobs"
-import { promiseIdentifier } from "./promises"
+import { extract, merge } from "../extract/base"
+import { blobIdentifier, givenFormLike, handlePossibleForm } from "../extract/blobs"
+import { promiseIdentifier } from "../extract/promises"
 
 /**
  * Given a Blob, return an identifier. If given an object or an array,
@@ -76,7 +76,7 @@ function mergePromiseData(given: unknown, promises: Record<string, Promise<unkno
 
 /** @deprecated */
 function isPromisePlaceholder(given: unknown) {
-	return typeof given === "string" && given.startsWith(placeholderOnly(RpcPlaceholder.PromisePrefix))
+	return typeof given === "string" && given.startsWith(resolvePlaceholder(RpcPlaceholder.PromisePrefix))
 		? RpcPlaceholder.PromisePrefix
 		: null
 }
