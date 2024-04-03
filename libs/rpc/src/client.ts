@@ -20,13 +20,12 @@ import getProperty from "just-safe-get"
 import removeFromArray from "just-remove"
 import { deserializeError } from "serialize-error"
 import { createPrimOptions, primMajorVersion, useVersionInRpc } from "./options"
-import { extractBlobData, mergeBlobData } from "./extract/blobs"
+import { extractBlobData, mergeBlobData, extractPromisePlaceholders } from "./extract/deprecated"
 import { PromiseResolveStatus } from "./interfaces"
 import type { PrimOptions, PrimWebSocketEvents, PrimHttpEvents, PrimHttpQueueItem, BlobRecords } from "./interfaces"
 import type { RpcCall, RpcAnswer } from "./types/rpc-structure"
 import type { PossibleModule, RpcModule } from "./types/rpc-module"
-import { RpcPlaceholder, placeholderName } from "./constants"
-import { extractPromisePlaceholders } from "./extract/promises"
+import { RpcPlaceholder, placeholderName, placeholderOnly } from "./constants"
 
 export type PrimClient<ModuleType extends PossibleModule> = RpcModule<ModuleType>
 // export interface PrimClient<ModuleType extends PrimOptions["module"]> {
@@ -77,7 +76,8 @@ export function createPrimClient<
 					if (targetIsCallable) {
 						// if an argument is a callback reference, the created callback below will send the result back to client
 						const argsWithListeners = argsProcessed.map(arg => {
-							const argIsReferenceToCallback = typeof arg === "string" && arg.startsWith(RpcPlaceholder.CallbackPrefix)
+							const argIsReferenceToCallback =
+								typeof arg === "string" && arg.startsWith(placeholderOnly(RpcPlaceholder.CallbackPrefix))
 							if (!argIsReferenceToCallback) {
 								return arg
 							}
@@ -142,7 +142,7 @@ export function createPrimClient<
 						const result = new Promise<RpcAnswer>((resolve, reject) => {
 							const promiseEvents = mitt<Record<string | number, unknown>>()
 							wsEvent.on("response", answer => {
-								if (answer.id.toString().startsWith(RpcPlaceholder.PromisePrefix)) {
+								if (answer.id.toString().startsWith(placeholderOnly(RpcPlaceholder.PromisePrefix))) {
 									promiseEvents.emit(answer.id, answer.result)
 									promiseEvents.off(answer.id)
 									return

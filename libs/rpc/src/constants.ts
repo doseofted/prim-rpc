@@ -1,11 +1,16 @@
 import { nanoid } from "nanoid"
 
+/** Placeholder names for extracted values from RPC */
 export enum RpcPlaceholder {
-	CallbackPrefix = "_cb_",
-	BinaryPrefix = "_bin_",
-	PromisePrefix = "_prom_",
+	CallbackPrefix = "cb",
+	BinaryPrefix = "bin",
+	PromisePrefix = "prom",
 }
 
 export function placeholderName(type: RpcPlaceholder, id?: string) {
-	return `${type}${id ?? nanoid()}`
+	return `_${type}_${id ?? nanoid()}`
+}
+
+export function placeholderOnly(given: RpcPlaceholder) {
+	return placeholderName(given, "")
 }
