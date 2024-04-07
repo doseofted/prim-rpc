@@ -31,12 +31,14 @@ export function createRpcClient<
 			return given
 		},
 		onAwaited(rpc, next) {
-			const localResult = handleLocalModuleMethod(rpc, options, next)
-			return handlePotentialPromise(localResult, localResult => {
-				if (localResult !== next) return localResult
-				// TODO: handle RPC (provide promise that resolves for server events)
-				throw "not implemented yet"
-			})
+			return handlePotentialPromise(
+				() => handleLocalModuleMethod(rpc, options, next),
+				localResult => {
+					if (localResult !== next) return localResult
+					// TODO: handle RPC (provide promise that resolves for server events)
+					throw "not implemented yet"
+				}
+			)
 		},
 		onIterable(rpc, next) {
 			// first determine if iterable result is given on local module

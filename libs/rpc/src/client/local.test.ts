@@ -97,18 +97,22 @@ describe("local client works with dynamic import and function wrapper", () => {
 describe("local client works pre/post hooks", () => {
 	const options = {
 		module: exampleModule,
-		preRequest(args, name) {
-			if (name === "anError" && args.length === 0) return { result: "Fixed it", args }
-			return {
-				args: args.map(arg => (typeof arg === "string" ? arg.toUpperCase() : arg)),
+		onPreCall(args, name) {
+			if (name === "anError" && args.length === 0) {
+				return { result: "Fixed it", args }
+			}
+			args = args.map(arg => (typeof arg === "string" ? arg.toUpperCase() : arg))
+			return { args }
+		},
+		onPostCall(args, result, name) {
+			if (name === "hello" && args[0] === "STRANGER") {
+				result = typeof result === "string" ? result.replace(/^Hello/, "Good Morning") : result
+				return { result }
 			}
 		},
-		postRequest(args, result, name) {
-			if (name === "hello" && args[0] === "STRANGER")
-				return typeof result === "string" ? result.replace(/^Hello/, "Good Morning") : result
-		},
-		onError(error, _name) {
-			return typeof error === "string" ? error.toUpperCase() : error
+		onCallError(error, _name) {
+			error = typeof error === "string" ? error.toUpperCase() : error
+			return { error }
 		},
 	} satisfies UserProvidedClientOptions
 

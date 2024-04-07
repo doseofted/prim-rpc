@@ -8,36 +8,37 @@ function defaultError(error: unknown) {
 }
 
 /**
- * Given object `T` or `Promise<T>`, act on `T` in the
+ * Given a function that returns object `T` or `Promise<T>`, act on `T` in the
  * provided `handler` which should return some value `R` back, which will become
  * the final return value of this function, wrapped as `Promise<R>` if given
  * `Promise<T>`. If an error is thrown, it will be caught and will rethrow if
  * behavior is not overridden in given `error` handler.
  *
- * This is useful when logic needs to remain synchronous because the final
- * result may not always be a Promise. This function also makes this pattern
- * play nicer with TypeScript.
+ * While more verbose, this is useful when logic needs to remain synchronous
+ * because the final result may not always be a Promise. This function also
+ * makes this pattern play nicer with TypeScript.
  *
  * @example
  * ```ts
  * import staticImport from "./hello"
  * const dynamicImport = import("./hello")
  *
- * const useCacheIfAvailable = true
- * function hello(imported) {
- *   return handlePotentialPromise(imported, imported => {
- *     const greeting = imported.fetchHello(useCacheIfAvailable)
- *     return handlePotentialPromise(greeting, greeting => {
- *       return `${greeting} Testing!`
- *     })
+ * // without (it must be known whether promise is or isn't given)
+ * const same = dynamicImport.then(dynamicImport => {
+ *   const a = dynamicImport.hello()
+ *   const b = staticImport.hello()
+ *   return a === b
+ * })
+ * same.then(console.log) // true
+ * // with (function handles both cases)
+ * const same = handlePotentialPromise(() => dynamicImport, dynamicImport => {
+ *   const a = dynamicImport.hello()
+ *   return handlePotentialPromise(() => staticImport, staticImport => {
+ *     const b = staticImport.hello()
+ *     return a === b
  *   })
- * }
- *
- * hello(dynamicImport).then(console.log) // "Hello Testing!"
- * console.log(hello(staticImport)) // "Hello Testing!"
- * // -- or --
- * handlePotentialPromise(hello(dynamicImport), console.log) // "Hello Testing!"
- * handlePotentialPromise(hello(staticImport), console.log) // "Hello Testing!"
+ * })
+ * handlePotentialPromise(() => same, console.log) // true
  * ```
  */
 export function handlePotentialPromise<
@@ -50,12 +51,11 @@ export function handlePotentialPromise<
 		: Returned extends Promise<infer _>
 			? Promise<ReturnedResolved>
 			: Returned,
->(given: Given, handler: (value: GivenResolved) => Returned, error = defaultError): ReturnedFinal {
-	if (given instanceof Promise) {
-		return given.then(handler).catch(error) as ReturnedFinal
-	}
+>(given: () => Given, handler: (value: GivenResolved) => Returned, error = defaultError): ReturnedFinal {
 	try {
-		return handler(given as unknown as GivenResolved) as unknown as ReturnedFinal
+		const result = given()
+		if (result instanceof Promise) return result.then(handler).catch(error) as ReturnedFinal
+		return handler(result as unknown as GivenResolved) as unknown as ReturnedFinal
 	} catch (errorGiven) {
 		error(errorGiven)
 	}

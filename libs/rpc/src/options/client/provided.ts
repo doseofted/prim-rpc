@@ -10,6 +10,7 @@ import type {
 	WithoutFunctionWrapper,
 	WithoutPromiseWrapper,
 } from "../../types/rpc-module"
+import type { ResolverClient } from "../../resolver/types"
 
 /**
  * An object conforming to `JSON` (with `parse` and `stringify` methods) that implements serialization/deserialization
@@ -86,6 +87,8 @@ export interface UserProvidedClientOptions<
 	 * allowed on any method given in the module as `true` or `"idempotent"` (the value).
 	 *
 	 * Note that some built-in methods are disallowed regardless of this setting (for instance: `call`, `apply`, `bind`).
+	 *
+	 * @default {}
 	 */
 	allowedMethodsOnMethod?: { [methodName: string]: RpcMethodSpecifier }
 	/**
@@ -142,30 +145,54 @@ export interface UserProvidedClientOptions<
 	 */
 	handleForms?: FormHandling
 	/**
-	 * Transform given arguments prior to sending RPC to server. This hook may alternatively intercept a function call and
-	 * return a result early. This hook is expected to be synchronous and return an object with either `.args` or
-	 * `.result`, otherwise this function should return void to continue with the original arguments.
+	 * Special types such as Files/Blobs are extracted from given arguments/return values up to a certain depth
+	 * (nested objects and arrays). The default limit is `3` but this may be set lower to optimize performance or higher
+	 * to catch all nested, special types.
+	 *
+	 * @default 3
+	 */
+	handlingDepth?: number
+	/**
+	 * A plugin (or list of available plugins) used to send RPC and receive RPC results.
+	 */
+	resolverClient?: ResolverClient | ResolverClient[]
+	/**
+	 * Transform given arguments prior to calling a function. This hook may alternatively intercept a function call and
+	 * return a result early. This hook returns an object with either `.args` or `.result`, otherwise this function should
+	 * return void to continue with the original arguments.
 	 *
 	 * This may be useful for logging, caching, or other pre-processing of RPC calls.
 	 *
 	 * @default undefined
 	 */
-	preRequest?: (args: unknown[], name: string) => { result?: unknown; args: unknown[] } | undefined | void
+	onPreCall?: (
+		args: unknown[],
+		name: string,
+		props: Record<PropertyKey, unknown>
+	) => { result?: unknown; args: unknown[] } | Promise<{ result?: unknown; args: unknown[] }> | undefined | void
 	/**
-	 * Transform given result prior to being returned to the RPC caller. This hook may be asynchronous.
-	 * If a the RPC result is a thrown error, this hook will not be called and the error will be thrown at the call site.
+	 * Transform given result prior to being returned to the function caller. If an object with `.result` is returned,
+	 * the return value will be modified, otherwise this function should return void to continue with original return
+	 * value. If the result is a thrown error, this hook will not be called and an error will be thrown at the call site.
 	 *
 	 * This may be useful for logging, caching, or other post-processing of RPC results.
 	 *
 	 * @default undefined
 	 */
-	postRequest?: (args: unknown[], result: unknown, name: string) => unknown
+	onPostCall?: (
+		args: unknown[],
+		result: unknown,
+		name: string,
+		props: Record<PropertyKey, unknown>
+	) => { result?: unknown } | Promise<{ result?: unknown }> | undefined | void
 	/**
-	 * Transform given error prior to being thrown to the RPC caller.
+	 * Transform given error prior to being thrown to the RPC caller. A returned object with `.error` will be thrown as
+	 * the new error, otherwise this function should return void to continue with the original error. While it's also
+	 * possible to throw in this hook, it's recommended to return an object with `.error`.
 	 *
 	 * This hook may be useful for invalidating cache or global handling of errors in an app.
 	 *
 	 * @default undefined
 	 */
-	onError?: (error: unknown, name: string) => unknown
+	onCallError?: (error: unknown, name: string) => { error?: unknown } | Promise<{ error?: unknown }> | undefined | void
 }

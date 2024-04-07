@@ -47,28 +47,39 @@ export function handleLocalModuleMethod(
 	options: UserProvidedClientOptions<PossibleModule>,
 	nextToken?: symbol
 ) {
-	const providedModule = getUnfulfilledModule(options.module)
 	return handlePotentialPromise(
-		providedModule,
+		() => getUnfulfilledModule(options.module),
 		providedModule => {
 			if (!providedModule) return nextToken
 			const method = getProperty(providedModule, rpc.method) as (...args: unknown[]) => unknown
 			if (method) {
-				const preprocessed = options.preRequest?.(rpc.args, rpc.method) || { args: rpc.args }
-				if (options.handleForms && "args" in preprocessed && givenFormLike(preprocessed.args[0])) {
-					preprocessed.args[0] = handlePossibleForm(preprocessed.args[0])
-				}
-				if ("result" in preprocessed) {
-					return options.postRequest?.(preprocessed.args, preprocessed.result, rpc.method) ?? preprocessed.result
-				}
-				const result = method(...preprocessed.args)
-				return options.postRequest?.(preprocessed.args, result, rpc.method) ?? result
+				const props = Object.fromEntries(Object.entries(method))
+				return handlePotentialPromise(
+					() => options.onPreCall?.(rpc.args, rpc.method, props) || { args: rpc.args },
+					preprocessed => {
+						if (options.handleForms && "args" in preprocessed && givenFormLike(preprocessed.args[0])) {
+							preprocessed.args[0] = handlePossibleForm(preprocessed.args[0])
+						}
+						const result =
+							"result" in preprocessed ? preprocessed.result : Reflect.apply(method, undefined, preprocessed.args)
+						return handlePotentialPromise(
+							() => options.onPostCall?.(preprocessed.args, result, rpc.method, props) || { result },
+							postprocessed => {
+								if ("result" in postprocessed) return postprocessed.result
+							}
+						)
+					}
+				)
 			}
 			return nextToken
 		},
 		error => {
-			const processedError = options.onError?.(error, rpc.method) ?? error
-			throw processedError
+			return handlePotentialPromise(
+				() => options.onCallError?.(error, rpc.method) || { error },
+				processedError => {
+					if (processedError.error) throw processedError.error
+				}
+			)
 		}
 	)
 }

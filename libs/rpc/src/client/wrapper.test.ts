@@ -7,34 +7,57 @@ import { handlePotentialPromise } from "./wrapper"
 
 describe("Promises can be easily handled without using async functions", () => {
 	test("promise given", async () => {
-		const hello = handlePotentialPromise(Promise.resolve("hello"), value => {
-			return value
-		})
+		const hello = handlePotentialPromise(
+			() => Promise.resolve("hello"),
+			value => {
+				return value
+			}
+		)
 		await expect(hello).resolves.toBe("hello")
 	})
 
+	test("error thrown", () => {
+		const hello = () =>
+			handlePotentialPromise(
+				() => {
+					throw "uh-oh"
+				},
+				_value => null
+			)
+		expect(hello).throws("uh-oh")
+	})
+
 	test("promise returned", async () => {
-		const hello = handlePotentialPromise("hello", value => {
-			return Promise.resolve(value)
-		})
+		const hello = handlePotentialPromise(
+			() => "hello",
+			value => {
+				return Promise.resolve(value)
+			}
+		)
 		await expect(hello).resolves.toBe("hello")
 	})
 
 	test("promise given and returned", async () => {
-		const hello = handlePotentialPromise(Promise.resolve("hello"), value => {
-			return Promise.resolve(value)
-		})
+		const hello = handlePotentialPromise(
+			() => Promise.resolve("hello"),
+			value => {
+				return Promise.resolve(value)
+			}
+		)
 		await expect(hello).resolves.toBe("hello")
 	})
 
 	test("promise rejected", async () => {
-		const hello = handlePotentialPromise(Promise.reject("oops"), () => {})
+		const hello = handlePotentialPromise(
+			() => Promise.reject("oops"),
+			() => {}
+		)
 		await expect(hello).rejects.toBe("oops")
 	})
 
 	test("promise rejected, overridden", async () => {
 		const hello = handlePotentialPromise(
-			Promise.resolve("hello"),
+			() => Promise.resolve("hello"),
 			() => {
 				throw "hi!"
 			},
@@ -46,17 +69,23 @@ describe("Promises can be easily handled without using async functions", () => {
 	})
 
 	test("no promise", () => {
-		const hello = handlePotentialPromise("hello", value => {
-			return value
-		})
+		const hello = handlePotentialPromise(
+			() => "hello",
+			value => {
+				return value
+			}
+		)
 		expect(hello).toBe("hello")
 	})
 
 	test("no promise, throws", () => {
 		const thrown = () =>
-			handlePotentialPromise("hello", value => {
-				throw value
-			})
+			handlePotentialPromise(
+				() => "hello",
+				value => {
+					throw value
+				}
+			)
 		expect(thrown).toThrow("hello")
 	})
 })
