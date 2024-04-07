@@ -1,9 +1,8 @@
-import { send } from "process"
-import { UserProvidedClientOptions } from "../options/client/provided"
+import { UserProvidedServerOptions } from "../options/provided"
 import { ResolverServer } from "../resolver/types"
 
-export function createRpcServer<GivenOptions extends UserProvidedClientOptions = UserProvidedClientOptions>(
-	options: GivenOptions
+export function createRpcServer<GivenOptions extends UserProvidedServerOptions = UserProvidedServerOptions>(
+	_options: GivenOptions
 ): ResolverServer {
 	return () => null
 }

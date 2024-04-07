@@ -3,7 +3,7 @@
 // SPDX-License-Identifier: Apache-2.0
 
 import { RpcPlaceholder, resolvePlaceholder } from "../constants"
-import { featureFlags } from "../flags"
+import { featureFlags } from "./flags"
 import { extract, merge } from "../extract/base"
 import { blobIdentifier, givenFormLike, handlePossibleForm } from "../extract/blobs"
 import { promiseIdentifier } from "../extract/promises"

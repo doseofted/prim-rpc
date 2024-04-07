@@ -1,4 +1,4 @@
-import type { TransformHandler } from "../options/client/provided"
+import type { TransformHandler } from "../options/provided"
 
 // interpreter
 

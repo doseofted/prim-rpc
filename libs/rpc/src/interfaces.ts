@@ -4,7 +4,7 @@
 
 import type { Emitter } from "mitt"
 import type { Schema, PartialDeep } from "type-fest"
-import type { featureFlags } from "./flags"
+import type { featureFlags } from "./deprecated/flags"
 import type { RpcCall, RpcAnswer } from "./types/rpc-structure"
 import type { WithoutFunctionWrapper, WithoutPromiseWrapper } from "./types/rpc-module"
 import type { RpcModule } from "./types/rpc-module"

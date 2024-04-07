@@ -9,8 +9,8 @@ import type {
 	RpcModule,
 	WithoutFunctionWrapper,
 	WithoutPromiseWrapper,
-} from "../../types/rpc-module"
-import type { ResolverClient } from "../../resolver/types"
+} from "../types/rpc-module"
+import type { ResolverClient, ResolverServer } from "../resolver/types"
 
 /**
  * An object conforming to `JSON` (with `parse` and `stringify` methods) that implements serialization/deserialization
@@ -155,7 +155,7 @@ export interface UserProvidedClientOptions<
 	/**
 	 * A plugin (or list of available plugins) used to send RPC and receive RPC results.
 	 */
-	resolverClient?: ResolverClient | ResolverClient[]
+	resolverClient?: null | ResolverClient | ResolverClient[]
 	/**
 	 * Transform given arguments prior to calling a function. This hook may alternatively intercept a function call and
 	 * return a result early. This hook returns an object with either `.args` or `.result`, otherwise this function should
@@ -169,7 +169,7 @@ export interface UserProvidedClientOptions<
 		args: unknown[],
 		name: string,
 		props: Record<PropertyKey, unknown>
-	) => { result?: unknown; args: unknown[] } | Promise<{ result?: unknown; args: unknown[] }> | undefined | void
+	) => { result?: unknown; args: unknown[] } | Promise<{ result?: unknown; args: unknown[] }> | void
 	/**
 	 * Transform given result prior to being returned to the function caller. If an object with `.result` is returned,
 	 * the return value will be modified, otherwise this function should return void to continue with original return
@@ -184,7 +184,7 @@ export interface UserProvidedClientOptions<
 		result: unknown,
 		name: string,
 		props: Record<PropertyKey, unknown>
-	) => { result?: unknown } | Promise<{ result?: unknown }> | undefined | void
+	) => { result?: unknown } | Promise<{ result?: unknown }> | void
 	/**
 	 * Transform given error prior to being thrown to the RPC caller. A returned object with `.error` will be thrown as
 	 * the new error, otherwise this function should return void to continue with the original error. While it's also
@@ -194,5 +194,15 @@ export interface UserProvidedClientOptions<
 	 *
 	 * @default undefined
 	 */
-	onCallError?: (error: unknown, name: string) => { error?: unknown } | Promise<{ error?: unknown }> | undefined | void
+	onCallError?: (error: unknown, name: string) => { error?: unknown } | Promise<{ error?: unknown }> | void
+}
+
+export interface UserProvidedServerOptions<
+	GivenModule extends PossibleModule = PossibleModule,
+	FormHandling extends boolean = boolean,
+> extends UserProvidedClientOptions<GivenModule, FormHandling> {
+	/**
+	 * A plugin (or list of available plugins) used to receive RPC and send RPC results.
+	 */
+	resolverServer?: null | ResolverServer | ResolverServer[]
 }

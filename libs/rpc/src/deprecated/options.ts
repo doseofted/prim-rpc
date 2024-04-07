@@ -4,8 +4,8 @@
 
 import { defu } from "defu"
 import { destr } from "destr"
-import type { PrimOptions, PrimServerOptions } from "./interfaces"
-import type { RpcCall } from "./types/rpc-structure"
+import type { PrimOptions, PrimServerOptions } from "../interfaces"
+import type { RpcCall } from "../types/rpc-structure"
 /**
  * As Prim+RPC introduces new updates to RPC message structure, update this version.
  * Don't update just because major version changes though (only if version changes RPC structure)
@@ -78,6 +78,7 @@ const createBaseClientOptions = (server = false): PrimOptions => ({
 	// !SECTION
 })
 
+/** @deprecated */
 const createBaseServerOptions = (): PrimServerOptions => ({
 	...createBaseClientOptions(true),
 	// the default prefix will likely be overridden
@@ -95,6 +96,8 @@ const createBaseServerOptions = (): PrimServerOptions => ({
  *
  * @param options Given options by developer
  * @returns Options with defaults set
+ *
+ * @deprecated
  */
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 export function createPrimOptions<OptionsType extends PrimOptions<any, any, any> = PrimOptions>(

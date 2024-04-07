@@ -6,7 +6,7 @@ import { describe, expect, test } from "vitest"
 import { handleLocalModuleMethod } from "./local"
 import type { PrimOptions } from "../interfaces"
 import type { RpcCall } from "../types/rpc-structure"
-import type { UserProvidedClientOptions } from "../options/client/provided"
+import type { UserProvidedClientOptions } from "../options/provided"
 
 const exampleModule = {
 	hello(name?: string) {
