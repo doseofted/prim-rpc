@@ -6,7 +6,7 @@ import { describe, expect, test } from "vitest"
 import { handleLocalModuleMethod } from "./local"
 import type { PrimOptions } from "../interfaces"
 import type { RpcCall } from "../types/rpc-structure"
-import type { UserProvidedClientOptions } from "../options/provided"
+import type { ProvidedClientOptions } from "../options/provided"
 
 const exampleModule = {
 	hello(name?: string) {
@@ -114,7 +114,7 @@ describe("local client works pre/post hooks", () => {
 			error = typeof error === "string" ? error.toUpperCase() : error
 			return { error }
 		},
-	} satisfies UserProvidedClientOptions
+	} satisfies ProvidedClientOptions
 
 	test("pre-hook with modified args", () => {
 		const rpc: RpcCall<string, unknown[]> = {

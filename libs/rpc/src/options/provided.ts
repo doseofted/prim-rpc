@@ -30,7 +30,7 @@ export type TransformHandler<StringifyType extends string = any> = {
 	binary?: boolean
 }
 
-export interface UserProvidedClientOptions<
+export interface ProvidedClientOptions<
 	GivenModule extends PossibleModule = PossibleModule,
 	FormHandling extends boolean = boolean,
 > {
@@ -197,10 +197,10 @@ export interface UserProvidedClientOptions<
 	onCallError?: (error: unknown, name: string) => { error?: unknown } | Promise<{ error?: unknown }> | void
 }
 
-export interface UserProvidedServerOptions<
+export interface ProvidedServerOptions<
 	GivenModule extends PossibleModule = PossibleModule,
 	FormHandling extends boolean = boolean,
-> extends UserProvidedClientOptions<GivenModule, FormHandling> {
+> extends ProvidedClientOptions<GivenModule, FormHandling> {
 	/**
 	 * A plugin (or list of available plugins) used to receive RPC and send RPC results.
 	 */

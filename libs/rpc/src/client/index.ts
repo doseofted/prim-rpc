@@ -8,17 +8,18 @@ import { handlePotentialPromise } from "./wrapper"
 import { getUnfulfilledModule, handleLocalModuleMethod } from "./local"
 import type { RpcModule, PossibleModule } from "../types/rpc-module"
 import type { MergeModuleMethods } from "../types/merge"
-import type { UserProvidedClientOptions } from "../options/provided"
-import { createOptions } from "../options/index"
+import type { ProvidedClientOptions } from "../options/provided"
+import { createOptions } from "../options"
 
 export function createRpcClient<
 	ModuleType extends PossibleModule = never,
-	GivenOptions extends UserProvidedClientOptions = UserProvidedClientOptions,
+	GivenOptions extends ProvidedClientOptions = ProvidedClientOptions,
 >(options?: GivenOptions) {
 	const optionsInit = createOptions(options)
 	// the returned client will catch all method calls given on it recursively
 	type FinalModule = MergeModuleMethods<
-		RpcModule<ModuleType, GivenOptions["handleForms"], true>,
+		// eslint-disable-next-line @typescript-eslint/ban-types
+		[ModuleType] extends [never] ? {} : RpcModule<ModuleType, GivenOptions["handleForms"], true>,
 		RpcModule<GivenOptions["module"], GivenOptions["handleForms"], false>
 	>
 	return createMethodCatcher<FinalModule>({

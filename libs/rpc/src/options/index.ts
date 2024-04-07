@@ -4,7 +4,7 @@
 
 import { defu } from "defu"
 import { destr } from "destr"
-import type { UserProvidedServerOptions } from "./provided"
+import type { ProvidedServerOptions } from "./provided"
 import type { SetRequired } from "type-fest"
 
 const defaults = {
@@ -17,11 +17,11 @@ const defaults = {
 	handleErrors: { enabled: true, stackTrace: false },
 	resolverClient: null,
 	resolverServer: null,
-} satisfies UserProvidedServerOptions
+} satisfies ProvidedServerOptions
 
-type MergeOptions = Omit<UserProvidedServerOptions, keyof typeof defaults>
+type MergeOptions = Omit<ProvidedServerOptions, keyof typeof defaults>
 
-export function createOptions(provided: UserProvidedServerOptions = {}) {
+export function createOptions(provided: ProvidedServerOptions = {}) {
 	const {
 		transformHandler = defaults.transformHandler,
 		handleErrors = defaults.handleErrors,
@@ -46,7 +46,7 @@ export function createOptions(provided: UserProvidedServerOptions = {}) {
 
 /** Options utilized internally by client/server (some values will be set to defaults) */
 export type InitializedOptions = SetRequired<
-	UserProvidedServerOptions,
+	ProvidedServerOptions,
 	| "transformHandler"
 	| "handleErrors"
 	| "module"

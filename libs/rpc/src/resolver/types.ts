@@ -29,38 +29,38 @@ export type ResolverClient = (events: RpcEvents, utils: RpcUtilities) => RpcActi
 /** Server-side tool to handle given RPCs */
 export type ResolverServer = (events: RpcActions, utils: RpcUtilities) => RpcEvents<true>
 
-// const websocketResolver: ResultResolver = (events, utils) => {
-//   const ws = new WebSocket(utils.url)
-//   ws.addEventListener("open", events.connected)
-//   ws.addEventListener("close", events.disconnected)
-//   ws.addEventListener("message", events.received)
+// const websocketResolver: ResolverClient = (events, utils) => {
+// 	const ws = new WebSocket(utils.url)
+// 	ws.addEventListener("open", events.connected)
+// 	ws.addEventListener("close", events.disconnected)
+// 	ws.addEventListener("message", events.received)
 // 	return {
-//     stream: true,
-//     send(rpc, _extracted) {
-//       // eslint-disable-next-line @typescript-eslint/no-unsafe-argument
-//       ws.send(utils.handler.stringify(rpc))
-//     },
-//     disconnect() {
-//       ws.close()
-//     },
-//   }
+// 		stream: true,
+// 		send(rpc, _extracted) {
+// 			// eslint-disable-next-line @typescript-eslint/no-unsafe-argument
+// 			ws.send(utils.handler.stringify(rpc))
+// 		},
+// 		disconnect() {
+// 			ws.close()
+// 		},
+// 	}
 // }
 
-// const fetchResolver: ResultResolver = (events, utils) => {
-//   return {
-//     stream: false,
-//     async send(rpc, extracted) {
-//       const response = await fetch(utils.url, {
-//         method: "POST",
-//         headers: {
-//           "Content-Type": utils.handler.mediaType,
-//         },
-//         // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
-//         body: utils.handler.stringify(rpc),
-//       })
-//       // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
-//       const result = await response.json()
-//       events.received(result, extracted)
-//     },
-//   }
+// const fetchResolver: ResolverClient = (events, utils) => {
+// 	return {
+// 		stream: false,
+// 		async send(rpc, extracted) {
+// 			const response = await fetch(utils.url, {
+// 				method: "POST",
+// 				headers: {
+// 					"Content-Type": utils.handler.mediaType,
+// 				},
+// 				// eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
+// 				body: utils.handler.stringify(rpc),
+// 			})
+// 			// eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
+// 			const result = await response.json()
+// 			events.received(result, extracted)
+// 		},
+// 	}
 // }

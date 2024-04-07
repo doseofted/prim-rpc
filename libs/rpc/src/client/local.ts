@@ -4,7 +4,7 @@
 
 import { givenFormLike, handlePossibleForm } from "../extract/blobs"
 import type { PossibleModule } from "../interfaces"
-import type { UserProvidedClientOptions } from "../options/provided"
+import type { ProvidedClientOptions } from "../options/provided"
 import type { RpcCall } from "../types/rpc-structure"
 import { handlePotentialPromise } from "./wrapper"
 import getProperty from "just-safe-get"
@@ -44,7 +44,7 @@ export function getUnfulfilledModule(
  */
 export function handleLocalModuleMethod(
 	rpc: RpcCall<string, unknown[]>,
-	options: UserProvidedClientOptions<PossibleModule>,
+	options: ProvidedClientOptions<PossibleModule>,
 	nextToken?: symbol
 ) {
 	return handlePotentialPromise(
