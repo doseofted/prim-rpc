@@ -315,8 +315,8 @@ importers:
         specifier: ^8.1.0
         version: 8.1.0
       '@hono/node-server':
-        specifier: ^1.8.2
-        version: 1.8.2
+        specifier: ^1.10.1
+        version: 1.10.1
       '@msgpack/msgpack':
         specifier: 3.0.0-beta2
         version: 3.0.0-beta2
@@ -1629,8 +1629,8 @@ packages:
     hasBin: true
     dev: false
 
-  /@hono/node-server@1.8.2:
-    resolution: {integrity: sha512-h8l2TBLCPHZBUrrkosZ6L5CpBLj6zdESyF4B+zngiCDF7aZFQJ0alVbLx7jn8PCVi9EyoFf8a4hOZFi1tD95EA==}
+  /@hono/node-server@1.10.1:
+    resolution: {integrity: sha512-5BKW25JH5PQKPDkTcIgv3yNUPtOAbnnjFFgWvIxxAY/B/ZNeYjjWoAeDmqhIiCgOAJ3Tauuw+0G+VainhuZRYQ==}
     engines: {node: '>=18.14.1'}
     dev: true
 
