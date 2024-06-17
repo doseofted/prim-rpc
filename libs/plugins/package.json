@@ -68,7 +68,7 @@
 		"supertest": "^6.3.4",
 		"superwstest": "^2.0.3",
 		"type-fest": "^4.10.1",
-		"ws": "^8.16.0"
+		"ws": "^8.17.1"
 	},
 	"peerDependencies": {
 		"@remix-run/node": "2.x",
