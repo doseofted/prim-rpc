@@ -34,7 +34,7 @@
 		"stylelint": "^16.2.0",
 		"stylelint-config-recommended": "^14.0.0",
 		"tsup": "^8.0.1",
-		"turbo": "^1.11.3",
+		"turbo": "^2.4.2",
 		"typedoc": "^0.25.9",
 		"typescript": "5.3.3",
 		"vite": "^6.1.0",

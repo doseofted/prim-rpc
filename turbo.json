@@ -1,33 +1,43 @@
 {
-	"$schema": "https://turbo.build/schema.json",
-	"globalDependencies": [],
-	"pipeline": {
-		"test": {
-			"dependsOn": [],
-			"cache": false
-		},
-		"testing": {
-			"dependsOn": [],
-			"cache": false,
-			"persistent": true
-		},
-		"lint": {
-			"dependsOn": []
-		},
-		"check": {
-			"dependsOn": ["^build"]
-		},
-		"build": {
-			"dependsOn": ["^build"],
-			"outputs": ["dist/**", ".next/**", "!.next/cache/**"]
-		},
-		"dev": {
-			"dependsOn": ["^build"],
-			"cache": false,
-			"persistent": true
-		},
-		"lint-style": {
-			"dependsOn": []
-		}
-	}
+  "$schema": "https://turbo.build/schema.json",
+  "globalDependencies": [],
+  "tasks": {
+    "test": {
+      "dependsOn": [],
+      "cache": false
+    },
+    "testing": {
+      "dependsOn": [],
+      "cache": false,
+      "persistent": true
+    },
+    "lint": {
+      "dependsOn": []
+    },
+    "check": {
+      "dependsOn": [
+        "^build"
+      ]
+    },
+    "build": {
+      "dependsOn": [
+        "^build"
+      ],
+      "outputs": [
+        "dist/**",
+        ".next/**",
+        "!.next/cache/**"
+      ]
+    },
+    "dev": {
+      "dependsOn": [
+        "^build"
+      ],
+      "cache": false,
+      "persistent": true
+    },
+    "lint-style": {
+      "dependsOn": []
+    }
+  }
 }
