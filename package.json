@@ -1,6 +1,6 @@
 {
 	"name": "@doseofted/prim-monorepo",
-	"packageManager": "pnpm@8.15.4",
+	"packageManager": "pnpm@10.4.0",
 	"description": "Monorepo that houses Prim+RPC projects",
 	"type": "module",
 	"license": "UNLICENSED",
