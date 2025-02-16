@@ -46,7 +46,7 @@
 		"@doseofted/prim-example": "workspace:*",
 		"@sinclair/typebox": "^0.32.15",
 		"@types/json-schema": "^7.0.15",
-		"@types/lodash": "^4.14.202",
+		"@types/lodash": "^4.17.15",
 		"@types/lodash-es": "^4.17.12",
 		"type-fest": "^4.10.1",
 		"typedoc": "^0.25.9",
