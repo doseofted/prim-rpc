@@ -1,3 +1,50 @@
+@import "tailwindcss";
+@plugin "@tailwindcss/typography";
+
+@plugin 'tailwind-scrollbar' {
+	nocompatible: true;
+}
+
+@theme {
+	--font-sans: "Plus Jakarta Sans Variable", sans-serif;
+	--font-title: "Montserrat Variable", sans-serif;
+	--font-mono: "Fira Code Variable", monospace;
+
+	/* Prim color scheme base */
+	/* LINK https://coolors.co/f0a3ff-6d53ff-1d0049-0069ba-5bb8ff-4aedff */
+	/* with semantic palette based on base color scheme */
+	/* LINK https://coolors.co/5bb8ff-ffd670-ff9770-ff70a6-47ec97 */
+	--color-prim-space: #2d0d60;
+	--color-primary: #f0a3ff;
+	--color-secondary: #6d53ff;
+	--color-accent: #0069ba;
+	--color-neutral: #1d0049;
+	--color-base-100: #ffffff;
+	--color-info: #5bb8ff;
+	--color-success: #47ec97;
+	--color-warning: #ffd670;
+	--color-error: #ff9770;
+}
+
+@plugin "daisyui";
+
+@plugin "daisyui/theme" {
+	name: "prim";
+	default: true;
+	prefersdark: false;
+	color-scheme: light;
+
+	--color-primary: #f0a3ff;
+	--color-secondary: #6d53ff;
+	--color-accent: #0069ba;
+	--color-neutral: #1d0049;
+	--color-base-100: #ffffff;
+	--color-info: #5bb8ff;
+	--color-success: #47ec97;
+	--color-warning: #ffd670;
+	--color-error: #ff9770;
+}
+
 /* Lenis must be disabled if this is enabled */
 /* @media (prefers-reduced-motion: no-preference) {
 	html {
@@ -15,9 +62,9 @@ pre.astro-code,
 .mockup-code {
 	&::before {
 		box-shadow:
-			1.4em 0 0 theme("colors.prim.space"),
-			2.8em 0 0 theme("colors.prim.space"),
-			4.2em 0 0 theme("colors.prim.space") !important;
+			1.4em 0 0 var(--color-prim-space),
+			2.8em 0 0 var(--color-prim-space),
+			4.2em 0 0 var(--color-prim-space) !important;
 	}
 
 	pre::before {
@@ -67,8 +114,8 @@ pre {
 	[data-highlighted-chars] {
 		padding: 0.06rem 0.125rem;
 		margin: 0 -0.125rem;
-		border: 1.5px solid theme("colors.prim.info");
-		background-color: theme("colors.prim.info/0.3");
+		border: 1.5px solid var(--color-prim-info);
+		background-color: var(--color-prim-info/0.3);
 		width: 100%;
 		height: 100%;
 		border-radius: 0.5rem;
@@ -87,7 +134,7 @@ pre {
 		width: 1rem;
 		margin-right: 1rem;
 		text-align: right;
-		color: theme("colors.gray.600");
+		color: var(--color-gray-600);
 	}
 
 	code[data-line-numbers-max-digits="2"] > [data-line]::before {
@@ -99,8 +146,8 @@ pre {
 	}
 
 	span[data-highlighted-line] {
-		background-color: theme("colors.prim.info/0.3");
-		border-left: 2px solid theme("colors.prim.info");
+		background-color: var(--color-prim-info/0.3);
+		border-left: 2px solid var(--color-prim-info);
 		margin-left: -6px;
 		padding-left: 4px;
 	}

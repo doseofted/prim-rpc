@@ -1,13 +1,13 @@
 // @ts-check
 import { defineConfig } from "astro/config"
-import tailwind from "@astrojs/tailwind"
 import react from "@astrojs/react"
 import mdx from "@astrojs/mdx"
 import sitemap from "@astrojs/sitemap"
-import vercel from "@astrojs/vercel/serverless"
+import vercel from "@astrojs/vercel"
 import rehypePrettyCode from "rehype-pretty-code"
 import icon from "astro-icon"
 import rehypeExternalLinks from "rehype-external-links"
+import tailwindcss from "@tailwindcss/vite"
 
 /** @type {import('rehype-pretty-code').Options} */
 const rehypePrettyOptions = {
@@ -38,7 +38,6 @@ export default defineConfig({
 		],
 	},
 	integrations: [
-		tailwind(),
 		react({
 			include: "src/**/*.react.tsx",
 		}),
@@ -51,10 +50,11 @@ export default defineConfig({
 			},
 		}),
 	],
-	output: "hybrid",
-	adapter: vercel({
-		functionPerRoute: false,
-	}),
+	vite: {
+		plugins: [tailwindcss()],
+	},
+	output: "static",
+	adapter: vercel(),
 	redirects: {
 		// List of short URLs
 		"/docs": { destination: "/docs/learn/introduction", status: 302 },
