@@ -1,7 +1,7 @@
 import defu from "defu"
 import { Light, LightState, type LightProperties } from "./Light"
 import { createConsola } from "consola"
-import { easeOut, transform } from "framer-motion/dom"
+import { easeOut, transform } from "motion"
 import mitt from "mitt"
 
 const level = import.meta.env.PROD ? 0 : 5

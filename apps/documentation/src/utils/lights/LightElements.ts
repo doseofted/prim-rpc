@@ -1,5 +1,5 @@
 import { createConsola } from "consola"
-import { clamp } from "framer-motion/dom"
+import { clamp } from "motion"
 import { ElementSet } from "./ElementSet"
 import { Light } from "./Light"
 import { LightGroup } from "./LightGroup"

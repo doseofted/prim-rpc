@@ -20,7 +20,7 @@ export function IntroText(props: IntroTextProps) {
 			y: ["100%", "0%"],
 			opacity: [0.3, 1],
 		}
-		const options = { duration, delay: stagger(staggerAmount, { start }), easing }
+		const options = { duration, delay: stagger(staggerAmount, { startDelay: start }), easing }
 		const animated = animate(elementsOnly, keyframes, options)
 		return () => animated.stop()
 	}, [])

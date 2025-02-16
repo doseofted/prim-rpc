@@ -314,8 +314,8 @@ const integrations = shuffle(
 			</Marquee>
 			<p class="text-xs opacity-75 flex gap-2 items-center leading-none">
 				<Icon name="ph:asterisk-bold" class="w-3 h-3" />
-				 All trademarks are property of their respective owners. Prim+RPC is not endorsed by or affiliated with any of
-				these frameworks.
+				All trademarks are property of their respective owners. Prim+RPC is not endorsed by or affiliated with any of these
+				frameworks.
 			</p>
 		</div>
 	</div>
@@ -360,20 +360,20 @@ const integrations = shuffle(
 			<div class="flex flex-wrap flex-col lg:flex-row justify-center gap-4">
 				<a href="/docs/learn/introduction" class="btn glass hover:bg-neutral text-white">
 					<Icon class="w-6 h-6" name="ph:lightbulb-fill" />
-					 Learn More
+					Learn More
 				</a>
 				<a href="/docs/learn/setup" class="btn glass hover:bg-neutral text-white">
 					<Icon class="w-6 h-6" name="ph:notebook-fill" />
-					 Get Started
+					Get Started
 				</a>
 				<!-- <div class="w-full hidden lg:block"></div> -->
 				<a href="/docs/learn/examples" class="btn glass hover:bg-neutral text-white">
 					<Icon class="w-6 h-6" name="ph:terminal-window-fill" />
-					 Try An Example
+					Try An Example
 				</a>
 				<a href="/docs/reference/plugins" class="btn glass hover:bg-neutral text-white">
 					<Icon class="w-6 h-6" name="ph:plug-fill" />
-					 Plugins
+					Plugins
 				</a>
 			</div>
 		</div>
@@ -411,7 +411,7 @@ const integrations = shuffle(
 		const scrollIndicatorParent = document.getElementById("scroll-down-parent") as HTMLElement
 		animate(scrollIndicatorParent, { opacity: [0, 1] }, { duration: 1, delay: start === startDefault ? 2.5 : 0 })
 		const scrollIndicator = document.getElementById("scroll-down-indicator") as HTMLElement
-		animate(scrollIndicator, { y: [0, 10, 0] }, { duration: 1.5, repeat: Infinity, easing: ["ease-out", "ease-in"] })
+		animate(scrollIndicator, { y: [0, 10, 0] }, { duration: 1.5, repeat: Infinity, ease: ["easeOut", "easeIn"] })
 
 		for (const featureCard of document.querySelectorAll<HTMLElement>(".feature-card")) {
 			featureCard.style.opacity = "0"
@@ -419,11 +419,7 @@ const integrations = shuffle(
 		inView(
 			document.querySelectorAll(".feature-list"),
 			info => {
-				animate(
-					info.target.querySelectorAll(".feature-card"),
-					{ opacity: [0, 1] },
-					{ duration: 0.9, delay: stagger(0.1) }
-				)
+				animate(info.querySelectorAll(".feature-card"), { opacity: [0, 1] }, { duration: 0.9, delay: stagger(0.1) })
 			},
 			{ amount: 0.2 }
 		)
@@ -439,7 +435,7 @@ const integrations = shuffle(
 			}
 		}, start * 1000)
 		const codeSnippets = document.querySelectorAll<HTMLElement>(".homepage-snippets")
-		animate(codeSnippets, slideIn, { delay: stagger(0.2, { start, from: "last" }), duration: 0.9 })
+		animate(codeSnippets, slideIn, { delay: stagger(0.2, { startDelay: start, from: "last" }), duration: 0.9 })
 		// navigation only needs to be animated on first load
 		const pageLogo = document.querySelector<HTMLElement>(".prim-logo-container")
 		const navigationElem = document.querySelectorAll<HTMLElement>(".prim-navigation")

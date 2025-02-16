@@ -1,6 +1,6 @@
 import { CanvasSpace, Circle, Pt } from "pts"
 import { lighten, transparentize } from "color2k"
-import { easeIn, easeOut, clamp } from "framer-motion/dom"
+import { easeIn, easeOut, clamp } from "motion"
 import type { LightElements } from "./LightElements"
 
 const debug = false

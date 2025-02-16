@@ -1,5 +1,4 @@
-import { animate, motionValue } from "framer-motion/dom"
-import { type ValueAnimationTransition } from "framer-motion"
+import { animate, motionValue, type ValueAnimationTransition } from "motion"
 import { defu } from "defu"
 import { createConsola } from "consola"
 import mitt from "mitt"
