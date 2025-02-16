@@ -3,29 +3,85 @@
 // SPDX-License-Identifier: Apache-2.0
 
 import { givenFormLike, handlePossibleForm } from "../extract/blobs"
-import { JsonHandler, PrimOptions } from "../interfaces"
 import { RpcCall } from "../types/rpc-structure"
-import { PossibleModule } from "../types/rpc-module"
+import { handlePotentialPromise } from "./wrapper"
+import { InitializedOptions } from "../options"
+
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
+function preprocessRecursive(rpc: RpcCall, options: InitializedOptions): RpcCall | Promise<RpcCall> {
+	const _result = handlePotentialPromise(
+		() => options.onPreCall?.(rpc.args, rpc.method, {}) || { args: rpc.args },
+		preprocessed => {
+			if (options.handleForms && "args" in preprocessed && givenFormLike(preprocessed.args[0])) {
+				preprocessed.args[0] = handlePossibleForm(preprocessed.args[0])
+			}
+			if ("result" in preprocessed) return preprocessed.result
+
+			const result = "result" in preprocessed ? preprocessed.result : handleProcessedRpc()
+			return handlePotentialPromise(
+				() => options.onPostCall?.(preprocessed.args, result, rpc.method, {}) || { result },
+				postprocessed => {
+					if ("result" in postprocessed) return postprocessed.result
+				}
+			)
+		},
+		error => {
+			return handlePotentialPromise(
+				() => options.onCallError?.(error, rpc.method) || { error },
+				processedError => {
+					if (processedError.error) throw processedError.error
+				}
+			)
+		}
+	)
+	// return handlePotentialPromise(() => result, result => {})
+	if (Array.isArray(rpc.chain) && rpc.chain.length > 0) {
+		const newChain = rpc.chain.map(chain => preprocessRecursive(chain, options))
+		if (newChain.some(c => c instanceof Promise)) {
+			return handlePotentialPromise(
+				() => Promise.all(newChain),
+				allResolved => {
+					rpc.chain = allResolved
+					return rpc
+				}
+			)
+		}
+		return rpc
+	}
+	return rpc
+}
+
+function handleProcessedRpc() {}
 
 export function handleRemoteModuleMethod(
 	rpc: RpcCall<string, unknown[]>,
-	options: PrimOptions<PossibleModule, JsonHandler>,
-	nextToken?: symbol
+	options: InitializedOptions,
+	_nextToken?: symbol
 ) {
-	const preprocessed = options.preRequest?.(rpc.args, rpc.method) || { args: rpc.args }
-	if (options.handleForms && Array.isArray(preprocessed.args) && givenFormLike(preprocessed.args[0])) {
-		preprocessed.args[0] = handlePossibleForm(preprocessed.args[0])
-	}
-	if ("result" in preprocessed) {
-		return options.postRequest?.(preprocessed.args, preprocessed.result, rpc.method) ?? preprocessed.result
-	}
-	// TODO: handle more types from RPC (callbacks and blobs)
-	const newRpc: RpcCall = {
-		...rpc,
-		args: preprocessed.args,
-	}
+	return handlePotentialPromise(
+		() => options.onPreCall?.(rpc.args, rpc.method, {}) || { args: rpc.args },
+		preprocessed => {
+			if (options.handleForms && "args" in preprocessed && givenFormLike(preprocessed.args[0])) {
+				preprocessed.args[0] = handlePossibleForm(preprocessed.args[0])
+			}
+			const result = "result" in preprocessed ? preprocessed.result : handleProcessedRpc()
+			return handlePotentialPromise(
+				() => options.onPostCall?.(preprocessed.args, result, rpc.method, {}) || { result },
+				postprocessed => {
+					if ("result" in postprocessed) return postprocessed.result
+				}
+			)
+		},
+		error => {
+			return handlePotentialPromise(
+				() => options.onCallError?.(error, rpc.method) || { error },
+				processedError => {
+					if (processedError.error) throw processedError.error
+				}
+			)
+		}
+	)
 
-	throw "not implemented yet"
 	// const result: unknown = null
 	// return options.postRequest?.(preprocessed.args, result, rpc.method) ?? result
 }

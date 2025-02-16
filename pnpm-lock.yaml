@@ -410,6 +410,9 @@ importers:
       destr:
         specifier: ^2.0.2
         version: 2.0.3
+      emery:
+        specifier: ^1.4.3
+        version: 1.4.3
       just-remove:
         specifier: ^3.2.0
         version: 3.2.0
@@ -5711,6 +5714,10 @@ packages:
   /elkjs@0.9.2:
     resolution: {integrity: sha512-2Y/RaA1pdgSHpY0YG4TYuYCD2wh97CRvu22eLG3Kz0pgQ/6KbIFTxsTnDc4MH/6hFlg2L/9qXrDMG0nMjP63iw==}
     dev: true
+
+  /emery@1.4.3:
+    resolution: {integrity: sha512-DrP24dscOZx5BJpOo32X1CjaWgbFojS4sAXKtlmTQmCJ01Vv2brjeWKIS6cQ4Rblt/hZIN+6pdV2L7Y9Rsh8EA==}
+    dev: false
 
   /emmet@2.4.6:
     resolution: {integrity: sha512-dJfbdY/hfeTyf/Ef7Y7ubLYzkBvPQ912wPaeVYpAxvFxkEBf/+hJu4H6vhAvFN6HlxqedlfVn2x1S44FfQ97pg==}

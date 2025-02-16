@@ -4,9 +4,8 @@
 
 import { describe, expect, test } from "vitest"
 import { handleLocalModuleMethod } from "./local"
-import type { PrimOptions } from "../interfaces"
 import type { RpcCall } from "../types/rpc-structure"
-import type { ProvidedClientOptions } from "../options/provided"
+import { createOptions } from "../options"
 
 const exampleModule = {
 	hello(name?: string) {
@@ -26,9 +25,9 @@ const exampleModule = {
 }
 
 describe("local client works with static import", () => {
-	const options = {
+	const options = createOptions({
 		module: exampleModule,
-	} satisfies PrimOptions
+	})
 
 	test("without error", () => {
 		const rpc: RpcCall<string, unknown[]> = {
@@ -71,9 +70,9 @@ describe("local client works with static import", () => {
 })
 
 describe("local client works with dynamic import and function wrapper", () => {
-	const options = {
+	const options = createOptions({
 		module: () => Promise.resolve(exampleModule),
-	} satisfies PrimOptions
+	})
 
 	test("without error", async () => {
 		const rpc: RpcCall<string, unknown[]> = {
@@ -95,7 +94,7 @@ describe("local client works with dynamic import and function wrapper", () => {
 })
 
 describe("local client works pre/post hooks", () => {
-	const options = {
+	const options = createOptions({
 		module: exampleModule,
 		onPreCall(args, name) {
 			if (name === "anError" && args.length === 0) {
@@ -114,7 +113,7 @@ describe("local client works pre/post hooks", () => {
 			error = typeof error === "string" ? error.toUpperCase() : error
 			return { error }
 		},
-	} satisfies ProvidedClientOptions
+	})
 
 	test("pre-hook with modified args", () => {
 		const rpc: RpcCall<string, unknown[]> = {

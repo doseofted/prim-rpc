@@ -3,8 +3,7 @@
 // SPDX-License-Identifier: Apache-2.0
 
 import { givenFormLike, handlePossibleForm } from "../extract/blobs"
-import type { PossibleModule } from "../interfaces"
-import type { ProvidedClientOptions } from "../options/provided"
+import { InitializedOptions } from "../options"
 import type { RpcCall } from "../types/rpc-structure"
 import { handlePotentialPromise } from "./wrapper"
 import getProperty from "just-safe-get"
@@ -44,11 +43,12 @@ export function getUnfulfilledModule(
  */
 export function handleLocalModuleMethod(
 	rpc: RpcCall<string, unknown[]>,
-	options: ProvidedClientOptions<PossibleModule>,
+	options: InitializedOptions,
 	nextToken?: symbol
 ) {
+	const providedModule = () => getUnfulfilledModule(options.module)
 	return handlePotentialPromise(
-		() => getUnfulfilledModule(options.module),
+		providedModule,
 		providedModule => {
 			if (!providedModule) return nextToken
 			const method = getProperty(providedModule, rpc.method) as (...args: unknown[]) => unknown

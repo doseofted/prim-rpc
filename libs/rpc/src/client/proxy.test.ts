@@ -74,7 +74,13 @@ describe("RPC proxy creates RPC-like structure, including chains", () => {
 		},
 		onIterable(rpc, next) {
 			const method = [rpc.method, rpc.chain?.map(c => c.method)].flat().filter(Boolean).join(".")
-			function generated(): Generator<unknown> {
+			function* _generated() {
+				let i = 1
+				while (i <= 3) {
+					yield i++
+				}
+			}
+			function generatedManual(): Pick<Generator<unknown>, "next"| "return" | "throw"| typeof Symbol.iterator> {
 				let i = 1
 				return {
 					[Symbol.iterator]() {
@@ -82,7 +88,10 @@ describe("RPC proxy creates RPC-like structure, including chains", () => {
 						return this
 					},
 					next(value) {
-						return { value: value ?? i++, done: i > 3 }
+						if (i > 3) {
+							return { value: undefined, done: true }
+						}
+						return { value: value ?? i++, done: false }
 					},
 					return(value) {
 						// eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
@@ -95,9 +104,16 @@ describe("RPC proxy creates RPC-like structure, including chains", () => {
 				}
 			}
 			if ("this.is.a.generator" === method) {
-				return generated()
+				return generatedManual()
 			}
-			function asyncGenerated(): AsyncGenerator<unknown> {
+			// eslint-disable-next-line @typescript-eslint/require-await
+			async function* _asyncGenerated() {
+				let i = 1
+				while (i <= 3) {
+					yield i++
+				}
+			}
+			function asyncGeneratedManual(): Pick<AsyncGenerator<unknown>, "next" | "return" | "throw" | typeof Symbol.asyncIterator> {
 				let i = 1
 				return {
 					[Symbol.asyncIterator]() {
@@ -105,7 +121,10 @@ describe("RPC proxy creates RPC-like structure, including chains", () => {
 						return this
 					},
 					next(value) {
-						return Promise.resolve({ value: value ?? i++, done: i > 3 })
+						if (i > 3) {
+							return Promise.resolve({ value: undefined, done: true })
+						}
+						return Promise.resolve({ value: value ?? i++, done: false })
 					},
 					return(value) {
 						// eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
@@ -118,7 +137,7 @@ describe("RPC proxy creates RPC-like structure, including chains", () => {
 				}
 			}
 			if ("this.is.an.asyncGenerator" === method) {
-				return asyncGenerated()
+				return asyncGeneratedManual()
 			}
 			return next
 		},
@@ -205,7 +224,8 @@ describe("RPC proxy creates RPC-like structure, including chains", () => {
 		const iterator2 = given.this.is().a.generator()
 		expect(iterator2.next()).toEqual({ value: 1, done: false })
 		expect(iterator2.next()).toEqual({ value: 2, done: false })
-		expect(iterator2.next()).toEqual({ value: 3, done: true })
+		expect(iterator2.next()).toEqual({ value: 3, done: false })
+		expect(iterator2.next()).toEqual({ value: undefined, done: true })
 
 		const asyncIterator1 = given.this.is().an.asyncGenerator()
 		j = 1
@@ -216,6 +236,7 @@ describe("RPC proxy creates RPC-like structure, including chains", () => {
 		const asyncIterator2 = given.this.is().an.asyncGenerator()
 		await expect(asyncIterator2.next()).resolves.toEqual({ value: 1, done: false })
 		await expect(asyncIterator2.next()).resolves.toEqual({ value: 2, done: false })
-		await expect(asyncIterator2.next()).resolves.toEqual({ value: 3, done: true })
+		await expect(asyncIterator2.next()).resolves.toEqual({ value: 3, done: false })
+		await expect(asyncIterator2.next()).resolves.toEqual({ value: undefined, done: true })
 	})
 })

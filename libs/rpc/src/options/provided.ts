@@ -70,8 +70,8 @@ export interface ProvidedClientOptions<
 	 */
 	transformHandler?: TransformHandler
 	/**
-	 * Module methods cannot be called by default, they must explicitly be marked as RPC.For methods to be considered RPC,
-	 * they must either (a) define a property `.rpc` on itself or (b) have its method name listed in the allow list
+	 * Module methods cannot be called by default, they must explicitly be marked as RPC. For methods to be considered
+	 * RPC, they must either (a) define a property `.rpc` on itself or (b) have its method name listed in the allow list
 	 * (this option). This allow list follows the schema of the module provided.
 	 *
 	 * Setting a method to `true` will allow client-side access to server-side functions (if over HTTP: using POST

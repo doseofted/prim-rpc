@@ -9,7 +9,7 @@ export type WithoutPromiseWrapper<Given> = Given extends PromiseLike<infer Value
 
 /** Given the parameters and return value of a function, create a second call signature that supports forms (unless disabled) */
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
-type FunctionWithFormParameter<Params extends unknown[], Result, F extends true | false = true> = [F] extends [false]
+type FunctionWithFormParameter<Params extends unknown[], Result, F extends true | false = true> = F extends false
 	? {
 			(...args: Params): Result
 		}
@@ -27,7 +27,7 @@ export type RpcModule<
 	Recursive extends true | false = true,
 	Root extends true | false = true,
 	Keys extends keyof ModuleGiven = Extract<keyof ModuleGiven, string>,
-> = [Root] extends [false]
+> = Root extends false
 	? {
 			[Key in Keys as ModuleGiven[Key] extends object ? Key : never]: ModuleGiven[Key] extends (
 				...args: infer Args
