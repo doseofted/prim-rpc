@@ -16,7 +16,8 @@
 	"customizations": {
 		"vscode": {
 			"extensions": [
-				"redhat.vscode-yaml"
+				"redhat.vscode-yaml",
+				"TypeScriptTeam.native-preview"
 			]
 		}
 	}

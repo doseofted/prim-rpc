@@ -5,4 +5,5 @@
   ],
   "editor.wordWrapColumn": 120,
   "editor.formatOnSave": true,
+  "typescript.experimental.useTsgo": true
 }

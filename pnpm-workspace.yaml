@@ -3,10 +3,18 @@ auditConfig: {}
 engineStrict: true
 
 onlyBuiltDependencies:
-  - '@go-task/cli'
+  - "@go-task/cli"
+
+packages:
+  - "libs/*"
+  - "apps/*"
 
 sideEffectsCache: false
 
 supportedArchitectures:
   cpu: [current]
   os: [current]
+
+catalog:
+  tsdown: ^0.13.3
+  "@typescript/native-preview": 7.0.0-dev.20250807.1

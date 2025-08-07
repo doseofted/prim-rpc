@@ -10,10 +10,12 @@
 		"url": "https://doseofted.me/"
 	},
 	"scripts": {
-		"start": "task"
+		"start": "task",
+		"turbo": "turbo run"
 	},
 	"packageManager": "pnpm@10.14.0",
 	"devDependencies": {
-		"@go-task/cli": "^3.44.1"
+		"@go-task/cli": "^3.44.1",
+		"turbo": "^2.5.5"
 	}
 }
