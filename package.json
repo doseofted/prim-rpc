@@ -1,0 +1,19 @@
+{
+	"name": "@doseofted/prim-monorepo",
+	"description": "Monorepo that houses Prim+RPC projects",
+	"type": "module",
+	"license": "UNLICENSED",
+	"private": true,
+	"author": {
+		"name": "Ted Klingenberg",
+		"email": "ted@doseofted.com",
+		"url": "https://doseofted.me/"
+	},
+	"scripts": {
+		"start": "task"
+	},
+	"packageManager": "pnpm@10.14.0",
+	"devDependencies": {
+		"@go-task/cli": "^3.44.1"
+	}
+}

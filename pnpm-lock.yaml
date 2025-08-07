@@ -1,0 +1,30 @@
+lockfileVersion: '9.0'
+
+settings:
+  autoInstallPeers: true
+  excludeLinksFromLockfile: false
+
+importers:
+
+  .:
+    devDependencies:
+      '@go-task/cli':
+        specifier: ^3.44.1
+        version: 3.44.1
+
+packages:
+
+  '@go-task/cli@3.44.1':
+    resolution: {integrity: sha512-l5Wj8SyjPfnriFB0Y4+UErjyxtylLlBlHb5cCilk+PRDP+RBt8jNEfkKrkrmDtLc/u82aj6Cu0zqo1DvMwAKIg==}
+
+  '@go-task/go-npm@0.2.0':
+    resolution: {integrity: sha512-vQbdtBvesHm8EUFHX8QKg4rbBodmu9VsAXH1ozpbiN5jdTMOYHTCMM31EurAYmY+rNNtxJQ4JGy6t383RPlqbw==}
+    hasBin: true
+
+snapshots:
+
+  '@go-task/cli@3.44.1':
+    dependencies:
+      '@go-task/go-npm': 0.2.0
+
+  '@go-task/go-npm@0.2.0': {}

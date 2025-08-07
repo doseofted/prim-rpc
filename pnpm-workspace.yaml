@@ -1,0 +1,12 @@
+auditConfig: {}
+
+engineStrict: true
+
+onlyBuiltDependencies:
+  - '@go-task/cli'
+
+sideEffectsCache: false
+
+supportedArchitectures:
+  cpu: [current]
+  os: [current]
