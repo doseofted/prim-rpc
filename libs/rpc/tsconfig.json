@@ -1,9 +1,9 @@
 {
-  "compilerOptions": {
-    "module": "preserve",
-    "noEmit": true,
-    "isolatedDeclarations": true,
-    "isolatedModules": true,
-    "verbatimModuleSyntax": true
-  }
+	"compilerOptions": {
+		"module": "preserve",
+		"noEmit": true,
+		"isolatedDeclarations": true,
+		"isolatedModules": true,
+		"verbatimModuleSyntax": true
+	}
 }

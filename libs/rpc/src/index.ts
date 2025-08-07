@@ -1,1 +1,1 @@
-console.info("Prim+RPC")
+console.info("Prim+RPC");

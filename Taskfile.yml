@@ -2,6 +2,14 @@
 version: "3"
 
 tasks:
-  default:
-    cmd: task --list
-    silent: true
+  default: pnpm task --list
+
+  build:
+    desc: "Build all parts of the project"
+    cmd: pnpm turbo build
+
+  format:
+    aliases:
+      - lint
+    desc: "Lint and format all parts of the project, fix found issues"
+    cmd: pnpm biome check --write

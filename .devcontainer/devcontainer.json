@@ -10,14 +10,16 @@
 	"workspaceFolder": "/home/vscode/${localWorkspaceFolderBasename}",
 	"workspaceMount": "source=${localWorkspaceFolder},target=/home/vscode/${localWorkspaceFolderBasename},type=bind",
 	"mounts": [
-		"source=prim_rpc_root_node_modules,target=/home/vscode/${localWorkspaceFolderBasename}/node_modules,type=volume"
+		"source=prim_rpc_root_node_modules,target=/home/vscode/${localWorkspaceFolderBasename}/node_modules,type=volume",
+		"source=prim_rpc_libs_rpc_node_modules,target=/home/vscode/${localWorkspaceFolderBasename}/libs/rpc/node_modules,type=volume"
 	],
-	"postCreateCommand": "pnpm config set store-dir /home/vscode/.pnpm-store && sudo chown -R $USER:$USER /home/vscode/${localWorkspaceFolderBasename}/node_modules && pnpm install --frozen-lockfile && (echo 'alias task=\"pnpm start\"' >> /home/vscode/.bashrc)",
+	"postCreateCommand": "pnpm config set store-dir /home/vscode/.pnpm-store && find /home/vscode/${localWorkspaceFolderBasename} -name \"node_modules\" -type d -exec sudo chown -R $USER:$USER {} \\; && pnpm install --frozen-lockfile && (echo 'alias task=\"pnpm start\"' >> /home/vscode/.bashrc)",
 	"customizations": {
 		"vscode": {
 			"extensions": [
 				"redhat.vscode-yaml",
-				"TypeScriptTeam.native-preview"
+				"TypeScriptTeam.native-preview",
+				"biomejs.biome"
 			]
 		}
 	}

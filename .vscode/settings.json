@@ -1,9 +1,10 @@
 {
-  "editor.rulers": [
-    80,
-    120
-  ],
-  "editor.wordWrapColumn": 120,
-  "editor.formatOnSave": true,
-  "typescript.experimental.useTsgo": true
+	"editor.rulers": [80, 120],
+	"editor.wordWrapColumn": 120,
+	"editor.formatOnSave": true,
+	"typescript.experimental.useTsgo": true,
+	"editor.defaultFormatter": "biomejs.biome",
+	"[json]": {
+		"editor.defaultFormatter": "biomejs.biome"
+	}
 }

@@ -1,6 +1,7 @@
 {
-  "recommendations": [
-    "redhat.vscode-yaml",
-    "TypeScriptTeam.native-preview"
-  ]
+	"recommendations": [
+		"redhat.vscode-yaml",
+		"TypeScriptTeam.native-preview",
+		"biomejs.biome"
+	]
 }
