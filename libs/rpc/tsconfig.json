@@ -1,5 +1,6 @@
 {
 	"compilerOptions": {
+		"lib": ["ES2020"],
 		"module": "preserve",
 		"noEmit": true,
 		"isolatedDeclarations": true,

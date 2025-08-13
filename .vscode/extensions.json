@@ -2,6 +2,11 @@
 	"recommendations": [
 		"redhat.vscode-yaml",
 		"TypeScriptTeam.native-preview",
-		"biomejs.biome"
+		"biomejs.biome",
+		"streetsidesoftware.code-spell-checker"
+	],
+	"unwantedRecommendations": [
+		"dbaeumer.vscode-eslint",
+		"esbenp.prettier-vscode"
 	]
 }

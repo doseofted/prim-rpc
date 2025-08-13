@@ -6,10 +6,23 @@ tasks:
 
   build:
     desc: "Build all parts of the project"
-    cmd: pnpm turbo build
+    cmd: pnpm turbo build {{.CLI_ARGS}}
+
+  dev:
+    desc: "Start all projects in development mode"
+    cmd: pnpm turbo dev {{.CLI_ARGS}}
+
+  test:
+    desc: "Run tests for all parts of the project"
+    cmd: pnpm vitest run {{.CLI_ARGS}}
+
+  testing:
+    desc: "Run tests for all parts of the project"
+    ignore_error: true
+    cmd: pnpm vitest {{.CLI_ARGS}}
 
   format:
     aliases:
       - lint
     desc: "Lint and format all parts of the project, fix found issues"
-    cmd: pnpm biome check --write
+    cmd: pnpm biome check --write {{.CLI_ARGS}}

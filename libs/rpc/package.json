@@ -41,10 +41,16 @@
 		"CHANGELOG.md"
 	],
 	"devDependencies": {
+		"@types/node": "catalog:",
 		"@typescript/native-preview": "catalog:",
 		"tsdown": "catalog:"
 	},
 	"scripts": {
-		"build": "tsdown"
+		"build": "tsdown",
+		"dev": "tsdown --watch",
+		"test": "vitest"
+	},
+	"dependencies": {
+		"es-toolkit": "^1.39.8"
 	}
 }
