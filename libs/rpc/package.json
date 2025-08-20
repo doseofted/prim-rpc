@@ -51,6 +51,7 @@
 		"test": "vitest"
 	},
 	"dependencies": {
-		"es-toolkit": "^1.39.8"
+		"es-toolkit": "^1.39.8",
+		"proxy-deep": "^4.0.1"
 	}
 }
