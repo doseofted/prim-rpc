@@ -1,26 +1,26 @@
 import { afterEach, beforeEach, describe, expect, test, vi } from "vitest";
-import { ToBeDetermined, ToBeDeterminedError } from "./iterable-promise";
+import { UnknownAsync, UnknownAsyncError } from "./unknown-async";
 
 beforeEach(() => vi.useFakeTimers());
 afterEach(() => vi.useRealTimers());
 
-describe("ToBeDetermined throws errors when invalid values are given", () => {
+describe("UnknownAsync throws errors when invalid values are given", () => {
 	test("value can only be given once", async () => {
-		const tbd = new ToBeDetermined();
+		const tbd = new UnknownAsync();
 		const promised = Promise.resolve(42);
 		expect(tbd.givePromise(promised)).toBe(true);
-		expect(() => tbd.givePromise(promised)).toThrowError(ToBeDeterminedError);
+		expect(() => tbd.givePromise(promised)).toThrowError(UnknownAsyncError);
 	});
 
 	test("promises can be resolved only when promised value is given", async () => {
-		const tbd = new ToBeDetermined();
+		const tbd = new UnknownAsync();
 		async function iteration() {
 			for await (const _ of tbd.proxy) {
 				expect.unreachable();
 			}
 		}
 		const expectIterationFails = expect(iteration()).rejects.toThrowError(
-			ToBeDeterminedError,
+			UnknownAsyncError,
 		);
 		const expectPromiseResolve = expect(tbd.proxy).resolves.toBe(42);
 		setTimeout(() => {
@@ -33,12 +33,12 @@ describe("ToBeDetermined throws errors when invalid values are given", () => {
 	});
 
 	test("iteration can happen only when iterator is given", async () => {
-		const tbd = new ToBeDetermined();
+		const tbd = new UnknownAsync();
 		function* generator() {
 			yield 1;
 		}
 		const expectPromiseReject = expect(tbd.proxy).rejects.toThrowError(
-			ToBeDeterminedError,
+			UnknownAsyncError,
 		);
 		const iterationSucceeds1 = expect(tbd.proxy.next()).resolves.toEqual({
 			value: 1,
@@ -59,24 +59,24 @@ describe("ToBeDetermined throws errors when invalid values are given", () => {
 	});
 
 	test("can only resolve or iterate when something is given", async () => {
-		const tbd = new ToBeDetermined();
+		const tbd = new UnknownAsync();
 		tbd.giveNothing();
 		const failPromise = expect(tbd.proxy).rejects.toThrowError(
-			ToBeDeterminedError,
+			UnknownAsyncError,
 		);
 		const failIterator = expect(tbd.proxy.next()).rejects.toThrowError(
-			ToBeDeterminedError,
+			UnknownAsyncError,
 		);
 		await Promise.all([failPromise, failIterator]);
 	});
 
 	test("can only resolve or iterate when something is given eventually", async () => {
-		const tbd = new ToBeDetermined();
+		const tbd = new UnknownAsync();
 		const failPromise = expect(tbd.proxy).rejects.toThrowError(
-			ToBeDeterminedError,
+			UnknownAsyncError,
 		);
 		const failIterator = expect(tbd.proxy.next()).rejects.toThrowError(
-			ToBeDeterminedError,
+			UnknownAsyncError,
 		);
 		setTimeout(() => {
 			tbd.giveNothing();
@@ -84,19 +84,38 @@ describe("ToBeDetermined throws errors when invalid values are given", () => {
 		vi.runAllTimers();
 		await Promise.all([failPromise, failIterator]);
 	});
+
+	test("rejects with custom error when nothing is given", async () => {
+		const tbd = new UnknownAsync();
+		class CustomError extends Error {
+			constructor(message?: string) {
+				super(message);
+				this.name = "CustomError";
+			}
+		}
+		const failPromise = expect(tbd.proxy).rejects.toThrowError(CustomError);
+		const failIterator = expect(tbd.proxy.next()).rejects.toThrowError(
+			CustomError,
+		);
+		setTimeout(() => {
+			tbd.giveNothing(new CustomError("It's custom now."));
+		}, 3_000);
+		vi.runAllTimers();
+		await Promise.all([failPromise, failIterator]);
+	});
 });
 
-describe("ToBeDetermined supports promises", () => {
+describe("UnknownAsync supports promises", () => {
 	test("resolves promise with promise given", async () => {
 		const value = 42;
 		const promised = Promise.resolve(value);
-		const promise = new ToBeDetermined();
+		const promise = new UnknownAsync();
 		promise.givePromise(promised);
 		await expect(promise.proxy).resolves.toBe(value);
 	});
 
 	test("resolves promise with non-promise given", async () => {
-		const promise = new ToBeDetermined();
+		const promise = new UnknownAsync();
 		const value = 42;
 		promise.givePromise(value);
 		await expect(promise.proxy).resolves.toBe(value);
@@ -105,7 +124,7 @@ describe("ToBeDetermined supports promises", () => {
 	test("resolves without given value prior", async () => {
 		const value = 42;
 		const promise = Promise.resolve(value);
-		const iterablePromise = new ToBeDetermined();
+		const iterablePromise = new UnknownAsync();
 		setTimeout(() => {
 			iterablePromise.givePromise(promise);
 		}, 3_000);
@@ -128,7 +147,7 @@ describe("ToBeDetermined supports promises", () => {
 	test("rejects without given value prior", async () => {
 		const error = new Error("Uh-oh");
 		const promise = Promise.reject(error);
-		const iterablePromise = new ToBeDetermined();
+		const iterablePromise = new UnknownAsync();
 		setTimeout(() => {
 			iterablePromise.givePromise(promise);
 		}, 3_000);
@@ -149,9 +168,9 @@ describe("ToBeDetermined supports promises", () => {
 	});
 });
 
-describe("ToBeDetermined supports iterators", () => {
+describe("UnknownAsync supports iterators", () => {
 	test("exposes async iterator symbol", async () => {
-		const iterable = new ToBeDetermined();
+		const iterable = new UnknownAsync();
 		function* generator() {
 			yield 1;
 		}
@@ -162,7 +181,7 @@ describe("ToBeDetermined supports iterators", () => {
 	});
 
 	test("can be iterated with awaited for-of loop", async () => {
-		const iterable = new ToBeDetermined();
+		const iterable = new UnknownAsync();
 		function* generator() {
 			yield 1;
 			yield 2;
@@ -188,7 +207,7 @@ describe("ToBeDetermined supports iterators", () => {
 	});
 
 	test("iterates with next method", async () => {
-		const iterable = new ToBeDetermined();
+		const iterable = new UnknownAsync();
 		function* generator() {
 			yield 1;
 			yield 2;
@@ -214,7 +233,7 @@ describe("ToBeDetermined supports iterators", () => {
 	});
 
 	test("can use throw method", async () => {
-		const iterable = new ToBeDetermined();
+		const iterable = new UnknownAsync();
 		const errorCaught = vi.fn();
 		function* generator() {
 			try {
@@ -248,7 +267,7 @@ describe("ToBeDetermined supports iterators", () => {
 	});
 
 	test("can return early from iterator", async () => {
-		const iterable = new ToBeDetermined();
+		const iterable = new UnknownAsync();
 		function* generator() {
 			yield 1;
 			yield 2;
@@ -293,7 +312,7 @@ describe("ToBeDetermined supports iterators", () => {
 				return { value: undefined, done: true };
 			},
 		};
-		const iterable = new ToBeDetermined();
+		const iterable = new UnknownAsync();
 		iterable.giveIterator(iterator);
 		const expected = expect(
 			Promise.all([
@@ -314,7 +333,7 @@ describe("ToBeDetermined supports iterators", () => {
 	});
 
 	test("iterates with an async next method", async () => {
-		const iterable = new ToBeDetermined();
+		const iterable = new UnknownAsync();
 		async function* generator() {
 			yield 1;
 			yield 2;
@@ -339,7 +358,7 @@ describe("ToBeDetermined supports iterators", () => {
 	});
 
 	test("iterates with next method without given value prior", async () => {
-		const iterable = new ToBeDetermined();
+		const iterable = new UnknownAsync();
 		function* generator() {
 			yield 1;
 			yield 2;

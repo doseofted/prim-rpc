@@ -6,10 +6,10 @@ enum ReusableMessages {
 	GivenNotIterable = "Given was not an iterable",
 	GivenNotPromise = "Given was not a promise",
 }
-export class ToBeDeterminedError extends Error {
+export class UnknownAsyncError extends Error {
 	constructor(message?: string) {
 		super(message);
-		this.name = "ToBeDeterminedError";
+		this.name = "UnknownAsyncError";
 	}
 }
 
@@ -21,7 +21,7 @@ enum GivenType {
 	Never,
 }
 
-export type ToBeDeterminedProxy =
+export type UnknownAsyncProxy =
 	// biome-ignore lint/suspicious/noExplicitAny: We could return any type of promise or iterator
 	AsyncIterableIterator<any, any, any> & Promise<any>; // & (() => Generator<any>);
 
@@ -38,7 +38,7 @@ export type ToBeDeterminedProxy =
  * without actually having to await an object. This class once initialized may
  * be wrapped in TypeScript types to reflect the intended return value.
  */
-export class ToBeDetermined<T extends ToBeDeterminedProxy> {
+export class UnknownAsync<T extends UnknownAsyncProxy> {
 	/** Original promise or iterable given */
 	#given?: unknown;
 
@@ -200,7 +200,7 @@ export class ToBeDetermined<T extends ToBeDeterminedProxy> {
 				if (this.#isIterable(promised)) {
 					return promised.next.apply(promised, args);
 				}
-				throw new ToBeDeterminedError(ReusableMessages.GivenNotIterable);
+				throw new UnknownAsyncError(ReusableMessages.GivenNotIterable);
 			},
 			return: async (...args: unknown[]) => {
 				if (this.#isIterable(this.#given)) {
@@ -211,7 +211,7 @@ export class ToBeDetermined<T extends ToBeDeterminedProxy> {
 				if (this.#isIterable(promised)) {
 					return promised.return.apply(promised, args);
 				}
-				throw new ToBeDeterminedError(ReusableMessages.GivenNotIterable);
+				throw new UnknownAsyncError(ReusableMessages.GivenNotIterable);
 			},
 			throw: async (...args: unknown[]) => {
 				if (this.#isIterable(this.#given)) {
@@ -222,7 +222,7 @@ export class ToBeDetermined<T extends ToBeDeterminedProxy> {
 				if (this.#isIterable(promised)) {
 					return promised.throw.apply(promised, args);
 				}
-				throw new ToBeDeterminedError(ReusableMessages.GivenNotIterable);
+				throw new UnknownAsyncError(ReusableMessages.GivenNotIterable);
 			},
 		};
 	}
@@ -231,7 +231,7 @@ export class ToBeDetermined<T extends ToBeDeterminedProxy> {
 
 	#checkAlreadyGiven() {
 		if (!this.#givenType) return;
-		throw new ToBeDeterminedError(`Value already given (${this.#givenType})`);
+		throw new UnknownAsyncError(`Value already given (${this.#givenType})`);
 	}
 
 	/**
@@ -245,7 +245,7 @@ export class ToBeDetermined<T extends ToBeDeterminedProxy> {
 		this.#promisedIteratorRejectWhenReady = () => {
 			if (!this.#notPreparedMethodCalls[GivenType.Iterator]) return;
 			this.#promisedIteratorReject(
-				new ToBeDeterminedError(ReusableMessages.GivenNotIterable),
+				new UnknownAsyncError(ReusableMessages.GivenNotIterable),
 			);
 			this.#notPreparedMethodCalls[GivenType.Iterator] = false;
 		};
@@ -268,27 +268,27 @@ export class ToBeDetermined<T extends ToBeDeterminedProxy> {
 		this.#promiseRejectWhenReady = () => {
 			if (!this.#notPreparedMethodCalls[GivenType.Promise]) return;
 			this.#promiseReject(
-				new ToBeDeterminedError(ReusableMessages.GivenNotPromise),
+				new UnknownAsyncError(ReusableMessages.GivenNotPromise),
 			);
 			this.#notPreparedMethodCalls[GivenType.Promise] = false;
 		};
 		if (this.#isIterable(this.#given)) {
 			this.#promisedIteratorResolve(this.#given);
 		} else {
-			throw new ToBeDeterminedError(ReusableMessages.GivenNotIterable);
+			throw new UnknownAsyncError(ReusableMessages.GivenNotIterable);
 		}
 		return true;
 	}
 
-	giveNothing() {
+	giveNothing(customError?: Error) {
 		this.#checkAlreadyGiven();
 		this.#givenType = GivenType.Never;
 		this.#promiseReject(
-			new ToBeDeterminedError(ReusableMessages.GivenNotPromise),
+			customError ?? new UnknownAsyncError(ReusableMessages.GivenNotPromise),
 		);
 		this.#notPreparedMethodCalls[GivenType.Promise] = false;
 		this.#promisedIteratorReject(
-			new ToBeDeterminedError(ReusableMessages.GivenNotIterable),
+			customError ?? new UnknownAsyncError(ReusableMessages.GivenNotIterable),
 		);
 		this.#notPreparedMethodCalls[GivenType.Iterator] = false;
 		return true;
