@@ -51,7 +51,9 @@
 		"test": "vitest"
 	},
 	"dependencies": {
+		"emery": "^1.4.4",
 		"es-toolkit": "^1.39.8",
-		"proxy-deep": "^4.0.1"
+		"proxy-deep": "^4.0.1",
+		"type-fest": "^4.41.0"
 	}
 }
