@@ -15,14 +15,6 @@ import {
 // TODO: consider creating "proxy of proxies" object to determine which proxy to use
 //       (such as CallCatcher or UnknownAsync)
 
-// type ObjectTree =
-// 	| Extract<CaughtType, CaughtType.Call | CaughtType.New>
-// 	| {
-// 			[key: PropertyKey]: ObjectTree;
-// 	  };
-
-// type CallCatcherInstances = Record<PropertyKey, CallCatcher>;
-
 type CallCondition = (next: symbol, stack: CaughtStack) => unknown;
 /**
  * Recursively records all method calls and properties accessed on an object
@@ -50,6 +42,7 @@ export class CallCatcher<ObjectShape = any> {
 
 	/** The instance that created the class */
 	// #directParent: CallCatcher | null = null;
+
 	/** The top-level instance that created the class */
 	#rootParent: CallCatcher | null = null;
 
@@ -89,25 +82,30 @@ export class CallCatcher<ObjectShape = any> {
 			return this.#updateStack(stack, updateStack);
 		}
 		const newItemIsCallable = this.#utilities.caughtTypeIsCallable(newItem);
+		const itemInStackIsCallable = stack
+			.concat(lastItem)
+			.reverse()
+			.find(this.#utilities.caughtTypeIsCallable);
+		const chain = itemInStackIsCallable ? itemInStackIsCallable.id : undefined;
 		if (lastType === CaughtType.Prop && newItemIsCallable) {
 			const path = [...lastItem.path, ...newItem.path];
 			stack.push({
 				...newItem,
 				path,
+				chain,
 				id: this.#createUniqueId(),
 			});
 			return this.#updateStack(stack, updateStack);
 		}
 		if (lastItem) stack.push(lastItem);
-		const lastItemIsCallable = this.#utilities.caughtTypeIsCallable(lastItem);
 		const newItemWithId = {
 			...newItem,
 			id: this.#createUniqueId(),
 		};
-		if (lastItemIsCallable) {
+		if (itemInStackIsCallable) {
 			stack.push({
 				...newItemWithId,
-				chain: lastItem.id,
+				chain,
 			});
 			return this.#updateStack(stack, updateStack);
 		}
@@ -141,7 +139,7 @@ export class CallCatcher<ObjectShape = any> {
 		},
 		construct: (_target, args, _newTarget) => {
 			const pendingStack = this.#appendToStack({
-				type: CaughtType.Call,
+				type: CaughtType.New,
 				path: [],
 				args,
 			});
@@ -153,32 +151,13 @@ export class CallCatcher<ObjectShape = any> {
 		},
 	}) as ObjectShape;
 
-	// proxy = new Proxy(this, {
-	// 	get(target, prop, receiver) {
-	// 		const id = createCaughtId(this.rootTarget.#lastId++);
-	// 		const value = this.rootTarget.#callCondition(
-	// 			this.rootTarget.#next,
-	// 			this.rootTarget.#stack,
-	// 		);
-	// 		const keepProxying = this.rootTarget.#next === value;
-	// 		if (keepProxying) {
-	// 			this.rootTarget.#stack.push({
-	// 				id,
-	// 				type: CaughtType.Prop,
-	// 				path: this.path.concat(prop),
-	// 			});
-	// 			return this.nest(() => null);
-	// 		} else {
-	// 			return value;
-	// 		}
-	// 		// return Reflect.get(target, prop, receiver);
-	// 	},
-	// 	apply(target, thisArg, argumentsList) {
-	// 		return Reflect.apply(target, thisArg, argumentsList);
-	// 	},
-	// }) as unknown as ObjectShape;
-
 	constructor(callCondition: CallCondition) {
 		this.#callCondition = callCondition;
+	}
+
+	destroy() {
+		this.#stack = null;
+		this.#rootParent = null;
+		this.#callCondition = null;
 	}
 }
