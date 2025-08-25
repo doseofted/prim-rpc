@@ -2,29 +2,6 @@ import { isFunction, isPromise, isSymbol } from "es-toolkit";
 import { isObject } from "es-toolkit/compat";
 import { CallCatcher, CaughtType } from "./call-catcher";
 
-enum ReusableMessages {
-	GivenNotIterable = "Given was not an iterable",
-	GivenNotPromise = "Given was not a promise",
-}
-export class UnknownAsyncError extends Error {
-	constructor(message?: string) {
-		super(message);
-		this.name = "UnknownAsyncError";
-	}
-}
-
-enum GivenType {
-	None = 0,
-	Promise,
-	Iterator,
-	Invalid,
-	Never,
-}
-
-export type UnknownAsyncProxy =
-	// biome-ignore lint/suspicious/noExplicitAny: We could return any type of promise or iterator
-	AsyncIterableIterator<any, any, any> & Promise<any>; // & (() => Generator<any>);
-
 /**
  * Returns a proxy object with methods of both a promise and an async iterable,
  * so that once it's decided whether the object is a promise or an iterable, all
@@ -286,3 +263,26 @@ export class UnknownAsync<T extends UnknownAsyncProxy> {
 		return true;
 	}
 }
+
+enum ReusableMessages {
+	GivenNotIterable = "Given was not an iterable",
+	GivenNotPromise = "Given was not a promise",
+}
+export class UnknownAsyncError extends Error {
+	constructor(message?: string) {
+		super(message);
+		this.name = "UnknownAsyncError";
+	}
+}
+
+enum GivenType {
+	None = 0,
+	Promise,
+	Iterator,
+	Invalid,
+	Never,
+}
+
+export type UnknownAsyncProxy =
+	// biome-ignore lint/suspicious/noExplicitAny: We could return any type of promise or iterator
+	AsyncIterableIterator<any, any, any> & Promise<any>; // & (() => Generator<any>);

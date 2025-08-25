@@ -1,10 +1,10 @@
 import { describe, expect, test, vi } from "vitest";
-import { CallCatcher } from "./call-catcher";
 import {
+	CallCatcher,
 	type Caught,
 	type CaughtStack,
 	CaughtType,
-} from "./call-catcher-structure";
+} from "./call-catcher";
 
 describe("CallCatcher can catch direct calls and props", () => {
 	test("can catch direct method calls", () => {

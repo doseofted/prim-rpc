@@ -1,20 +1,8 @@
+import { castToOpaque, type Opaque } from "emery";
 import type { SetOptional } from "type-fest";
-import {
-	type Caught,
-	type CaughtCall,
-	type CaughtId,
-	type CaughtNew,
-	type CaughtStack,
-	CaughtType,
-	createCaughtId,
-} from "./call-catcher-structure";
-
-export * from "./call-catcher-structure";
 
 // TODO: consider creating "proxy of proxies" object to determine which proxy to use
 //       (such as CallCatcher or UnknownAsync)
-
-type CallCondition = (next: symbol, stack: CaughtStack) => unknown;
 
 /**
  * Recursively records all method calls and properties accessed on an object
@@ -149,3 +137,45 @@ export class CallCatcher<ObjectShape = any> {
 		this.#callCondition = callCondition;
 	}
 }
+
+const CaughtIdSymbol: unique symbol = Symbol();
+export type CaughtId = Opaque<number, typeof CaughtIdSymbol>;
+export function createCaughtId(id: number) {
+	return castToOpaque<CaughtId>(id);
+}
+
+export type CallCondition = (next: symbol, stack: CaughtStack) => unknown;
+
+export enum CaughtType {
+	/** Property access */
+	Prop = 1,
+	/** Method calls */
+	Call,
+	/** Constructor calls */
+	New,
+}
+
+export type CaughtBase = {
+	id: CaughtId;
+	path: PropertyKey[];
+	type: CaughtType;
+	chain?: CaughtId;
+};
+
+export type CaughtCall<Args extends unknown[] = unknown[]> = CaughtBase & {
+	type: CaughtType.Call;
+	args: Args;
+};
+
+export type CaughtProp = CaughtBase & {
+	type: CaughtType.Prop;
+};
+
+export type CaughtNew<Args extends unknown[] = unknown[]> = CaughtBase & {
+	type: CaughtType.New;
+	args: Args;
+};
+
+export type Caught = CaughtCall | CaughtProp | CaughtNew;
+
+export type CaughtStack = Caught[];
