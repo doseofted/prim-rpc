@@ -1,6 +1,6 @@
 import { isFunction, isPromise, isSymbol } from "es-toolkit";
 import { isObject } from "es-toolkit/compat";
-import { DeepProxy } from "proxy-deep";
+import { CallCatcher, CaughtType } from "./call-catcher";
 
 enum ReusableMessages {
 	GivenNotIterable = "Given was not an iterable",
@@ -71,49 +71,41 @@ export class UnknownAsync<T extends UnknownAsyncProxy> {
 	 * Promise or iterator methods can be called on this proxy before the promise
 	 * or iterator is given the instance of this class.
 	 */
-	proxy = new DeepProxy(this, {
-		get(_target, property, _receiver) {
-			if (this.rootTarget.#methods.includes(property)) {
-				return this.nest(() => null);
-			}
-		},
-		apply(_target, _thisArg, argArray) {
-			const methodName = this.path.at(-1) as PropertyKey;
-			const includesPromiseMethod =
-				this.rootTarget.#methodsPromise.includes(methodName);
-			if (includesPromiseMethod) {
-				if (this.rootTarget.#givenType !== GivenType.Promise) {
-					this.rootTarget.#notPreparedMethodCalls[GivenType.Promise] = true;
-				}
-				// if given nothing, return a promise that once given
-				// - an iterable, rejects with error (given was not expected)
-				// - a promise, resolves/rejects to promise result
-				// if given a promise, return the promise
-				// if given an iterable, give error
-				return this.rootTarget.#promise[methodName].apply(
-					this.rootTarget.#promise,
-					argArray,
-				);
-			}
-			const includesIteratorMethod =
-				this.rootTarget.#methodsIterator.includes(methodName);
-			if (includesIteratorMethod) {
-				if (this.rootTarget.#givenType !== GivenType.Iterator) {
-					this.rootTarget.#notPreparedMethodCalls[GivenType.Iterator] = true;
-				}
-				// if given nothing, return an async iterator that once given
-				// - an iterable, iterate with given method
-				// - a promise, throws error on next iteration (given was not expected)
-				// if given a promise, error
-				// if given an iterator, return iterator
-				return this.rootTarget.#iterator[methodName].apply(
-					this.rootTarget.#iterator,
-					argArray,
-				);
-			}
-			// return get(this.rootTarget.#given, this.path)(...argArray);
-		},
-	}) as unknown as T;
+	proxy = new CallCatcher<T>((next, stack) => {
+		const caught = stack.at(-1);
+		const methodName = caught.path.at(-1);
+		const methodNameGiven = methodName !== undefined;
+		const includesMethodName = this.#methods.includes(methodName);
+		if (methodNameGiven && !includesMethodName) return;
+		if (caught.type !== CaughtType.Call) return next;
+		const includesPromiseMethod = this.#methodsPromise.includes(methodName);
+		const notGivenPromiseType = this.#givenType !== GivenType.Promise;
+		if (includesPromiseMethod && notGivenPromiseType) {
+			this.#notPreparedMethodCalls[GivenType.Promise] = true;
+		}
+		if (includesPromiseMethod) {
+			// if given nothing, return a promise that once given
+			// - an iterable, rejects with error (given was not expected)
+			// - a promise, resolves/rejects to promise result
+			// if given a promise, return the promise
+			// if given an iterable, give error
+			return this.#promise[methodName].apply(this.#promise, caught.args);
+		}
+		const includesIteratorMethod = this.#methodsIterator.includes(methodName);
+		const notGivenIteratorType = this.#givenType !== GivenType.Iterator;
+		if (includesIteratorMethod && notGivenIteratorType) {
+			this.#notPreparedMethodCalls[GivenType.Iterator] = true;
+		}
+		if (includesIteratorMethod) {
+			// if given nothing, return an async iterator that once given
+			// - an iterable, iterate with given method
+			// - a promise, throws error on next iteration (given was not expected)
+			// if given a promise, error
+			// if given an iterator, return iterator
+			return this.#iterator[methodName].apply(this.#iterator, caught.args);
+		}
+		return next;
+	}).proxy;
 
 	#promise: Promise<unknown>;
 	#promiseResolve: (value: unknown | PromiseLike<unknown>) => void;

@@ -9,13 +9,13 @@ import {
 	createCaughtId,
 } from "./call-catcher-structure";
 
-// TODO: (1) consider creating more generic recursive proxy that tracks access to object
-//           - allow tracked items to be filtered
-// TODO: if (1) is considered, make CallCatcher build an RPC-like structure from it
+export * from "./call-catcher-structure";
+
 // TODO: consider creating "proxy of proxies" object to determine which proxy to use
 //       (such as CallCatcher or UnknownAsync)
 
 type CallCondition = (next: symbol, stack: CaughtStack) => unknown;
+
 /**
  * Recursively records all method calls and properties accessed on an object
  * until an end condition is met, after which the recorded properties and
@@ -36,12 +36,6 @@ export class CallCatcher<ObjectShape = any> {
 
 	#stack: CaughtStack = [];
 	#callCondition: CallCondition;
-
-	/** Avoid creating new nested proxies, if already created */
-	// #instances: CallCatcherInstances = {};
-
-	/** The instance that created the class */
-	// #directParent: CallCatcher | null = null;
 
 	/** The top-level instance that created the class */
 	#rootParent: CallCatcher | null = null;
@@ -153,11 +147,5 @@ export class CallCatcher<ObjectShape = any> {
 
 	constructor(callCondition: CallCondition) {
 		this.#callCondition = callCondition;
-	}
-
-	destroy() {
-		this.#stack = null;
-		this.#rootParent = null;
-		this.#callCondition = null;
 	}
 }
