@@ -16,6 +16,11 @@ import { CallCatcher, CaughtType } from "./call-catcher";
  * be wrapped in TypeScript types to reflect the intended return value.
  */
 export class UnknownAsync<T extends UnknownAsyncProxy> {
+	#handle?: HandleUnknownOptions;
+	constructor(handle?: HandleUnknownOptions) {
+		this.#handle = handle;
+	}
+
 	/** Original promise or iterable given */
 	#given?: unknown;
 
@@ -48,50 +53,71 @@ export class UnknownAsync<T extends UnknownAsyncProxy> {
 	 * Promise or iterator methods can be called on this proxy before the promise
 	 * or iterator is given the instance of this class.
 	 */
-	proxy = new CallCatcher<T>((next, stack) => {
-		const caught = stack.at(-1);
-		const methodName = caught.path.at(-1);
-		const methodNameGiven = methodName !== undefined;
-		const includesMethodName = this.#methods.includes(methodName);
-		if (methodNameGiven && !includesMethodName) return;
-		if (caught.type !== CaughtType.Call) return next;
-		const includesPromiseMethod = this.#methodsPromise.includes(methodName);
-		const notGivenPromiseType = this.#givenType !== GivenType.Promise;
-		if (includesPromiseMethod && notGivenPromiseType) {
-			this.#notPreparedMethodCalls[GivenType.Promise] = true;
-		}
-		if (includesPromiseMethod) {
-			// if given nothing, return a promise that once given
-			// - an iterable, rejects with error (given was not expected)
-			// - a promise, resolves/rejects to promise result
-			// if given a promise, return the promise
-			// if given an iterable, give error
-			return this.#promise[methodName].apply(this.#promise, caught.args);
-		}
-		const includesIteratorMethod = this.#methodsIterator.includes(methodName);
-		const notGivenIteratorType = this.#givenType !== GivenType.Iterator;
-		if (includesIteratorMethod && notGivenIteratorType) {
-			this.#notPreparedMethodCalls[GivenType.Iterator] = true;
-		}
-		if (includesIteratorMethod) {
-			// if given nothing, return an async iterator that once given
-			// - an iterable, iterate with given method
-			// - a promise, throws error on next iteration (given was not expected)
-			// if given a promise, error
-			// if given an iterator, return iterator
-			return this.#iterator[methodName].apply(this.#iterator, caught.args);
-		}
-		return next;
-	}).proxy;
+	proxy = new CallCatcher<T>(
+		(next, stack) => {
+			const caught = stack.at(-1);
+			const methodName = caught.path.at(-1);
+			const methodNameGiven = methodName !== undefined;
+			const includesMethodName = this.#methods.includes(methodName);
+			if (methodNameGiven && !includesMethodName) return;
+			if (caught.type !== CaughtType.Call) return next;
+			const includesPromiseMethod = this.#methodsPromise.includes(methodName);
+			const notGivenPromiseType = this.#givenType !== GivenType.Promise;
+			if (includesPromiseMethod && notGivenPromiseType) {
+				this.#notPreparedMethodCalls[GivenType.Promise] = true;
+			}
+			const handlePromises = this.#handle.promises;
+			if (includesPromiseMethod && !handlePromises) {
+				throw new TypeError("Target is not a promise");
+			}
+			if (includesPromiseMethod) {
+				// if given nothing, return a promise that once given
+				// - an iterable, rejects with error (given was not expected)
+				// - a promise, resolves/rejects to promise result
+				// if given a promise, return the promise
+				// if given an iterable, give error
+				return this.#promise[methodName].apply(this.#promise, caught.args);
+			}
+			const includesIteratorMethod = this.#methodsIterator.includes(methodName);
+			const notGivenIteratorType = this.#givenType !== GivenType.Iterator;
+			if (includesIteratorMethod && notGivenIteratorType) {
+				this.#notPreparedMethodCalls[GivenType.Iterator] = true;
+			}
+			const handleIterators = this.#handle.iterators;
+			if (includesIteratorMethod && !handleIterators) {
+				throw new TypeError("Target is not an iterator");
+			}
+			if (includesIteratorMethod) {
+				// if given nothing, return an async iterator that once given
+				// - an iterable, iterate with given method
+				// - a promise, throws error on next iteration (given was not expected)
+				// if given a promise, error
+				// if given an iterator, return iterator
+				return this.#iterator[methodName].apply(this.#iterator, caught.args);
+			}
+			return next;
+		},
+		{
+			callFunction: true,
+			propAccess: true,
+		},
+	).proxy;
 
-	#promise: Promise<unknown>;
 	#promiseResolve: (value: unknown | PromiseLike<unknown>) => void;
 	#promiseReject: (reason?: unknown) => void;
 	#promiseRejectWhenReady?: () => void;
+	// same as `Promise.withResolvers` (still relatively new in 2025)
+	#promise = new Promise<unknown>((resolve, reject) => {
+		this.#promiseResolve = (resolved) => {
+			this.#promisedIteratorRejectWhenReady?.();
+			resolve(resolved);
+		};
+		this.#promiseReject = (rejected) => {
+			this.#promisedIteratorRejectWhenReady?.();
+			reject(rejected);
+		};
+	});
 
-	#promisedIterator: Promise<
-		IterableIterator<unknown> | AsyncIterableIterator<unknown>
-	>;
 	#promisedIteratorResolve: (
 		value:
 			| IterableIterator<unknown>
@@ -100,12 +126,60 @@ export class UnknownAsync<T extends UnknownAsyncProxy> {
 	) => void;
 	#promisedIteratorReject: (reason?: unknown) => void;
 	#promisedIteratorRejectWhenReady?: () => void;
+	// same as `Promise.withResolvers` (still relatively new in 2025)
+	#promisedIterator = new Promise((resolve, reject) => {
+		this.#promisedIteratorResolve = (resolved) => {
+			this.#promiseRejectWhenReady?.();
+			resolve(resolved);
+		};
+		this.#promisedIteratorReject = (rejected) => {
+			this.#promiseRejectWhenReady?.();
+			reject(rejected);
+		};
+	});
 
 	/**
 	 * This is specifically an iterator (not just an iterable) because we want to
 	 * handle an iterator specifically (not other iterables like a Set or Map)
 	 */
-	#iterator: AsyncIterableIterator<unknown>;
+	#iterator = {
+		[Symbol.asyncIterator]() {
+			return this;
+		},
+		next: async (...args: unknown[]) => {
+			if (this.#isIterable(this.#given)) {
+				this.#promiseRejectWhenReady?.();
+				return this.#given.next.apply(this.#given, args);
+			}
+			const promised = await this.#promisedIterator;
+			if (this.#isIterable(promised)) {
+				return promised.next.apply(promised, args);
+			}
+			throw new UnknownAsyncError(ReusableMessages.GivenNotIterable);
+		},
+		return: async (...args: unknown[]) => {
+			if (this.#isIterable(this.#given)) {
+				this.#promiseRejectWhenReady?.();
+				return this.#given.return.apply(this.#given, args);
+			}
+			const promised = await this.#promisedIterator;
+			if (this.#isIterable(promised)) {
+				return promised.return.apply(promised, args);
+			}
+			throw new UnknownAsyncError(ReusableMessages.GivenNotIterable);
+		},
+		throw: async (...args: unknown[]) => {
+			if (this.#isIterable(this.#given)) {
+				this.#promiseRejectWhenReady?.();
+				return this.#given.throw.apply(this.#given, args);
+			}
+			const promised = await this.#promisedIterator;
+			if (this.#isIterable(promised)) {
+				return promised.throw.apply(promised, args);
+			}
+			throw new UnknownAsyncError(ReusableMessages.GivenNotIterable);
+		},
+	};
 
 	#isPromise(given: unknown, setGivenType = false): given is Promise<unknown> {
 		if (this.#givenType === GivenType.Promise) return true;
@@ -132,68 +206,6 @@ export class UnknownAsync<T extends UnknownAsyncProxy> {
 			this.#givenType = isIterator ? GivenType.Iterator : GivenType.Invalid;
 		}
 		return isIterator;
-	}
-
-	constructor() {
-		// same as `Promise.withResolvers` (still relatively new in 2025)
-		this.#promise = new Promise<unknown>((resolve, reject) => {
-			this.#promiseResolve = (resolved) => {
-				this.#promisedIteratorRejectWhenReady?.();
-				resolve(resolved);
-			};
-			this.#promiseReject = (rejected) => {
-				this.#promisedIteratorRejectWhenReady?.();
-				reject(rejected);
-			};
-		});
-		this.#promisedIterator = new Promise((resolve, reject) => {
-			this.#promisedIteratorResolve = (resolved) => {
-				this.#promiseRejectWhenReady?.();
-				resolve(resolved);
-			};
-			this.#promisedIteratorReject = (rejected) => {
-				this.#promiseRejectWhenReady?.();
-				reject(rejected);
-			};
-		});
-		this.#iterator = {
-			[Symbol.asyncIterator]() {
-				return this;
-			},
-			next: async (...args: unknown[]) => {
-				if (this.#isIterable(this.#given)) {
-					this.#promiseRejectWhenReady?.();
-					return this.#given.next.apply(this.#given, args);
-				}
-				const promised = await this.#promisedIterator;
-				if (this.#isIterable(promised)) {
-					return promised.next.apply(promised, args);
-				}
-				throw new UnknownAsyncError(ReusableMessages.GivenNotIterable);
-			},
-			return: async (...args: unknown[]) => {
-				if (this.#isIterable(this.#given)) {
-					this.#promiseRejectWhenReady?.();
-					return this.#given.return.apply(this.#given, args);
-				}
-				const promised = await this.#promisedIterator;
-				if (this.#isIterable(promised)) {
-					return promised.return.apply(promised, args);
-				}
-				throw new UnknownAsyncError(ReusableMessages.GivenNotIterable);
-			},
-			throw: async (...args: unknown[]) => {
-				if (this.#isIterable(this.#given)) {
-					this.#promiseRejectWhenReady?.();
-					return this.#given.throw.apply(this.#given, args);
-				}
-				const promised = await this.#promisedIterator;
-				if (this.#isIterable(promised)) {
-					return promised.throw.apply(promised, args);
-				}
-				throw new UnknownAsyncError(ReusableMessages.GivenNotIterable);
-			},
-		};
 	}
 
 	#givenType = GivenType.None;
@@ -263,6 +275,11 @@ export class UnknownAsync<T extends UnknownAsyncProxy> {
 		return true;
 	}
 }
+
+export type HandleUnknownOptions = {
+	iterators?: boolean;
+	promises?: boolean;
+};
 
 enum ReusableMessages {
 	GivenNotIterable = "Given was not an iterable",

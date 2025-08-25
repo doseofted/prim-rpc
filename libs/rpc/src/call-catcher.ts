@@ -12,6 +12,31 @@ import type { SetOptional } from "type-fest";
  */
 // biome-ignore lint/suspicious/noExplicitAny: Provided type could be any object
 export class CallCatcher<ObjectShape = any> {
+	// TODO: handle set/delete operations and consider what it means for handling property access
+
+	constructor(callCondition: CallCondition, catchOptions: CatchOptions = true) {
+		this.#callCondition = callCondition;
+		this.#shouldCatch = this.#expandOptions(catchOptions);
+	}
+
+	#expandOptions(options: CatchOptions): CatchOptionsGranular {
+		if (typeof options === "boolean") {
+			return {
+				callFunction: options,
+				callConstructor: options,
+				propAccess: options,
+				propAssignment: options,
+				propDeletion: options,
+			};
+		}
+		return options;
+	}
+
+	#shouldCatch: CatchOptionsGranular;
+	changeCaught(options: CatchOptions) {
+		this.#shouldCatch = this.#expandOptions(options);
+	}
+
 	#lastId: CaughtId = createCaughtId(0);
 	#createUniqueId(): CaughtId {
 		const root = this.#rootParent ?? this;
@@ -31,18 +56,9 @@ export class CallCatcher<ObjectShape = any> {
 	#createChild(pendingStack: CaughtStack): CallCatcher {
 		const child = new CallCatcher(this.#callCondition);
 		child.#rootParent = this.#rootParent ?? this;
-		// child.#directParent = this;
 		child.#stack = pendingStack;
 		return child;
 	}
-
-	#utilities = {
-		caughtTypeIsCallable(
-			given?: Omit<Caught, "id">,
-		): given is CaughtCall | CaughtNew {
-			return given && [CaughtType.Call, CaughtType.New].includes(given.type);
-		},
-	};
 
 	#updateStack(stack: CaughtStack, replaceStack = false): CaughtStack {
 		if (replaceStack) this.#stack = stack;
@@ -63,11 +79,11 @@ export class CallCatcher<ObjectShape = any> {
 			stack.push({ ...lastItem, id: this.#createUniqueId() });
 			return this.#updateStack(stack, updateStack);
 		}
-		const newItemIsCallable = this.#utilities.caughtTypeIsCallable(newItem);
+		const newItemIsCallable = newItem.type === CaughtType.Call;
 		const itemInStackIsCallable = stack
-			.concat(lastItem)
+			.concat(lastItem ? [lastItem] : [])
 			.reverse()
-			.find(this.#utilities.caughtTypeIsCallable);
+			.find((given) => given.type === CaughtType.Call);
 		const chain = itemInStackIsCallable ? itemInStackIsCallable.id : undefined;
 		if (lastType === CaughtType.Prop && newItemIsCallable) {
 			const path = [...lastItem.path, ...newItem.path];
@@ -95,47 +111,65 @@ export class CallCatcher<ObjectShape = any> {
 		return this.#updateStack(stack, updateStack);
 	}
 
+	#determineNext(pendingStack: CaughtStack) {
+		const next = Symbol();
+		const condition = this.#callCondition(next, pendingStack);
+		if (condition !== next) return condition;
+		const instance = this.#createChild(pendingStack);
+		return instance.proxy;
+	}
+
 	proxy = new Proxy(CallCatcher, {
 		get: (_target, property, _receiver) => {
+			if (!this.#shouldCatch.propAccess) return;
 			const pendingStack = this.#appendToStack({
 				type: CaughtType.Prop,
 				path: [property],
+				interaction: CaughtPropAccess.Access,
 			});
-			const next = Symbol();
-			const condition = this.#callCondition(next, pendingStack);
-			if (condition !== next) return condition;
-			const instance = this.#createChild(pendingStack);
-			return instance.proxy;
+			return this.#determineNext(pendingStack);
+		},
+		set(_target, property, _newValue, _receiver) {
+			if (!this.#shouldCatch.propAssignment) return;
+			const pendingStack = this.#appendToStack({
+				type: CaughtType.Prop,
+				path: [property],
+				interaction: CaughtPropAccess.Assignment,
+			});
+			return this.#determineNext(pendingStack);
+		},
+		deleteProperty(_target, property) {
+			if (!this.#shouldCatch.propDeletion) return;
+			const pendingStack = this.#appendToStack({
+				type: CaughtType.Prop,
+				path: [property],
+				interaction: CaughtPropAccess.Deletion,
+			});
+			return this.#determineNext(pendingStack);
 		},
 		apply: (_target, _thisArg, args) => {
+			if (!this.#shouldCatch.callFunction)
+				throw new TypeError("Target is not a function");
 			const pendingStack = this.#appendToStack({
 				type: CaughtType.Call,
 				path: [],
 				args,
+				constructed: false,
 			});
-			const next = Symbol();
-			const condition = this.#callCondition(next, pendingStack);
-			if (condition !== next) return condition;
-			const instance = this.#createChild(pendingStack);
-			return instance.proxy;
+			return this.#determineNext(pendingStack);
 		},
 		construct: (_target, args, _newTarget) => {
+			if (!this.#shouldCatch.callConstructor)
+				throw new TypeError("Target is not a constructor");
 			const pendingStack = this.#appendToStack({
-				type: CaughtType.New,
+				type: CaughtType.Call,
 				path: [],
 				args,
+				constructed: true,
 			});
-			const next = Symbol();
-			const condition = this.#callCondition(next, pendingStack);
-			if (condition !== next) return condition;
-			const instance = this.#createChild(pendingStack);
-			return instance.proxy;
+			return this.#determineNext(pendingStack);
 		},
 	}) as ObjectShape;
-
-	constructor(callCondition: CallCondition) {
-		this.#callCondition = callCondition;
-	}
 }
 
 const CaughtIdSymbol: unique symbol = Symbol();
@@ -144,6 +178,15 @@ export function createCaughtId(id: number) {
 	return castToOpaque<CaughtId>(id);
 }
 
+type CatchOptionsGranular = {
+	callFunction?: boolean;
+	callConstructor?: boolean;
+	propAccess?: boolean;
+	propAssignment?: boolean;
+	propDeletion?: boolean;
+};
+export type CatchOptions = boolean | CatchOptionsGranular;
+
 export type CallCondition = (next: symbol, stack: CaughtStack) => unknown;
 
 export enum CaughtType {
@@ -151,8 +194,6 @@ export enum CaughtType {
 	Prop = 1,
 	/** Method calls */
 	Call,
-	/** Constructor calls */
-	New,
 }
 
 export type CaughtBase = {
@@ -162,20 +203,31 @@ export type CaughtBase = {
 	chain?: CaughtId;
 };
 
+export enum CaughtCallType {
+	/** Function calls */
+	Function = 1,
+	/** Constructor calls */
+	Constructor,
+}
 export type CaughtCall<Args extends unknown[] = unknown[]> = CaughtBase & {
 	type: CaughtType.Call;
 	args: Args;
+	constructed: boolean;
 };
 
+export enum CaughtPropAccess {
+	/** Property access */
+	Access = 1,
+	/** Property assignment */
+	Assignment,
+	/** Property deletion */
+	Deletion,
+}
 export type CaughtProp = CaughtBase & {
 	type: CaughtType.Prop;
+	interaction: CaughtPropAccess;
 };
 
-export type CaughtNew<Args extends unknown[] = unknown[]> = CaughtBase & {
-	type: CaughtType.New;
-	args: Args;
-};
-
-export type Caught = CaughtCall | CaughtProp | CaughtNew;
+export type Caught = CaughtCall | CaughtProp;
 
 export type CaughtStack = Caught[];

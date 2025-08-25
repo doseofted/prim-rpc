@@ -1,19 +1,50 @@
 import { afterEach, beforeEach, describe, expect, test, vi } from "vitest";
-import { UnknownAsync, UnknownAsyncError } from "./unknown-async";
+import {
+	type HandleUnknownOptions,
+	UnknownAsync,
+	UnknownAsyncError,
+} from "./unknown-async";
 
 beforeEach(() => vi.useFakeTimers());
 afterEach(() => vi.useRealTimers());
 
+const handle: HandleUnknownOptions = {
+	promises: true,
+	iterators: true,
+};
+
+describe.todo("UnknownAsync can be configured", () => {
+	// ...
+});
+
 describe("UnknownAsync throws errors when invalid values are given", () => {
 	test("value can only be given once", async () => {
-		const tbd = new UnknownAsync();
+		const tbd = new UnknownAsync(handle);
 		const promised = Promise.resolve(42);
 		expect(tbd.givePromise(promised)).toBe(true);
 		expect(() => tbd.givePromise(promised)).toThrowError(UnknownAsyncError);
 	});
 
+	test("proxies only supported properties", async () => {
+		const tbd = new UnknownAsync(handle);
+		const promised = Promise.resolve(42);
+		expect(tbd.givePromise(promised)).toBe(true);
+		expect(tbd.proxy.then).toBeDefined();
+		expect(tbd.proxy.catch).toBeDefined();
+		expect(tbd.proxy.finally).toBeDefined();
+		expect(tbd.proxy.next).toBeDefined();
+		expect(tbd.proxy.return).toBeDefined();
+		expect(tbd.proxy.throw).toBeDefined();
+		expect(tbd.proxy[Symbol.asyncIterator]).toBeDefined();
+		// biome-ignore lint/suspicious/noExplicitAny: purposely giving unsupported properties
+		const proxy = tbd.proxy as any;
+		expect(proxy.iDoNotExist).toBeUndefined();
+		// proxied iterator will become async iterator
+		expect(proxy[Symbol.iterator]).toBeUndefined();
+	});
+
 	test("promises can be resolved only when promised value is given", async () => {
-		const tbd = new UnknownAsync();
+		const tbd = new UnknownAsync(handle);
 		async function iteration() {
 			for await (const _ of tbd.proxy) {
 				expect.unreachable();
@@ -33,7 +64,7 @@ describe("UnknownAsync throws errors when invalid values are given", () => {
 	});
 
 	test("iteration can happen only when iterator is given", async () => {
-		const tbd = new UnknownAsync();
+		const tbd = new UnknownAsync(handle);
 		function* generator() {
 			yield 1;
 		}
@@ -59,7 +90,7 @@ describe("UnknownAsync throws errors when invalid values are given", () => {
 	});
 
 	test("can only resolve or iterate when something is given", async () => {
-		const tbd = new UnknownAsync();
+		const tbd = new UnknownAsync(handle);
 		tbd.giveNothing();
 		const failPromise = expect(tbd.proxy).rejects.toThrowError(
 			UnknownAsyncError,
@@ -71,7 +102,7 @@ describe("UnknownAsync throws errors when invalid values are given", () => {
 	});
 
 	test("can only resolve or iterate when something is given eventually", async () => {
-		const tbd = new UnknownAsync();
+		const tbd = new UnknownAsync(handle);
 		const failPromise = expect(tbd.proxy).rejects.toThrowError(
 			UnknownAsyncError,
 		);
@@ -86,7 +117,7 @@ describe("UnknownAsync throws errors when invalid values are given", () => {
 	});
 
 	test("rejects with custom error when nothing is given", async () => {
-		const tbd = new UnknownAsync();
+		const tbd = new UnknownAsync(handle);
 		class CustomError extends Error {
 			constructor(message?: string) {
 				super(message);
@@ -109,13 +140,13 @@ describe("UnknownAsync supports promises", () => {
 	test("resolves promise with promise given", async () => {
 		const value = 42;
 		const promised = Promise.resolve(value);
-		const promise = new UnknownAsync();
+		const promise = new UnknownAsync(handle);
 		promise.givePromise(promised);
 		await expect(promise.proxy).resolves.toBe(value);
 	});
 
 	test("resolves promise with non-promise given", async () => {
-		const promise = new UnknownAsync();
+		const promise = new UnknownAsync(handle);
 		const value = 42;
 		promise.givePromise(value);
 		await expect(promise.proxy).resolves.toBe(value);
@@ -124,7 +155,7 @@ describe("UnknownAsync supports promises", () => {
 	test("resolves without given value prior", async () => {
 		const value = 42;
 		const promise = Promise.resolve(value);
-		const iterablePromise = new UnknownAsync();
+		const iterablePromise = new UnknownAsync(handle);
 		setTimeout(() => {
 			iterablePromise.givePromise(promise);
 		}, 3_000);
@@ -147,7 +178,7 @@ describe("UnknownAsync supports promises", () => {
 	test("rejects without given value prior", async () => {
 		const error = new Error("Uh-oh");
 		const promise = Promise.reject(error);
-		const iterablePromise = new UnknownAsync();
+		const iterablePromise = new UnknownAsync(handle);
 		setTimeout(() => {
 			iterablePromise.givePromise(promise);
 		}, 3_000);
@@ -170,7 +201,7 @@ describe("UnknownAsync supports promises", () => {
 
 describe("UnknownAsync supports iterators", () => {
 	test("exposes async iterator symbol", async () => {
-		const iterable = new UnknownAsync();
+		const iterable = new UnknownAsync(handle);
 		function* generator() {
 			yield 1;
 		}
@@ -181,7 +212,7 @@ describe("UnknownAsync supports iterators", () => {
 	});
 
 	test("can be iterated with awaited for-of loop", async () => {
-		const iterable = new UnknownAsync();
+		const iterable = new UnknownAsync(handle);
 		function* generator() {
 			yield 1;
 			yield 2;
@@ -207,7 +238,7 @@ describe("UnknownAsync supports iterators", () => {
 	});
 
 	test("iterates with next method", async () => {
-		const iterable = new UnknownAsync();
+		const iterable = new UnknownAsync(handle);
 		function* generator() {
 			yield 1;
 			yield 2;
@@ -233,7 +264,7 @@ describe("UnknownAsync supports iterators", () => {
 	});
 
 	test("can use throw method", async () => {
-		const iterable = new UnknownAsync();
+		const iterable = new UnknownAsync(handle);
 		const errorCaught = vi.fn();
 		function* generator() {
 			try {
@@ -267,7 +298,7 @@ describe("UnknownAsync supports iterators", () => {
 	});
 
 	test("can return early from iterator", async () => {
-		const iterable = new UnknownAsync();
+		const iterable = new UnknownAsync(handle);
 		function* generator() {
 			yield 1;
 			yield 2;
@@ -312,7 +343,7 @@ describe("UnknownAsync supports iterators", () => {
 				return { value: undefined, done: true };
 			},
 		};
-		const iterable = new UnknownAsync();
+		const iterable = new UnknownAsync(handle);
 		iterable.giveIterator(iterator);
 		const expected = expect(
 			Promise.all([
@@ -333,7 +364,7 @@ describe("UnknownAsync supports iterators", () => {
 	});
 
 	test("iterates with an async next method", async () => {
-		const iterable = new UnknownAsync();
+		const iterable = new UnknownAsync(handle);
 		async function* generator() {
 			yield 1;
 			yield 2;
@@ -358,7 +389,7 @@ describe("UnknownAsync supports iterators", () => {
 	});
 
 	test("iterates with next method without given value prior", async () => {
-		const iterable = new UnknownAsync();
+		const iterable = new UnknownAsync(handle);
 		function* generator() {
 			yield 1;
 			yield 2;

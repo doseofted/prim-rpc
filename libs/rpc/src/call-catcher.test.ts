@@ -6,6 +6,10 @@ import {
 	CaughtType,
 } from "./call-catcher";
 
+describe.todo("CallCatcher can be configured", () => {
+	// ...
+});
+
 describe("CallCatcher can catch direct calls and props", () => {
 	test("can catch direct method calls", () => {
 		type ToCatch = (cb: () => void) => Caught;
@@ -71,12 +75,15 @@ describe("CallCatcher can catch direct calls and props", () => {
 		const callCatcher = new CallCatcher<ToCatch>((next, stack) => {
 			const caught = stack.at(-1);
 			const constructed =
-				caught.type === CaughtType.New && caught.path.length === 0;
+				caught.type === CaughtType.Call &&
+				caught.constructed &&
+				caught.path.length === 0;
 			return constructed ? caught : next;
 		});
 		expect(new callCatcher.proxy()).toEqual(
 			expect.objectContaining({
-				type: CaughtType.New,
+				type: CaughtType.Call,
+				constructed: true,
 				path: [],
 			}),
 		);
@@ -91,12 +98,15 @@ describe("CallCatcher can catch direct calls and props", () => {
 		const callCatcher = new CallCatcher<ToCatch>((next, stack) => {
 			const caught = stack.at(-1);
 			const constructed =
-				caught.type === CaughtType.New && caught.path.at(-1) === "Test";
+				caught.type === CaughtType.Call &&
+				caught.constructed &&
+				caught.path.at(-1) === "Test";
 			return constructed ? caught : next;
 		});
 		expect(new callCatcher.proxy.Test()).toEqual(
 			expect.objectContaining({
-				type: CaughtType.New,
+				type: CaughtType.Call,
+				constructed: true,
 				path: ["Test"],
 			}),
 		);
