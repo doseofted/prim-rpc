@@ -1,8 +1,10 @@
+import { isSubset } from "es-toolkit";
 import { afterEach, beforeEach, describe, expect, test, vi } from "vitest";
 import {
 	type HandleUnknownOptions,
 	UnknownAsync,
 	UnknownAsyncError,
+	type UnknownAsyncProxy,
 } from "./unknown-async";
 
 beforeEach(() => vi.useFakeTimers());
@@ -13,8 +15,44 @@ const handle: HandleUnknownOptions = {
 	iterators: true,
 };
 
-describe.todo("UnknownAsync can be configured", () => {
-	// ...
+describe("UnknownAsync can be configured", () => {
+	test("can support promises without iterators", async () => {
+		const tbd = new UnknownAsync({ promises: true, iterators: false });
+		function* generator() {
+			yield 1;
+		}
+		const nextAttempt1 = expect(tbd.proxy.next()).rejects.toThrowError(
+			UnknownAsyncError,
+		);
+		expect(() => tbd.giveIterator(generator())).toThrowError(TypeError);
+		const nextAttempt2 = expect(tbd.proxy.next()).rejects.toThrowError(
+			UnknownAsyncError,
+		);
+		await Promise.all([nextAttempt1, nextAttempt2]);
+	});
+
+	test("can support iterators without promises", async () => {
+		const tbd = new UnknownAsync({ promises: false, iterators: true });
+		const promise = Promise.resolve(42);
+		const promised = expect(tbd.proxy).rejects.toThrowError(UnknownAsyncError);
+		expect(() => tbd.givePromise(promise)).toThrowError(TypeError);
+		await promised;
+	});
+
+	test("can use provided callback for unsupported properties", async () => {
+		type ToCatch = { lorem: { ipsum: number }; ipsum?: number };
+		const tbd = new UnknownAsync<ToCatch>(handle);
+		tbd.setFallback((next, stack) => {
+			const caught = stack.at(-1);
+			if (isSubset(caught.path, ["lorem", "ipsum"])) return 123;
+			return caught.path.at(0) === "lorem" ? next : undefined;
+		});
+		const promised = Promise.resolve(42);
+		expect(tbd.givePromise(promised)).toBe(true);
+		await expect(tbd.proxy).resolves.toBe(42);
+		expect(tbd.proxy.lorem.ipsum).toEqual(123);
+		expect(tbd.proxy.ipsum).toBeUndefined();
+	});
 });
 
 describe("UnknownAsync throws errors when invalid values are given", () => {
@@ -26,7 +64,11 @@ describe("UnknownAsync throws errors when invalid values are given", () => {
 	});
 
 	test("proxies only supported properties", async () => {
-		const tbd = new UnknownAsync(handle);
+		type ExpectedAndUnexpected = UnknownAsyncProxy & {
+			iDoNotExist: unknown;
+			[Symbol.iterator]: unknown;
+		};
+		const tbd = new UnknownAsync<ExpectedAndUnexpected>(handle);
 		const promised = Promise.resolve(42);
 		expect(tbd.givePromise(promised)).toBe(true);
 		expect(tbd.proxy.then).toBeDefined();
@@ -36,11 +78,8 @@ describe("UnknownAsync throws errors when invalid values are given", () => {
 		expect(tbd.proxy.return).toBeDefined();
 		expect(tbd.proxy.throw).toBeDefined();
 		expect(tbd.proxy[Symbol.asyncIterator]).toBeDefined();
-		// biome-ignore lint/suspicious/noExplicitAny: purposely giving unsupported properties
-		const proxy = tbd.proxy as any;
-		expect(proxy.iDoNotExist).toBeUndefined();
-		// proxied iterator will become async iterator
-		expect(proxy[Symbol.iterator]).toBeUndefined();
+		expect(tbd.proxy.iDoNotExist).toBeUndefined();
+		expect(tbd.proxy[Symbol.iterator]).toBeUndefined();
 	});
 
 	test("promises can be resolved only when promised value is given", async () => {
@@ -259,6 +298,37 @@ describe("UnknownAsync supports iterators", () => {
 		});
 		await expect(iterable.proxy.next()).resolves.toEqual({
 			value: undefined,
+			done: true,
+		});
+	});
+
+	test("iterates with next method and arguments", async () => {
+		const iterable = new UnknownAsync(handle);
+		function* generator() {
+			let value = 0;
+			const a = yield value;
+			value += a;
+			const b = yield value;
+			value += b;
+			const c = yield value;
+			value += c;
+			return value;
+		}
+		iterable.giveIterator(generator());
+		await expect(iterable.proxy.next()).resolves.toEqual({
+			value: 0,
+			done: false,
+		});
+		await expect(iterable.proxy.next(5)).resolves.toEqual({
+			value: 5,
+			done: false,
+		});
+		await expect(iterable.proxy.next(10)).resolves.toEqual({
+			value: 15,
+			done: false,
+		});
+		await expect(iterable.proxy.next(15)).resolves.toEqual({
+			value: 30,
 			done: true,
 		});
 	});
