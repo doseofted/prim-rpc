@@ -18,6 +18,8 @@ const handle: HandleUnknownOptions = {
 describe("UnknownAsync can be configured", () => {
 	test("can support promises without iterators", async () => {
 		const tbd = new UnknownAsync({ promises: true, iterators: false });
+		const promise = Promise.resolve(42);
+		const promised = expect(tbd.proxy).resolves.toBe(42);
 		function* generator() {
 			yield 1;
 		}
@@ -29,14 +31,26 @@ describe("UnknownAsync can be configured", () => {
 			UnknownAsyncError,
 		);
 		await Promise.all([nextAttempt1, nextAttempt2]);
+		expect(tbd.givePromise(promise)).toBe(true);
+		await promised;
 	});
 
 	test("can support iterators without promises", async () => {
 		const tbd = new UnknownAsync({ promises: false, iterators: true });
+		function* generator() {
+			yield 1;
+		}
 		const promise = Promise.resolve(42);
 		const promised = expect(tbd.proxy).rejects.toThrowError(UnknownAsyncError);
 		expect(() => tbd.givePromise(promise)).toThrowError(TypeError);
 		await promised;
+		expect(tbd.giveIterator(generator())).toBe(true);
+		const next1 = expect(tbd.proxy.next()).resolves.toEqual({
+			value: 1,
+			done: false,
+		});
+		const next2 = expect(tbd.proxy.next()).resolves.toEqual({ done: true });
+		await Promise.all([next1, next2]);
 	});
 
 	test("can use provided callback for unsupported properties", async () => {

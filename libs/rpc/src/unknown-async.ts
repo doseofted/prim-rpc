@@ -89,14 +89,8 @@ export class UnknownAsync<T = UnknownAsyncProxy> {
 		const handlePromises = this.#handle.promises;
 		if (includesPromiseMethod && !handlePromises) {
 			this.#rejectFuturePromises(true);
-			// throw new TypeError("Target is not a promise");
 		}
 		if (includesPromiseMethod) {
-			// if given nothing, return a promise that once given
-			// - an iterable, rejects with error (given was not expected)
-			// - a promise, resolves/rejects to promise result
-			// if given a promise, return the promise
-			// if given an iterable, give error
 			return this.#promise[methodName].apply(this.#promise, caught.args);
 		}
 		const includesIteratorMethod = this.#methodsIterator.includes(methodName);
@@ -107,14 +101,8 @@ export class UnknownAsync<T = UnknownAsyncProxy> {
 		const handleIterators = this.#handle.iterators;
 		if (includesIteratorMethod && !handleIterators) {
 			this.#rejectFutureIterators(true);
-			// throw new TypeError("Target is not an iterator");
 		}
 		if (includesIteratorMethod) {
-			// if given nothing, return an async iterator that once given
-			// - an iterable, iterate with given method
-			// - a promise, throws error on next iteration (given was not expected)
-			// if given a promise, error
-			// if given an iterator, return iterator
 			return this.#iterator[methodName].apply(this.#iterator, caught.args);
 		}
 		return next; // this should be unreachable
@@ -237,12 +225,12 @@ export class UnknownAsync<T = UnknownAsyncProxy> {
 			this.#promisedIteratorReject(
 				customError ?? new UnknownAsyncError(ReusableMessages.GivenNotIterable),
 			);
+			this.#notPreparedMethodCalls[GivenType.Iterator] = false;
 			return;
 		}
 		this.#promisedIteratorRejectWhenReady = () => {
 			if (!this.#notPreparedMethodCalls[GivenType.Iterator]) return;
 			this.#rejectFutureIterators(true, customError);
-			this.#notPreparedMethodCalls[GivenType.Iterator] = false;
 		};
 	}
 
@@ -252,7 +240,6 @@ export class UnknownAsync<T = UnknownAsyncProxy> {
 	 */
 	givePromise(promise: unknown) {
 		if (!this.#handle.promises) {
-			// this.giveNothing();
 			throw new TypeError("Promises can't be handled with provided options");
 		}
 		this.#checkAlreadyGiven();
@@ -272,12 +259,12 @@ export class UnknownAsync<T = UnknownAsyncProxy> {
 			this.#promiseReject(
 				customError ?? new UnknownAsyncError(ReusableMessages.GivenNotPromise),
 			);
+			this.#notPreparedMethodCalls[GivenType.Promise] = false;
 			return;
 		}
 		this.#promiseRejectWhenReady = () => {
 			if (!this.#notPreparedMethodCalls[GivenType.Promise]) return;
 			this.#rejectFuturePromises(true, customError);
-			this.#notPreparedMethodCalls[GivenType.Promise] = false;
 		};
 	}
 
@@ -287,7 +274,6 @@ export class UnknownAsync<T = UnknownAsyncProxy> {
 	 */
 	giveIterator(iterable: unknown) {
 		if (!this.#handle.iterators) {
-			// this.giveNothing();
 			throw new TypeError("Iterators can't be handled with provided options");
 		}
 		this.#checkAlreadyGiven();
@@ -306,9 +292,7 @@ export class UnknownAsync<T = UnknownAsyncProxy> {
 		this.#checkAlreadyGiven();
 		this.#givenType = GivenType.Never;
 		this.#rejectFuturePromises(true, customError);
-		this.#notPreparedMethodCalls[GivenType.Promise] = false;
 		this.#rejectFutureIterators(true, customError);
-		this.#notPreparedMethodCalls[GivenType.Iterator] = false;
 		return true;
 	}
 }

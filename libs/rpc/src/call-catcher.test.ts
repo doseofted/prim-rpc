@@ -2,7 +2,7 @@ import { describe, expect, test, vi } from "vitest";
 import {
 	CallCatcher,
 	type Caught,
-	CaughtPropAccess,
+	CaughtPropType,
 	type CaughtStack,
 	CaughtType,
 } from "./call-catcher";
@@ -125,11 +125,10 @@ describe("CallCatcher can catch direct calls and props", () => {
 				caught.type === CaughtType.Prop &&
 				caught.path.at(-1) === "test";
 			const testPropSet =
-				testPropInteraction &&
-				caught.interaction === CaughtPropAccess.Assignment;
+				testPropInteraction && caught.interaction === CaughtPropType.Assignment;
 			if (testPropSet) cb(caught.value);
 			const testPropAccess =
-				testPropInteraction && caught.interaction === CaughtPropAccess.Access;
+				testPropInteraction && caught.interaction === CaughtPropType.Access;
 			return testPropAccess ? stack : next;
 		});
 		callCatcher.proxy.test = 5;
@@ -140,19 +139,19 @@ describe("CallCatcher can catch direct calls and props", () => {
 			expect.objectContaining({
 				type: CaughtType.Prop,
 				path: ["test"],
-				interaction: CaughtPropAccess.Assignment,
+				interaction: CaughtPropType.Assignment,
 				value: 5,
 			}),
 			expect.objectContaining({
 				type: CaughtType.Prop,
 				path: ["test"],
-				interaction: CaughtPropAccess.Assignment,
+				interaction: CaughtPropType.Assignment,
 				value: 10,
 			}),
 			expect.objectContaining({
 				type: CaughtType.Prop,
 				path: ["test"],
-				interaction: CaughtPropAccess.Access,
+				interaction: CaughtPropType.Access,
 			}),
 		]);
 	});
@@ -169,10 +168,10 @@ describe("CallCatcher can catch direct calls and props", () => {
 				caught.type === CaughtType.Prop &&
 				caught.path.at(-1) === "test";
 			const testPropDelete =
-				testPropInteraction && caught.interaction === CaughtPropAccess.Deletion;
+				testPropInteraction && caught.interaction === CaughtPropType.Deletion;
 			if (testPropDelete) cb();
 			const testPropAccess =
-				testPropInteraction && caught.interaction === CaughtPropAccess.Access;
+				testPropInteraction && caught.interaction === CaughtPropType.Access;
 			return testPropAccess ? stack : next;
 		});
 		delete callCatcher.proxy.test;
@@ -181,12 +180,12 @@ describe("CallCatcher can catch direct calls and props", () => {
 			expect.objectContaining({
 				type: CaughtType.Prop,
 				path: ["test"],
-				interaction: CaughtPropAccess.Deletion,
+				interaction: CaughtPropType.Deletion,
 			}),
 			expect.objectContaining({
 				type: CaughtType.Prop,
 				path: ["test"],
-				interaction: CaughtPropAccess.Access,
+				interaction: CaughtPropType.Access,
 			}),
 		]);
 	});
@@ -307,7 +306,7 @@ describe("CallCatcher can catch nested calls and props", () => {
 		expect(stackUpdate).toHaveBeenLastCalledWith(
 			expect.objectContaining({
 				type: CaughtType.Prop,
-				interaction: CaughtPropAccess.Access,
+				interaction: CaughtPropType.Access,
 				path: ["lorem"],
 			}),
 		);
@@ -316,7 +315,7 @@ describe("CallCatcher can catch nested calls and props", () => {
 		expect(stackUpdate).toHaveBeenLastCalledWith(
 			expect.objectContaining({
 				type: CaughtType.Prop,
-				interaction: CaughtPropAccess.Access,
+				interaction: CaughtPropType.Access,
 				path: ["lorem", "ipsum"],
 			}),
 		);
@@ -327,7 +326,7 @@ describe("CallCatcher can catch nested calls and props", () => {
 		expect(stackUpdate).toHaveBeenLastCalledWith(
 			expect.objectContaining({
 				type: CaughtType.Prop,
-				interaction: CaughtPropAccess.Assignment,
+				interaction: CaughtPropType.Assignment,
 				path: ["lorem", "ipsum", "foo"],
 				value: { bar: 5 },
 			}),
@@ -337,7 +336,7 @@ describe("CallCatcher can catch nested calls and props", () => {
 		expect(stackUpdate).toHaveBeenLastCalledWith(
 			expect.objectContaining({
 				type: CaughtType.Prop,
-				interaction: CaughtPropAccess.Deletion,
+				interaction: CaughtPropType.Deletion,
 				path: ["lorem", "ipsum", "foo"],
 			}),
 		);
@@ -346,7 +345,7 @@ describe("CallCatcher can catch nested calls and props", () => {
 		expect(stackUpdate).toHaveBeenLastCalledWith(
 			expect.objectContaining({
 				type: CaughtType.Prop,
-				interaction: CaughtPropAccess.Access,
+				interaction: CaughtPropType.Access,
 				path: ["lorem", "ipsum", "foo", "bar"],
 			}),
 		);
@@ -354,18 +353,18 @@ describe("CallCatcher can catch nested calls and props", () => {
 		expect(bar).toEqual([
 			expect.objectContaining({
 				type: CaughtType.Prop,
-				interaction: CaughtPropAccess.Assignment,
+				interaction: CaughtPropType.Assignment,
 				path: ["lorem", "ipsum", "foo"],
 				value: { bar: 5 },
 			}),
 			expect.objectContaining({
 				type: CaughtType.Prop,
-				interaction: CaughtPropAccess.Deletion,
+				interaction: CaughtPropType.Deletion,
 				path: ["lorem", "ipsum", "foo"],
 			}),
 			expect.objectContaining({
 				type: CaughtType.Prop,
-				interaction: CaughtPropAccess.Access,
+				interaction: CaughtPropType.Access,
 				path: ["lorem", "ipsum", "foo", "bar"],
 			}),
 		]);

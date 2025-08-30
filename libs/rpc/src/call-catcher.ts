@@ -51,12 +51,10 @@ export class CallCatcher<ObjectShape = any> {
 
 	/** The top-level instance that created the class */
 	#rootParent: CallCatcher | null = null;
-	// #directParent: CallCatcher | null = null;
 
 	#createChild(pendingStack: CaughtStack): CallCatcher {
 		const child = new CallCatcher(this.#callCondition);
 		child.#rootParent = this.#rootParent ?? this;
-		// child.#directParent = this;
 		child.#stack = pendingStack;
 		return child;
 	}
@@ -81,7 +79,7 @@ export class CallCatcher<ObjectShape = any> {
 		const bothItemsAreProps =
 			newType === CaughtType.Prop && newType === lastType;
 		const lastPropertyWasModified =
-			bothItemsAreProps && lastItem.interaction !== CaughtPropAccess.Access;
+			bothItemsAreProps && lastItem.interaction !== CaughtPropType.Access;
 		if (lastPropertyWasModified) {
 			stack.push(lastItem);
 			const path = bothItemsAreProps
@@ -122,11 +120,10 @@ export class CallCatcher<ObjectShape = any> {
 		const lastItem = pendingStack.at(-1);
 		const lastItemIsPropModification =
 			lastItem.type === CaughtType.Prop &&
-			lastItem.interaction !== CaughtPropAccess.Access;
+			lastItem.interaction !== CaughtPropType.Access;
 		// Proxy set/deleteProperty returns boolean (assume true if not provided)
 		if (lastItemIsPropModification) {
 			this.#stack = pendingStack;
-			// if (this.#directParent) this.#directParent.#stack = pendingStack;
 			return true;
 		}
 		const instance = this.#createChild(pendingStack);
@@ -139,7 +136,7 @@ export class CallCatcher<ObjectShape = any> {
 			const pendingStack = this.#appendToStack({
 				type: CaughtType.Prop,
 				path: [property],
-				interaction: CaughtPropAccess.Access,
+				interaction: CaughtPropType.Access,
 			});
 			return this.#determineNext(pendingStack);
 		},
@@ -148,7 +145,7 @@ export class CallCatcher<ObjectShape = any> {
 			const pendingStack = this.#appendToStack({
 				type: CaughtType.Prop,
 				path: [property],
-				interaction: CaughtPropAccess.Assignment,
+				interaction: CaughtPropType.Assignment,
 				value: newValue,
 			});
 			return this.#determineNext(pendingStack);
@@ -158,7 +155,7 @@ export class CallCatcher<ObjectShape = any> {
 			const pendingStack = this.#appendToStack({
 				type: CaughtType.Prop,
 				path: [property],
-				interaction: CaughtPropAccess.Deletion,
+				interaction: CaughtPropType.Deletion,
 			});
 			return this.#determineNext(pendingStack);
 		},
@@ -230,7 +227,7 @@ export type CaughtCall<Args extends unknown[] = unknown[]> = CaughtBase & {
 	constructed: boolean;
 };
 
-export enum CaughtPropAccess {
+export enum CaughtPropType {
 	/** Property access */
 	Access = 1,
 	/** Property assignment */
@@ -240,7 +237,7 @@ export enum CaughtPropAccess {
 }
 export type CaughtProp<Value = unknown> = CaughtBase & {
 	type: CaughtType.Prop;
-	interaction: CaughtPropAccess;
+	interaction: CaughtPropType;
 	value?: Value;
 };
 
