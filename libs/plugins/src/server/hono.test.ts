@@ -261,6 +261,7 @@ describe("Hono middleware can support alternative JSON handler", () => {
 		const today = new Date()
 		const expected = module.whatIsDayAfter(today)
 		const formData = new FormData()
+		// Use Buffer directly with filename to make it treated as a file
 		formData.append(
 			"rpc",
 			Buffer.from(
@@ -269,7 +270,11 @@ describe("Hono middleware can support alternative JSON handler", () => {
 					args: today,
 					id: 1,
 				})
-			)
+			),
+			{
+				filename: "rpc.bin",
+				contentType: "application/octet-stream",
+			}
 		)
 		const response = await request(server)
 			.post("/prim")
@@ -306,7 +311,11 @@ describe("Hono middleware can support alternative JSON handler", () => {
 					args: ["_bin_cool"],
 					id: 1,
 				})
-			)
+			),
+			{
+				filename: "rpc.bin",
+				contentType: "application/octet-stream",
+			}
 		)
 		const fileName = "hi.txt"
 		const fileContents = new Blob(["hello"], { type: "text/plain" })
