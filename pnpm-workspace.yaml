@@ -1,5 +1,22 @@
 packages:
-  - "libs/**"
-  - "apps/**"
-  - "!apps/documentation-old/.next/types/**"
-  - "!apps/documentation/.vercel/**"
+  - libs/*
+  - apps/*
+
+auditConfig: {}
+
+catalog:
+  '@types/node': ^24.3.0
+  '@typescript/native-preview': 7.0.0-dev.20250829.3
+  tsdown: ^0.13.5
+
+engineStrict: true
+
+onlyBuiltDependencies:
+  - '@go-task/cli'
+  - esbuild
+
+sideEffectsCache: false
+
+supportedArchitectures:
+  cpu: [current]
+  os: [current]

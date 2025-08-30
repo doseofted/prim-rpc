@@ -1,0 +1,5 @@
+packages:
+  - "libs/**"
+  - "apps/**"
+  - "!apps/documentation-old/.next/types/**"
+  - "!apps/documentation/.vercel/**"
