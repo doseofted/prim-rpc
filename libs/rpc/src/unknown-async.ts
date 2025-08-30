@@ -4,10 +4,10 @@ import {
 	CallCatcher,
 	type CallCondition,
 	type CatchOptions,
-	CaughtType,
-	CaughtPropType,
-	type Caught,
 	type CatchOptionsGranular,
+	type Caught,
+	CaughtPropType,
+	CaughtType,
 } from "./call-catcher";
 
 /**
@@ -39,13 +39,13 @@ export class UnknownAsync<T = UnknownAsyncProxy> {
 		catchOptions:
 			| boolean
 			| Omit<CatchOptionsGranular, "callFunction" | "propAccess"> = true,
-	) {
+	): void {
 		this.#fallbackCondition = condition;
 		this.#callCatcher.changeCaught(catchOptions);
 	}
 
 	/** If a fallback is provided with `.setFallback()`, it can be removed */
-	removeFallback() {
+	removeFallback(): void {
 		this.#fallbackCondition = undefined;
 		this.#callCatcher.changeCaught(this.#defaultCatchOptions);
 	}
@@ -132,7 +132,7 @@ export class UnknownAsync<T = UnknownAsyncProxy> {
 	 * Promise or iterator methods can be called on this proxy before the promise
 	 * or iterator is given the instance of this class.
 	 */
-	proxy = this.#callCatcher.proxy;
+	proxy = this.#callCatcher.proxy as T;
 
 	#promiseResolve: (value: unknown | PromiseLike<unknown>) => void;
 	#promiseReject: (reason?: unknown) => void;

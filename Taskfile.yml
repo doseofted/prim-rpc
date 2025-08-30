@@ -21,8 +21,18 @@ tasks:
     ignore_error: true
     cmd: pnpm vitest {{.CLI_ARGS}}
 
+  check:
+    desc: "Check for issues with linting and formatting"
+    cmd: pnpm biome check {{.CLI_ARGS}}
+
   format:
     aliases:
       - lint
     desc: "Lint and format all parts of the project, fix found issues"
     cmd: pnpm biome check --write {{.CLI_ARGS}}
+
+  upgrade:
+    desc: "Upgrade all dependencies to their latest versions"
+    cmds:
+      - pnpm upgrade --recursive --interactive {{.CLI_ARGS}}
+      - corepack use pnpm@latest

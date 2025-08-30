@@ -52,7 +52,7 @@
 	},
 	"dependencies": {
 		"emery": "^1.4.4",
-		"es-toolkit": "^1.39.8",
+		"es-toolkit": "^1.39.10",
 		"type-fest": "^4.41.0"
 	}
 }

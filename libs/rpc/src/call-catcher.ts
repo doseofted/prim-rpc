@@ -28,7 +28,7 @@ export class CallCatcher<ObjectShape = any> {
 	}
 
 	#shouldCatch: CatchOptionsGranular;
-	changeCaught(options: CatchOptions) {
+	changeCaught(options: CatchOptions): void {
 		const expandedOptions = this.#expandOptions(options);
 		Object.entries(expandedOptions).forEach(([key, value]) => {
 			this.#shouldCatch[key] = value ?? this.#shouldCatch[key];
@@ -189,7 +189,7 @@ export class CallCatcher<ObjectShape = any> {
 
 const CaughtIdSymbol: unique symbol = Symbol();
 export type CaughtId = Opaque<number, typeof CaughtIdSymbol>;
-export function createCaughtId(id: number) {
+export function createCaughtId(id: number): CaughtId {
 	return castToOpaque<CaughtId>(id);
 }
 
