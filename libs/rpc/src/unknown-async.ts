@@ -5,6 +5,9 @@ import {
 	type CallCondition,
 	type CatchOptions,
 	CaughtType,
+	CaughtPropType,
+	type Caught,
+	type CatchOptionsGranular,
 } from "./call-catcher";
 
 /**
@@ -31,8 +34,20 @@ export class UnknownAsync<T = UnknownAsyncProxy> {
 	 * When a method or property is accessed that doesn't exist, optionally
 	 * provide a fallback handler for the properties accessed.
 	 */
-	setFallback(condition: CallCondition) {
+	setFallback(
+		condition: CallCondition,
+		catchOptions:
+			| boolean
+			| Omit<CatchOptionsGranular, "callFunction" | "propAccess"> = true,
+	) {
 		this.#fallbackCondition = condition;
+		this.#callCatcher.changeCaught(catchOptions);
+	}
+
+	/** If a fallback is provided with `.setFallback()`, it can be removed */
+	removeFallback() {
+		this.#fallbackCondition = undefined;
+		this.#callCatcher.changeCaught(this.#defaultCatchOptions);
 	}
 
 	/** Original promise or iterable given */
@@ -63,23 +78,28 @@ export class UnknownAsync<T = UnknownAsyncProxy> {
 		[GivenType.Iterator]: false,
 	};
 
-	#caughtOptions: CatchOptions = {
+	#shouldCaughtBeProcessed(caught: Caught) {
+		const isCall = caught.type === CaughtType.Call;
+		const isProp = caught.type === CaughtType.Prop;
+		const isPropAccess = isProp && caught.interaction === CaughtPropType.Access;
+		return isCall || isPropAccess;
+	}
+
+	#defaultCatchOptions: CatchOptions = {
 		callFunction: true,
 		propAccess: true,
 	};
-	/**
-	 * Promise or iterator methods can be called on this proxy before the promise
-	 * or iterator is given the instance of this class.
-	 */
-	proxy = new CallCatcher<T>((next, stack) => {
+	#callCatcher = new CallCatcher<T>((next, stack) => {
 		const caught = stack.at(-1);
+		const intendedForFallback = !this.#shouldCaughtBeProcessed(caught);
 		const methodName = caught.path.at(-1);
 		const noMethodName = isUndefined(methodName);
 		const includesMethodName = this.#methods.includes(methodName);
 		const anonymousMethod = noMethodName && caught.type === CaughtType.Call;
 		if (anonymousMethod) return next;
 		const unsupportedMethod = !noMethodName && !includesMethodName;
-		if (unsupportedMethod) return this.#fallbackCondition?.(next, stack);
+		if (unsupportedMethod || intendedForFallback)
+			return this.#fallbackCondition?.(next, stack);
 		if (caught.type !== CaughtType.Call) return next;
 		const includesPromiseMethod = this.#methodsPromise.includes(methodName);
 		const notGivenPromiseType = this.#givenType !== GivenType.Promise;
@@ -106,7 +126,13 @@ export class UnknownAsync<T = UnknownAsyncProxy> {
 			return this.#iterator[methodName].apply(this.#iterator, caught.args);
 		}
 		return next; // this should be unreachable
-	}, this.#caughtOptions).proxy;
+	}, this.#defaultCatchOptions);
+
+	/**
+	 * Promise or iterator methods can be called on this proxy before the promise
+	 * or iterator is given the instance of this class.
+	 */
+	proxy = this.#callCatcher.proxy;
 
 	#promiseResolve: (value: unknown | PromiseLike<unknown>) => void;
 	#promiseReject: (reason?: unknown) => void;

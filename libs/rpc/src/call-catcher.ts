@@ -29,7 +29,10 @@ export class CallCatcher<ObjectShape = any> {
 
 	#shouldCatch: CatchOptionsGranular;
 	changeCaught(options: CatchOptions) {
-		this.#shouldCatch = this.#expandOptions(options);
+		const expandedOptions = this.#expandOptions(options);
+		Object.entries(expandedOptions).forEach(([key, value]) => {
+			this.#shouldCatch[key] = value ?? this.#shouldCatch[key];
+		});
 	}
 
 	#lastId: CaughtId = createCaughtId(0);
@@ -190,7 +193,7 @@ export function createCaughtId(id: number) {
 	return castToOpaque<CaughtId>(id);
 }
 
-type CatchOptionsGranular = {
+export type CatchOptionsGranular = {
 	callFunction?: boolean;
 	callConstructor?: boolean;
 	propAccess?: boolean;

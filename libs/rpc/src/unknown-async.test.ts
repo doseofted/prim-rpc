@@ -54,18 +54,28 @@ describe("UnknownAsync can be configured", () => {
 	});
 
 	test("can use provided callback for unsupported properties", async () => {
-		type ToCatch = { lorem: { ipsum: number }; ipsum?: number };
+		type ToCatch = { lorem: { ipsum: number }; ipsum?: number; foo: number };
 		const tbd = new UnknownAsync<ToCatch>(handle);
 		tbd.setFallback((next, stack) => {
 			const caught = stack.at(-1);
+			if (caught.path.at(0) === "foo") return true;
 			if (isSubset(caught.path, ["lorem", "ipsum"])) return 123;
 			return caught.path.at(0) === "lorem" ? next : undefined;
 		});
 		const promised = Promise.resolve(42);
 		expect(tbd.givePromise(promised)).toBe(true);
-		await expect(tbd.proxy).resolves.toBe(42);
 		expect(tbd.proxy.lorem.ipsum).toEqual(123);
+		tbd.proxy.foo = 42;
+		delete tbd.proxy.foo;
+		expect(tbd.proxy.foo).toBe(true);
 		expect(tbd.proxy.ipsum).toBeUndefined();
+		// despite all of the noise above, promise should still resolve
+		await expect(tbd.proxy).resolves.toBe(42);
+		tbd.removeFallback();
+		expect(tbd.proxy.lorem).toBeUndefined();
+		expect(tbd.proxy.ipsum).toBeUndefined();
+		expect(tbd.proxy.foo).toBeUndefined();
+		await expect(tbd.proxy).resolves.toBe(42);
 	});
 });
 
