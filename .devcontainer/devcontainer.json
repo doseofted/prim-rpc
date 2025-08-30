@@ -3,7 +3,7 @@
 	"image": "mcr.microsoft.com/devcontainers/base:noble",
 	"features": {
 		"ghcr.io/devcontainers/features/node:1": {
-			"version": "21",
+			"version": "22",
 			"nvmVersion": "latest"
 		}
 	},

@@ -25,9 +25,10 @@ describe("Hono plugin is functional as Prim Plugin", () => {
 	beforeEach(async () => {
 		server = serve({ fetch: app.fetch, port: 0 })
 		const listening = new Promise(resolve => {
+			console.log("listening")
 			server.addListener("listening", resolve)
 		})
-		server.listen()
+		// server.listen()
 		await listening
 		return () => new Promise(resolve => server?.close(resolve))
 	})
@@ -59,7 +60,7 @@ describe("Hono plugin is functional as Hono middleware", () => {
 		const listening = new Promise(resolve => {
 			server.addListener("listening", resolve)
 		})
-		server.listen()
+		// server.listen()
 		await listening
 		return () => new Promise(resolve => server?.close(resolve))
 	})
@@ -90,7 +91,7 @@ describe("Hono middleware works with over GET/POST", () => {
 		const listening = new Promise(resolve => {
 			server.addListener("listening", resolve)
 		})
-		server.listen()
+		// server.listen()
 		await listening
 		return () => new Promise(resolve => server?.close(resolve))
 	})
@@ -130,7 +131,7 @@ describe("Hono middleware can support binary data", () => {
 		const listening = new Promise(resolve => {
 			server.addListener("listening", resolve)
 		})
-		server.listen()
+		// server.listen()
 		await listening
 		return () => new Promise(resolve => server?.close(resolve))
 	})
@@ -222,7 +223,7 @@ describe("Hono middleware can support alternative JSON handler", () => {
 		const listening = new Promise(resolve => {
 			server.addListener("listening", resolve)
 		})
-		server.listen()
+		// server.listen()
 		await listening
 
 		const today = new Date()
@@ -255,7 +256,7 @@ describe("Hono middleware can support alternative JSON handler", () => {
 		const listening = new Promise(resolve => {
 			server.addListener("listening", resolve)
 		})
-		server.listen()
+		// server.listen()
 		await listening
 
 		const today = new Date()
@@ -299,7 +300,7 @@ describe("Hono middleware can support alternative JSON handler", () => {
 		const listening = new Promise(resolve => {
 			server.addListener("listening", resolve)
 		})
-		server.listen()
+		// server.listen()
 		await listening
 
 		const formData = new FormData()
