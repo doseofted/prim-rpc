@@ -15,7 +15,7 @@ export const lenis = USE_LENIS
 			syncTouch: true,
 			touchMultiplier: 2,
 			infinite: false,
-	  })
+		})
 	: {
 			/** If Lenis isn't given, add back method called in TableOfContents.astro and use native behavior */
 			scrollTo(_given: string) {
@@ -23,7 +23,7 @@ export const lenis = USE_LENIS
 			},
 			raf(_time: number) {},
 			destroy() {},
-	  }
+		}
 
 declare global {
 	interface Window {

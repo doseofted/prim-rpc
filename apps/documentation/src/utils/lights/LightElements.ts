@@ -91,7 +91,7 @@ export class LightElements {
 		},
 		csvData<T = string>(dataset: DOMStringMap, key: string, mapFn: (str: string) => T = s => s as unknown as T) {
 			return dataset[key] && typeof dataset[key] === "string"
-				? dataset[key]?.split(",").map(mapFn) ?? undefined
+				? (dataset[key]?.split(",").map(mapFn) ?? undefined)
 				: undefined
 		},
 	}

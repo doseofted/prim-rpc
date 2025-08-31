@@ -15,7 +15,7 @@ interface Props {
 	entry: CollectionType<"plugins">
 }
 
-export const prerender = true;
+export const prerender = true
 
 export async function getStaticPaths() {
 	const documentation = await getCollection("plugins")

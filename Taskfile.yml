@@ -39,7 +39,6 @@ tasks:
       - "pnpm audit"
       - task: audit:fix
 
-
   cleanup:
     desc: "Remove various temporary files and directories created within project, for a clean run"
     ignore_error: true

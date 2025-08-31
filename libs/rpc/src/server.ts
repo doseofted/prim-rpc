@@ -218,7 +218,7 @@ function createServerActions(
 							// so we can call the method using the client.
 							// call module with `client` if not provided directly to server (checks already ran on module, if provided)
 							const targetRemote = getProperty(client, methodExpanded) as AnyFunction & { rpc?: boolean }
-							const preCallResult = configured.preCall ? configured.preCall(args, targetLocal) ?? { args } : { args }
+							const preCallResult = configured.preCall ? (configured.preCall(args, targetLocal) ?? { args }) : { args }
 							if (configured.preCall && "result" in preCallResult) {
 								return { ...rpcBase, result: await preCallResult.result }
 							}
@@ -258,7 +258,7 @@ function createServerActions(
 							const targetRemote = getProperty(limitedClient, methodExpanded) as AnyFunction & { rpc?: boolean }
 							// const targetLocal = getProperty(givenModule, methodExpanded) as AnyFunction & { rpc?: boolean }
 							// const processedArgs = preprocess(...args).bind(targetLocal)
-							const preCallResult = configured.preCall ? configured.preCall(args) ?? { args } : { args }
+							const preCallResult = configured.preCall ? (configured.preCall(args) ?? { args }) : { args }
 							if (configured.preCall && "result" in preCallResult) {
 								return { ...rpcBase, result: await preCallResult.result }
 							}
@@ -322,7 +322,7 @@ function createServerActions(
 				? "application/octet-stream"
 				: blobCount > 1
 					? "multipart/form-data"
-					: jsonHandler.mediaType ?? "application/json"
+					: (jsonHandler.mediaType ?? "application/json")
 			contentType = jsonHandler?.binary ? "application/octet-stream" : contentType
 			const headers = { "content-type": contentType }
 			const answers = Array.isArray(given) ? given : [given]

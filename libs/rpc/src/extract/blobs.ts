@@ -46,10 +46,10 @@ function handlePossibleForm(form: HTMLFormElement | FormData | SubmitEvent) {
 		form instanceof HTMLFormElement
 			? new FormData(form)
 			: form instanceof SubmitEvent
-			? form.target instanceof HTMLFormElement
-				? new FormData(form.target)
-				: undefined
-			: form
+				? form.target instanceof HTMLFormElement
+					? new FormData(form.target)
+					: undefined
+				: form
 	const data: Record<string, FormDataEntryValue | FormDataEntryValue[]> = {}
 	for (const [key, val] of formData) {
 		if (data[key]) {

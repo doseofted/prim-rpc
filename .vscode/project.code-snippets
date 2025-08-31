@@ -5,8 +5,8 @@
 		"body": [
 			"$LINE_COMMENT Part of the Prim+RPC project ( https://prim.doseofted.me/ )",
 			"$LINE_COMMENT Copyright ${1:$CURRENT_YEAR} $2",
-			""
-		]
+			"",
+		],
 	},
 	"Add notice with open source license": {
 		"prefix": "noticeLicense",
@@ -14,7 +14,7 @@
 			"$LINE_COMMENT Part of the Prim+RPC project ( https://prim.doseofted.me/ )",
 			"$LINE_COMMENT Copyright ${1:$CURRENT_YEAR} $2",
 			"$LINE_COMMENT SPDX-License-Identifier: ${3|Apache-2.0|}",
-			""
-		]
-	}
+			"",
+		],
+	},
 }

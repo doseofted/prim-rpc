@@ -9,10 +9,5 @@
 		"jsx": "react-jsx",
 		"jsxImportSource": "react"
 	},
-	"include": [
-		"src/**/*",
-		"src/**/*.ts",
-		"src/**/*.tsx",
-		"src/**/*.astro"
-	]
+	"include": ["src/**/*", "src/**/*.ts", "src/**/*.tsx", "src/**/*.astro"]
 }

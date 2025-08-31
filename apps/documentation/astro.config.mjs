@@ -23,7 +23,7 @@ const rehypePrettyOptions = {
 export default defineConfig({
 	site: "https://prim.doseofted.me",
 	legacy: {
-		collections: true
+		collections: true,
 	},
 	markdown: {
 		shikiConfig: {
