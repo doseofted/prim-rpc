@@ -1,0 +1,8 @@
+{
+	"compilerOptions": {
+		// NOTE: WebWorker is not needed here (included in .references) but ESLint complains if it's not included
+		"lib": ["DOM", "DOM.Iterable", "ESNext", "WebWorker"]
+	},
+	"extends": "../../tsconfig.json",
+	"include": ["src/**/*"]
+}

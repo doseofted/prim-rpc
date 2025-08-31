@@ -1,0 +1,24 @@
+---
+import { Icon } from "astro-icon/components"
+
+interface Prop {
+	title: string
+	icon: string
+	details: string
+}
+const { title, icon, details } = Astro.props
+---
+
+<div
+	data-light="1"
+	data-size="1,2"
+	data-brightness="0.5,0.7"
+	class:list={[
+		"h-full relative bg-white/70 group-hover:bg-white/90 group-focus:bg-white/90 transition-colors duration-300 rounded-xl border border-white/60 px-4 py-3 sm:py-6 sm:px-8 text-prim-space space-y-4",
+	]}>
+	<p class="font-bold text-base md:text-lg flex">
+		<span class="flex-grow">{title}</span>
+		<Icon name={icon} class="w-6 h-6 inline-block" />
+	</p>
+	<p class="text-sm lg:text-base">{details}</p>
+</div>

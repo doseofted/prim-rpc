@@ -1,0 +1,186 @@
+{
+	"name": "@doseofted/prim-rpc-plugins",
+	"version": "0.1.0-alpha.23",
+	"description": "Prim+RPC plugins/handlers for popular frameworks both server and client side.",
+	"license": "Apache-2.0",
+	"author": {
+		"name": "Ted Klingenberg",
+		"email": "ted@doseofted.com",
+		"url": "https://doseofted.me/"
+	},
+	"contributors": [],
+	"repository": {
+		"type": "git",
+		"url": "https://github.com/doseofted/prim-rpc.git",
+		"directory": "libs/plugins"
+	},
+	"publishConfig": {
+		"provenance": true
+	},
+	"homepage": "https://prim.doseofted.me/",
+	"keywords": [
+		"api",
+		"json",
+		"ipc",
+		"rpc"
+	],
+	"bugs": {
+		"url": "https://github.com/doseofted/prim-rpc/issues"
+	},
+	"scripts": {
+		"dev": "tsup --watch --config build.config.js",
+		"build": "tsup --config build.config.js",
+		"document": "typedoc",
+		"check": "tsc --noEmit",
+		"test": "vitest run",
+		"testing": "vitest watch",
+		"lint": "eslint ."
+	},
+	"devDependencies": {
+		"@doseofted/prim-example": "workspace:*",
+		"@doseofted/prim-rpc": "workspace:*",
+		"@fastify/multipart": "^9.0.3",
+		"@hono/node-server": "^1.19.1",
+		"@msgpack/msgpack": "3.1.2",
+		"@remix-run/node": "^2.17.0",
+		"@types/express": "^5.0.3",
+		"@types/formidable": "^3.4.5",
+		"@types/node": "^20.19.11",
+		"@types/supertest": "^6.0.3",
+		"@types/ws": "^8.18.1",
+		"@vitest/web-worker": "^1.6.1",
+		"@whatwg-node/server": "^0.10.12",
+		"astro": "5.13.5",
+		"axios": "^1.11.0",
+		"express": "^5.1.0",
+		"fastify": "^5.5.0",
+		"form-data": "^4.0.4",
+		"formidable": "^3.5.4",
+		"h3": "^1.15.4",
+		"hono": "^4.9.5",
+		"next": "15.5.2",
+		"query-string": "^9.2.2",
+		"react": "^18.3.1",
+		"react-dom": "^18.3.1",
+		"socket.io": "^4.8.1",
+		"socket.io-client": "^4.8.1",
+		"superjson": "^2.2.2",
+		"supertest": "^6.3.4",
+		"superwstest": "^2.1.1",
+		"type-fest": "4.10.1",
+		"ws": "^8.18.3"
+	},
+	"peerDependencies": {
+		"@remix-run/node": ">=2.0.0 <3.0.0",
+		"astro": ">=3.0.0 <6.0.0",
+		"axios": ">=1.0.0 <2.0.0",
+		"express": ">=4.0.0 <6.0.0",
+		"fastify": ">=4.0.0 <6.0.0",
+		"h3": ">=1.0.0 <2.0.0",
+		"hono": ">=4.0.0 <5.0.0",
+		"next": ">=13.0.0 <16.0.0",
+		"ws": ">=8.17.1 <9.0.0"
+	},
+	"peerDependenciesMeta": {
+		"astro": {
+			"optional": true
+		},
+		"axios": {
+			"optional": true
+		},
+		"fastify": {
+			"optional": true
+		},
+		"express": {
+			"optional": true
+		},
+		"ws": {
+			"optional": true
+		},
+		"h3": {
+			"optional": true
+		},
+		"next": {
+			"optional": true
+		},
+		"@remix-run/node": {
+			"optional": true
+		},
+		"hono": {
+			"optional": true
+		}
+	},
+	"type": "module",
+	"exports": {
+		"./axios": "./dist/client/axios.js",
+		"./browser": "./dist/client/browser.js",
+		"./browser-fetch": "./dist/client/browser-fetch.js",
+		"./browser-websocket": "./dist/client/browser-websocket.js",
+		"./astro": "./dist/server/astro.js",
+		"./fastify": "./dist/server/fastify.js",
+		"./server-fetch": "./dist/server/server-fetch.js",
+		"./express": "./dist/server/express.js",
+		"./h3": "./dist/server/h3.js",
+		"./ws": "./dist/server/ws.js",
+		"./web-worker": "./dist/ipc/web-worker.js",
+		"./nextjs": "./dist/server/nextjs.js",
+		"./remix": "./dist/server/remix.js",
+		"./hono": "./dist/server/hono.js",
+		"./package.json": "./package.json"
+	},
+	"typesVersions": {
+		"*": {
+			"axios": [
+				"dist/client/axios.d.ts"
+			],
+			"browser": [
+				"dist/client/browser.d.ts"
+			],
+			"browser-fetch": [
+				"dist/client/browser-fetch.d.ts"
+			],
+			"browser-websocket": [
+				"dist/client/browser-websocket.d.ts"
+			],
+			"astro": [
+				"dist/server/astro.d.ts"
+			],
+			"fastify": [
+				"dist/server/fastify.d.ts"
+			],
+			"server-fetch": [
+				"dist/server/server-fetch.d.ts"
+			],
+			"express": [
+				"dist/server/express.d.ts"
+			],
+			"h3": [
+				"dist/server/h3.d.ts"
+			],
+			"ws": [
+				"dist/server/ws.d.ts"
+			],
+			"web-worker": [
+				"dist/ipc/web-worker.d.ts"
+			],
+			"nextjs": [
+				"./dist/server/nextjs.d.ts"
+			],
+			"remix": [
+				"./dist/server/remix.d.ts"
+			],
+			"hono": [
+				"./dist/server/hono.d.ts"
+			]
+		}
+	},
+	"files": [
+		"dist",
+		"NOTICE.md",
+		"CHANGELOG.md"
+	],
+	"dependencies": {
+		"mitt": "^3.0.1",
+		"nanoid": "^5.1.5"
+	}
+}

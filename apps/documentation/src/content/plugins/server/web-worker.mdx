@@ -1,0 +1,163 @@
+---
+title: Web Worker
+icon: simple-icons:javascript
+type: method-handler
+transport: worker
+features: []
+status: available
+links:
+  - name: Web Worker
+    href: https://developer.mozilla.org/en-US/docs/Web/API/Worker
+  - name: Shared Worker
+    href: https://developer.mozilla.org/en-US/docs/Web/API/SharedWorker
+---
+
+import CodeFile from "@/components/Code/CodeFile.astro"
+import Aside from "@/components/Markdown/Aside.astro"
+
+Prim+RPC can be used to bridge Web Workers and Shared Workers. You may use the Web Worker as a server where functions
+are placed (the most common scenario) or use the Web Worker as a client to call functions defined on the main thread. We
+will cover both scenarios.
+
+Also note that while these examples use `Worker`, you can just as easily swap these out for `SharedWorker` as Prim+RPC
+supports both. A Shared Worker is useful, for instance, when sharing the same data between multiple tabs.
+
+<Aside>
+
+Whether using Prim+RPC or not, Web Worker setup can become complicated when using build tools like TypeScript and Vite.
+If you get stuck, check out the [Web Worker example](/docs/learn/examples#web-worker-communication) for working code.
+
+</Aside>
+
+First, let's set up a module to be used from whichever environment we designate as the server:
+
+<CodeFile filename="module.ts">
+
+```typescript
+export function hello() {
+	return "Hi from Prim+RPC!"
+}
+hello.rpc = true
+
+export default hello
+```
+
+</CodeFile>
+
+## Web Worker as Server
+
+We can set up a Web Worker as a server that will host our functions:
+
+<CodeFile filename="worker.ts">
+
+```typescript
+import { createPrimServer } from "@doseofted/prim-rpc"
+import { createMethodHandler, createCallbackHandler, jsonHandler } from "@doseofted/prim-rpc-plugins/web-worker"
+import * as module from "./module"
+
+const methodHandler = createMethodHandler({ worker: self })
+const callbackHandler = createCallbackHandler({ worker: self })
+const prim = createPrimServer({ module, methodHandler, callbackHandler, jsonHandler })
+```
+
+</CodeFile>
+
+Now we can use this set up the module to be used from the main thread. We will pass this file as the URL to our Web
+Worker. This example assumes you are using Vite to bundle your app (which includes tools to separate your worker code
+into a separate bundle from your main thread) but, of course, you may use any bundler or use none at all.
+
+From the main thread:
+
+<CodeFile filename="client.ts">
+
+```typescript
+import { createPrimClient } from "@doseofted/prim-rpc"
+import { createMethodPlugin, createCallbackPlugin, jsonHandler } from "@doseofted/prim-rpc-plugins/web-worker"
+import type * as Module from "./module"
+
+// you may also use `SharedWorker` here
+const worker = new Worker(new URL("./worker", import.meta.url), { type: "module" })
+
+const methodPlugin = createMethodPlugin({ worker })
+const callbackPlugin = createCallbackPlugin({ worker })
+export const client = createPrimClient<Module>({ methodPlugin, callbackPlugin, jsonHandler })
+```
+
+</CodeFile>
+
+Now we can use this client anywhere in our app and the function will be executed inside of the Web Worker:
+
+<CodeFile filename="index.ts">
+
+```typescript
+import { client } from "./client"
+
+const greeting = await client.hello()
+console.log(greeting)
+```
+
+</CodeFile>
+
+## Web Worker as Client
+
+Let's set up Web Worker that can easily access functions defined on the main thread. This can be useful when your
+functions in a Web Worker needs specific browser APIs only available on the main thread.
+
+First, let's set up the client that will run inside of the Web Worker.
+
+<CodeFile filename="client.ts">
+
+```typescript
+import { createPrimClient } from "@doseofted/prim-rpc"
+import { createMethodPlugin, createCallbackPlugin, jsonHandler } from "@doseofted/prim-rpc-plugins/web-worker"
+import type * as Module from "./module"
+
+const methodPlugin = createMethodPlugin({ worker: self })
+const callbackPlugin = createCallbackPlugin({ worker: self })
+const client = createPrimClient<Module>({ methodPlugin, callbackPlugin, jsonHandler })
+```
+
+</CodeFile>
+
+And we'll set up a file that will act as the entrypoint for our Worker:
+
+<CodeFile filename="worker.ts">
+
+```typescript
+import { client } from "./client"
+
+// client usage will go here, soon!
+```
+
+</CodeFile>
+
+We don't yet have a server that can communicate with the Worker yet. Let's set that up now:
+
+<CodeFile filename="main.ts">
+
+```typescript
+import { createPrimServer } from "@doseofted/prim-rpc"
+import { createMethodHandler, createCallbackHandler, jsonHandler } from "@doseofted/prim-rpc-plugins/web-worker"
+import * as module from "./module"
+
+const worker = new Worker(new URL("./worker", import.meta.url), { type: "module" })
+
+const methodHandler = createMethodHandler({ worker })
+const callbackHandler = createCallbackHandler({ worker })
+const prim = createPrimServer({ module, methodHandler, callbackHandler, jsonHandler })
+```
+
+</CodeFile>
+
+Now in our Web Worker, we can make a call to our function defined on the main thread:
+
+<CodeFile filename="worker.ts">
+
+```typescript {3-4}
+import { client } from "./client"
+
+const greeting = await client.hello()
+console.log(greeting)
+```
+
+</CodeFile>

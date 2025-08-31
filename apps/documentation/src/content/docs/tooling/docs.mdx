@@ -1,0 +1,54 @@
+---
+title: Documentation Generation
+---
+
+# {frontmatter.title}
+
+import CodeFile from "@/components/Code/CodeFile.astro"
+import Aside from "@/components/Markdown/Aside.astro"
+
+<Aside type="warning">
+
+This tool is in early stages and the interface is expected to change significantly.
+
+</Aside>
+
+Prim+RPC includes tools to generate RPC-specific documentation. It does this by reusing your existing
+[TypeDoc documentation](https://github.com/TypeStrong/typedoc#typedoc) for your TypeScript or JavaScript code and
+converts this into a simpler version that documents functions as it relates to RPC.
+
+The first step is to generate TypeDoc documentation for your code. This can be done by running the following command in
+your project:
+
+<CodeFile>
+
+```zsh
+npx typedoc src/index.ts --json dist/docs.json
+```
+
+</CodeFile>
+
+Now you may execute this utility on the result:
+
+<CodeFile>
+
+```typescript
+import { createDocsForModule } from "@doseofted/prim-rpc-tooling/docs"
+import typeDoc from "./dist/docs.json"
+
+const rpcDocs = createDocsForModule(typeDoc)
+```
+
+</CodeFile>
+
+The resulting documentation is a simpler version of the TypeDoc that relates to RPC. This output could be used for a
+documentation website or fed to another tool like [HTTPsnippet](https://github.com/Kong/httpsnippet#readme) to generate
+requests for other clients outside of JavaScript.
+
+<Aside>
+
+In the future, basic JavaScript types will be turned into JSON Schema for typed usage outside of TypeScript. It's not
+planned to support all TypeScript types in RPC documentation since it doesn't make sense to use them outside of
+TypeScript but basic JSON Schema support could be useful for using Prim+RPC outside of JavaScript environments.
+
+</Aside>

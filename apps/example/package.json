@@ -1,0 +1,57 @@
+{
+	"name": "@doseofted/prim-example-server",
+	"version": "0.1.0-alpha.36",
+	"description": "An example backend making use of Prim+RPC.",
+	"license": "UNLICENSED",
+	"private": true,
+	"author": {
+		"name": "Ted Klingenberg",
+		"email": "ted@doseofted.com",
+		"url": "https://doseofted.me/"
+	},
+	"contributors": [],
+	"repository": {
+		"type": "git",
+		"url": "https://github.com/doseofted/prim-rpc.git",
+		"directory": "apps/backend"
+	},
+	"homepage": "https://prim.doseofted.me/",
+	"keywords": [
+		"api",
+		"json",
+		"ipc",
+		"rpc"
+	],
+	"bugs": {
+		"url": "https://github.com/doseofted/prim-rpc/issues"
+	},
+	"dependencies": {
+		"@doseofted/prim-example": "workspace:*",
+		"@doseofted/prim-rpc": "workspace:*",
+		"@doseofted/prim-rpc-plugins": "workspace:*",
+		"@fastify/cors": "^9.0.0",
+		"@fastify/multipart": "^8.3.1",
+		"@msgpack/msgpack": "3.0.0-beta2",
+		"fastify": "^4.29.1",
+		"form-data": "^4.0.4",
+		"superjson": "^2.2.2",
+		"tsx": "^4.20.5",
+		"ws": "^8.18.3"
+	},
+	"scripts": {
+		"dev": "tsx watch --clear-screen=false src/index.ts",
+		"start": "tsx --clear-screen=false src/index.ts",
+		"check": "tsc --noEmit",
+		"test": "vitest run",
+		"testing": "vitest watch",
+		"lint": "eslint .",
+		"entrypoint": "zx entrypoint.mjs"
+	},
+	"engines": {
+		"node": ">= 18.7.0"
+	},
+	"devDependencies": {
+		"@types/ws": "^8.18.1"
+	},
+	"type": "module"
+}
