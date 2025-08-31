@@ -14,6 +14,9 @@ import ReportIssue from "@/components/ReportIssue.astro"
 interface Props {
 	entry: CollectionType<"plugins">
 }
+
+export const prerender = true;
+
 export async function getStaticPaths() {
 	const documentation = await getCollection("plugins")
 	return documentation.map(entry => {

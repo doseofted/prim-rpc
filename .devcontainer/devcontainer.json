@@ -26,7 +26,8 @@
 				"streetsidesoftware.code-spell-checker",
 				"vitest.explorer",
 				"dbaeumer.vscode-eslint",
-				"esbenp.prettier-vscode"
+				"esbenp.prettier-vscode",
+				"astro-build.astro-vscode"
 			]
 		}
 	}

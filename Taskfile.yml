@@ -70,7 +70,7 @@ tasks:
   start:docs:
     desc: "Start the documentation server in development mode"
     cmds:
-      - "pnpm --filter=./apps/documentation dev"
+      - "pnpm --filter=./apps/documentation dev --host"
 
   start:example:
     desc: "Start the reference project to play with Prim+RPC on a server"
