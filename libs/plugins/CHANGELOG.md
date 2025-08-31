@@ -1,5 +1,12 @@
 # @doseofted/prim-rpc-plugins
 
+## 0.1.0-alpha.23
+
+### Patch Changes
+
+- d833982: Updated dependencies in the project
+- d833982: Peer dependencies have been updated to reflect latest versions of libraries that plugins support
+
 ## 0.1.0-alpha.22
 
 ### Patch Changes

@@ -1,5 +1,11 @@
 # @doseofted/prim-rpc-tooling
 
+## 0.1.0-alpha.9
+
+### Patch Changes
+
+- d833982: Updated dependencies in the project
+
 ## 0.1.0-alpha.8
 
 ### Patch Changes
