@@ -1,5 +1,0 @@
-{
-	"$schema": "https://typedoc.org/schema.json",
-	"entryPoints": ["src/docs/index.ts", "src/build/index.ts", "src/cli/index.ts"],
-	"json": "docs/api.json"
-}

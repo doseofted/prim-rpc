@@ -1,9 +1,0 @@
-{
-	"compilerOptions": {
-		"lib": ["DOM", "ESNext"],
-		// https://github.com/microsoft/TypeScript/issues/54542#issuecomment-1594889906
-		"skipLibCheck": true
-	},
-	"extends": "../../tsconfig.json",
-	"include": ["src/**/*"]
-}
