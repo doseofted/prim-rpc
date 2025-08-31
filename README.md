@@ -61,8 +61,9 @@ to use the library, please see the [Documentation](https://prim.doseofted.me/).
 > [participate in discussions](https://github.com/doseofted/prim-rpc/discussions) to help shape the future of the
 > project!
 
-Prim+RPC is planned to become stable by the end of Q1 2024, alongside the release Ted's
-[portfolio website](https://doseofted.me/) that will make use of it.
+Prim+RPC is planned to become stable by the end of 2025, prior to the release of Ted's
+[portfolio website](https://doseofted.me/) that will make use of it. See the in-progress
+[pull request](https://github.com/doseofted/prim-rpc/pull/101) for details regarding the next version of Prim+RPC.
 
 Prim+RPC Core, the framework-agnostic core of the project, will become stable first and will be released once the
 default plugins are stable. Lastly, Prim+RPC's optional tooling (such as documentation generation) will become stable.
