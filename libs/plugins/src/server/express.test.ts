@@ -28,7 +28,7 @@ describe("Express plugin is functional as Prim Plugin", () => {
 	let server: Server
 	beforeEach(async () => {
 		await new Promise<void>(resolve => {
-			server = app.listen(0, "localhost", resolve)
+			server = app.listen(0, "localhost", () => resolve())
 		})
 		return () => server?.close()
 	})
@@ -58,7 +58,7 @@ describe("Express plugin is functional as Express plugin", () => {
 	let server: Server
 	beforeEach(async () => {
 		await new Promise<void>(resolve => {
-			server = app.listen(0, "localhost", resolve)
+			server = app.listen(0, "localhost", () => resolve())
 		})
 		return () => server?.close()
 	})
@@ -88,7 +88,7 @@ describe("Express middleware works with over GET/POST", () => {
 	let server: Server
 	beforeEach(async () => {
 		await new Promise<void>(resolve => {
-			server = app.listen(0, "localhost", resolve)
+			server = app.listen(0, "localhost", () => resolve())
 		})
 		return () => server?.close()
 	})
@@ -126,7 +126,7 @@ describe("Express middleware can support binary data", () => {
 	let server: Server
 	beforeEach(async () => {
 		await new Promise<void>(resolve => {
-			server = app.listen(0, "localhost", resolve)
+			server = app.listen(0, "localhost", () => resolve())
 		})
 		return () => server?.close()
 	})
@@ -208,7 +208,7 @@ describe("Express middleware can support alternative JSON handler", () => {
 		app.use(expressPrimRpc({ prim, multipartPlugin }))
 		let server: Server
 		await new Promise<void>(resolve => {
-			server = app.listen(0, "localhost", resolve)
+			server = app.listen(0, "localhost", () => resolve())
 		})
 
 		const today = new Date()
@@ -245,7 +245,7 @@ describe("Express middleware can support alternative JSON handler", () => {
 		app.use(expressPrimRpc({ prim, multipartPlugin, formDataHandler: FormData }))
 		let server: Server
 		await new Promise<void>(resolve => {
-			server = app.listen(0, "localhost", resolve)
+			server = app.listen(0, "localhost", () => resolve())
 		})
 
 		const today = new Date()
@@ -289,7 +289,7 @@ describe("Express middleware can support alternative JSON handler", () => {
 		app.use(expressPrimRpc({ prim, multipartPlugin, formDataHandler: FormData }))
 		let server: Server
 		await new Promise<void>(resolve => {
-			server = app.listen(0, "localhost", resolve)
+			server = app.listen(0, "localhost", () => resolve())
 		})
 
 		const formData = new FormData()
