@@ -36,7 +36,7 @@
 	},
 	"type": "module",
 	"devDependencies": {
-		"@ark-ui/react": "2.2.2",
+		"@ark-ui/react": "^5.22.0",
 		"@astrojs/mdx": "^4.3.4",
 		"@astrojs/react": "^3.6.3",
 		"@astrojs/sitemap": "^3.5.1",

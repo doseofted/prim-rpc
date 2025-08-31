@@ -2,32 +2,32 @@
 	"folders": [
 		{
 			"name": "🌳 Prim+RPC",
-			"path": "."
+			"path": ".",
 		},
 		{
 			"name": "📙 Library",
-			"path": "./libs/rpc"
+			"path": "./libs/rpc",
 		},
 		{
 			"name": "📙 Plugins",
-			"path": "./libs/plugins"
+			"path": "./libs/plugins",
 		},
 		{
 			"name": "📙 Tooling",
-			"path": "./libs/tooling"
+			"path": "./libs/tooling",
 		},
 		{
 			"name": "🌐 Documentation",
-			"path": "./apps/documentation"
+			"path": "./apps/documentation",
 		},
 		{
 			"name": "📗 Example Server",
-			"path": "./apps/example"
+			"path": "./apps/example",
 		},
 		{
 			"name": "📗 Example Module",
-			"path": "./libs/example"
-		}
+			"path": "./libs/example",
+		},
 	],
 	"settings": {
 		"editor.rulers": [80, 120],
@@ -35,7 +35,7 @@
 		"editor.renderWhitespace": "selection",
 		"editor.detectIndentation": true,
 		"editor.codeActionsOnSave": {
-			"source.fixAll": "explicit"
+			"source.fixAll": "explicit",
 		},
 		"editor.linkedEditing": true,
 		"editor.formatOnSave": true,
@@ -43,11 +43,12 @@
 		"npm.packageManager": "auto",
 		"stylelint.validate": ["css", "less", "postcss", "scss"],
 		"eslint.validate": ["javascript", "javascriptreact", "typescript", "typescriptreact"],
+		"typescript.tsdk": "🌳 Prim+RPC/node_modules/typescript/lib",
 		"yaml.schemas": {
-			"https://json.schemastore.org/taskfile.json": "Taskfile.*.yml"
+			"https://json.schemastore.org/taskfile.json": "Taskfile.*.yml",
 		},
 		"files.associations": {
-			"*.Corefile": "caddyfile"
+			"*.Corefile": "caddyfile",
 		},
 		"cSpell.words": [
 			"frontmatter",
@@ -59,16 +60,19 @@
 			"pnpm",
 			"Taskfile",
 			"Turborepo",
-			"websockets"
+			"websockets",
 		],
-		"cSpell.enableFiletypes": ["dockerfile", "mdx"],
+		"cSpell.enabledFileTypes": {
+			"dockerfile": true,
+			"mdx": true,
+		},
 		"css.lint.unknownAtRules": "ignore",
 		"editor.defaultFormatter": "esbenp.prettier-vscode",
 		"[typescript]": {
-			"editor.defaultFormatter": "esbenp.prettier-vscode"
+			"editor.defaultFormatter": "esbenp.prettier-vscode",
 		},
 		"[css]": {
-			"editor.defaultFormatter": "esbenp.prettier-vscode"
+			"editor.defaultFormatter": "esbenp.prettier-vscode",
 		},
 		"peacock.color": "#57b0ca",
 		"peacock.remoteColor": "#57b0ca",
@@ -84,7 +88,7 @@
 			"statusBarItem.hoverBackground": "#3999b5",
 			"statusBarItem.remoteBackground": "#57b0ca",
 			"statusBarItem.remoteForeground": "#15202b"
-		}
+		},
 	},
 	"extensions": {
 		"recommendations": [
@@ -94,7 +98,7 @@
 			"stylelint.vscode-stylelint",
 			"astro-build.astro-vscode",
 			"unifiedjs.vscode-mdx",
-			"streetsidesoftware.code-spell-checker"
-		]
-	}
+			"streetsidesoftware.code-spell-checker",
+		],
+	},
 }

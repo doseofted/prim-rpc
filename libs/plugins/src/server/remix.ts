@@ -47,7 +47,13 @@ export function primRemix(options: PrimRequestOptions) {
 				const isBinary = (value as any)?.arrayBuffer != null || value instanceof Blob
 				if (key === "rpc") {
 					const binaryBody = isBinary && jsonHandler.binary
-					body = binaryBody ? await (value as Blob).arrayBuffer() : (value as string).toString()
+					if (binaryBody && value instanceof Blob) {
+						body = await value.arrayBuffer()
+					} else if (typeof value === "string") {
+						body = value
+					} else {
+						body = String(value)
+					}
 				} else if (key.startsWith("_bin_") && isBinary) {
 					blobs[key] = value as Blob
 				}

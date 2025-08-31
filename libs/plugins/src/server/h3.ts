@@ -50,7 +50,7 @@ export function defineH3PrimHandler(options: PrimH3PluginOptions) {
 				if (part.name === "rpc") {
 					body = jsonHandler.binary ? part.data : part.data.toString("utf-8")
 				} else if (typeof part.filename === "string" && part.name.startsWith("_bin_")) {
-					const file = new FileForEnv([part.data], part.filename, { type: part.type })
+					const file = new FileForEnv([new Uint8Array(part.data)], part.filename, { type: part.type })
 					blobs[part.name] = file as File // it may be node:buffer.File, but BlobRecords expects native File
 				}
 			}
@@ -72,7 +72,7 @@ export function defineH3PrimHandler(options: PrimH3PluginOptions) {
 			}
 			for (const [blobKey, blobValue] of blobEntries) {
 				const asBuffer = blobValue instanceof Blob ? await blobValue.arrayBuffer() : blobValue
-				const fileBuffer = Buffer.from(asBuffer)
+				const fileBuffer = Buffer.from(asBuffer instanceof ArrayBuffer ? new Uint8Array(asBuffer) : asBuffer)
 				const options: AppendOptions = {
 					filename: blobValue instanceof FileForEnv ? blobValue.name : "",
 					contentType: blobValue instanceof FileForEnv ? blobValue.type : "",

@@ -96,8 +96,8 @@ export const expressPrimRpc = (options: PrimExpressPluginOptions) => {
 								const givenValue = value[0]
 								const given = resolvedFiles[0]
 								const file = givenValue.originalFilename
-									? new FileForEnv([given], givenValue.originalFilename)
-									: new Blob([given])
+									? new FileForEnv([new Uint8Array(given)], givenValue.originalFilename)
+									: new Blob([new Uint8Array(given)])
 								blobs[fieldname] = file as File | Blob
 							}
 						}
@@ -133,7 +133,7 @@ export const expressPrimRpc = (options: PrimExpressPluginOptions) => {
 				}
 				for (const [blobKey, blobValue] of blobEntries) {
 					const asBuffer = blobValue instanceof Blob ? await blobValue.arrayBuffer() : blobValue
-					const fileBuffer = Buffer.from(asBuffer)
+					const fileBuffer = Buffer.from(asBuffer instanceof ArrayBuffer ? new Uint8Array(asBuffer) : asBuffer)
 					const options: AppendOptions = {
 						filename: blobValue instanceof Blob ? (blobValue as File)?.name : "",
 						contentType: blobValue instanceof Blob ? blobValue.type : "",

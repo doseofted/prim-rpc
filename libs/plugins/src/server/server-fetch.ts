@@ -42,7 +42,27 @@ export function primFetch(options: PrimRequestOptions) {
 				const isBinary = (value as any)?.arrayBuffer != null || value instanceof Blob
 				if (key === "rpc") {
 					const binaryBody = isBinary && jsonHandler.binary
-					body = binaryBody ? await (value as Blob).arrayBuffer() : (value as string).toString()
+					if (binaryBody) {
+						// Original logic: if binaryBody is true, get arrayBuffer from blob-like objects
+						if (value instanceof Blob) {
+							body = await value.arrayBuffer()
+						} else if (
+							value !== null &&
+							typeof value === "object" &&
+							"arrayBuffer" in (value as object) &&
+							typeof (value as Record<string, unknown>).arrayBuffer === "function"
+						) {
+							// Handle blob-like objects with arrayBuffer method (like @whatwg-node/fetch ponyfill)
+							// eslint-disable-next-line @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-unsafe-call
+							body = await (value as { arrayBuffer(): Promise<ArrayBuffer> }).arrayBuffer()
+						} else {
+							// Fallback: if it's binary but doesn't have arrayBuffer method, treat as already binary data
+							body = value as ArrayBuffer | string
+						}
+					} else {
+						// Non-binary body: convert to string safely
+						body = typeof value === "string" ? value : String(value)
+					}
 				} else if (key.startsWith("_bin_") && isBinary) {
 					blobs[key] = value as Blob
 				}

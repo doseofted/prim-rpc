@@ -96,7 +96,7 @@ export const fastifyPrimRpc: FastifyPluginAsync<PrimFastifyPluginOptions> = asyn
 			}
 			for (const [blobKey, blobValue] of blobEntries) {
 				const asBuffer = blobValue instanceof Blob ? await blobValue.arrayBuffer() : blobValue
-				const fileBuffer = Buffer.from(asBuffer)
+				const fileBuffer = Buffer.from(asBuffer instanceof ArrayBuffer ? new Uint8Array(asBuffer) : asBuffer)
 				const options: AppendOptions = {
 					filename: blobValue instanceof FileForEnv ? blobValue.name : "",
 					contentType: blobValue instanceof FileForEnv ? blobValue.type : "",
