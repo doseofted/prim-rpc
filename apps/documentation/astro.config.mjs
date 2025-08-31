@@ -54,7 +54,7 @@ export default defineConfig({
 			},
 		}),
 	],
-	output: "server",
+	output: "static",
 	adapter: vercel(),
 	redirects: {
 		// List of short URLs
