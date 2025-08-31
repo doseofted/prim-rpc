@@ -5,7 +5,6 @@
 "@doseofted/prim-rpc-plugins": minor
 "@doseofted/prim-rpc-tooling": minor
 "@doseofted/prim-rpc": minor
-"@doseofted/prim-rpc-ui": minor
 ---
 
 Initial prerelease of Prim+RPC core, plugins, tooling
