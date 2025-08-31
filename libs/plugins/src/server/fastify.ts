@@ -14,6 +14,22 @@ import { Buffer } from "node:buffer" // unlike other servers, Fastify only works
 import type FormData from "form-data"
 import type { AppendOptions } from "form-data"
 import { type FileForEnvType, useFileForEnv } from "../utils/isomorphic"
+
+// Type definitions for multipart plugin methods (not exported by @fastify/multipart in v5)
+interface MultipartRequest extends FastifyRequest {
+	isMultipart(): boolean
+	parts(options?: { limits?: { fileSize?: number } }): AsyncIterable<MultipartFile>
+}
+
+interface MultipartFile {
+	fieldname: string
+	type: "field" | "file"
+	value?: string
+	filename?: string
+	mimetype?: string
+	file: NodeJS.ReadableStream
+	toBuffer(): Promise<Buffer>
+}
 /** The default Prim context when used with Fastify. Overridden with `contextTransform` option. */
 export type PrimFastifyContext = { context: "fastify"; request: FastifyRequest; reply: FastifyReply }
 
@@ -49,7 +65,7 @@ export const fastifyPrimRpc: FastifyPluginAsync<PrimFastifyPluginOptions> = asyn
 	} = options
 	const { jsonHandler } = prim.options
 	if (multipartPlugin) {
-		await fastify.register(multipartPlugin)
+		await fastify.register(multipartPlugin as unknown as FastifyPluginAsync<Record<string, unknown>>)
 	}
 	// LINK https://github.com/fastify/help/issues/158#issuecomment-1086190754
 	fastify.addContentTypeParser("application/json", { parseAs: "string" }, (_req, body, done) => {
@@ -104,14 +120,14 @@ export const fastifyPrimRpc: FastifyPluginAsync<PrimFastifyPluginOptions> = asyn
 			// TODO: read RPC for `_bin_` references and call `request.files()` only when needed
 			const blobs: BlobRecords = {}
 			let bodyForm: string | Buffer
-			if (multipartPlugin && request.isMultipart()) {
-				const parts = request.parts({
+			if (multipartPlugin && (request as MultipartRequest).isMultipart()) {
+				const parts = (request as MultipartRequest).parts({
 					limits: { fileSize },
 				})
 				for await (const part of parts) {
 					if (part.fieldname === "rpc") {
 						if (part.type !== "file") {
-							bodyForm = part.value as string
+							bodyForm = part.value || ""
 						} else {
 							bodyForm = await part.toBuffer()
 						}
@@ -123,7 +139,7 @@ export const fastifyPrimRpc: FastifyPluginAsync<PrimFastifyPluginOptions> = asyn
 							part.file.on("end", () => resolve(chunks))
 						})
 						if (fileBuffer.length > 0) {
-							const file = new FileForEnv(fileBuffer, part.filename, { type: part.mimetype })
+							const file = new FileForEnv([Buffer.concat(fileBuffer)], part.filename || "", { type: part.mimetype })
 							blobs[part.fieldname] = file as unknown as File // it may be node:buffer.File, but BlobRecords expects native File
 						}
 					}

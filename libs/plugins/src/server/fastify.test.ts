@@ -5,10 +5,10 @@
 /* eslint-disable @typescript-eslint/no-unsafe-member-access -- `request` doesn't have full type definitions */
 
 import { readFileSync } from "node:fs"
-import { describe, test, beforeEach, expect } from "vitest"
+import { describe, test, beforeEach, afterEach, expect } from "vitest"
 import request from "superwstest"
 import * as module from "@doseofted/prim-example"
-import Fastify from "fastify"
+import Fastify, { type FastifyInstance } from "fastify"
 import multipartPlugin from "@fastify/multipart"
 import { RpcAnswer, createPrimServer } from "@doseofted/prim-rpc"
 import { createMethodHandler, fastifyPrimRpc } from "./fastify"
@@ -17,17 +17,18 @@ import FormData from "form-data"
 import { Blob, File } from "node:buffer"
 
 describe("Fastify plugin is functional as Prim Plugin", () => {
-	const fastify = Fastify()
-	createPrimServer({
-		module,
-		methodHandler: createMethodHandler({ fastify }),
-	})
+	let fastify: FastifyInstance
 	beforeEach(async () => {
-		await fastify.ready()
-		await new Promise<void>(resolve => {
-			fastify.server.listen(0, "localhost", resolve)
+		fastify = Fastify()
+		createPrimServer({
+			module,
+			methodHandler: createMethodHandler({ fastify }),
 		})
-		return () => fastify.server.close()
+		await fastify.ready()
+		await fastify.listen({ port: 0, host: "localhost" })
+	})
+	afterEach(async () => {
+		await fastify.close()
 	})
 	const args = { greeting: "What's up", name: "Ted" }
 	const expected = { id: 1, result: module.sayHello(args) }
@@ -46,18 +47,20 @@ describe("Fastify plugin is functional as Prim Plugin", () => {
 	})
 })
 
-describe("Fastify plugin is functional as Fastify plugin", async () => {
-	const prim = createPrimServer({
-		module,
-	})
-	const fastify = Fastify()
-	await fastify.register(fastifyPrimRpc, { prim })
+describe("Fastify plugin is functional as Fastify plugin", () => {
+	let fastify: FastifyInstance
+	let prim: ReturnType<typeof createPrimServer>
 	beforeEach(async () => {
-		await fastify.ready()
-		await new Promise<void>(resolve => {
-			fastify.server.listen(0, "localhost", resolve)
+		prim = createPrimServer({
+			module,
 		})
-		return () => fastify.server.close()
+		fastify = Fastify()
+		await fastify.register(fastifyPrimRpc, { prim })
+		await fastify.ready()
+		await fastify.listen({ port: 0, host: "localhost" })
+	})
+	afterEach(async () => {
+		await fastify.close()
 	})
 	const args = { greeting: "What's up", name: "Ted" }
 	const expected = { id: 1, result: module.sayHello(args) }
@@ -77,17 +80,18 @@ describe("Fastify plugin is functional as Fastify plugin", async () => {
 })
 
 describe("Fastify plugin works with over GET/POST", () => {
-	const fastify = Fastify()
-	createPrimServer({
-		module,
-		methodHandler: createMethodHandler({ fastify }),
-	})
+	let fastify: FastifyInstance
 	beforeEach(async () => {
-		await fastify.ready()
-		await new Promise<void>(resolve => {
-			fastify.server.listen(0, "localhost", resolve)
+		fastify = Fastify()
+		createPrimServer({
+			module,
+			methodHandler: createMethodHandler({ fastify }),
 		})
-		return () => fastify.server.close()
+		await fastify.ready()
+		await fastify.listen({ port: 0, host: "localhost" })
+	})
+	afterEach(async () => {
+		await fastify.close()
 	})
 	const args = { greeting: "What's up", name: "Ted" }
 	const expected = { id: 1, result: module.sayHello(args) }
@@ -117,17 +121,18 @@ describe("Fastify plugin works with over GET/POST", () => {
 })
 
 describe("Fastify plugin can support binary data", () => {
-	const fastify = Fastify()
-	createPrimServer({
-		module,
-		methodHandler: createMethodHandler({ fastify, multipartPlugin, formDataHandler: FormData }),
-	})
+	let fastify: FastifyInstance
 	beforeEach(async () => {
-		await fastify.ready()
-		await new Promise<void>(resolve => {
-			fastify.server.listen(0, "localhost", resolve)
+		fastify = Fastify()
+		createPrimServer({
+			module,
+			methodHandler: createMethodHandler({ fastify, multipartPlugin, formDataHandler: FormData }),
 		})
-		return () => fastify.server.close()
+		await fastify.ready()
+		await fastify.listen({ port: 0, host: "localhost" })
+	})
+	afterEach(async () => {
+		await fastify.close()
 	})
 	test("upload a file", async () => {
 		const formData = new FormData()

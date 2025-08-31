@@ -1,5 +1,10 @@
 packages:
-  - "libs/**"
-  - "apps/**"
-  - "!apps/documentation-old/.next/types/**"
-  - "!apps/documentation/.vercel/**"
+  - libs/**
+  - apps/**
+  - '!apps/documentation-old/.next/types/**'
+  - '!apps/documentation/.vercel/**'
+
+onlyBuiltDependencies:
+  - '@go-task/cli'
+  - esbuild
+  - sharp
