@@ -1,0 +1,33 @@
+---
+import { Icon } from "astro-icon/components"
+import { twJoin } from "tailwind-merge"
+twJoin
+interface Props {
+	href?: string
+	icon?: `ph:${string}` | `simple-icons:${string}` | `/${string}` | (string & {})
+	block?: boolean
+	classes?: string
+	disabled?: boolean
+}
+const { href, icon, block, classes, disabled } = Astro.props
+const target = href?.startsWith("http") ? "_blank" : undefined
+const rel = href?.startsWith("http") ? "nofollow" : undefined
+const isIconComponent = !(icon && icon.startsWith("/"))
+---
+
+<a
+	href={href}
+	target={target}
+	rel={rel}
+	class:list={twJoin(
+		"not-prose btn gap-4 lg:gap-2",
+		block && "btn-block",
+		disabled && "btn-disabled !text-opacity-60 !cursor-not-allowed",
+		classes
+	)}
+	class="">
+	{icon && (isIconComponent ? <Icon class="w-6 h-6" name={icon} /> : <img class="w-6 h-6" src={icon} />)}
+	<span class="flex-grow text-left">
+		<slot />
+	</span>
+</a>

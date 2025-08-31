@@ -1,0 +1,27 @@
+# build output
+dist/
+# generated types
+.astro/
+
+# dependencies
+node_modules/
+
+# logs
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+
+
+# environment variables
+.env
+.env.production
+
+# macOS-specific files
+.DS_Store
+
+# Vercel adaptor build output from Astro
+.vercel
+
+# This content folder is generated on project build and doesn't need to be committed
+src/content/api/v**

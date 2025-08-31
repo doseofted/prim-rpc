@@ -1,0 +1,8 @@
+**/dist/
+**/.task/
+**/.turbo/
+**/.next/
+/data/
+pnpm-*.yaml
+**/.changeset/
+apps/documentation/.vercel

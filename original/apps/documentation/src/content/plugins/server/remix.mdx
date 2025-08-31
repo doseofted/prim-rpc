@@ -1,0 +1,110 @@
+---
+title: Remix
+icon: simple-icons:remix
+type: "method-handler"
+transport: "http"
+features: []
+status: available
+links:
+  - name: Remix
+    href: https://github.com/remix-run/remix#readme
+---
+
+import CodeFile from "@/components/Code/CodeFile.astro"
+import Code from "@/components/Code/Code.astro"
+import CodeTabs from "@/components/Code/CodeTabs.react.tsx"
+import Aside from "@/components/Markdown/Aside.astro"
+
+Prim+RPC supports Remix by defining an API route. You may also choose to use Remix with an Express server, for which
+Prim+RPC [also has a plugin](/docs/reference/plugins/server/express). The first step is to create some function the
+server that you'd like to expose to the client:
+
+<CodeFile filename="app/functions/index.ts">
+
+```typescript
+export function hello() {
+	return "Hi from Prim+RPC!"
+}
+hello.rpc = true
+
+export default hello
+```
+
+</CodeFile>
+
+You may configure Prim+RPC with Remix by using a catch-all route in your app directory. You may name this route anything
+that you'd like, just remember to set the corresponding Prim+RPC [prefix option](/docs/reference/config#-prefix) to
+match:
+
+<CodeFile filename="app/routes/prim.$/route.ts">
+
+```typescript
+import { createPrimServer } from "@doseofted/prim-rpc"
+import { primRemix } from "@doseofted/prim-rpc-plugins/remix"
+import * as module from "../../functions"
+
+const prim = createPrimServer({ module })
+
+export const { loader, action } = primRemix({ prim })
+```
+
+</CodeFile>
+
+<Aside>
+	You may choose to name your route `app/routes/prim.$/route.ts{:txt}` or `app/routes/prim.$.ts{:txt}`, both are valid route names in Remix.
+</Aside>
+
+Your Prim+RPC server is now set up! Remix is a fullstack framework that can run on both server and client, which means
+the Prim+RPC client may be called on the server as well as the client.
+
+On the server, you can avoid a network request from the client by conditionally passing the module. Below is an example
+of how you may do so, using the Fetch API method plugin:
+
+<CodeFile filename="app/routes/prim.$/client.ts">
+
+```typescript
+import { createPrimClient } from "@doseofted/prim-rpc"
+import { createMethodPlugin } from "@doseofted/prim-rpc-plugins/browser"
+import type * as Module from "../../functions"
+
+const endpoint = import.meta.env.SSR ? undefined : "/prim"
+const module = import.meta.env.SSR ? import("../../functions") : null
+const methodPlugin = createMethodPlugin()
+export const client = createPrimClient<Promise<typeof Module>>({ endpoint, module, methodPlugin })
+```
+
+</CodeFile>
+
+Now this exported client may used from anywhere in your project. We'll demonstrate usage of the client from both the
+server and the client.
+
+<CodeFile filename="app/routes/_index.tsx">
+
+```tsx
+import { useState, useEffect } from "react"
+import { client } from "./prim.$/client"
+import type { LoaderFunction } from "@remix-run/node"
+
+export const loader: LoaderFunction = async () => {
+	const greeting = await client.hello()
+	return { greeting }
+}
+
+export default function Page() {
+	const { greeting: greetingServer } = useLoaderData<typeof loader>()
+	const [greetingClient, setGreetingClient] = useState("")
+	useEffect(() => {
+		client.hello().then(given => setGreetingClient(given))
+	}, [])
+	return (
+		<div>
+			<p>Server rendered: {greetingServer}</p>
+			<p>Client rendered: {greetingClient}</p>
+		</div>
+	)
+}
+```
+
+</CodeFile>
+
+Now we are all set up!

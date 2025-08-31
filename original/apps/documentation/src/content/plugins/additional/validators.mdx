@@ -1,0 +1,148 @@
+---
+title: Validators
+icon: ph:globe-bold
+type: validator
+transport: inapplicable
+features: []
+status: available
+---
+
+import CodeFile from "@/components/Code/CodeFile.astro"
+
+Prim+RPC does not include validation of arguments and return values by default but this can easily be added in one of
+several ways, using the validation tool of your choice.
+
+[See the Security guide](/docs/learn/security#validate-arguments) to learn various ways of setting up validation. In
+this guide, we'll see how to set up several popular validation libraries with our functions directly. However we could
+just as easily move this validation into a [Pre-Call](/docs/reference/config#-pre-call-hook) or
+[Post-Call](/docs/reference/config#-post-call-hook) hook.
+
+For all of these examples we will be adding validation to this example function (implementation can generally be
+ignored, we will only be focusing on the validation of inputs):
+
+<CodeFile>
+
+```typescript
+import { transport } from "./email-example"
+
+interface Options {
+	to: string
+	name?: string
+	reply: string
+	subject?: string
+}
+
+export function sendMessage(message: string, opts: Options) {
+	try {
+		const text = `Message from ${opts.name} <${opts.reply}>\n\n${message}`
+		const { to, subject } = opts
+		await transport.sendMail({ text, to, subject })
+	} catch (error) {
+		throw new Error("Internal email error")
+	}
+}
+```
+
+</CodeFile>
+
+## Zod
+
+[Zod](https://github.com/colinhacks/zod#readme) is a very popular form of validation. We could set up validation like
+so:
+
+<CodeFile>
+
+```typescript {2,4-10,13}
+import { transport } from "./email-example"
+import { z } from "zod"
+
+const optsSchema = z.object({
+	to: z.string().email(),
+	name: z.string().optional(),
+	reply: z.string().email(),
+	subject: z.string().optional(),
+})
+type Options = z.infer<typeof optsSchema>
+
+export function sendMessage(message: string, opts: Options) {
+	;[message, opts] = z.tuple([z.string(), optsSchema]).parse([message, opts])
+	try {
+		const text = `Message from ${opts.name} <${opts.reply}>\n\n${message}`
+		const { to, subject } = opts
+		await transport.sendMail({ text, to, subject })
+	} catch (error) {
+		throw new Error("Internal email error")
+	}
+}
+```
+
+</CodeFile>
+
+## ArkType
+
+[ArkType](https://github.com/arktypeio/arktype#readme) is a recent library gaining traction for its resemblance to
+TypeScript types. We could set up validation like so:
+
+<CodeFile>
+
+```typescript {2,4-10,13}
+import { transport } from "./email-example"
+import { type } from "arktype"
+
+const optsSchema = type({
+	to: "email",
+	name: "string|undefined",
+	reply: "email",
+	subject: "string|undefined",
+})
+type Options = typeof optsSchema.infer
+
+export function sendMessage(message: string, opts: Options) {
+	;[message, opts] = type(["string", optsSchema]).assert([message, opts])
+	try {
+		const text = `Message from ${opts.name} <${opts.reply}>\n\n${message}`
+		const { to, subject } = opts
+		await transport.sendMail({ text, to, subject })
+	} catch (error) {
+		throw new Error("Internal email error")
+	}
+}
+```
+
+</CodeFile>
+
+## Valibot
+
+[Valibot](https://github.com/fabian-hiller/valibot#readme) is an alternative to Zod that has a tree-shakeable design.
+
+<CodeFile>
+
+```typescript {2,4-10,13}
+import { transport } from "./email-example"
+import { object, string, optional, email, parse, type Output } from "valibot"
+
+const optsSchema = object({
+	to: string([email()]),
+	name: optional(string()),
+	reply: string([email()]),
+	subject: optional(string()),
+})
+type Options = Output<typeof optsSchema>
+
+export function sendMessage(message: string, opts: Options) {
+	;[message, opts] = parse(tuple([string(), optsSchema]), [message, opts])
+	try {
+		const text = `Message from ${opts.name} <${opts.reply}>\n\n${message}`
+		const { to, subject } = opts
+		await transport.sendMail({ text, to, subject })
+	} catch (error) {
+		throw new Error("Internal email error")
+	}
+}
+```
+
+</CodeFile>
+
+## Others
+
+The examples on this page are not exhaustive. You may use any validation library that you'd like.
