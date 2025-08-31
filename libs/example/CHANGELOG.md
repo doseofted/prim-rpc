@@ -1,5 +1,11 @@
 # @doseofted/prim-example
 
+## 0.1.0-alpha.4
+
+### Patch Changes
+
+- d833982: Updated dependencies in the project
+
 ## 0.1.0-alpha.3
 
 ### Patch Changes
