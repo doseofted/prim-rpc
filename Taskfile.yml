@@ -27,6 +27,18 @@ tasks:
     cmds:
       - "pnpm upgrade -r --interactive --latest"
 
+  audit:fix:
+    cmds:
+      - "pnpm audit --fix"
+    prompt: "Do you want to update dependencies to address audit?"
+
+  audit:
+    desc: "Audit for vulnerabilities"
+    ignore_error: true
+    cmds:
+      - "pnpm audit"
+      - task: audit:fix
+
   cleanup:
     desc: "Remove various temporary files and directories created within project, for a clean run"
     ignore_error: true
@@ -70,7 +82,7 @@ tasks:
   start:docs:
     desc: "Start the documentation server in development mode"
     cmds:
-      - "pnpm --filter=./apps/documentation dev"
+      - "pnpm --filter=./apps/documentation dev --host"
 
   start:example:
     desc: "Start the reference project to play with Prim+RPC on a server"

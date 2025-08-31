@@ -74,7 +74,7 @@ export function createPrimClient<
 				function applySync(givenPath: string[], givenModule: ModuleType, targetContext: unknown, givenArgs: unknown[]) {
 					const functionName = givenPath.join("/")
 					const preRequestResult = configured.preRequest
-						? configured.preRequest(givenArgs, functionName) ?? { args: givenArgs }
+						? (configured.preRequest(givenArgs, functionName) ?? { args: givenArgs })
 						: { args: givenArgs }
 					if (configured.preRequest && "result" in preRequestResult) {
 						return configured.postRequest(preRequestResult.result, functionName)

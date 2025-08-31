@@ -4,7 +4,8 @@
 
 ### Minor Changes
 
-- fc9767e: Pre-call and pre-request hooks can now return/resolve function calls early (and the return value from this hook must be an object consisting of .args and optionally .result)
+- fc9767e: Pre-call and pre-request hooks can now return/resolve function calls early (and the return value from this
+  hook must be an object consisting of .args and optionally .result)
 
 ### Patch Changes
 
@@ -14,14 +15,17 @@
 
 ### Minor Changes
 
-- 8072796: .methodsOnMethods option now requires an key/value object where the key is the method-on-method name and the value is either `true` or `"idempotent"` (similar to .allowList option)
-- d5887ab: RPC can no longer be made by GET requests by default: introduced new keyword for function's `.rpc` property named "idempotent" that, when used with HTTP plugins, allows RPC over GET requests
+- 8072796: .methodsOnMethods option now requires an key/value object where the key is the method-on-method name and the
+  value is either `true` or `"idempotent"` (similar to .allowList option)
+- d5887ab: RPC can no longer be made by GET requests by default: introduced new keyword for function's `.rpc` property
+  named "idempotent" that, when used with HTTP plugins, allows RPC over GET requests
 
 ## 0.1.0-alpha.23
 
 ### Patch Changes
 
-- c7716bd: Added ability to receive multiple promises from a function with callback handler (disabled by default, must be enabled in options under `flags`)
+- c7716bd: Added ability to receive multiple promises from a function with callback handler (disabled by default, must
+  be enabled in options under `flags`)
 
 ## 0.1.0-alpha.22
 

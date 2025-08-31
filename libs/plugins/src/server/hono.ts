@@ -33,8 +33,13 @@ export function honoPrimRpc(options: PrimHonoPluginOptions) {
 			const formData = await req.formData()
 			for (const [key, value] of formData) {
 				if (key === "rpc") {
-					// eslint-disable-next-line @typescript-eslint/no-base-to-string
-					body = value instanceof Blob && jsonHandler.binary ? await value.arrayBuffer() : value.toString()
+					if (value instanceof Blob && jsonHandler.binary) {
+						body = await value.arrayBuffer()
+					} else if (typeof value === "string") {
+						body = value
+					} else {
+						body = String(value)
+					}
 				} else if (key.startsWith("_bin_") && value instanceof Blob) {
 					blobs[key] = value
 				}

@@ -1,6 +1,5 @@
 import { Tabs } from "@ark-ui/react"
 import { Icon } from "@iconify/react"
-import type { CSSProperties } from "react"
 
 // Slot key names need to be named for usage in Astro
 type CodeTabsList = {
