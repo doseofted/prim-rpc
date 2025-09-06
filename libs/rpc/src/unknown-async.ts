@@ -8,6 +8,7 @@ import {
 	type Caught,
 	CaughtPropType,
 	CaughtType,
+	CaughtCallType,
 } from "./call-catcher";
 
 /**
@@ -24,9 +25,19 @@ import {
  * be wrapped in TypeScript types to reflect the intended return value.
  */
 export class UnknownAsync<T = UnknownAsyncProxy> {
-	#handle?: HandleUnknownOptions;
-	constructor(handle?: HandleUnknownOptions) {
-		this.#handle = handle;
+	#handle?: HandleUnknownOptionsGranular;
+	constructor(handle: HandleUnknownOptions = true) {
+		this.#handle = this.#expandHandled(handle);
+	}
+
+	#expandHandled(options: HandleUnknownOptions): HandleUnknownOptionsGranular {
+		if (typeof options === "boolean") {
+			return {
+				iterators: options,
+				promises: options,
+			};
+		}
+		return options;
 	}
 
 	#fallbackCondition?: CallCondition;
@@ -53,8 +64,8 @@ export class UnknownAsync<T = UnknownAsyncProxy> {
 	/** Original promise or iterable given */
 	#given?: unknown;
 
-	#methodsPromise: PropertyKey[] = ["then", "catch", "finally"];
-	#methodsIterator: PropertyKey[] = [
+	static #methodsPromise: PropertyKey[] = ["then", "catch", "finally"];
+	static #methodsIterator: PropertyKey[] = [
 		"next",
 		"return",
 		"throw",
@@ -62,12 +73,13 @@ export class UnknownAsync<T = UnknownAsyncProxy> {
 		Symbol.asyncIterator,
 	];
 	/** Methods not to expose from proxy */
-	#hiddenMethods: PropertyKey[] = [Symbol.iterator];
+	static #hiddenMethods: PropertyKey[] = [Symbol.iterator];
 	/** Methods of either a promise or iterable */
-	get #methods(): PropertyKey[] {
-		return [...this.#methodsPromise, ...this.#methodsIterator].filter(
-			(method) => !this.#hiddenMethods.includes(method),
-		);
+	static get #methods(): PropertyKey[] {
+		return [
+			...UnknownAsync.#methodsPromise,
+			...UnknownAsync.#methodsIterator,
+		].filter((method) => !UnknownAsync.#hiddenMethods.includes(method));
 	}
 
 	#notPreparedMethodCalls: Record<
@@ -78,11 +90,19 @@ export class UnknownAsync<T = UnknownAsyncProxy> {
 		[GivenType.Iterator]: false,
 	};
 
-	#shouldCaughtBeProcessed(caught: Caught) {
+	static #shouldCaughtBeProcessed(caught: Caught) {
 		const isCall = caught.type === CaughtType.Call;
+		const isCallFunc = isCall && caught.callMethod === CaughtCallType.Function;
 		const isProp = caught.type === CaughtType.Prop;
 		const isPropAccess = isProp && caught.interaction === CaughtPropType.Access;
-		return isCall || isPropAccess;
+		return (isCallFunc && CaughtType.Call) || (isPropAccess && CaughtType.Prop);
+	}
+
+	static asyncTypeSupported(caught: Caught) {
+		const isSupportedType = UnknownAsync.#shouldCaughtBeProcessed(caught);
+		const includesAsyncMethod =
+			isSupportedType && UnknownAsync.#methods.includes(caught.path.at(-1));
+		return includesAsyncMethod;
 	}
 
 	#defaultCatchOptions: CatchOptions = {
@@ -91,17 +111,18 @@ export class UnknownAsync<T = UnknownAsyncProxy> {
 	};
 	#callCatcher = new CallCatcher<T>((next, stack) => {
 		const caught = stack.at(-1);
-		const intendedForFallback = !this.#shouldCaughtBeProcessed(caught);
+		const intendedForFallback = !UnknownAsync.#shouldCaughtBeProcessed(caught);
 		const methodName = caught.path.at(-1);
 		const noMethodName = isUndefined(methodName);
-		const includesMethodName = this.#methods.includes(methodName);
+		const includesMethodName = UnknownAsync.#methods.includes(methodName);
 		const anonymousMethod = noMethodName && caught.type === CaughtType.Call;
 		if (anonymousMethod) return next;
 		const unsupportedMethod = !noMethodName && !includesMethodName;
 		if (unsupportedMethod || intendedForFallback)
 			return this.#fallbackCondition?.(next, stack);
 		if (caught.type !== CaughtType.Call) return next;
-		const includesPromiseMethod = this.#methodsPromise.includes(methodName);
+		const includesPromiseMethod =
+			UnknownAsync.#methodsPromise.includes(methodName);
 		const notGivenPromiseType = this.#givenType !== GivenType.Promise;
 		if (includesPromiseMethod && notGivenPromiseType) {
 			this.#notPreparedMethodCalls[GivenType.Promise] = true;
@@ -113,7 +134,8 @@ export class UnknownAsync<T = UnknownAsyncProxy> {
 		if (includesPromiseMethod) {
 			return this.#promise[methodName].apply(this.#promise, caught.args);
 		}
-		const includesIteratorMethod = this.#methodsIterator.includes(methodName);
+		const includesIteratorMethod =
+			UnknownAsync.#methodsIterator.includes(methodName);
 		const notGivenIteratorType = this.#givenType !== GivenType.Iterator;
 		if (includesIteratorMethod && notGivenIteratorType) {
 			this.#notPreparedMethodCalls[GivenType.Iterator] = true;
@@ -230,7 +252,7 @@ export class UnknownAsync<T = UnknownAsyncProxy> {
 		if (this.#givenType === GivenType.Iterator) return true;
 		const isIterator =
 			isObject(given) &&
-			this.#methodsIterator
+			UnknownAsync.#methodsIterator
 				.filter((given) => isSymbol(given))
 				.some((property) => property in given && isFunction(given[property]));
 		if (setGivenType) {
@@ -323,10 +345,11 @@ export class UnknownAsync<T = UnknownAsyncProxy> {
 	}
 }
 
-export type HandleUnknownOptions = {
+export type HandleUnknownOptionsGranular = {
 	iterators?: boolean;
 	promises?: boolean;
 };
+export type HandleUnknownOptions = boolean | HandleUnknownOptionsGranular;
 
 enum ReusableMessages {
 	GivenNotIterable = "Given was not an iterable",

@@ -27,6 +27,59 @@ export class CallCatcher<ObjectShape = any> {
 		return options;
 	}
 
+	/** Initialize a new instance with a stack from a previous instance */
+	// biome-ignore lint/suspicious/noExplicitAny: Provided type could be any object
+	static newWithStack<ObjectShape = any>(
+		stack: CaughtStack,
+		callCondition: CallCondition,
+		catchOptions?: CatchOptions,
+	) {
+		const instance = new CallCatcher<ObjectShape>(callCondition, catchOptions);
+		instance.#updateStack(stack, true);
+		return instance;
+	}
+
+	/**
+	 * Replay the last caught item in the stack with the given call condition,
+	 * and return the result. This may only be called upon initializing a new
+	 * instance with `newWithStack` prior to interacting with the proxy.
+	 */
+	replayLast() {
+		if (this.#proxyUtilized) {
+			throw new CallCatcherError(
+				"This instance's proxy has already been utilized",
+			);
+		}
+		return this.#determineNext(this.#stack);
+		// const lastCaught = this.#stack.at(-1);
+		// if (!lastCaught) return;
+		// const result = this.#callCondition(Symbol(), this.#stack);
+		// return result;
+	}
+
+	// /** Initialize this instance from a previously created instance */
+	// transferFromInstance(instance: CallCatcher, processImmediately = false) {
+	// 	if (processImmediately) {
+	// 		// child instance is created but unused
+	// 		// this.#determineNext(instance.#stack);
+	// 		// call condition (but what happens to returned value?)
+	// 		// const condition = this.#callCondition(Symbol(), instance.#stack);
+	// 	}
+	// 	this.#updateStack(instance.#stack, true);
+	// }
+
+	// FIXME: the proxy returned doesn't belong to the original class (it's a child of it)
+	// Should this instead become static method with args of constructor so returned value
+	// is the new instance (with proxy that belongs to it)?
+	/** Transfer a stack from a previous instance to this instance, returns proxy */
+	// transferStack(stack: CaughtStack, processLast = false) {
+	// 	if (processLast) {
+	// 		return this.#determineNext(stack);
+	// 	}
+	// 	this.#updateStack(stack, true);
+	// 	return this.proxy;
+	// }
+
 	#shouldCatch: CatchOptionsGranular;
 	changeCaught(options: CatchOptions): void {
 		const expandedOptions = this.#expandOptions(options);
@@ -63,7 +116,7 @@ export class CallCatcher<ObjectShape = any> {
 	}
 
 	#updateStack(stack: CaughtStack, replaceStack = false): CaughtStack {
-		if (replaceStack) this.#stack = stack;
+		if (replaceStack) this.#stack = stack.concat();
 		return stack;
 	}
 
@@ -118,6 +171,7 @@ export class CallCatcher<ObjectShape = any> {
 
 	#determineNext(pendingStack: CaughtStack) {
 		const next = Symbol();
+		if (!this.#proxyUtilized) this.#proxyUtilized = true;
 		const condition = this.#callCondition(next, pendingStack);
 		if (condition !== next) return condition;
 		const lastItem = pendingStack.at(-1);
@@ -133,6 +187,7 @@ export class CallCatcher<ObjectShape = any> {
 		return instance.proxy;
 	}
 
+	#proxyUtilized = false;
 	proxy = new Proxy(CallCatcher, {
 		get: (_target, property, _receiver) => {
 			if (!this.#shouldCatch.propAccess) return;
@@ -169,7 +224,7 @@ export class CallCatcher<ObjectShape = any> {
 				type: CaughtType.Call,
 				path: [],
 				args,
-				constructed: false,
+				callMethod: CaughtCallType.Function,
 			});
 			return this.#determineNext(pendingStack);
 		},
@@ -180,11 +235,18 @@ export class CallCatcher<ObjectShape = any> {
 				type: CaughtType.Call,
 				path: [],
 				args,
-				constructed: true,
+				callMethod: CaughtCallType.Constructor,
 			});
 			return this.#determineNext(pendingStack);
 		},
 	}) as ObjectShape;
+}
+
+export class CallCatcherError extends Error {
+	constructor(message?: string) {
+		super(message);
+		this.name = "CallCatcherError";
+	}
 }
 
 const CaughtIdSymbol: unique symbol = Symbol();
@@ -227,7 +289,7 @@ export enum CaughtCallType {
 export type CaughtCall<Args extends unknown[] = unknown[]> = CaughtBase & {
 	type: CaughtType.Call;
 	args: Args;
-	constructed: boolean;
+	callMethod: CaughtCallType;
 };
 
 export enum CaughtPropType {

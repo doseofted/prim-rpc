@@ -1,7 +1,9 @@
 import { describe, expect, test, vi } from "vitest";
 import {
 	CallCatcher,
+	CallCatcherError,
 	type Caught,
+	CaughtCallType,
 	CaughtPropType,
 	type CaughtStack,
 	CaughtType,
@@ -9,6 +11,58 @@ import {
 
 describe.todo("CallCatcher can be configured", () => {
 	// ...
+});
+
+describe("CallCatcher can be initialized from a previous instance", () => {
+	test("original stack can be transferred", () => {
+		function callFuncName(caught: Caught, name: string) {
+			const isCall = caught.type === CaughtType.Call;
+			const lastPath = caught.path.at(-1);
+			const match = isCall && lastPath === name;
+			return match;
+		}
+		const catcher1 = new CallCatcher((next, stack) => {
+			const caught = stack.at(-1);
+			if (callFuncName(caught, "path")) return stack;
+			return next;
+		});
+		const conditionResult1 = catcher1.proxy.deep.nested.path();
+		const catcher2 = CallCatcher.newWithStack(
+			conditionResult1,
+			(next, stack) => {
+				const caught = stack.at(-1);
+				if (callFuncName(caught, "path")) return 123;
+				if (callFuncName(caught, "done")) return stack;
+				return next;
+			},
+		);
+		const conditionResult2 = catcher2.replayLast();
+		const continuedCallResult = catcher2.proxy.testing.lorem.ipsum.done();
+		expect(conditionResult1).toEqual([
+			expect.objectContaining({
+				type: CaughtType.Call,
+				path: ["deep", "nested", "path"],
+				args: [],
+			}),
+		]);
+		expect(conditionResult2).toEqual(123);
+		expect(continuedCallResult).toEqual([
+			expect.objectContaining({
+				type: CaughtType.Call,
+				callMethod: CaughtCallType.Function,
+				path: ["deep", "nested", "path"],
+				args: [],
+			}),
+			expect.objectContaining({
+				type: CaughtType.Call,
+				callMethod: CaughtCallType.Function,
+				path: ["testing", "lorem", "ipsum", "done"],
+				args: [],
+			}),
+		]);
+		// we've already replayed the stack, we're not able to do so again
+		expect(() => catcher2.replayLast()).toThrow(CallCatcherError);
+	});
 });
 
 describe("CallCatcher can catch direct calls and props", () => {
@@ -57,14 +111,15 @@ describe("CallCatcher can catch direct calls and props", () => {
 			const caught = stack.at(-1);
 			const constructed =
 				caught.type === CaughtType.Call &&
-				caught.constructed &&
+				caught.callMethod === CaughtCallType.Constructor &&
 				caught.path.length === 0;
 			return constructed ? caught : next;
 		});
 		expect(new callCatcher.proxy()).toEqual(
 			expect.objectContaining({
 				type: CaughtType.Call,
-				constructed: true,
+				callMethod: CaughtCallType.Constructor,
+				args: [],
 				path: [],
 			}),
 		);
@@ -80,14 +135,15 @@ describe("CallCatcher can catch direct calls and props", () => {
 			const caught = stack.at(-1);
 			const constructed =
 				caught.type === CaughtType.Call &&
-				caught.constructed &&
+				caught.callMethod === CaughtCallType.Constructor &&
 				caught.path.at(-1) === "Test";
 			return constructed ? caught : next;
 		});
 		expect(new callCatcher.proxy.Test()).toEqual(
 			expect.objectContaining({
 				type: CaughtType.Call,
-				constructed: true,
+				callMethod: CaughtCallType.Constructor,
+				args: [],
 				path: ["Test"],
 			}),
 		);
