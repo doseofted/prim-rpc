@@ -15,28 +15,14 @@ export class CallCatcher<ObjectShape = any> {
 	}
 
 	#expandOptions(options: CatchOptions): CatchOptionsGranular {
-		if (typeof options === "boolean") {
-			return {
-				callFunction: options,
-				callConstructor: options,
-				propAccess: options,
-				propAssignment: options,
-				propDeletion: options,
-			};
-		}
-		return options;
-	}
-
-	/** Initialize a new instance with a stack from a previous instance */
-	// biome-ignore lint/suspicious/noExplicitAny: Provided type could be any object
-	static newWithStack<ObjectShape = any>(
-		stack: CaughtStack,
-		callCondition: CallCondition,
-		catchOptions?: CatchOptions,
-	) {
-		const instance = new CallCatcher<ObjectShape>(callCondition, catchOptions);
-		instance.#updateStack(stack, true);
-		return instance;
+		if (typeof options !== "boolean") return options;
+		return {
+			callFunction: options,
+			callConstructor: options,
+			propAccess: options,
+			propAssignment: options,
+			propDeletion: options,
+		};
 	}
 
 	/**
@@ -44,41 +30,14 @@ export class CallCatcher<ObjectShape = any> {
 	 * and return the result. This may only be called upon initializing a new
 	 * instance with `newWithStack` prior to interacting with the proxy.
 	 */
-	replayLast() {
+	#replayLast() {
 		if (this.#proxyUtilized) {
 			throw new CallCatcherError(
 				"This instance's proxy has already been utilized",
 			);
 		}
 		return this.#determineNext(this.#stack);
-		// const lastCaught = this.#stack.at(-1);
-		// if (!lastCaught) return;
-		// const result = this.#callCondition(Symbol(), this.#stack);
-		// return result;
 	}
-
-	// /** Initialize this instance from a previously created instance */
-	// transferFromInstance(instance: CallCatcher, processImmediately = false) {
-	// 	if (processImmediately) {
-	// 		// child instance is created but unused
-	// 		// this.#determineNext(instance.#stack);
-	// 		// call condition (but what happens to returned value?)
-	// 		// const condition = this.#callCondition(Symbol(), instance.#stack);
-	// 	}
-	// 	this.#updateStack(instance.#stack, true);
-	// }
-
-	// FIXME: the proxy returned doesn't belong to the original class (it's a child of it)
-	// Should this instead become static method with args of constructor so returned value
-	// is the new instance (with proxy that belongs to it)?
-	/** Transfer a stack from a previous instance to this instance, returns proxy */
-	// transferStack(stack: CaughtStack, processLast = false) {
-	// 	if (processLast) {
-	// 		return this.#determineNext(stack);
-	// 	}
-	// 	this.#updateStack(stack, true);
-	// 	return this.proxy;
-	// }
 
 	#shouldCatch: CatchOptionsGranular;
 	changeCaught(options: CatchOptions): void {
@@ -118,6 +77,20 @@ export class CallCatcher<ObjectShape = any> {
 	#updateStack(stack: CaughtStack, replaceStack = false): CaughtStack {
 		if (replaceStack) this.#stack = stack.concat();
 		return stack;
+	}
+
+	/**
+	 * Set the initial stack from another instance. The stack must be set prior to
+	 * interacting with the proxy and should only be set once for each instance.
+	 */
+	setInitialStack(stack: CaughtStack, replay = false) {
+		if (this.#proxyUtilized) {
+			throw new CallCatcherError(
+				"This instance's proxy has already been utilized",
+			);
+		}
+		this.#updateStack(stack, true);
+		if (replay) return this.#replayLast();
 	}
 
 	#appendToStack(

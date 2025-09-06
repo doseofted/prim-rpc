@@ -3,7 +3,6 @@ import { isObject } from "es-toolkit/compat";
 import {
 	CallCatcher,
 	type CallCondition,
-	type CatchOptions,
 	type CatchOptionsGranular,
 	type Caught,
 	CaughtPropType,
@@ -24,9 +23,58 @@ import {
  * without actually having to await an object. This class once initialized may
  * be wrapped in TypeScript types to reflect the intended return value.
  */
-export class UnknownAsync<T = UnknownAsyncProxy> {
+export class UnknownAsync<T = UnknownAsyncProxy> extends CallCatcher<T> {
 	#handle?: HandleUnknownOptionsGranular;
+	#defaultCatchOptions: CatchOptionsGranular;
+
 	constructor(handle: HandleUnknownOptions = true) {
+		const defaultCatchOptions: CatchOptionsGranular = {
+			callFunction: true,
+			propAccess: true,
+		};
+		const handler: CallCondition = (next, stack) => {
+			const caught = stack.at(-1);
+			const intendedForFallback =
+				!UnknownAsync.#shouldCaughtBeProcessed(caught);
+			const methodName = caught.path.at(-1);
+			const noMethodName = isUndefined(methodName);
+			const includesMethodName = UnknownAsync.#methods.includes(methodName);
+			const anonymousMethod = noMethodName && caught.type === CaughtType.Call;
+			if (anonymousMethod) return next;
+			const unsupportedMethod = !noMethodName && !includesMethodName;
+			if (unsupportedMethod || intendedForFallback)
+				return this.#fallbackCondition?.(next, stack);
+			if (caught.type !== CaughtType.Call) return next;
+			const includesPromiseMethod =
+				UnknownAsync.#methodsPromise.includes(methodName);
+			const notGivenPromiseType = this.#givenType !== GivenType.Promise;
+			if (includesPromiseMethod && notGivenPromiseType) {
+				this.#notPreparedMethodCalls[GivenType.Promise] = true;
+			}
+			const handlePromises = this.#handle.promises;
+			if (includesPromiseMethod && !handlePromises) {
+				this.#rejectFuturePromises(true);
+			}
+			if (includesPromiseMethod) {
+				return this.#promise[methodName].apply(this.#promise, caught.args);
+			}
+			const includesIteratorMethod =
+				UnknownAsync.#methodsIterator.includes(methodName);
+			const notGivenIteratorType = this.#givenType !== GivenType.Iterator;
+			if (includesIteratorMethod && notGivenIteratorType) {
+				this.#notPreparedMethodCalls[GivenType.Iterator] = true;
+			}
+			const handleIterators = this.#handle.iterators;
+			if (includesIteratorMethod && !handleIterators) {
+				this.#rejectFutureIterators(true);
+			}
+			if (includesIteratorMethod) {
+				return this.#iterator[methodName].apply(this.#iterator, caught.args);
+			}
+			return next; // this should be unreachable
+		};
+		super(handler, defaultCatchOptions);
+		this.#defaultCatchOptions = defaultCatchOptions;
 		this.#handle = this.#expandHandled(handle);
 	}
 
@@ -40,25 +88,53 @@ export class UnknownAsync<T = UnknownAsyncProxy> {
 		return options;
 	}
 
+	#expandOptions(
+		options: CatchOptionsUnknownAsync,
+	): CatchOptionsUnknownAsyncGranular {
+		if (typeof options !== "boolean") return options;
+		return {
+			callConstructor: options,
+			propAssignment: options,
+			propDeletion: options,
+		};
+	}
+
+	changeCaught(options: CatchOptionsUnknownAsync): void {
+		const optionsGranular = this.#expandOptions(options);
+		const superOptions: CatchOptionsGranular = {
+			...optionsGranular,
+			...this.#defaultCatchOptions,
+		};
+		super.changeCaught(superOptions);
+	}
+
 	#fallbackCondition?: CallCondition;
 	/**
 	 * When a method or property is accessed that doesn't exist, optionally
 	 * provide a fallback handler for the properties accessed.
+	 *
+	 * By default, all property access will be recorded once a fallback is set.
+	 * This can be changed by providing specific catch options.
 	 */
-	setFallback(
+	fallbackSet(
 		condition: CallCondition,
-		catchOptions:
-			| boolean
-			| Omit<CatchOptionsGranular, "callFunction" | "propAccess"> = true,
+		catchOptions: CatchOptionsUnknownAsync = true,
 	): void {
 		this.#fallbackCondition = condition;
-		this.#callCatcher.changeCaught(catchOptions);
+		this.changeCaught(catchOptions);
 	}
 
-	/** If a fallback is provided with `.setFallback()`, it can be removed */
-	removeFallback(): void {
+	/**
+	 * If a fallback is provided with `.setFallback()`, it can be removed.
+	 *
+	 * By default, the catch options will revert to original defaults once there
+	 * is no need to capture additional access (since the fallback is removed).
+	 */
+	fallbackRemove(revertCatchOptions = true): void {
 		this.#fallbackCondition = undefined;
-		this.#callCatcher.changeCaught(this.#defaultCatchOptions);
+		if (revertCatchOptions) {
+			this.changeCaught(this.#defaultCatchOptions);
+		}
 	}
 
 	/** Original promise or iterable given */
@@ -104,57 +180,6 @@ export class UnknownAsync<T = UnknownAsyncProxy> {
 			isSupportedType && UnknownAsync.#methods.includes(caught.path.at(-1));
 		return includesAsyncMethod;
 	}
-
-	#defaultCatchOptions: CatchOptions = {
-		callFunction: true,
-		propAccess: true,
-	};
-	#callCatcher = new CallCatcher<T>((next, stack) => {
-		const caught = stack.at(-1);
-		const intendedForFallback = !UnknownAsync.#shouldCaughtBeProcessed(caught);
-		const methodName = caught.path.at(-1);
-		const noMethodName = isUndefined(methodName);
-		const includesMethodName = UnknownAsync.#methods.includes(methodName);
-		const anonymousMethod = noMethodName && caught.type === CaughtType.Call;
-		if (anonymousMethod) return next;
-		const unsupportedMethod = !noMethodName && !includesMethodName;
-		if (unsupportedMethod || intendedForFallback)
-			return this.#fallbackCondition?.(next, stack);
-		if (caught.type !== CaughtType.Call) return next;
-		const includesPromiseMethod =
-			UnknownAsync.#methodsPromise.includes(methodName);
-		const notGivenPromiseType = this.#givenType !== GivenType.Promise;
-		if (includesPromiseMethod && notGivenPromiseType) {
-			this.#notPreparedMethodCalls[GivenType.Promise] = true;
-		}
-		const handlePromises = this.#handle.promises;
-		if (includesPromiseMethod && !handlePromises) {
-			this.#rejectFuturePromises(true);
-		}
-		if (includesPromiseMethod) {
-			return this.#promise[methodName].apply(this.#promise, caught.args);
-		}
-		const includesIteratorMethod =
-			UnknownAsync.#methodsIterator.includes(methodName);
-		const notGivenIteratorType = this.#givenType !== GivenType.Iterator;
-		if (includesIteratorMethod && notGivenIteratorType) {
-			this.#notPreparedMethodCalls[GivenType.Iterator] = true;
-		}
-		const handleIterators = this.#handle.iterators;
-		if (includesIteratorMethod && !handleIterators) {
-			this.#rejectFutureIterators(true);
-		}
-		if (includesIteratorMethod) {
-			return this.#iterator[methodName].apply(this.#iterator, caught.args);
-		}
-		return next; // this should be unreachable
-	}, this.#defaultCatchOptions);
-
-	/**
-	 * Promise or iterator methods can be called on this proxy before the promise
-	 * or iterator is given the instance of this class.
-	 */
-	proxy = this.#callCatcher.proxy as T;
 
 	#promiseResolve: (value: unknown | PromiseLike<unknown>) => void;
 	#promiseReject: (reason?: unknown) => void;
@@ -373,3 +398,11 @@ enum GivenType {
 export type UnknownAsyncProxy =
 	// biome-ignore lint/suspicious/noExplicitAny: We could return any type of promise or iterator
 	AsyncIterableIterator<any, any, any> & Promise<any>; // & (() => Generator<any>);
+
+export type CatchOptionsUnknownAsyncGranular = Omit<
+	CatchOptionsGranular,
+	"callFunction" | "propAccess"
+>;
+export type CatchOptionsUnknownAsync =
+	| boolean
+	| CatchOptionsUnknownAsyncGranular;

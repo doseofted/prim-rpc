@@ -6,6 +6,7 @@ import {
 	UnknownAsyncError,
 	type UnknownAsyncProxy,
 } from "./unknown-async";
+import { CaughtType } from "./call-catcher";
 
 beforeEach(() => vi.useFakeTimers());
 afterEach(() => vi.useRealTimers());
@@ -14,6 +15,62 @@ const handle: HandleUnknownOptions = {
 	promises: true,
 	iterators: true,
 };
+
+describe("UnknownAsync can act as an instance of CallCatcher", () => {
+	test("can handle nested types that eventually resolve", async () => {
+		type ToCatch = { test: { what: () => Promise<number> } };
+		const tbd = new UnknownAsync<ToCatch>(handle);
+		tbd.fallbackSet((next) => next);
+		const promised = expect(tbd.proxy.test.what()).resolves.toEqual(42);
+		tbd.givePromise(42);
+		await promised;
+	});
+
+	test("can handle a provided stack from previous instance", async () => {
+		// biome-ignore lint/suspicious/noExplicitAny: demonstration purposes
+		const tbd = new UnknownAsync<any>(handle);
+		tbd.fallbackSet((next, stack) => {
+			const caught = stack.at(-1);
+			const methodCall = caught.type === CaughtType.Call;
+			const pathLast = caught.path.at(-1);
+			if (methodCall && pathLast === "test") return stack;
+			return next;
+		});
+		const stack = tbd.proxy.this.is.a.test("hello");
+		expect(stack).toEqual([
+			expect.objectContaining({
+				type: CaughtType.Call,
+				path: ["this", "is", "a", "test"],
+				args: ["hello"],
+			}),
+		]);
+		// biome-ignore lint/suspicious/noExplicitAny: demonstration purposes
+		const tbd2 = new UnknownAsync<any>(handle);
+		tbd2.setInitialStack(stack);
+		const recordStack = vi.fn();
+		tbd2.fallbackSet((next, stack) => {
+			recordStack(stack);
+			return next;
+		});
+		const promised = expect(
+			tbd2.proxy.continues.and.finishes(),
+		).resolves.toEqual(42);
+		tbd2.givePromise(42);
+		await promised;
+		expect(recordStack).toHaveBeenLastCalledWith([
+			expect.objectContaining({
+				type: CaughtType.Call,
+				path: ["this", "is", "a", "test"],
+				args: ["hello"],
+			}),
+			expect.objectContaining({
+				type: CaughtType.Call,
+				path: ["continues", "and", "finishes"],
+				args: [],
+			}),
+		]);
+	});
+});
 
 describe("UnknownAsync can be configured", () => {
 	test("can support promises without iterators", async () => {
@@ -56,7 +113,7 @@ describe("UnknownAsync can be configured", () => {
 	test("can use provided callback for unsupported properties", async () => {
 		type ToCatch = { lorem: { ipsum: number }; ipsum?: number; foo: number };
 		const tbd = new UnknownAsync<ToCatch>(handle);
-		tbd.setFallback((next, stack) => {
+		tbd.fallbackSet((next, stack) => {
 			const caught = stack.at(-1);
 			if (caught.path.at(0) === "foo") return true;
 			if (isSubset(caught.path, ["lorem", "ipsum"])) return 123;
@@ -71,7 +128,7 @@ describe("UnknownAsync can be configured", () => {
 		expect(tbd.proxy.ipsum).toBeUndefined();
 		// despite all of the noise above, promise should still resolve
 		await expect(tbd.proxy).resolves.toBe(42);
-		tbd.removeFallback();
+		tbd.fallbackRemove();
 		expect(tbd.proxy.lorem).toBeUndefined();
 		expect(tbd.proxy.ipsum).toBeUndefined();
 		expect(tbd.proxy.foo).toBeUndefined();

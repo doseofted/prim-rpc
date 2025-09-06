@@ -27,16 +27,13 @@ describe("CallCatcher can be initialized from a previous instance", () => {
 			return next;
 		});
 		const conditionResult1 = catcher1.proxy.deep.nested.path();
-		const catcher2 = CallCatcher.newWithStack(
-			conditionResult1,
-			(next, stack) => {
-				const caught = stack.at(-1);
-				if (callFuncName(caught, "path")) return 123;
-				if (callFuncName(caught, "done")) return stack;
-				return next;
-			},
-		);
-		const conditionResult2 = catcher2.replayLast();
+		const catcher2 = new CallCatcher((next, stack) => {
+			const caught = stack.at(-1);
+			if (callFuncName(caught, "path")) return 123;
+			if (callFuncName(caught, "done")) return stack;
+			return next;
+		});
+		const conditionResult2 = catcher2.setInitialStack(conditionResult1, true);
 		const continuedCallResult = catcher2.proxy.testing.lorem.ipsum.done();
 		expect(conditionResult1).toEqual([
 			expect.objectContaining({
@@ -61,7 +58,9 @@ describe("CallCatcher can be initialized from a previous instance", () => {
 			}),
 		]);
 		// we've already replayed the stack, we're not able to do so again
-		expect(() => catcher2.replayLast()).toThrow(CallCatcherError);
+		expect(() => catcher2.setInitialStack(conditionResult2)).toThrow(
+			CallCatcherError,
+		);
 	});
 });
 
