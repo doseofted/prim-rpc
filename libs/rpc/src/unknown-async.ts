@@ -47,9 +47,9 @@ export class UnknownAsync<T = UnknownAsyncProxy> extends CallCatcher<T> {
 			if (caught.type !== CaughtType.Call) return next;
 			const includesPromiseMethod =
 				UnknownAsync.#methodsPromise.includes(methodName);
-			const notGivenPromiseType = this.#givenType !== GivenType.Promise;
+			const notGivenPromiseType = this.#givenType !== UnknownAsyncType.Promise;
 			if (includesPromiseMethod && notGivenPromiseType) {
-				this.#notPreparedMethodCalls[GivenType.Promise] = true;
+				this.#notPreparedMethodCalls[UnknownAsyncType.Promise] = true;
 			}
 			const handlePromises = this.#handle.promises;
 			if (includesPromiseMethod && !handlePromises) {
@@ -60,9 +60,10 @@ export class UnknownAsync<T = UnknownAsyncProxy> extends CallCatcher<T> {
 			}
 			const includesIteratorMethod =
 				UnknownAsync.#methodsIterator.includes(methodName);
-			const notGivenIteratorType = this.#givenType !== GivenType.Iterator;
+			const notGivenIteratorType =
+				this.#givenType !== UnknownAsyncType.Iterator;
 			if (includesIteratorMethod && notGivenIteratorType) {
-				this.#notPreparedMethodCalls[GivenType.Iterator] = true;
+				this.#notPreparedMethodCalls[UnknownAsyncType.Iterator] = true;
 			}
 			const handleIterators = this.#handle.iterators;
 			if (includesIteratorMethod && !handleIterators) {
@@ -150,7 +151,7 @@ export class UnknownAsync<T = UnknownAsyncProxy> extends CallCatcher<T> {
 	];
 	/** Methods not to expose from proxy */
 	static #hiddenMethods: PropertyKey[] = [Symbol.iterator];
-	/** Methods of either a promise or iterable */
+	/** Methods of either a promise or async iterable */
 	static get #methods(): PropertyKey[] {
 		return [
 			...UnknownAsync.#methodsPromise,
@@ -159,11 +160,11 @@ export class UnknownAsync<T = UnknownAsyncProxy> extends CallCatcher<T> {
 	}
 
 	#notPreparedMethodCalls: Record<
-		GivenType.Promise | GivenType.Iterator,
+		UnknownAsyncType.Promise | UnknownAsyncType.Iterator,
 		boolean
 	> = {
-		[GivenType.Promise]: false,
-		[GivenType.Iterator]: false,
+		[UnknownAsyncType.Promise]: false,
+		[UnknownAsyncType.Iterator]: false,
 	};
 
 	static #shouldCaughtBeProcessed(caught: Caught) {
@@ -174,11 +175,16 @@ export class UnknownAsync<T = UnknownAsyncProxy> extends CallCatcher<T> {
 		return (isCallFunc && CaughtType.Call) || (isPropAccess && CaughtType.Prop);
 	}
 
-	static asyncTypeSupported(caught: Caught) {
+	static determineCaughtType(caught: Caught) {
 		const isSupportedType = UnknownAsync.#shouldCaughtBeProcessed(caught);
-		const includesAsyncMethod =
-			isSupportedType && UnknownAsync.#methods.includes(caught.path.at(-1));
-		return includesAsyncMethod;
+		const lastPath = caught.path.at(-1);
+		const isPromise =
+			isSupportedType && UnknownAsync.#methodsPromise.includes(lastPath);
+		const isIterator =
+			isSupportedType && UnknownAsync.#methodsIterator.includes(lastPath);
+		if (isPromise) return UnknownAsyncType.Promise;
+		if (isIterator) return UnknownAsyncType.Iterator;
+		return UnknownAsyncType.None;
 	}
 
 	#promiseResolve: (value: unknown | PromiseLike<unknown>) => void;
@@ -260,11 +266,11 @@ export class UnknownAsync<T = UnknownAsyncProxy> extends CallCatcher<T> {
 	};
 
 	#isPromise(given: unknown, setGivenType = false): given is Promise<unknown> {
-		if (this.#givenType === GivenType.Promise) return true;
+		if (this.#givenType === UnknownAsyncType.Promise) return true;
 		const isPromiseResult = isPromise(given);
 		// even if not a promise, the type is not invalid (but also not a promise)
 		if (setGivenType && isPromiseResult) {
-			this.#givenType = GivenType.Promise;
+			this.#givenType = UnknownAsyncType.Promise;
 		}
 		return isPromiseResult;
 	}
@@ -274,19 +280,21 @@ export class UnknownAsync<T = UnknownAsyncProxy> extends CallCatcher<T> {
 		setGivenType = false,
 	): given is AsyncIterableIterator<unknown> | IterableIterator<unknown> {
 		// if we already know given value was invalid, short-circuit
-		if (this.#givenType === GivenType.Iterator) return true;
+		if (this.#givenType === UnknownAsyncType.Iterator) return true;
 		const isIterator =
 			isObject(given) &&
 			UnknownAsync.#methodsIterator
 				.filter((given) => isSymbol(given))
 				.some((property) => property in given && isFunction(given[property]));
 		if (setGivenType) {
-			this.#givenType = isIterator ? GivenType.Iterator : GivenType.Invalid;
+			this.#givenType = isIterator
+				? UnknownAsyncType.Iterator
+				: UnknownAsyncType.Invalid;
 		}
 		return isIterator;
 	}
 
-	#givenType = GivenType.None;
+	#givenType = UnknownAsyncType.None;
 
 	#checkAlreadyGiven() {
 		if (!this.#givenType) return;
@@ -298,11 +306,11 @@ export class UnknownAsync<T = UnknownAsyncProxy> extends CallCatcher<T> {
 			this.#promisedIteratorReject(
 				customError ?? new UnknownAsyncError(ReusableMessages.GivenNotIterable),
 			);
-			this.#notPreparedMethodCalls[GivenType.Iterator] = false;
+			this.#notPreparedMethodCalls[UnknownAsyncType.Iterator] = false;
 			return;
 		}
 		this.#promisedIteratorRejectWhenReady = () => {
-			if (!this.#notPreparedMethodCalls[GivenType.Iterator]) return;
+			if (!this.#notPreparedMethodCalls[UnknownAsyncType.Iterator]) return;
 			this.#rejectFutureIterators(true, customError);
 		};
 	}
@@ -332,11 +340,11 @@ export class UnknownAsync<T = UnknownAsyncProxy> extends CallCatcher<T> {
 			this.#promiseReject(
 				customError ?? new UnknownAsyncError(ReusableMessages.GivenNotPromise),
 			);
-			this.#notPreparedMethodCalls[GivenType.Promise] = false;
+			this.#notPreparedMethodCalls[UnknownAsyncType.Promise] = false;
 			return;
 		}
 		this.#promiseRejectWhenReady = () => {
-			if (!this.#notPreparedMethodCalls[GivenType.Promise]) return;
+			if (!this.#notPreparedMethodCalls[UnknownAsyncType.Promise]) return;
 			this.#rejectFuturePromises(true, customError);
 		};
 	}
@@ -363,7 +371,7 @@ export class UnknownAsync<T = UnknownAsyncProxy> extends CallCatcher<T> {
 
 	giveNothing(customError?: Error) {
 		this.#checkAlreadyGiven();
-		this.#givenType = GivenType.Never;
+		this.#givenType = UnknownAsyncType.Never;
 		this.#rejectFuturePromises(true, customError);
 		this.#rejectFutureIterators(true, customError);
 		return true;
@@ -387,7 +395,7 @@ export class UnknownAsyncError extends Error {
 	}
 }
 
-enum GivenType {
+export enum UnknownAsyncType {
 	None = 0,
 	Promise,
 	Iterator,
