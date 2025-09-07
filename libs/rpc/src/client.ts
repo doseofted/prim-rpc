@@ -36,6 +36,6 @@ export class RpcClient<T> extends CallCatcher<T> {
 	}
 }
 
-export function createRpcClient() {
-	return new RpcClient().proxy;
+export function createRpcClient<T>(): T {
+	return new RpcClient<T>().proxy;
 }

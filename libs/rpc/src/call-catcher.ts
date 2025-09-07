@@ -83,7 +83,8 @@ export class CallCatcher<ObjectShape = any> {
 	 * Set the initial stack from another instance. The stack must be set prior to
 	 * interacting with the proxy and should only be set once for each instance.
 	 */
-	setInitialStack(stack: CaughtStack, replay = false) {
+	// biome-ignore lint/suspicious/noExplicitAny: this could be any result depending on provided stack
+	setInitialStack(stack: CaughtStack, replay = false): any {
 		if (this.#proxyUtilized) {
 			throw new CallCatcherError(
 				"This instance's proxy has already been utilized",

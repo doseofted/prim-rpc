@@ -175,7 +175,7 @@ export class UnknownAsync<T = UnknownAsyncProxy> extends CallCatcher<T> {
 		return (isCallFunc && CaughtType.Call) || (isPropAccess && CaughtType.Prop);
 	}
 
-	static determineCaughtType(caught: Caught) {
+	static determineCaughtType(caught: Caught): UnknownAsyncType {
 		const isSupportedType = UnknownAsync.#shouldCaughtBeProcessed(caught);
 		const lastPath = caught.path.at(-1);
 		const isPromise =

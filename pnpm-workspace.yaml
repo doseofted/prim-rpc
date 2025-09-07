@@ -5,9 +5,9 @@ packages:
 auditConfig: {}
 
 catalog:
-  '@types/node': ^24.3.0
-  '@typescript/native-preview': 7.0.0-dev.20250829.3
-  tsdown: ^0.13.5
+  '@types/node': ^24.3.1
+  '@typescript/native-preview': 7.0.0-dev.20250901.1
+  tsdown: ^0.14.2
 
 engineStrict: true
 
