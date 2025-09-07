@@ -5,9 +5,9 @@ import {
 	type CallCondition,
 	type CatchOptionsGranular,
 	type Caught,
+	CaughtCallType,
 	CaughtPropType,
 	CaughtType,
-	CaughtCallType,
 } from "./call-catcher";
 
 /**

@@ -1,12 +1,12 @@
 import { isSubset } from "es-toolkit";
 import { afterEach, beforeEach, describe, expect, test, vi } from "vitest";
+import { CaughtType } from "./call-catcher";
 import {
 	type HandleUnknownOptions,
 	UnknownAsync,
 	UnknownAsyncError,
 	type UnknownAsyncProxy,
 } from "./unknown-async";
-import { CaughtType } from "./call-catcher";
 
 beforeEach(() => vi.useFakeTimers());
 afterEach(() => vi.useRealTimers());

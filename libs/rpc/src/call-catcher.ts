@@ -28,13 +28,11 @@ export class CallCatcher<ObjectShape = any> {
 	/**
 	 * Replay the last caught item in the stack with the given call condition,
 	 * and return the result. This may only be called upon initializing a new
-	 * instance with `newWithStack` prior to interacting with the proxy.
+	 * instance prior to interacting with the proxy.
 	 */
 	#replayLast() {
 		if (this.#proxyUtilized) {
-			throw new CallCatcherError(
-				"This instance's proxy has already been utilized",
-			);
+			throw new CallCatcherError(ReusableMessages.ProxyAlreadyUtilized);
 		}
 		return this.#determineNext(this.#stack);
 	}
@@ -86,9 +84,7 @@ export class CallCatcher<ObjectShape = any> {
 	// biome-ignore lint/suspicious/noExplicitAny: this could be any result depending on provided stack
 	setInitialStack(stack: CaughtStack, replay = false): any {
 		if (this.#proxyUtilized) {
-			throw new CallCatcherError(
-				"This instance's proxy has already been utilized",
-			);
+			throw new CallCatcherError(ReusableMessages.ProxyAlreadyUtilized);
 		}
 		this.#updateStack(stack, true);
 		if (replay) return this.#replayLast();
@@ -216,6 +212,9 @@ export class CallCatcher<ObjectShape = any> {
 	}) as ObjectShape;
 }
 
+enum ReusableMessages {
+	ProxyAlreadyUtilized = "This instance's proxy has already been utilized",
+}
 export class CallCatcherError extends Error {
 	constructor(message?: string) {
 		super(message);
