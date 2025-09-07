@@ -1,34 +1,41 @@
 import { CallCatcher, type CallCondition, CaughtType } from "./call-catcher";
 import { UnknownAsync } from "./unknown-async";
 
-export class RpcClient<T> {
-	#catchCondition: CallCondition = (next, stack) => {
-		const caught = stack.at(-1);
-		const funcCall = caught.type === CaughtType.Call;
-		const asyncMethod = UnknownAsync.determineCaughtType(caught);
-		console.log(asyncMethod);
-		if (funcCall && !asyncMethod) {
-			// console.log(caught.path.join("."));
+export class RpcClient<T> extends CallCatcher<T> {
+	// this will become private in the future
+	#pendingRpcCalls = [];
+
+	constructor() {
+		const callCondition: CallCondition = (next, stack) => {
+			const caught = stack.at(-1);
+			const funcCall = caught.type === CaughtType.Call;
+			const asyncMethod = UnknownAsync.determineCaughtType(caught);
+			const isModuleCall = funcCall && !asyncMethod;
+			if (!isModuleCall) return next;
+
+			this.#pendingRpcCalls.push(stack);
+
 			const unknownAsync = new UnknownAsync();
-			unknownAsync.fallbackSet(this.#catchCondition);
-			if (caught.path.at(-1) === "promised") {
+			unknownAsync.setInitialStack(stack);
+			unknownAsync.fallbackSet(callCondition);
+			const lastPath = caught.path.at(-1);
+			if (lastPath === "promised") {
 				unknownAsync.givePromise(stack);
-			} else if (caught.path.at(-1) === "iterated") {
+			} else if (lastPath === "iterated") {
 				function* generator() {
-					for (const item of stack) {
-						yield item;
-					}
+					for (const item of stack) yield item;
 				}
 				unknownAsync.giveIterator(generator());
 			}
-			unknownAsync.setInitialStack(stack);
 			return unknownAsync.proxy;
-		}
-		return next;
-	};
-	#catcher = new CallCatcher<T>(this.#catchCondition, {
-		callFunction: true,
-		propAccess: true,
-	});
-	proxy = this.#catcher.proxy;
+		};
+		super(callCondition, {
+			callFunction: true,
+			propAccess: true,
+		});
+	}
+}
+
+export function createRpcClient() {
+	return new RpcClient().proxy;
 }

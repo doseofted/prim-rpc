@@ -37,7 +37,6 @@ describe("RpcClient can handle function calls", () => {
 		const recordItemInStack = vi.fn();
 		let index = 0;
 		for await (const item of result2.cooler.than.that.iterated()) {
-			console.log(item);
 			recordItemInStack(item, ++index);
 		}
 		expect(recordItemInStack).toHaveBeenCalledTimes(3);
