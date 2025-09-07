@@ -2,8 +2,8 @@ import { CaughtCallType, CaughtType } from "./call-catcher";
 import { describe, test, expect, vi } from "vitest";
 import { RpcClient } from "./client";
 
-describe("playground", () => {
-	test("create client", async () => {
+describe("RpcClient can handle function calls", () => {
+	test("promises and iterators are resolved", async () => {
 		// biome-ignore lint/suspicious/noExplicitAny: demonstration
 		const client = new RpcClient<any>();
 
