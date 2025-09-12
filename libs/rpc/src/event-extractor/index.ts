@@ -1,0 +1,165 @@
+import { castToOpaque, type Opaque } from "emery";
+import { isPlainObject } from "es-toolkit";
+import { set as setProperty } from "es-toolkit/compat";
+import type { EventfulValue, InheritsEventfulValue } from "./eventful-value";
+
+export * from "./eventful-types";
+
+/**
+ * Given an object with properties that are not directly serializable,
+ * specifically those that emit events (including promises, iterators, and
+ * functions), extract those properties and replace them with unique IDs. This
+ * class can work with the value directly or work with an object that contains
+ * such values.
+ *
+ * These types of values could be serialized directly all-at-once in some cases
+ * but doing so would either be unsafe (serializing a function and its body
+ * would expose logic that shouldn't be shared) or defeat the purpose of the
+ * object (we await or iterate values over time, not all-at-once).
+ *
+ * The intent of this class is not to decide how those extracted objects should
+ * be serialized but to extract them and assign unique IDs to properties of the
+ * original object, recursively. The purpose of this class is not serialize
+ * values unsupported by JSON (a separate serialization library may be used for
+ * this purpose) but instead to extract objects that are only useful based on
+ * events that occur on them over time.
+ *
+ * This may include additional, custom types that either emit events or would
+ * be expensive or difficult to serialize all-at-once. For example, support for
+ * File/Blob objects could be added so that these large extracted objects could
+ * be serialized separately and sent as a stream of events rather than
+ * all-at-once (even though the objects themselves aren't "eventful").
+ */
+export class EventExtractor {
+	#recursiveDepth: number;
+	#maintainReferences: boolean;
+
+	constructor(
+		/**
+		 * By default, only the provided value, top-level object, or array is
+		 * processed, not nested values (recursion depth of 1). This recursion depth
+		 * can be changed or toggled on (depth of `Infinity`) or off (`0` depth).
+		 */
+		recursive: number | boolean = 1,
+		/**
+		 * By default, every reference to a supported type extracted from an object
+		 * will result in a new unique identifier for that value. By maintaining
+		 * references, previously extracted values will be checked against found
+		 * values and if they are the same instance, they will receive the same
+		 * identifier.
+		 *
+		 * **Important:** if references are maintained, this list also should be
+		 * destroyed when it's no longer needed with the `destroy()` method or by
+		 * `using` the created class instance.
+		 */
+		maintainReferences = false,
+	) {
+		this.#recursiveDepth =
+			typeof recursive === "number" ? recursive : recursive ? Infinity : 0;
+		this.#maintainReferences = maintainReferences;
+	}
+
+	#extractedReferences: ExtractedReferences = new Map();
+
+	#replaceReference(
+		original: unknown,
+		path: PropertyKey[],
+	): false | ReferencedValueId {
+		const saveReferences = this.#maintainReferences;
+		if (saveReferences && this.#extractedReferences.has(original)) {
+			const savedId = this.#extractedReferences.get(original);
+			const [prefix] = savedId.split("-");
+			const newId = createReferencedValueId(prefix, path);
+			if (saveReferences && !this.#extractedReferences.has(original)) {
+				this.#extractedReferences.set(original, newId);
+			}
+			return newId;
+		}
+		for (const supportedType of this.#supportedTypes) {
+			const isMatch = supportedType.isMatch(original);
+			if (!isMatch) break;
+			const newId = createReferencedValueId(isMatch, path);
+			if (saveReferences && !this.#extractedReferences.has(original)) {
+				this.#extractedReferences.set(original, newId);
+			}
+			return newId;
+		}
+		return false;
+	}
+
+	#extract(
+		provided: unknown,
+		extracted: ReplacedReferencesOpaque = new Map(),
+		path: PropertyKey[] = [],
+	): [provided: unknown, extracted: ReplacedReferencesOpaque] {
+		const depth = path.length;
+		const nextDepth = depth + 1;
+		const recursionAllowed = nextDepth < this.#recursiveDepth;
+		const replacedNew = this.#replaceReference(provided, path);
+		const replaced = replacedNew;
+		// first, try to replace the value directly
+		// (always allowed regardless of recursion depth)
+		if (replaced) {
+			extracted.set(replaced, provided);
+			return [replaced, extracted];
+		} else if (Array.isArray(provided)) {
+			if (!recursionAllowed) return [provided, extracted];
+			const updatedProvided = provided.map((item, index) =>
+				this.#extract(item, extracted, [...path, index]).at(0),
+			);
+			return [updatedProvided, extracted];
+		} else if (isPlainObject(provided)) {
+			if (!recursionAllowed) return [provided, extracted];
+			const entries = Object.entries(provided).map(([key, item]) => [
+				key,
+				this.#extract(item, extracted, [...path, key]).at(0),
+			]);
+			return [Object.fromEntries(entries), extracted];
+		}
+		return [provided, extracted];
+	}
+
+	extract(given: unknown): [provided: unknown, extracted: ReplacedReferences] {
+		return this.#extract(given);
+	}
+
+	merge(given: unknown, extracted: ReplacedReferences): unknown {
+		for (const [id, item] of extracted) {
+			const [_type, path] = id.split("-");
+			if (!path) return item; // when no path is provided, it is the root
+			const isObjectOrArray = isPlainObject(given) || Array.isArray(given);
+			if (isObjectOrArray) setProperty(given, path, item);
+		}
+		return given;
+	}
+
+	#supportedTypes: EventfulValue[] = [];
+
+	addSupportedType(ProvidedEventfulValue: InheritsEventfulValue): void {
+		this.#supportedTypes.push(new ProvidedEventfulValue());
+	}
+
+	destroy(): void {
+		this.#supportedTypes = [];
+		this.#extractedReferences.clear();
+	}
+
+	[Symbol.dispose](): void {
+		this.destroy();
+	}
+}
+
+const ReferencedValueSymbol: unique symbol = Symbol();
+export type ReferencedValueId = Opaque<string, typeof ReferencedValueSymbol>;
+export function createReferencedValueId(
+	prefix: string,
+	path: PropertyKey[] = [],
+): ReferencedValueId {
+	return castToOpaque<ReferencedValueId>(
+		[prefix, path.join(".")].filter((p) => p !== "").join("-"),
+	);
+}
+
+type ReplacedReferencesOpaque = Map<ReferencedValueId, unknown>;
+type ReplacedReferences = Map<string, unknown>;
+type ExtractedReferences = Map<unknown, ReferencedValueId>;

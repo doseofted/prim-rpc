@@ -1,3 +1,4 @@
+import { castToOpaque, type Opaque } from "emery";
 import {
 	CallCatcher,
 	type CallCondition,
@@ -5,18 +6,6 @@ import {
 	CaughtType,
 } from "./call-catcher";
 import { UnknownAsync } from "./unknown-async";
-
-export enum ReturnedType {
-	Promise = 1,
-	Iterator,
-	Value,
-}
-type HandlerResult =
-	// biome-ignore lint/suspicious/noExplicitAny: Promise could be anything
-	| { type: ReturnedType.Promise; value: any | Promise<any> }
-	// biome-ignore lint/suspicious/noExplicitAny: Iterator could be anything
-	| { type: ReturnedType.Iterator; value: AsyncIterable<any> };
-type Handler = (stack: CaughtStack) => HandlerResult | Promise<HandlerResult>;
 
 /**
  * Capture all function calls on an object and record them as RPCs. Captured
@@ -31,11 +20,7 @@ type Handler = (stack: CaughtStack) => HandlerResult | Promise<HandlerResult>;
 export class RpcGenerator<T> extends CallCatcher<T> {
 	#handler: Handler;
 
-	// #convertStackToRpc(stack: CaughtStack) {
-	// 	return stack.map((_caught) => {
-	// 		return {};
-	// 	});
-	// }
+	// #convertStackToRpc(stack: CaughtStack): RpcStack {}
 
 	constructor(handler: Handler) {
 		const callCondition: CallCondition = (next, stack) => {
@@ -49,7 +34,7 @@ export class RpcGenerator<T> extends CallCatcher<T> {
 			unknownAsync.setInitialStack(stack);
 			unknownAsync.fallbackSet(callCondition);
 
-			const runHandler = async () => {
+			const runHandler = async (stack: CaughtStack) => {
 				const result = await this.#handler(stack);
 				switch (result.type) {
 					case ReturnedType.Promise:
@@ -58,7 +43,7 @@ export class RpcGenerator<T> extends CallCatcher<T> {
 						return unknownAsync.giveIterator(result.value);
 				}
 			};
-			void runHandler();
+			void runHandler(stack);
 			return unknownAsync.proxy;
 		};
 		super(callCondition, {
@@ -68,3 +53,33 @@ export class RpcGenerator<T> extends CallCatcher<T> {
 		this.#handler = handler;
 	}
 }
+
+export enum ReturnedType {
+	Promise = 1,
+	Iterator,
+}
+type HandlerResult =
+	// biome-ignore lint/suspicious/noExplicitAny: Promise could be anything
+	| { type: ReturnedType.Promise; value: any | Promise<any> }
+	// biome-ignore lint/suspicious/noExplicitAny: Iterator could be anything
+	| { type: ReturnedType.Iterator; value: AsyncIterable<any> };
+type Handler = (stack: CaughtStack) => HandlerResult | Promise<HandlerResult>;
+
+const RpcIdSymbol: unique symbol = Symbol();
+export type RpcId = Opaque<number, typeof RpcIdSymbol>;
+export function createRpcId(id: number): RpcId {
+	return castToOpaque<RpcId>(id);
+}
+
+type SerializablePropertyKey = Exclude<PropertyKey, symbol>;
+export type RpcBase = {
+	id: RpcId;
+	chain?: RpcId;
+};
+
+export type Rpc<Args extends unknown[] = unknown[]> = RpcBase & {
+	method: SerializablePropertyKey[];
+	args: Args;
+};
+
+export type RpcStack = Rpc[];
