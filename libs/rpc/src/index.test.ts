@@ -1,6 +1,6 @@
 import { expect, test } from "vitest";
 import { hello } from ".";
 
-test("hello says hi", () => {
-	expect(hello()).toBe("hi");
+test("hello says Prim+RPC", () => {
+	expect(hello()).toBe("Prim+RPC");
 });

@@ -1,5 +1,3 @@
-console.info("Prim+RPC");
-
 export function hello() {
-	return "hi";
+	return "Prim+RPC";
 }

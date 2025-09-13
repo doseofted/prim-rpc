@@ -1,6 +1,6 @@
 import { isFunction, isPromise } from "es-toolkit";
+import { isIterator } from "../utils/is-iterable";
 import { EventfulValue } from "./eventful-value";
-import { isIterable } from "./utilities";
 
 export class EventfulPromise extends EventfulValue {
 	constructor() {
@@ -10,7 +10,7 @@ export class EventfulPromise extends EventfulValue {
 
 export class EventfulIterator extends EventfulValue {
 	constructor() {
-		super("i", isIterable);
+		super("i", isIterator);
 	}
 }
 

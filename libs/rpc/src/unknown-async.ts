@@ -1,5 +1,4 @@
-import { isFunction, isPromise, isSymbol, isUndefined } from "es-toolkit";
-import { isObject } from "es-toolkit/compat";
+import { isPromise, isUndefined } from "es-toolkit";
 import {
 	CallCatcher,
 	type CallCondition,
@@ -9,6 +8,7 @@ import {
 	CaughtPropType,
 	CaughtType,
 } from "./call-catcher";
+import { isIterable } from "./utils/is-iterable";
 
 /**
  * Returns a proxy object with methods of both a promise and an async iterable,
@@ -263,7 +263,7 @@ export class UnknownAsync<T = UnknownAsyncProxy> extends CallCatcher<T> {
 			}
 			throw new UnknownAsyncError(ReusableMessages.GivenNotIterable);
 		},
-	};
+	} satisfies AsyncIterableIterator<unknown>;
 
 	#isPromise(given: unknown, setGivenType = false): given is Promise<unknown> {
 		if (this.#givenType === UnknownAsyncType.Promise) return true;
@@ -281,17 +281,13 @@ export class UnknownAsync<T = UnknownAsyncProxy> extends CallCatcher<T> {
 	): given is AsyncIterableIterator<unknown> | IterableIterator<unknown> {
 		// if we already know given value was invalid, short-circuit
 		if (this.#givenType === UnknownAsyncType.Iterator) return true;
-		const isIterator =
-			isObject(given) &&
-			UnknownAsync.#methodsIterator
-				.filter((given) => isSymbol(given))
-				.some((property) => property in given && isFunction(given[property]));
-		if (setGivenType) {
-			this.#givenType = isIterator
-				? UnknownAsyncType.Iterator
-				: UnknownAsyncType.Invalid;
+		const isIteratorResult = isIterable(given);
+		if (setGivenType && isIteratorResult) {
+			this.#givenType = UnknownAsyncType.Iterator;
+		} else if (setGivenType) {
+			this.#givenType = UnknownAsyncType.Invalid;
 		}
-		return isIterator;
+		return isIteratorResult;
 	}
 
 	#givenType = UnknownAsyncType.None;
