@@ -159,6 +159,17 @@ export function createReferencedValueId(
 		[prefix, path.join(".")].filter((p) => p !== "").join("-"),
 	);
 }
+type ReferencedValueParts = {
+	prefix: string;
+	path: PropertyKey[];
+};
+export function extractReferenceValueIdParts(
+	id: ReferencedValueId,
+): ReferencedValueParts {
+	const [prefix, pathPart] = id.split("-");
+	const path = pathPart ? pathPart.split(".") : [];
+	return { prefix, path };
+}
 
 type ReplacedReferencesOpaque = Map<ReferencedValueId, unknown>;
 type ReplacedReferences = Map<string, unknown>;

@@ -1,4 +1,3 @@
-import { castToOpaque, type Opaque } from "emery";
 import { isPromise } from "es-toolkit";
 import {
 	CallCatcher,
@@ -6,6 +5,7 @@ import {
 	type CaughtStack,
 	CaughtType,
 } from "./call-catcher";
+import { createRpcId, type RpcFunctionCall } from "./types/rpc-messages";
 import { UnknownAsync } from "./unknown-async";
 import { isIterator } from "./utils/is-iterable";
 
@@ -15,14 +15,27 @@ import { isIterator } from "./utils/is-iterable";
  * methods, and curried functions.
  *
  * The intent of the class is to capture access on the object's proxy as RPC,
- * in a format that could be serialized. While this class will provide a handler
- * to return a result to the callee, serialization and transport are not
- * responsibilities of this class.
+ * in a format that could be eventually serialized. This class only handles
+ * method calls, and does not serialize arguments or deserialize returned
+ * values. This should instead be handled by a separate class that's expected
+ * to serialize these values into RPC events.
  */
-export class RpcGenerator<T> extends CallCatcher<T> {
+export class RpcMethodGenerator<T> extends CallCatcher<T> {
 	#handler: MethodCallHandler;
 
-	// #convertStackToRpc(stack: CaughtStack): RpcStack {}
+	#convertStackToRpc(stack: CaughtStack): RpcFunctionCall[] {
+		return stack // NOTE: at this point, all properties should've become calls
+			.map((caught) => {
+				if (caught.type !== CaughtType.Call) return null;
+				return {
+					id: createRpcId(caught.id),
+					method: caught.path.map((part) => part.toString()),
+					args: caught.args,
+					chain: caught.chain ? createRpcId(caught.chain) : null,
+				};
+			})
+			.filter((given) => given !== null);
+	}
 
 	constructor(handler: MethodCallHandler) {
 		const callCondition: CallCondition = (next, stack) => {
@@ -39,7 +52,8 @@ export class RpcGenerator<T> extends CallCatcher<T> {
 			const runHandler = async (stack: CaughtStack) => {
 				try {
 					const skip = Symbol();
-					const value = await this.#handler(stack, skip);
+					const rpc = this.#convertStackToRpc(stack);
+					const value = await this.#handler(rpc, skip);
 					if (skip === value) {
 						return unknownAsync.giveNothing();
 					} else if (isPromise(value)) {
@@ -65,26 +79,7 @@ export class RpcGenerator<T> extends CallCatcher<T> {
 }
 
 type MethodCallHandler = (
-	stack: CaughtStack,
+	stack: RpcFunctionCall[],
 	skip: symbol,
 	// biome-ignore lint/suspicious/noExplicitAny: value could be anything
 ) => any;
-
-const RpcIdSymbol: unique symbol = Symbol();
-export type RpcId = Opaque<number, typeof RpcIdSymbol>;
-export function createRpcId(id: number): RpcId {
-	return castToOpaque<RpcId>(id);
-}
-
-type SerializablePropertyKey = Exclude<PropertyKey, symbol>;
-export type RpcBase = {
-	id: RpcId;
-	chain?: RpcId;
-};
-
-export type Rpc<Args extends unknown[] = unknown[]> = RpcBase & {
-	method: SerializablePropertyKey[];
-	args: Args;
-};
-
-export type RpcStack = Rpc[];
