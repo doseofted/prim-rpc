@@ -1,5 +1,5 @@
 import { describe, expect, test } from "vitest";
-import { RpcMethodDecoder } from "./rpc-method-decoder";
+import { RpcMethodDecoder, RpcMethodDecoderError } from "./rpc-method-decoder";
 import { createRpcId } from "./types/rpc-messages";
 
 describe("RpcMethodDecoder can call a function given as RPC", () => {
@@ -93,7 +93,7 @@ describe("RpcMethodDecoder throws on invalid calls", () => {
 				method: ["add"],
 				args: [2, 3],
 			});
-		}).toThrowError("Module is not provided");
+		}).toThrow(RpcMethodDecoderError);
 	});
 
 	test("throws when method is not a function", () => {
@@ -103,9 +103,7 @@ describe("RpcMethodDecoder throws on invalid calls", () => {
 				method: "add",
 				args: [2, 3],
 			});
-		}).toThrowError(
-			'RPC method "add" is not a function on the provided module',
-		);
+		}).toThrow(RpcMethodDecoderError);
 	});
 
 	test("throws when method is in deny list", () => {
@@ -115,9 +113,7 @@ describe("RpcMethodDecoder throws on invalid calls", () => {
 				method: "toString",
 				args: [2, 3],
 			});
-		}).toThrowError(
-			'RPC method "toString" is not a function on the provided module',
-		);
+		}).toThrow(RpcMethodDecoderError);
 	});
 
 	test("throws when method is not marked as RPC", () => {
@@ -127,9 +123,7 @@ describe("RpcMethodDecoder throws on invalid calls", () => {
 				method: "add",
 				args: [2, 3],
 			});
-		}).toThrowError(
-			'RPC method "add" is not a function on the provided module',
-		);
+		}).toThrow(RpcMethodDecoderError);
 	});
 
 	test("throws when method is valid RPC but parent path includes function", () => {
@@ -144,8 +138,6 @@ describe("RpcMethodDecoder throws on invalid calls", () => {
 				method: ["someFunction", "test", "add"],
 				args: [2, 3],
 			});
-		}).toThrowError(
-			'RPC method "someFunction.test.add" is not a function on the provided module',
-		);
+		}).toThrow(RpcMethodDecoderError);
 	});
 });
