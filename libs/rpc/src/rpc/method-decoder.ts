@@ -1,8 +1,8 @@
 import { isNullish } from "emery";
-import { intersection, isFunction } from "es-toolkit";
+import { intersection, isFunction, isPlainObject } from "es-toolkit";
 import { get as getProperty } from "es-toolkit/compat";
 import type { PartialDeep, Schema } from "type-fest";
-import type { RpcFunctionCall, RpcId } from "./types/rpc-messages";
+import type { RpcFunctionCall, RpcId } from "./types-message";
 
 /**
  * Decode RPC into function calls on a provided object or function and receive
@@ -25,8 +25,13 @@ export class RpcMethodDecoder<T> {
 
 	#parentChainId: RpcId | null;
 
-	#decodeResultAsObject(result: unknown, originalId: RpcId | null = null) {
-		const decoder = new RpcMethodDecoder(result);
+	#decodeResultAsRpc(
+		result: unknown,
+		originalId: RpcId | null = null,
+		schema: PartialSchema<unknown>,
+	) {
+		const funcMethods = this.#allowedFunctionMethods;
+		const decoder = new RpcMethodDecoder(result, schema, funcMethods);
 		decoder.#parentChainId = originalId;
 		return { result, decoder };
 	}
@@ -47,9 +52,13 @@ export class RpcMethodDecoder<T> {
 		if (intersection(functionDenyList, methodName).length > 0) return false;
 		const givenIsFunc = isFunction(given);
 		const isRpcFunction = givenIsFunc && "rpc" in given && given.rpc === true;
-		const isAllowedFunction =
-			getProperty(this.#allowedSchema, methodName) === true;
-		return isRpcFunction || isAllowedFunction;
+		const schemaValue = getProperty(this.#allowedSchema, methodName);
+		const isAllowedSchemaDirect = schemaValue === true;
+		const isAllowedSchemaWithItems =
+			isPlainObject(schemaValue) &&
+			Object.values(schemaValue).some((v) => v === true);
+		const isAllowedSchema = isAllowedSchemaDirect || isAllowedSchemaWithItems;
+		return isRpcFunction || isAllowedSchema;
 	}
 
 	get #validModule() {
@@ -71,25 +80,32 @@ export class RpcMethodDecoder<T> {
 	} {
 		const moduleProvided = this.#validModule;
 		const parentId = this.#parentChainId;
-		if (!isNullish(parentId) && rpc.chain !== parentId) {
+		const isChain = !isNullish(rpc.chain);
+		const invalidChain = isChain && rpc.chain !== parentId;
+		if (invalidChain) {
 			throw new RpcMethodDecoderError(ReusableMessages.MethodChainDoesNotExist);
 		}
+
 		// we now know the module is an object
 		const methodName =
 			typeof rpc.method === "string" ? [rpc.method] : rpc.method;
+		const subSchema = getProperty(this.#allowedSchema, methodName);
 		const moduleIsRpcFunction = this.#givenIsRpcFunction(
 			moduleProvided,
 			methodName,
 		);
-		if (methodName.length === 0 && !moduleIsRpcFunction) {
+		const moduleIsNotFunction = methodName.length === 0 && !moduleIsRpcFunction;
+		if (moduleIsNotFunction) {
 			// we want to attempt calling the module as a function, but it isn't
 			throw new RpcMethodDecoderError(ReusableMessages.FunctionDoesNotExist);
 		}
-		if (methodName.length === 0 && moduleIsRpcFunction) {
+		const callModuleAsFunction = methodName.length === 0 && moduleIsRpcFunction;
+		if (callModuleAsFunction) {
 			// we want to attempt calling the module as a function
 			const returned = moduleProvided(...rpc.args);
-			return this.#decodeResultAsObject(returned, rpc.id);
+			return this.#decodeResultAsRpc(returned, rpc.id, subSchema);
 		}
+
 		// we now know the intended target is a property of the module
 		const functionIndexesInPath: number[] = [];
 		methodName.slice(0, -1).reduce((a, b, i) => {
@@ -107,9 +123,14 @@ export class RpcMethodDecoder<T> {
 		if (rpcMethodOnModule) {
 			// we want to attempt calling the method of the module
 			const returned = method(...rpc.args);
-			return this.#decodeResultAsObject(returned, rpc.id);
+			return this.#decodeResultAsRpc(returned, rpc.id, subSchema);
 		}
-		// we now know that the target is a method of an RPC function
+
+		// we now know that the target is a method of an RPC function object
+		if (this.#allowedFunctionMethods.length === 0) {
+			// if method names are not explicitly allowed, this feature is disabled
+			throw new RpcMethodDecoderError(ReusableMessages.FunctionDoesNotExist);
+		}
 		const parentMethodPath = methodName.slice(0, -1);
 		const lastPossibleMethodIndex = parentMethodPath.length - 1;
 		const deepMethodOfMethod =
@@ -133,12 +154,18 @@ export class RpcMethodDecoder<T> {
 		);
 		const methodOnMethodCanBeCalled =
 			parentIsRpcMethod && methodOnMethodAllowed;
-		if (methodOnMethodCanBeCalled) {
-			// we want to attempt a call to an allowed method of a valid RPC function on the module
-			const methodOnMethod = getProperty(moduleProvided, methodName);
-			const result = methodOnMethod(...rpc.args);
-			return this.#decodeResultAsObject(result, rpc.id);
+		const methodOnMethod = getProperty(moduleProvided, methodName);
+		const methodOnMethodIsFunction = isFunction(methodOnMethod);
+		if (!methodOnMethodIsFunction) {
+			// function does not exist on the function object
+			throw new RpcMethodDecoderError(ReusableMessages.FunctionDoesNotExist);
 		}
+		if (methodOnMethodCanBeCalled) {
+			// we want to attempt a call to an allowed method of a valid RPC function object on the module
+			const result = methodOnMethod(...rpc.args);
+			return this.#decodeResultAsRpc(result, rpc.id, subSchema);
+		}
+
 		// any other attempt to call a function is not allowed
 		throw new RpcMethodDecoderError(ReusableMessages.FunctionDoesNotExist);
 	}
@@ -157,8 +184,9 @@ export class RpcMethodDecoderError extends Error {
 	}
 }
 
+type RecursiveRpcCheck = true | { [key: string]: RecursiveRpcCheck };
 type PartialSchema<T> = PartialDeep<
-	Schema<T, true, { recurseIntoArrays: true }>
+	Schema<T, RecursiveRpcCheck, { recurseIntoArrays: true }>
 >;
 
 const functionDenyList = [

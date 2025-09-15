@@ -1,10 +1,10 @@
 import { describe, expect, test, vi } from "vitest";
-import { RpcMethodGenerator } from "./rpc-method-generator";
+import { RpcMethodEncoder } from "./method-encoder";
 
-describe("RpcMethodGenerator can handle function calls", () => {
+describe("RpcMethodEncoder can handle function calls", () => {
 	test("promises and iterators are resolved", async () => {
 		// biome-ignore lint/suspicious/noExplicitAny: demonstration
-		const client = new RpcMethodGenerator<any>((rpc, skip) => {
+		const client = new RpcMethodEncoder<any>((rpc, skip) => {
 			const caught = rpc.at(-1);
 			const lastMethod = caught.method.at(-1);
 			if (lastMethod === "promised") {

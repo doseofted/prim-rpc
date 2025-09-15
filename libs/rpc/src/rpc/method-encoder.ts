@@ -4,10 +4,10 @@ import {
 	type CallCondition,
 	type CaughtStack,
 	CaughtType,
-} from "./call-catcher";
-import { createRpcId, type RpcFunctionCall } from "./types/rpc-messages";
-import { UnknownAsync } from "./unknown-async";
-import { isIterator } from "./utils/is-iterable";
+} from "../call-catcher";
+import { UnknownAsync } from "../unknown-async";
+import { isIterator } from "../utils/is-iterable";
+import { createRpcId, type RpcFunctionCall } from "./types-message";
 
 /**
  * Capture all function calls on an object and record them as RPCs. Captured
@@ -20,7 +20,7 @@ import { isIterator } from "./utils/is-iterable";
  * values. This should instead be handled by a separate class that's expected
  * to serialize these values into RPC events.
  */
-export class RpcMethodGenerator<T> extends CallCatcher<T> {
+export class RpcMethodEncoder<T> extends CallCatcher<T> {
 	#handler: MethodCallHandler;
 
 	#convertStackToRpc(stack: CaughtStack): RpcFunctionCall[] {

@@ -1,6 +1,6 @@
 import { describe, expect, test } from "vitest";
-import { RpcMethodDecoder, RpcMethodDecoderError } from "./rpc-method-decoder";
-import { createRpcId } from "./types/rpc-messages";
+import { RpcMethodDecoder, RpcMethodDecoderError } from "./method-decoder";
+import { createRpcId } from "./types-message";
 
 describe("RpcMethodDecoder can call a function given as RPC", () => {
 	function add(a: number, b: number) {
@@ -60,18 +60,18 @@ describe("RpcMethodDecoder can call a function given as RPC", () => {
 		}
 		addAndCurry.rpc = true;
 		const decoder = new RpcMethodDecoder({ addAndCurry });
-		const id = createRpcId(1);
+		const chain = createRpcId(1);
 		const { decoder: decoderCurry } = decoder.attemptCall({
 			method: ["addAndCurry"],
 			args: [2],
 			chain: null,
-			id,
+			id: chain,
 		});
 		const { result } = decoderCurry.attemptCall({
 			method: ["add"],
 			args: [3],
 			id: createRpcId(2),
-			chain: id,
+			chain,
 		});
 		expect(result).toBe(5);
 	});
