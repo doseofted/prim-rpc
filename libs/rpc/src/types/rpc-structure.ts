@@ -21,6 +21,8 @@ export type RpcFunctionCall<Args extends unknown[] = unknown[]> = {
 	method: string | string[];
 	/** Arguments serialized into form that to be sent as part of RPC */
 	args: Args;
+	/** Flag to determine if function was called as a constructor */
+	new?: boolean;
 	/** An ID used to match a function call with a previous function call */
 	chain?: RpcId | RpcEventId | null;
 	/** Values extracted from arguments, expected to be resolved in the future */

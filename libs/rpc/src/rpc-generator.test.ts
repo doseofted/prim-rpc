@@ -1,10 +1,10 @@
 import { describe, expect, test, vi } from "vitest";
-import { RpcMethodEncoder } from "./method-encoder";
+import { RpcGenerator } from "./rpc-generator";
 
-describe("RpcMethodEncoder can handle function calls", () => {
+describe("RpcGenerator can handle function calls", () => {
 	test("promises and iterators are resolved", async () => {
 		// biome-ignore lint/suspicious/noExplicitAny: demonstration
-		const client = new RpcMethodEncoder<any>((rpc, skip) => {
+		const client = new RpcGenerator<any>((rpc, skip) => {
 			const caught = rpc.at(-1);
 			const lastMethod = caught.method.at(-1);
 			if (lastMethod === "promised") {
@@ -35,12 +35,12 @@ describe("RpcMethodEncoder can handle function calls", () => {
 				id: expect.any(String),
 				chain: null,
 			}),
-			{
+			expect.objectContaining({
 				id: expect.any(String),
 				method: ["i", "know", "right", "promised"],
 				args: [],
 				chain: expect.any(String),
-			},
+			}),
 		]);
 
 		const result3 = result2.cooler.than.that.iterated();

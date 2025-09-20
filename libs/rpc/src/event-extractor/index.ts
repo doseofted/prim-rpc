@@ -1,14 +1,7 @@
 import { castToOpaque, type Opaque } from "emery";
 import { isPlainObject } from "es-toolkit";
 import { set as setProperty } from "es-toolkit/compat";
-import {
-	castToEventfulValueId,
-	type EventfulValue,
-	type EventfulValueId,
-	type InheritsEventfulValue,
-} from "./eventful-value";
-
-export * from "./eventful-types";
+import { castToEventId, type EventId, IdGenerator } from "./id-generator";
 
 /**
  * Given an object with properties that are not directly serializable,
@@ -37,6 +30,8 @@ export * from "./eventful-types";
  */
 export class EventExtractor {
 	#recursiveDepth: number;
+	#recurseIntoArrays: boolean;
+
 	#maintainReferences: boolean;
 
 	constructor(
@@ -45,7 +40,7 @@ export class EventExtractor {
 		 * processed, not nested values (recursion depth of 1). This recursion depth
 		 * can be changed or toggled on (depth of `Infinity`) or off (`0` depth).
 		 */
-		recursive: number | boolean = 1,
+		recursive: RecursionOptions = 1,
 		/**
 		 * By default, every reference to a supported type extracted from an object
 		 * will result in a new unique identifier for that value. By maintaining
@@ -59,8 +54,14 @@ export class EventExtractor {
 		 */
 		maintainReferences = false,
 	) {
+		const boolToDepth = (given: boolean | number) =>
+			typeof given === "number" ? given : given ? Infinity : 0;
 		this.#recursiveDepth =
-			typeof recursive === "number" ? recursive : recursive ? Infinity : 0;
+			typeof recursive === "object"
+				? boolToDepth(recursive.depth)
+				: boolToDepth(recursive);
+		this.#recurseIntoArrays =
+			typeof recursive === "object" ? (recursive.arrays ?? true) : true;
 		this.#maintainReferences = maintainReferences;
 	}
 
@@ -100,6 +101,8 @@ export class EventExtractor {
 		const depth = path.length;
 		const nextDepth = depth + 1;
 		const recursionAllowed = nextDepth < this.#recursiveDepth;
+		const recursionIntoArraysAllowed =
+			recursionAllowed && this.#recurseIntoArrays;
 		const replacedNew = this.#replaceReference(provided, path);
 		const replaced = replacedNew;
 		// first, try to replace the value directly
@@ -108,7 +111,7 @@ export class EventExtractor {
 			extracted.set(replaced, provided);
 			return [replaced, extracted];
 		} else if (Array.isArray(provided)) {
-			if (!recursionAllowed) return [provided, extracted];
+			if (!recursionIntoArraysAllowed) return [provided, extracted];
 			const updatedProvided = provided.map((item, index) =>
 				this.#extract(item, extracted, [...path, index]).at(0),
 			);
@@ -139,10 +142,11 @@ export class EventExtractor {
 		return given;
 	}
 
-	#supportedTypes: EventfulValue[] = [];
+	#supportedTypes: IdGenerator[] = [];
 
-	addSupportedType(ProvidedEventfulValue: InheritsEventfulValue): void {
-		this.#supportedTypes.push(new ProvidedEventfulValue());
+	addSupportedType(prefix: string, isMatch: (given: unknown) => boolean): void {
+		const newSupportedType = new IdGenerator(prefix, isMatch);
+		this.#supportedTypes.push(newSupportedType);
 	}
 
 	destroy(): void {
@@ -158,7 +162,7 @@ export class EventExtractor {
 const ReferencedValueSymbol: unique symbol = Symbol();
 export type ReferencedValueId = Opaque<string, typeof ReferencedValueSymbol>;
 export function createReferencedValueId(
-	prefix: EventfulValueId,
+	prefix: EventId,
 	path: PropertyKey[] = [],
 ): ReferencedValueId {
 	return castToOpaque<ReferencedValueId>(
@@ -166,14 +170,14 @@ export function createReferencedValueId(
 	);
 }
 type ReferencedValueParts = {
-	prefix: EventfulValueId;
+	prefix: EventId;
 	path: PropertyKey[];
 };
 export function extractReferenceValueIdParts(
 	id: ReferencedValueId,
 ): ReferencedValueParts {
 	const [prefixGiven, pathPart] = id.split("-");
-	const prefix = castToEventfulValueId(prefixGiven);
+	const prefix = castToEventId(prefixGiven);
 	const path = pathPart ? pathPart.split(".") : [];
 	return { prefix, path };
 }
@@ -181,3 +185,8 @@ export function extractReferenceValueIdParts(
 type ReplacedReferencesOpaque = Map<ReferencedValueId, unknown>;
 export type ReplacedReferences = Map<string, unknown>;
 export type ExtractedReferences = Map<unknown, ReferencedValueId>;
+
+type RecursionDepthProvided = number | boolean;
+type RecursionOptions =
+	| RecursionDepthProvided
+	| { depth: RecursionDepthProvided; arrays?: boolean };

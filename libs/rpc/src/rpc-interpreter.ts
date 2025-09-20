@@ -2,14 +2,14 @@ import { isNullish } from "emery";
 import { intersection, isFunction, isPlainObject } from "es-toolkit";
 import { get as getProperty } from "es-toolkit/compat";
 import type { PartialDeep, Schema } from "type-fest";
-import type { RpcFunctionCall, RpcId } from "./types-message";
+import type { RpcFunctionCall, RpcId } from "./types/rpc-structure";
 
 /**
  * Decode RPC into function calls on a provided object or function and receive
  * two values: the returned value and a decoder that can decode further
  * RPCs that may be chained from the original function call.
  */
-export class RpcMethodDecoder<T> {
+export class RpcInterpreter<T> {
 	#module: unknown;
 	#allowedSchema: unknown | undefined;
 	#allowedFunctionMethods: string[];
@@ -31,7 +31,7 @@ export class RpcMethodDecoder<T> {
 		schema: PartialSchema<unknown>,
 	) {
 		const funcMethods = this.#allowedFunctionMethods;
-		const decoder = new RpcMethodDecoder(result, schema, funcMethods);
+		const decoder = new RpcInterpreter(result, schema, funcMethods);
 		decoder.#parentChainId = originalId;
 		return { result, decoder };
 	}
@@ -64,26 +64,26 @@ export class RpcMethodDecoder<T> {
 	get #validModule() {
 		const moduleProvided = this.#module;
 		if (isNullish(moduleProvided)) {
-			throw new RpcMethodDecoderError(ReusableMessages.ModuleNotProvided);
+			throw new RpcInterpreterError(ReusableMessages.ModuleNotProvided);
 		}
 		const moduleIsObject =
 			typeof moduleProvided === "object" || isFunction(moduleProvided);
 		if (!moduleIsObject) {
-			throw new RpcMethodDecoderError(ReusableMessages.ModuleIsInvalid);
+			throw new RpcInterpreterError(ReusableMessages.ModuleIsInvalid);
 		}
 		return moduleProvided;
 	}
 
 	attemptCall(rpc: RpcFunctionCall): {
 		result: unknown;
-		decoder: RpcMethodDecoder<unknown>;
+		decoder: RpcInterpreter<unknown>;
 	} {
 		const moduleProvided = this.#validModule;
 		const parentId = this.#parentChainId;
 		const isChain = !isNullish(rpc.chain);
 		const invalidChain = isChain && rpc.chain !== parentId;
 		if (invalidChain) {
-			throw new RpcMethodDecoderError(ReusableMessages.MethodChainDoesNotExist);
+			throw new RpcInterpreterError(ReusableMessages.MethodChainDoesNotExist);
 		}
 
 		// we now know the module is an object
@@ -97,7 +97,7 @@ export class RpcMethodDecoder<T> {
 		const moduleIsNotFunction = methodName.length === 0 && !moduleIsRpcFunction;
 		if (moduleIsNotFunction) {
 			// we want to attempt calling the module as a function, but it isn't
-			throw new RpcMethodDecoderError(ReusableMessages.FunctionDoesNotExist);
+			throw new RpcInterpreterError(ReusableMessages.FunctionDoesNotExist);
 		}
 		const callModuleAsFunction = methodName.length === 0 && moduleIsRpcFunction;
 		if (callModuleAsFunction) {
@@ -129,7 +129,7 @@ export class RpcMethodDecoder<T> {
 		// we now know that the target is a method of an RPC function object
 		if (this.#allowedFunctionMethods.length === 0) {
 			// if method names are not explicitly allowed, this feature is disabled
-			throw new RpcMethodDecoderError(ReusableMessages.FunctionDoesNotExist);
+			throw new RpcInterpreterError(ReusableMessages.FunctionDoesNotExist);
 		}
 		const parentMethodPath = methodName.slice(0, -1);
 		const lastPossibleMethodIndex = parentMethodPath.length - 1;
@@ -138,7 +138,7 @@ export class RpcMethodDecoder<T> {
 			functionIndexesInPath.length > 1;
 		if (deepMethodOfMethod) {
 			// methods on an RPC function can only be one level deep
-			throw new RpcMethodDecoderError(ReusableMessages.FunctionDoesNotExist);
+			throw new RpcInterpreterError(ReusableMessages.FunctionDoesNotExist);
 		}
 		// we now know that the target is the direct method of a function
 		const methodOnMethodName = methodName.at(-1);
@@ -158,7 +158,7 @@ export class RpcMethodDecoder<T> {
 		const methodOnMethodIsFunction = isFunction(methodOnMethod);
 		if (!methodOnMethodIsFunction) {
 			// function does not exist on the function object
-			throw new RpcMethodDecoderError(ReusableMessages.FunctionDoesNotExist);
+			throw new RpcInterpreterError(ReusableMessages.FunctionDoesNotExist);
 		}
 		if (methodOnMethodCanBeCalled) {
 			// we want to attempt a call to an allowed method of a valid RPC function object on the module
@@ -167,7 +167,7 @@ export class RpcMethodDecoder<T> {
 		}
 
 		// any other attempt to call a function is not allowed
-		throw new RpcMethodDecoderError(ReusableMessages.FunctionDoesNotExist);
+		throw new RpcInterpreterError(ReusableMessages.FunctionDoesNotExist);
 	}
 }
 
@@ -177,7 +177,7 @@ enum ReusableMessages {
 	FunctionDoesNotExist = "Provided method name is not a function on the module",
 	MethodChainDoesNotExist = "Provided method chain does not reference a called function",
 }
-export class RpcMethodDecoderError extends Error {
+export class RpcInterpreterError extends Error {
 	constructor(message: string) {
 		super(message);
 		this.name = "RpcMethodDecoderError";

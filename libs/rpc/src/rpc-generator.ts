@@ -2,12 +2,13 @@ import { isPromise } from "es-toolkit";
 import {
 	CallCatcher,
 	type CallCondition,
+	CaughtCallType,
 	type CaughtStack,
 	CaughtType,
-} from "../call-catcher";
-import { UnknownAsync } from "../unknown-async";
-import { isIterator } from "../utils/is-iterable";
-import { createRpcId, type RpcFunctionCall } from "./types-message";
+} from "./call-catcher";
+import { createRpcId, type RpcFunctionCall } from "./types/rpc-structure";
+import { UnknownAsync } from "./unknown-async";
+import { isIterator } from "./utils/is-iterable";
 
 /**
  * Capture all function calls on an object and record them as RPCs. Captured
@@ -19,8 +20,12 @@ import { createRpcId, type RpcFunctionCall } from "./types-message";
  * method calls, and does not serialize arguments or deserialize returned
  * values. This should instead be handled by a separate class that's expected
  * to serialize these values into RPC events.
+ *
+ * All handled function calls will be returned back to the caller as an async
+ * value, either as a promise or an async iterator because it's expected that
+ * the returned value is remote and will not immediately be available.
  */
-export class RpcMethodEncoder<T> extends CallCatcher<T> {
+export class RpcGenerator<T> extends CallCatcher<T> {
 	#handler: MethodCallHandler;
 
 	#convertStackToRpc(stack: CaughtStack): RpcFunctionCall[] {
@@ -30,6 +35,7 @@ export class RpcMethodEncoder<T> extends CallCatcher<T> {
 				return {
 					id: createRpcId(caught.id),
 					method: caught.path.map((part) => part.toString()),
+					new: caught.callMethod === CaughtCallType.Constructor,
 					args: caught.args,
 					chain: caught.chain ? createRpcId(caught.chain) : null,
 				};
@@ -72,7 +78,7 @@ export class RpcMethodEncoder<T> extends CallCatcher<T> {
 		};
 		super(callCondition, {
 			callFunction: true,
-			callConstructor: true, // TODO: consider whether calls should be supported and how that affects RPC messages
+			callConstructor: true,
 			propAccess: true,
 		});
 		this.#handler = handler;

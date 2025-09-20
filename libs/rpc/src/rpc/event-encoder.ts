@@ -4,7 +4,7 @@ import {
 	type RpcEvent,
 	type RpcFunctionCall,
 	type RpcFunctionResult,
-} from "./types-message";
+} from "../types/rpc-structure";
 
 /**
  * An RPC's arguments or returned value may contain events that happen over
