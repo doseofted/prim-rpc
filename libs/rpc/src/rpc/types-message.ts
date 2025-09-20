@@ -1,9 +1,10 @@
 import { castToOpaque, type Opaque } from "emery";
+import type { CaughtId } from "../call-catcher";
 
 const RpcIdSymbol: unique symbol = Symbol();
-export type RpcId = Opaque<number, typeof RpcIdSymbol>;
-export function createRpcId(id: number): RpcId {
-	return castToOpaque<RpcId>(id);
+export type RpcId = Opaque<string, typeof RpcIdSymbol>;
+export function createRpcId(id: CaughtId): RpcId {
+	return castToOpaque<RpcId>(id.toString());
 }
 
 /**
@@ -14,10 +15,16 @@ export function createRpcId(id: number): RpcId {
  * the client).
  */
 export type RpcFunctionCall<Args extends unknown[] = unknown[]> = {
+	/** An ID is used to match a function call with a result */
 	id?: RpcId | null;
+	/** The method refers to the path of a function on an object */
 	method: string | string[];
+	/** Arguments serialized into form that to be sent as part of RPC */
 	args: Args;
-	chain?: RpcId | null;
+	/** An ID used to match a function call with a previous function call */
+	chain?: RpcId | RpcEventId | null;
+	/** Values extracted from arguments, expected to be resolved in the future */
+	expect?: RpcEventId[];
 };
 
 /**
@@ -25,14 +32,19 @@ export type RpcFunctionCall<Args extends unknown[] = unknown[]> = {
  * function call.
  */
 export type RpcFunctionResult<Result = unknown, Error = unknown> = {
+	/** The ID of the RPC from which the result originated */
 	id?: RpcId;
+	/** The serialized result of an RPC */
 	result?: Result;
+	/** Uncaught, thrown values are extracted into its own field */
 	error?: Error;
+	/** Values extracted from the result, expected to be resolved in the future */
+	expect?: RpcEventId[];
 };
 
 const RpcEventIdSymbol: unique symbol = Symbol();
-export type RpcEventId = Opaque<number, typeof RpcEventIdSymbol>;
-export function createRpcEventId(id: number): RpcEventId {
+export type RpcEventId = Opaque<string, typeof RpcEventIdSymbol>;
+export function createRpcEventId(id: string): RpcEventId {
 	return castToOpaque<RpcEventId>(id);
 }
 
@@ -49,7 +61,10 @@ export function createRpcEventId(id: number): RpcEventId {
  */
 export type RpcEvent<Result = unknown, Error = unknown> = Omit<
 	RpcFunctionResult<Result, Error>,
-	"id"
+	"id" | "expect"
 > & {
+	/** The event ID given from an RPC, its result, or another event contained */
 	id: RpcEventId;
+	/** Values extracted from the event */
+	expect?: RpcEventId[];
 };

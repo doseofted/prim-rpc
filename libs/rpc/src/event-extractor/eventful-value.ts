@@ -1,13 +1,5 @@
 import { castToOpaque, type Opaque } from "emery";
 
-const EventfulValueSymbol: unique symbol = Symbol();
-export type EventfulValueId = Opaque<string, typeof EventfulValueSymbol>;
-export function createEventfulValueId(
-	prefix: string,
-): (id: number) => EventfulValueId {
-	return (id: number) => castToOpaque<EventfulValueId>([prefix, id].join(""));
-}
-
 /**
  * Base class used to add a supported type to `EventExtract`. Extend this class
  * and provide required options to detect whether a type is supported and
@@ -30,3 +22,17 @@ export class EventfulValue {
 export type InheritsEventfulValue = Omit<typeof EventfulValue, "new"> & {
 	new (): EventfulValue;
 };
+
+const EventfulValueSymbol: unique symbol = Symbol();
+export type EventfulValueId = Opaque<string, typeof EventfulValueSymbol>;
+export function createEventfulValueId(
+	prefix: string,
+): (id: number) => EventfulValueId {
+	return (id: number) => castToEventfulValueId([prefix, id].join(""));
+}
+export function castToEventfulValueId(id: string): EventfulValueId {
+	if (!id.match(/^[a-zA-Z0-9]+[0-9]+$/)) {
+		throw new TypeError(`Invalid EventfulValueId: ${id}`);
+	}
+	return castToOpaque<EventfulValueId>(id);
+}

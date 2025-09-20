@@ -23,7 +23,7 @@ describe("RpcMethodEncoder can handle function calls", () => {
 			expect.objectContaining({
 				method: ["test", "what", "cool", "promised"],
 				args: [],
-				id: expect.any(Number),
+				id: expect.any(String),
 			}),
 		]);
 
@@ -32,14 +32,14 @@ describe("RpcMethodEncoder can handle function calls", () => {
 			expect.objectContaining({
 				method: ["test", "what", "cool", "promised"],
 				args: [],
-				id: expect.any(Number),
+				id: expect.any(String),
 				chain: null,
 			}),
 			{
-				id: expect.any(Number),
+				id: expect.any(String),
 				method: ["i", "know", "right", "promised"],
 				args: [],
-				chain: expect.any(Number),
+				chain: expect.any(String),
 			},
 		]);
 
@@ -52,7 +52,7 @@ describe("RpcMethodEncoder can handle function calls", () => {
 		expect(recordItemInStack).toHaveBeenCalledTimes(3);
 		expect(recordItemInStack).toHaveBeenCalledWith(
 			expect.objectContaining({
-				id: expect.any(Number),
+				id: expect.any(String),
 				method: ["test", "what", "cool", "promised"],
 				args: [],
 				chain: null,
@@ -61,19 +61,19 @@ describe("RpcMethodEncoder can handle function calls", () => {
 		);
 		expect(recordItemInStack).toHaveBeenCalledWith(
 			expect.objectContaining({
-				id: expect.any(Number),
+				id: expect.any(String),
 				method: ["i", "know", "right", "promised"],
 				args: [],
-				chain: expect.any(Number),
+				chain: expect.any(String),
 			}),
 			2,
 		);
 		expect(recordItemInStack).toHaveBeenCalledWith(
 			expect.objectContaining({
-				id: expect.any(Number),
+				id: expect.any(String),
 				method: ["cooler", "than", "that", "iterated"],
 				args: [],
-				chain: expect.any(Number),
+				chain: expect.any(String),
 			}),
 			3,
 		);

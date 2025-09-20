@@ -72,13 +72,14 @@ export class RpcMethodEncoder<T> extends CallCatcher<T> {
 		};
 		super(callCondition, {
 			callFunction: true,
+			callConstructor: true, // TODO: consider whether calls should be supported and how that affects RPC messages
 			propAccess: true,
 		});
 		this.#handler = handler;
 	}
 }
 
-type MethodCallHandler = (
+export type MethodCallHandler = (
 	stack: RpcFunctionCall[],
 	skip: symbol,
 	// biome-ignore lint/suspicious/noExplicitAny: value could be anything

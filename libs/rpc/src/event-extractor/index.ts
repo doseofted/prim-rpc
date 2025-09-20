@@ -1,7 +1,12 @@
 import { castToOpaque, type Opaque } from "emery";
 import { isPlainObject } from "es-toolkit";
 import { set as setProperty } from "es-toolkit/compat";
-import type { EventfulValue, InheritsEventfulValue } from "./eventful-value";
+import {
+	castToEventfulValueId,
+	type EventfulValue,
+	type EventfulValueId,
+	type InheritsEventfulValue,
+} from "./eventful-value";
 
 export * from "./eventful-types";
 
@@ -68,7 +73,7 @@ export class EventExtractor {
 		const saveReferences = this.#maintainReferences;
 		if (saveReferences && this.#extractedReferences.has(original)) {
 			const savedId = this.#extractedReferences.get(original);
-			const [prefix] = savedId.split("-");
+			const { prefix } = extractReferenceValueIdParts(savedId);
 			const newId = createReferencedValueId(prefix, path);
 			if (saveReferences && !this.#extractedReferences.has(original)) {
 				this.#extractedReferences.set(original, newId);
@@ -119,16 +124,17 @@ export class EventExtractor {
 		return [provided, extracted];
 	}
 
-	extract(given: unknown): [provided: unknown, extracted: ReplacedReferences] {
-		return this.#extract(given);
+	extract<T = unknown>(given: T): [provided: T, extracted: ReplacedReferences] {
+		return this.#extract(given) as [T, ReplacedReferences];
 	}
 
-	merge(given: unknown, extracted: ReplacedReferences): unknown {
+	merge<T = unknown>(given: T, extracted: ReplacedReferences): T {
 		for (const [id, item] of extracted) {
 			const [_type, path] = id.split("-");
-			if (!path) return item; // when no path is provided, it is the root
+			if (!path) return item as T; // when no path is provided, it is the root
 			const isObjectOrArray = isPlainObject(given) || Array.isArray(given);
-			if (isObjectOrArray) setProperty(given, path, item);
+			if (isObjectOrArray)
+				setProperty(given as Record<PropertyKey, unknown>, path, item);
 		}
 		return given;
 	}
@@ -152,7 +158,7 @@ export class EventExtractor {
 const ReferencedValueSymbol: unique symbol = Symbol();
 export type ReferencedValueId = Opaque<string, typeof ReferencedValueSymbol>;
 export function createReferencedValueId(
-	prefix: string,
+	prefix: EventfulValueId,
 	path: PropertyKey[] = [],
 ): ReferencedValueId {
 	return castToOpaque<ReferencedValueId>(
@@ -160,17 +166,18 @@ export function createReferencedValueId(
 	);
 }
 type ReferencedValueParts = {
-	prefix: string;
+	prefix: EventfulValueId;
 	path: PropertyKey[];
 };
 export function extractReferenceValueIdParts(
 	id: ReferencedValueId,
 ): ReferencedValueParts {
-	const [prefix, pathPart] = id.split("-");
+	const [prefixGiven, pathPart] = id.split("-");
+	const prefix = castToEventfulValueId(prefixGiven);
 	const path = pathPart ? pathPart.split(".") : [];
 	return { prefix, path };
 }
 
 type ReplacedReferencesOpaque = Map<ReferencedValueId, unknown>;
-type ReplacedReferences = Map<string, unknown>;
-type ExtractedReferences = Map<unknown, ReferencedValueId>;
+export type ReplacedReferences = Map<string, unknown>;
+export type ExtractedReferences = Map<unknown, ReferencedValueId>;
