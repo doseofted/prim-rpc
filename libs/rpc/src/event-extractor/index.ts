@@ -54,8 +54,6 @@ export class EventExtractor {
 		 */
 		maintainReferences = false,
 	) {
-		const boolToDepth = (given: boolean | number) =>
-			typeof given === "number" ? given : given ? Infinity : 0;
 		this.#recursiveDepth =
 			typeof recursive === "object"
 				? boolToDepth(recursive.depth)
@@ -65,7 +63,7 @@ export class EventExtractor {
 		this.#maintainReferences = maintainReferences;
 	}
 
-	#extractedReferences: ExtractedReferences = new Map();
+	#extractedReferences: ExtractedReferencesOpaque = new Map();
 
 	#replaceReference(
 		original: unknown,
@@ -144,8 +142,11 @@ export class EventExtractor {
 
 	#supportedTypes: IdGenerator[] = [];
 
-	addSupportedType(prefix: string, isMatch: (given: unknown) => boolean): void {
-		const newSupportedType = new IdGenerator(prefix, isMatch);
+	addSupportedType(
+		idPrefix: string,
+		isMatch: (given: unknown) => boolean,
+	): void {
+		const newSupportedType = new IdGenerator(idPrefix, isMatch);
 		this.#supportedTypes.push(newSupportedType);
 	}
 
@@ -157,6 +158,10 @@ export class EventExtractor {
 	[Symbol.dispose](): void {
 		this.destroy();
 	}
+}
+
+function boolToDepth(given: boolean | number) {
+	return typeof given === "number" ? given : given ? Infinity : 0;
 }
 
 const ReferencedValueSymbol: unique symbol = Symbol();
@@ -182,9 +187,9 @@ export function extractReferenceValueIdParts(
 	return { prefix, path };
 }
 
-type ReplacedReferencesOpaque = Map<ReferencedValueId, unknown>;
 export type ReplacedReferences = Map<string, unknown>;
-export type ExtractedReferences = Map<unknown, ReferencedValueId>;
+type ReplacedReferencesOpaque = Map<ReferencedValueId, unknown>;
+type ExtractedReferencesOpaque = Map<unknown, ReferencedValueId>;
 
 type RecursionDepthProvided = number | boolean;
 type RecursionOptions =

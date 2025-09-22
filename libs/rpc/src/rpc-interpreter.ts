@@ -3,6 +3,7 @@ import { intersection, isFunction, isPlainObject } from "es-toolkit";
 import { get as getProperty } from "es-toolkit/compat";
 import type { PartialDeep, Schema } from "type-fest";
 import type { RpcFunctionCall, RpcId } from "./types/rpc-structure";
+import { isIterator } from "./utils/is-iterable";
 
 /**
  * Decode RPC into function calls on a provided object or function and receive
@@ -74,7 +75,7 @@ export class RpcInterpreter<T> {
 		return moduleProvided;
 	}
 
-	attemptCall(rpc: RpcFunctionCall): {
+	callMethod(rpc: RpcFunctionCall): {
 		result: unknown;
 		decoder: RpcInterpreter<unknown>;
 	} {
@@ -169,7 +170,30 @@ export class RpcInterpreter<T> {
 		// any other attempt to call a function is not allowed
 		throw new RpcInterpreterError(ReusableMessages.FunctionDoesNotExist);
 	}
+
+	async *callChain(rpcStack: RpcStack): AsyncGenerator<unknown> {
+		const isExpectedGenerator = isFunction(rpcStack);
+		const isStack =
+			Array.isArray(rpcStack) || isExpectedGenerator || isIterator(rpcStack);
+		if (!isStack) return this.callChain([rpcStack]);
+		let nextDecoder: RpcInterpreter<unknown> = this;
+		const rpcIterable = isExpectedGenerator ? rpcStack() : rpcStack;
+		for await (const rpcMessage of rpcIterable) {
+			const { result, decoder } = nextDecoder.callMethod(rpcMessage);
+			yield result;
+			nextDecoder = decoder;
+		}
+	}
 }
+
+type RpcStackIterable =
+	| AsyncGenerator<RpcFunctionCall>
+	| Generator<RpcFunctionCall>;
+type RpcStack =
+	| (() => RpcStackIterable)
+	| RpcStackIterable
+	| RpcFunctionCall[]
+	| RpcFunctionCall;
 
 enum ReusableMessages {
 	ModuleNotProvided = "Module is not provided",
@@ -184,8 +208,8 @@ export class RpcInterpreterError extends Error {
 	}
 }
 
-type RecursiveRpcCheck = true | { [key: string]: RecursiveRpcCheck };
-type PartialSchema<T> = PartialDeep<
+export type RecursiveRpcCheck = true | { [key: string]: RecursiveRpcCheck };
+export type PartialSchema<T> = PartialDeep<
 	Schema<T, RecursiveRpcCheck, { recurseIntoArrays: true }>
 >;
 

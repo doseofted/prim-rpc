@@ -61,12 +61,15 @@ export function createRpcEventId(id: string): RpcEventId {
  * The ID of an RPC may communicate details about its value including its type
  * and may be used to parse the value into its expected form.
  */
-export type RpcEvent<Result = unknown, Error = unknown> = Omit<
-	RpcFunctionResult<Result, Error>,
-	"id" | "expect"
-> & {
+export type RpcEvent<
+	EventNames extends string = string,
+	Result = unknown,
+	Error = unknown,
+> = Omit<RpcFunctionResult<Result, Error>, "id" | "expect"> & {
 	/** The event ID given from an RPC, its result, or another event contained */
 	id: RpcEventId;
+	/** The custom event name, defined by the given event type (its identifier) */
+	event?: EventNames;
 	/** Values extracted from the event */
 	expect?: RpcEventId[];
 };
