@@ -1,6 +1,6 @@
 import { expect, test } from "vitest";
 import { createRpc } from ".";
 
-test("hello says Prim+RPC", () => {
+test("Prim+RPC client exists", () => {
 	expect(createRpc()).toBeDefined();
 });

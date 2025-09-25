@@ -3,9 +3,11 @@ import { describe, expect, test } from "vitest";
 import { isIterator } from "../utils/is-iterable";
 import { EventExtractor } from ".";
 
+const recursionDepthDefault = 7;
+
 describe("EventExtractor can extract top-level properties", () => {
 	test("can extract a promise from a simple object", () => {
-		using extractor = new EventExtractor(true, false);
+		using extractor = new EventExtractor(recursionDepthDefault, false);
 		extractor.addSupportedType("p", isPromise);
 		const original = {
 			promise: Promise.resolve(123),
@@ -21,7 +23,7 @@ describe("EventExtractor can extract top-level properties", () => {
 	});
 
 	test("can extract an iterator from a simple object", () => {
-		using extractor = new EventExtractor(true, false);
+		using extractor = new EventExtractor(recursionDepthDefault, false);
 		extractor.addSupportedType("i", isIterator);
 		const original = {
 			iterator: (function* () {
@@ -41,7 +43,7 @@ describe("EventExtractor can extract top-level properties", () => {
 	});
 
 	test("can extract an async iterator from a simple object", () => {
-		using extractor = new EventExtractor(true, false);
+		using extractor = new EventExtractor(recursionDepthDefault, false);
 		extractor.addSupportedType("i", isIterator);
 		const original = {
 			asyncIterator: (async function* () {
@@ -63,7 +65,7 @@ describe("EventExtractor can extract top-level properties", () => {
 
 describe("EventExtractor can extract nested properties", () => {
 	test("can extract a promise from a nested object", () => {
-		using extractor = new EventExtractor(true, false);
+		using extractor = new EventExtractor(recursionDepthDefault, false);
 		extractor.addSupportedType("p", isPromise);
 		const original = {
 			deeply: {
@@ -89,7 +91,7 @@ describe("EventExtractor can extract nested properties", () => {
 
 describe("EventExtractor can maintain references across multiple usages", () => {
 	test("can maintain references to previously extracted promises", () => {
-		using extractor = new EventExtractor(true, true);
+		using extractor = new EventExtractor(recursionDepthDefault, true);
 		extractor.addSupportedType("p", isPromise);
 		const original = {
 			promise: Promise.resolve(123),
@@ -123,7 +125,7 @@ describe("EventExtractor can maintain references across multiple usages", () => 
 
 describe("EventExtractor can merge extracted values back into original", () => {
 	test("can merge a promise back into a simple object", () => {
-		using extractor = new EventExtractor(true, false);
+		using extractor = new EventExtractor(recursionDepthDefault, false);
 		extractor.addSupportedType("p", isPromise);
 		const original = {
 			promise: Promise.resolve(123),
@@ -142,7 +144,7 @@ describe("EventExtractor can merge extracted values back into original", () => {
 	});
 
 	test("can merge a promise provided at the top-level", () => {
-		using extractor = new EventExtractor(true, false);
+		using extractor = new EventExtractor(recursionDepthDefault, false);
 		extractor.addSupportedType("p", isPromise);
 		const original = Promise.resolve(123);
 		const [replaced, extracted] = extractor.extract(original);

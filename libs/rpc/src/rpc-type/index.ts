@@ -1,5 +1,5 @@
 import { createNanoEvents, type Unsubscribe } from "nanoevents";
-import type { RpcEvent, RpcEventId } from "./types/rpc-structure";
+import type { RpcEvent, RpcEventId } from "../types/rpc-structure";
 
 class RpcType<
 	ObjectType = unknown,

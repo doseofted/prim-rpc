@@ -1,8 +1,5 @@
 import { ReconstructedPromise } from "../reconstructed/promise";
-import {
-	createRpcType,
-	type RpcTypeConstructor,
-} from "../rpc-event-handler-attempt-3";
+import { createRpcType, type RpcTypeConstructor } from ".";
 
 type Expected = Promise<unknown>;
 type Context = {

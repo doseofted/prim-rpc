@@ -11,7 +11,7 @@ class PrimRpc<Module = unknown> {
 			options.allowSchema,
 			options.allowMethodList,
 		);
-		const rpcEvents = new RpcEventEncoder(true, true);
+		const rpcEvents = new RpcEventEncoder(true, true, true);
 		this.client = new RpcGenerator((stack, skip) => {
 			const rpc = stack.at(-1);
 			const [replacedRpc, extractedEvents] = rpcEvents.extract(rpc);
