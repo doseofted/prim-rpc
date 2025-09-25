@@ -1,4 +1,5 @@
 import { expect, test } from "vitest";
+import { RpcTypePromise } from "./event-handler/promise";
 import { ReconstructedPromise } from "./reconstructed/promise";
 import { RpcEventHandler } from "./rpc-event-handler-attempt-1";
 import {
@@ -36,6 +37,16 @@ test("Attempt 2: RpcTypePromise reconstruct and deconstruct classes work togethe
 	deconstructed.onDeconstructEvent((rpc) => {
 		reconstructed.emitReconstructEvent(rpc);
 	});
-	deconstructed.deconstruct(Promise.resolve(123));
+	deconstructed.provide(Promise.resolve(123));
 	await expect(reconstructed.value).resolves.toBe(123);
+});
+
+test("Attempt 3: RpcTypePromise (v2) can reconstruct and deconstruct", async () => {
+	const fromRpc = new RpcTypePromise();
+	const expectedValue = 42;
+	const promised = new Promise((resolve) => fromRpc.onProvided(resolve));
+	const toRpc = new RpcTypePromise();
+	toRpc.onRpc((rpc) => fromRpc.provideRpc(rpc));
+	toRpc.provideObject(Promise.resolve(expectedValue), createRpcEventId("p1"));
+	await expect(promised).resolves.toBe(expectedValue);
 });

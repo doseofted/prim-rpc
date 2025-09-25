@@ -9,13 +9,12 @@ import type {
 
 interface RpcTypeReconstruct<Events extends string = string> {
 	emitReconstructEvent(rpc: RpcEvent<Events>): void;
-	// reconstruct(id: RpcEventId): Promise<unknown>;
 	get value(): unknown;
 }
 
 interface RpcTypeDeconstruct<Events extends string = string> {
 	onDeconstructEvent(cb?: (message: RpcEvent<Events>) => void): () => void;
-	deconstruct(value: unknown): void;
+	provide(value: unknown): void;
 }
 
 type RpcTypePromiseEvents = "resolve" | "reject";
@@ -97,7 +96,7 @@ export class RpcTypeDeconstructPromise
 		return this.#deconstructEmitter.on("rpc", cb);
 	}
 
-	deconstruct(promise: Promise<unknown>): void {
+	provide(promise: Promise<unknown>): void {
 		void promise
 			.then((result) => {
 				this.#deconstructEmitter.emit("rpc", {

@@ -156,3 +156,7 @@ describe("EventExtractor can merge extracted values back into original", () => {
 		expect(merged).toBe(original);
 	});
 });
+
+describe.todo("EventExtractor can handle circular references", () => {
+	// ...
+});

@@ -53,11 +53,28 @@ export class EventExtractor {
 		 * `using` the created class instance.
 		 */
 		maintainReferences = false,
+		/**
+		 * If, when extracting types from the object, a reference is found in the
+		 * object, replace that reference with an ID referencing the path of the
+		 * referenced value rather than attempting to extract values again.
+		 *
+		 * This is similar to `maintainReferences` but includes not just supported
+		 * types but any reference found in the object.
+		 *
+		 * If this option is disabled, the `recursive` option should limit the depth
+		 * of recursion to avoid infinite loops.
+		 */
+		replaceCyclical = false,
 	) {
 		this.#recursiveDepth =
 			typeof recursive === "object"
 				? boolToDepth(recursive.depth)
 				: boolToDepth(recursive);
+		if (!replaceCyclical && this.#recursiveDepth === Infinity) {
+			throw new Error(
+				"Cyclical references must be replaced when recursive depth is infinite",
+			);
+		}
 		this.#recurseIntoArrays =
 			typeof recursive === "object" ? (recursive.arrays ?? true) : true;
 		this.#maintainReferences = maintainReferences;
