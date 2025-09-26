@@ -46,6 +46,7 @@ export class RpcGenerator<T> extends CallCatcher<T> {
 	constructor(handler: MethodCallHandler) {
 		const callCondition: CallCondition = (next, stack) => {
 			const caught = stack.at(-1);
+			if (!caught) return next;
 			const funcCall = caught.type === CaughtType.Call;
 			const asyncMethod = UnknownAsync.determineCaughtType(caught);
 			const isModuleCall = funcCall && !asyncMethod;

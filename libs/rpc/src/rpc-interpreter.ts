@@ -144,6 +144,7 @@ export class RpcInterpreter<T> {
 		// we now know that the target is the direct method of a function
 		const methodOnMethodName = methodName.at(-1);
 		const methodOnMethodAllowed =
+			methodOnMethodName &&
 			this.#allowedFunctionMethods.includes(methodOnMethodName) &&
 			!functionDenyList.includes(methodOnMethodName);
 		const parentMethod = methodOnMethodAllowed

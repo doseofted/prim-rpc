@@ -15,22 +15,22 @@ describe.todo("CallCatcher can be configured", () => {
 
 describe("CallCatcher can be initialized from a previous instance", () => {
 	test("original stack can be transferred", () => {
-		function callFuncName(caught: Caught, name: string) {
-			const isCall = caught.type === CaughtType.Call;
-			const lastPath = caught.path.at(-1);
+		function callFuncName(name: string, caught?: Caught) {
+			const isCall = caught?.type === CaughtType.Call;
+			const lastPath = caught?.path.at(-1);
 			const match = isCall && lastPath === name;
 			return match;
 		}
 		const catcher1 = new CallCatcher((next, stack) => {
 			const caught = stack.at(-1);
-			if (callFuncName(caught, "path")) return stack;
+			if (callFuncName("path", caught)) return stack;
 			return next;
 		});
 		const conditionResult1 = catcher1.proxy.deep.nested.path();
 		const catcher2 = new CallCatcher((next, stack) => {
 			const caught = stack.at(-1);
-			if (callFuncName(caught, "path")) return 123;
-			if (callFuncName(caught, "done")) return stack;
+			if (callFuncName("path", caught)) return 123;
+			if (callFuncName("done", caught)) return stack;
 			return next;
 		});
 		const conditionResult2 = catcher2.setInitialStack(conditionResult1, true);
@@ -70,7 +70,7 @@ describe("CallCatcher can catch direct calls and props", () => {
 		const callCatcher = new CallCatcher<ToCatch>((next, stack) => {
 			const caught = stack.at(-1);
 			const called =
-				caught.type === CaughtType.Call && caught.path.length === 0;
+				caught?.type === CaughtType.Call && caught.path.length === 0;
 			return called ? caught : next;
 		});
 		const callback = vi.fn();
@@ -90,7 +90,7 @@ describe("CallCatcher can catch direct calls and props", () => {
 		const callCatcher = new CallCatcher<ToCatch>((next, stack) => {
 			const caught = stack.at(-1);
 			const called =
-				caught.type === CaughtType.Call && caught.path.at(-1) === "hello";
+				caught?.type === CaughtType.Call && caught.path.at(-1) === "hello";
 			return called ? caught : next;
 		});
 		expect(callCatcher.proxy.hello("Ted")).toEqual(
@@ -109,7 +109,7 @@ describe("CallCatcher can catch direct calls and props", () => {
 		const callCatcher = new CallCatcher<ToCatch>((next, stack) => {
 			const caught = stack.at(-1);
 			const constructed =
-				caught.type === CaughtType.Call &&
+				caught?.type === CaughtType.Call &&
 				caught.callMethod === CaughtCallType.Constructor &&
 				caught.path.length === 0;
 			return constructed ? caught : next;
@@ -133,7 +133,7 @@ describe("CallCatcher can catch direct calls and props", () => {
 		const callCatcher = new CallCatcher<ToCatch>((next, stack) => {
 			const caught = stack.at(-1);
 			const constructed =
-				caught.type === CaughtType.Call &&
+				caught?.type === CaughtType.Call &&
 				caught.callMethod === CaughtCallType.Constructor &&
 				caught.path.at(-1) === "Test";
 			return constructed ? caught : next;
@@ -213,15 +213,13 @@ describe("CallCatcher can catch direct calls and props", () => {
 
 	test("can catch property deletions", () => {
 		type ToCatch = {
-			test: number;
+			test?: number;
 		};
 		const cb = vi.fn();
 		const callCatcher = new CallCatcher<ToCatch>((next, stack) => {
 			const caught = stack.at(-1);
 			const testPropInteraction =
-				caught &&
-				caught.type === CaughtType.Prop &&
-				caught.path.at(-1) === "test";
+				caught?.type === CaughtType.Prop && caught.path.at(-1) === "test";
 			const testPropDelete =
 				testPropInteraction && caught.interaction === CaughtPropType.Deletion;
 			if (testPropDelete) cb();
@@ -256,7 +254,7 @@ describe("CallCatcher can catch nested calls and props", () => {
 		const callCatcher = new CallCatcher<ToCatch>((next, stack) => {
 			const caught = stack.at(-1);
 			const called =
-				caught.type === CaughtType.Call && caught.path.at(-1) === "morning";
+				caught?.type === CaughtType.Call && caught.path.at(-1) === "morning";
 			return called ? caught : next;
 		});
 		expect(callCatcher.proxy.good.morning("Ted")).toEqual(
@@ -280,13 +278,16 @@ describe("CallCatcher can catch nested calls and props", () => {
 		const callCatcher = new CallCatcher<ToCatch>((next, stack) => {
 			const caught = stack.at(-1);
 			if (
-				caught.type === CaughtType.Call &&
+				caught?.type === CaughtType.Call &&
 				caught.path.at(-1) === "hello" &&
 				caught.args.at(0) === "Ted"
 			) {
 				return caught;
 			}
-			if (caught.type === CaughtType.Call && caught.path.at(-1) === "goodbye") {
+			if (
+				caught?.type === CaughtType.Call &&
+				caught.path.at(-1) === "goodbye"
+			) {
 				return stack;
 			}
 			return next;
@@ -325,7 +326,7 @@ describe("CallCatcher can catch nested calls and props", () => {
 		const callCatcher = new CallCatcher<ToCatch>((next, stack) => {
 			const caught = stack.at(-1);
 			const accessed =
-				caught.type === CaughtType.Prop && caught.path.at(-1) === "bar";
+				caught?.type === CaughtType.Prop && caught.path.at(-1) === "bar";
 			return accessed ? caught : next;
 		});
 		expect(callCatcher.proxy.lorem.ipsum.foo.bar).toEqual(
@@ -340,7 +341,7 @@ describe("CallCatcher can catch nested calls and props", () => {
 		type ToCatch = {
 			lorem: {
 				ipsum: {
-					foo: {
+					foo?: {
 						bar: number | CaughtStack;
 					};
 				};
@@ -351,7 +352,7 @@ describe("CallCatcher can catch nested calls and props", () => {
 			const caught = stack.at(-1);
 			stackUpdate(caught);
 			const accessed =
-				caught.type === CaughtType.Prop && caught.path.at(-1) === "bar";
+				caught?.type === CaughtType.Prop && caught.path.at(-1) === "bar";
 			if (accessed) return stack;
 			return next;
 		});
@@ -396,7 +397,7 @@ describe("CallCatcher can catch nested calls and props", () => {
 			}),
 		);
 
-		const bar = ipsum.foo.bar;
+		const bar = (ipsum.foo as ToCatch["lorem"]["ipsum"]["foo"])?.bar;
 		expect(stackUpdate).toHaveBeenLastCalledWith(
 			expect.objectContaining({
 				type: CaughtType.Prop,

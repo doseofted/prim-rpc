@@ -103,7 +103,7 @@ export class CallCatcher<ObjectShape = any> {
 		const lastType = lastItem?.type;
 		const newType = newItem.type;
 		const bothItemsAreProps =
-			newType === CaughtType.Prop && newType === lastType;
+			newType === CaughtType.Prop && lastType && newType === lastType;
 		const lastPropertyWasModified =
 			bothItemsAreProps && lastItem.interaction !== CaughtPropType.Access;
 		if (lastPropertyWasModified) {
@@ -119,7 +119,7 @@ export class CallCatcher<ObjectShape = any> {
 			return this.#updateStack(stack, updateStack);
 		}
 		const newItemIsCallable = newItem.type === CaughtType.Call;
-		if (lastType === CaughtType.Prop && newItemIsCallable) {
+		if (lastItem && lastType === CaughtType.Prop && newItemIsCallable) {
 			const path = [...lastItem.path, ...newItem.path];
 			stack.push({
 				...newItem,
@@ -146,7 +146,7 @@ export class CallCatcher<ObjectShape = any> {
 		if (condition !== next) return condition;
 		const lastItem = pendingStack.at(-1);
 		const lastItemIsPropModification =
-			lastItem.type === CaughtType.Prop &&
+			lastItem?.type === CaughtType.Prop &&
 			lastItem.interaction !== CaughtPropType.Access;
 		// Proxy set/deleteProperty returns boolean (assume true if not provided)
 		if (lastItemIsPropModification) {

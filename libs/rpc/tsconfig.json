@@ -7,6 +7,6 @@
 		"isolatedDeclarations": true,
 		"isolatedModules": true,
 		"verbatimModuleSyntax": true,
-		"strictNullChecks": false
+		"strictNullChecks": true
 	}
 }

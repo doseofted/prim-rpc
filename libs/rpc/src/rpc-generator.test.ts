@@ -6,7 +6,7 @@ describe("RpcGenerator can handle function calls", () => {
 		// biome-ignore lint/suspicious/noExplicitAny: demonstration
 		const client = new RpcGenerator<any>((rpc, skip) => {
 			const caught = rpc.at(-1);
-			const lastMethod = caught.method.at(-1);
+			const lastMethod = caught?.method.at(-1);
 			if (lastMethod === "promised") {
 				return rpc;
 			} else if (lastMethod === "iterated") {

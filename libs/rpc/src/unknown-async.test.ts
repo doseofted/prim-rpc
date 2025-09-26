@@ -31,8 +31,8 @@ describe("UnknownAsync can act as an instance of CallCatcher", () => {
 		const tbd = new UnknownAsync<any>(handle);
 		tbd.fallbackSet((next, stack) => {
 			const caught = stack.at(-1);
-			const methodCall = caught.type === CaughtType.Call;
-			const pathLast = caught.path.at(-1);
+			const methodCall = caught?.type === CaughtType.Call;
+			const pathLast = caught?.path.at(-1);
 			if (methodCall && pathLast === "test") return stack;
 			return next;
 		});
@@ -111,13 +111,13 @@ describe("UnknownAsync can be configured", () => {
 	});
 
 	test("can use provided callback for unsupported properties", async () => {
-		type ToCatch = { lorem: { ipsum: number }; ipsum?: number; foo: number };
+		type ToCatch = { lorem: { ipsum: number }; ipsum?: number; foo?: number };
 		const tbd = new UnknownAsync<ToCatch>(handle);
 		tbd.fallbackSet((next, stack) => {
 			const caught = stack.at(-1);
-			if (caught.path.at(0) === "foo") return true;
-			if (isSubset(caught.path, ["lorem", "ipsum"])) return 123;
-			return caught.path.at(0) === "lorem" ? next : undefined;
+			if (caught?.path.at(0) === "foo") return true;
+			if (isSubset(caught?.path ?? [], ["lorem", "ipsum"])) return 123;
+			return caught?.path.at(0) === "lorem" ? next : undefined;
 		});
 		const promised = Promise.resolve(42);
 		expect(tbd.givePromise(promised)).toBe(true);
@@ -436,13 +436,13 @@ describe("UnknownAsync supports iterators", () => {
 			done: false,
 		});
 		const errorToCatch = new Error("Test 1");
-		await expect(iterable.proxy.throw(errorToCatch)).resolves.toEqual({
+		await expect(iterable.proxy.throw?.(errorToCatch)).resolves.toEqual({
 			value: 3,
 			done: false,
 		});
 		expect(errorCaught).toHaveBeenCalledWith(errorToCatch);
 		const errorNotToCatch = new Error("Test 2");
-		await expect(iterable.proxy.throw(errorNotToCatch)).rejects.toThrow(
+		await expect(iterable.proxy.throw?.(errorNotToCatch)).rejects.toThrow(
 			errorNotToCatch,
 		);
 		await expect(iterable.proxy.next()).resolves.toEqual({ done: true });
@@ -460,7 +460,7 @@ describe("UnknownAsync supports iterators", () => {
 			value: 1,
 			done: false,
 		});
-		await expect(iterable.proxy.return(4)).resolves.toEqual({
+		await expect(iterable.proxy.return?.(4)).resolves.toEqual({
 			value: 4,
 			done: true,
 		});
@@ -496,6 +496,7 @@ describe("UnknownAsync supports iterators", () => {
 		};
 		const iterable = new UnknownAsync(handle);
 		iterable.giveIterator(iterator);
+		type MapYielded = { value?: number; done: boolean };
 		const expected = expect(
 			Promise.all([
 				iterable.proxy.next(),
@@ -505,7 +506,7 @@ describe("UnknownAsync supports iterators", () => {
 			]),
 		).resolves.toEqual(
 			expectedYieldOrder
-				.map((value) => ({ value, done: false }))
+				.map<MapYielded>((value) => ({ value, done: false }))
 				.concat({ value: undefined, done: true }),
 		);
 		vi.runAllTimers();

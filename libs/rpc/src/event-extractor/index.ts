@@ -87,8 +87,9 @@ export class EventExtractor {
 		path: PropertyKey[],
 	): false | ReferencedValueId {
 		const saveReferences = this.#maintainReferences;
-		if (saveReferences && this.#extractedReferences.has(original)) {
-			const savedId = this.#extractedReferences.get(original);
+		const hasReference = this.#extractedReferences.has(original);
+		const savedId = hasReference && this.#extractedReferences.get(original);
+		if (saveReferences && savedId) {
 			const { prefix } = extractReferenceValueIdParts(savedId);
 			const newId = createReferencedValueId(prefix, path);
 			if (saveReferences && !this.#extractedReferences.has(original)) {
