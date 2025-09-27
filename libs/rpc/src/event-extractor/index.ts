@@ -34,6 +34,8 @@ export class EventExtractor {
 
 	#maintainReferences: boolean;
 
+	#replaceCyclical: boolean;
+
 	constructor(
 		/**
 		 * By default, only the provided value, top-level object, or array is
@@ -78,6 +80,7 @@ export class EventExtractor {
 		this.#recurseIntoArrays =
 			typeof recursive === "object" ? (recursive.arrays ?? true) : true;
 		this.#maintainReferences = maintainReferences;
+		this.#replaceCyclical = replaceCyclical;
 	}
 
 	#extractedReferences: ExtractedReferencesOpaque = new Map();
@@ -92,16 +95,15 @@ export class EventExtractor {
 		if (saveReferences && savedId) {
 			const { prefix } = extractReferenceValueIdParts(savedId);
 			const newId = createReferencedValueId(prefix, path);
-			if (saveReferences && !this.#extractedReferences.has(original)) {
-				this.#extractedReferences.set(original, newId);
-			}
+			// Update the reference with the new path-specific ID
+			this.#extractedReferences.set(original, newId);
 			return newId;
 		}
 		for (const supportedType of this.#supportedTypes) {
 			const isMatch = supportedType.isMatch(original);
 			if (!isMatch) break;
 			const newId = createReferencedValueId(isMatch, path);
-			if (saveReferences && !this.#extractedReferences.has(original)) {
+			if (saveReferences) {
 				this.#extractedReferences.set(original, newId);
 			}
 			return newId;
@@ -109,18 +111,140 @@ export class EventExtractor {
 		return false;
 	}
 
+	#cyclicalPrefix = "c";
+	/**
+	 * A cyclical type is unique from any other supported type because it
+	 * determines how values are extracted and merged
+	 */
+	#cyclicalType: IdGenerator = new IdGenerator(
+		this.#cyclicalPrefix,
+		() => true,
+	);
+	// todo: it may not make sense to track all references unless the original reference
+	// is also extracted (since the path would reference an object that wasn't extracted)
+	#cyclicalReferences: CyclicalReferences = new Map();
+	#extractedCyclicalReferences: ExtractedCyclicalReferencesOpaque = new Map();
+
+	#createCyclicalMappedItem(
+		extracted: ReplacedReferencesOpaque,
+		originalPath: PropertyKey[],
+		referencedPath: PropertyKey[],
+		originalObject?: unknown,
+	): { id: ReferencedValueId; referencedId: ReferencedValueId } | false {
+		const saveReferences = this.#replaceCyclical;
+		const savedCyclicalReference =
+			this.#extractedCyclicalReferences.has(originalObject);
+		const savedId =
+			savedCyclicalReference &&
+			this.#extractedCyclicalReferences.get(originalObject);
+		if (savedId) {
+			const { prefix } = extractReferenceValueIdParts(savedId.refId);
+			const cyclicalReferenceOriginal = this.#cyclicalType.isMatch(null);
+			if (!cyclicalReferenceOriginal) return false;
+			const newId = createReferencedValueId(prefix, originalPath);
+			// Update the reference with the new path-specific ID
+			this.#extractedCyclicalReferences.set(originalObject, savedId);
+			return { id: newId, referencedId: savedId.valueId };
+		}
+		// todo: assign originalObject back to extracted, and use that extracted key
+		// (a cyclical ID) as the value of the extracted cyclical reference
+		const cyclicalReferenceOriginal = this.#cyclicalType.isMatch(null);
+		if (!cyclicalReferenceOriginal) return false;
+		const cyclicalIdObject = createReferencedValueId(
+			cyclicalReferenceOriginal,
+			referencedPath,
+		);
+		extracted.set(cyclicalIdObject, { value: originalObject });
+
+		const isMatch = this.#cyclicalType.isMatch(null);
+		if (!isMatch) return false;
+		const id = createReferencedValueId(isMatch, originalPath);
+		if (saveReferences) {
+			this.#extractedCyclicalReferences.set(originalObject, {
+				valueId: cyclicalIdObject,
+				refId: id,
+			});
+		}
+		return { id, referencedId: cyclicalIdObject };
+	}
+
+	#replaceCyclicalReferences(
+		provided: unknown,
+		extracted: ReplacedReferencesOpaque,
+		cyclical: CyclicalReferences,
+		path: PropertyKey[],
+	) {
+		if (!this.#replaceCyclical) return null;
+		const cyclicalPath = cyclical.has(provided) && cyclical.get(provided);
+		if (cyclicalPath) {
+			return this.#createCyclicalMappedItem(
+				extracted,
+				path,
+				cyclicalPath,
+				provided,
+			);
+		}
+		const maintainedCyclicalPath =
+			this.#maintainReferences &&
+			this.#cyclicalReferences.has(provided) &&
+			this.#cyclicalReferences.get(provided);
+		if (maintainedCyclicalPath) {
+			return this.#createCyclicalMappedItem(
+				extracted,
+				path,
+				maintainedCyclicalPath,
+				provided,
+			);
+		}
+		// now set the current object for potential future reference
+		cyclical.set(provided, path);
+		if (this.#maintainReferences) {
+			this.#cyclicalReferences.set(provided, path);
+		}
+		return null;
+	}
+
+	#replaceRootCyclicalReferences(
+		provided: unknown,
+		extracted: ReplacedReferencesOpaque,
+	) {
+		// find the root-level cyclical references and replace them in the object
+		const isObjectOrArray = isPlainObject(provided) || Array.isArray(provided);
+		if (!isObjectOrArray) throw new TypeError("Expected object or array");
+		// find the extracted key with a .value property, extract the ID's path
+		// and then replace that path with a reference to the found ID
+		for (const [id, item] of extracted) {
+			const { prefixType, path } = extractReferenceValueIdParts(id);
+			if (prefixType !== this.#cyclicalPrefix) continue;
+			if (isPlainObject(item) && "value" in item) {
+				setProperty(provided, path, id);
+			}
+		}
+	}
+
 	#extract(
 		provided: unknown,
 		extracted: ReplacedReferencesOpaque = new Map(),
+		cyclical: CyclicalReferences = new Map(),
 		path: PropertyKey[] = [],
 	): [provided: unknown, extracted: ReplacedReferencesOpaque] {
+		const cyclicalPath = this.#replaceCyclicalReferences(
+			provided,
+			extracted,
+			cyclical,
+			path,
+		);
+		if (cyclicalPath) {
+			const { id, referencedId } = cyclicalPath;
+			extracted.set(id, { ref: referencedId });
+			return [id, extracted];
+		}
 		const depth = path.length;
 		const nextDepth = depth + 1;
 		const recursionAllowed = nextDepth < this.#recursiveDepth;
 		const recursionIntoArraysAllowed =
 			recursionAllowed && this.#recurseIntoArrays;
-		const replacedNew = this.#replaceReference(provided, path);
-		const replaced = replacedNew;
+		const replaced = this.#replaceReference(provided, path);
 		// first, try to replace the value directly
 		// (always allowed regardless of recursion depth)
 		if (replaced) {
@@ -129,16 +253,23 @@ export class EventExtractor {
 		} else if (Array.isArray(provided)) {
 			if (!recursionIntoArraysAllowed) return [provided, extracted];
 			const updatedProvided = provided.map((item, index) =>
-				this.#extract(item, extracted, [...path, index]).at(0),
+				this.#extract(item, extracted, cyclical, [...path, index]).at(0),
 			);
+			if (depth === 0) {
+				this.#replaceRootCyclicalReferences(updatedProvided, extracted);
+			}
 			return [updatedProvided, extracted];
 		} else if (isPlainObject(provided)) {
 			if (!recursionAllowed) return [provided, extracted];
 			const entries = Object.entries(provided).map(([key, item]) => [
 				key,
-				this.#extract(item, extracted, [...path, key]).at(0),
+				this.#extract(item, extracted, cyclical, [...path, key]).at(0),
 			]);
-			return [Object.fromEntries(entries), extracted];
+			const updatedProvided = Object.fromEntries(entries);
+			if (depth === 0) {
+				this.#replaceRootCyclicalReferences(updatedProvided, extracted);
+			}
+			return [updatedProvided, extracted];
 		}
 		return [provided, extracted];
 	}
@@ -147,11 +278,44 @@ export class EventExtractor {
 		return this.#extract(given) as [T, ReplacedReferences];
 	}
 
-	merge<T = unknown>(given: T, extracted: ReplacedReferences): T {
+	#addBackRootCyclicalReferences(
+		given: unknown,
+		extracted: ReplacedReferences,
+	) {
+		// find the root-level cyclical references and set those in the object
+		const isObjectOrArray = isPlainObject(given) || Array.isArray(given);
+		if (!isObjectOrArray) throw new TypeError("Expected object or array");
 		for (const [id, item] of extracted) {
-			const [_type, path] = id.split("-");
-			if (!path) return item as T; // when no path is provided, it is the root
-			const isObjectOrArray = isPlainObject(given) || Array.isArray(given);
+			const parts = extractReferenceValueIdParts(id as ReferencedValueId);
+			const { prefixType, path } = parts;
+			if (prefixType !== this.#cyclicalPrefix) continue;
+			if (isPlainObject(item) && "value" in item) {
+				setProperty(given, path, item.value);
+			}
+		}
+	}
+
+	merge<T = unknown>(given: T, extracted: ReplacedReferences): T {
+		const isObjectOrArray = isPlainObject(given) || Array.isArray(given);
+		// first, add back any root cyclical references
+		if (isObjectOrArray) this.#addBackRootCyclicalReferences(given, extracted);
+		// now add back extracted types, including references to root cyclical references
+		for (const [id, item] of extracted) {
+			const parts = extractReferenceValueIdParts(id as ReferencedValueId);
+			const { prefixType, path } = parts;
+			if (prefixType === this.#cyclicalPrefix) {
+				const itemIsObject = isPlainObject(item);
+				if (itemIsObject && "ref" in item) {
+					const ref = extracted.get(item.ref);
+					if (isObjectOrArray && isPlainObject(ref) && "value" in ref) {
+						setProperty(given, path, ref.value);
+					}
+				}
+				continue;
+			}
+			if (path.length === 0) {
+				return item as T; // when no path is provided, it is the root
+			}
 			if (isObjectOrArray)
 				setProperty(given as Record<PropertyKey, unknown>, path, item);
 		}
@@ -164,6 +328,8 @@ export class EventExtractor {
 		idPrefix: string,
 		isMatch: (given: unknown) => boolean,
 	): void {
+		if (idPrefix === this.#cyclicalPrefix)
+			throw new Error(`'${this.#cyclicalPrefix}' is a reserved prefix`);
 		const newSupportedType = new IdGenerator(idPrefix, isMatch);
 		this.#supportedTypes.push(newSupportedType);
 	}
@@ -171,6 +337,8 @@ export class EventExtractor {
 	destroy(): void {
 		this.#supportedTypes = [];
 		this.#extractedReferences.clear();
+		this.#cyclicalReferences.clear();
+		this.#extractedCyclicalReferences.clear();
 	}
 
 	[Symbol.dispose](): void {
@@ -195,14 +363,22 @@ export function createReferencedValueId(
 type ReferencedValueParts = {
 	prefix: EventId;
 	path: PropertyKey[];
+	prefixType: string;
+	prefixCount: number;
 };
 export function extractReferenceValueIdParts(
 	id: ReferencedValueId,
 ): ReferencedValueParts {
 	const [prefixGiven, pathPart] = id.split("-");
 	const prefix = castToEventId(prefixGiven);
+	const [_, prefixType, prefixCountString] =
+		prefix.match(/^([a-zA-Z]+)([0-9]+)$/) ?? [];
+	if (!prefixType || !prefixCountString) {
+		throw new TypeError(`Invalid ReferencedValueId: ${id}`);
+	}
+	const prefixCount = Number(prefixCountString);
 	const path = pathPart ? pathPart.split(".") : [];
-	return { prefix, path };
+	return { prefix, path, prefixType, prefixCount };
 }
 
 export type ReplacedReferences = Map<string, unknown>;
@@ -213,3 +389,9 @@ type RecursionDepthProvided = number | boolean;
 type RecursionOptions =
 	| RecursionDepthProvided
 	| { depth: RecursionDepthProvided; arrays?: boolean };
+
+type CyclicalReferences = Map<unknown, PropertyKey[]>;
+type ExtractedCyclicalReferencesOpaque = Map<
+	unknown,
+	{ valueId: ReferencedValueId; refId: ReferencedValueId }
+>;

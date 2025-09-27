@@ -1,7 +1,7 @@
 import { isPromise } from "es-toolkit";
 import { describe, expect, test } from "vitest";
 import { isIterator } from "../utils/is-iterable";
-import { EventExtractor } from ".";
+import { EventExtractor, extractReferenceValueIdParts } from ".";
 
 const recursionDepthDefault = 7;
 
@@ -159,6 +159,74 @@ describe("EventExtractor can merge extracted values back into original", () => {
 	});
 });
 
-describe.todo("EventExtractor can handle circular references", () => {
-	// ...
+describe("EventExtractor can handle cyclical references", () => {
+	test("can extract and replace cyclical references", () => {
+		using extractor = new EventExtractor(recursionDepthDefault, false, true);
+		const original = {
+			lorem: {
+				ipsum: "dolor",
+			},
+			reference: { ipsum: "to be replaced" },
+			another: [{ ipsum: "to be replaced" }],
+			and: {
+				one: {
+					more: { ipsum: "to be replaced" },
+					and: { ipsum: "stay the same" },
+				},
+			},
+		};
+		original.reference = original.lorem;
+		original.another[0] = original.reference;
+		original.and.one.more = original.another[0];
+		expect(original.lorem).toBe(original.reference);
+		expect(original.lorem).toBe(original.another[0]);
+		expect(original.lorem).toBe(original.and.one.more);
+		const [replaced, extracted] = extractor.extract(original);
+		expect(replaced).toEqual({
+			lorem: expect.stringMatching(/^c\d+-lorem$/),
+			reference: expect.stringMatching(/^c\d+-.*$/),
+			another: [expect.stringMatching(/^c\d+-.*$/)],
+			and: {
+				one: {
+					more: expect.stringMatching(/^c\d+-.*$/),
+					and: { ipsum: "stay the same" },
+				},
+			},
+		});
+		expect(extracted.size).toBe(4);
+		expect(replaced.lorem).toEqual(expect.stringMatching(/^c\d+-lorem$/));
+		// biome-ignore lint/suspicious/noExplicitAny: the value was replaced (but types aren't transformed)
+		const { prefix } = extractReferenceValueIdParts(replaced.reference as any);
+		const expectIdString = expect.stringMatching(new RegExp(`^${prefix}-.*$`));
+		expect(replaced.reference).toEqual(expectIdString);
+		expect(replaced.another[0]).toEqual(expectIdString);
+		expect(replaced.and.one.more).toEqual(expectIdString);
+	});
+
+	test("can merge cyclical references back into original and retain references", () => {
+		using extractor = new EventExtractor(recursionDepthDefault, false, true);
+		const original = {
+			lorem: {
+				ipsum: "dolor",
+			},
+			reference: { ipsum: "to be replaced" },
+			another: [{ ipsum: "to be replaced" }],
+			and: {
+				one: {
+					more: { ipsum: "to be replaced" },
+					and: { ipsum: "stay the same" },
+				},
+			},
+		};
+		original.reference = original.lorem;
+		original.another[0] = original.reference;
+		original.and.one.more = original.another[0];
+		const [replaced, extracted] = extractor.extract(original);
+		const merged = extractor.merge(replaced, extracted);
+		expect(merged).toEqual(original);
+		expect(merged.lorem).toBe(merged.reference);
+		expect(merged.lorem).toBe(merged.another[0]);
+		expect(merged.lorem).toBe(merged.and.one.more);
+		expect(merged.and.one.and).toEqual({ ipsum: "stay the same" });
+	});
 });
