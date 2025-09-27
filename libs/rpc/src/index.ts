@@ -1,4 +1,4 @@
-import { RpcEventEncoder } from "./rpc/event-encoder";
+import { EventExtractor } from "./event-extractor";
 import { RpcGenerator } from "./rpc-generator";
 import { type PartialSchema, RpcInterpreter } from "./rpc-interpreter";
 
@@ -11,12 +11,12 @@ class PrimRpc<Module = unknown> {
 			options.allowSchema,
 			options.allowMethodList,
 		);
-		const rpcEvents = new RpcEventEncoder(true, true, true);
+		const rpcEvents = new EventExtractor(true, true, true);
 		this.client = new RpcGenerator((stack, skip) => {
 			const rpc = stack.at(-1);
 			if (!rpc) return skip;
-			const [replacedRpc, extractedEvents] = rpcEvents.extract(rpc);
-			console.log(replacedRpc, extractedEvents);
+			const [replacedArgs, extractedArgEvents] = rpcEvents.extract(rpc.args);
+			console.log(replacedArgs, extractedArgEvents);
 			return skip;
 		});
 	}

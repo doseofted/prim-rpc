@@ -1,4 +1,5 @@
 import { createNanoEvents, type Unsubscribe } from "nanoevents";
+import type { PartialSchema } from "../rpc-interpreter";
 import type { RpcEvent, RpcEventId } from "../types/rpc-structure";
 
 class RpcType<
@@ -37,19 +38,17 @@ class RpcType<
 		});
 	}
 
-	#id: RpcEventId;
 	#providedObject = false;
 	#providedRpcQueue: Array<RpcEvent<EventNames>> = [];
 	/** Deconstruct an object into RPC events, to be provided with `.onRpc` */
 	provideObject(provided: ObjectType, id: RpcEventId): void {
-		this.#id = id;
 		if (this.#providedObject) throw new Error("Object already provided");
 		this.#providedObject = true;
 		this.#deconstructAction(
 			provided,
 			(rpc) => {
 				const rpcObject = {
-					id: this.#id,
+					id,
 					...rpc,
 				};
 				const eventsCount = this.#emitter.events.rpc?.length ?? 0;
@@ -110,6 +109,9 @@ type RpcTypeOptions<
 > = {
 	reconstruct: ReconstructCallback<ObjectType, Context, EventNames>;
 	deconstruct: DeconstructCallback<ObjectType, Context, EventNames>;
+	allowSchema: PartialSchema<ObjectType>;
+	// isType: (value: unknown) => value is ObjectType;
+	// idPrefix: string;
 };
 
 export type RpcTypeConstructor<

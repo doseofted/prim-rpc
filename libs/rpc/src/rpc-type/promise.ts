@@ -8,7 +8,11 @@ type Context = {
 type Events = "resolve" | "reject";
 
 export type RpcTypePromise = RpcTypeConstructor<Expected, Context, Events>;
-export const RpcTypePromise: RpcTypePromise = createRpcType({
+export const RpcTypePromise: RpcTypePromise = createRpcType<
+	Expected,
+	Context,
+	Events
+>({
 	reconstruct(rpc, emit, ctx) {
 		if (!ctx.promised) {
 			ctx.promised = new ReconstructedPromise();
@@ -28,5 +32,11 @@ export const RpcTypePromise: RpcTypePromise = createRpcType({
 		} catch (error) {
 			emit({ event: "reject", error });
 		}
+	},
+	allowSchema: {
+		// biome-ignore lint/suspicious/noThenProperty: it's not a function, this is fine
+		then: true,
+		catch: true,
+		finally: true,
 	},
 });

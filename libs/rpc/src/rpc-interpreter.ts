@@ -15,7 +15,7 @@ export class RpcInterpreter<T> {
 	#allowedSchema: unknown | undefined;
 	#allowedFunctionMethods: string[];
 	constructor(
-		providedModule: T,
+		providedModule?: T,
 		allowedSchema?: PartialSchema<T>,
 		allowedFunctionMethods?: string[],
 	) {
@@ -211,7 +211,8 @@ export class RpcInterpreterError extends Error {
 
 export type RecursiveRpcCheck = true | { [key: string]: RecursiveRpcCheck };
 export type PartialSchema<T> = PartialDeep<
-	Schema<T, RecursiveRpcCheck, { recurseIntoArrays: true }>
+	Schema<T, RecursiveRpcCheck, { recurseIntoArrays: true }>,
+	{ recurseIntoArrays: true; allowUndefinedInNonTupleArrays: false }
 >;
 
 const functionDenyList = [
