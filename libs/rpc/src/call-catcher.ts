@@ -82,9 +82,19 @@ export class CallCatcher<ObjectShape = any> {
 	 * interacting with the proxy and should only be set once for each instance.
 	 */
 	// biome-ignore lint/suspicious/noExplicitAny: this could be any result depending on provided stack
-	setInitialStack(stack: CaughtStack, replay = false): any {
+	setInitialStack(stack: CaughtStack, replay = false, root?: CallCatcher): any {
 		if (this.#proxyUtilized) {
 			throw new CallCatcherError(ReusableMessages.ProxyAlreadyUtilized);
+		}
+		if (root) {
+			this.#rootParent = root;
+		} else {
+			// get the last ID
+			const ids = stack.map((item) => item.id).sort((a, b) => (a < b ? -1 : 1));
+			const maxId = Number(ids.at(-1) ?? 0);
+			// and continue where we left off (if root isn't provided, these IDs will
+			// collide if the previous instance continues to be used)
+			this.#lastId = createCaughtId(maxId + 1);
 		}
 		this.#updateStack(stack, true);
 		if (replay) return this.#replayLast();

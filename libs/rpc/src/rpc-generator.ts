@@ -74,7 +74,9 @@ export class RpcGenerator<T> extends CallCatcher<T> {
 			if (!isModuleCall) return next;
 
 			const unknownAsync = new UnknownAsync();
-			unknownAsync.setInitialStack(stack);
+			// note: UnknownAsync and RpcGenerator use the same callback and must use
+			// the same root CallCatcher instance to continue generating unique IDs
+			unknownAsync.setInitialStack(stack, false, this);
 			unknownAsync.fallbackSet(callCondition);
 
 			const runHandler = async (stack: CaughtStack) => {

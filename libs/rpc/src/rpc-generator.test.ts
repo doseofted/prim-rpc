@@ -80,7 +80,7 @@ describe("RpcGenerator can handle function calls", () => {
 		);
 	});
 
-	test.todo("multiple calls on the root results in unique IDs", async () => {
+	test("multiple calls on the root results in unique IDs", async () => {
 		// biome-ignore lint/suspicious/noExplicitAny: demonstration
 		const client = new RpcGenerator<any>((rpc) => {
 			const caught = rpc.at(-1);
@@ -98,11 +98,9 @@ describe("RpcGenerator can handle function calls", () => {
 		) {
 			const stacks = await Promise.all(promised);
 			const ids = stacks.flatMap((stack) => {
-				console.log("stack", stack);
 				return stack.map((item) => item.id);
 			});
 			const idSet = new Set(ids);
-			console.log(ids, idSet);
 			return ids.length === idSet.size;
 		}
 		await expect(
