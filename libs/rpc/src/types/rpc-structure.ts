@@ -27,6 +27,8 @@ export type RpcFunctionCall<Args extends unknown[] = unknown[]> = {
 	chain?: RpcId | RpcEventId | null;
 	/** Values extracted from arguments, expected to be resolved in the future */
 	expect?: RpcEventId[];
+	/** Expected values that resolved prior to sending the RPC */
+	expected?: Record<RpcEventId, RpcEvent>;
 };
 
 /**
@@ -42,6 +44,8 @@ export type RpcFunctionResult<Result = unknown, Error = unknown> = {
 	error?: Error;
 	/** Values extracted from the result, expected to be resolved in the future */
 	expect?: RpcEventId[];
+	/** Expected values that resolved prior to sending the RPC result */
+	expected?: Record<RpcEventId, RpcEvent>;
 };
 
 const RpcEventIdSymbol: unique symbol = Symbol();
@@ -65,11 +69,13 @@ export type RpcEvent<
 	EventNames extends string = string,
 	Result = unknown,
 	Error = unknown,
-> = Omit<RpcFunctionResult<Result, Error>, "id" | "expect"> & {
+> = Omit<RpcFunctionResult<Result, Error>, "id" | "expect" | "expected"> & {
 	/** The event ID given from an RPC, its result, or another event contained */
 	id: RpcEventId;
 	/** The custom event name, defined by the given event type (its identifier) */
 	event?: EventNames;
 	/** Values extracted from the event */
 	expect?: RpcEventId[];
+	/** Expected values that resolved prior to sending the RPC event */
+	expected?: Record<RpcEventId, RpcEvent>;
 };

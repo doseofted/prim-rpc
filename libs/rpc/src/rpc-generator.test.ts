@@ -1,5 +1,6 @@
 import { describe, expect, test, vi } from "vitest";
 import { RpcGenerator } from "./rpc-generator";
+import type { RpcFunctionCall } from "./types/rpc-structure";
 
 describe("RpcGenerator can handle function calls", () => {
 	test("promises and iterators are resolved", async () => {
@@ -77,5 +78,78 @@ describe("RpcGenerator can handle function calls", () => {
 			}),
 			3,
 		);
+	});
+
+	test.todo("multiple calls on the root results in unique IDs", async () => {
+		// biome-ignore lint/suspicious/noExplicitAny: demonstration
+		const client = new RpcGenerator<any>((rpc) => {
+			const caught = rpc.at(-1);
+			const lastMethod = caught?.method.at(-1);
+			if (lastMethod === "ipsum") return rpc;
+		});
+
+		const chainPath1 = client.proxy.lorem();
+		const chainPath1Result = chainPath1.ipsum();
+		const chainPath2 = client.proxy.lorem();
+		const chainPath2Result = chainPath2.ipsum();
+
+		async function chainedIdsAreUnique(
+			...promised: Promise<RpcFunctionCall[]>[]
+		) {
+			const stacks = await Promise.all(promised);
+			const ids = stacks.flatMap((stack) => {
+				console.log("stack", stack);
+				return stack.map((item) => item.id);
+			});
+			const idSet = new Set(ids);
+			console.log(ids, idSet);
+			return ids.length === idSet.size;
+		}
+		await expect(
+			chainedIdsAreUnique(chainPath1Result, chainPath2Result),
+		).resolves.toBe(true);
+	});
+
+	test("can handle multiple calls on part of a chain", async () => {
+		// biome-ignore lint/suspicious/noExplicitAny: demonstration
+		const client = new RpcGenerator<any>((rpc) => {
+			const caught = rpc.at(-1);
+			const lastMethod = caught?.method.at(-1);
+			if (lastMethod === "ipsum") return rpc;
+			if (lastMethod === "bar") return rpc;
+		});
+
+		const partOfChain = client.proxy.functionCall();
+		const chainPath1 = partOfChain.lorem.ipsum();
+		const chainPath2 = partOfChain.foo.bar();
+
+		await expect(chainPath1).resolves.toEqual([
+			expect.objectContaining({
+				id: expect.any(String),
+				method: ["functionCall"],
+				args: [],
+				chain: null,
+			}),
+			expect.objectContaining({
+				id: expect.any(String),
+				method: ["lorem", "ipsum"],
+				args: [],
+				chain: expect.any(String),
+			}),
+		]);
+		await expect(chainPath2).resolves.toEqual([
+			expect.objectContaining({
+				id: expect.any(String),
+				method: ["functionCall"],
+				args: [],
+				chain: null,
+			}),
+			expect.objectContaining({
+				id: expect.any(String),
+				method: ["foo", "bar"],
+				args: [],
+				chain: expect.any(String),
+			}),
+		]);
 	});
 });

@@ -395,43 +395,40 @@ export class EventExtractor {
 		const isObjectOrArray = isPlainObject(given) || Array.isArray(given);
 		// first, add back any root cyclical references
 		if (isObjectOrArray) this.#addBackRootCyclicalReferences(given, extracted);
+		// Pre-compute the root object value to avoid searching in every iteration
+		let rootObjectValue = null;
+		for (const [rootId, rootItem] of extracted) {
+			const rootParts = extractReferenceValueIdParts(
+				rootId as ReferencedValueId,
+			);
+			const isCyclicalType = rootParts.prefixType === this.#cyclicalPrefix;
+			const referencesRoot = isCyclicalType && rootParts.path.length === 0;
+			const rootItemHasValue =
+				referencesRoot && isPlainObject(rootItem) && "value" in rootItem;
+			if (!rootItemHasValue) continue;
+			rootObjectValue = rootItem.value;
+			break;
+		}
 		// now add back extracted types, including references to root cyclical references
 		for (const [id, item] of extracted) {
 			const parts = extractReferenceValueIdParts(id as ReferencedValueId);
 			const { prefixType, path } = parts;
 			if (prefixType === this.#cyclicalPrefix) {
 				const itemIsObject = isPlainObject(item);
-				if (itemIsObject && "ref" in item) {
-					const ref = extracted.get(item.ref);
-					if (isObjectOrArray && isPlainObject(ref) && "value" in ref) {
-						// Check if this is a self-reference to the root object
-						// Find the root object entry (path length 0 with cyclical prefix)
-						let rootObjectValue = null;
-						for (const [rootId, rootItem] of extracted) {
-							const rootParts = extractReferenceValueIdParts(
-								rootId as ReferencedValueId,
-							);
-							if (
-								rootParts.prefixType === this.#cyclicalPrefix &&
-								rootParts.path.length === 0 &&
-								isPlainObject(rootItem) &&
-								"value" in rootItem
-							) {
-								rootObjectValue = rootItem.value;
-								break;
-							}
-						}
-						// If ref.value is the same as the root object, use given instead
-						const valueToSet =
-							ref.value === rootObjectValue ? given : ref.value;
-						setProperty(given, path, valueToSet);
-					}
-				}
+				const extractedRefFound = itemIsObject && "ref" in item;
+				if (!extractedRefFound) continue;
+				const ref = extracted.get(item.ref);
+				const refContainsValue =
+					isObjectOrArray && isPlainObject(ref) && "value" in ref;
+				if (!refContainsValue) continue;
+				// If ref.value is the same as the root object, use given instead
+				const valueToSet = ref.value === rootObjectValue ? given : ref.value;
+				setProperty(given, path, valueToSet);
 				continue;
 			}
-			if (path.length === 0) {
-				return item as T; // when no path is provided, it is the root
-			}
+			// when no path is provided, it is the root
+			if (path.length === 0) return item as T;
+			// when the path is provided, set the property on the given object
 			if (isObjectOrArray)
 				setProperty(given as Record<PropertyKey, unknown>, path, item);
 		}

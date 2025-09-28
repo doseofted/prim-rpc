@@ -43,6 +43,27 @@ export class RpcGenerator<T> extends CallCatcher<T> {
 			.filter((given) => given !== null);
 	}
 
+	/**
+	 * When a chain of RPCs are created (for example `proxy.lorem().ipsum()`),
+	 * each call has a unique ID. However, if we assign `const a = proxy.lorem()`,
+	 * call `a.ipsum()`, and then call `a.dolor()`, both `ipsum` and `dolor` are
+	 * part of the same chain and without this setting, would share the same root
+	 * ID. While this may not be an issue for this class, it could be an issue for
+	 * a class that extends or otherwise utilizes this class instance (especially
+	 * if an RPC is already sent and the resulting reference is lost, meaning the
+	 * root ID originally intended can't be utilized).
+	 *
+	 * With this option enabled, each RPC created from the root will still receive
+	 * new IDs (as they did previously) but RPCs created from a previous chain
+	 * that diverge will have new IDs generated from their previous IDs, instead
+	 * of sharing the same ID. This will allow a unique ID to be generated for
+	 * each chain while still being able to understand the original intention
+	 * (for example, we know that the function was called from a previous chain
+	 * and not the root, which could be useful).
+	 */
+	// todo: implement this logic
+	// #generateNewIdsOnChainSplit = false;
+
 	constructor(handler: MethodCallHandler) {
 		const callCondition: CallCondition = (next, stack) => {
 			const caught = stack.at(-1);
