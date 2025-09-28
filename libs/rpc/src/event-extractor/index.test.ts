@@ -303,4 +303,34 @@ describe("EventExtractor can handle cyclical references", () => {
 		expect(merged.editors[0].name).toBe("Author");
 		expect(() => JSON.stringify(merged)).toThrow();
 	});
+
+	test("can handle references across multiple provided objects", () => {
+		using extractor = new EventExtractor(recursionDepthDefault, true, true);
+		type Node = { value: string; next?: Node };
+		const sharedChild: Node = { value: "child" };
+		const original1: Node = { value: "parent1", next: sharedChild };
+		const original2: Node = { value: "parent2", next: sharedChild };
+		const [replaced1, extracted1] = extractor.extract(original1);
+		const [replaced2, extracted2] = extractor.extract(original2);
+		expect(replaced1).toEqual({
+			value: "parent1",
+			next: { value: "child" },
+		});
+		expect(replaced2).toEqual({
+			value: "parent2",
+			next: expect.stringMatching(/^c\d+-next$/),
+		});
+		expect(extracted1.size).toBe(0);
+		expect(extracted2.size).toBe(2);
+		const extractedKeys2 = Array.from(extracted2.keys());
+		expect(extractedKeys2.every((key) => key.startsWith("c"))).toBe(true);
+
+		const merged1 = extractor.merge(replaced1, extracted1);
+		const merged2 = extractor.merge(replaced2, extracted2);
+		expect(merged1.next).toBe(sharedChild);
+		expect(merged2.next).toBe(sharedChild);
+		expect(merged1.next).toBe(merged2.next);
+		expect(merged1.next?.value).toBe("child");
+		expect(merged2.next?.value).toBe("child");
+	});
 });

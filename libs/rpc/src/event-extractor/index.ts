@@ -135,9 +135,12 @@ export class EventExtractor {
 		/** Replace circular references with a placeholder (to be replaced later) */
 		const circularPlaceholder = this.#cyclicalPrefix;
 		// Replace visited objects with placeholder to break infinite loops
-		if (visited.has(provided)) return circularPlaceholder;
+		if (visited.has(provided)) {
+			return circularPlaceholder;
+		}
 		if (isPlainObject(provided)) {
 			visited.add(provided);
+			let placeholderNeeded = false;
 			const cleanEntries = Object.entries(provided).map(([key, value]) => {
 				// Only replace object/array values that are in the cyclical map
 				// Primitive values should never be in the cyclical map
@@ -145,6 +148,7 @@ export class EventExtractor {
 				const isObjectOrArray =
 					hasCyclical && (isPlainObject(value) || Array.isArray(value));
 				if (hasCyclical && isObjectOrArray) {
+					placeholderNeeded = true;
 					return [key, circularPlaceholder];
 				}
 				return [
@@ -153,21 +157,27 @@ export class EventExtractor {
 				];
 			});
 			visited.delete(provided);
-			const clean = Object.fromEntries(cleanEntries);
+			const clean = placeholderNeeded
+				? Object.fromEntries(cleanEntries)
+				: provided;
 			return clean;
 		}
 		if (Array.isArray(provided)) {
 			visited.add(provided);
+			let placeholderNeeded = false;
 			const clean = provided.map((item) => {
 				// Only replace object/array items that are in the cyclical map
 				const hasCyclical = cyclical.has(item);
 				const isObjectOrArray =
 					hasCyclical && (isPlainObject(item) || Array.isArray(item));
-				if (hasCyclical && isObjectOrArray) return circularPlaceholder;
+				if (hasCyclical && isObjectOrArray) {
+					placeholderNeeded = true;
+					return circularPlaceholder;
+				}
 				return this.#createCircularPlaceholders(item, cyclical, visited);
 			});
 			visited.delete(provided);
-			return clean;
+			return placeholderNeeded ? clean : provided;
 		}
 		// return all other types as-is
 		return provided;
@@ -316,20 +326,37 @@ export class EventExtractor {
 			return [replaced, extracted];
 		} else if (Array.isArray(provided)) {
 			if (!recursionIntoArraysAllowed) return [provided, extracted];
-			const updatedProvided = provided.map((item, index) =>
-				this.#extract(item, extracted, cyclical, [...path, index]).at(0),
-			);
+			let newEntryCount = 0;
+			const updatedProvided = provided.map((item, index) => {
+				const [entry, extractedPending] = this.#extract(
+					item,
+					extracted,
+					cyclical,
+					[...path, index],
+				);
+				newEntryCount += extractedPending.size;
+				return entry;
+			});
+			const updatedReturn = newEntryCount > 0 ? updatedProvided : provided;
 			if (depth === 0) {
 				this.#replaceRootCyclicalReferences(updatedProvided, extracted);
 			}
-			return [updatedProvided, extracted];
+			return [updatedReturn, extracted];
 		} else if (isPlainObject(provided)) {
 			if (!recursionAllowed) return [provided, extracted];
-			const entries = Object.entries(provided).map(([key, item]) => [
-				key,
-				this.#extract(item, extracted, cyclical, [...path, key]).at(0),
-			]);
-			const updatedProvided = Object.fromEntries(entries);
+			let newEntriesCount = 0;
+			const entries = Object.entries(provided).map(([key, item]) => {
+				const [entry, extractedPending] = this.#extract(
+					item,
+					extracted,
+					cyclical,
+					[...path, key],
+				);
+				newEntriesCount += extractedPending.size;
+				return [key, entry];
+			});
+			const updatedProvided =
+				newEntriesCount > 0 ? Object.fromEntries(entries) : provided;
 			if (depth === 0) {
 				this.#replaceRootCyclicalReferences(updatedProvided, extracted);
 			}
