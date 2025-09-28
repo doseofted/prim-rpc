@@ -1,6 +1,5 @@
 {
 	"name": "@doseofted/prim-monorepo",
-	"packageManager": "pnpm@10.15.0+sha512.486ebc259d3e999a4e8691ce03b5cac4a71cbeca39372a9b762cb500cfdf0873e2cb16abe3d951b1ee2cf012503f027b98b6584e4df22524e0c7450d9ec7aa7b",
 	"description": "Monorepo that houses Prim+RPC projects",
 	"type": "module",
 	"license": "UNLICENSED",
@@ -11,33 +10,16 @@
 		"url": "https://doseofted.me/"
 	},
 	"scripts": {
-		"start": "task"
+		"start": "task",
+		"task": "task",
+		"turbo": "turbo run",
+		"vitest": "vitest"
 	},
-	"dependencies": {
-		"@go-task/cli": "3.35.0",
-		"zx": "^7.2.4"
-	},
+	"packageManager": "pnpm@10.17.1+sha512.17c560fca4867ae9473a3899ad84a88334914f379be46d455cbf92e5cf4b39d34985d452d2583baf19967fa76cb5c17bc9e245529d0b98745721aa7200ecaf7a",
 	"devDependencies": {
-		"@changesets/cli": "^2.29.6",
-		"@types/eslint": "^8.56.12",
-		"@typescript-eslint/eslint-plugin": "^7.18.0",
-		"@typescript-eslint/parser": "^7.18.0",
-		"@vitest/ui": "^1.6.1",
-		"chokidar": "^3.5.3",
-		"eslint": "^8.57.1",
-		"eslint-config-prettier": "^9.1.2",
-		"jsdom": "^24.1.3",
-		"postcss": "^8.5.6",
-		"prettier": "^3.6.2",
-		"prettier-plugin-astro": "^0.13.0",
-		"semver": "^7.7.2",
-		"stylelint": "^16.23.1",
-		"stylelint-config-recommended": "^14.0.1",
-		"tsup": "^8.5.0",
-		"turbo": "^2.5.6",
-		"typedoc": "0.25.9",
-		"typescript": "5.3.3",
-		"vite": "^5.4.19",
-		"vitest": "^1.6.1"
+		"@biomejs/biome": "^2.2.4",
+		"@go-task/cli": "^3.45.4",
+		"turbo": "^2.5.8",
+		"vitest": "^3.2.4"
 	}
 }

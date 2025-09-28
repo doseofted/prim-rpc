@@ -1,7 +1,12 @@
 {
 	"compilerOptions": {
-		"lib": ["DOM", "DOM.Iterable", "ESNext"]
-	},
-	"extends": "../../tsconfig.json",
-	"include": ["src/**/*"]
+		"lib": ["ES2023"],
+		"target": "ES2023",
+		"module": "preserve",
+		"noEmit": true,
+		"isolatedDeclarations": true,
+		"isolatedModules": true,
+		"verbatimModuleSyntax": true,
+		"strictNullChecks": true
+	}
 }

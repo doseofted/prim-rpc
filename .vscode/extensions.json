@@ -1,0 +1,13 @@
+{
+	"recommendations": [
+		"redhat.vscode-yaml",
+		"TypeScriptTeam.native-preview",
+		"biomejs.biome",
+		"streetsidesoftware.code-spell-checker",
+		"vitest.explorer"
+	],
+	"unwantedRecommendations": [
+		"dbaeumer.vscode-eslint",
+		"esbenp.prettier-vscode"
+	]
+}

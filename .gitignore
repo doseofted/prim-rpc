@@ -1,27 +1,5 @@
-# Don't commit mounted volumes from Docker Compose
-/data/*
-# Keep an empty folder when needed
-!**/.gitkeep
-# Don't commit envionment but keep an example for reference
-.env
-.env.*
-!.env.example
-# Logs don't need to be committed
-*.log
-# Don't need to commit Mac-specific settings
+node_modules/
+dist/
+.turbo/
+.task/
 .DS_Store
-# Don't need Windows-specific cache either
-Thumbs.db
-[Dd]esktop.ini
-# Node modules are reinstalled on each client (and huge, don't commit)
-node_modules
-# TurboRepo cache doesn't need to be committed
-.turbo
-# Don't commit Checksums used by Taskfile when fingerprinting files
-.task/*
-# Don't need to commit JavaScript-specific, built, distributable files
-dist
-# The .pnpm-store folder is usually in a system-specific location but just in case:
-.pnpm-store
-# The API docs are generated with TypeDoc on each build are don't need to be commited to repo
-**/docs/api.json
