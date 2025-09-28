@@ -120,16 +120,65 @@ export class EventExtractor {
 		this.#cyclicalPrefix,
 		() => true,
 	);
-	// todo: it may not make sense to track all references unless the original reference
-	// is also extracted (since the path would reference an object that wasn't extracted)
 	#cyclicalReferences: CyclicalReferences = new Map();
 	#extractedCyclicalReferences: ExtractedCyclicalReferencesOpaque = new Map();
+
+	/**
+	 * Recursively creates a clean copy of an object, replacing any references
+	 * to objects in the cyclical map with placeholder values.
+	 */
+	#createCircularPlaceholders(
+		provided: unknown,
+		cyclical: CyclicalReferences,
+		visited: Set<unknown> = new Set(),
+	): unknown {
+		/** Replace circular references with a placeholder (to be replaced later) */
+		const circularPlaceholder = this.#cyclicalPrefix;
+		// Replace visited objects with placeholder to break infinite loops
+		if (visited.has(provided)) return circularPlaceholder;
+		if (isPlainObject(provided)) {
+			visited.add(provided);
+			const cleanEntries = Object.entries(provided).map(([key, value]) => {
+				// Only replace object/array values that are in the cyclical map
+				// Primitive values should never be in the cyclical map
+				const hasCyclical = cyclical.has(value);
+				const isObjectOrArray =
+					hasCyclical && (isPlainObject(value) || Array.isArray(value));
+				if (hasCyclical && isObjectOrArray) {
+					return [key, circularPlaceholder];
+				}
+				return [
+					key,
+					this.#createCircularPlaceholders(value, cyclical, visited),
+				];
+			});
+			visited.delete(provided);
+			const clean = Object.fromEntries(cleanEntries);
+			return clean;
+		}
+		if (Array.isArray(provided)) {
+			visited.add(provided);
+			const clean = provided.map((item) => {
+				// Only replace object/array items that are in the cyclical map
+				const hasCyclical = cyclical.has(item);
+				const isObjectOrArray =
+					hasCyclical && (isPlainObject(item) || Array.isArray(item));
+				if (hasCyclical && isObjectOrArray) return circularPlaceholder;
+				return this.#createCircularPlaceholders(item, cyclical, visited);
+			});
+			visited.delete(provided);
+			return clean;
+		}
+		// return all other types as-is
+		return provided;
+	}
 
 	#createCyclicalMappedItem(
 		extracted: ReplacedReferencesOpaque,
 		originalPath: PropertyKey[],
 		referencedPath: PropertyKey[],
-		originalObject?: unknown,
+		originalObject: unknown,
+		cyclical: CyclicalReferences,
 	): { id: ReferencedValueId; referencedId: ReferencedValueId } | false {
 		const saveReferences = this.#replaceCyclical;
 		const savedCyclicalReference =
@@ -154,7 +203,12 @@ export class EventExtractor {
 			cyclicalReferenceOriginal,
 			referencedPath,
 		);
-		extracted.set(cyclicalIdObject, { value: originalObject });
+		// Remove circular references that will get recreated on merge
+		const extractedValue = this.#createCircularPlaceholders(
+			originalObject,
+			cyclical,
+		);
+		extracted.set(cyclicalIdObject, { value: extractedValue });
 
 		const isMatch = this.#cyclicalType.isMatch(null);
 		if (!isMatch) return false;
@@ -182,6 +236,7 @@ export class EventExtractor {
 				path,
 				cyclicalPath,
 				provided,
+				cyclical,
 			);
 		}
 		const maintainedCyclicalPath =
@@ -194,6 +249,7 @@ export class EventExtractor {
 				path,
 				maintainedCyclicalPath,
 				provided,
+				cyclical,
 			);
 		}
 		// now set the current object for potential future reference
@@ -204,6 +260,14 @@ export class EventExtractor {
 		return null;
 	}
 
+	/**
+	 * As a final step, after all extraction is complete, replace any root-level
+	 * cyclical references with IDs referencing the path of the referenced value.
+	 *
+	 * This needs to happen after extracting values since the referenced value
+	 * was already iterated on (and it wasn't known that was an original reference
+	 * until the reference to it was found).
+	 */
 	#replaceRootCyclicalReferences(
 		provided: unknown,
 		extracted: ReplacedReferencesOpaque,
@@ -278,6 +342,11 @@ export class EventExtractor {
 		return this.#extract(given) as [T, ReplacedReferences];
 	}
 
+	/**
+	 * Before adding back merged properties or adding back cyclical references,
+	 * add back the objects to which references point first, so that references
+	 * are created as expected in the final object.
+	 */
 	#addBackRootCyclicalReferences(
 		given: unknown,
 		extracted: ReplacedReferences,
@@ -308,7 +377,27 @@ export class EventExtractor {
 				if (itemIsObject && "ref" in item) {
 					const ref = extracted.get(item.ref);
 					if (isObjectOrArray && isPlainObject(ref) && "value" in ref) {
-						setProperty(given, path, ref.value);
+						// Check if this is a self-reference to the root object
+						// Find the root object entry (path length 0 with cyclical prefix)
+						let rootObjectValue = null;
+						for (const [rootId, rootItem] of extracted) {
+							const rootParts = extractReferenceValueIdParts(
+								rootId as ReferencedValueId,
+							);
+							if (
+								rootParts.prefixType === this.#cyclicalPrefix &&
+								rootParts.path.length === 0 &&
+								isPlainObject(rootItem) &&
+								"value" in rootItem
+							) {
+								rootObjectValue = rootItem.value;
+								break;
+							}
+						}
+						// If ref.value is the same as the root object, use given instead
+						const valueToSet =
+							ref.value === rootObjectValue ? given : ref.value;
+						setProperty(given, path, valueToSet);
 					}
 				}
 				continue;

@@ -229,4 +229,78 @@ describe("EventExtractor can handle cyclical references", () => {
 		expect(merged.lorem).toBe(merged.and.one.more);
 		expect(merged.and.one.and).toEqual({ ipsum: "stay the same" });
 	});
+
+	test("can handle self reference", () => {
+		using extractor = new EventExtractor(recursionDepthDefault, false, true);
+		type SelfReferencing = { self?: SelfReferencing };
+		const original: SelfReferencing = {
+			self: undefined,
+		};
+		original.self = original;
+		const [replaced, extracted] = extractor.extract(original);
+
+		expect(replaced).toEqual({
+			self: expect.stringMatching(/^c\d+-self$/),
+		});
+		expect(extracted.size).toBe(2);
+		const extractedKeys = Array.from(extracted.keys());
+		expect(extractedKeys.every((key) => key.startsWith("c"))).toBe(true);
+		// Check that one of the extracted items is the original object
+		expect(() =>
+			Array.from(extracted.values()).every((value) => JSON.stringify(value)),
+		).not.toThrow();
+		const merged = extractor.merge(replaced, extracted);
+		expect(merged.self).toBe(merged);
+	});
+
+	test("can handle circular references to parent objects", () => {
+		using extractor = new EventExtractor(recursionDepthDefault, false, true);
+		type Book = { title: string; editors: Editor[] };
+		type Editor = { name: string; books: Book[] };
+		type Library = { books: Book[]; editors: Editor[] };
+		const original: Library = {
+			books: [
+				{
+					title: "Book",
+					editors: [
+						{
+							name: "Author (replaced)",
+							books: [],
+						},
+					],
+				},
+			],
+			editors: [
+				{
+					name: "Author",
+					books: [
+						{
+							title: "Book (replaced)",
+							editors: [],
+						},
+					],
+				},
+			],
+		};
+		original.books[0].editors[0] = original.editors[0];
+		original.editors[0].books[0] = original.books[0];
+		const [replaced, extracted] = extractor.extract(original);
+
+		expect(extracted.size).toBe(4);
+		expect(() => JSON.stringify(replaced)).not.toThrow();
+		const extractedKeys = Array.from(extracted.keys());
+		expect(extractedKeys.every((key) => key.startsWith("c"))).toBe(true);
+		expect(() =>
+			Array.from(extracted.values()).every((value) => JSON.stringify(value)),
+		).not.toThrow();
+
+		const merged = extractor.merge(replaced, extracted);
+		expect(merged.books[0].editors[0]).toBe(merged.editors[0]);
+		expect(merged.editors[0].books[0]).toBe(merged.books[0]);
+		expect(merged.books[0].editors[0].books[0]).toBe(merged.books[0]);
+		expect(merged.editors[0].books[0].editors[0]).toBe(merged.editors[0]);
+		expect(merged.books[0].title).toBe("Book");
+		expect(merged.editors[0].name).toBe("Author");
+		expect(() => JSON.stringify(merged)).toThrow();
+	});
 });
