@@ -3,8 +3,14 @@ import type { CaughtId } from "../call-catcher";
 
 const RpcIdSymbol: unique symbol = Symbol();
 export type RpcId = Opaque<string, typeof RpcIdSymbol>;
-export function createRpcId(id: CaughtId): RpcId {
-	return castToOpaque<RpcId>(id.toString());
+export function createRpcId(id: CaughtId, inc = 0): RpcId {
+	return castToOpaque<RpcId>([id.toString(), inc].join("."));
+}
+export type RpcIdParts = { base: string; inc: number };
+export function extractRpcIdParts(rpcId: RpcId): RpcIdParts {
+	const [base, incBase] = rpcId.toString().split(".");
+	const inc = parseInt(incBase, 10) || 0;
+	return { base, inc };
 }
 
 /**

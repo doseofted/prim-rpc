@@ -3,10 +3,15 @@ import {
 	CallCatcher,
 	type CallCondition,
 	CaughtCallType,
+	type CaughtId,
 	type CaughtStack,
 	CaughtType,
 } from "./call-catcher";
-import { createRpcId, type RpcFunctionCall } from "./types/rpc-structure";
+import {
+	createRpcId,
+	type RpcFunctionCall,
+	type RpcId,
+} from "./types/rpc-structure";
 import { UnknownAsync } from "./unknown-async";
 import { isIterator } from "./utils/is-iterable";
 
@@ -28,16 +33,26 @@ import { isIterator } from "./utils/is-iterable";
 export class RpcGenerator<T> extends CallCatcher<T> {
 	#handler: MethodCallHandler;
 
+	#createNewRpcId(id: CaughtId, chain = false): RpcId {
+		const originalRpcId = createRpcId(id);
+		let inc = this.#utilizedIds.has(originalRpcId)
+			? (this.#utilizedIds.get(originalRpcId) ?? 0)
+			: 0;
+		inc += chain ? 0 : !this.#reuseChainIdentifiers ? 1 : 0;
+		this.#utilizedIds.set(originalRpcId, inc);
+		return createRpcId(id, inc);
+	}
+
 	#convertStackToRpc(stack: CaughtStack): RpcFunctionCall[] {
 		return stack // NOTE: at this point, all properties should've become calls
 			.map((caught) => {
 				if (caught.type !== CaughtType.Call) return null;
 				return {
-					id: createRpcId(caught.id),
+					id: this.#createNewRpcId(caught.id),
 					method: caught.path.map((part) => part.toString()),
 					new: caught.callMethod === CaughtCallType.Constructor,
 					args: caught.args,
-					chain: caught.chain ? createRpcId(caught.chain) : null,
+					chain: caught.chain ? this.#createNewRpcId(caught.chain, true) : null,
 				};
 			})
 			.filter((given) => given !== null);
@@ -61,8 +76,13 @@ export class RpcGenerator<T> extends CallCatcher<T> {
 	 * (for example, we know that the function was called from a previous chain
 	 * and not the root, which could be useful).
 	 */
-	// todo: implement this logic
-	// #generateNewIdsOnChainSplit = false;
+	// todo: only generate new IDs for duplicate calls when this is true
+	#reuseChainIdentifiers = false;
+
+	// todo: add option to only call handler when promise is resolved (potential config option for RPC client)
+	// todo: add ability to throw error if same function is called twice (potential config option for RPC client)
+
+	#utilizedIds = new Map<RpcId, number>();
 
 	constructor(handler: MethodCallHandler) {
 		const callCondition: CallCondition = (next, stack) => {
@@ -83,6 +103,7 @@ export class RpcGenerator<T> extends CallCatcher<T> {
 				try {
 					const skip = Symbol();
 					const rpc = this.#convertStackToRpc(stack);
+					console.log(rpc);
 					const value = await this.#handler(rpc, skip);
 					if (skip === value) {
 						return unknownAsync.giveNothing();

@@ -121,6 +121,14 @@ describe("RpcGenerator can handle function calls", () => {
 		const chainPath1 = partOfChain.lorem.ipsum();
 		const chainPath2 = partOfChain.foo.bar();
 
+		// const arg = { test: 1 };
+		// const test = partOfChain.test(arg).ipsum;
+		// const result1 = JSON.stringify(await test(), null, 2);
+		// arg.test = 2;
+		// const result2 = JSON.stringify(await test(), null, 2);
+		// console.log(result1, result2);
+		// console.log(await chainPath1, await chainPath2);
+
 		await expect(chainPath1).resolves.toEqual([
 			expect.objectContaining({
 				id: expect.any(String),
