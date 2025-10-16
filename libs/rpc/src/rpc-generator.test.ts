@@ -166,30 +166,74 @@ describe("RpcGenerator generates expected IDs based on its configuration", () =>
 		const client = new RpcGenerator<any>((rpc) => {
 			const caught = rpc.at(-1);
 			const lastMethod = caught?.method.at(-1);
-			if (lastMethod === "ipsum") return rpc;
-			if (lastMethod === "bar") return rpc;
+			if (lastMethod === "end") return rpc;
 		});
-
-		const a = client.proxy.test();
-		client.endChainOrPartOfChain(["1.0" as RpcId]);
-		console.log("After ending chain 1.0");
-		a.what();
-		client.endChainOrPartOfChain(["1.1" as RpcId]);
-		console.log("After ending chain 1.1");
-		const b = a.what();
-		b.coolio();
-		const c = b.coolio();
-		client.endChainOrPartOfChain(["5.0" as RpcId]);
-		console.log("After ending chain 5.0");
-		c.test();
-		client.endChainOrPartOfChain(["9.0" as RpcId]);
-		console.log("After ending chain 9.0");
-		c.test();
-
-		const d = client.proxy.test().dose().it();
-		d.work();
-		client.endChainOrPartOfChain(["15.0" as RpcId]);
-		console.log("After ending chain 15.0");
-		d.work();
+		const chain1 = client.proxy.test();
+		// awaiting `.end()` is the same as calling `.then()` which increments by 2
+		// so `.end()` will get an ID of "3.0" and `.then()` will then an ID "5.0"
+		const end1 = await chain1.end();
+		expect(end1).toEqual([
+			{ id: "1.0", method: ["test"], new: false, args: [], chain: null },
+			// increment by 2 due to property access (+1) followed by method call (+1)
+			{ id: "3.0", method: ["end"], new: false, args: [], chain: "1.0" },
+		]);
+		// we can no longer chain calls from "1.0"
+		client.endChain("1.0" as RpcId);
+		// again we have awaited a promise so the next ID after calling `.end()`
+		// will be "11.0" because "9.0" was used to call the promise `.then()`
+		const end2 = await chain1.end();
+		// the next available ID after incrementing by 2 is "7.0" because we
+		// awaited the promise from `.end()` which used "5.0"
+		expect(end2).toEqual([
+			// "1.0" is no longer available so we increment the ID to "1.1"
+			{ id: "1.1", method: ["test"], new: false, args: [], chain: null },
+			// we skip "5.0" because it was used to call previous promise `.then()`
+			{ id: "7.0", method: ["end"], new: false, args: [], chain: "1.1" },
+		]);
+		const chainSplit = chain1.what();
+		// we await this call so "15.0" will not be available for next explicit
+		// method call
+		const end3 = await chainSplit.end();
+		expect(end3).toEqual([
+			// we can keep using the same chain ID as last time
+			{ id: "1.1", method: ["test"], new: false, args: [], chain: null },
+			// we skip "9.0" because it was used to call previous promise `.then()`
+			{ id: "11.0", method: ["what"], new: false, args: [], chain: "1.1" },
+			// the end method increments by 2 again (and "15.0") is used with previous
+			// await keyword (a `.then()` method call) so the next ID will be "17.0"
+			{ id: "13.0", method: ["end"], new: false, args: [], chain: "11.0" },
+		]);
+		// we can no longer chain calls from "1.1"
+		client.endChain(["1.1" as RpcId]);
+		// "19.0" will be unavailable due to awaiting promise (calling `.then()`)
+		const end4 = await chainSplit.end();
+		expect(end4).toEqual([
+			// the previous ID "1.1" ended so we increment to "1.2"
+			{ id: "1.2", method: ["test"], new: false, args: [], chain: null },
+			// "11.0" came after the ended ID "1.1" so it must also be incremented
+			// (this was already called, so we increment instead of creating new ID)
+			{ id: "11.1", method: ["what"], new: false, args: [], chain: "1.2" },
+			// the end method increments by 2 again (and "15.0" is used with previous
+			// await keyword) so incrementing will result in "17.0"
+			// (this is a new ID since we called a new method on the chain)
+			{ id: "17.0", method: ["end"], new: false, args: [], chain: "11.1" },
+		]);
+		const chainSplit2 = chainSplit.lorem().ipsum();
+		client.endChain(["11.1" as RpcId]);
+		const end5 = await chainSplit2.end();
+		expect(end5).toEqual([
+			// the previous ID "1.2" is still valid because we ended a chain after it
+			{ id: "1.2", method: ["test"], new: false, args: [], chain: null },
+			// "11.1" is no longer valid so we increment to "11.2"
+			{ id: "11.2", method: ["what"], new: false, args: [], chain: "1.2" },
+			// we called `.lorem()` prior to ending the chain so its ID will be
+			// incremented to "21.1" (instead of "21.0")
+			{ id: "21.1", method: ["lorem"], new: false, args: [], chain: "11.2" },
+			// similar to above, we increment to "23.1" instead of "23.0"
+			{ id: "23.1", method: ["ipsum"], new: false, args: [], chain: "21.1" },
+			// The `.end()` method is called after ending the chain and is a new
+			// method call so it gets a new ID of "25.0"
+			{ id: "25.0", method: ["end"], new: false, args: [], chain: "23.1" },
+		]);
 	});
 });

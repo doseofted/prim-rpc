@@ -34,14 +34,6 @@ export class RpcGenerator<T> extends CallCatcher<T> {
 	#handler: MethodCallHandler;
 
 	/**
-	 * Recorded chain of method calls represented by a merged list of IDs that
-	 * points to the original IDs in that chain. If one of these IDs in the chain
-	 * is added to `#endedIds`, anything after it in the chain also becomes
-	 * invalid and must have an ID regenerated.
-	 */
-	#chainedIdSequences = new Map<string, RpcId[]>();
-
-	/**
 	 * Recorded IDs that have been utilized in an RPC call. Once recorded, the ID
 	 * can no longer be used for new method calls (a variant must be used instead)
 	 * but it can be used while extending chains with new method calls, up until
@@ -60,33 +52,6 @@ export class RpcGenerator<T> extends CallCatcher<T> {
 	 */
 	#endedIds = new Set<RpcId>();
 
-	#createChainIdentifier(chainIds: RpcId[]) {
-		return chainIds.join("/");
-	}
-
-	/**
-	 * If a remote host no longer has access to a specific result (for example,
-	 * the connection is closed), this method should be called with all relevant
-	 * IDs that were utilized in that connection.
-	 *
-	 * This only needs to be called if there is no automatic method to determine
-	 * when an ID should be discarded. If new RPC IDs can only be used once, for
-	 * example, then this method is not necessary.
-	 */
-	endChainOrPartOfChain(chainIds: RpcId[]) {
-		// const chainId = this.#createChainIdentifier(chainIds);
-		// this.#chainedIdSequences.delete(chainId);
-		for (const [i] of chainIds.entries()) {
-			// look for all possible chains that could be affected
-			const chainId = this.#createChainIdentifier(chainIds.slice(0, i + 1));
-			this.#chainedIdSequences.delete(chainId);
-		}
-		for (const id of chainIds) {
-			this.#endedIds.add(id);
-			// this.#openedIds.delete(id);
-		}
-	}
-
 	/**
 	 * Get the current RPC ID for a caught ID without incrementing.
 	 * Returns the most recent version of this ID.
@@ -100,93 +65,73 @@ export class RpcGenerator<T> extends CallCatcher<T> {
 	/**
 	 * Create a new RPC ID, optionally incrementing if needed.
 	 * @param id The caught ID to convert
-	 * @param shouldIncrement Whether to increment the ID (e.g., for new calls or ended IDs)
-	 * @param trackAsOpened Whether to track this ID for future increments
+	 * @param incrementAndTrack Whether to increment the ID (e.g., for new calls or ended IDs)
+	 * @param trackNew Whether to track this ID for future increments
 	 */
 	#createNewRpcId(
 		id: CaughtId,
-		shouldIncrement: boolean,
-		trackAsOpened: boolean,
+		incrementAndTrack: boolean,
+		trackNew: boolean,
 	): RpcId {
 		const baseId = createRpcId(id);
-		const currentInc = this.#openedIds.get(baseId) ?? 0;
-		const currentRpcId = createRpcId(id, currentInc);
-		const hasEnded = this.#endedIds.has(currentRpcId);
+		const currentIncrementValue = this.#openedIds.get(baseId) ?? 0;
+		const currentRpcId = createRpcId(id, currentIncrementValue);
+		const idEnded = this.#endedIds.has(currentRpcId);
+		const needsIncrement = incrementAndTrack || idEnded;
+		const incrementAmount = needsIncrement ? 1 : 0;
+		const newIncrementValue = currentIncrementValue + incrementAmount;
+		const newOpenId = !this.#openedIds.has(baseId);
+		const trackNewId = trackNew && newOpenId;
+		if (needsIncrement || trackNewId)
+			this.#openedIds.set(baseId, newIncrementValue);
+		return createRpcId(id, newIncrementValue);
+	}
 
-		// Increment if requested OR if current version has ended
-		const needsIncrement = shouldIncrement || hasEnded;
-		const newInc = needsIncrement ? currentInc + 1 : currentInc;
-
-		// Update tracking when incrementing OR when tracking a new final ID
-		if (needsIncrement) {
-			this.#openedIds.set(baseId, newInc);
-		} else if (trackAsOpened && !this.#openedIds.has(baseId)) {
-			// First time tracking this ID without incrementing
-			this.#openedIds.set(baseId, newInc);
-		}
-
-		return createRpcId(id, newInc);
+	/**
+	 * If a remote host no longer has access to a specific result (for example,
+	 * the connection is closed), this method should be called with all relevant
+	 * IDs that were utilized in that connection. This may either reference an
+	 * entire chain from beginning to end, or start at any point in an existing
+	 * chain and continue to the end of the chain.
+	 *
+	 * This only needs to be called if there is no automatic method to determine
+	 * when an ID should be discarded. If new RPC IDs can only be used once, for
+	 * example, then this method is not necessary.
+	 */
+	endChain(chainIds: RpcId | RpcId[]) {
+		const chainIdList = Array.isArray(chainIds) ? chainIds : [chainIds];
+		for (const id of chainIdList) this.#endedIds.add(id);
 	}
 
 	#startOrUpdateChain(unprocessedChain: CaughtId[]): RpcId[] {
-		// Check each ID to see if any have ended
-		const results: RpcId[] = [];
-		let regenerateFromIndex = -1;
-
-		for (let i = 0; i < unprocessedChain.length; i++) {
-			const id = unprocessedChain[i];
-			const currentRpcId = this.#getCurrentRpcId(id);
-
-			if (this.#endedIds.has(currentRpcId)) {
-				regenerateFromIndex = i;
-				break;
-			}
-			results.push(currentRpcId);
-		}
-
-		if (regenerateFromIndex !== -1) {
-			// Regenerate IDs from the ended one onwards
+		const currentRpcIds = unprocessedChain.map((id) =>
+			this.#getCurrentRpcId(id),
+		);
+		const regenerateFrom = currentRpcIds.findIndex((id) =>
+			this.#endedIds.has(id),
+		);
+		const regenerationNeeded = regenerateFrom !== -1;
+		const okayIds = !regenerationNeeded
+			? currentRpcIds
+			: currentRpcIds.slice(0, regenerateFrom);
+		if (regenerationNeeded) {
 			// IDs that were previously used need incrementing, new IDs start fresh
 			const newIds = unprocessedChain
-				.slice(regenerateFromIndex)
-				.map((id, i, arr) => {
-					const isFirst = i === 0;
-					const isLast = i === arr.length - 1;
+				.slice(regenerateFrom)
+				.map((id, index, chain) => {
+					const isFirst = index === 0;
+					const isLast = index === chain.length - 1;
 					const baseId = createRpcId(id);
 					const wasUsed = this.#openedIds.has(baseId);
-					// Increment if: first (ended) OR was previously used in this chain
 					const shouldIncrement = isFirst || wasUsed;
 					return this.#createNewRpcId(id, shouldIncrement, isLast);
 				});
-			return [...results, ...newIds];
+			return [...okayIds, ...newIds];
 		}
-
-		// No ended IDs - reuse existing IDs, only track the last one
-		return unprocessedChain.map((id, i, arr) => {
-			const isLast = i === arr.length - 1;
+		return unprocessedChain.map((id, index, chain) => {
+			const isLast = index === chain.length - 1;
 			return this.#createNewRpcId(id, false, isLast);
 		});
-
-		// const chainSeenBefore = this.#createChainIdentifier(chainIds);
-		// const newId = chainIds.pop();
-		// const existingChainId = this.#createChainIdentifier(chainIds);
-		// const existingChain = this.#chainedIdSequences.get(existingChainId) ?? [];
-		// const endedIndex = existingChain.findIndex((id) => this.#endedIds.has(id));
-		// const existingChainIncludesEnded = endedIndex !== -1
-		// if (existingChainIncludesEnded) {
-		// 	const endedIds = existingChain.slice(endedIndex);
-		// 	const okayIds = existingChain.slice(0, endedIndex);
-		// 	const newIds = unprocessedChain
-		// 		.slice(endedIndex)
-		// 		.map((id) => this.#createNewRpcId(id));
-		// 	this.endChainOrPartOfChain(endedIds);
-		// 	return [...okayIds, ...newIds];
-		// }
-		// const existingChainExists = existingChain.length > 0
-		// if (existingChainExists) {
-		// 	const newId = this.#createNewRpcId()
-		// 	const updatedChain = [...existingChain, ];
-		// }
 	}
 
 	#convertStackToRpc(stack: CaughtStack): RpcFunctionCall[] {
@@ -196,8 +141,8 @@ export class RpcGenerator<T> extends CallCatcher<T> {
 		for (let i = 0; i < stack.length; i++) {
 			idMap.set(stack[i].id, newIds[i]);
 		}
-
-		return stack // NOTE: at this point, all properties should've become calls
+		// at this point, all properties should've become calls
+		return stack
 			.map((caught, index) => {
 				if (caught.type !== CaughtType.Call) return null;
 				// Use the mapped chain ID instead of regenerating from caught.chain
@@ -216,11 +161,6 @@ export class RpcGenerator<T> extends CallCatcher<T> {
 	// todo: add option to only call handler when promise is resolved (potential config option for RPC client)
 	// todo: add ability to throw error if same function is called twice (potential config option for RPC client)
 
-	// IDEA: instead of always incrementing RPC IDs when calls they're called multiple times,
-	// instead only duplicate once an event is received that the connection has been terminated
-	// for that ID (and after that point, any call after that in the chain will either
-	// require a new ID or will result in an error, because it can't be used anymore)
-
 	constructor(handler: MethodCallHandler) {
 		const callCondition: CallCondition = (next, stack) => {
 			const caught = stack.at(-1);
@@ -229,13 +169,11 @@ export class RpcGenerator<T> extends CallCatcher<T> {
 			const asyncMethod = UnknownAsync.determineCaughtType(caught);
 			const isModuleCall = funcCall && !asyncMethod;
 			if (!isModuleCall) return next;
-
 			const unknownAsync = new UnknownAsync();
 			// note: UnknownAsync and RpcGenerator use the same callback and must use
 			// the same root CallCatcher instance to continue generating unique IDs
 			unknownAsync.setInitialStack(stack, false, this);
 			unknownAsync.fallbackSet(callCondition);
-
 			const runHandler = async (stack: CaughtStack) => {
 				try {
 					const skip = Symbol();
