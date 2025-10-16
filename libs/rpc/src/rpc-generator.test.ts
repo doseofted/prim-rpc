@@ -1,6 +1,6 @@
 import { describe, expect, test, vi } from "vitest";
 import { RpcGenerator } from "./rpc-generator";
-import type { RpcFunctionCall } from "./types/rpc-structure";
+import type { RpcFunctionCall, RpcId } from "./types/rpc-structure";
 
 describe("RpcGenerator can handle function calls", () => {
 	test("promises and iterators are resolved", async () => {
@@ -157,5 +157,25 @@ describe("RpcGenerator can handle function calls", () => {
 				chain: expect.any(String),
 			}),
 		]);
+	});
+});
+
+describe("RpcGenerator generates expected IDs based on its configuration", () => {
+	test("default ID generation works", async () => {
+		// biome-ignore lint/suspicious/noExplicitAny: demonstration
+		const client = new RpcGenerator<any>((rpc) => {
+			const caught = rpc.at(-1);
+			const lastMethod = caught?.method.at(-1);
+			if (lastMethod === "ipsum") return rpc;
+			if (lastMethod === "bar") return rpc;
+		});
+
+		const a = client.proxy.test();
+		a.what();
+		client.endChainOrPartOfChain(["1.0" as RpcId]);
+		console.log("After ending chain 1.0");
+		const b = a.what();
+		b.coolio();
+		b.coolio();
 	});
 });

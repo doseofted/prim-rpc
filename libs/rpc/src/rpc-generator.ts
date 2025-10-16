@@ -33,22 +33,130 @@ import { isIterator } from "./utils/is-iterable";
 export class RpcGenerator<T> extends CallCatcher<T> {
 	#handler: MethodCallHandler;
 
-	#createNewRpcId(id: CaughtId, chain = false): RpcId {
+	/**
+	 * Recorded chain of method calls represented by a merged list of IDs that
+	 * points to the original IDs in that chain. If one of these IDs in the chain
+	 * is added to `#endedIds`, anything after it in the chain also becomes
+	 * invalid and must have an ID regenerated.
+	 */
+	#chainedIdSequences = new Map<string, RpcId[]>();
+
+	/**
+	 * Recorded IDs that have been utilized in an RPC call. Once recorded, the ID
+	 * can no longer be used for new method calls (a variant must be used instead)
+	 * but it can be used while extending chains with new method calls, up until
+	 * the ID has been recorded in `#endedIds` (in which case, the chain can no
+	 * longer be used).
+	 */
+	#openedIds = new Map<RpcId, number>();
+	/**
+	 * Recorded IDs for which a result has been received for an RPC and can no
+	 * longer be used to form new chains. Once an RPC ID is recorded as "ended",
+	 * calling a method on the result of another method will mean that the entire
+	 * chain and each ID in the chain is no longer valid. The behavior will depend
+	 * on how the client is configured but may either result in an error where no
+	 * IDs are generated from the chain or all IDs in the chain are regenerated
+	 * with new variants of those IDs.
+	 */
+	#endedIds = new Set<RpcId>();
+
+	#createChainIdentifier(chainIds: RpcId[]) {
+		return chainIds.join("/");
+	}
+
+	/**
+	 * If a remote host no longer has access to a specific result (for example,
+	 * the connection is closed), this method should be called with all relevant
+	 * IDs that were utilized in that connection.
+	 *
+	 * This only needs to be called if there is no automatic method to determine
+	 * when an ID should be discarded. If new RPC IDs can only be used once, for
+	 * example, then this method is not necessary.
+	 */
+	endChainOrPartOfChain(chainIds: RpcId[]) {
+		// const chainId = this.#createChainIdentifier(chainIds);
+		// this.#chainedIdSequences.delete(chainId);
+		for (const [i] of chainIds.entries()) {
+			// look for all possible chains that could be affected
+			const chainId = this.#createChainIdentifier(chainIds.slice(0, i + 1));
+			this.#chainedIdSequences.delete(chainId);
+		}
+		for (const id of chainIds) {
+			this.#endedIds.add(id);
+			// this.#openedIds.delete(id);
+		}
+	}
+
+	#createNewRpcId(id: CaughtId, chain = false, i = 1): RpcId {
 		const originalRpcId = createRpcId(id);
-		let inc = this.#utilizedIds.has(originalRpcId)
-			? (this.#utilizedIds.get(originalRpcId) ?? 0)
-			: 0;
-		inc += chain ? 0 : !this.#reuseChainIdentifiers ? 1 : 0;
-		this.#utilizedIds.set(originalRpcId, inc);
+		const exists = this.#openedIds.has(originalRpcId);
+		let inc = exists ? (this.#openedIds.get(originalRpcId) ?? 0) : 0;
+		inc += chain ? 0 : exists ? i : 0;
+		if (!chain) this.#openedIds.set(originalRpcId, inc);
+		if (!chain)
+			console.log("New RPC ID", {
+				id,
+				originalRpcId,
+				inc,
+				chain,
+				exists,
+			});
 		return createRpcId(id, inc);
 	}
 
+	#retrieveCurrentRpcId(id: CaughtId): RpcId {
+		// we treat this as a chain because we don't want to increment the ID
+		return this.#createNewRpcId(id, true);
+	}
+
+	#startOrUpdateChain(unprocessedChain: CaughtId[]): RpcId[] {
+		const chainIds = unprocessedChain.map((id) =>
+			this.#retrieveCurrentRpcId(id),
+		);
+		const chainEndIndex = chainIds.findIndex((id) => this.#endedIds.has(id));
+		if (chainEndIndex !== -1) {
+			// part of the chain has ended, so we need to regenerate IDs from that point
+			const okayIds = chainIds.slice(0, chainEndIndex);
+			const endedIds = chainIds.slice(chainEndIndex);
+			this.endChainOrPartOfChain(endedIds);
+			const newIds = unprocessedChain
+				.slice(chainEndIndex)
+				.map((id, i) => this.#createNewRpcId(id));
+			return [...okayIds, ...newIds];
+		}
+		// return chainIds
+		return unprocessedChain.map((id) => this.#createNewRpcId(id, false, 0));
+
+		// const chainSeenBefore = this.#createChainIdentifier(chainIds);
+		// const newId = chainIds.pop();
+		// const existingChainId = this.#createChainIdentifier(chainIds);
+		// const existingChain = this.#chainedIdSequences.get(existingChainId) ?? [];
+		// const endedIndex = existingChain.findIndex((id) => this.#endedIds.has(id));
+		// const existingChainIncludesEnded = endedIndex !== -1
+		// if (existingChainIncludesEnded) {
+		// 	const endedIds = existingChain.slice(endedIndex);
+		// 	const okayIds = existingChain.slice(0, endedIndex);
+		// 	const newIds = unprocessedChain
+		// 		.slice(endedIndex)
+		// 		.map((id) => this.#createNewRpcId(id));
+		// 	this.endChainOrPartOfChain(endedIds);
+		// 	return [...okayIds, ...newIds];
+		// }
+		// const existingChainExists = existingChain.length > 0
+		// if (existingChainExists) {
+		// 	const newId = this.#createNewRpcId()
+		// 	const updatedChain = [...existingChain, ];
+		// }
+	}
+
 	#convertStackToRpc(stack: CaughtStack): RpcFunctionCall[] {
+		const newIds = this.#startOrUpdateChain(stack.map((caught) => caught.id));
+		// console.log(newIds);
 		return stack // NOTE: at this point, all properties should've become calls
 			.map((caught) => {
 				if (caught.type !== CaughtType.Call) return null;
 				return {
-					id: this.#createNewRpcId(caught.id),
+					id: newIds.shift(),
 					method: caught.path.map((part) => part.toString()),
 					new: caught.callMethod === CaughtCallType.Constructor,
 					args: caught.args,
@@ -58,31 +166,13 @@ export class RpcGenerator<T> extends CallCatcher<T> {
 			.filter((given) => given !== null);
 	}
 
-	/**
-	 * When a chain of RPCs are created (for example `proxy.lorem().ipsum()`),
-	 * each call has a unique ID. However, if we assign `const a = proxy.lorem()`,
-	 * call `a.ipsum()`, and then call `a.dolor()`, both `ipsum` and `dolor` are
-	 * part of the same chain and without this setting, would share the same root
-	 * ID. While this may not be an issue for this class, it could be an issue for
-	 * a class that extends or otherwise utilizes this class instance (especially
-	 * if an RPC is already sent and the resulting reference is lost, meaning the
-	 * root ID originally intended can't be utilized).
-	 *
-	 * With this option enabled, each RPC created from the root will still receive
-	 * new IDs (as they did previously) but RPCs created from a previous chain
-	 * that diverge will have new IDs generated from their previous IDs, instead
-	 * of sharing the same ID. This will allow a unique ID to be generated for
-	 * each chain while still being able to understand the original intention
-	 * (for example, we know that the function was called from a previous chain
-	 * and not the root, which could be useful).
-	 */
-	// todo: only generate new IDs for duplicate calls when this is true
-	#reuseChainIdentifiers = false;
-
 	// todo: add option to only call handler when promise is resolved (potential config option for RPC client)
 	// todo: add ability to throw error if same function is called twice (potential config option for RPC client)
 
-	#utilizedIds = new Map<RpcId, number>();
+	// IDEA: instead of always incrementing RPC IDs when calls they're called multiple times,
+	// instead only duplicate once an event is received that the connection has been terminated
+	// for that ID (and after that point, any call after that in the chain will either
+	// require a new ID or will result in an error, because it can't be used anymore)
 
 	constructor(handler: MethodCallHandler) {
 		const callCondition: CallCondition = (next, stack) => {
