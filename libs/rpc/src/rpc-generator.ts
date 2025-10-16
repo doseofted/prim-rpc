@@ -87,45 +87,85 @@ export class RpcGenerator<T> extends CallCatcher<T> {
 		}
 	}
 
-	#createNewRpcId(id: CaughtId, chain = false, i = 1): RpcId {
-		const originalRpcId = createRpcId(id);
-		const exists = this.#openedIds.has(originalRpcId);
-		let inc = exists ? (this.#openedIds.get(originalRpcId) ?? 0) : 0;
-		inc += chain ? 0 : exists ? i : 0;
-		if (!chain) this.#openedIds.set(originalRpcId, inc);
-		if (!chain)
-			console.log("New RPC ID", {
-				id,
-				originalRpcId,
-				inc,
-				chain,
-				exists,
-			});
-		return createRpcId(id, inc);
+	/**
+	 * Get the current RPC ID for a caught ID without incrementing.
+	 * Returns the most recent version of this ID.
+	 */
+	#getCurrentRpcId(id: CaughtId): RpcId {
+		const baseId = createRpcId(id);
+		const currentInc = this.#openedIds.get(baseId) ?? 0;
+		return createRpcId(id, currentInc);
 	}
 
-	#retrieveCurrentRpcId(id: CaughtId): RpcId {
-		// we treat this as a chain because we don't want to increment the ID
-		return this.#createNewRpcId(id, true);
+	/**
+	 * Create a new RPC ID, optionally incrementing if needed.
+	 * @param id The caught ID to convert
+	 * @param shouldIncrement Whether to increment the ID (e.g., for new calls or ended IDs)
+	 * @param trackAsOpened Whether to track this ID for future increments
+	 */
+	#createNewRpcId(
+		id: CaughtId,
+		shouldIncrement: boolean,
+		trackAsOpened: boolean,
+	): RpcId {
+		const baseId = createRpcId(id);
+		const currentInc = this.#openedIds.get(baseId) ?? 0;
+		const currentRpcId = createRpcId(id, currentInc);
+		const hasEnded = this.#endedIds.has(currentRpcId);
+
+		// Increment if requested OR if current version has ended
+		const needsIncrement = shouldIncrement || hasEnded;
+		const newInc = needsIncrement ? currentInc + 1 : currentInc;
+
+		// Update tracking when incrementing OR when tracking a new final ID
+		if (needsIncrement) {
+			this.#openedIds.set(baseId, newInc);
+		} else if (trackAsOpened && !this.#openedIds.has(baseId)) {
+			// First time tracking this ID without incrementing
+			this.#openedIds.set(baseId, newInc);
+		}
+
+		return createRpcId(id, newInc);
 	}
 
 	#startOrUpdateChain(unprocessedChain: CaughtId[]): RpcId[] {
-		const chainIds = unprocessedChain.map((id) =>
-			this.#retrieveCurrentRpcId(id),
-		);
-		const chainEndIndex = chainIds.findIndex((id) => this.#endedIds.has(id));
-		if (chainEndIndex !== -1) {
-			// part of the chain has ended, so we need to regenerate IDs from that point
-			const okayIds = chainIds.slice(0, chainEndIndex);
-			const endedIds = chainIds.slice(chainEndIndex);
-			this.endChainOrPartOfChain(endedIds);
-			const newIds = unprocessedChain
-				.slice(chainEndIndex)
-				.map((id, i) => this.#createNewRpcId(id));
-			return [...okayIds, ...newIds];
+		// Check each ID to see if any have ended
+		const results: RpcId[] = [];
+		let regenerateFromIndex = -1;
+
+		for (let i = 0; i < unprocessedChain.length; i++) {
+			const id = unprocessedChain[i];
+			const currentRpcId = this.#getCurrentRpcId(id);
+
+			if (this.#endedIds.has(currentRpcId)) {
+				regenerateFromIndex = i;
+				break;
+			}
+			results.push(currentRpcId);
 		}
-		// return chainIds
-		return unprocessedChain.map((id) => this.#createNewRpcId(id, false, 0));
+
+		if (regenerateFromIndex !== -1) {
+			// Regenerate IDs from the ended one onwards
+			// IDs that were previously used need incrementing, new IDs start fresh
+			const newIds = unprocessedChain
+				.slice(regenerateFromIndex)
+				.map((id, i, arr) => {
+					const isFirst = i === 0;
+					const isLast = i === arr.length - 1;
+					const baseId = createRpcId(id);
+					const wasUsed = this.#openedIds.has(baseId);
+					// Increment if: first (ended) OR was previously used in this chain
+					const shouldIncrement = isFirst || wasUsed;
+					return this.#createNewRpcId(id, shouldIncrement, isLast);
+				});
+			return [...results, ...newIds];
+		}
+
+		// No ended IDs - reuse existing IDs, only track the last one
+		return unprocessedChain.map((id, i, arr) => {
+			const isLast = i === arr.length - 1;
+			return this.#createNewRpcId(id, false, isLast);
+		});
 
 		// const chainSeenBefore = this.#createChainIdentifier(chainIds);
 		// const newId = chainIds.pop();
@@ -151,16 +191,23 @@ export class RpcGenerator<T> extends CallCatcher<T> {
 
 	#convertStackToRpc(stack: CaughtStack): RpcFunctionCall[] {
 		const newIds = this.#startOrUpdateChain(stack.map((caught) => caught.id));
-		// console.log(newIds);
+		// Create a map from caught IDs to their regenerated RPC IDs
+		const idMap = new Map<CaughtId, RpcId>();
+		for (let i = 0; i < stack.length; i++) {
+			idMap.set(stack[i].id, newIds[i]);
+		}
+
 		return stack // NOTE: at this point, all properties should've become calls
-			.map((caught) => {
+			.map((caught, index) => {
 				if (caught.type !== CaughtType.Call) return null;
+				// Use the mapped chain ID instead of regenerating from caught.chain
+				const chainId = caught.chain ? (idMap.get(caught.chain) ?? null) : null;
 				return {
-					id: newIds.shift(),
+					id: newIds[index],
 					method: caught.path.map((part) => part.toString()),
 					new: caught.callMethod === CaughtCallType.Constructor,
 					args: caught.args,
-					chain: caught.chain ? this.#createNewRpcId(caught.chain, true) : null,
+					chain: chainId,
 				};
 			})
 			.filter((given) => given !== null);

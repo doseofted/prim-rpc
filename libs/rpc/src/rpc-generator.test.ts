@@ -171,11 +171,25 @@ describe("RpcGenerator generates expected IDs based on its configuration", () =>
 		});
 
 		const a = client.proxy.test();
-		a.what();
 		client.endChainOrPartOfChain(["1.0" as RpcId]);
 		console.log("After ending chain 1.0");
+		a.what();
+		client.endChainOrPartOfChain(["1.1" as RpcId]);
+		console.log("After ending chain 1.1");
 		const b = a.what();
 		b.coolio();
-		b.coolio();
+		const c = b.coolio();
+		client.endChainOrPartOfChain(["5.0" as RpcId]);
+		console.log("After ending chain 5.0");
+		c.test();
+		client.endChainOrPartOfChain(["9.0" as RpcId]);
+		console.log("After ending chain 9.0");
+		c.test();
+
+		const d = client.proxy.test().dose().it();
+		d.work();
+		client.endChainOrPartOfChain(["15.0" as RpcId]);
+		console.log("After ending chain 15.0");
+		d.work();
 	});
 });
