@@ -161,7 +161,57 @@ describe("RpcGenerator can handle function calls", () => {
 });
 
 describe("RpcGenerator generates expected IDs based on its configuration", () => {
-	test("default ID generation works", async () => {
+	test("default ID generation works with persistent chains", async () => {
+		// biome-ignore lint/suspicious/noExplicitAny: demonstration
+		const client = new RpcGenerator<any>((rpc) => {
+			const caught = rpc.at(-1);
+			const lastMethod = caught?.method.at(-1);
+			if (lastMethod === "end") return rpc;
+		});
+
+		const chain1 = client.proxy.lorem().ipsum();
+		// note that awaiting `.end()` is the same as calling `.then()` which
+		// increments by 2 (meaning "7.0" will be skipped in next test)
+		const end1 = await chain1.end();
+		expect(end1).toEqual([
+			{ id: "1.0", method: ["lorem"], new: false, args: [], chain: null },
+			// increment by 2 due to property access (+1) followed by method call (+1)
+			{ id: "3.0", method: ["ipsum"], new: false, args: [], chain: "1.0" },
+			// increment +2 again for next method call
+			{ id: "5.0", method: ["end"], new: false, args: [], chain: "3.0" },
+		]);
+		const chain2Split1 = chain1.foo().bar();
+		const end2 = await chain2Split1.end();
+		expect(end2).toEqual([
+			// these IDs remain the same because we've not ended the chain
+			{ id: "1.0", method: ["lorem"], new: false, args: [], chain: null },
+			{ id: "3.0", method: ["ipsum"], new: false, args: [], chain: "1.0" },
+			// increment +2 again for next method call
+			{ id: "9.0", method: ["foo"], new: false, args: [], chain: "3.0" },
+			{ id: "11.0", method: ["bar"], new: false, args: [], chain: "9.0" },
+			{ id: "13.0", method: ["end"], new: false, args: [], chain: "11.0" },
+		]);
+		const chain2Split2 = chain1.a().z();
+		const end3 = await chain2Split2.end();
+		expect(end3).toEqual([
+			// these IDs remain the same because we've not ended the chain
+			{ id: "1.0", method: ["lorem"], new: false, args: [], chain: null },
+			{ id: "3.0", method: ["ipsum"], new: false, args: [], chain: "1.0" },
+			// increment +2 again for next method call
+			{ id: "17.0", method: ["a"], new: false, args: [], chain: "3.0" },
+			{ id: "19.0", method: ["z"], new: false, args: [], chain: "17.0" },
+			{ id: "21.0", method: ["end"], new: false, args: [], chain: "19.0" },
+		]);
+		const newChain = client.proxy.newChain();
+		const end4 = await newChain.end();
+		expect(end4).toEqual([
+			// we started an entirely new chain so we start with all new IDs
+			{ id: "25.0", method: ["newChain"], new: false, args: [], chain: null },
+			{ id: "27.0", method: ["end"], new: false, args: [], chain: "25.0" },
+		]);
+	});
+
+	test("default ID generation works when part of chain is ended", async () => {
 		// biome-ignore lint/suspicious/noExplicitAny: demonstration
 		const client = new RpcGenerator<any>((rpc) => {
 			const caught = rpc.at(-1);
@@ -235,5 +285,33 @@ describe("RpcGenerator generates expected IDs based on its configuration", () =>
 			// method call so it gets a new ID of "25.0"
 			{ id: "25.0", method: ["end"], new: false, args: [], chain: "23.1" },
 		]);
+	});
+
+	test("default ID generation works when ended chain should throw errors", async () => {
+		// biome-ignore lint/suspicious/noExplicitAny: demonstration
+		const client = new RpcGenerator<any>(
+			(rpc) => {
+				const caught = rpc.at(-1);
+				const lastMethod = caught?.method.at(-1);
+				if (lastMethod === "end") return rpc;
+			},
+			{ chainEndBehavior: "throw" },
+		);
+		const chain1 = client.proxy.lorem();
+		const chain2 = chain1.ipsum();
+		const end1 = await chain2.end();
+		expect(end1).toEqual([
+			{ id: "1.0", method: ["lorem"], new: false, args: [], chain: null },
+			// increment by 2 due to property access (+1) followed by method call (+1)
+			{ id: "3.0", method: ["ipsum"], new: false, args: [], chain: "1.0" },
+			// increment +2 again for next method call
+			{ id: "5.0", method: ["end"], new: false, args: [], chain: "3.0" },
+		]);
+		// we can no longer chain calls from "3.0"
+		client.endChain("3.0" as RpcId);
+		// this will work because it doesn't include "3.0"
+		await expect(chain1.willNotThrow()).resolves.toBeUndefined();
+		// this throws because "3.0" has been ended and can't be used on new chains
+		await expect(chain2.willThrow()).rejects.toThrow(Error);
 	});
 });

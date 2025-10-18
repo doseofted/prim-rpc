@@ -82,9 +82,12 @@ export class RpcGenerator<T> extends CallCatcher<T> {
 		const newIncrementValue = currentIncrementValue + incrementAmount;
 		const newOpenId = !this.#openedIds.has(baseId);
 		const trackNewId = trackNew && newOpenId;
+		const throwOnSameId = this.#chainEndBehavior === "throw";
+		if (needsIncrement && throwOnSameId) throw new Error("RPC chain ended");
 		if (needsIncrement || trackNewId)
 			this.#openedIds.set(baseId, newIncrementValue);
-		return createRpcId(id, newIncrementValue);
+		const newOrExistingId = createRpcId(id, newIncrementValue);
+		return newOrExistingId;
 	}
 
 	/**
@@ -98,7 +101,7 @@ export class RpcGenerator<T> extends CallCatcher<T> {
 	 * when an ID should be discarded. If new RPC IDs can only be used once, for
 	 * example, then this method is not necessary.
 	 */
-	endChain(chainIds: RpcId | RpcId[]) {
+	endChain(chainIds: RpcId | RpcId[]): void {
 		const chainIdList = Array.isArray(chainIds) ? chainIds : [chainIds];
 		for (const id of chainIdList) this.#endedIds.add(id);
 	}
@@ -126,23 +129,25 @@ export class RpcGenerator<T> extends CallCatcher<T> {
 					const shouldIncrement = isFirst || wasUsed;
 					return this.#createNewRpcId(id, shouldIncrement, isLast);
 				});
-			return [...okayIds, ...newIds];
+			const updatedChain = [...okayIds, ...newIds];
+			return updatedChain;
 		}
-		return unprocessedChain.map((id, index, chain) => {
+		const updatedChain = unprocessedChain.map((id, index, chain) => {
 			const isLast = index === chain.length - 1;
 			return this.#createNewRpcId(id, false, isLast);
 		});
+		return updatedChain;
 	}
 
 	#convertStackToRpc(stack: CaughtStack): RpcFunctionCall[] {
 		const newIds = this.#startOrUpdateChain(stack.map((caught) => caught.id));
 		// Create a map from caught IDs to their regenerated RPC IDs
 		const idMap = new Map<CaughtId, RpcId>();
-		for (let i = 0; i < stack.length; i++) {
-			idMap.set(stack[i].id, newIds[i]);
+		for (const [index, caught] of stack.entries()) {
+			idMap.set(caught.id, newIds[index]);
 		}
 		// at this point, all properties should've become calls
-		return stack
+		const rpcChain = stack
 			.map((caught, index) => {
 				if (caught.type !== CaughtType.Call) return null;
 				// Use the mapped chain ID instead of regenerating from caught.chain
@@ -156,12 +161,13 @@ export class RpcGenerator<T> extends CallCatcher<T> {
 				};
 			})
 			.filter((given) => given !== null);
+		return rpcChain;
 	}
 
-	// todo: add option to only call handler when promise is resolved (potential config option for RPC client)
-	// todo: add ability to throw error if same function is called twice (potential config option for RPC client)
+	#chainEndBehavior: "throw" | "new" = "new"; // note: the default might change in the future
+	#handleOnBehavior: HandleOnOption = { event: "call" };
 
-	constructor(handler: MethodCallHandler) {
+	constructor(handler: MethodCallHandler, options?: RpcGeneratorOptions) {
 		const callCondition: CallCondition = (next, stack) => {
 			const caught = stack.at(-1);
 			if (!caught) return next;
@@ -178,7 +184,6 @@ export class RpcGenerator<T> extends CallCatcher<T> {
 				try {
 					const skip = Symbol();
 					const rpc = this.#convertStackToRpc(stack);
-					console.log(rpc);
 					const value = await this.#handler(rpc, skip);
 					if (skip === value) {
 						return unknownAsync.giveNothing();
@@ -202,6 +207,8 @@ export class RpcGenerator<T> extends CallCatcher<T> {
 			propAccess: true,
 		});
 		this.#handler = handler;
+		this.#chainEndBehavior = options?.chainEndBehavior ?? "new";
+		this.#handleOnBehavior = options?.handleOn ?? { event: "call" };
 	}
 }
 
@@ -210,3 +217,46 @@ export type MethodCallHandler = (
 	skip: symbol,
 	// biome-ignore lint/suspicious/noExplicitAny: value could be anything
 ) => any;
+
+type ChainEndBehavior = "throw" | "new";
+type HandleOnOption =
+	| {
+			event: "call";
+	  }
+	| {
+			event: "await";
+	  }
+	| {
+			event: "keyword";
+			keyword: string;
+			accessType: "method" | "property";
+	  }
+	| {
+			event: "debounce";
+			timeout: number;
+	  };
+
+export type RpcGeneratorOptions = {
+	/**
+	 * When a chain of method calls is ended, there are two possible behaviors:
+	 *
+	 * - `'throw'`: any further method calls on the chain will throw an error
+	 * - `'new'`: any further method calls on the chain will generate new RPC
+	 *
+	 * @default 'new'
+	 */
+	chainEndBehavior?: ChainEndBehavior;
+	/**
+	 * The provided handler can be called on various events:
+	 *
+	 * - `'call'`: the handler is called as soon as a function is called
+	 * - `'awaited'`: the handler is called when a function is awaited
+	 * - `'keyword'`: the handler is called when a special keyword in a method
+	 *   or property is used (event parameters must be provided)
+	 * - `'debounce'`: the handler is called after a period of inactivity
+	 *   following a method call (event parameters must be provided)
+	 *
+	 * @default { event: 'call' }
+	 */
+	handleOn?: HandleOnOption;
+};
