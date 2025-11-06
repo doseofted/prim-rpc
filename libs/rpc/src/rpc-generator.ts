@@ -164,8 +164,21 @@ export class RpcGenerator<T> extends CallCatcher<T> {
 		return rpcChain;
 	}
 
-	#chainEndBehavior: "throw" | "new" = "new"; // note: the default might change in the future
-	#handleOnBehavior: HandleOnOption = { event: "call" };
+	#chainEndBehavior: "throw" | "new"; // note: the default might change in the future
+	// #handleOnBehavior: HandleOnOption = { event: "call" };
+
+	/**
+	 * When the `.handleOn` option is set to a value other than `'call'`, RPC is
+	 * not called immediately and is instead queued until the relevant event
+	 * occurs. Each RPC chain s tracked separately.
+	 */
+	// #handlerQueue = new Map<RpcId[], RpcFunctionCall[]>();
+
+	// todo: the handleOn option won't change the shape of the handler method but
+	// instead will solely determine the timing of when it's called. A queue will
+	// be kept with various RPC chains that are pending and once it's time to call
+	// the handler, they will be fired in order and all call the handler, just at
+	// a later time
 
 	constructor(handler: MethodCallHandler, options?: RpcGeneratorOptions) {
 		const callCondition: CallCondition = (next, stack) => {
@@ -208,7 +221,7 @@ export class RpcGenerator<T> extends CallCatcher<T> {
 		});
 		this.#handler = handler;
 		this.#chainEndBehavior = options?.chainEndBehavior ?? "new";
-		this.#handleOnBehavior = options?.handleOn ?? { event: "call" };
+		// this.#handleOnBehavior = options?.handleOn ?? { event: "call" };
 	}
 }
 
