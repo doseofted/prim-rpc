@@ -80,7 +80,7 @@ export class PendingRpc {
 	 * The result of this function is a promise to the result of the last RPC in
 	 * the provided chain.
 	 */
-	async queueRpc(rpc: RpcFunctionCall[]) {
+	async queueRpc(rpc: RpcFunctionCall[]): Promise<unknown> {
 		// find or create metadata template for each RPC ID
 		const rpcMeta = rpc
 			.map((rpc) => {
@@ -144,7 +144,7 @@ export class PendingRpc {
 	 * instance must be configured with the `External` event type to call this
 	 * method.
 	 */
-	externalCall(rpcChainIds: RpcId[]) {
+	externalCall(rpcChainIds: RpcId[]): void {
 		const isExternal = this.#options.event === HandleEvent.External;
 		if (!isExternal) {
 			throw new Error(

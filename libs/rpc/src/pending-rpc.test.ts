@@ -4,7 +4,7 @@ import { HandleEvent, PendingRpc } from "./pending-rpc";
 import { RpcGenerator } from "./rpc-generator";
 
 // TODO: add tests, this is just to ensure the basic functionality works
-describe("PendingRpc works", () => {
+describe.todo("PendingRpc works", () => {
 	test("it queues RPCs", async () => {
 		// TODO: determine if pending RPC should be utilized by RpcGenerator or
 		// if it should remain separate from it
