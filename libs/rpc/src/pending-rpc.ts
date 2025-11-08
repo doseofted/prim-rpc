@@ -17,26 +17,13 @@ export class PendingRpc {
 		options: HandleOnOptions = { event: HandleEvent.Call },
 		handler: null | QueueHandler = null,
 	) {
-		if (options.event === HandleEvent.Await) {
-			const keywordsPromise = ["then", "catch", "finally"];
-			const keywordsIterator = [
-				"next",
-				"return",
-				"throw",
-				Symbol.asyncIterator,
-			];
-			options = {
-				event: HandleEvent.Keyword,
-				keywords: [...keywordsPromise, ...keywordsIterator],
-			};
-		}
 		if (
 			options.event === HandleEvent.Keyword &&
 			options.keywords.length === 0
 		) {
 			throw new Error("Keywords must be provided to handle events on Keyword");
 		}
-		if (options.event === HandleEvent.Debounce && options.timeout <= 0) {
+		if (options.event === HandleEvent.Batch && options.timeout <= 0) {
 			throw new Error("Timeout must be provided to handle events on Debounce");
 		}
 		this.#options = options;
@@ -81,7 +68,7 @@ export class PendingRpc {
 			/** Whether the RPC ID has been passed to the provided handler yet */
 			handled: boolean;
 			/** The intended result of the RPC ID (to be resolved/rejected later) */
-			promised: ReconstructedPromise<unknown>;
+			promised: null | ReconstructedPromise<unknown>;
 		}
 	> = new Map();
 
@@ -118,7 +105,7 @@ export class PendingRpc {
 		}
 		const newChainId = createRpcChainId(rpcIds);
 		const isDebounced =
-			this.#options.event === HandleEvent.Debounce ? this.#options : false;
+			this.#options.event === HandleEvent.Batch ? this.#options : false;
 		const controller = isDebounced ? new AbortController() : null;
 		this.#queuedChains.set(newChainId, { rpc, controller });
 		const isCall = this.#options.event === HandleEvent.Call;
@@ -149,7 +136,7 @@ export class PendingRpc {
 		// or will create a new chain (first RPC ID added or part of chain ended)
 		// - chain will not exist (even if others look similar), append new
 		const promised = lastRpc.metadata.promised;
-		return promised.value;
+		return promised?.value;
 	}
 
 	/**
@@ -193,7 +180,6 @@ export class PendingRpc {
 		} else {
 			this.#handledNotEmittedQueue.push([unhandled, rpcChainOnly]);
 		}
-		// const result = this.#handler?.(unhandled, rpcChainOnly);
 	}
 
 	get #handlerConfigured(): boolean {
@@ -212,12 +198,15 @@ export class PendingRpc {
 			if (!rpc.id) return;
 			const metadata = this.#results.get(rpc.id);
 			if (!metadata) return;
+			if (metadata.handled) return; // this should ony be new RPC
 			metadata.handled = true;
 			const resultPromise = results.at(index);
 			try {
-				metadata.promised.admin.resolve(await resultPromise);
+				metadata.promised?.admin.resolve(await resultPromise);
 			} catch (error) {
-				metadata.promised.admin.reject(error);
+				metadata.promised?.admin.reject(error);
+			} finally {
+				metadata.promised = null; // clear reference
 			}
 		});
 		await Promise.all(promised);
@@ -238,7 +227,6 @@ export class PendingRpc {
 			this.#handledNotEmittedQueue = [];
 		}
 		return removeHandler;
-		// this.#handler = handler;
 	}
 }
 
@@ -249,22 +237,18 @@ type PendingRpcEvents = {
 export enum HandleEvent {
 	/** Immediately process all provided RPC once called */
 	Call = 1,
-	/**
-	 * Process RPC once a promise or async iterator method is called
-	 * (this is a pre-configured alias for `HandleEvent.Keyword`)
-	 */
-	Await,
 	/** Process RPC once a specific method is called */
 	Keyword,
 	/**
-	 * Process RPC after a certain amount of time has passed since the last call
-	 * in a chain (debounced)
-	 */
-	Debounce,
-	/**
-	 * Process all pending RPC once an external event occurs (triggered manually)
+	 * Process all pending RPC for a chain once an external event occurs
+	 * (triggered manually)
 	 */
 	External,
+	/**
+	 * Process RPC after a certain amount of time has passed since the last call
+	 * in a chain (batching)
+	 */
+	Batch,
 }
 
 export type QueueHandler = (
@@ -274,40 +258,24 @@ export type QueueHandler = (
 	allRpc: RpcFunctionCall[],
 ) => Promise<unknown>[];
 
+// TODO: consider removing dedicated batch option and combining it with the
+// remaining options by adding a "batchTimeout" property
+// - the Call option with a timeout would behave the same as Batch today
+// - the Keyword and External options would have a leading timeout while Call
+//   option would have a trailing timeout, when timeout is configured
 export type HandleOnOptions =
 	| { event: HandleEvent.Call }
-	| { event: HandleEvent.Await }
+	| {
+			event: HandleEvent.External;
+	  }
 	| {
 			event: HandleEvent.Keyword;
 			keywords: PropertyKey[];
 	  }
 	| {
-			event: HandleEvent.Debounce;
+			event: HandleEvent.Batch;
 			timeout: number;
-	  }
-	| {
-			event: HandleEvent.External;
 	  };
-
-// Example RPC:
-// const base = client.proxy.lorem().ipsum()
-// await new Promise(r => setTimeout(r, 200))
-// const result = await base.foo().bar()
-// // ^^^ generates RPC chain 1.0, 3.0, 7.0, 9.0
-// const anotherResult = await client.test()
-// // ^^^ generates RPC chain 13.0
-//
-// Immediate behavior:
-// -> 1.0, 3.0, 7.0, 9.0, 13.0 sent immediately
-//
-// Debounce/timeout behavior (100ms):
-// -> 1.0, 3.0 sent after 100ms
-// -> 7.0, 9.0, 13.0 sent after another 100ms (after 200ms timeout)
-// ^^^ depending on await time, 13.0 may be sent separately if longer than 100ms
-//
-// Promise/event behavior:
-// -> 1.0, 3.0, 7.0, 9.0 sent only once awaited (or event triggered)
-// -> 13.0 sent only once awaited (or event triggered)
 
 const RpcIdSymbol: unique symbol = Symbol();
 export type RpcChainId = Opaque<string, typeof RpcIdSymbol>;

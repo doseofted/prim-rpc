@@ -1,4 +1,5 @@
 import { isPromise } from "es-toolkit";
+import { createNanoEvents, type Unsubscribe } from "nanoevents";
 import {
 	CallCatcher,
 	type CallCondition,
@@ -180,6 +181,14 @@ export class RpcGenerator<T> extends CallCatcher<T> {
 	// the handler, they will be fired in order and all call the handler, just at
 	// a later time
 
+	#emitter = createNanoEvents<RpcGeneratorEvents>();
+	on<T extends keyof RpcGeneratorEvents>(
+		type: T,
+		callback: RpcGeneratorEvents[T],
+	): Unsubscribe {
+		return this.#emitter.on(type, callback);
+	}
+
 	constructor(handler: MethodCallHandler, options?: RpcGeneratorOptions) {
 		const callCondition: CallCondition = (next, stack) => {
 			const caught = stack.at(-1);
@@ -197,6 +206,9 @@ export class RpcGenerator<T> extends CallCatcher<T> {
 				try {
 					const skip = Symbol();
 					const rpc = this.#convertStackToRpc(stack);
+					unknownAsync.on("awaited", (type, method) => {
+						this.#emitter.emit("awaited", rpc, type, method);
+					});
 					const value = await this.#handler(rpc, skip);
 					if (skip === value) {
 						return unknownAsync.giveNothing();
@@ -272,4 +284,12 @@ export type RpcGeneratorOptions = {
 	 * @default { event: 'call' }
 	 */
 	handleOn?: HandleOnOption;
+};
+
+export type RpcGeneratorEvents = {
+	awaited(
+		rpc: RpcFunctionCall[],
+		type: "promise" | "iterator",
+		method: PropertyKey,
+	): void;
 };

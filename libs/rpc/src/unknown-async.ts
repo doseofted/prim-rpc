@@ -1,4 +1,5 @@
 import { isPromise, isUndefined } from "es-toolkit";
+import { createNanoEvents, type Unsubscribe } from "nanoevents";
 import {
 	CallCatcher,
 	type CallCondition,
@@ -26,6 +27,14 @@ import { isIterable } from "./utils/is-iterable";
 export class UnknownAsync<T = UnknownAsyncProxy> extends CallCatcher<T> {
 	#handle: HandleUnknownOptionsGranular;
 	#defaultCatchOptions: CatchOptionsGranular;
+
+	#emitter = createNanoEvents<UnknownAsyncEvents>();
+	on<T extends keyof UnknownAsyncEvents>(
+		type: T,
+		callback: UnknownAsyncEvents[T],
+	): Unsubscribe {
+		return this.#emitter.on(type, callback);
+	}
 
 	constructor(handle: HandleUnknownOptions = true) {
 		const defaultCatchOptions: CatchOptionsGranular = {
@@ -57,6 +66,7 @@ export class UnknownAsync<T = UnknownAsyncProxy> extends CallCatcher<T> {
 				this.#rejectFuturePromises(true);
 			}
 			if (includesPromiseMethod) {
+				this.#emitter.emit("awaited", "promise", methodName);
 				return this.#promise[methodName].apply(this.#promise, caught?.args);
 			}
 			const includesIteratorMethod =
@@ -71,6 +81,7 @@ export class UnknownAsync<T = UnknownAsyncProxy> extends CallCatcher<T> {
 				this.#rejectFutureIterators(true);
 			}
 			if (includesIteratorMethod) {
+				this.#emitter.emit("awaited", "iterator", methodName);
 				return this.#iterator[methodName].apply(this.#iterator, caught?.args);
 			}
 			return next; // this should be unreachable
@@ -415,3 +426,7 @@ export type CatchOptionsUnknownAsyncGranular = Omit<
 export type CatchOptionsUnknownAsync =
 	| boolean
 	| CatchOptionsUnknownAsyncGranular;
+
+export type UnknownAsyncEvents = {
+	awaited(type: "promise" | "iterator", method: PropertyKey): void;
+};
