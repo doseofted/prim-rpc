@@ -1,39 +1,90 @@
 import { isNullish } from "emery";
-import { describe, test } from "vitest";
+import { describe, expect, test, vi } from "vitest";
 import { HandleEvent, PendingRpc } from "./pending-rpc";
 import { RpcGenerator } from "./rpc-generator";
 
-// TODO: add tests, this is just to ensure the basic functionality works
-describe.todo("PendingRpc works", () => {
-	test("it queues RPCs", async () => {
-		// TODO: determine if pending RPC should be utilized by RpcGenerator or
-		// if it should remain separate from it
-		const pendingRpc = new PendingRpc(
-			{ event: HandleEvent.External },
-			(newRpc, chain) => {
-				console.log({ newRpc, chain });
-				return newRpc.map(async (given) => {
-					return given;
-				});
-			},
-		);
+describe("PendingRpc works without timeout options", () => {
+	test("with Call event", async () => {
+		const event = HandleEvent.Call;
+		const processed = vi.fn();
+		const pendingRpc = new PendingRpc({ event }, (newRpc) => {
+			processed();
+			return newRpc.map(async (_given) => newRpc);
+		});
 		// biome-ignore lint/suspicious/noExplicitAny: just a test
 		const rpcGenerator = new RpcGenerator<any>(
 			(given) => pendingRpc.queueRpc(given),
-			{
-				chainEndBehavior: "new",
-				// TODO: ".then()" is not recorded as RPC so I need to send event from
-				// generator when await happens (instead of using "await" event)
-				// handleOn: { event: "call" },
-			},
+			{ chainEndBehavior: "new" },
+		);
+		const chain = rpcGenerator.proxy.this.is.a;
+		expect(processed).not.toHaveBeenCalled();
+		const promised = chain.test();
+		expect(processed).toHaveBeenCalled();
+		await expect(promised).resolves.toEqual([
+			expect.objectContaining({
+				id: expect.any(String),
+				method: ["this", "is", "a", "test"],
+				args: [],
+				new: false,
+				chain: null,
+			}),
+		]);
+	});
+
+	test("with External event", async () => {
+		const event = HandleEvent.External;
+		const processed = vi.fn();
+		const pendingRpc = new PendingRpc({ event }, (newRpc) => {
+			processed();
+			return newRpc.map(async (_given) => newRpc);
+		});
+		// biome-ignore lint/suspicious/noExplicitAny: just a test
+		const rpcGenerator = new RpcGenerator<any>(
+			(given) => pendingRpc.queueRpc(given),
+			{ chainEndBehavior: "new" },
 		);
 		rpcGenerator.on("awaited", (rpc) =>
 			pendingRpc.externalCall(
 				rpc.map((r) => r.id).filter((given) => !isNullish(given)),
 			),
 		);
-		const a = rpcGenerator.proxy.a().test();
-		await a;
-		await a.what().test();
+		const promised = rpcGenerator.proxy.this.is.a.test();
+		expect(processed).not.toHaveBeenCalled();
+		await expect(promised).resolves.toEqual([
+			expect.objectContaining({
+				id: expect.any(String),
+				method: ["this", "is", "a", "test"],
+				args: [],
+			}),
+		]);
+		expect(processed).toHaveBeenCalled();
+	});
+
+	test("with Keyword event", async () => {
+		const event = HandleEvent.Keyword;
+		const keywords = ["test"];
+		const processed = vi.fn();
+		const pendingRpc = new PendingRpc({ event, keywords }, (newRpc) => {
+			processed();
+			return newRpc.map(async (_given) => newRpc);
+		});
+		// biome-ignore lint/suspicious/noExplicitAny: just a test
+		const rpcGenerator = new RpcGenerator<any>(
+			(given) => pendingRpc.queueRpc(given),
+			{ chainEndBehavior: "new" },
+		);
+		const chain = rpcGenerator.proxy.this.is.a;
+		expect(processed).not.toHaveBeenCalled();
+		const promised = chain.test();
+		expect(processed).toHaveBeenCalled();
+		await expect(promised).resolves.toEqual([
+			expect.objectContaining({
+				id: expect.any(String),
+				method: ["this", "is", "a", "test"],
+				args: [],
+				new: false,
+				chain: null,
+			}),
+		]);
 	});
 });

@@ -1,4 +1,4 @@
-import { castToOpaque, type Opaque } from "emery";
+import { castToOpaque, isNullish, type Opaque } from "emery";
 import { createNanoEvents, type Unsubscribe } from "nanoevents";
 import { ReconstructedPromise } from "./reconstructed/promise";
 import type { RpcFunctionCall, RpcId } from "./types/rpc-structure";
@@ -23,10 +23,8 @@ export class PendingRpc {
 		) {
 			throw new Error("Keywords must be provided to handle events on Keyword");
 		}
-		if (options.event === HandleEvent.Batch && options.timeout <= 0) {
-			throw new Error("Timeout must be provided to handle events on Debounce");
-		}
 		this.#options = options;
+		this.#options.timeoutAppliesOn ??= "chain";
 		if (handler) {
 			this.#emitter.on("pending", (newRpc, allRpc) => {
 				const results = handler(newRpc, allRpc);
@@ -48,18 +46,6 @@ export class PendingRpc {
 			controller: AbortController | null;
 		}
 	>();
-
-	/**
-	 * Each time RPC is received, it's possible that a chain has been appended
-	 * and events on a previous chain should no longer be called. However if we
-	 * already have set up a debounce timer that will get called, we need to
-	 * ensure that old chains are not processed, only the newer, updated chain.
-	 *
-	 * Each time a chain is updated, add the old chain ID to this set so that an
-	 * event is not handled prematurely.
-	 */
-	// NOTE: if already removed from queued chains, do we still need to track cancelled events?
-	// #cancelledChains = new Set<RpcChainId>();
 
 	/** The results of individual RPC calls */
 	#results: Map<
@@ -103,14 +89,19 @@ export class PendingRpc {
 			previousChain.controller?.abort();
 			this.#queuedChains.delete(oldChainId);
 		}
+
 		const newChainId = createRpcChainId(rpcIds);
-		const isDebounced =
-			this.#options.event === HandleEvent.Batch ? this.#options : false;
-		const controller = isDebounced ? new AbortController() : null;
+		const isBatched = !isNullish(this.#options.timeoutBatch);
+		const globalAbort = isBatched && this.#options.timeoutAppliesOn === "call";
+		if (globalAbort) this.#globalAbortController ??= new AbortController();
+		const controller = isBatched
+			? (this.#globalAbortController ?? new AbortController())
+			: null;
 		this.#queuedChains.set(newChainId, { rpc, controller });
+
 		const isCall = this.#options.event === HandleEvent.Call;
 		if (isCall) {
-			this.#triggerEvent(newChainId);
+			this.#batchTriggerEvent(newChainId, controller);
 		}
 		const isKeyword =
 			this.#options.event === HandleEvent.Keyword ? this.#options : false;
@@ -121,20 +112,8 @@ export class PendingRpc {
 			const methodLast = Array.isArray(method) ? method.at(-1) : method;
 			const { keywords } = isKeyword;
 			const isKeywordMethod = methodLast && keywords.includes(methodLast);
-			if (isKeywordMethod) this.#triggerEvent(newChainId);
+			if (isKeywordMethod) this.#batchTriggerEvent(newChainId, controller);
 		}
-		if (isDebounced) {
-			const signal = controller?.signal;
-			const debounceTimeout = isDebounced ? isDebounced.timeout : 0;
-			setTimeout(() => {
-				if (signal?.aborted ?? true) return;
-				this.#triggerEvent(newChainId);
-			}, debounceTimeout);
-		}
-		// we will either add to an existing chain (new RPC ID added to the end)
-		// - look for slice [0, -1] of chain
-		// or will create a new chain (first RPC ID added or part of chain ended)
-		// - chain will not exist (even if others look similar), append new
 		const promised = lastRpc.metadata.promised;
 		return promised?.value;
 	}
@@ -152,7 +131,29 @@ export class PendingRpc {
 			);
 		}
 		const chainId = createRpcChainId(rpcChainIds);
-		this.#triggerEvent(chainId);
+		const controller = this.#queuedChains.get(chainId)?.controller ?? null;
+		this.#batchTriggerEvent(chainId, controller);
+	}
+
+	#globalAbortController: AbortController | null = null;
+
+	/**
+	 * Trigger an event immediately if configured to do so. Otherwise queue
+	 * the event using the provided batch options.
+	 */
+	#batchTriggerEvent(
+		chainId: RpcChainId,
+		controller: AbortController | null,
+	): void {
+		if (!controller) {
+			this.#triggerEvent(chainId);
+			return;
+		}
+		const timeout = this.#options.timeoutBatch ?? 0;
+		setTimeout(() => {
+			if (controller.signal.aborted) return;
+			this.#triggerEvent(chainId);
+		}, timeout);
 	}
 
 	#handledNotEmittedQueue: Parameters<QueueHandler>[] = [];
@@ -244,11 +245,6 @@ export enum HandleEvent {
 	 * (triggered manually)
 	 */
 	External,
-	/**
-	 * Process RPC after a certain amount of time has passed since the last call
-	 * in a chain (batching)
-	 */
-	Batch,
 }
 
 export type QueueHandler = (
@@ -258,25 +254,71 @@ export type QueueHandler = (
 	allRpc: RpcFunctionCall[],
 ) => Promise<unknown>[];
 
-// TODO: consider removing dedicated batch option and combining it with the
-// remaining options by adding a "batchTimeout" property
-// - the Call option with a timeout would behave the same as Batch today
-// - the Keyword and External options would have a leading timeout while Call
-//   option would have a trailing timeout, when timeout is configured
-export type HandleOnOptions =
-	| { event: HandleEvent.Call }
+type BatchOptions = {
+	/**
+	 * Process RPC after a certain amount of time has passed since the last call
+	 * in a chain (batching). This applies to the whole chain, not individual
+	 * method calls in the chain.
+	 *
+	 * There are other timeout options that are configured with decent defaults
+	 * depending on the option chosen. These default can be provided explicitly
+	 * if defaults don't match needs of a project.
+	 */
+	timeoutBatch: number | null;
+	/**
+	 * The timeout, if enabled, applies by default to individual chains of RPC,
+	 * not individual calls across chains. This option can be changed.
+	 *
+	 * When set to `"chain"` (and using the Call event as an example), a call on
+	 * `client` such as `client.a().b()` will start a new timer.
+	 * If `client.c().d()` is called prior to the timer event, it has no effect
+	 * because it's not part of the same chain.
+	 *
+	 * When set to `"call"`, each individual method call starts/resets the timer.
+	 * In this case, calling `client.a().b()` followed by `client.c().d()` prior
+	 * to the timer expiring will result in all four calls being batched together
+	 * once the timer expires.
+	 */
+	timeoutAppliesOn: "chain" | "call";
+	/**
+	 * Whether the timeout is leading (at start) or trailing (at end). It is
+	 * recommended to use trailing timeouts (`false`) for Call events.
+	 */
+	timeoutLeading: boolean | null;
+};
+
+type HandleOnOptionsBase =
 	| {
+			/**
+			 * Immediately process all provided RPC once called. This may be
+			 * combined with the timer options to batch RPC calls as soon as they
+			 * happen and the batch timeout elapses.
+			 */
+			event: HandleEvent.Call;
+	  }
+	| {
+			/**
+			 * Process all pending RPC for a chain once an external event occurs
+			 * (triggered manually). This may be used if a timer is set up outside
+			 * of this class or if RPC is only executed based on a specific user
+			 * interaction (like a button tap).
+			 */
 			event: HandleEvent.External;
 	  }
 	| {
+			/**
+			 * Process RPC once a specific method is called. This may be used to
+			 * only process RPC once a keyword like `.end()` or `.exec()` is called.
+			 * It may also be used to detect a promise method if promise methods are
+			 * processed as RPC events. If promises are handled separate from RPC,
+			 * consider opting for the `External` event instead and trigger when a
+			 * promise method is called.
+			 */
 			event: HandleEvent.Keyword;
+			/** Keywords to trigger the handler */
 			keywords: PropertyKey[];
-	  }
-	| {
-			event: HandleEvent.Batch;
-			timeout: number;
 	  };
-
+export type HandleOnOptions = HandleOnOptionsBase & Partial<BatchOptions>;
 const RpcIdSymbol: unique symbol = Symbol();
 export type RpcChainId = Opaque<string, typeof RpcIdSymbol>;
 export function createRpcChainId(rpcIds: RpcId[]): RpcChainId {
