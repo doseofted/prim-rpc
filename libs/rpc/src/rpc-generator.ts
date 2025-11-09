@@ -1,3 +1,4 @@
+import { isNullish } from "emery";
 import { isPromise } from "es-toolkit";
 import { createNanoEvents, type Unsubscribe } from "nanoevents";
 import {
@@ -207,7 +208,10 @@ export class RpcGenerator<T> extends CallCatcher<T> {
 					const skip = Symbol();
 					const rpc = this.#convertStackToRpc(stack);
 					unknownAsync.on("awaited", (type, method) => {
-						this.#emitter.emit("awaited", rpc, type, method);
+						const rpcIds = rpc
+							.map((r) => r.id)
+							.filter((given) => !isNullish(given));
+						this.#emitter.emit("awaited", rpcIds, type, method);
 					});
 					const value = await this.#handler(rpc, skip);
 					if (skip === value) {
@@ -288,7 +292,7 @@ export type RpcGeneratorOptions = {
 
 export type RpcGeneratorEvents = {
 	awaited(
-		rpc: RpcFunctionCall[],
+		rpc: RpcId[],
 		type: "promise" | "iterator",
 		method: PropertyKey,
 	): void;

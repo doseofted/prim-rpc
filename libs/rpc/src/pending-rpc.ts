@@ -284,6 +284,7 @@ type BatchOptions = {
 	 * Whether the timeout is leading (at start) or trailing (at end). It is
 	 * recommended to use trailing timeouts (`false`) for Call events.
 	 */
+	// todo: implement leading timeouts
 	timeoutLeading: boolean | null;
 };
 
