@@ -93,7 +93,6 @@ export class PendingRpc {
 		if (previousChain) {
 			previousChain.controller?.abort();
 			this.#queuedChains.delete(oldChainId);
-			// this.#globalQueuedChains.delete(oldChainId);
 		}
 
 		const newChainId = createRpcChainId(rpcIds);
@@ -107,7 +106,6 @@ export class PendingRpc {
 				// this call shouldn't be made until the last global call is made
 				// (and the last call will not have a `.globalReady` flag set)
 				meta.globalReady = true;
-				// this.#globalQueuedChains.set(oldChainId, meta);
 			}
 		}
 		const order = this.#orderIncrementor++;
@@ -154,14 +152,6 @@ export class PendingRpc {
 	}
 
 	#globalAbortController: AbortController | null = null;
-	// #globalQueuedChains = new Map<
-	// 	RpcChainId,
-	// 	{
-	// 		rpc: RpcFunctionCall[];
-	// 		controller: AbortController | null;
-	// 		order: number;
-	// 	}
-	// >();
 
 	/**
 	 * Trigger an event immediately if configured to do so. Otherwise queue
@@ -209,7 +199,6 @@ export class PendingRpc {
 				return { rpc, metadata, handled };
 			})
 			.filter((item) => item !== null);
-		// FIXME: check if unhandled length being different will cause issue if part of chain is already handled
 		const unhandled = rpcChain
 			.filter((item) => !item.handled)
 			.map((item) => item.rpc);
@@ -322,8 +311,8 @@ type BatchOptions = {
 	 * Whether the timeout is leading (at start) or trailing (at end). It is
 	 * recommended to use trailing timeouts (`false`) for Call events.
 	 */
-	// todo: implement leading timeouts
-	timeoutLeading: boolean | null;
+	// TODO: implement leading timeouts
+	// timeoutLeading: boolean | null;
 };
 
 type HandleOnOptionsBase =
