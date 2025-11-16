@@ -8,7 +8,8 @@ import type { RpcFunctionCall, RpcId } from "./types/rpc-structure";
  * calls are configured to be sent (likely due to transport limitations).
  *
  * This is a queue that can either be configured to dispatch immediately, on a
- * timer, or manually with a method (to be provided an an event's callback).
+ * timer, on a given keyword, or manually with a method (to be provided as a
+ * callback to some external event).
  */
 export class PendingRpc {
 	#options: HandleOnOptions;
@@ -34,6 +35,8 @@ export class PendingRpc {
 		}
 	}
 
+	#orderIncrementor = 0;
+
 	/**
 	 * Keep track of all provided chains of RPC so that once an event occurs,
 	 * as configured in the options, all RPC contained in the chain can be sent
@@ -44,6 +47,8 @@ export class PendingRpc {
 		{
 			rpc: RpcFunctionCall[];
 			controller: AbortController | null;
+			order: number;
+			globalReady: boolean;
 		}
 	>();
 
@@ -88,16 +93,29 @@ export class PendingRpc {
 		if (previousChain) {
 			previousChain.controller?.abort();
 			this.#queuedChains.delete(oldChainId);
+			// this.#globalQueuedChains.delete(oldChainId);
 		}
 
 		const newChainId = createRpcChainId(rpcIds);
 		const isBatched = !isNullish(this.#options.timeoutBatch);
 		const globalAbort = isBatched && this.#options.timeoutAppliesOn === "call";
-		if (globalAbort) this.#globalAbortController ??= new AbortController();
+		if (globalAbort) {
+			// Abort the previous global timer and create a new one to reset the batch timeout
+			this.#globalAbortController?.abort();
+			this.#globalAbortController = new AbortController();
+			for (const meta of this.#queuedChains.values()) {
+				// this call shouldn't be made until the last global call is made
+				// (and the last call will not have a `.globalReady` flag set)
+				meta.globalReady = true;
+				// this.#globalQueuedChains.set(oldChainId, meta);
+			}
+		}
+		const order = this.#orderIncrementor++;
+		const globalReady = false;
 		const controller = isBatched
 			? (this.#globalAbortController ?? new AbortController())
 			: null;
-		this.#queuedChains.set(newChainId, { rpc, controller });
+		this.#queuedChains.set(newChainId, { rpc, controller, order, globalReady });
 
 		const isCall = this.#options.event === HandleEvent.Call;
 		if (isCall) {
@@ -136,6 +154,14 @@ export class PendingRpc {
 	}
 
 	#globalAbortController: AbortController | null = null;
+	// #globalQueuedChains = new Map<
+	// 	RpcChainId,
+	// 	{
+	// 		rpc: RpcFunctionCall[];
+	// 		controller: AbortController | null;
+	// 		order: number;
+	// 	}
+	// >();
 
 	/**
 	 * Trigger an event immediately if configured to do so. Otherwise queue
@@ -152,7 +178,17 @@ export class PendingRpc {
 		const timeout = this.#options.timeoutBatch ?? 0;
 		setTimeout(() => {
 			if (controller.signal.aborted) return;
+			const chain = this.#queuedChains.get(chainId) ?? null;
+			if (chain?.globalReady) return; // already triggered as part of global batch
 			this.#triggerEvent(chainId);
+			const isBatched = !isNullish(this.#options.timeoutBatch);
+			const globalAbort =
+				isBatched && this.#options.timeoutAppliesOn === "call";
+			if (!globalAbort) return;
+			// only trigger events that are waiting on global batch trigger
+			for (const [chainIdEntry, meta] of this.#queuedChains.entries()) {
+				if (meta.globalReady) this.#triggerEvent(chainIdEntry);
+			}
 		}, timeout);
 	}
 
@@ -162,7 +198,8 @@ export class PendingRpc {
 	#triggerEvent(chainId: RpcChainId) {
 		const chain = this.#queuedChains.get(chainId) ?? null;
 		const rpcChainOnly = chain?.rpc ?? [];
-		if (rpcChainOnly.length === 0) return;
+		if (rpcChainOnly.length === 0) return; // this shouldn't happen
+
 		const rpcChain = rpcChainOnly
 			.map((rpc) => {
 				const id = rpc.id;
@@ -172,6 +209,7 @@ export class PendingRpc {
 				return { rpc, metadata, handled };
 			})
 			.filter((item) => item !== null);
+		// FIXME: check if unhandled length being different will cause issue if part of chain is already handled
 		const unhandled = rpcChain
 			.filter((item) => !item.handled)
 			.map((item) => item.rpc);
@@ -199,7 +237,7 @@ export class PendingRpc {
 			if (!rpc.id) return;
 			const metadata = this.#results.get(rpc.id);
 			if (!metadata) return;
-			if (metadata.handled) return; // this should ony be new RPC
+			if (metadata.handled) return; // this should only be new RPC
 			metadata.handled = true;
 			const resultPromise = results.at(index);
 			try {
