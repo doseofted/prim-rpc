@@ -27,9 +27,9 @@ export class PendingRpc {
 		this.#options = options;
 		this.#options.timeoutAppliesOn ??= "chain";
 		if (handler) {
-			this.#emitter.on("pending", (newRpc, allRpc) => {
-				const results = handler(newRpc, allRpc);
-				this.#pendingEventHandler(newRpc, results);
+			this.#emitter.on("pending", (newRpc, skipPlaceholder, allRpc) => {
+				const results = handler(newRpc, skipPlaceholder, allRpc);
+				this.#pendingEventHandler(newRpc, results, skipPlaceholder);
 				return results;
 			});
 		}
@@ -60,6 +60,8 @@ export class PendingRpc {
 			handled: boolean;
 			/** The intended result of the RPC ID (to be resolved/rejected later) */
 			promised: null | ReconstructedPromise<unknown>;
+			/** The symbol used to skip this RPC (if provided) */
+			skip: symbol | null;
 		}
 	> = new Map();
 
@@ -71,7 +73,10 @@ export class PendingRpc {
 	 * The result of this function is a promise to the result of the last RPC in
 	 * the provided chain.
 	 */
-	async queueRpc(rpc: RpcFunctionCall[]): Promise<unknown> {
+	async queueRpc(
+		rpc: RpcFunctionCall[],
+		skip: symbol | null = null,
+	): Promise<unknown> {
 		// find or create metadata template for each RPC ID
 		const rpcMeta = rpc
 			.map((rpc) => {
@@ -81,7 +86,7 @@ export class PendingRpc {
 				if (metadata) return { id, metadata };
 				const handled = false;
 				const promised = new ReconstructedPromise<unknown>();
-				metadata = { handled, promised };
+				metadata = { handled, promised, skip };
 				this.#results.set(id, metadata);
 				return { id, metadata, rpc };
 			})
@@ -203,10 +208,15 @@ export class PendingRpc {
 			.filter((item) => !item.handled)
 			.map((item) => item.rpc);
 		if (unhandled.length === 0) return;
+		const skipPlaceholder = Symbol();
 		if (this.#handlerConfigured) {
-			this.#emitter.emit("pending", unhandled, rpcChainOnly);
+			this.#emitter.emit("pending", unhandled, skipPlaceholder, rpcChainOnly);
 		} else {
-			this.#handledNotEmittedQueue.push([unhandled, rpcChainOnly]);
+			this.#handledNotEmittedQueue.push([
+				unhandled,
+				skipPlaceholder,
+				rpcChainOnly,
+			]);
 		}
 	}
 
@@ -217,7 +227,8 @@ export class PendingRpc {
 
 	async #pendingEventHandler(
 		newRpc: RpcFunctionCall[],
-		results: Promise<unknown>[],
+		results: unknown[],
+		skipPlaceholder: symbol,
 	) {
 		if (newRpc.length !== results.length) {
 			throw new Error("Pending RPC handler returned mismatched results length");
@@ -230,7 +241,12 @@ export class PendingRpc {
 			metadata.handled = true;
 			const resultPromise = results.at(index);
 			try {
-				metadata.promised?.admin.resolve(await resultPromise);
+				const result = await resultPromise;
+				if (result === skipPlaceholder) {
+					metadata.promised?.admin.resolve(metadata.skip);
+				} else {
+					metadata.promised?.admin.resolve(result);
+				}
 			} catch (error) {
 				metadata.promised?.admin.reject(error);
 			} finally {
@@ -243,11 +259,14 @@ export class PendingRpc {
 	onQueuedRpc(handler: QueueHandler): Unsubscribe {
 		if (this.#handlerConfigured)
 			throw new Error("Pending RPC handler already set");
-		const removeHandler = this.#emitter.on("pending", (newRpc, allRpc) => {
-			const results = handler(newRpc, allRpc);
-			this.#pendingEventHandler(newRpc, results);
-			return results;
-		});
+		const removeHandler = this.#emitter.on(
+			"pending",
+			(newRpc, skipPlaceholder, allRpc) => {
+				const results = handler(newRpc, skipPlaceholder, allRpc);
+				this.#pendingEventHandler(newRpc, results, skipPlaceholder);
+				return results;
+			},
+		);
 		if (this.#handledNotEmittedQueue.length > 0) {
 			for (const queued of this.#handledNotEmittedQueue) {
 				this.#emitter.emit("pending", ...queued);
@@ -277,9 +296,10 @@ export enum HandleEvent {
 export type QueueHandler = (
 	/** Unhandled, new RPC which may reference RPC from previous chains */
 	newRpc: RpcFunctionCall[],
+	skipSymbol: symbol,
 	/** All RPC that makes up the given chain, including handled calls, for context */
 	allRpc: RpcFunctionCall[],
-) => Promise<unknown>[];
+) => unknown[];
 
 type BatchOptions = {
 	/**

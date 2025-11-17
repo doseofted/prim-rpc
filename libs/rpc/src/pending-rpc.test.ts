@@ -1,6 +1,7 @@
 import { afterEach, beforeEach, describe, expect, test, vi } from "vitest";
 import { HandleEvent, type HandleOnOptions, PendingRpc } from "./pending-rpc";
 import { RpcGenerator } from "./rpc-generator";
+import { UnknownAsyncError } from "./unknown-async";
 
 beforeEach(() => vi.useFakeTimers());
 afterEach(() => vi.useRealTimers());
@@ -88,10 +89,13 @@ describe("PendingRpc works when chain is continued after already being partially
 		const event = HandleEvent.Keyword;
 		const keywords = ["test"];
 		const processed = vi.fn();
-		const pendingRpc = new PendingRpc({ event, keywords }, (newRpc, allRpc) => {
-			processed(allRpc);
-			return newRpc.map(async (given) => given);
-		});
+		const pendingRpc = new PendingRpc(
+			{ event, keywords },
+			(newRpc, _skip, allRpc) => {
+				processed(allRpc);
+				return newRpc.map(async (given) => given);
+			},
+		);
 		// biome-ignore lint/suspicious/noExplicitAny: just a test
 		const rpcGenerator = new RpcGenerator<any>(
 			(given) => pendingRpc.queueRpc(given),
@@ -144,7 +148,7 @@ describe("PendingRpc works when chain is continued after already being partially
 			timeoutBatch: 300,
 		} satisfies HandleOnOptions;
 		const processed = vi.fn();
-		const pendingRpc = new PendingRpc(options, (newRpc, allRpc) => {
+		const pendingRpc = new PendingRpc(options, (newRpc, _skip, allRpc) => {
 			processed(allRpc);
 			return newRpc.map(async (given) => given);
 		});
@@ -497,4 +501,37 @@ describe("PendingRpc works with timeout enabled per call (global)", () => {
 			],
 		]);
 	});
+});
+
+test("Original skip symbol is returned back to caller", async () => {
+	const event = HandleEvent.Call;
+	const pendingRpc = new PendingRpc({ event }, (newRpc, skip) => {
+		return newRpc.map(async (_given) => skip);
+	});
+	// biome-ignore lint/suspicious/noExplicitAny: just a test
+	const rpcGenerator = new RpcGenerator<any>(
+		(given, skip) => pendingRpc.queueRpc(given, skip),
+		{ chainEndBehavior: "new" },
+	);
+	// biome-ignore lint/suspicious/noExplicitAny: just a test
+	const catchIteratorRejection = async (promised: any) => {
+		try {
+			await promised?.next?.();
+		} catch {
+			// no-op
+		}
+	};
+	const promise1 = rpcGenerator.proxy.just();
+	void catchIteratorRejection(promise1);
+	const promise2 = promise1.a();
+	void catchIteratorRejection(promise2);
+	const promise3 = promise2.test();
+	void catchIteratorRejection(promise3);
+
+	await expect(promise1).rejects.toBeInstanceOf(UnknownAsyncError);
+	await expect(promise1).rejects.toThrowError("Given was not a promise");
+	await expect(promise2).rejects.toBeInstanceOf(UnknownAsyncError);
+	await expect(promise2).rejects.toThrowError("Given was not a promise");
+	await expect(promise3).rejects.toBeInstanceOf(UnknownAsyncError);
+	await expect(promise3).rejects.toThrowError("Given was not a promise");
 });
