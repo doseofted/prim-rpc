@@ -10,6 +10,11 @@ import {
 	CaughtType,
 } from "./call-catcher";
 import { isIterable } from "./utils/is-iterable";
+import {
+	isMethodAsyncIterator,
+	isMethodIterator,
+	isMethodPromise,
+} from "./utils/method-name-guards";
 
 /**
  * Returns a proxy object with methods of both a promise and an async iterable,
@@ -48,18 +53,20 @@ export class UnknownAsync<T = UnknownAsyncProxy> extends CallCatcher<T> {
 			const methodName = caught?.path.at(-1);
 			const noMethodName = isUndefined(methodName);
 			const includesMethodName =
-				methodName && UnknownAsync.#methods.includes(methodName);
+				isMethodPromise(methodName) || isMethodAsyncIterator(methodName);
 			const anonymousMethod = noMethodName && caught?.type === CaughtType.Call;
 			if (anonymousMethod) return next;
 			const unsupportedMethod = !noMethodName && !includesMethodName;
 			if (unsupportedMethod || intendedForFallback)
 				return this.#fallbackCondition?.(next, stack);
 			if (caught && caught.type !== CaughtType.Call) return next;
-			const includesPromiseMethod =
-				methodName && UnknownAsync.#methodsPromise.includes(methodName);
+			const includesPromiseMethod = isMethodPromise(methodName);
 			const notGivenPromiseType = this.#givenType !== UnknownAsyncType.Promise;
 			if (includesPromiseMethod && notGivenPromiseType) {
 				this.#notPreparedMethodCalls[UnknownAsyncType.Promise] = true;
+				// If giveIterator() already ran, the "when ready" callback was
+				// a no-op because this flag wasn't set yet. Re-trigger it now.
+				this.#promiseRejectWhenReady?.();
 			}
 			const handlePromises = this.#handle.promises;
 			if (includesPromiseMethod && !handlePromises) {
@@ -67,14 +74,19 @@ export class UnknownAsync<T = UnknownAsyncProxy> extends CallCatcher<T> {
 			}
 			if (includesPromiseMethod) {
 				this.#emitter.emit("awaited", "promise", methodName);
-				return this.#promise[methodName].apply(this.#promise, caught?.args);
+				const promiseArgs = caught?.args ?? [];
+				const functionReference = this.#promise[methodName] as UnknownFunction;
+				return functionReference.apply(this.#promise, promiseArgs);
 			}
 			const includesIteratorMethod =
-				methodName && UnknownAsync.#methodsIterator.includes(methodName);
+				isMethodAsyncIterator(methodName) || isMethodIterator(methodName);
 			const notGivenIteratorType =
 				this.#givenType !== UnknownAsyncType.Iterator;
 			if (includesIteratorMethod && notGivenIteratorType) {
 				this.#notPreparedMethodCalls[UnknownAsyncType.Iterator] = true;
+				// If givePromise() already ran, the "when ready" callback was
+				// a no-op because this flag wasn't set yet. Re-trigger it now.
+				this.#promisedIteratorRejectWhenReady?.();
 			}
 			const handleIterators = this.#handle.iterators;
 			if (includesIteratorMethod && !handleIterators) {
@@ -82,7 +94,9 @@ export class UnknownAsync<T = UnknownAsyncProxy> extends CallCatcher<T> {
 			}
 			if (includesIteratorMethod) {
 				this.#emitter.emit("awaited", "iterator", methodName);
-				return this.#iterator[methodName].apply(this.#iterator, caught?.args);
+				const iteratorArgs = caught?.args ?? [];
+				const functionReference = this.#iterator[methodName] as UnknownFunction;
+				return functionReference.apply(this.#iterator, iteratorArgs);
 			}
 			return next; // this should be unreachable
 		};
@@ -153,24 +167,6 @@ export class UnknownAsync<T = UnknownAsyncProxy> extends CallCatcher<T> {
 	/** Original promise or iterable given */
 	#given?: unknown;
 
-	static #methodsPromise: PropertyKey[] = ["then", "catch", "finally"];
-	static #methodsIterator: PropertyKey[] = [
-		"next",
-		"return",
-		"throw",
-		Symbol.iterator,
-		Symbol.asyncIterator,
-	];
-	/** Methods not to expose from proxy */
-	static #hiddenMethods: PropertyKey[] = [Symbol.iterator];
-	/** Methods of either a promise or async iterable */
-	static get #methods(): PropertyKey[] {
-		return [
-			...UnknownAsync.#methodsPromise,
-			...UnknownAsync.#methodsIterator,
-		].filter((method) => !UnknownAsync.#hiddenMethods.includes(method));
-	}
-
 	#notPreparedMethodCalls: Record<
 		UnknownAsyncType.Promise | UnknownAsyncType.Iterator,
 		boolean
@@ -190,21 +186,17 @@ export class UnknownAsync<T = UnknownAsyncProxy> extends CallCatcher<T> {
 	static determineCaughtType(caught: Caught): UnknownAsyncType {
 		const isSupportedType = UnknownAsync.#shouldCaughtBeProcessed(caught);
 		const lastPath = caught.path.at(-1);
-		const isPromise =
-			lastPath &&
-			isSupportedType &&
-			UnknownAsync.#methodsPromise.includes(lastPath);
+		const isPromise = isSupportedType && isMethodPromise(lastPath);
 		const isIterator =
-			lastPath &&
 			isSupportedType &&
-			UnknownAsync.#methodsIterator.includes(lastPath);
+			(isMethodAsyncIterator(lastPath) || isMethodIterator(lastPath));
 		if (isPromise) return UnknownAsyncType.Promise;
 		if (isIterator) return UnknownAsyncType.Iterator;
 		return UnknownAsyncType.None;
 	}
 
-	#promiseResolve: (value: unknown | PromiseLike<unknown>) => void;
-	#promiseReject: (reason?: unknown) => void;
+	#promiseResolve?: (value: unknown | PromiseLike<unknown>) => void;
+	#promiseReject?: (reason?: unknown) => void;
 	#promiseRejectWhenReady?: () => void;
 	// same as `Promise.withResolvers` (still relatively new in 2025)
 	#promise = new Promise<unknown>((resolve, reject) => {
@@ -218,13 +210,13 @@ export class UnknownAsync<T = UnknownAsyncProxy> extends CallCatcher<T> {
 		};
 	});
 
-	#promisedIteratorResolve: (
+	#promisedIteratorResolve?: (
 		value:
 			| IterableIterator<unknown>
 			| AsyncIterableIterator<unknown>
 			| PromiseLike<IterableIterator<unknown> | AsyncIterableIterator<unknown>>,
 	) => void;
-	#promisedIteratorReject: (reason?: unknown) => void;
+	#promisedIteratorReject?: (reason?: unknown) => void;
 	#promisedIteratorRejectWhenReady?: () => void;
 	// same as `Promise.withResolvers` (still relatively new in 2025)
 	#promisedIterator = new Promise((resolve, reject) => {
@@ -249,37 +241,52 @@ export class UnknownAsync<T = UnknownAsyncProxy> extends CallCatcher<T> {
 		next: async (...args: unknown[]) => {
 			if (this.#isIterable(this.#given)) {
 				this.#promiseRejectWhenReady?.();
-				return this.#given.next.apply(this.#given, args);
+				const nextFunction = this.#given.next as UnknownFunction;
+				return nextFunction?.apply(
+					this.#given,
+					args,
+				) as IteratorResult<unknown>;
 			}
 			const promised = await this.#promisedIterator;
 			if (this.#isIterable(promised)) {
-				return promised.next.apply(promised, args);
+				const nextFunction = promised.next as UnknownFunction;
+				return nextFunction?.apply(promised, args) as IteratorResult<unknown>;
 			}
 			throw new UnknownAsyncError(ReusableMessages.GivenNotIterable);
 		},
 		return: async (...args: unknown[]) => {
 			if (this.#isIterable(this.#given)) {
 				this.#promiseRejectWhenReady?.();
-				return this.#given.return?.apply(this.#given, args);
+				const returnFunction = this.#given.return as UnknownFunction;
+				return returnFunction?.apply(
+					this.#given,
+					args,
+				) as IteratorResult<unknown>;
 			}
 			const promised = await this.#promisedIterator;
 			if (this.#isIterable(promised)) {
-				return promised.return?.apply(promised, args);
+				const returnFunction = promised.return as UnknownFunction;
+				return returnFunction?.apply(promised, args) as IteratorResult<unknown>;
 			}
 			throw new UnknownAsyncError(ReusableMessages.GivenNotIterable);
 		},
 		throw: async (...args: unknown[]) => {
 			if (this.#isIterable(this.#given)) {
 				this.#promiseRejectWhenReady?.();
-				return this.#given.throw?.apply(this.#given, args);
+				const throwFunction = this.#given.throw as UnknownFunction;
+				return throwFunction?.apply(
+					this.#given,
+					args,
+				) as IteratorResult<unknown>;
 			}
 			const promised = await this.#promisedIterator;
 			if (this.#isIterable(promised)) {
-				return promised.throw?.apply(promised, args);
+				const throwFunction = promised.throw as UnknownFunction | undefined;
+				return throwFunction?.apply(promised, args) as IteratorResult<unknown>;
 			}
 			throw new UnknownAsyncError(ReusableMessages.GivenNotIterable);
 		},
-	} satisfies AsyncIterableIterator<unknown>;
+	} satisfies AsyncIterableIterator<unknown, unknown, unknown>;
 
 	#isPromise(given: unknown, setGivenType = false): given is Promise<unknown> {
 		if (this.#givenType === UnknownAsyncType.Promise) return true;
@@ -315,7 +322,7 @@ export class UnknownAsync<T = UnknownAsyncProxy> extends CallCatcher<T> {
 
 	#rejectFutureIterators(instant = false, customError?: Error) {
 		if (instant) {
-			this.#promisedIteratorReject(
+			this.#promisedIteratorReject?.(
 				customError ?? new UnknownAsyncError(ReusableMessages.GivenNotIterable),
 			);
 			this.#notPreparedMethodCalls[UnknownAsyncType.Iterator] = false;
@@ -342,14 +349,14 @@ export class UnknownAsync<T = UnknownAsyncProxy> extends CallCatcher<T> {
 		if (this.#isPromise(this.#given)) {
 			this.#given.then(this.#promiseResolve).catch(this.#promiseReject);
 		} else {
-			this.#promiseResolve(this.#given);
+			this.#promiseResolve?.(this.#given);
 		}
 		return true;
 	}
 
 	#rejectFuturePromises(instant = false, customError?: Error) {
 		if (instant) {
-			this.#promiseReject(
+			this.#promiseReject?.(
 				customError ?? new UnknownAsyncError(ReusableMessages.GivenNotPromise),
 			);
 			this.#notPreparedMethodCalls[UnknownAsyncType.Promise] = false;
@@ -374,7 +381,7 @@ export class UnknownAsync<T = UnknownAsyncProxy> extends CallCatcher<T> {
 		this.#isIterable(this.#given, true);
 		this.#rejectFuturePromises(false);
 		if (this.#isIterable(this.#given)) {
-			this.#promisedIteratorResolve(this.#given);
+			this.#promisedIteratorResolve?.(this.#given);
 		} else {
 			throw new UnknownAsyncError(ReusableMessages.GivenNotIterable);
 		}
@@ -389,6 +396,8 @@ export class UnknownAsync<T = UnknownAsyncProxy> extends CallCatcher<T> {
 		return true;
 	}
 }
+
+type UnknownFunction = (...args: unknown[]) => unknown;
 
 export type HandleUnknownOptionsGranular = {
 	iterators?: boolean;

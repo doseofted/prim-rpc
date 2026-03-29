@@ -1,10 +1,12 @@
 {
 	"compilerOptions": {
 		"lib": ["ES2023"],
+		"types": ["node"],
 		"target": "ES2023",
 		"module": "preserve",
 		"noEmit": true,
 		"isolatedDeclarations": true,
+		"declaration": true,
 		"isolatedModules": true,
 		"verbatimModuleSyntax": true,
 		"strictNullChecks": true

@@ -1,4 +1,4 @@
-import { castToOpaque, type Opaque } from "emery";
+import { castToOpaque, type Opaque, typedEntries } from "emery";
 import type { SetOptional } from "type-fest";
 
 /**
@@ -40,7 +40,7 @@ export class CallCatcher<ObjectShape = any> {
 	#shouldCatch: CatchOptionsGranular;
 	changeCaught(options: CatchOptions): void {
 		const expandedOptions = this.#expandOptions(options);
-		Object.entries(expandedOptions).forEach(([key, value]) => {
+		typedEntries(expandedOptions).forEach(([key, value]) => {
 			this.#shouldCatch[key] = value ?? this.#shouldCatch[key];
 		});
 	}

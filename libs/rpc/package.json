@@ -52,8 +52,8 @@
 	},
 	"dependencies": {
 		"emery": "^1.4.4",
-		"es-toolkit": "^1.41.0",
+		"es-toolkit": "^1.45.1",
 		"nanoevents": "^9.1.0",
-		"type-fest": "^5.2.0"
+		"type-fest": "^5.4.4"
 	}
 }

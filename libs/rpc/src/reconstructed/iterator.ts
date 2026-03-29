@@ -49,7 +49,7 @@ export class ReconstructedIterator {
 				return result;
 			} catch (error) {
 				promise.admin.reject(error);
-				return error;
+				return error as ReturnType<AsyncIteratorEvents[AsyncIteratorEventsKey]>;
 			}
 		});
 		const queue = this.#queue[event];

@@ -24,7 +24,7 @@ export class RpcInterpreter<T> {
 		this.#allowedFunctionMethods = allowedFunctionMethods ?? [];
 	}
 
-	#parentChainId: RpcId | null;
+	#parentChainId: RpcId | null = null;
 
 	#decodeResultAsRpc(
 		result: unknown,

@@ -15,8 +15,8 @@ class PrimRpc<Module = unknown> {
 		this.client = new RpcGenerator((stack, skip) => {
 			const rpc = stack.at(-1);
 			if (!rpc) return skip;
-			const [replacedArgs, extractedArgEvents] = rpcEvents.extract(rpc.args);
-			console.log(replacedArgs, extractedArgEvents);
+			const [_replacedArgs, _extractedArgEvents] = rpcEvents.extract(rpc.args);
+			// console.log(replacedArgs, extractedArgEvents);
 			return skip;
 		});
 	}

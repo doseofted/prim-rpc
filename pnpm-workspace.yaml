@@ -2,16 +2,14 @@ packages:
   - libs/*
   - apps/*
 
-minimumReleaseAge: 10080
-
-auditConfig: {}
-
 catalog:
-  '@types/node': ^24.10.0
-  '@typescript/native-preview': 7.0.0-dev.20251107.1
-  tsdown: ^0.16.1
+  '@types/node': ^25.5.0
+  '@typescript/native-preview': 7.0.0-dev.20260315.1
+  tsdown: ^0.21.3
 
 engineStrict: true
+
+minimumReleaseAge: 10080
 
 onlyBuiltDependencies:
   - '@go-task/cli'
@@ -20,5 +18,5 @@ onlyBuiltDependencies:
 sideEffectsCache: false
 
 supportedArchitectures:
-  cpu: [current]
-  os: [current]
+  cpu: [ current ]
+  os: [ current ]

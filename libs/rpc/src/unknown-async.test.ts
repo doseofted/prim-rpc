@@ -80,11 +80,11 @@ describe("UnknownAsync can be configured", () => {
 		function* generator() {
 			yield 1;
 		}
-		const nextAttempt1 = expect(tbd.proxy.next()).rejects.toThrowError(
+		const nextAttempt1 = expect(tbd.proxy.next()).rejects.toThrow(
 			UnknownAsyncError,
 		);
-		expect(() => tbd.giveIterator(generator())).toThrowError(TypeError);
-		const nextAttempt2 = expect(tbd.proxy.next()).rejects.toThrowError(
+		expect(() => tbd.giveIterator(generator())).toThrow(TypeError);
+		const nextAttempt2 = expect(tbd.proxy.next()).rejects.toThrow(
 			UnknownAsyncError,
 		);
 		await Promise.all([nextAttempt1, nextAttempt2]);
@@ -98,8 +98,8 @@ describe("UnknownAsync can be configured", () => {
 			yield 1;
 		}
 		const promise = Promise.resolve(42);
-		const promised = expect(tbd.proxy).rejects.toThrowError(UnknownAsyncError);
-		expect(() => tbd.givePromise(promise)).toThrowError(TypeError);
+		const promised = expect(tbd.proxy).rejects.toThrow(UnknownAsyncError);
+		expect(() => tbd.givePromise(promise)).toThrow(TypeError);
 		await promised;
 		expect(tbd.giveIterator(generator())).toBe(true);
 		const next1 = expect(tbd.proxy.next()).resolves.toEqual({
@@ -141,7 +141,7 @@ describe("UnknownAsync throws errors when invalid values are given", () => {
 		const tbd = new UnknownAsync(handle);
 		const promised = Promise.resolve(42);
 		expect(tbd.givePromise(promised)).toBe(true);
-		expect(() => tbd.givePromise(promised)).toThrowError(UnknownAsyncError);
+		expect(() => tbd.givePromise(promised)).toThrow(UnknownAsyncError);
 	});
 
 	test("proxies only supported properties", async () => {
@@ -170,7 +170,7 @@ describe("UnknownAsync throws errors when invalid values are given", () => {
 				expect.unreachable();
 			}
 		}
-		const expectIterationFails = expect(iteration()).rejects.toThrowError(
+		const expectIterationFails = expect(iteration()).rejects.toThrow(
 			UnknownAsyncError,
 		);
 		const expectPromiseResolve = expect(tbd.proxy).resolves.toBe(42);
@@ -188,7 +188,7 @@ describe("UnknownAsync throws errors when invalid values are given", () => {
 		function* generator() {
 			yield 1;
 		}
-		const expectPromiseReject = expect(tbd.proxy).rejects.toThrowError(
+		const expectPromiseReject = expect(tbd.proxy).rejects.toThrow(
 			UnknownAsyncError,
 		);
 		const iterationSucceeds1 = expect(tbd.proxy.next()).resolves.toEqual({
@@ -212,10 +212,8 @@ describe("UnknownAsync throws errors when invalid values are given", () => {
 	test("can only resolve or iterate when something is given", async () => {
 		const tbd = new UnknownAsync(handle);
 		tbd.giveNothing();
-		const failPromise = expect(tbd.proxy).rejects.toThrowError(
-			UnknownAsyncError,
-		);
-		const failIterator = expect(tbd.proxy.next()).rejects.toThrowError(
+		const failPromise = expect(tbd.proxy).rejects.toThrow(UnknownAsyncError);
+		const failIterator = expect(tbd.proxy.next()).rejects.toThrow(
 			UnknownAsyncError,
 		);
 		await Promise.all([failPromise, failIterator]);
@@ -223,10 +221,8 @@ describe("UnknownAsync throws errors when invalid values are given", () => {
 
 	test("can only resolve or iterate when something is given eventually", async () => {
 		const tbd = new UnknownAsync(handle);
-		const failPromise = expect(tbd.proxy).rejects.toThrowError(
-			UnknownAsyncError,
-		);
-		const failIterator = expect(tbd.proxy.next()).rejects.toThrowError(
+		const failPromise = expect(tbd.proxy).rejects.toThrow(UnknownAsyncError);
+		const failIterator = expect(tbd.proxy.next()).rejects.toThrow(
 			UnknownAsyncError,
 		);
 		setTimeout(() => {
@@ -244,10 +240,8 @@ describe("UnknownAsync throws errors when invalid values are given", () => {
 				this.name = "CustomError";
 			}
 		}
-		const failPromise = expect(tbd.proxy).rejects.toThrowError(CustomError);
-		const failIterator = expect(tbd.proxy.next()).rejects.toThrowError(
-			CustomError,
-		);
+		const failPromise = expect(tbd.proxy).rejects.toThrow(CustomError);
+		const failIterator = expect(tbd.proxy.next()).rejects.toThrow(CustomError);
 		setTimeout(() => {
 			tbd.giveNothing(new CustomError("It's custom now."));
 		}, 3_000);
@@ -327,6 +321,7 @@ describe("UnknownAsync supports iterators", () => {
 		}
 		// iterators returned from instance are async regardless of what's given
 		iterable.giveIterator(generator());
+		// @ts-expect-error intentionally testing that sync iterator symbol is not present
 		expect(iterable.proxy[Symbol.iterator]).not.toBeDefined();
 		expect(iterable.proxy[Symbol.asyncIterator]).toBeDefined();
 	});
@@ -385,7 +380,7 @@ describe("UnknownAsync supports iterators", () => {
 
 	test("iterates with next method and arguments", async () => {
 		const iterable = new UnknownAsync(handle);
-		function* generator() {
+		function* generator(): Generator<number, number, number> {
 			let value = 0;
 			const a = yield value;
 			value += a;
