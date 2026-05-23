@@ -26,6 +26,7 @@ export class PendingRpc {
 		}
 		this.#options = options;
 		this.#options.timeoutAppliesOn ??= "chain";
+		this.#options.timeoutLeading ??= false;
 		if (handler) {
 			this.#emitter.on("pending", (newRpc, skipPlaceholder, allRpc) => {
 				const results = handler(newRpc, skipPlaceholder, allRpc);
@@ -101,6 +102,11 @@ export class PendingRpc {
 		}
 
 		const newChainId = createRpcChainId(rpcIds);
+		// Transfer leading-timeout cooldown when a chain grows to a new ID
+		if (previousChain && this.#leadingCooldown.has(oldChainId)) {
+			this.#leadingCooldown.delete(oldChainId);
+			this.#leadingCooldown.add(newChainId);
+		}
 		const isBatched = !isNullish(this.#options.timeoutBatch);
 		const globalAbort = isBatched && this.#options.timeoutAppliesOn === "call";
 		if (globalAbort) {
@@ -158,6 +164,11 @@ export class PendingRpc {
 
 	#globalAbortController: AbortController | null = null;
 
+	/** Tracks chains currently in a leading-timeout cooldown window */
+	#leadingCooldown = new Set<RpcChainId>();
+	/** Tracks whether the global scope is in a leading-timeout cooldown */
+	#globalLeadingCooldown = false;
+
 	/**
 	 * Trigger an event immediately if configured to do so. Otherwise queue
 	 * the event using the provided batch options.
@@ -171,10 +182,38 @@ export class PendingRpc {
 			return;
 		}
 		const timeout = this.#options.timeoutBatch ?? 0;
+		const leading = this.#options.timeoutLeading ?? false;
+		const isGlobal = this.#options.timeoutAppliesOn === "call";
+
+		// Leading edge: fire immediately if not already in a cooldown window
+		if (leading) {
+			const inCooldown = isGlobal
+				? this.#globalLeadingCooldown
+				: this.#leadingCooldown.has(chainId);
+			if (!inCooldown) {
+				// Enter cooldown and fire immediately
+				if (isGlobal) {
+					this.#globalLeadingCooldown = true;
+				} else {
+					this.#leadingCooldown.add(chainId);
+				}
+				this.#triggerEvent(chainId);
+			}
+		}
+
+		// Trailing edge: flush anything accumulated during the cooldown window
 		setTimeout(() => {
 			if (controller.signal.aborted) return;
 			const chain = this.#queuedChains.get(chainId) ?? null;
 			if (chain?.globalReady) return; // already triggered as part of global batch
+			// Clear cooldown state so the next call after this fires immediately again
+			if (leading) {
+				if (isGlobal) {
+					this.#globalLeadingCooldown = false;
+				} else {
+					this.#leadingCooldown.delete(chainId);
+				}
+			}
 			this.#triggerEvent(chainId);
 			const isBatched = !isNullish(this.#options.timeoutBatch);
 			const globalAbort =
@@ -330,9 +369,13 @@ type BatchOptions = {
 	/**
 	 * Whether the timeout is leading (at start) or trailing (at end). It is
 	 * recommended to use trailing timeouts (`false`) for Call events.
+	 *
+	 * When `true`, the first call fires immediately, then subsequent calls
+	 * within the timeout window are batched and flushed when the window closes
+	 * (leading edge with trailing flush). When `false` (default), all calls
+	 * are batched and only fire after the timeout elapses (trailing edge only).
 	 */
-	// TODO: implement leading timeouts
-	// timeoutLeading: boolean | null;
+	timeoutLeading: boolean;
 };
 
 type HandleOnOptionsBase =

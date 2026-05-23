@@ -503,6 +503,157 @@ describe("PendingRpc works with timeout enabled per call (global)", () => {
 	});
 });
 
+describe("PendingRpc works with leading timeout per chain (local)", () => {
+	test("with Call event", async () => {
+		const options = {
+			event: HandleEvent.Call,
+			timeoutAppliesOn: "chain",
+			timeoutBatch: 300,
+			timeoutLeading: true,
+		} satisfies HandleOnOptions;
+		const processed = vi.fn();
+		const pendingRpc = new PendingRpc(options, (newRpc) => {
+			processed();
+			return newRpc.map(async (_given) => newRpc);
+		});
+		// biome-ignore lint/suspicious/noExplicitAny: just a test
+		const rpcGenerator = new RpcGenerator<any>(
+			(given) => pendingRpc.queueRpc(given),
+			{ chainEndBehavior: "new" },
+		);
+		// First call fires immediately (leading edge)
+		const chain1 = rpcGenerator.proxy.hello();
+		expect(processed).toHaveBeenCalledTimes(1);
+		// Extend the chain during cooldown — batched, not fired
+		const continued = new Promise((resolve) =>
+			setTimeout(() => {
+				resolve(chain1.world());
+			}, 100),
+		);
+		vi.advanceTimersByTime(100);
+		expect(processed).toHaveBeenCalledTimes(1); // still in cooldown
+		// Trailing flush (300ms after last call in this chain)
+		vi.advanceTimersByTime(300);
+		expect(processed).toHaveBeenCalledTimes(2);
+		// Trailing batch only contains the new, unhandled RPC
+		await expect(continued).resolves.toEqual([
+			expect.objectContaining({ method: ["world"] }),
+		]);
+	});
+
+	test("with Keyword event", async () => {
+		const options = {
+			event: HandleEvent.Keyword,
+			keywords: ["end"],
+			timeoutAppliesOn: "chain",
+			timeoutBatch: 300,
+			timeoutLeading: true,
+		} satisfies HandleOnOptions;
+		const processed = vi.fn();
+		const pendingRpc = new PendingRpc(options, (newRpc) => {
+			processed();
+			return newRpc.map(async (_given) => newRpc);
+		});
+		// biome-ignore lint/suspicious/noExplicitAny: just a test
+		const rpcGenerator = new RpcGenerator<any>(
+			(given) => pendingRpc.queueRpc(given),
+			{ chainEndBehavior: "new" },
+		);
+		// First keyword match fires immediately (leading edge)
+		const chain1 = rpcGenerator.proxy.hello.end();
+		expect(processed).toHaveBeenCalledTimes(1);
+		// Continue the chain during cooldown — batched
+		const continued = new Promise((resolve) =>
+			setTimeout(() => {
+				resolve(chain1.world.end());
+			}, 100),
+		);
+		vi.advanceTimersByTime(100);
+		expect(processed).toHaveBeenCalledTimes(1); // cooldown still active
+		// Trailing flush (300ms after continuation)
+		vi.advanceTimersByTime(300);
+		expect(processed).toHaveBeenCalledTimes(2);
+		await expect(continued).resolves.toEqual([
+			expect.objectContaining({ method: ["world", "end"] }),
+		]);
+	});
+});
+
+describe("PendingRpc works with leading timeout per call (global)", () => {
+	test("with Call event", async () => {
+		const options = {
+			event: HandleEvent.Call,
+			timeoutAppliesOn: "call",
+			timeoutBatch: 300,
+			timeoutLeading: true,
+		} satisfies HandleOnOptions;
+		const processed = vi.fn();
+		const pendingRpc = new PendingRpc(options, (newRpc) => {
+			processed();
+			return newRpc.map(async (_given) => newRpc);
+		});
+		// biome-ignore lint/suspicious/noExplicitAny: just a test
+		const rpcGenerator = new RpcGenerator<any>(
+			(given) => pendingRpc.queueRpc(given),
+			{ chainEndBehavior: "new" },
+		);
+		// Very first call fires immediately (global leading edge)
+		rpcGenerator.proxy.hello();
+		expect(processed).toHaveBeenCalledTimes(1);
+		// A second, separate call during global cooldown — batched
+		const promised = new Promise((resolve) =>
+			setTimeout(() => {
+				resolve(rpcGenerator.proxy.world());
+			}, 100),
+		);
+		vi.advanceTimersByTime(100);
+		expect(processed).toHaveBeenCalledTimes(1); // global cooldown
+		// Trailing flush (300ms after the last global call)
+		vi.advanceTimersByTime(300);
+		expect(processed).toHaveBeenCalledTimes(2);
+		await expect(promised).resolves.toEqual([
+			expect.objectContaining({ method: ["world"] }),
+		]);
+	});
+
+	test("with Keyword event", async () => {
+		const options = {
+			event: HandleEvent.Keyword,
+			keywords: ["test"],
+			timeoutAppliesOn: "call",
+			timeoutBatch: 300,
+			timeoutLeading: true,
+		} satisfies HandleOnOptions;
+		const processed = vi.fn();
+		const pendingRpc = new PendingRpc(options, (newRpc) => {
+			processed();
+			return newRpc.map(async (_given) => newRpc);
+		});
+		// biome-ignore lint/suspicious/noExplicitAny: just a test
+		const rpcGenerator = new RpcGenerator<any>(
+			(given) => pendingRpc.queueRpc(given),
+			{ chainEndBehavior: "new" },
+		);
+		// First keyword match fires immediately (global leading)
+		rpcGenerator.proxy.this.is.a.test();
+		expect(processed).toHaveBeenCalledTimes(1);
+		// Second chain during global cooldown — batched
+		const promised = new Promise((resolve) =>
+			setTimeout(() => {
+				resolve(rpcGenerator.proxy.different.test());
+			}, 100),
+		);
+		vi.advanceTimersByTime(100);
+		expect(processed).toHaveBeenCalledTimes(1); // cooldown
+		// Trailing flush
+		vi.advanceTimersByTime(300);
+		expect(processed).toHaveBeenCalledTimes(2);
+		await expect(promised).resolves.toEqual([
+			expect.objectContaining({ method: ["different", "test"] }),
+		]);
+	});
+});
+
 test("Original skip symbol is returned back to caller", async () => {
 	const event = HandleEvent.Call;
 	const pendingRpc = new PendingRpc({ event }, (newRpc, skip) => {
