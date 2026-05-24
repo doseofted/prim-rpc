@@ -26,7 +26,8 @@ export class PendingRpc {
 		}
 		this.#options = options;
 		this.#options.timeoutAppliesOn ??= "chain";
-		this.#options.timeoutLeading ??= false;
+		this.#options.timeoutEdge ??= "trailing";
+		this.#options.timeoutStyle ??= "debounce";
 		if (handler) {
 			this.#emitter.on("pending", (newRpc, skipPlaceholder, allRpc) => {
 				const results = handler(newRpc, skipPlaceholder, allRpc);
@@ -96,8 +97,18 @@ export class PendingRpc {
 		const rpcIds = rpcMeta.map(({ id }) => id);
 		const oldChainId = createRpcChainId(rpcIds.slice(0, -1));
 		const previousChain = this.#queuedChains.get(oldChainId) ?? null;
+		const isBatched = !isNullish(this.#options.timeoutBatch);
+		const isThrottle = this.#options.timeoutStyle === "throttle";
+		const globalAbort = isBatched && this.#options.timeoutAppliesOn === "call";
+		let createdGlobalTimer = false;
 		if (previousChain) {
-			previousChain.controller?.abort();
+			if (isThrottle) {
+				// Throttle: keep the existing timer and redirect to the new chain
+				this.#chainRedirects.set(oldChainId, createRpcChainId(rpcIds));
+			} else {
+				// Debounce: cancel the previous timer
+				previousChain.controller?.abort();
+			}
 			this.#queuedChains.delete(oldChainId);
 		}
 
@@ -107,12 +118,22 @@ export class PendingRpc {
 			this.#leadingCooldown.delete(oldChainId);
 			this.#leadingCooldown.add(newChainId);
 		}
-		const isBatched = !isNullish(this.#options.timeoutBatch);
-		const globalAbort = isBatched && this.#options.timeoutAppliesOn === "call";
 		if (globalAbort) {
-			// Abort the previous global timer and create a new one to reset the batch timeout
-			this.#globalAbortController?.abort();
-			this.#globalAbortController = new AbortController();
+			if (isThrottle) {
+				// Throttle: only start a new global timer if none is active
+				if (
+					!this.#globalAbortController ||
+					this.#globalAbortController.signal.aborted
+				) {
+					this.#globalAbortController = new AbortController();
+					createdGlobalTimer = true;
+				}
+			} else {
+				// Debounce: reset the global batch timeout on every call
+				this.#globalAbortController?.abort();
+				this.#globalAbortController = new AbortController();
+				createdGlobalTimer = true;
+			}
 			for (const meta of this.#queuedChains.values()) {
 				// this call shouldn't be made until the last global call is made
 				// (and the last call will not have a `.globalReady` flag set)
@@ -126,8 +147,14 @@ export class PendingRpc {
 			: null;
 		this.#queuedChains.set(newChainId, { rpc, controller, order, globalReady });
 
+		const hasExistingChainTimer =
+			previousChain !== null && isThrottle;
+		const shouldScheduleTimer =
+			(!globalAbort || !isThrottle || createdGlobalTimer) &&
+			!hasExistingChainTimer;
+
 		const isCall = this.#options.event === HandleEvent.Call;
-		if (isCall) {
+		if (isCall && shouldScheduleTimer) {
 			this.#batchTriggerEvent(newChainId, controller);
 		}
 		const isKeyword =
@@ -139,7 +166,9 @@ export class PendingRpc {
 			const methodLast = Array.isArray(method) ? method.at(-1) : method;
 			const { keywords } = isKeyword;
 			const isKeywordMethod = methodLast && keywords.includes(methodLast);
-			if (isKeywordMethod) this.#batchTriggerEvent(newChainId, controller);
+			if (isKeywordMethod && shouldScheduleTimer) {
+				this.#batchTriggerEvent(newChainId, controller);
+			}
 		}
 		const promised = lastRpc.metadata.promised;
 		return promised?.value;
@@ -164,6 +193,20 @@ export class PendingRpc {
 
 	#globalAbortController: AbortController | null = null;
 
+	/** Redirect stale chain IDs to their current successor during throttle windows */
+	#chainRedirects = new Map<RpcChainId, RpcChainId>();
+
+	#resolveChainId(chainId: RpcChainId): RpcChainId {
+		let current = chainId;
+		while (this.#chainRedirects.has(current)) {
+			const next = this.#chainRedirects.get(current);
+			if (!next) break;
+			this.#chainRedirects.delete(current);
+			current = next;
+		}
+		return current;
+	}
+
 	/** Tracks chains currently in a leading-timeout cooldown window */
 	#leadingCooldown = new Set<RpcChainId>();
 	/** Tracks whether the global scope is in a leading-timeout cooldown */
@@ -182,11 +225,13 @@ export class PendingRpc {
 			return;
 		}
 		const timeout = this.#options.timeoutBatch ?? 0;
-		const leading = this.#options.timeoutLeading ?? false;
+		const edge = this.#options.timeoutEdge ?? "trailing";
+		const hasLeading = edge === "leading" || edge === "both";
+		const hasTrailing = edge === "trailing" || edge === "both";
 		const isGlobal = this.#options.timeoutAppliesOn === "call";
 
 		// Leading edge: fire immediately if not already in a cooldown window
-		if (leading) {
+		if (hasLeading) {
 			const inCooldown = isGlobal
 				? this.#globalLeadingCooldown
 				: this.#leadingCooldown.has(chainId);
@@ -204,24 +249,38 @@ export class PendingRpc {
 		// Trailing edge: flush anything accumulated during the cooldown window
 		setTimeout(() => {
 			if (controller.signal.aborted) return;
-			const chain = this.#queuedChains.get(chainId) ?? null;
-			if (chain?.globalReady) return; // already triggered as part of global batch
+			const resolvedId = this.#resolveChainId(chainId);
+			const chain = this.#queuedChains.get(resolvedId) ?? null;
+			const isThrottleGlobal =
+				this.#options.timeoutStyle === "throttle" && isGlobal;
+			if (chain?.globalReady && !isThrottleGlobal) {
+				return; // already triggered as part of global batch
+			}
 			// Clear cooldown state so the next call after this fires immediately again
-			if (leading) {
+			if (hasLeading) {
 				if (isGlobal) {
 					this.#globalLeadingCooldown = false;
 				} else {
-					this.#leadingCooldown.delete(chainId);
+					this.#leadingCooldown.delete(resolvedId);
 				}
 			}
-			this.#triggerEvent(chainId);
-			const isBatched = !isNullish(this.#options.timeoutBatch);
-			const globalAbort =
-				isBatched && this.#options.timeoutAppliesOn === "call";
-			if (!globalAbort) return;
-			// only trigger events that are waiting on global batch trigger
-			for (const [chainIdEntry, meta] of this.#queuedChains.entries()) {
-				if (meta.globalReady) this.#triggerEvent(chainIdEntry);
+			if (hasTrailing) {
+				const isBatched = !isNullish(this.#options.timeoutBatch);
+				const globalAbort =
+					isBatched && this.#options.timeoutAppliesOn === "call";
+				if (isThrottleGlobal) {
+					// Throttle: flush every queued chain when the fixed window closes
+					for (const [chainIdEntry] of this.#queuedChains.entries()) {
+						this.#triggerEvent(chainIdEntry);
+					}
+				} else {
+					this.#triggerEvent(resolvedId);
+					if (!globalAbort) return;
+					// Debounce: flush chains waiting on the global batch trigger
+					for (const [chainIdEntry, meta] of this.#queuedChains.entries()) {
+						if (meta.globalReady) this.#triggerEvent(chainIdEntry);
+					}
+				}
 			}
 		}, timeout);
 	}
@@ -367,15 +426,28 @@ type BatchOptions = {
 	 */
 	timeoutAppliesOn: "chain" | "call";
 	/**
-	 * Whether the timeout is leading (at start) or trailing (at end). It is
-	 * recommended to use trailing timeouts (`false`) for Call events.
-	 *
-	 * When `true`, the first call fires immediately, then subsequent calls
-	 * within the timeout window are batched and flushed when the window closes
-	 * (leading edge with trailing flush). When `false` (default), all calls
-	 * are batched and only fire after the timeout elapses (trailing edge only).
+	 * The edge at which the timeout happens during a window.
+	 * 
+	 * - `"trailing"`: dispatch at the end of a window (default)
+	 * - `"leading"`: dispatch the first call immediately and clear the cooldown
+	 * at the end of the window, without dispatching event at the end of the
+	 * window (typically not used for RPC, see "both" option)
+	 * - `"both"`: dispatch immediately on the first call and then dispatch
+	 * remaining calls at the end of the window
 	 */
-	timeoutLeading: boolean;
+	timeoutEdge: "leading" | "trailing" | "both";
+	/**
+	 * The method by which the timeout window is managed.
+	 *
+	 * - `"throttle"`: fires events at a steady interval (default), ensures
+	 * continuous RPC events doesn't prevent future RPC from firing
+	 * - `"debounce"`: fires events at the end of an interval, ensures that RPC
+	 * events are only fired after stream of events has settled
+	 * 
+	 * Note that using the "debounce" option with a "leading" edge may result in
+	 * events that don't fire until the next window.
+	 */
+	timeoutStyle: "debounce" | "throttle";
 };
 
 type HandleOnOptionsBase =

@@ -509,7 +509,7 @@ describe("PendingRpc works with leading timeout per chain (local)", () => {
 			event: HandleEvent.Call,
 			timeoutAppliesOn: "chain",
 			timeoutBatch: 300,
-			timeoutLeading: true,
+			timeoutEdge: "both",
 		} satisfies HandleOnOptions;
 		const processed = vi.fn();
 		const pendingRpc = new PendingRpc(options, (newRpc) => {
@@ -547,7 +547,7 @@ describe("PendingRpc works with leading timeout per chain (local)", () => {
 			keywords: ["end"],
 			timeoutAppliesOn: "chain",
 			timeoutBatch: 300,
-			timeoutLeading: true,
+			timeoutEdge: "both",
 		} satisfies HandleOnOptions;
 		const processed = vi.fn();
 		const pendingRpc = new PendingRpc(options, (newRpc) => {
@@ -585,7 +585,7 @@ describe("PendingRpc works with leading timeout per call (global)", () => {
 			event: HandleEvent.Call,
 			timeoutAppliesOn: "call",
 			timeoutBatch: 300,
-			timeoutLeading: true,
+			timeoutEdge: "both",
 		} satisfies HandleOnOptions;
 		const processed = vi.fn();
 		const pendingRpc = new PendingRpc(options, (newRpc) => {
@@ -622,7 +622,7 @@ describe("PendingRpc works with leading timeout per call (global)", () => {
 			keywords: ["test"],
 			timeoutAppliesOn: "call",
 			timeoutBatch: 300,
-			timeoutLeading: true,
+			timeoutEdge: "both",
 		} satisfies HandleOnOptions;
 		const processed = vi.fn();
 		const pendingRpc = new PendingRpc(options, (newRpc) => {
@@ -650,6 +650,324 @@ describe("PendingRpc works with leading timeout per call (global)", () => {
 		expect(processed).toHaveBeenCalledTimes(2);
 		await expect(promised).resolves.toEqual([
 			expect.objectContaining({ method: ["different", "test"] }),
+		]);
+	});
+});
+
+describe("PendingRpc works with throttle timeout per chain (local)", () => {
+	test("with Call event", async () => {
+		const options = {
+			event: HandleEvent.Call,
+			timeoutAppliesOn: "chain",
+			timeoutBatch: 300,
+			timeoutStyle: "throttle",
+		} satisfies HandleOnOptions;
+		const processed = vi.fn();
+		const pendingRpc = new PendingRpc(options, (newRpc) => {
+			processed();
+			return newRpc.map(async (_given) => newRpc);
+		});
+		// biome-ignore lint/suspicious/noExplicitAny: just a test
+		const rpcGenerator = new RpcGenerator<any>(
+			(given) => pendingRpc.queueRpc(given),
+			{ chainEndBehavior: "new" },
+		);
+		const existingChain1 = rpcGenerator.proxy.test();
+		const promised2 = new Promise((resolve) =>
+			setTimeout(() => {
+				// extends chain at 200ms — must not reset the 300ms window
+				resolve(existingChain1.lorem().ipsum());
+			}, 200),
+		);
+		vi.advanceTimersByTime(200);
+		expect(processed).not.toHaveBeenCalled();
+		// original window from t=0 fires at 300ms (not 500ms as with debounce)
+		vi.advanceTimersByTime(100);
+		expect(processed).toHaveBeenCalledTimes(1);
+		await expect(promised2).resolves.toEqual([
+			expect.objectContaining({ method: ["test"] }),
+			expect.objectContaining({ method: ["lorem"] }),
+			expect.objectContaining({ method: ["ipsum"] }),
+		]);
+	});
+
+	test("with Keyword event", async () => {
+		const options = {
+			event: HandleEvent.Keyword,
+			keywords: ["test"],
+			timeoutAppliesOn: "chain",
+			timeoutBatch: 300,
+			timeoutStyle: "throttle",
+		} satisfies HandleOnOptions;
+		const processed = vi.fn();
+		const pendingRpc = new PendingRpc(options, (newRpc) => {
+			processed();
+			return newRpc.map(async (_given) => newRpc);
+		});
+		// biome-ignore lint/suspicious/noExplicitAny: just a test
+		const rpcGenerator = new RpcGenerator<any>(
+			(given) => pendingRpc.queueRpc(given),
+			{ chainEndBehavior: "new" },
+		);
+		const existingChain1 = rpcGenerator.proxy.this.is.a;
+		const promised1 = existingChain1.test();
+		const promised2 = new Promise((resolve) =>
+			setTimeout(() => {
+				resolve(promised1.and.another.test());
+			}, 200),
+		);
+		vi.advanceTimersByTime(200);
+		expect(processed).not.toHaveBeenCalled();
+		vi.advanceTimersByTime(100);
+		expect(processed).toHaveBeenCalledTimes(1);
+		await expect(promised2).resolves.toEqual([
+			expect.objectContaining({ method: ["this", "is", "a", "test"] }),
+			expect.objectContaining({ method: ["and", "another", "test"] }),
+		]);
+	});
+});
+
+describe("PendingRpc works with throttle timeout per call (global)", () => {
+	test("with Call event", async () => {
+		const options = {
+			event: HandleEvent.Call,
+			timeoutAppliesOn: "call",
+			timeoutBatch: 300,
+			timeoutStyle: "throttle",
+		} satisfies HandleOnOptions;
+		const processed = vi.fn();
+		const pendingRpc = new PendingRpc(options, (newRpc) => {
+			processed();
+			return newRpc.map(async (_given) => newRpc);
+		});
+		// biome-ignore lint/suspicious/noExplicitAny: just a test
+		const rpcGenerator = new RpcGenerator<any>(
+			(given) => pendingRpc.queueRpc(given),
+			{ chainEndBehavior: "new" },
+		);
+		const existingChain1 = rpcGenerator.proxy.im.a.teapot();
+		const result = new Promise((resolve1) => {
+			const resolvedInner = new Promise((resolve2) => {
+				setTimeout(() => {
+					resolve2(existingChain1.pour.me.out());
+				}, 100);
+			});
+			setTimeout(() => {
+				const existingChain2 = rpcGenerator.proxy.im.a.cup();
+				setTimeout(() => {
+					const resolvedSecond = existingChain2.do.not.spill();
+					Promise.all([resolvedInner, resolvedSecond]).then(resolve1);
+				}, 100);
+			}, 100);
+		});
+		expect(processed).not.toHaveBeenCalled();
+		vi.advanceTimersByTime(200);
+		expect(processed).not.toHaveBeenCalled();
+		// global window from first call fires at 300ms, not 500ms
+		vi.advanceTimersByTime(100);
+		expect(processed).toHaveBeenCalled();
+		expect(await result).toEqual([
+			[
+				expect.objectContaining({ method: ["im", "a", "teapot"] }),
+				expect.objectContaining({ method: ["pour", "me", "out"] }),
+			],
+			[
+				expect.objectContaining({ method: ["im", "a", "cup"] }),
+				expect.objectContaining({ method: ["do", "not", "spill"] }),
+			],
+		]);
+	});
+
+	test("with Keyword event", async () => {
+		const options = {
+			event: HandleEvent.Keyword,
+			keywords: ["test"],
+			timeoutAppliesOn: "call",
+			timeoutBatch: 300,
+			timeoutStyle: "throttle",
+		} satisfies HandleOnOptions;
+		const processed = vi.fn();
+		const pendingRpc = new PendingRpc(options, (newRpc) => {
+			processed();
+			return newRpc.map(async (_given) => newRpc);
+		});
+		// biome-ignore lint/suspicious/noExplicitAny: just a test
+		const rpcGenerator = new RpcGenerator<any>(
+			(given) => pendingRpc.queueRpc(given),
+			{ chainEndBehavior: "new" },
+		);
+		const existingChain1 = rpcGenerator.proxy.this.is.a;
+		const result = new Promise((resolve1) => {
+			const resolvedInner = new Promise((resolve2) => {
+				const promised1 = existingChain1.test();
+				setTimeout(() => {
+					resolve2(promised1.and.another.test());
+				}, 100);
+			});
+			setTimeout(() => {
+				const existingChain2 = rpcGenerator.proxy.different.test();
+				setTimeout(() => {
+					const resolvedSecond = existingChain2.another.test();
+					Promise.all([resolvedInner, resolvedSecond]).then(resolve1);
+				}, 100);
+			}, 100);
+		});
+		expect(processed).not.toHaveBeenCalled();
+		vi.advanceTimersByTime(200);
+		expect(processed).not.toHaveBeenCalled();
+		vi.advanceTimersByTime(100);
+		expect(processed).toHaveBeenCalled();
+		expect(await result).toEqual([
+			[
+				expect.objectContaining({ method: ["this", "is", "a", "test"] }),
+				expect.objectContaining({ method: ["and", "another", "test"] }),
+			],
+			[
+				expect.objectContaining({ method: ["different", "test"] }),
+				expect.objectContaining({ method: ["another", "test"] }),
+			],
+		]);
+	});
+});
+
+describe("PendingRpc works with throttle + leading edge per chain (local)", () => {
+	test("with Call event", async () => {
+		const options = {
+			event: HandleEvent.Call,
+			timeoutAppliesOn: "chain",
+			timeoutBatch: 300,
+			timeoutStyle: "throttle",
+			timeoutEdge: "leading",
+		} satisfies HandleOnOptions;
+		const processed = vi.fn();
+		const pendingRpc = new PendingRpc(options, (newRpc) => {
+			processed();
+			return newRpc.map(async (_given) => newRpc);
+		});
+		// biome-ignore lint/suspicious/noExplicitAny: just a test
+		const rpcGenerator = new RpcGenerator<any>(
+			(given) => pendingRpc.queueRpc(given),
+			{ chainEndBehavior: "new" },
+		);
+		const chain1 = rpcGenerator.proxy.hello();
+		expect(processed).toHaveBeenCalledTimes(1);
+		const continued = new Promise((resolve) =>
+			setTimeout(() => {
+				resolve(chain1.world());
+			}, 100),
+		);
+		vi.advanceTimersByTime(100);
+		expect(processed).toHaveBeenCalledTimes(1);
+		// leading-only: no trailing flush at window end
+		vi.advanceTimersByTime(300);
+		expect(processed).toHaveBeenCalledTimes(1);
+		void continued;
+	});
+});
+
+describe("PendingRpc works with throttle + both edges per chain (local)", () => {
+	test("with Call event", async () => {
+		const options = {
+			event: HandleEvent.Call,
+			timeoutAppliesOn: "chain",
+			timeoutBatch: 300,
+			timeoutStyle: "throttle",
+			timeoutEdge: "both",
+		} satisfies HandleOnOptions;
+		const processed = vi.fn();
+		const pendingRpc = new PendingRpc(options, (newRpc) => {
+			processed();
+			return newRpc.map(async (_given) => newRpc);
+		});
+		// biome-ignore lint/suspicious/noExplicitAny: just a test
+		const rpcGenerator = new RpcGenerator<any>(
+			(given) => pendingRpc.queueRpc(given),
+			{ chainEndBehavior: "new" },
+		);
+		const chain1 = rpcGenerator.proxy.hello();
+		expect(processed).toHaveBeenCalledTimes(1);
+		const continued = new Promise((resolve) =>
+			setTimeout(() => {
+				resolve(chain1.world());
+			}, 100),
+		);
+		vi.advanceTimersByTime(100);
+		expect(processed).toHaveBeenCalledTimes(1);
+		// fixed window from first call (throttle), trailing flush at 300ms
+		vi.advanceTimersByTime(200);
+		expect(processed).toHaveBeenCalledTimes(2);
+		await expect(continued).resolves.toEqual([
+			expect.objectContaining({ method: ["world"] }),
+		]);
+	});
+});
+
+describe("PendingRpc works with throttle + leading edge per call (global)", () => {
+	test("with Call event", async () => {
+		const options = {
+			event: HandleEvent.Call,
+			timeoutAppliesOn: "call",
+			timeoutBatch: 300,
+			timeoutStyle: "throttle",
+			timeoutEdge: "leading",
+		} satisfies HandleOnOptions;
+		const processed = vi.fn();
+		const pendingRpc = new PendingRpc(options, (newRpc) => {
+			processed();
+			return newRpc.map(async (_given) => newRpc);
+		});
+		// biome-ignore lint/suspicious/noExplicitAny: just a test
+		const rpcGenerator = new RpcGenerator<any>(
+			(given) => pendingRpc.queueRpc(given),
+			{ chainEndBehavior: "new" },
+		);
+		rpcGenerator.proxy.hello();
+		expect(processed).toHaveBeenCalledTimes(1);
+		const promised = new Promise((resolve) =>
+			setTimeout(() => {
+				resolve(rpcGenerator.proxy.world());
+			}, 100),
+		);
+		vi.advanceTimersByTime(100);
+		expect(processed).toHaveBeenCalledTimes(1);
+		vi.advanceTimersByTime(300);
+		expect(processed).toHaveBeenCalledTimes(1);
+		void promised;
+	});
+});
+
+describe("PendingRpc works with throttle + both edges per call (global)", () => {
+	test("with Call event", async () => {
+		const options = {
+			event: HandleEvent.Call,
+			timeoutAppliesOn: "call",
+			timeoutBatch: 300,
+			timeoutStyle: "throttle",
+			timeoutEdge: "both",
+		} satisfies HandleOnOptions;
+		const processed = vi.fn();
+		const pendingRpc = new PendingRpc(options, (newRpc) => {
+			processed();
+			return newRpc.map(async (_given) => newRpc);
+		});
+		// biome-ignore lint/suspicious/noExplicitAny: just a test
+		const rpcGenerator = new RpcGenerator<any>(
+			(given) => pendingRpc.queueRpc(given),
+			{ chainEndBehavior: "new" },
+		);
+		rpcGenerator.proxy.hello();
+		expect(processed).toHaveBeenCalledTimes(1);
+		const promised = new Promise((resolve) =>
+			setTimeout(() => {
+				resolve(rpcGenerator.proxy.world());
+			}, 100),
+		);
+		vi.advanceTimersByTime(100);
+		expect(processed).toHaveBeenCalledTimes(1);
+		vi.advanceTimersByTime(200);
+		expect(processed).toHaveBeenCalledTimes(2);
+		await expect(promised).resolves.toEqual([
+			expect.objectContaining({ method: ["world"] }),
 		]);
 	});
 });
