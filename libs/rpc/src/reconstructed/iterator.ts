@@ -6,7 +6,7 @@ import { ReconstructedPromise } from "./promise";
  * available, this async iterator `.value` can be returned and iterated over
  * while iteration is controlled later with `.admin` actions.
  *
- * Since the iterator results are not know at the time of iteration, the
+ * Since the iterator results are not known at the time of iteration, the
  * iterator created will be asynchronous even if methods that handle iteration
  * do not include promised results.
  */

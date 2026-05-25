@@ -1,6 +1,7 @@
 import { castToOpaque, type Opaque } from "emery";
 import { isPlainObject } from "es-toolkit";
 import { set as setProperty } from "es-toolkit/compat";
+import { inFunctionDenyList } from "../utils/deny-list";
 import { castToEventId, type EventId, IdGenerator } from "./id-generator";
 
 /**
@@ -469,6 +470,9 @@ export function createReferencedValueId(
 	prefix: EventId,
 	path: PropertyKey[] = [],
 ): ReferencedValueId {
+	if (path.some(inFunctionDenyList)) {
+		throw new TypeError("Path in deny list was found")
+	}
 	return castToOpaque<ReferencedValueId>(
 		[prefix, path.join(".")].filter((p) => p !== "").join("-"),
 	);
@@ -491,6 +495,9 @@ export function extractReferenceValueIdParts(
 	}
 	const prefixCount = Number(prefixCountString);
 	const path = pathPart ? pathPart.split(".") : [];
+	if (path.some(inFunctionDenyList)) {
+		throw new TypeError("Path in deny list was found")
+	}
 	return { prefix, path, prefixType, prefixCount };
 }
 

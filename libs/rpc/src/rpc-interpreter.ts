@@ -1,9 +1,10 @@
 import { isNullish } from "emery";
-import { intersection, isFunction, isPlainObject } from "es-toolkit";
+import { isFunction, isPlainObject } from "es-toolkit";
 import { get as getProperty } from "es-toolkit/compat";
 import type { PartialDeep, Schema } from "type-fest";
 import type { RpcFunctionCall, RpcId } from "./types/rpc-structure";
 import { isIterator } from "./utils/is-iterable";
+import { inFunctionDenyList } from "./utils/deny-list";
 
 /**
  * Decode RPC into function calls on a provided object or function and receive
@@ -50,7 +51,7 @@ export class RpcInterpreter<T> {
 		given: unknown,
 		methodName: string[],
 	): given is (...args: unknown[]) => unknown {
-		if (intersection(functionDenyList, methodName).length > 0) return false;
+		if (methodName.some(inFunctionDenyList)) return false;
 		const givenIsFunc = isFunction(given);
 		const isRpcFunction = givenIsFunc && "rpc" in given && given.rpc === true;
 		const schemaValue = getProperty(this.#allowedSchema, methodName);
@@ -146,7 +147,7 @@ export class RpcInterpreter<T> {
 		const methodOnMethodAllowed =
 			methodOnMethodName &&
 			this.#allowedFunctionMethods.includes(methodOnMethodName) &&
-			!functionDenyList.includes(methodOnMethodName);
+			!inFunctionDenyList(methodOnMethodName);
 		const parentMethod = methodOnMethodAllowed
 			? getProperty(moduleProvided, parentMethodPath)
 			: null;
@@ -214,17 +215,3 @@ export type PartialSchema<T> = PartialDeep<
 	Schema<T, RecursiveRpcCheck, { recurseIntoArrays: true }>,
 	{ recurseIntoArrays: true; allowUndefinedInNonTupleArrays: false }
 >;
-
-const functionDenyList = [
-	"prototype",
-	"__proto__",
-	"constructor",
-	"toString",
-	"toLocaleString",
-	"valueOf",
-	"apply",
-	"bind",
-	"call",
-	"arguments",
-	"caller",
-];
