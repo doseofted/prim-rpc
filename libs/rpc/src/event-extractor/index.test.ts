@@ -1,7 +1,14 @@
 import { isPromise } from "es-toolkit";
-import { describe, expect, test } from "vitest";
+import { afterEach, describe, expect, test } from "vitest";
 import { isIterator } from "../utils/is-iterable";
-import { EventExtractor, extractReferenceValueIdParts } from ".";
+import {
+	createReferencedValueId,
+	EventExtractor,
+	EventExtractorError,
+	extractReferenceValueIdParts,
+	type ReferencedValueId,
+} from ".";
+import { castToEventId } from "./id-generator";
 
 const recursionDepthDefault = 7;
 
@@ -332,5 +339,184 @@ describe("EventExtractor can handle cyclical references", () => {
 		expect(merged1.next).toBe(merged2.next);
 		expect(merged1.next?.value).toBe("child");
 		expect(merged2.next?.value).toBe("child");
+	});
+});
+
+describe("EventExtractor rejects extracted paths in the deny list", () => {
+	afterEach(() => {
+		// biome-ignore lint/suspicious/noExplicitAny: resetting prototype prop
+		delete (Object.prototype as any).polluted;
+		// biome-ignore lint/suspicious/noExplicitAny: resetting prototype prop
+		delete (Object.prototype as any).isAdmin;
+	});
+
+	test("merge throws on a path that walks through `constructor.prototype`", () => {
+		using extractor = new EventExtractor(recursionDepthDefault, false, false);
+		// ensure the prefix is supported so that we can test the path safety guard
+		extractor.addSupportedType("p", isPromise);
+		const maliciousKey = "p1-constructor.prototype.polluted";
+		const extracted = new Map<string, unknown>([[maliciousKey, "PWNED"]]);
+		const given: Record<string, unknown> = {};
+
+		expect(() => extractor.merge(given, extracted)).toThrow(TypeError);
+		// biome-ignore lint/suspicious/noExplicitAny: probing prototype
+		expect(({} as any).polluted).toBeUndefined();
+	});
+
+	test("merge throws on a cyclical-ref path through `constructor.prototype`", () => {
+		// The cyclical prefix `c` does not need to be registered (only toggled on)
+		using extractor = new EventExtractor(recursionDepthDefault, false, true);
+		const refKey = "c1-some.legit.path";
+		const polluteKey = "c2-constructor.prototype.isAdmin";
+		const extracted = new Map<string, unknown>([
+			[refKey, { value: true }],
+			[polluteKey, { ref: refKey }],
+		]);
+		const given: Record<string, unknown> = {};
+
+		expect(() => extractor.merge(given, extracted)).toThrow(TypeError);
+		// biome-ignore lint/suspicious/noExplicitAny: probing prototype
+		expect(({} as any).isAdmin).toBeUndefined();
+	});
+
+	test("merge throws when any reserved key (e.g. `__proto__`, `prototype`) appears in the path", () => {
+		using extractor = new EventExtractor(recursionDepthDefault, false, false);
+		extractor.addSupportedType("p", isPromise);
+		const cases = [
+			"p1-__proto__.polluted",
+			"p1-prototype.polluted",
+			"p1-foo.constructor.bar",
+			"p1-toString",
+		];
+		for (const id of cases) {
+			const given: Record<string, unknown> = {};
+			expect(() => extractor.merge(given, new Map([[id, "x"]]))).toThrow(
+				TypeError,
+			);
+		}
+		// biome-ignore lint/suspicious/noExplicitAny: probing prototype
+		expect(({} as any).polluted).toBeUndefined();
+	});
+
+	test("extractReferenceValueIdParts utility throws on a value from deny list", () => {
+		expect(() =>
+			extractReferenceValueIdParts(
+				"p1-constructor.prototype.polluted" as ReferencedValueId,
+			),
+		).toThrow(TypeError);
+	});
+
+	test("createReferencedValueId refuses to create an ID with a value from deny list", () => {
+		const prefix = castToEventId("p1");
+		expect(() =>
+			createReferencedValueId(prefix, ["constructor", "prototype", "x"]),
+		).toThrow(TypeError);
+		expect(() => createReferencedValueId(prefix, ["__proto__"])).toThrow(
+			TypeError,
+		);
+		expect(() =>
+			createReferencedValueId(prefix, ["safe", "path"]),
+		).not.toThrow();
+	});
+
+	test("extract throws if a source object contains a reserved key in its path", () => {
+		// while this isn't really malicious, there's also no legitimate use case for it
+		using extractor = new EventExtractor(recursionDepthDefault, false, false);
+		extractor.addSupportedType("p", isPromise);
+		const original = {
+			constructor: { prototype: { promise: Promise.resolve(123) } },
+		};
+		expect(() => extractor.extract(original)).toThrow(TypeError);
+	});
+});
+
+describe("EventExtractor only accepts registered prefixes on merge", () => {
+	test("merge rejects an unknown prefix that was never registered", () => {
+		using extractor = new EventExtractor(recursionDepthDefault, false, false);
+		// No `addSupportedType` call was made here "x" is not registered
+		const extracted = new Map<string, unknown>([["x1-safe.path", "data"]]);
+		const given: Record<string, unknown> = { safe: { path: "x1-safe.path" } };
+		expect(() => extractor.merge(given, extracted)).toThrow(
+			EventExtractorError,
+		);
+		// And nothing should have been written either.
+		expect(given.safe).toEqual({ path: "x1-safe.path" });
+	});
+
+	test("merge accepts a prefix once it is registered", () => {
+		using extractor = new EventExtractor(recursionDepthDefault, false, false);
+		extractor.addSupportedType("p", isPromise);
+		const extracted = new Map<string, unknown>([["p1-nested.value", 42]]);
+		const given: Record<string, unknown> = { nested: {} };
+		expect(() => extractor.merge(given, extracted)).not.toThrow();
+		expect(given.nested).toEqual({ value: 42 });
+	});
+
+	test("merge accepts a prefix registered after the payload was constructed (late registration)", () => {
+		using extractor = new EventExtractor(recursionDepthDefault, false, false);
+		const extracted = new Map<string, unknown>([["p1-nested.value", 42]]);
+		// Before registration, there's no handler for this type.
+		expect(() => extractor.merge({ nested: {} }, extracted)).toThrow(
+			EventExtractorError,
+		);
+		// After registration, we know that this type is supported.
+		extractor.addSupportedType("p", isPromise);
+		const given: Record<string, unknown> = { nested: {} };
+		expect(() => extractor.merge(given, extracted)).not.toThrow();
+		expect(given.nested).toEqual({ value: 42 });
+	});
+
+	test("merge still accepts the built-in cyclical prefix without any registration", () => {
+		using extractor = new EventExtractor(recursionDepthDefault, false, true);
+		type SelfRef = { self?: SelfRef };
+		const original: SelfRef = {};
+		original.self = original;
+		const [replaced, extracted] = extractor.extract(original);
+		const merged = extractor.merge(replaced, extracted);
+		expect(merged.self).toBe(merged);
+	});
+
+	test("merge rejects a mixed payload if any single entry uses an unknown prefix", () => {
+		// Fail-fast: a single bad entry invalidates the whole `extracted` map.
+		using extractor = new EventExtractor(recursionDepthDefault, false, false);
+		extractor.addSupportedType("p", isPromise);
+		const extracted = new Map<string, unknown>([
+			["p1-good.value", "ok"],
+			["zz9-unknown.path", "bad"],
+		]);
+		const given: Record<string, unknown> = { good: {}, unknown: {} };
+		expect(() => extractor.merge(given, extracted)).toThrow(
+			EventExtractorError,
+		);
+	});
+
+	test("merge rejects cyclical-prefixed entries when replaceCyclical is disabled", () => {
+		using extractor = new EventExtractor(recursionDepthDefault, false, false);
+		const extracted = new Map<string, unknown>([
+			["c1-some.path", { value: "rejected" }],
+		]);
+		const given: Record<string, unknown> = { some: {} };
+		expect(() => extractor.merge(given, extracted)).toThrow(
+			EventExtractorError,
+		);
+		// Nothing should have been written.
+		expect(given.some).toEqual({});
+	});
+
+	test("merge rejects a cyclical-ref payload when replaceCyclical is disabled", () => {
+		// Same opt-out, but using the `{ ref: ... }` shape that the cyclical
+		// branch normally consumes. Without the gate this would have run the
+		// `setProperty(given, path, valueToSet)` line inside merge.
+		using extractor = new EventExtractor(recursionDepthDefault, false, false);
+		const extracted = new Map<string, unknown>([
+			["c1-target.path", { value: { hello: "world" } }],
+			["c2-other.path", { ref: "c1-target.path" }],
+		]);
+		const given: Record<string, unknown> = { target: {}, other: {} };
+		expect(() => extractor.merge(given, extracted)).toThrow(
+			EventExtractorError,
+		);
+		expect(given.target).toEqual({});
+		expect(given.other).toEqual({});
 	});
 });

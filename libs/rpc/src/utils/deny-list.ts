@@ -11,11 +11,11 @@ export const functionDenyList: string[] = [
 	"call",
 	"arguments",
 	"caller",
-]
+];
 
 /** Utility to check if given key is in the deny list */
 export function inFunctionDenyList(
 	key: PropertyKey | undefined | null,
 ): boolean {
-	return typeof key === "string" && functionDenyList.includes(key)
+	return typeof key === "string" && functionDenyList.includes(key);
 }

@@ -3,8 +3,8 @@ import { isFunction, isPlainObject } from "es-toolkit";
 import { get as getProperty } from "es-toolkit/compat";
 import type { PartialDeep, Schema } from "type-fest";
 import type { RpcFunctionCall, RpcId } from "./types/rpc-structure";
-import { isIterator } from "./utils/is-iterable";
 import { inFunctionDenyList } from "./utils/deny-list";
+import { isIterator } from "./utils/is-iterable";
 
 /**
  * Decode RPC into function calls on a provided object or function and receive

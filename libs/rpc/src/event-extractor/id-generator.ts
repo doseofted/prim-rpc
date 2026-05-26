@@ -6,11 +6,18 @@ import { castToOpaque, type Opaque } from "emery";
  */
 export class IdGenerator {
 	#id = 0;
+	#prefix: string;
 	#createNextId: () => EventId;
 
 	constructor(prefix: string, matcher: (provided: unknown) => boolean) {
+		this.#prefix = prefix;
 		this.#createNextId = () => createEventId(prefix)(++this.#id);
 		this.#matcher = matcher;
+	}
+
+	/** The literal prefix string this generator stamps on every id. */
+	get prefix(): string {
+		return this.#prefix;
 	}
 
 	#matcher: (provided: unknown) => boolean;

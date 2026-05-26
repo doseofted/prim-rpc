@@ -371,6 +371,32 @@ export class EventExtractor {
 	}
 
 	/**
+	 * Prior to merging an extracted item back into the given object, ensure that
+	 * the provided identifier maps to a known type or if the identifier is a
+	 * cyclical reference, ensure that the cyclical reference feature is enabled.
+	 */
+	#parseKnownReferencedValueId(id: ReferencedValueId): ReferencedValueParts {
+		const parts = extractReferenceValueIdParts(id);
+		if (parts.prefixType === this.#cyclicalPrefix) {
+			if (!this.#replaceCyclical) {
+				throw new EventExtractorError(
+					EventExtractorReusableMessages.CyclicalPrefixWithReplaceCyclicalDisabled,
+				);
+			}
+			return parts;
+		}
+		const isRegistered = this.#supportedTypes.some(
+			(t) => t.prefix === parts.prefixType,
+		);
+		if (!isRegistered) {
+			throw new EventExtractorError(
+				EventExtractorReusableMessages.UnregisteredPrefix,
+			);
+		}
+		return parts;
+	}
+
+	/**
 	 * Before adding back merged properties or adding back cyclical references,
 	 * add back the objects to which references point first, so that references
 	 * are created as expected in the final object.
@@ -383,7 +409,7 @@ export class EventExtractor {
 		const isObjectOrArray = isPlainObject(given) || Array.isArray(given);
 		if (!isObjectOrArray) throw new TypeError("Expected object or array");
 		for (const [id, item] of extracted) {
-			const parts = extractReferenceValueIdParts(id as ReferencedValueId);
+			const parts = this.#parseKnownReferencedValueId(id as ReferencedValueId);
 			const { prefixType, path } = parts;
 			if (prefixType !== this.#cyclicalPrefix) continue;
 			if (isPlainObject(item) && "value" in item) {
@@ -399,7 +425,7 @@ export class EventExtractor {
 		// Pre-compute the root object value to avoid searching in every iteration
 		let rootObjectValue = null;
 		for (const [rootId, rootItem] of extracted) {
-			const rootParts = extractReferenceValueIdParts(
+			const rootParts = this.#parseKnownReferencedValueId(
 				rootId as ReferencedValueId,
 			);
 			const isCyclicalType = rootParts.prefixType === this.#cyclicalPrefix;
@@ -412,7 +438,7 @@ export class EventExtractor {
 		}
 		// now add back extracted types, including references to root cyclical references
 		for (const [id, item] of extracted) {
-			const parts = extractReferenceValueIdParts(id as ReferencedValueId);
+			const parts = this.#parseKnownReferencedValueId(id as ReferencedValueId);
 			const { prefixType, path } = parts;
 			if (prefixType === this.#cyclicalPrefix) {
 				const itemIsObject = isPlainObject(item);
@@ -460,6 +486,18 @@ export class EventExtractor {
 	}
 }
 
+enum EventExtractorReusableMessages {
+	CyclicalPrefixWithReplaceCyclicalDisabled = "Cyclical prefix processing is disabled because replaceCyclical is disabled",
+	UnregisteredPrefix = "Referenced value id uses an unregistered prefix",
+}
+
+export class EventExtractorError extends Error {
+	constructor(message?: string) {
+		super(message);
+		this.name = "EventExtractorError";
+	}
+}
+
 function boolToDepth(given: boolean | number) {
 	return typeof given === "number" ? given : given ? Infinity : 0;
 }
@@ -471,7 +509,7 @@ export function createReferencedValueId(
 	path: PropertyKey[] = [],
 ): ReferencedValueId {
 	if (path.some(inFunctionDenyList)) {
-		throw new TypeError("Path in deny list was found")
+		throw new TypeError("Path in deny list was found");
 	}
 	return castToOpaque<ReferencedValueId>(
 		[prefix, path.join(".")].filter((p) => p !== "").join("-"),
@@ -496,7 +534,7 @@ export function extractReferenceValueIdParts(
 	const prefixCount = Number(prefixCountString);
 	const path = pathPart ? pathPart.split(".") : [];
 	if (path.some(inFunctionDenyList)) {
-		throw new TypeError("Path in deny list was found")
+		throw new TypeError("Path in deny list was found");
 	}
 	return { prefix, path, prefixType, prefixCount };
 }

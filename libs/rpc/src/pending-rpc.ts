@@ -147,8 +147,7 @@ export class PendingRpc {
 			: null;
 		this.#queuedChains.set(newChainId, { rpc, controller, order, globalReady });
 
-		const hasExistingChainTimer =
-			previousChain !== null && isThrottle;
+		const hasExistingChainTimer = previousChain !== null && isThrottle;
 		const shouldScheduleTimer =
 			(!globalAbort || !isThrottle || createdGlobalTimer) &&
 			!hasExistingChainTimer;
@@ -427,7 +426,7 @@ type BatchOptions = {
 	timeoutAppliesOn: "chain" | "call";
 	/**
 	 * The edge at which the timeout happens during a window.
-	 * 
+	 *
 	 * - `"trailing"`: dispatch at the end of a window (default)
 	 * - `"leading"`: dispatch the first call immediately and clear the cooldown
 	 * at the end of the window, without dispatching event at the end of the
@@ -443,7 +442,7 @@ type BatchOptions = {
 	 * continuous RPC events doesn't prevent future RPC from firing
 	 * - `"debounce"`: fires events at the end of an interval, ensures that RPC
 	 * events are only fired after stream of events has settled
-	 * 
+	 *
 	 * Note that using the "debounce" option with a "leading" edge may result in
 	 * events that don't fire until the next window.
 	 */
