@@ -1,17 +1,22 @@
 packages:
-  - libs/**
-  - apps/**
-  - '!apps/documentation-old/.next/types/**'
-  - '!apps/documentation/.vercel/**'
+  - libs/*
+  - apps/*
+
+catalog:
+  '@types/node': ^25.5.0
+  '@typescript/native-preview': 7.0.0-dev.20260315.1
+  tsdown: ^0.21.3
+
+engineStrict: true
+
+minimumReleaseAge: 10080
 
 onlyBuiltDependencies:
   - '@go-task/cli'
   - esbuild
-  - sharp
 
-overrides:
-  cookie@<0.7.0: '0.7.0'
-  dompurify@<3.2.4: '3.2.4'
-  esbuild@<=0.24.2: '0.25.0'
-  semver@>=7.0.0 <7.5.2: '7.5.2'
-  ws@>=8.0.0 <8.17.1: '>=8.17.1 <9.0.0'
+sideEffectsCache: false
+
+supportedArchitectures:
+  cpu: [ current ]
+  os: [ current ]
