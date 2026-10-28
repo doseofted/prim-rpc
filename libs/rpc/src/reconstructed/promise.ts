@@ -7,15 +7,23 @@
  * new in 2025)
  */
 export class ReconstructedPromise<T> {
-	admin: {
+	#resolve?: (value: T | PromiseLike<T>) => void;
+	// biome-ignore lint/suspicious/noExplicitAny: not typically typed
+	#reject?: (reason?: any) => void;
+
+	#value = new Promise<T>((resolve, reject) => {
+		this.#resolve = resolve;
+		this.#reject = reject;
+	});
+
+	get admin(): {
 		resolve: (value: T | PromiseLike<T>) => void;
 		// biome-ignore lint/suspicious/noExplicitAny: not typically typed
 		reject: (reason?: any) => void;
-	};
+	} {
+		return { resolve: this.#resolve!, reject: this.#reject! };
+	}
 
-	#value = new Promise<T>((resolve, reject) => {
-		this.admin = { reject, resolve };
-	});
 	get value(): Promise<T> {
 		return this.#value;
 	}

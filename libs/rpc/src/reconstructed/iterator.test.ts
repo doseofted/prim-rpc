@@ -1,8 +1,5 @@
-import { afterEach, beforeEach, describe, expect, test, vi } from "vitest";
+import { describe, expect, test } from "vitest";
 import { ReconstructedIterator } from "./iterator";
-
-beforeEach(() => vi.useFakeTimers());
-afterEach(() => vi.useRealTimers());
 
 describe("ReconstructedIterator can be used", () => {
 	test("with its methods before iterator methods are provided", async () => {
@@ -33,12 +30,6 @@ describe("ReconstructedIterator can be used", () => {
 	test("with a for await loop before iterator methods are provided", async () => {
 		let max = 3;
 		const reconstructed = new ReconstructedIterator();
-		setTimeout(() => {
-			reconstructed.admin.onNext(() => {
-				return { value: max--, done: max < 0 };
-			});
-		}, 3_000);
-		vi.runAllTimers();
 		async function getIterations() {
 			const recorded: unknown[] = [];
 			for await (const iteration of reconstructed.value) {
@@ -46,6 +37,9 @@ describe("ReconstructedIterator can be used", () => {
 			}
 			return recorded;
 		}
+		reconstructed.admin.onNext(() => {
+			return { value: max--, done: max < 0 };
+		});
 		await expect(getIterations()).resolves.toEqual([3, 2, 1]);
 	});
 });

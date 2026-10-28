@@ -25,3 +25,10 @@ describe("ReconstructedPromise can be used", () => {
 		await expected;
 	});
 });
+
+test("Admin methods can be utilized immediately after construction", async () => {
+	// sanity check since we use a non-null assertion on admin methods
+	const reconstructed = new ReconstructedPromise();
+	reconstructed.admin.resolve(42);
+	await expect(reconstructed.value).resolves.toBe(42);
+});

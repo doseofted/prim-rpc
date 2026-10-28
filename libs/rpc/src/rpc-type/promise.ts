@@ -13,7 +13,7 @@ export const RpcTypePromise: RpcTypePromise = createRpcType<
 	Context,
 	Events
 >({
-	reconstruct(rpc, emit, ctx) {
+	reconstruct(rpc, emit, _emitRpc, _emitCall, ctx) {
 		if (!ctx.promised) {
 			ctx.promised = new ReconstructedPromise();
 			emit(ctx.promised.value);
@@ -25,7 +25,7 @@ export const RpcTypePromise: RpcTypePromise = createRpcType<
 			ctx.promised.admin.reject(rpc.error);
 		}
 	},
-	async deconstruct(value, emit) {
+	async deconstruct(value, emit, _ctx, _eventId) {
 		try {
 			const result = await value;
 			emit({ event: "resolve", result });
