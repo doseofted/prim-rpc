@@ -1,0 +1,7 @@
+{
+	"id": "corepack",
+	"version": "1.0.0",
+	"name": "Corepack",
+	"description": "Installs Corepack after Node so packageManager in package.json selects pnpm.",
+	"installsAfter": ["ghcr.io/devcontainers/features/node"]
+}

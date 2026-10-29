@@ -1,6 +1,7 @@
 {
 	"editor.rulers": [80, 120],
 	"editor.wordWrapColumn": 120,
+	"json.schemaDownload.enable": true,
 	"editor.formatOnSave": true,
 	"typescript.experimental.useTsgo": true,
 	"editor.defaultFormatter": "biomejs.biome",

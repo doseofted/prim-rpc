@@ -2,6 +2,10 @@ packages:
   - libs/*
   - apps/*
 
+allowBuilds:
+  '@go-task/cli': true
+  esbuild: true
+
 catalog:
   '@types/node': ^25.5.0
   '@typescript/native-preview': 7.0.0-dev.20260315.1
@@ -10,10 +14,6 @@ catalog:
 engineStrict: true
 
 minimumReleaseAge: 10080
-
-onlyBuiltDependencies:
-  - '@go-task/cli'
-  - esbuild
 
 sideEffectsCache: false
 

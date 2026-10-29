@@ -1,0 +1,6 @@
+{
+	"id": "lazygit",
+	"version": "1.0.0",
+	"name": "lazygit",
+	"description": "Installs lazygit from Debian's package repository."
+}
