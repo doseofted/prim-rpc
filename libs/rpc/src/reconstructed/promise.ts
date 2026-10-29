@@ -21,7 +21,12 @@ export class ReconstructedPromise<T> {
 		// biome-ignore lint/suspicious/noExplicitAny: not typically typed
 		reject: (reason?: any) => void;
 	} {
-		return { resolve: this.#resolve!, reject: this.#reject! };
+		const resolve = this.#resolve;
+		const reject = this.#reject;
+		if (!resolve || !reject) {
+			throw new Error("ReconstructedPromise resolvers are not initialized");
+		}
+		return { resolve, reject };
 	}
 
 	get value(): Promise<T> {

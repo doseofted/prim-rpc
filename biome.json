@@ -1,5 +1,5 @@
 {
-	"$schema": "https://biomejs.dev/schemas/2.4.7/schema.json",
+	"$schema": "https://biomejs.dev/schemas/2.6.2/schema.json",
 	"vcs": {
 		"enabled": false,
 		"clientKind": "git",
@@ -7,7 +7,14 @@
 	},
 	"files": {
 		"ignoreUnknown": false,
-		"includes": ["**", "!original", "!.turbo", "!.task", "!**/dist"]
+		"includes": [
+			"**",
+			"!original",
+			"!.turbo",
+			"!.task",
+			"!**/dist",
+			"!.agents/skills/pnpm-*"
+		]
 	},
 	"formatter": {
 		"enabled": true,
@@ -16,7 +23,7 @@
 	"linter": {
 		"enabled": true,
 		"rules": {
-			"recommended": true
+			"preset": "recommended"
 		}
 	},
 	"javascript": {

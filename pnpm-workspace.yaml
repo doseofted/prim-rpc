@@ -2,21 +2,29 @@ packages:
   - libs/*
   - apps/*
 
-allowBuilds:
-  '@go-task/cli': true
-  esbuild: true
-
 catalog:
-  '@types/node': ^25.5.0
-  '@typescript/native-preview': 7.0.0-dev.20260315.1
-  tsdown: ^0.21.3
+  "@types/node": ^26.6.5
+  typescript: 7.1.0-beta
+  tsdown: ^0.23.1
 
 engineStrict: true
 
 minimumReleaseAge: 10080
 
+skills:
+  dirs:
+    - .agents/skills
+
+permissions:
+  "@go-task/cli":
+    build: true
+  esbuild:
+    build: true
+  taze:
+    skills: true
+
 sideEffectsCache: false
 
 supportedArchitectures:
-  cpu: [ current ]
-  os: [ current ]
+  cpu: [current]
+  os: [current]

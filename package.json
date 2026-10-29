@@ -17,10 +17,12 @@
 	},
 	"packageManager": "pnpm@12.16.1+sha512.091d1dee7927575661b25dab3c2ae31cafc1c54d6b71ed6a6600cf0c1cb10434a447eae14015f1b23e2e6bedeed79df94a932e2164d2832280dce3fb32f656d1",
 	"devDependencies": {
-		"@biomejs/biome": "^2.4.7",
-		"@go-task/cli": "^3.49.1",
-		"@vitest/ui": "^4.1.0",
-		"turbo": "^2.8.17",
-		"vitest": "^4.1.0"
+		"@biomejs/biome": "^2.6.2",
+		"@go-task/cli": "^3.54.0",
+		"@vitest/ui": "^5.0.5",
+		"taze": "^21.3.0",
+		"turbo": "^2.11.10",
+		"typescript": "catalog:",
+		"vitest": "^5.0.5"
 	}
 }

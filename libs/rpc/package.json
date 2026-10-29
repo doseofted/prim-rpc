@@ -42,18 +42,19 @@
 	],
 	"devDependencies": {
 		"@types/node": "catalog:",
-		"@typescript/native-preview": "catalog:",
+		"typescript": "catalog:",
 		"tsdown": "catalog:"
 	},
 	"scripts": {
 		"build": "tsdown",
+		"typecheck": "tsc --noEmit",
 		"dev": "tsdown --watch",
 		"test": "vitest"
 	},
 	"dependencies": {
 		"emery": "^1.4.4",
-		"es-toolkit": "^1.45.1",
-		"nanoevents": "^9.1.0",
-		"type-fest": "^5.4.4"
+		"es-toolkit": "^1.52.0",
+		"nanoevents": "^10.0.0",
+		"type-fest": "^5.10.0"
 	}
 }

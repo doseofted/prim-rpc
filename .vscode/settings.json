@@ -3,7 +3,8 @@
 	"editor.wordWrapColumn": 120,
 	"json.schemaDownload.enable": true,
 	"editor.formatOnSave": true,
-	"typescript.experimental.useTsgo": true,
+	"js/ts.experimental.useTsgo": true,
+	"js/ts.tsdk.path": "node_modules/typescript",
 	"editor.defaultFormatter": "biomejs.biome",
 	"[json]": {
 		"editor.defaultFormatter": "biomejs.biome"

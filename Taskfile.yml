@@ -4,10 +4,6 @@ version: "3"
 tasks:
   default: pnpm task --list
 
-  build:
-    desc: "Build all parts of the project"
-    cmd: pnpm turbo build {{.CLI_ARGS}}
-
   dev:
     desc: "Start all projects in development mode"
     cmd: pnpm turbo dev {{.CLI_ARGS}}
@@ -21,18 +17,45 @@ tasks:
     ignore_error: true
     cmd: pnpm vitest {{.CLI_ARGS}}
 
-  check:
-    desc: "Check for issues with linting and formatting"
+  format:check:
+    aliases:
+      - check
+    desc: "Lint and format all parts of the project without writing changes"
     cmd: pnpm biome check {{.CLI_ARGS}}
 
-  format:
+  format:write:
     aliases:
+      - format
       - lint
     desc: "Lint and format all parts of the project, fix found issues"
     cmd: pnpm biome check --write {{.CLI_ARGS}}
 
-  upgrade:
-    desc: "Upgrade all dependencies to their latest versions"
-    cmds:
-      - pnpm upgrade --recursive --interactive {{.CLI_ARGS}}
-      - corepack use pnpm@latest
+  typecheck:
+    desc: "Type-check all parts of the project"
+    cmd: pnpm turbo typecheck {{.CLI_ARGS}}
+
+  build:
+    desc: "Build all parts of the project"
+    deps:
+      - task: format:check
+        vars:
+          CLI_ARGS: ""
+      - typecheck
+    cmd: pnpm turbo build {{.CLI_ARGS}}
+
+  upgrade:range:
+    aliases:
+      - upgrade
+    desc: "Choose updates that stay within package.json ranges (honors minimumReleaseAge)"
+    interactive: true
+    cmd: pnpm exec taze --recursive --ignore-paths "original/**" --interactive {{.CLI_ARGS}}
+
+  upgrade:latest:
+    desc: "Choose the newest versions, including majors (exact versions stay pinned, honors minimumReleaseAge)"
+    interactive: true
+    cmd: pnpm exec taze major --recursive --ignore-paths "original/**" --interactive {{.CLI_ARGS}}
+
+  upgrade:all:
+    desc: "Choose the newest versions, including majors and exact pins (honors minimumReleaseAge)"
+    interactive: true
+    cmd: pnpm exec taze major --recursive --include-locked --ignore-paths "original/**" --interactive {{.CLI_ARGS}}
