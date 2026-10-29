@@ -1,33 +1,42 @@
 {
-	"name": "Ubuntu",
-	"image": "mcr.microsoft.com/devcontainers/base:noble",
+	"name": "PrimRPC",
+	"image": "mcr.microsoft.com/devcontainers/base:trixie",
 	"features": {
-		"ghcr.io/devcontainers/features/node:1": {
-			"version": "22",
-			"nvmVersion": "latest"
-		}
+		"ghcr.io/devcontainers/features/node:2": {
+			"version": "26",
+			"pnpmVersion": "none"
+		},
+		"./features/corepack": {},
+		"./features/lazygit": {},
+		"./features/oh-my-zsh": {}
 	},
-	"workspaceFolder": "/home/vscode/${localWorkspaceFolderBasename}",
 	"workspaceMount": "source=${localWorkspaceFolder},target=/home/vscode/${localWorkspaceFolderBasename},type=bind",
+	"workspaceFolder": "/home/vscode/${localWorkspaceFolderBasename}",
+	"containerUser": "vscode",
 	"mounts": [
-		"source=released_prim_rpc_root_node_modules,target=/home/vscode/${localWorkspaceFolderBasename}/node_modules,type=volume",
-		"source=released_prim_rpc_libs_rpc_node_modules,target=/home/vscode/${localWorkspaceFolderBasename}/libs/rpc/node_modules,type=volume",
-		"source=released_prim_rpc_libs_plugins_node_modules,target=/home/vscode/${localWorkspaceFolderBasename}/libs/plugins/node_modules,type=volume",
-		"source=released_prim_rpc_libs_example_node_modules,target=/home/vscode/${localWorkspaceFolderBasename}/libs/example/node_modules,type=volume",
-		"source=released_prim_rpc_libs_tooling_node_modules,target=/home/vscode/${localWorkspaceFolderBasename}/libs/tooling/node_modules,type=volume",
-		"source=released_prim_rpc_apps_documentation_node_modules,target=/home/vscode/${localWorkspaceFolderBasename}/apps/documentation/node_modules,type=volume",
-		"source=released_prim_rpc_apps_example_node_modules,target=/home/vscode/${localWorkspaceFolderBasename}/apps/example/node_modules,type=volume"
+		"source=${devcontainerId}-node_modules,target=/home/vscode/${localWorkspaceFolderBasename}/node_modules,type=volume"
 	],
-	"postCreateCommand": "pnpm config set store-dir /home/vscode/.pnpm-store && find /home/vscode/${localWorkspaceFolderBasename} -name \"node_modules\" -type d -exec sudo chown -R $USER:$USER {} \\; && pnpm install --frozen-lockfile && (echo 'alias task=\"pnpm start\"' >> /home/vscode/.bashrc)",
+	"containerEnv": {
+		"pnpm_config_store_dir": "/home/vscode/${localWorkspaceFolderBasename}/node_modules/.pnpm-store",
+		"COREPACK_ENABLE_DOWNLOAD_PROMPT": "0"
+	},
+	"postCreateCommand": "sudo chown -R \"$USER:$USER\" node_modules && sudo chsh -s /bin/zsh \"$USER\" && pnpm install --frozen-lockfile --config.confirm-modules-purge=false && printf '%s\\n' 'alias task=\"pnpm task\"' 'alias lg=\"lazygit\"' >> \"$HOME/.zshrc\"",
 	"customizations": {
 		"vscode": {
+			"settings": {
+				"terminal.integrated.defaultProfile.linux": "zsh",
+				"terminal.integrated.profiles.linux": {
+					"zsh": {
+						"path": "/bin/zsh"
+					}
+				}
+			},
 			"extensions": [
 				"redhat.vscode-yaml",
+				"TypeScriptTeam.native-preview",
+				"biomejs.biome",
 				"streetsidesoftware.code-spell-checker",
-				"vitest.explorer",
-				"dbaeumer.vscode-eslint",
-				"esbenp.prettier-vscode",
-				"astro-build.astro-vscode"
+				"vitest.explorer"
 			]
 		}
 	}

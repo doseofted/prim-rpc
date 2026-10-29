@@ -1,0 +1,18 @@
+{
+	"editor.rulers": [80, 120],
+	"editor.wordWrapColumn": 120,
+	"json.schemaDownload.enable": true,
+	"editor.formatOnSave": true,
+	"js/ts.experimental.useTsgo": true,
+	"js/ts.tsdk.path": "node_modules/typescript",
+	"editor.defaultFormatter": "biomejs.biome",
+	"[json]": {
+		"editor.defaultFormatter": "biomejs.biome"
+	},
+	"[javascript]": {
+		"editor.defaultFormatter": "biomejs.biome"
+	},
+	"[typescript]": {
+		"editor.defaultFormatter": "biomejs.biome"
+	}
+}

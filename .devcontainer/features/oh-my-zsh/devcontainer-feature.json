@@ -1,0 +1,10 @@
+{
+	"id": "oh-my-zsh",
+	"version": "1.0.0",
+	"name": "Oh My Zsh plugins",
+	"description": "Enables Oh My Zsh's git and node plugins, pnpm's zsh completion, and Starship, when Oh My Zsh is already installed.",
+	"installsAfter": [
+		"ghcr.io/devcontainers/features/node",
+		"./features/corepack"
+	]
+}
